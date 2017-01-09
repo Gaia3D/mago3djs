@@ -7,6 +7,7 @@ var F4D_Accesor = function()
 	this.data_ytpe = undefined;
 	this.dimension = undefined;
 	
+	
 	this.min_x = 0.0;
 	this.min_y = 0.0;
 	this.min_z = 0.0;
