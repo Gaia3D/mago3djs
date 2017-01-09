@@ -991,12 +991,13 @@ f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePat
 		  //------------------------------------------------------
 		  
 		  var octree = undefined;
-		  if(subOctreeNumberName)
+		  if(subOctreeNumberName != undefined)
 		  {
 			  // we are reading interior comRefs.***
 			  if(neoBuilding.octree == undefined)
 			  {
 				  var hola = 0;
+				  neoBuilding.octree = new f4d_octree(undefined);
 			  }
 			  
 			  octree = neoBuilding.octree.getOctree_byNumberName(subOctreeNumberName);
@@ -2385,19 +2386,19 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	
 	lod_level = 0;
 	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin1";
-	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, f4d_readerWriter);
+	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 1;
 	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin2";
-	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, f4d_readerWriter);
+	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 2;
 	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin3";
-	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, f4d_readerWriter);
+	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 0;
 	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Bone";
-	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter);
+	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************

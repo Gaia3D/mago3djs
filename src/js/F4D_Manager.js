@@ -337,6 +337,8 @@ var f4d_manager = function()
 	this.render_time = 0;
 	this.bPicking = false;
 	
+	this.scene = undefined;
+	
 	// SPEED TEST.********************************************************
 	this.f4d_rendering_time = 0;
 	this.xdo_rendering_time = 0;
@@ -955,10 +957,9 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 	{
 		this.textureAux_1x1 = GL.createTexture();
 		// Test wait for texture to load.********************************************
-		//http://stackoverflow.com/questions/19722247/webgl-wait-for-texture-to-load
 		GL.bindTexture(GL.TEXTURE_2D, this.textureAux_1x1);
 		//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
-		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // red
+		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
 		GL.bindTexture(GL.TEXTURE_2D, null);
 	}
 	
@@ -1984,7 +1985,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 		//mvMat[13] = 0.0;
 		//mvMat[14] = 0.0;
 		var mvMat_inv = new Cesium.Matrix4();
-		mvMat_inv = Cesium.Matrix4.inverse(mvMat, mvMat_inv);
+		mvMat_inv = Cesium.Matrix4.inverseTransformation(mvMat, mvMat_inv);
 		//var normalMat = new Cesium.Matrix4();
 		this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
 		//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
@@ -3210,22 +3211,87 @@ f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, ne
 				}
 				
 			}
-			/*
-			else if(squaredDistToCamera<this.min_squaredDist_to_see_LOD0)
-			{
-				if(neoBuilding._header.isSmall)
-						neoVisibleBuildings_array.push(neoBuilding);
-					else
-						this.currentVisibleBuildings_LOD0_array.push(neoBuilding);
-			}	
-			*/
 			else{
 				neoVisibleBuildings_array.push(neoBuilding);
 			}
 		}
 		
 	}
-	
+	/*
+	// old code. works ok.***
+	for(var i=0; i<neoBuildings_count; i++)
+	{
+		var neoBuilding = this.f4d_neoBuildingsList.neoBuildings_Array[i];
+		
+		if(neoBuilding._buildingPosition == undefined)
+		{
+			continue;
+		}
+		
+		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition);
+		if(squaredDistToCamera > this.min_squaredDist_to_see)
+			continue;
+		
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
+		this.radiusAprox_aux = 1000.0;
+		
+		if(this.radiusAprox_aux)
+		{
+			this.boundingSphere_Aux.radius = this.radiusAprox_aux; 
+		}
+		else
+		{
+			this.boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
+		}
+		
+		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
+		if(frustumCull !== Cesium.Intersect.OUTSIDE) 
+		{
+			
+			if(squaredDistToCamera < this.min_squaredDist_to_see_detailed)// min dist to see detailed.***
+			{
+				if(neoBuilding._neoRefLists_Container.neoRefsLists_Array.length > 0)
+				{
+					// Detect the Detailed building.***
+					//if(neoBuilding._header._f4d_version == 1)	
+					{
+						if(last_squared_dist)
+						{
+							if(squaredDistToCamera < last_squared_dist)
+							{
+								last_squared_dist = squaredDistToCamera;
+								neoVisibleBuildings_array.push(this.detailed_neoBuilding);
+								this.detailed_neoBuilding = neoBuilding;
+							}
+							else{
+									neoVisibleBuildings_array.push(neoBuilding);
+							}
+						}
+						else{
+							last_squared_dist = squaredDistToCamera;
+							this.detailed_neoBuilding = neoBuilding;
+							//neoVisibleBuildings_array.push(neoBuilding);
+						}
+					}
+				}
+				else{
+					if(neoBuilding._header && neoBuilding._header.isSmall)
+						neoVisibleBuildings_array.push(neoBuilding);
+					else
+					{
+						neoVisibleBuildings_array.push(neoBuilding);
+						//this.currentVisibleBuildings_LOD0_array.push(neoBuilding);
+					}
+				}
+				
+			}
+			else{
+				neoVisibleBuildings_array.push(neoBuilding);
+			}
+		}
+		
+	}
+	*/
 	return neoVisibleBuildings_array;
 };
 
@@ -3628,6 +3694,75 @@ f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleB
 	return visibleBuildings_array;
 	
 };
+
+f4d_manager.prototype.load_TEST_Files = function()
+		{
+			// Now, load sejong.***
+			var project_number = 7500; // House with car and mini park to children.***
+			var GAIA3D__counter =1;
+			//GAIA3D__offset_latitude += 0.0021;
+			//GAIA3D__offset_longitude += 0.0021;
+			
+			var incre_latAng = 0.0005;
+			var incre_longAng = 0.0005;
+			
+			// Test modularitzing.*******************************************************
+			var BR_ProjectsList = this.f4dBR_buildingProjectsList;
+			var neoBuildingsList = this.f4d_neoBuildingsList;
+
+			var height = 1635.0;
+			var GL = this.scene.context._gl;
+			//viewer.f4d_readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.f4d_readerWriter, BR_ProjectsList);
+			// End test modularitzing.---------------------------------------------------
+			
+			
+				
+
+			/*
+			var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+			url : '//assets.agi.com/stk-terrain/world',
+			requestWaterMask : false,
+			requestVertexNormals : true
+			});
+			this.terrainProvider = cesiumTerrainProviderMeshes;
+			*/
+	////////////////////////////////////////////////////////////////////////////////////////
+
+			//----------------------------------------------------------------------------------------------------------------------------------------------------
+			//this.f4d_readerWriter.openF4d_TerranTile(GL, this.f4d_terranTile, this.f4d_readerWriter);
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------
+			var deltaLat = -0.001;
+			var deltaLon = 0.001;
+			var lat = 37.5172076;
+			var lon = 126.929;
+			
+			//var buildingFileName = "F4D_gangnam_del";
+			//var buildingFileName = "F4D_KICT_main_Arc_v3_with_spaces";
+			var buildingFileName = "F4D_Duplex_A_20110907_optimized";
+			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			
+			var buildingFileName = "F4D_gangbuk_cultur_del";
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			
+			var buildingFileName = "F4D_KANGBUK_del";
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			
+			
+			
+			var buildingFileName = "F4D_7117_M320P";
+			//var buildingFileName = "F4D_7117_M320P_low";
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+
+			deltaLat = 0.0002;
+			deltaLon = 0.0002;
+			var latitude = 37.5168;
+			var longitude = 126.95;
+			var elev = 48.0;
+
+			//--------------------------------------------------------------------------------------------------------
+			
+			
+		};
 
 
 

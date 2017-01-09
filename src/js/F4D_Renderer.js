@@ -75,7 +75,7 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 	var current_tex_id = undefined;
 	  
 	  
-	  //GL.activeTexture(GL.TEXTURE2);
+	  GL.activeTexture(GL.TEXTURE2); // necessary.***
 	 if(renderTexture) 
 	 {
 		 if(ssao_idx == 1)

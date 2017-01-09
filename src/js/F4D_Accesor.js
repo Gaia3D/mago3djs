@@ -1,3 +1,6 @@
+
+
+
 var F4D_Accesor = function()
 {
 	this.buffer_id = undefined;
@@ -6,7 +9,7 @@ var F4D_Accesor = function()
 	this.stride = undefined;
 	this.data_ytpe = undefined;
 	this.dimension = undefined;
-	
+	//---------------------------------------------
 	
 	this.min_x = 0.0;
 	this.min_y = 0.0;

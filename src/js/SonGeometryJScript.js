@@ -2129,6 +2129,7 @@ var f4d_octree = function(octreeOwner)
   f4d_octree.prototype.getOctree_byNumberName = function(octreeNumberName)
   {
 	  var motherOctree = this.getMotherOctree();
+	  
 	  var numDigits = this.getNumberOfDigits(octreeNumberName);
 	  
 	  if(numDigits == 1)
@@ -2139,6 +2140,9 @@ var f4d_octree = function(octreeOwner)
 			  return motherOctree.subOctrees_array[octreeNumberName-1];
 		  }
 	  }
+	  
+	  if(motherOctree.subOctrees_array.length == 0)
+		  return undefined;
 	  
 	  // determine the next level octree.***
 	  var exp = numDigits-1;
@@ -3323,6 +3327,9 @@ f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, 
 f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux)
 {
 	// Cesium dependency.***
+	if(this.position == undefined)
+		return;
+	
 	if(boundingSphere_Aux == undefined)
 		boundingSphere_Aux = new Cesium.BoundingSphere();
 	
