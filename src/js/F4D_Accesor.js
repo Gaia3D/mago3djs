@@ -1,6 +1,3 @@
-
-
-
 var F4D_Accesor = function()
 {
 	this.buffer_id = undefined;
