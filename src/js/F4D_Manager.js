@@ -1232,6 +1232,299 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 	
 };
 
+
+f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
+{
+	if(!isLastFrustum)
+		return;
+	
+
+			if(this.bPicking == true)
+			{
+				//this.objectSelected = this.getSelectedObject_Picking(GL, scene, renderables_neoRefLists_array);
+
+			}
+			//moveSelectedObject
+	
+	//this.isCameraMoving = this.isButtonDown(scene);
+	if(this.textureAux_1x1 == undefined)
+	{
+		this.textureAux_1x1 = GL.createTexture();
+		// Test wait for texture to load.********************************************
+		GL.bindTexture(GL.TEXTURE_2D, this.textureAux_1x1);
+		//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
+		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
+		GL.bindTexture(GL.TEXTURE_2D, null);
+	}
+	
+	if(this.depthFboNeo == undefined)this.depthFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
+	if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
+	
+	var neoVisibleBuildings_array = [];
+	
+	// do frustum culling.***
+	if(!this.isCameraMoving)
+	{
+		frustumVolume = scene._frameState.cullingVolume;
+		this.currentVisibleNeoBuildings_array.length = 0;
+		this.doFrustumCulling_neoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
+	}
+	
+	//if(this.detailed_neoBuilding) // original.***
+	//if(this.currentVisibleNeoBuildings_array.length > 0)
+	{
+		// Calculate "modelViewProjectionRelativeToEye".*********************************************************
+		Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
+		Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.*** 
+		Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix); 
+		Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix); 
+		//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
+	
+		// Calculate encodedCamPosMC high and low values.********************************************************
+		this.calculate_encodedCameraPositionMC_HighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
+		
+		// Normal matrix.********************************************************************
+		var mvMat = scene._context._us._modelView; // original.***
+		var mvMat_inv = new Cesium.Matrix4();
+		mvMat_inv = Cesium.Matrix4.inverse(mvMat, mvMat_inv);
+		//var normalMat = new Cesium.Matrix4();
+		this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
+		//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
+		this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
+
+		Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array); 
+		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
+		//-----------------------------------------------------------------------------------
+	
+	
+		var camera = scene._camera;
+		var frustum = camera.frustum;
+		var current_frustum_near = scene._context._us._currentFrustum.x;
+		var current_frustum_far = scene._context._us._currentFrustum.y;
+		
+		GL.enable(GL.CULL_FACE);
+		
+		//scene._context._currentFramebuffer._bind();
+		
+		var ssao_idx = 0; // 0= depth. 1= ssao.***
+		
+		
+		// 1) The depth render.***************************************************************************************************
+		// 1) The depth render.***************************************************************************************************
+		// 1) The depth render.***************************************************************************************************
+		var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
+		//var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
+		this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
+		GL.clearColor(0, 0, 0, 1);
+		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+		GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);  
+	
+		shaderProgram = currentShader.program;
+		GL.useProgram(shaderProgram);
+		//GL.enableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
+		GL.enableVertexAttribArray(currentShader.position3_loc);
+		if(currentShader.normal3_loc != -1)
+			GL.enableVertexAttribArray(currentShader.normal3_loc);
+
+		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
+		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
+		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
+		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+		
+		  GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
+		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
+		
+		GL.uniform1f(currentShader.near_loc, frustum._near);	
+		//GL.uniform1f(currentShader.far_loc, frustum._far);	
+		GL.uniform1f(currentShader.far_loc, current_frustum_far); 
+		
+		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
+		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+		
+		var renderTexture = false;
+
+		//this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		// now, render depth of the neoSimpleBuildings.**********************************************************************************
+		var imageLod = 3;
+		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
+		for(var i=0; i<neoSkinsCount; i++)
+		{
+			var neoBuilding = this.currentVisibleNeoBuildings_array[i];
+			var neoSkin = neoBuilding.neoSimpleBuilding;
+			// check if loaded the simplebuilding texture.***
+			if(neoSkin.texturesArray.length == 0)
+			{
+				// must load the texture.***
+				if(this.backGround_imageReadings_count < 10)
+				{
+					var simpBuild_tex = neoSkin.newTexture();
+					
+					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.f4d_readerWriter.readF4D_Texture_inServer(GL, filePath_inServer, simpBuild_tex, this);
+				}
+			}
+			else
+			{
+				var simpBuildTexture = neoSkin.texturesArray[0]; 
+				if(simpBuildTexture.load_finished)
+				{
+					if(simpBuildTexture.textureId != undefined)
+					{
+						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
+						//this.f4dRenderer.render_F4D_neoSimpleBuilding_PostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
+					}
+					else
+					{
+						
+						//simpBuildTexture.textureId = GL.createTexture();
+		
+						// must upload the texture to gl.***
+						//GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
+						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+						//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
+						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+						//GL.generateMipmap(GL.TEXTURE_2D);
+						//GL.bindTexture(GL.TEXTURE_2D, null);
+						  
+						//delete simpBuildTexture.texImage;
+						
+					}
+				}
+			}
+		}
+		
+		if(currentShader.normal3_loc != -1)
+			GL.disableVertexAttribArray(currentShader.normal3_loc);
+		GL.disableVertexAttribArray(currentShader.position3_loc);
+		//GL.disableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
+	
+		this.depthFboNeo.unbind();
+		
+		// 2) ssao render.************************************************************************************************************
+		// 2) ssao render.************************************************************************************************************
+		// 2) ssao render.************************************************************************************************************
+		scene._context._currentFramebuffer._bind();
+		currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[4];
+		
+		//GL.clearColor(0, 0, 0, 1);
+		//GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+		//GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
+		
+		if(this.noiseTexture == undefined)
+			this.noiseTexture = genNoiseTextureRGBA(GL, 4, 4, this.pixels);
+		
+		shaderProgram = currentShader.program;
+		GL.useProgram(shaderProgram);
+		GL.enableVertexAttribArray(currentShader.texCoord2_loc);
+		GL.enableVertexAttribArray(currentShader.position3_loc);
+		if(currentShader.normal3_loc != -1)
+			GL.enableVertexAttribArray(currentShader.normal3_loc);
+
+		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
+		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
+		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
+		
+			GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
+		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
+
+		GL.uniform1f(currentShader.near_loc, frustum._near);	
+		//GL.uniform1f(currentShader.far_loc, frustum._far); // Original.***
+		GL.uniform1f(currentShader.far_loc, current_frustum_far); // test.***	
+		
+		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
+		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+			
+		GL.uniform1i(currentShader.depthTex_loc, 0);	
+		GL.uniform1i(currentShader.noiseTex_loc, 1);	
+		GL.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+		GL.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
+		GL.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
+		GL.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+		GL.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
+		GL.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);	
+		GL.uniform3fv(currentShader.kernel16_loc, this.kernel);	
+			GL.activeTexture(GL.TEXTURE0);
+			GL.bindTexture(GL.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***		
+			GL.activeTexture(GL.TEXTURE1);            
+			GL.bindTexture(GL.TEXTURE_2D, this.noiseTexture); 
+			
+		renderTexture = true;
+		// Test.***
+		//var neoBuildingCount = this.currentVisibleNeoBuildings_array.length;
+		//for(var i=0; i <neoBuildingCount; i++)
+		//{
+		//	this.detailed_neoBuilding = this.currentVisibleNeoBuildings_array[i];
+		//	GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
+		//	GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
+		//	this.forceRender_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, this.currentVisibleNeoBuildings_array[i]);
+		//}
+
+		ssao_idx = 1;
+		//this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
+		var imageLod = 3;
+		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
+		for(var i=0; i<neoSkinsCount; i++)
+		{
+			var neoBuilding = this.currentVisibleNeoBuildings_array[i];
+			var neoSkin = neoBuilding.neoSimpleBuilding;
+			// check if loaded the simplebuilding texture.***
+			if(neoSkin.texturesArray.length == 0)
+			{
+				// must load the texture.***
+				if(this.backGround_imageReadings_count < 10)
+				{
+					var simpBuild_tex = neoSkin.newTexture();
+					
+					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.f4d_readerWriter.readF4D_Texture_inServer(GL, filePath_inServer, simpBuild_tex, this);
+				}
+			}
+			else
+			{
+				var simpBuildTexture = neoSkin.texturesArray[0]; 
+				if(simpBuildTexture.load_finished)
+				{
+					if(simpBuildTexture.textureId != undefined)
+					{
+						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
+						//this.f4dRenderer.render_F4D_neoSimpleBuilding_PostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
+					}
+					else
+					{
+						
+						//simpBuildTexture.textureId = GL.createTexture();
+		
+						// must upload the texture to gl.***
+						//GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
+						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+						//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
+						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+						//GL.generateMipmap(GL.TEXTURE_2D);
+						//GL.bindTexture(GL.TEXTURE_2D, null);
+						  
+						//delete simpBuildTexture.texImage;
+						
+					}
+				}
+			}
+		}
+		
+		if(currentShader.normal3_loc != -1)
+			GL.disableVertexAttribArray(currentShader.normal3_loc);
+		GL.disableVertexAttribArray(currentShader.position3_loc);
+		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
+		
+	}
+	
+};
+
 f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_neoRefLists_array)
 {
 	// Picking render.***
@@ -1952,7 +2245,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 
 	// *************************************************************************************************************************************************
 	// Now, render the detailed building if exist.******************************************************************************************************
-
+	// This is OLD.************************************
 	var transformedCamPos = undefined;
 	var currentShader = undefined;
 	if(this.detailed_building && isLastFrustum)

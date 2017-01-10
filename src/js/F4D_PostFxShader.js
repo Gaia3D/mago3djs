@@ -306,9 +306,6 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl)
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	
-	//shader.program.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader._lightDirection = gl.getUniformLocation(shader.program, "uLightingDirection");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
@@ -332,10 +329,6 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl)
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
 	
-	// ModelReference.****
-	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	//shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	//shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
 
 };
 
@@ -422,24 +415,13 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl)
 	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	//shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	//shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	
-	//shader.program.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader._lightDirection = gl.getUniformLocation(shader.program, "uLightingDirection");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");	
 	
-	// ModelReference.****
-	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	//shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	//shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
 		
 };
 
@@ -519,7 +501,7 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl)
 		\n\
 		const int kernelSize = 16;  \n\
 		//const float radius = 0.01;      \n\
-		const float radius = 0.25;      \n\
+		const float radius = 0.15;      \n\
 		\n\
 		float unpackDepth(const in vec4 rgba_depth) {\n\
 			//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\
@@ -565,7 +547,7 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl)
 				float depthBufferValue = getDepth(offset.xy);				              \n\
 				//float range_check = abs(linearDepth - depthBufferValue); // original.***\n\
 				float range_check = abs(linearDepth - depthBufferValue)+radius*0.998; // modified.***\n\
-				if (range_check < radius && depthBufferValue <= sampleDepth) {\n\
+				if (range_check < radius*1.001 && depthBufferValue <= sampleDepth) {\n\
 					occlusion +=  1.0;\n\
 				}\n\
 				\n\
