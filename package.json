@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "compression": "^1.6.2",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^2.3.2",
