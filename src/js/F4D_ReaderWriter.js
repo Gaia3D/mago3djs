@@ -28,7 +28,8 @@ var _getAllFilesFromFolder = function(dir)
 
 var f4d_ReaderWriter = function()
 {
-	
+	this.rootPath = "";
+	this.geometryDataPath = "/3d_data";
 	this.vi_arrays_Container = new VertexIdxVBO_ArraysContainer();
 	this.byteColorsVBO_ArraysContainer = new ByteColorsVBO_ArraysContainer();
 		//var simpleBuildingImage = new Image();
@@ -1961,30 +1962,30 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 
 f4d_ReaderWriter.prototype.openF4d_TerranTile = function(GL, terranTile, f4d_readerWriter )
 {
-	var filePath_inServer = "/F4D_GeometryData/Result_xdo2f4d/f4dTerranTileFile.txt";
+	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dTerranTileFile.txt";
 	f4d_readerWriter.readF4D_TerranTileFile_inServer(GL, filePath_inServer, terranTile, f4d_readerWriter);
 
 };	
 
 f4d_ReaderWriter.prototype.openF4dProjects_TestFromXDO = function(GL, BR_ProjectsList, f4d_readerWriter )
 {
-	var filePath_inServer = "/F4D_GeometryData/Result_xdo2f4d/f4dIndexFile.txt";
+	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dIndexFile.txt";
 	//f4d_readerWriter.readF4D_IndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 	
-	filePath_inServer = "/F4D_GeometryData/Result_xdo2f4d/f4dIndexFile_2.txt";
+	filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dIndexFile_2.txt";
 	f4d_readerWriter.readF4D_IndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 };	
 
 f4d_ReaderWriter.prototype.openF4dProjects_TestFromCOLLADA = function(GL, BR_ProjectsList, f4d_readerWriter )
 {
-	var filePath_inServer = "/F4D_GeometryData/Result_collada2f4d/pCloud_IndexFile.txt";
+	var filePath_inServer = this.geometryDataPath + "/Result_collada2f4d/pCloud_IndexFile.txt";
 	f4d_readerWriter.readF4D_pCloudIndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 	
 };
 
 f4d_ReaderWriter.prototype.openF4dandXDOProjects_forSPEEDTEST = function(GL, BR_ProjectsList, f4d_readerWriter )
 {
-	var filePath_inServer = "/F4D_GeometryData/Result_xdo2f4d/f4dIndexFile.txt";
+	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dIndexFile.txt";
 	f4d_readerWriter.readF4D_IndexFile_inServer_SPEEDTEST(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 };
 
@@ -2301,7 +2302,7 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	// The location(latitude, longitude, height) is provisional.***
 	
 	// Read the header.***
-	var neoBuilding_header_path = "/F4D_GeometryData/"+buildingFileName+"/Header.hed";
+	var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
 	
 	var neoBuilding = NeoBuildingsList.new_neoBuilding();
 	
@@ -2357,23 +2358,23 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	var filePath_inServer = "";
 	
 	
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Blocks1";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.get_BlockList("Blocks1");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter);
 	
-	var filePath_inServer_2 = "/F4D_GeometryData/"+buildingFileName+"/Blocks2";
+	var filePath_inServer_2 = this.geometryDataPath + "/"+buildingFileName+"/Blocks2";
 	var blocksList_2 = blocksListContainer.get_BlockList("Blocks2");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer_2, blocksList_2, neoBuilding, f4d_readerWriter);
 	
-	var filePath_inServer_3 = "/F4D_GeometryData/"+buildingFileName+"/Blocks3";
+	var filePath_inServer_3 = this.geometryDataPath + "/"+buildingFileName+"/Blocks3";
 	var blocksList_3 = blocksListContainer.get_BlockList("Blocks3");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer_3, blocksList_3, neoBuilding, f4d_readerWriter);
 	
-	var filePath_inServer_bone = "/F4D_GeometryData/"+buildingFileName+"/BlocksBone";
+	var filePath_inServer_bone = this.geometryDataPath + "/"+buildingFileName+"/BlocksBone";
 	var blocksList_bone = blocksListContainer.get_BlockList("BlocksBone");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer_bone, blocksList_bone, neoBuilding, f4d_readerWriter);
 	
-	var filePath_inServer_4 = "/F4D_GeometryData/"+buildingFileName+"/Blocks4"; // Interior Objects.***
+	var filePath_inServer_4 = this.geometryDataPath + "/"+buildingFileName+"/Blocks4"; // Interior Objects.***
 	var blocksList_4 = blocksListContainer.get_BlockList("Blocks4");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer_4, blocksList_4, neoBuilding, f4d_readerWriter);
 	
@@ -2385,24 +2386,24 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	var neoRefList_container = neoBuilding._neoRefLists_Container;
 	
 	lod_level = 0;
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin1";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin1";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 1;
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin2";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin2";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 2;
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Skin3";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin3";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	lod_level = 0;
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/Ref_Bone";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Bone";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************
-	var interiorCRef_folderPath = "/F4D_GeometryData/"+buildingFileName+"/inLOD4";
+	var interiorCRef_folderPath = this.geometryDataPath + "/"+buildingFileName+"/inLOD4";
 	lod_level = 0;
 	//var interior_base_name = "Ref_NodeData";
 	var subOctreeName_counter = -1;
@@ -2428,7 +2429,7 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	// Now, read the simple building.************************
 	
 	neoBuilding.neoSimpleBuilding = new F4D_NeoSimpleBuilding();
-	filePath_inServer = "/F4D_GeometryData/"+buildingFileName+"/SimpleBuilding";
+	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
 	f4d_readerWriter.readF4D_neoSimpleBuilding_inServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, f4d_readerWriter);
 	
 	
@@ -2531,7 +2532,7 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	  //------------------------------------------------------
 	  
 	// 0) Header, the original version.*********************************************************************************************************
-	var filePath_header_inServer = "/F4D_GeometryData/"+projectNumStr+"/Header";
+	var filePath_header_inServer = this.geometryDataPath + "/"+projectNumStr+"/Header";
 	f4d_readerWriter.readF4D_HeaderOriginal_inServer(GL, filePath_header_inServer, BR_buildingProject, f4d_readerWriter, f4d_manager);
 	
 	if(BR_buildingProject.octree == undefined)
@@ -2540,23 +2541,23 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	
 	// 1) Blocks.*******************************************************************************************************************************
-	var filePath_inServer = "/F4D_GeometryData/"+projectNumStr+"/Blocks1";
+	var filePath_inServer = this.geometryDataPath + "/"+projectNumStr+"/Blocks1";
 	var blocksList = blocksListContainer.get_BlockList("Blocks1");
 	f4d_readerWriter.readF4D_Blocks_inServer(GL, filePath_inServer, blocksList, BR_buildingProject, f4d_readerWriter);
 	
-	var filePath_inServer_2 = "/F4D_GeometryData/"+projectNumStr+"/Blocks2";
+	var filePath_inServer_2 = this.geometryDataPath + "/"+projectNumStr+"/Blocks2";
 	var blocksList_2 = blocksListContainer.get_BlockList("Blocks2");
 	f4d_readerWriter.readF4D_Blocks_inServer(GL, filePath_inServer_2, blocksList_2, BR_buildingProject, f4d_readerWriter);
 	
-	var filePath_inServer_3 = "/F4D_GeometryData/"+projectNumStr+"/Blocks3";
+	var filePath_inServer_3 = this.geometryDataPath + "/"+projectNumStr+"/Blocks3";
 	var blocksList_3 = blocksListContainer.get_BlockList("Blocks3");
 	f4d_readerWriter.readF4D_Blocks_inServer(GL, filePath_inServer_3, blocksList_3, BR_buildingProject, f4d_readerWriter);
 	
-	var filePath_inServer_bone = "/F4D_GeometryData/"+projectNumStr+"/BlocksBone";
+	var filePath_inServer_bone = this.geometryDataPath + "/"+projectNumStr+"/BlocksBone";
 	var blocksList_bone = blocksListContainer.get_BlockList("BlocksBone");
 	f4d_readerWriter.readF4D_Blocks_inServer(GL, filePath_inServer_bone, blocksList_bone, BR_buildingProject, f4d_readerWriter);
 	
-	var filePath_inServer_4 = "/F4D_GeometryData/"+projectNumStr+"/Blocks4"; // Interior Objects.***
+	var filePath_inServer_4 = this.geometryDataPath + "/"+projectNumStr+"/Blocks4"; // Interior Objects.***
 	var blocksList_4 = blocksListContainer.get_BlockList("Blocks4");
 	f4d_readerWriter.readF4D_Blocks_inServer(GL, filePath_inServer_4, blocksList_4, BR_buildingProject, f4d_readerWriter);
 
@@ -2567,21 +2568,21 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	var compRefList_container = BR_buildingProject._compRefList_Container;
 	
-	filePath_inServer = "/F4D_GeometryData/"+projectNumStr+"/Ref_Skin1";
+	filePath_inServer = this.geometryDataPath + "/"+projectNumStr+"/Ref_Skin1";
 	f4d_readerWriter.readF4D_CompoundReferences_inServer(GL, filePath_inServer, compRefList_container, "Ref_Skin1", 0, blocksList, moveMatrix, BR_buildingProject, f4d_readerWriter);
 	
-	filePath_inServer_2 = "/F4D_GeometryData/"+projectNumStr+"/Ref_Skin2";
+	filePath_inServer_2 = this.geometryDataPath + "/"+projectNumStr+"/Ref_Skin2";
 	f4d_readerWriter.readF4D_CompoundReferences_inServer(GL, filePath_inServer_2, compRefList_container, "Ref_Skin2", 1, blocksList_2, moveMatrix, BR_buildingProject, f4d_readerWriter);
 	
-	filePath_inServer_3 = "/F4D_GeometryData/"+projectNumStr+"/Ref_Skin3";
+	filePath_inServer_3 = this.geometryDataPath + "/"+projectNumStr+"/Ref_Skin3";
 	f4d_readerWriter.readF4D_CompoundReferences_inServer(GL, filePath_inServer_3, compRefList_container, "Ref_Skin3", 2, blocksList_3, moveMatrix, BR_buildingProject, f4d_readerWriter);
 	
-	filePath_inServer_bone = "/F4D_GeometryData/"+projectNumStr+"/Ref_Bone";
+	filePath_inServer_bone = this.geometryDataPath + "/"+projectNumStr+"/Ref_Bone";
 	f4d_readerWriter.readF4D_CompoundReferences_inServer(GL, filePath_inServer_bone, compRefList_container, "Ref_Bone", 3, blocksList_bone, moveMatrix, BR_buildingProject, f4d_readerWriter);
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************
 	var interiorCompRefList_Container = BR_buildingProject._interiorCompRefList_Container;
-	var interiorCRef_folderPath = "/F4D_GeometryData/"+projectNumStr+"/inLOD4";
+	var interiorCRef_folderPath = this.geometryDataPath + "/"+projectNumStr+"/inLOD4";
 	//var interiorCRef_files = _getAllFilesFromFolder(interiorCRef_folderPath);
 	var interior_base_name = "Ref_NodeData";
 	var subOctreeName_counter = -1;
@@ -2603,7 +2604,7 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	}
 	
 	// Now, the SimpleBuilding.**************************************************************************************************************************
-	var filePath_inServer_SimpleBuilding = "/F4D_GeometryData/"+projectNumStr+"/SimpleBuilding";
+	var filePath_inServer_SimpleBuilding = this.geometryDataPath + "/"+projectNumStr+"/SimpleBuilding";
 	var simpleBuilding = BR_buildingProject._simpleBuilding;
 	f4d_readerWriter.readF4D_SimpleBuilding_inServer(GL, filePath_inServer_SimpleBuilding, simpleBuilding, f4d_readerWriter);
 	//readF4D_SimpleBuilding_inServer(filePath_inServer_SimpleBuilding, simpleBuilding);
@@ -2621,7 +2622,7 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	var simpleBuildingImage = new Image();
 	simpleBuildingImage.onload = function() { handleTextureLoaded(GL, simpleBuildingImage, simpleBuilding._simpleBuildingTexture); }
-	var filePath_inServer_SimpleBuildingImage = "/F4D_GeometryData/"+projectNumStr+"/SimpleBuildingTexture.bmp";
+	var filePath_inServer_SimpleBuildingImage = this.geometryDataPath + "/"+projectNumStr+"/SimpleBuildingTexture.bmp";
 	simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
 	
 	this.filesReadings_count -=1;
