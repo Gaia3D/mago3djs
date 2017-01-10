@@ -15,7 +15,7 @@ var del = require('del');
 
 var paths = {
 	data : './3d_data',
-	source_js : './src/js/*',
+	source_js : [ './src/js/*.js', '!./src/js/cesium' ],
 	source_images : './images/*',
 	source_css : './src/css/*',
 	dest_js : './build/js',

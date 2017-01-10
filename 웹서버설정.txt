@@ -1,0 +1,11 @@
+apache lounge를 다운 받아서 설치 했음
+
+1 httpd.conf
+ - 아파치 홈 디렉토리
+ ServerRoot "c:/apache"
+
+ServerName localhost:80
+
+ DocumentRoot "C:\git\repository\geomartian"
+
+
