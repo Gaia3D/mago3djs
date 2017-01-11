@@ -12,6 +12,7 @@ var jasmine = require('gulp-jasmine');
 var jasmineBrowser = require('gulp-jasmine-browser');
 var watch = require('gulp-watch');
 var del = require('del');
+var jsdoc = require('gulp-jsdoc3');
 
 var paths = {
 	data : './3d_data',
@@ -26,7 +27,7 @@ var paths = {
 
 // 삭제가 필요한 디렉토리가 있는 경우
 gulp.task('clean', function() {
-	return del([ paths.dest_js, paths.dest_images, paths.dest_css ]);
+	return del([ paths.dest_js, paths.dest_css ]);
 });
 
 //gulp.task('minify-js', [ 'clean' ], function() {
@@ -88,5 +89,11 @@ gulp.task('watch', function() {
 //	    .pipe(jasmineBrowser.server({port: 8888}));
 //	});
 
-gulp.task('default', [ 'uglify', 'minify-css' ]);
+gulp.task('doc', function (cb) {
+	var config = require('./jsdoc.json');
+	gulp.src(['README.md', './src/js/*.js'], {read: false})
+		.pipe(jsdoc(config, cb));
+});
+
+gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
 
