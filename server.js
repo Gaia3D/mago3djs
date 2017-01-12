@@ -1,3 +1,5 @@
+// Cesium has been copied.
+
 (function() {
 	'use strict';
 	/*jshint node:true*/
