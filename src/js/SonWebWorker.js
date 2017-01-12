@@ -1,8 +1,8 @@
 
 //importScripts('../Build/CesiumUnminified/SonGeometryJScript.js'); // No.***
-importScripts('SonGeometryJScript.js'); // Yes.***
-importScripts('SonGeometryModifier.js'); 
-importScripts('F4D_Point3D.js'); 
+//importScripts('SonGeometryJScript.js'); // Yes.***
+//importScripts('SonGeometryModifier.js'); 
+//importScripts('F4D_Point3D.js'); 
 //importScripts('CullingVolume.js');
 
 

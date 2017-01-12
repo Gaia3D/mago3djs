@@ -13,6 +13,7 @@ var jasmineBrowser = require('gulp-jasmine-browser');
 var watch = require('gulp-watch');
 var del = require('del');
 var jsdoc = require('gulp-jsdoc3');
+var Server = require('karma').Server;
 
 var paths = {
 	data : './3d_data',
@@ -89,11 +90,18 @@ gulp.task('watch', function() {
 //	    .pipe(jasmineBrowser.server({port: 8888}));
 //	});
 
+gulp.task('jasmine', function (done) {
+	new Server({
+		configFile: __dirname + '/karma.conf.js',
+		singleRun: true
+	}, done).start();
+});
+
 gulp.task('doc', function (cb) {
 	var config = require('./jsdoc.json');
 	gulp.src(['README.md', './src/js/*.js'], {read: false})
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
+gulp.task('default', [ 'uglify', 'minify-css', 'jasmine', 'doc' ]);
 
