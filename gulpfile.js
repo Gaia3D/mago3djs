@@ -90,12 +90,12 @@ gulp.task('watch', function() {
 //	    .pipe(jasmineBrowser.server({port: 8888}));
 //	});
 
-gulp.task('jasmine', function (done) {
-	new Server({
-		configFile: __dirname + '/karma.conf.js',
-		singleRun: true
-	}, done).start();
-});
+//gulp.task('jasmine', function (done) {
+//	new Server({
+//		configFile: __dirname + '/karma.conf.js',
+//		singleRun: true
+//	}, done).start();
+//});
 
 gulp.task('doc', function (cb) {
 	var config = require('./jsdoc.json');
@@ -103,5 +103,5 @@ gulp.task('doc', function (cb) {
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'uglify', 'minify-css', 'jasmine', 'doc' ]);
+gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
 
