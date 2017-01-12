@@ -21,7 +21,7 @@
 
 2 테스트 프레임워크
  - jasmine 을 가지고 웹 브라우저 없이 maven 처럼 gulp 빌드시 테스트 코드를 전체 실행할 수 있는 방법을 모르겠다.
- - karma + mocha로 추후 전환을 고려
+ - karma testrunner
  
 3 웹 서버
  - cesium 이 웹서버가 꼭 필요 하다.
@@ -32,5 +32,12 @@
  - jsdoc
  - https://github.com/jsdoc3/jsdoc
  - http://usejsdoc.org/
+
+5 docker
+ 
+ 
+ 
+ 
+ 
  
  
