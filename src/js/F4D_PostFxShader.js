@@ -1,7 +1,7 @@
-
-
-function f4d_PostFx_Shader(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+function f4d_PostFx_Shader(gl) {
 	// shader program.***
 	this.program = undefined;
 	this.shader_vertex = undefined;
@@ -54,13 +54,17 @@ function f4d_PostFx_Shader(gl)
 	this.invertNormals_loc  = undefined;
 };
 
-function f4d_PostFx_ShadersManager()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+function f4d_PostFx_ShadersManager() {
 	this.pFx_shaders_array = [];
 };
 
-f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, typeString)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -72,8 +76,10 @@ f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, type
 	return shader;
 };
 
-f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL) {
 	this.create_renderDepthShader(GL); // 0.***
 	this.create_ssaoShader(GL); // 1.***
 	this.create_blurShader(GL); // 2.***
@@ -89,8 +95,10 @@ f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL)
 	//this.create_renderDepthShader_TEST_ModelRef(GL); // 5
 };
 
-f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -161,8 +169,10 @@ f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl)
 	shader.colorTex_loc = gl.getUniformLocation(shader.program, "colorTex");
 };
 
-f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -328,12 +338,12 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl)
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-	
-
 };
 
-f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -421,15 +431,15 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl)
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");	
-	
-		
 };
 
 // Ref Model.***********************************************************************************************************************
 // Ref Model.***********************************************************************************************************************
 // Ref Model.***********************************************************************************************************************
-f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -678,7 +688,6 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl)
 		}
 		*/
 		
-		
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
@@ -734,11 +743,12 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl)
 	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
 	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
 	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-
 };
 
-f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -817,7 +827,6 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 
-
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
@@ -834,14 +843,13 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function
 		
 };
 
-
-
-
 // Selection shader.***********************************************************************************************************************
 // Selection shader.***********************************************************************************************************************
 // Selection shader.***********************************************************************************************************************
-f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -874,7 +882,6 @@ f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = funct
 			gl_FragColor = vColor4Aux;\n\
 		}";
 		
-		
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
@@ -896,15 +903,15 @@ f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = funct
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	
-
 };
 
 // SimpleDepth shader.***********************************************************************************************************************
 // SimpleDepth shader.***********************************************************************************************************************
 // SimpleDepth shader.***********************************************************************************************************************
-f4d_PostFx_ShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_PostFx_ShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) {
 	// no used.!!!!!!!!!!!!!!!
 	var shader = new f4d_PostFx_Shader(this.gl);
 	this.pFx_shaders_array.push(shader);
@@ -972,13 +979,4 @@ f4d_PostFx_ShadersManager.prototype.create_SimpleDepthShader_ModelRef = function
 
 	//shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");	
-	
-
 };
-
-
-
-
-
-
-

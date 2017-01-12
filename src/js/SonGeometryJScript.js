@@ -1,6 +1,5 @@
 // Color.************************************************************************************* //
-  var f4d_color = function()
-  {
+var f4d_color = function() {
 	  this.r = 0;
 	  this.g = 0;
 	  this.b = 0;
@@ -3382,8 +3381,3 @@ f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersec
 	}
 	
 };
-  
-
-
-  
-

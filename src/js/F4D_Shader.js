@@ -65,8 +65,10 @@
 		*/
 		
 // f4d_Shader.******************************************************************************************************************************************
-var f4d_Shader = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_Shader = function() {
 	this.shader_name = undefined;
     this.shader_vertex_source = undefined;
 	this.shader_fragment_source = undefined;
@@ -96,18 +98,20 @@ var f4d_Shader = function()
 };
 
 // f4d_ShadersManager.************************************************************************************************************************************
-var f4d_ShadersManager = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_ShadersManager = function() {
 	this.shaders_array = [];
 	
 	// Create shaders to render F4D_Format.**********************
 	// 1) Standard shader, that can render light mapping.***
-	
-	
 };
 
-f4d_ShadersManager.prototype.get_f4dShader = function(idx)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.get_f4dShader = function(idx) {
 	var shader = undefined;
 	
 	if(idx >= 0 && idx < this.shaders_array.length)
@@ -118,8 +122,10 @@ f4d_ShadersManager.prototype.get_f4dShader = function(idx)
 	return shader;
 };
 
-f4d_ShadersManager.prototype.get_shader = function(GL, source, type, typeString)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -131,8 +137,10 @@ f4d_ShadersManager.prototype.get_shader = function(GL, source, type, typeString)
 	return shader;
 };
 
-f4d_ShadersManager.prototype.create_f4dDefaultShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
 	this.create_f4dStandardShader(GL);                // 0.***
 	this.create_f4dTextureSimpleObjectShader(GL);     // 1.***
 	this.create_f4dColorSelectionShader(GL);          // 2.***
@@ -143,8 +151,10 @@ f4d_ShadersManager.prototype.create_f4dDefaultShader = function(GL)
 	this.create_f4d_SimpleObjectTexNormal_Shader(GL); // 7.***
 };
 
-f4d_ShadersManager.prototype.create_f4dColorSelectionShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 	var shader = new f4d_Shader();
 	this.shaders_array.push(shader);
 	
@@ -196,8 +206,10 @@ f4d_ShadersManager.prototype.create_f4dColorSelectionShader = function(GL)
 	shader._position = GL.getAttribLocation(shader.SHADER_PROGRAM, "position");
 };
 
-f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 	var shader = new f4d_Shader();
 	this.shaders_array.push(shader);
 	
@@ -256,8 +268,10 @@ f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL)
 	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
-f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
 	var shader = new f4d_Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
@@ -313,8 +327,10 @@ f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL
 	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
-f4d_ShadersManager.prototype.create_f4dStandardShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new f4d_Shader();
 	this.shaders_array.push(standard_shader);
@@ -366,13 +382,12 @@ f4d_ShadersManager.prototype.create_f4dStandardShader = function(GL)
 
 	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
 	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-	
-	
-		
 };
 
-f4d_ShadersManager.prototype.create_f4dCloudShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new f4d_Shader();
 	this.shaders_array.push(standard_shader);
@@ -421,13 +436,12 @@ f4d_ShadersManager.prototype.create_f4dCloudShader = function(GL)
 
 	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
 	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-	
-	
-		
 };
 
-f4d_ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new f4d_Shader();
 	this.shaders_array.push(standard_shader);
@@ -470,11 +484,12 @@ f4d_ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL)
 
 	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
 	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-	
 };
 
-f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new f4d_Shader();
 	this.shaders_array.push(standard_shader);
@@ -498,8 +513,6 @@ f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL)
 			vColor=color;\n\
 		}";
 		
-
-
 	standard_shader.shader_fragment_source="\n\
 		precision lowp float;\n\
 		varying vec4 vColor;\n\
@@ -524,11 +537,12 @@ f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL)
 
 	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
 	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-	
 };
 
-f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) {
 	var shader = new f4d_Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
@@ -565,7 +579,6 @@ f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(
 			float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
 			vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		}";
-
 	
 	shader.shader_fragment_source="\n\
 		precision mediump float;\n\
@@ -577,7 +590,6 @@ f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(
 			vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 			gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
 		}";
-
 		
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
@@ -607,14 +619,4 @@ f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(
 	shader._normal = GL.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
   
-  
 //# sourceURL=f4d_Shader.js
-  
-  
-  
-  
-  
-  
-  
-  
-  
