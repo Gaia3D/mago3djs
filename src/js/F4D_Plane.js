@@ -1,25 +1,28 @@
-
-
-var F4D_Plane = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var F4D_Plane = function() {
 	// ax+by+cz+d = 0 plane.***
 	this.a = 0.0;
 	this.b = 0.0;
 	this.c = 0.0;
 	this.d = 0.0;
-	
 };
 
-F4D_Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+F4D_Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
 	this.a = nx;
 	this.b = ny;
 	this.c = nz;
 	this.d = -this.a*px -this.b*py - this.c*pz;
 };
 
-F4D_Plane.prototype.intersectionLine = function(line, intersectionPoint)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+F4D_Plane.prototype.intersectionLine = function(line, intersectionPoint) {
 	
 	var r = line.point.x;
 	var s = line.point.y;
@@ -44,33 +47,3 @@ F4D_Plane.prototype.intersectionLine = function(line, intersectionPoint)
 	else
 		return undefined;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

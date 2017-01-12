@@ -1,9 +1,9 @@
-
-
 // real time radiosity shader http://madebyevan.com/webgl-path-tracing/
 //http://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html // GOOD TUTORIALS !!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-function genNoiseTextureRGBA(gl, w, h, pixels) {       
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+function genNoiseTextureRGBA(gl, w, h, pixels) {
   var texture = gl.createTexture();
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -125,8 +125,10 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
   return texture;
 }
 
-var f4d_manager = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_manager = function() {
 	// F4D Data structure & objects.*****************************************
 	this.f4dBR_buildingProjectsList = new f4d_BR_buildingProjectsList(); // Old. Provisionally for f4d projects.*** !!!
 	this.f4d_terranTile = new f4d_TerranTile();// use this.***
@@ -402,8 +404,10 @@ var f4d_manager = function()
 	this.load_samsung= false;
 };
 
-f4d_manager.prototype.create_clouds_TEST = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.create_clouds_TEST = function() {
 	var increLong = 0.004;
 	var increLat = 0.004;
 	
@@ -448,8 +452,10 @@ f4d_manager.prototype.create_clouds_TEST = function()
 	*/
 };
 
-f4d_manager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral) {
 	// if camera is interior of building -> this.squareDistUmbral = 22.0;
 	// if camera is exterior of building -> this.squareDistUmbral = 200.0;
 	/*
@@ -475,19 +481,21 @@ f4d_manager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral)
 	return camera_was_moved;
 };
 
-f4d_manager.prototype.update_CameraMoved = function(cameraPosition)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.update_CameraMoved = function(cameraPosition) {
 	// This function must run in a background process.****
 	// call this function if camera was moved.****
 	//----------------------------------------------------------------
 	
 	// 1rst, do frustum culling and find a detailed building.***
-	
-	
 };
 
-f4d_manager.prototype.select_F4D_object = function(GL, _modelViewProjectionRelativeToEye, mousePickPos_x, mousePickPos_y, drawingBufferHeight)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.select_F4D_object = function(GL, _modelViewProjectionRelativeToEye, mousePickPos_x, mousePickPos_y, drawingBufferHeight) {
 	if(this.detailed_building)
 	{
 
@@ -520,11 +528,12 @@ f4d_manager.prototype.select_F4D_object = function(GL, _modelViewProjectionRelat
 		// For the moment... later we need select simple_buildings too.***
 		this.currentSelectedObj_idx = -1;
 	}
-	
 };
 
-f4d_manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	var clouds_count = this.f4d_atmos.cloudsManager.circularCloudsArray.length;
 	if(clouds_count == 0)
 		return;
@@ -605,8 +614,10 @@ f4d_manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, culli
 	
 };
 
-f4d_manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	//if(!isLastFrustum)
 	//	return;
 	//this.doFrustumCulling_clouds(cullingVolume, this.f4d_atmos.cloudsManager.circularCloudsArray, cameraPosition);
@@ -805,13 +816,12 @@ f4d_manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, cul
 	//------------------------------------------------------------
 	// Finally.***
 	GL.disable(GL.STENCIL_TEST);
-	
 };
 
-
-
-f4d_manager.prototype.calculate_encodedCameraPositionMC_HighLow = function(encodedCamPosMC_High, encodedCamPosMC_Low, cameraPosition)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.calculate_encodedCameraPositionMC_HighLow = function(encodedCamPosMC_High, encodedCamPosMC_Low, cameraPosition) {
 	var camSplitVelue_X  = Cesium.EncodedCartesian3.encode(cameraPosition.x);
 	var camSplitVelue_Y  = Cesium.EncodedCartesian3.encode(cameraPosition.y);
 	var camSplitVelue_Z  = Cesium.EncodedCartesian3.encode(cameraPosition.z);
@@ -833,8 +843,10 @@ f4d_manager.prototype.calculate_encodedCameraPositionMC_HighLow = function(encod
 	//this.encodedCamPosMC_Low[2] = us._encodedCameraPositionMC.low.z;
 };
 
-f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	//this.isCameraMoving = this.isButtonDown(scene);
 	
 	// Check if camera was moved considerably for update the renderables objects.***
@@ -918,10 +930,10 @@ f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, c
 	GL.disableVertexAttribArray(shader._position);
 };
 
-
-
-function handleTextureLoaded(gl, image, texture) 
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+function handleTextureLoaded(gl, image, texture) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 	//var gl = viewer.scene.context._gl;
 	gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -934,8 +946,10 @@ function handleTextureLoaded(gl, image, texture)
 };
 
 // render_neobuildings
-f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	if(!isLastFrustum)
 		return;
 	
@@ -943,8 +957,6 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 		this.getRenderables_detailedNeoBuilding(GL, scene, this.currentRenderables_neoRefLists_array);
 		
 	var renderables_neoRefLists_array = this.currentRenderables_neoRefLists_array;
-	
-	
 	
 			if(this.bPicking == true)
 			{
@@ -1003,7 +1015,6 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 		//-----------------------------------------------------------------------------------
 	
-	
 		var camera = scene._camera;
 		var frustum = camera.frustum;
 		var current_frustum_near = scene._context._us._currentFrustum.x;
@@ -1014,7 +1025,6 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 		//scene._context._currentFramebuffer._bind();
 		
 		var ssao_idx = 0; // 0= depth. 1= ssao.***
-		
 		
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
@@ -1204,7 +1214,6 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 					}
 					else
 					{
-						
 						//simpBuildTexture.textureId = GL.createTexture();
 		
 						// must upload the texture to gl.***
@@ -1227,18 +1236,16 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 			GL.disableVertexAttribArray(currentShader.normal3_loc);
 		GL.disableVertexAttribArray(currentShader.position3_loc);
 		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
-		
 	}
-	
 };
 
-
-f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	if(!isLastFrustum)
 		return;
 	
-
 			if(this.bPicking == true)
 			{
 				//this.objectSelected = this.getSelectedObject_Picking(GL, scene, renderables_neoRefLists_array);
@@ -1296,7 +1303,6 @@ f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mode
 		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 		//-----------------------------------------------------------------------------------
 	
-	
 		var camera = scene._camera;
 		var frustum = camera.frustum;
 		var current_frustum_near = scene._context._us._currentFrustum.x;
@@ -1520,13 +1526,13 @@ f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mode
 			GL.disableVertexAttribArray(currentShader.normal3_loc);
 		GL.disableVertexAttribArray(currentShader.position3_loc);
 		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
-		
 	}
-	
 };
 
-f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_neoRefLists_array)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_neoRefLists_array) {
 	// Picking render.***
 	// Picking render.***
 	// Picking render.***
@@ -1577,15 +1583,13 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 		//-----------------------------------------------------------------------------------
 	
-	
 		var camera = scene._camera;
 		var frustum = camera.frustum;
 		var current_frustum_near = scene._context._us._currentFrustum.x;
 		var current_frustum_far = scene._context._us._currentFrustum.y;
 		
 		gl.enable(gl.CULL_FACE); // option.***
-		
-
+	
 		// colorSelection render.************************************************************************************************************
 		// colorSelection render.************************************************************************************************************
 		// colorSelection render.************************************************************************************************************
@@ -1600,7 +1604,6 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 		//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
 		
-		
 		shaderProgram = currentShader.program;
 		gl.useProgram(shaderProgram);
 		gl.enableVertexAttribArray(currentShader.position3_loc);
@@ -1610,7 +1613,6 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 
-		
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
 		  gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
 
@@ -1624,7 +1626,6 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 		
 		// Now, read the picked pixel and find the object.*********************************************************
 
-
 		var pixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
 		gl.readPixels(this.mouse_x, scene.drawingBufferHeight - this.mouse_y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1634,18 +1635,16 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 		//this.objectSelected = this.selectionCandidateObjects_array[idx];
 		
 		return this.selectionCandidateObjects_array[idx];
-		
 	}
-	
 	else{
 		return undefined;
 	}
-	
 };
 
-
-f4d_manager.prototype.getRayCamSpace = function(GL, scene, resultRay)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.getRayCamSpace = function(GL, scene, resultRay) {
 	var frustum_far = 1.0; // unitary frustum far.***
 	var camera = scene._camera;
 	var frustum = camera.frustum;
@@ -1665,8 +1664,10 @@ f4d_manager.prototype.getRayCamSpace = function(GL, scene, resultRay)
 	return resultRay;
 };
 
-f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, scene, renderables_neoRefLists_array)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, scene, renderables_neoRefLists_array) {
 	
 	// depth render.************************************************************************************************************
 	// depth render.************************************************************************************************************
@@ -1693,7 +1694,6 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 	//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	
-	
 	shaderProgram = currentShader.program;
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
@@ -1704,7 +1704,6 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 
-	
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
 	  gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
 	  
@@ -1743,7 +1742,6 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
 		var pixelPos = new Cesium.Cartesian3();
 		pixelPos = Cesium.Matrix4.multiplyByPoint(mv_inv, pixelPosCamCoordCartesian, pixelPos);
 		
-		
 		var pixelPosBuilding = new Cesium.Cartesian3();
 		pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.detailed_neoBuilding.transfMat_inv, pixelPos, pixelPosBuilding);
 		
@@ -1751,7 +1749,6 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
 		// provisionally make an XY plane.***
 		// the plane is in world coord.***
 		this.selObjMovePlane.setPointAndNormal(pixelPosBuilding.x, pixelPosBuilding.y, pixelPosBuilding.z, 0.0, 0.0, 1.0);
-		
 		
 		/*
 		// a check. calculate the ray direction and compare with the cesium camera direction.***
@@ -1767,7 +1764,6 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
 	
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	var hola = 0;
-	
 };
 	/*
 	// camera function.***
@@ -1798,9 +1794,11 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
         return result;
     }
 	*/
-	
-f4d_manager.prototype.enableCameraMotion = function(state, scene)
-{
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.enableCameraMotion = function(state, scene) {
 	scene.screenSpaceCameraController.enableRotate = state;
 	scene.screenSpaceCameraController.enableZoom = state;
 	scene.screenSpaceCameraController.enableLook = state;
@@ -1808,8 +1806,7 @@ f4d_manager.prototype.enableCameraMotion = function(state, scene)
 	scene.screenSpaceCameraController.enableTranslate = state;
 };
 
-f4d_manager.prototype.isDragging = function(GL, scene)
-{
+f4d_manager.prototype.isDragging = function(GL, scene) {
 	// test function.***
 	var current_objectSelected = this.getSelectedObject_Picking(GL, scene, this.currentRenderables_neoRefLists_array);
 	
@@ -1822,8 +1819,10 @@ f4d_manager.prototype.isDragging = function(GL, scene)
 	}
 };
 
-f4d_manager.prototype.moveSelectedObject = function(GL, scene, renderables_neoRefLists_array)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.moveSelectedObject = function(GL, scene, renderables_neoRefLists_array) {
 	if(this.objectSelected == undefined)
 		return;
 	
@@ -1891,9 +1890,10 @@ f4d_manager.prototype.moveSelectedObject = function(GL, scene, renderables_neoRe
 	var hola = 0;
 };
 
-
-f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, result_neoRefLists_array)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, result_neoRefLists_array) {
 	result_neoRefLists_array.length = 0; // Init.***
 	
 	if(this.detailed_neoBuilding == undefined)
@@ -1908,7 +1908,6 @@ f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, r
 		
 		// Determine if the camera is inside of the building.***
 		
-
 		if(this.isCameraInsideNeoBuilding)
 		{
 			if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
@@ -1928,7 +1927,6 @@ f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, r
 			transformedCamDir = this.detailed_neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
 			this.pointSC.set(camera.up.x, camera.up.y, camera.up.z);
 			transformedCamUp = this.detailed_neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
-			
 			
 			this.myCameraSC.position.x = transformedCamPos.x;
 			this.myCameraSC.position.y = transformedCamPos.y;
@@ -1963,12 +1961,13 @@ f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, r
 			result_neoRefLists_array.push(neoRefListsContainer_exterior.neoRefsLists_Array[i]); // GET EXTERIORS.****
 		}
 	}
-	
 	return result_neoRefLists_array;
 };
 
-f4d_manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array) {
 	
 	if(ssao_idx == -1)// picking mode.***********************************************************************************
 	{
@@ -2006,29 +2005,23 @@ f4d_manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition,
 				}
 			}
 		}
-
 	}
 
 	if(ssao_idx == -1)
 	{
 		var isInterior = false; // no used.***
-
 		this.f4dRenderer.render_F4D_neoRefLists_ColorSelection(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 	else{
-	
 		var isInterior = false; // no used.***
-
 		this.f4dRenderer.render_F4D_neoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
-	
 };
 
-f4d_manager.prototype.forceRender_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, neoBuilding)
-{
-
-
-	
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.forceRender_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, neoBuilding) {
 	//if(picking)// refrence: http://learningwebgl.com/blog/?p=1786
 	//var f4d_shadersManager = this.f4d_shadersManager;
 	//var standardShader = f4d_shadersManager.get_f4dShader(0);
@@ -2049,15 +2042,11 @@ f4d_manager.prototype.forceRender_Detailed_neoBuilding = function(GL, cameraPosi
 	
 	//var frameState = scene._frameState;
 	
-	
-	
 	var isInterior = false;
 	this.f4dRenderer.forceRender_F4D_neoRefLists(GL, neoBuilding._neoRefLists_Container.neoRefsLists_Array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture);
-	
 };
 
-f4d_manager.prototype.render_DetailedBuilding = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, shader)
-{
+f4d_manager.prototype.render_DetailedBuilding = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, shader) {
 	// must make a relative camera for the building, to do octrees frustum culling.***
 	transformedCamPos = this.detailed_building.getTransformedRelativeEyePosition_toBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 	this.isCameraInsideBuilding = this.detailed_building.isCameraInsideOfBuilding(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
@@ -2111,9 +2100,6 @@ f4d_manager.prototype.render_DetailedBuilding = function(GL, cameraPosition, _mo
 		this.detailed_building.update_currentVisibleIndices_exterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 	}
 
-	
-	
-
 	var isInterior = false;
 	this.f4dRenderer.render_F4D_compRefLists_v1(GL, this.detailed_building._compRefList_Container._compRefsList_Array, this.detailed_building, 
 		this.modelViewProjRelToEye_matrix, this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this, isInterior, shader);
@@ -2127,8 +2113,10 @@ f4d_manager.prototype.render_DetailedBuilding = function(GL, cameraPosition, _mo
 	}
 };
 
-f4d_manager.prototype.create_FirstTime_VBO_CacheKeys= function(GL, BR_Project)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.create_FirstTime_VBO_CacheKeys= function(GL, BR_Project) {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
 	var vt_cacheKey = simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0];
@@ -2163,8 +2151,10 @@ f4d_manager.prototype.create_FirstTime_VBO_CacheKeys= function(GL, BR_Project)
 	BR_Project._f4d_nailImage_readed_finished = true;
 }
 
-f4d_manager.prototype.reCalculate_ModelViewProjectionRelToEyeMatrix = function(scene)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.reCalculate_ModelViewProjectionRelToEyeMatrix = function(scene) {
 	if(scene.context._us._modelView[0] == 0 && scene.context._us._modelView[1] == 0 && scene.context._us._modelView[2] == 0 && scene.context._us._modelView[3] == 0 && 
 	scene.context._us._modelView[4] == 0 && scene.context._us._modelView[5] == 0 && scene.context._us._modelView[6] == 0 && scene.context._us._modelView[7] == 0 && 
 	scene.context._us._modelView[8] == 0 && scene.context._us._modelView[9] == 0 && scene.context._us._modelView[10] == 0 && scene.context._us._modelView[11] == 0 && 
@@ -2182,8 +2172,10 @@ f4d_manager.prototype.reCalculate_ModelViewProjectionRelToEyeMatrix = function(s
 	Cesium.Matrix4.toArray(modelViewProjectionRelToEye, this.modelViewProjRelToEye_matrix); 
 }
 
-f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum, frustum_idx)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum, frustum_idx) {
 	if(this.isCameraInsideNeoBuilding)
 		return;
 	
@@ -2191,7 +2183,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	
 	if(!isLastFrustum)return;
 		
-	
 	//this.isCameraMoving = this.isButtonDown(scene);
 	
 	// Check if camera was moved considerably for update the renderables objects.***
@@ -2239,7 +2230,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix); 
 	//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
 	
-
 	// Calculate encodedCamPosMC high and low values.********************************************************
 	this.calculate_encodedCameraPositionMC_HighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
 
@@ -2265,7 +2255,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	  GL.depthRange(0, 1);
 	  
 	  var shaderProgram = undefined;
-	  
 	
 	// Calculate the normal_matrix.***
 	//https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
@@ -2289,7 +2278,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array); 
 	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 	//GL.uniformMatrix3fv(currentShader._NormalMatrix, false, this.normalMat3_array);
-	
 	
 	//------------------------------------------------------
 	this.render_time = 0;
@@ -2396,7 +2384,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 			}
 
 		}
-		
 		//--------------------------------------------------------------------------------------------------------------
 		
 		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
@@ -2460,7 +2447,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 			else{
 				this.currentVisibleBuildingsPost_array.push(BR_Project);
 			}
-		
 		}
 		
 		//--------------------------------------------------------------------------------------------------------------
@@ -2476,8 +2462,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	GL.disableVertexAttribArray(currentShader.position3_loc);
 	GL.disableVertexAttribArray(currentShader.normal3_loc);
 	this.depthFbo.unbind(); // DEPTH END.*****************************************************************************************************************************************************************
-	
-	
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Now, ssao.************************************************************
@@ -2576,7 +2560,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 								
 								this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
 								this.backGround_fileReadings_count ++;
-
 							}
 							//continue;
 						}
@@ -2584,9 +2567,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 					else{
 						this.currentVisibleBuildingsPost_array.push(BR_Project);
 					}
-
 				}
-				
 				//--------------------------------------------------------------------------------------------------------------
 				
 				//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
@@ -2626,7 +2607,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 						GL.disableVertexAttribArray(shader._position);
 						return;
 					}
-					
 				}
 				*/
 				
@@ -2663,9 +2643,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 					else{
 						this.currentVisibleBuildingsPost_array.push(BR_Project);
 					}
-				
 				}
-				
 				//--------------------------------------------------------------------------------------------------------------
 				
 				//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
@@ -2688,17 +2666,13 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 				*/
 			}
 			
-			
 		GL.activeTexture(GL.TEXTURE0);  
 		//this.ssaoFbo.unbind();
-		
 		
 	GL.disableVertexAttribArray(currentShader.texCoord2_loc);
 	GL.disableVertexAttribArray(currentShader.position3_loc);
 	GL.disableVertexAttribArray(currentShader.normal3_loc);	
 	//this.ssaoFbo.unbind();// SSAO END.********************************************************************************************************************************************************************
-	
-	
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Now, blur.************************************************************
@@ -2735,13 +2709,11 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	this.ssaoFSQuad.draw(currentShader, GL); 
 	GL.activeTexture(GL.TEXTURE0);
 		
-		
 	GL.disableVertexAttribArray(currentShader.texCoord2_loc);
 	GL.disableVertexAttribArray(currentShader.position3_loc);
 	//GL.disableVertexAttribArray(currentShader.normal3_loc);	
 	*/
 	// END BLUR.**************************************************************************************************************************************************************************************************************
-	
 	
 	GL.viewport(0, 0, scene._canvas.width, scene._canvas.height);
 	
@@ -2761,12 +2733,12 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 	//GL.bindFramebuffer(GL.FRAMEBUFFER, null);
 	GL.bindBuffer(GL.ARRAY_BUFFER, null);
 	GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
-
 };
 
-
-f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	GL.disable(GL.CULL_FACE); // Optional.***
 	
 	//this.isCameraMoving = this.isButtonDown(scene);
@@ -2911,24 +2883,19 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 						
 						this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
 						this.backGround_fileReadings_count ++;
-
 					}
 					//continue;
 				}
-				
 			}
 			else{
 				this.currentVisibleBuildingsPost_array.push(BR_Project);
 			}
-
 		}
-		
 		//--------------------------------------------------------------------------------------------------------------
 		
 		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
 		if(BR_Project._simpleBuilding_v1)// Test
 		{
-			
 			if(BR_Project._f4d_lod0Image_exists)
 			{
 				if(BR_Project._f4d_lod0Image_readed_finished)
@@ -2966,7 +2933,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 		*/
 		
 		var BR_Project = this.currentVisibleBuildings_array[p_counter];
-		
 		//if(!this.isCameraMoving)
 		{
 			// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
@@ -2979,7 +2945,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 					this.create_FirstTime_VBO_CacheKeys(GL, BR_Project);
 					continue;
 				}
-				
 				else if(!BR_Project._f4d_nailImage_readed)
 				{
 					if(this.backGround_imageReadings_count < 100)
@@ -2995,14 +2960,11 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 					}
 					continue;
 				}
-				
 			}
 			else{
 				this.currentVisibleBuildingsPost_array.push(BR_Project);
 			}
-		
 		}
-		
 		//--------------------------------------------------------------------------------------------------------------
 		
 		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
@@ -3025,7 +2987,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 		*/
 	}
 
-	
 	GL.disableVertexAttribArray(shader._texcoord);
 	GL.disableVertexAttribArray(shader._position);
 	GL.disableVertexAttribArray(shader._normal);
@@ -3048,7 +3009,6 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 	//---------------------------------------------------
 	
 	// Time control.************
-		
 		if(this.isCameraMoving)
 		{
 			this.dateSC = new Date();
@@ -3059,13 +3019,12 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 			//	
 			//}
 		}
-		
-	
 };
 
-
-f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
 	// http://blog.tojicode.com/2011/05/interleaved-array-basics.html
 	// https://groups.google.com/forum/#!topic/webgl-dev-list/vwCq6BPBXEs
 	
@@ -3081,7 +3040,6 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 	{
 		this.isCameraMoving = false;
 	}
-	
 	
 	// Check if camera was moved considerably for update the renderables objects.***
 	if(this.detailed_building)
@@ -3116,7 +3074,6 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 	this.encodedCamPosMC_Low[1] = camSplitVelue_Y.low;
 	this.encodedCamPosMC_Low[2] = camSplitVelue_Z.low;
 	
-	
 	// Now, render the simple visible buildings.***************************************************************************
 	var shader = this.f4d_shadersManager.get_f4dShader(3);
 	var shaderProgram = shader.SHADER_PROGRAM;
@@ -3149,18 +3106,12 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 	//var date = new Date();
 	//var startTime = date.getTime();
 	
-	
-	////////////////////////////////////
-	
-	
 	var f4d_projects_count = this.f4dBR_buildingProjectsList._BR_buildingsArray.length;
 	for(var iAux = 0; iAux<100; iAux++)
 	{
 		buildingsLoaded = 0;
-		
 		for(var p_counter = 0; p_counter<f4d_projects_count; p_counter++)
 		{
-			
 			var BR_Project = this.f4dBR_buildingProjectsList._BR_buildingsArray[p_counter];
 			
 			// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
@@ -3240,17 +3191,13 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 				}
 				
 				buildingsLoaded = f4d_projects_count;
-				
 				this.renderingCounter++;
-				
 			}
 			else
 			{
 				var h=0;
 			}
-			
 		}
-		
 	}
 	
 	if(this.renderingCounter > 50)
@@ -3265,9 +3212,7 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 		this.f4d_averageRenderTime = this.f4d_amountRenderTime/this.averageRenderingCounter;
 		this.xdo_averageRenderTime = this.xdo_amountRenderTime/this.averageRenderingCounter;
 		this.xdo_averageRenderTime_arrays = this.xdo_amountRenderTime_arrays/this.averageRenderingCounter;
-
 	}
-	
 			
 	console.log("Buildings Count: %o", buildingsLoaded);
 	console.log("Renders Count: %o", this.averageRenderingCounter);
@@ -3280,8 +3225,6 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 	//date = new Date();
 	//currentTime = date.getTime();
 	//secondsUsed_f4d = currentTime - startTime;
-	
-	
 	
 	GL.disableVertexAttribArray(shader._texcoord);
 	GL.disableVertexAttribArray(shader._position);
@@ -3303,11 +3246,12 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 	GL.bindBuffer(GL.ARRAY_BUFFER, null);
 	GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
 	//---------------------------------------------------
-	
 };
 
-f4d_manager.prototype.doFrustumCulling = function(frustumVolume, visibleBuildings_array, cameraPosition)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.doFrustumCulling = function(frustumVolume, visibleBuildings_array, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
@@ -3332,7 +3276,6 @@ f4d_manager.prototype.doFrustumCulling = function(frustumVolume, visibleBuilding
 	{
 		var BR_Project = this.f4dBR_buildingProjectsList._BR_buildingsArray[p_counter];
 		
-		
 		if(BR_Project._buildingPosition == undefined)
 		{
 			// this building does not readed the header yet.***
@@ -3342,7 +3285,6 @@ f4d_manager.prototype.doFrustumCulling = function(frustumVolume, visibleBuilding
 			}
 			continue;
 		}
-			
 		
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
 		if(squaredDistToCamera > this.min_squaredDist_to_see)
@@ -3417,8 +3359,7 @@ f4d_manager.prototype.doFrustumCulling = function(frustumVolume, visibleBuilding
 	return visibleBuildings_array;
 };
 
-f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, neoVisibleBuildings_array, cameraPosition)
-{
+f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, neoVisibleBuildings_array, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
@@ -3467,7 +3408,6 @@ f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, ne
 		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
 		if(frustumCull !== Cesium.Intersect.OUTSIDE) 
 		{
-			
 			if(squaredDistToCamera < this.min_squaredDist_to_see_detailed)// min dist to see detailed.***
 			{
 				if(neoBuilding._neoRefLists_Container.neoRefsLists_Array.length > 0)
@@ -3503,13 +3443,11 @@ f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, ne
 						//this.currentVisibleBuildings_LOD0_array.push(neoBuilding);
 					}
 				}
-				
 			}
 			else{
 				neoVisibleBuildings_array.push(neoBuilding);
 			}
 		}
-		
 	}
 	/*
 	// old code. works ok.***
@@ -3589,8 +3527,10 @@ f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, ne
 	return neoVisibleBuildings_array;
 };
 
-f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, frustumVolume, visibleBuildings_array, cameraPosition)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, frustumVolume, visibleBuildings_array, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
@@ -3661,7 +3601,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 	var filePath_scratch = undefined;
 	var tileNumberNameString = undefined;
 	
-	
 	var detailedVisibleTiles_count = this.detailedVisibleTiles_array.length;
 	for(var i=0; i<detailedVisibleTiles_count; i++)
 	{
@@ -3676,7 +3615,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 				this.f4d_readerWriter.readF4D_TileArrayBuffer_inServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
-			
 			continue;
 		}
 		
@@ -3695,7 +3633,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 		for(var j=0; j<buildings_count; j++)
 		{
 			BR_Project = this.detailedVisibleTiles_array[i]._BR_buildingsArray[j];
-
 				
 			if(BR_Project._buildingPosition == undefined)
 			{
@@ -3706,7 +3643,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
 			if(squaredDistToCamera < this.min_squaredDist_to_see_detailed)
 			{
-				
 				// Activate this in the future, when all f4d_projects unified.***
 				if(BR_Project._compRefList_Container._compRefsList_Array.length > 0)
 				{
@@ -3729,7 +3665,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 							this.detailed_building = BR_Project;
 						}
 					}
-					
 				}
 				else{
 					if(BR_Project._header.isSmall)
@@ -3737,7 +3672,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 					else
 						this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 				}
-				
 			}
 			else if(squaredDistToCamera < this.min_squaredDist_to_see_LOD0)
 			{
@@ -3763,7 +3697,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			}
 		}
 	}
-	
 	
 	var LOD0VisiblesTiles_count = this.LOD0VisibleTiles_array.length;
 	for(var i=0; i<LOD0VisiblesTiles_count; i++)
@@ -3832,12 +3765,9 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 		}
 	}
 	
-	
-	
 	var filteredVisibleTiles_count = this.filteredVisibleTiles_array.length;
 	for(var i=0; i<filteredVisibleTiles_count; i++)
 	{
-		
 		this.terranTileSC = this.filteredVisibleTiles_array[i];
 		if(!this.terranTileSC.fileReading_started)
 		{
@@ -3858,7 +3788,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			this.terranTileSC.parseFile_allBuildings(this);
 			//continue;
 		}
-		
 		
 		need_frustumCulling = false;
 		if(this.terranTileSC.visibilityType == Cesium.Intersect.INTERSECTING)
@@ -3897,7 +3826,6 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 					// Provisionally check for LODzero distance.***
 					if(squaredDistToCamera < this.min_squaredDist_to_see_LOD0)
 					{
-						
 						if(need_frustumCulling)
 						{
 							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
@@ -3920,15 +3848,16 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 					}
 				}
 			}	
-			
 		}
 	}
 	
 	return visibleBuildings_array;
 };
 
-f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuildings_array, cameraPosition)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuildings_array, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
@@ -3986,11 +3915,12 @@ f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleB
 	}
 	
 	return visibleBuildings_array;
-	
 };
 
-f4d_manager.prototype.load_TEST_Files = function()
-		{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_manager.prototype.load_TEST_Files = function() {
 			// Now, load sejong.***
 			var project_number = 7500; // House with car and mini park to children.***
 			var GAIA3D__counter =1;
@@ -4009,9 +3939,6 @@ f4d_manager.prototype.load_TEST_Files = function()
 			//viewer.f4d_readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.f4d_readerWriter, BR_ProjectsList);
 			// End test modularitzing.---------------------------------------------------
 			
-			
-				
-
 			/*
 			var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
 			url : '//assets.agi.com/stk-terrain/world',
@@ -4049,8 +3976,6 @@ f4d_manager.prototype.load_TEST_Files = function()
 			var buildingFileName = "F4D_KANGBUK_del";
 			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
 			
-			
-			
 			var buildingFileName = "F4D_7117_M320P";
 			//var buildingFileName = "F4D_7117_M320P_low";
 			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
@@ -4062,27 +3987,5 @@ f4d_manager.prototype.load_TEST_Files = function()
 			var elev = 48.0;
 
 			//--------------------------------------------------------------------------------------------------------
-			
-			
 		};
-
-
-
 //# sourceURL=f4d_manager.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

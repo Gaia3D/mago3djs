@@ -25,10 +25,10 @@
 	*/
 // End codes examples.----------------------------------------------------------------------------------------------------------------------
 
-
-
-var f4d_renderer = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_renderer = function() {
 	this.vbo_vi_cacheKey_aux = undefined;
 	this.byteColorAux = new f4d_ByteColor();
 	
@@ -41,19 +41,19 @@ var f4d_renderer = function()
 	this.simpObj_scratch = undefined;
 };
 
-f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0)return;
-
 	
 	this.dateSC = new Date();
 	this.startTimeSC = this.dateSC.getTime();
 	this.currentTimeSC = undefined;
 	var secondsUsed = undefined;
 	var timeControlCounter = 0;
-	
 	
 	GL.enable(GL.DEPTH_TEST);
 	//GL.disable(GL.DEPTH_TEST);
@@ -65,7 +65,6 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 	//if(ssao_idx == 0)
 	//	GL.disable(GL.CULL_FACE);
 	
-	
 	var cacheKeys_count = undefined;
 	var reference = undefined;
 	var block_idx = undefined;
@@ -73,7 +72,6 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 	var ifc_entity = undefined;
 	var vbo_ByteColorsCacheKeys_Container = undefined;
 	var current_tex_id = undefined;
-	  
 	  
 	  GL.activeTexture(GL.TEXTURE2); // necessary.***
 	 if(renderTexture) 
@@ -397,19 +395,19 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 	GL.enable(GL.DEPTH_TEST);
 };
 
-f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0)return;
-
 	
 	this.dateSC = new Date();
 	this.startTimeSC = this.dateSC.getTime();
 	this.currentTimeSC = undefined;
 	var secondsUsed = undefined;
 	var timeControlCounter = 0;
-	
 	
 	GL.enable(GL.DEPTH_TEST);
 	//GL.disable(GL.DEPTH_TEST);
@@ -421,7 +419,6 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 	//if(ssao_idx == 0)
 	//	GL.disable(GL.CULL_FACE);
 	
-	
 	var cacheKeys_count = undefined;
 	var reference = undefined;
 	var block_idx = undefined;
@@ -430,29 +427,21 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 	var vbo_ByteColorsCacheKeys_Container = undefined;
 	var current_tex_id = undefined;
 	  
-	  
-	  
 	// ------------------------------------------------------------------------------------- //  
 	for(var j=0; j<neoRefLists_count; j++)
 	{
-		
 		var neoRefList = neoRefList_array[j];
 		var myBlocksList = neoRefList_array[j].blocksList;
-		
 
 		// New version. Use occlussion indices.***
 		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
 
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-
-
 		for(var k=0; k<visibleIndices_count; k++)
 		{
 			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
 			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
 			{
-				
-				
 			}
 			var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
 			//var neoReference = neoRefList.neoRefs_Array[k]; // TEST.***
@@ -519,8 +508,6 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 					continue; // never enter here.***
 			}
 			
-				
-
 			// End checking textures loaded.------------------------------------------------------------------------------------
 
 				// ifc_space = 27, ifc_window = 26, ifc_plate = 14
@@ -612,7 +599,6 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 
 					}
 				}
-
 			
 			timeControlCounter++;
 			if(timeControlCounter > 20)
@@ -623,9 +609,10 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 	GL.enable(GL.DEPTH_TEST);
 };
 
-
-f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager, isInterior, standardShader)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager, isInterior, standardShader) {
 	var compRefLists_count = compRefList_array.length;
 	if(compRefLists_count == 0)return;
 
@@ -649,7 +636,6 @@ f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_arr
 	GL.depthFunc(GL.LEQUAL); 
 	GL.depthRange(0, 1);
 	
-
 //    	  Entity.prototype._getModelMatrix = function(time, result) {
 //    	        var position = Property.getValueOrUndefined(this._position, time, positionScratch);
 //    	        if (!defined(position)) {
@@ -710,10 +696,8 @@ f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_arr
 				GL.disableVertexAttribArray(standardShader._position);
 				return;
 			}
-			
 		}
 			
-
 		for(var k=0; k<visibleIndices_count; k++)
 		{
 			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
@@ -802,8 +786,10 @@ f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_arr
 	//---------------------------------------------------
 };
 
-f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	var compRefLists_count = compRefList_array.length;
 	if(compRefLists_count == 0)return;
 
@@ -822,7 +808,6 @@ f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, 
 	GL.depthFunc(GL.LEQUAL); 
 	GL.depthRange(0, 1);
 	
-
 //    	  Entity.prototype._getModelMatrix = function(time, result) {
 //    	        var position = Property.getValueOrUndefined(this._position, time, positionScratch);
 //    	        if (!defined(position)) {
@@ -925,8 +910,10 @@ f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, 
 	//---------------------------------------------------
 };
 
-f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	var simpleBuilding = BR_Project._simpleBuilding;
 	var storeys_count = simpleBuilding._simpleStoreys_list.length;
 	if(storeys_count == 0)
@@ -964,7 +951,6 @@ f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, mode
 	GL.bindTexture(GL.TEXTURE_2D, simpleBuilding._simpleBuildingTexture);
 	GL.uniform1i(shaderProgram.samplerUniform, 0);
 
-	
 	for(var i=0; i<storeys_count; i++)
 	{
 		var storey = simpleBuilding._simpleStoreys_list[i];
@@ -985,7 +971,6 @@ f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, mode
 				GL.bindBuffer(GL.ARRAY_BUFFER, texcoordsArrays_cacheKey);
 				GL.vertexAttribPointer(shader._texcoord, 2, GL.UNSIGNED_BYTE, true,0,0);
 				//GL.vertexAttribPointer(scene.textureCoordAttribute, 2, GL.UNSIGNED_BYTE, true,0,0);
-
 				
 				GL.drawArrays(GL.TRIANGLES, 0, vertices_count);
 			}
@@ -1004,8 +989,10 @@ f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, mode
 	//---------------------------------------------------
 };
 
-f4d_renderer.prototype.render_F4D_simpleBuilding_V1 = function(GL, BR_Project, f4d_manager, imageLod)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_simpleBuilding_V1 = function(GL, BR_Project, f4d_manager, imageLod) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
@@ -1110,8 +1097,11 @@ f4d_renderer.prototype.render_F4D_simpleBuilding_V1 = function(GL, BR_Project, f
 	}
 	*/
 };
-f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, neoBuilding, f4d_manager, imageLod, shader)
-{
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, neoBuilding, f4d_manager, imageLod, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
@@ -1205,7 +1195,6 @@ f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, 
 		}
 	}
 	
-
 	var vbo_vicky = simpBuild.vbo_vicks_container._vbo_cacheKeysArray[0];
 	if(vbo_vicky.MESH_VERTEX_cacheKey == null)
 	{
@@ -1235,8 +1224,10 @@ f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, 
 	}
 };
 
-f4d_renderer.prototype.render_F4D_simpleBuilding_V1_PostFxShader = function(GL, BR_Project, f4d_manager, imageLod, shader)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_simpleBuilding_V1_PostFxShader = function(GL, BR_Project, f4d_manager, imageLod, shader) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
@@ -1293,11 +1284,10 @@ f4d_renderer.prototype.render_F4D_simpleBuilding_V1_PostFxShader = function(GL, 
 	}
 };
 
-
-
-
-f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
 	
 	//if(simpBuildV1._simpleObjects_array.length == 0)
@@ -1305,7 +1295,6 @@ f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, mo
 	//	return;
 	//}
 	
-
 	// Test using f4d_shaderManager.************************
 	var shader = f4d_shadersManager.get_f4dShader(6);
 	var shaderProgram = shader.SHADER_PROGRAM;
@@ -1343,8 +1332,10 @@ f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, mo
 	}
 };
 
-f4d_renderer.prototype.render_XDO_simpleBuilding_V1 = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_XDO_simpleBuilding_V1 = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
 
@@ -1356,7 +1347,6 @@ f4d_renderer.prototype.render_XDO_simpleBuilding_V1 = function(GL, BR_Project, m
 
 	  GL.uniform3fv(shader._BuildingPosHIGH, BR_Project._buildingPositionHIGH);
 	  GL.uniform3fv(shader._BuildingPosLOW, BR_Project._buildingPositionLOW);
-
 	  
 	// http://learningwebgl.com/blog/?p=507
 	//GL.activeTexture(GL.TEXTURE0);
@@ -1378,8 +1368,10 @@ f4d_renderer.prototype.render_XDO_simpleBuilding_V1 = function(GL, BR_Project, m
 			f4d_manager.xdo_rendering_time += this.currentTimeSC - this.startTimeSC;
 };
 
-f4d_renderer.prototype.render_XDO_simpleBuilding_drawArrays = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_XDO_simpleBuilding_drawArrays = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
 
@@ -1391,7 +1383,6 @@ f4d_renderer.prototype.render_XDO_simpleBuilding_drawArrays = function(GL, BR_Pr
 
 	  GL.uniform3fv(shader._BuildingPosHIGH, BR_Project._buildingPositionHIGH);
 	  GL.uniform3fv(shader._BuildingPosLOW, BR_Project._buildingPositionLOW);
-
 	  
 	// http://learningwebgl.com/blog/?p=507
 	//GL.activeTexture(GL.TEXTURE0);
@@ -1415,9 +1406,11 @@ f4d_renderer.prototype.render_XDO_simpleBuilding_drawArrays = function(GL, BR_Pr
 	
 // Unique color selection tutorial. http://coffeesmudge.blogspot.kr/2013/08/implementing-picking-in-webgl.html
 // Unique color selection tutorial. http://learningwebgl.com/blog/?p=1786	
-	
-f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager)
-{
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
 	
 	var compRefLists_count = compRefList_array.length;
@@ -1442,7 +1435,6 @@ f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, c
 	  var byteCol_b_location = GL.getUniformLocation(shaderProgram, "byteColor_b");
 	  // End test son.----------------------------------------------
 
-
 //    	  Entity.prototype._getModelMatrix = function(time, result) {
 //    	        var position = Property.getValueOrUndefined(this._position, time, positionScratch);
 //    	        if (!defined(position)) {
@@ -1456,7 +1448,6 @@ f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, c
 //    	        }
 //    	        return result;
 //    	    };
-		
 		  
 	  //if(defined(context._us._modelView))
 	  {
@@ -1559,7 +1550,6 @@ f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, c
 	//GL.bindBuffer(GL.ARRAY_BUFFER, null);
 	//GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
 	//---------------------------------------------------
-	
 };	
 	
 /*
@@ -1621,39 +1611,13 @@ function render_F4D_drawArrays(scene, objects3D_array)
 			}
 
 		}
-
-		
 		GL.useProgram(null);
-
 
         GL.bindFramebuffer(GL.FRAMEBUFFER, null);
 		GL.bindBuffer(GL.ARRAY_BUFFER, null);
 	    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
 		//---------------------------------------------------
-		
     };
 	*/
 	
-	
 //# sourceURL=f4d_renderer.js
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

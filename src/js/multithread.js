@@ -1,3 +1,4 @@
+// 사용안함
 !function() {
 
 	var URL = window.URL || window.webkitURL;
