@@ -25,6 +25,8 @@ var F4D_MetaData = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param arrayBuffer = 변수
+ * @param f4dReadWriter = 변수
  */
 F4D_MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
 	var version_string_length = 5;
@@ -201,6 +203,7 @@ var F4D_NeoReferencesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * return neoRef
  */
 F4D_NeoReferencesList.prototype.new_neoReference = function() {
 	var neoRef = new F4D_NeoReference();
@@ -210,6 +213,7 @@ F4D_NeoReferencesList.prototype.new_neoReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param matrix = 변수
  */
 F4D_NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 	var neoRefs_count = this.neoRefs_Array.length;
@@ -222,6 +226,9 @@ F4D_NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
  */
 F4D_NeoReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndices = this.interior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
@@ -241,6 +248,9 @@ F4D_NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
  */
 F4D_NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndices = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
@@ -248,6 +258,9 @@ F4D_NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
  */
 F4D_NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndicesSC = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
@@ -257,6 +270,10 @@ F4D_NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, e
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param neoBuilding = 변수
+ * @param f4dReadWriter = 변수
  */
 F4D_NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBuilding, f4dReadWriter) {
 	var startBuff = undefined;
@@ -357,6 +374,7 @@ var F4D_NeoReferencesLists_Container = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param blocksList = 변수 
  */
 F4D_NeoReferencesLists_Container.prototype.new_NeoRefsList = function(blocksList) {
 	var neoRefList = new F4D_NeoReferencesList();
@@ -367,6 +385,9 @@ F4D_NeoReferencesLists_Container.prototype.new_NeoRefsList = function(blocksList
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
  */
 F4D_NeoReferencesLists_Container.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z) {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
@@ -401,6 +422,7 @@ var F4D_NeoSimpleBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns accesor 
  */
 F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
 	var accesor = new F4D_Accesor();
@@ -410,6 +432,7 @@ F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * return texture
  */
 F4D_NeoSimpleBuilding.prototype.newTexture = function() {
 	var texture = new F4D_neoTexture();
@@ -481,6 +504,8 @@ var F4D_NeoBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param texture = 변수
+ * @returns tex_id
  */
 F4D_NeoBuilding.prototype.getTextureId = function(texture) {
 	/*
@@ -507,6 +532,9 @@ F4D_NeoBuilding.prototype.getTextureId = function(texture) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
  */
 F4D_NeoBuilding.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z) {
 	this._neoRefLists_Container.update_currentVisibleIndices_ofLists(eye_x, eye_y, eye_z);
@@ -521,6 +549,7 @@ F4D_NeoBuilding.prototype.update_currentAllIndices_exterior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns this.metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
  */
 F4D_NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
 	return this.metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
@@ -528,6 +557,10 @@ F4D_NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param absolute_eye_x = 변수
+ * @param absolute_eye_y = 변수
+ * @param absolute_eye_z = 변수
+ * @returns this.point3d_scrath_2
  */
 F4D_NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
@@ -557,6 +590,7 @@ var F4D_NeoBuildingsList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns neoBuilding
  */
 F4D_NeoBuildingsList.prototype.new_neoBuilding = function() {
 	var neoBuilding = new F4D_NeoBuilding();
