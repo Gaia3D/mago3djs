@@ -95,7 +95,7 @@ gulp.task('watch', function() {
 
 gulp.task('test', function() {
 	return gulp.src([ './test/*.js' ], {read : false})
-		.pipe(mocha({reporter : 'json'}))
+		.pipe(mocha({reporter : 'spec'}))
 		.on('error', util.log);
 });
 
