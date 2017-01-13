@@ -43,6 +43,14 @@ var f4d_renderer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param neoRefList_array = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_manager = 변수
+ * @param isInterior = 변수
+ * @param standardShader = 변수
+ * @param renderTexture = 변수
+ * @param ssao_idx = 변수
  */
 f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
@@ -397,6 +405,14 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param neoRefList_array = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_manager = 변수
+ * @param isInterior = 변수
+ * @param standardShader = 변수
+ * @param renderTexture = 변수
+ * @param ssao_idx = 변수
  */
 f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
@@ -611,6 +627,15 @@ f4d_renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoR
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param compRefList_array = 변수
+ * @param BR_Project = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_manager = 변수
+ * @param isInterior = 변수
+ * @param standardShader = 변수
  */
 f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager, isInterior, standardShader) {
 	var compRefLists_count = compRefList_array.length;
@@ -788,6 +813,13 @@ f4d_renderer.prototype.render_F4D_compRefLists_v1 = function(GL, compRefList_arr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param compRefList_array = 변수
+ * @param BR_Project = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_shadersManager = 변수
  */
 f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	var compRefLists_count = compRefList_array.length;
@@ -912,6 +944,12 @@ f4d_renderer.prototype.render_F4D_compRefList = function(GL, compRefList_array, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_Project = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_shadersManager = 변수
  */
 f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	var simpleBuilding = BR_Project._simpleBuilding;
@@ -991,6 +1029,10 @@ f4d_renderer.prototype.render_F4D_simpleBuilding = function(GL, BR_Project, mode
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_Project = 변수
+ * @param f4d_manager = 변수
+ * @param imageLod = 변수
  */
 f4d_renderer.prototype.render_F4D_simpleBuilding_V1 = function(GL, BR_Project, f4d_manager, imageLod) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
@@ -1100,6 +1142,11 @@ f4d_renderer.prototype.render_F4D_simpleBuilding_V1 = function(GL, BR_Project, f
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_manager = 변수
+ * @param imageLod = 변수
+ * @param shader = 변수
  */
 f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, neoBuilding, f4d_manager, imageLod, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
@@ -1226,6 +1273,11 @@ f4d_renderer.prototype.render_F4D_neoSimpleBuilding_PostFxShader = function(GL, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_Project = 변수
+ * @param f4d_manager = 변수
+ * @param imageLod = 변수
+ * @param shader = 변수
  */
 f4d_renderer.prototype.render_F4D_simpleBuilding_V1_PostFxShader = function(GL, BR_Project, f4d_manager, imageLod, shader) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
@@ -1286,6 +1338,12 @@ f4d_renderer.prototype.render_F4D_simpleBuilding_V1_PostFxShader = function(GL, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param pCloudProject = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_manager = 변수
  */
 f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
 	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
@@ -1334,6 +1392,12 @@ f4d_renderer.prototype.render_F4D_pCloudProject = function(GL, pCloudProject, mo
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_Project = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_manager = 변수
  */
 f4d_renderer.prototype.render_XDO_simpleBuilding_V1 = function(GL, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
@@ -1409,6 +1473,13 @@ f4d_renderer.prototype.render_XDO_simpleBuilding_drawArrays = function(GL, BR_Pr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param compRefList_array = 변수
+ * @param BR_Project = 변수
+ * @param modelViewProjRelToEye_matrix = 변수
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param f4d_shadersManager = 변수
  */
 f4d_renderer.prototype.render_F4D_compRefList_forColorSelection = function(GL, compRefList_array, BR_Project, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_shadersManager) {
 	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/

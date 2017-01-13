@@ -1,5 +1,6 @@
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 function f4d_PostFx_Shader(gl) {
 	// shader program.***
@@ -63,6 +64,11 @@ function f4d_PostFx_ShadersManager() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param source = 변수
+ * @param type = 변수
+ * @param typeString = 변수
+ * @returns shader
  */
 f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 	// Source from internet.***
@@ -78,6 +84,7 @@ f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, type
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL) {
 	this.create_renderDepthShader(GL); // 0.***
@@ -97,6 +104,7 @@ f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -171,6 +179,7 @@ f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -342,6 +351,7 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -438,6 +448,7 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl) {
 // Ref Model.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -747,6 +758,7 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -848,6 +860,7 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function
 // Selection shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl) {
 	var shader = new f4d_PostFx_Shader(this.gl);
@@ -910,6 +923,7 @@ f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = funct
 // SimpleDepth shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
  */
 f4d_PostFx_ShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) {
 	// no used.!!!!!!!!!!!!!!!

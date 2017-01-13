@@ -17,6 +17,8 @@ var f4d_shadowBlendingCube = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
+ * @param tTriMat = 변수
  */
 f4d_shadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	// create a blending cube, with faces inverted.***
@@ -107,6 +109,7 @@ f4d_shadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns floatArray
  */
 f4d_shadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function() {
 	var floatArray = this.vertexMatrix.get_vbo_vertexColorRGBA_FloatArray(floatArray);
@@ -115,6 +118,7 @@ f4d_shadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function()
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns shortArray
  */
 f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function() {
 	this.vertexMatrix.set_vertexIdxInList();
@@ -126,6 +130,7 @@ f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * 
  */
 var f4d_atmosphere = function() {
 	this.cloudsManager = new f4d_cloudsManager();
@@ -141,6 +146,7 @@ var f4d_cloudsManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns circularCloud
  */
 f4d_cloudsManager.prototype.newCircularCloud = function() {
 	var circularCloud = new f4d_circularCloud();
@@ -192,6 +198,7 @@ var f4d_circularCloud = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns floatArray
  */
 f4d_circularCloud.prototype.get_vbo_vertexColor_FloatArray = function() {
 	var floatArray = this.vertexMatrix.get_vbo_vertexColor_FloatArray(floatArray);
@@ -200,6 +207,7 @@ f4d_circularCloud.prototype.get_vbo_vertexColor_FloatArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns floatArray
  */
 f4d_circularCloud.prototype.get_vbo_indices_ShortArray = function() {
 	this.vertexMatrix.set_vertexIdxInList();
@@ -211,6 +219,7 @@ f4d_circularCloud.prototype.get_vbo_indices_ShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns floatArray
  */
 f4d_circularCloud.prototype.get_vbo_shadowVertex_FloatArray = function() {
 	var floatArray = this.shadowVertexMatrix.get_vbo_vertex_FloatArray(floatArray);
@@ -219,6 +228,7 @@ f4d_circularCloud.prototype.get_vbo_shadowVertex_FloatArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns shortArray
  */
 f4d_circularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
 	this.shadowVertexMatrix.set_vertexIdxInList();
@@ -230,6 +240,7 @@ f4d_circularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
  */
 f4d_circularCloud.prototype.rotateMesh_byLocation = function(vtxMat) {
 	// we rotate the cloud mesh by longitude, latitude.***
@@ -273,6 +284,11 @@ f4d_circularCloud.prototype.doShadowMesh_withSunDirection = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param logitude = 경도
+ * @param latitude = 위도
+ * @param radius = 반지름
+ * @param depth = 깊이
+ * @param numPointsForCircle = 변수
  */
 f4d_circularCloud.prototype.createCloud = function(longitude, latitude, altitude, radius, depth, numPointsForCircle) {
 	this.longitude = longitude;
@@ -314,6 +330,13 @@ f4d_circularCloud.prototype.createCloud = function(longitude, latitude, altitude
 	this.cullingRadius = this.bbox.get_maxLength()/2;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
+ * @param tTriMat = 변수
+ * @param shadowVtxMat = 변수
+ * @param shadowTTriMat = 변수
+ */
 f4d_circularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shadowTTriMat) {
 	// use vertex_matrix.***
 	// our cloud has 6 rings. Top ring and the bottom ring has radius zero.***

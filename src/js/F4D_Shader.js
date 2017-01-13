@@ -110,6 +110,8 @@ var f4d_ShadersManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param idx = 변수
+ * returns shader
  */
 f4d_ShadersManager.prototype.get_f4dShader = function(idx) {
 	var shader = undefined;

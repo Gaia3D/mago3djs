@@ -16,7 +16,9 @@ var compRefList_array_background = undefined;
 
 //var compRefList_Container = new f4d_CompoundReferencesList_Container();
 //var interiorCompRefList_Container = new f4d_CompoundReferencesList_Container();
-
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_geoModifier = new f4d_geometryModifier();
 // End test son.-------------------------------------------------
 
@@ -31,7 +33,10 @@ onmessage = function(e) {
   var result = possibleCameraPositionChanged(e);
   postMessage([result]);
 };
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param value = 변수
+ */
 function setTest(value)
 {
 	squareDistUmbral = value;
@@ -96,7 +101,10 @@ function getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume)
 	return buildings_array;
 };
 */
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param e = 변수
+ */
 function possibleCameraPositionChanged(e)
 {
 	var compRefList_Container = e.data[0];
