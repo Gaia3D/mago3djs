@@ -1,7 +1,10 @@
 /**
  * 
  */
-var assert = require('assert');
+var chai = require('chai');
+var assert = chai.assert;
+var expect = chai.expect
+var should = chai.should();
 
 describe('Array', function() {
 	describe('#indexOf()', function() {

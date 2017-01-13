@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "chai": "^3.5.0",
     "compression": "^1.6.2",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
