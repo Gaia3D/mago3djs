@@ -8,8 +8,9 @@ var cleanCss = require('gulp-clean-css');
 var rename = require("gulp-rename");
 var util = require('gulp-util');
 var convertEncoding = require('gulp-convert-encoding');
-var jasmine = require('gulp-jasmine');
-var jasmineBrowser = require('gulp-jasmine-browser');
+//var jasmine = require('gulp-jasmine');
+//var jasmineBrowser = require('gulp-jasmine-browser');
+var mocha = require('gulp-mocha');
 var watch = require('gulp-watch');
 var del = require('del');
 var jsdoc = require('gulp-jsdoc3');
@@ -23,12 +24,13 @@ var paths = {
 	dest_js : './build/js',
 	dest_images : './images',
 	dest_css : './build/css',
-	test : './test/*.js'
+	test : './test/*.js',
+	build : './build'
 };
 
 // 삭제가 필요한 디렉토리가 있는 경우
 gulp.task('clean', function() {
-	return del([ paths.dest_js, paths.dest_css ]);
+	return del([ paths.build ]);
 });
 
 //gulp.task('minify-js', [ 'clean' ], function() {
@@ -79,23 +81,23 @@ gulp.task('watch', function() {
 });
 
 //gulp.task('jasmine', function() {
-//	return gulp.src( [ './external/jasmine-2.5.2/*.js', './test/hellospec.js', './src/test/hello.js' ] )
-//			.pipe(convertEncoding({to: 'utf8'}))
-//			.pipe(jasmine());
-//});
-
-//gulp.task('jasmine', function() {
 //	  return gulp.src(['./src/js/*.js', './test/*.js'])
 //	    .pipe(jasmineBrowser.specRunner())
 //	    .pipe(jasmineBrowser.server({port: 8888}));
 //	});
 
-//gulp.task('jasmine', function (done) {
+//gulp.task('karma-jasmine', function (done) {
 //	new Server({
 //		configFile: __dirname + '/karma.conf.js',
 //		singleRun: true
 //	}, done).start();
 //});
+
+gulp.task('test', function() {
+	return gulp.src([ './test/*.js' ], {read : false})
+		.pipe(mocha({reporter : 'json'}))
+		.on('error', util.log);
+});
 
 gulp.task('doc', function (cb) {
 	var config = require('./jsdoc.json');
@@ -103,5 +105,5 @@ gulp.task('doc', function (cb) {
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
+gulp.task('default', [ 'uglify', 'minify-css', 'test', 'doc' ]);
 
