@@ -235,16 +235,19 @@ f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, block
 				// Vertices.************************
 				  var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.new_VBO_VertexIdxCacheKey();
 				  
+				  
 				  vbo_vi_cacheKey.MESH_VERTEX_cacheKey = GL.createBuffer ();
 				  GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
 				  GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 				  
 				  bytes_readed = bytes_readed + 4*verticesFloatValues_count; // updating data.***
 				  
+				
 				var shortIndicesValues_count =  this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				vbo_vi_cacheKey.indices_count = shortIndicesValues_count;
 				// Now, make the VBO of the block readed.******************************
 				
+				  
 				  // Indices.***********************
 				  startBuff = bytes_readed;
 				  endBuff = bytes_readed + 2*shortIndicesValues_count;
@@ -254,7 +257,6 @@ f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, block
 				  GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 				  
 				  bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
-				  
 			}
 	   }
 };
@@ -350,6 +352,7 @@ f4d_ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksL
 				 */ 
 				bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
 				vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
+			}
 	   }
 };
 
@@ -370,6 +373,7 @@ f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arr
 	for(var i=0; i<neoRefs_count; i++)
 	{
 		var neoRef = neoRefsList.new_neoReference();
+
 		// 1) Id.***
 		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
@@ -670,7 +674,6 @@ f4d_ReaderWriter.prototype.readF4D_OcclusionCullingOctree_Cell = function(arrayB
 			bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, subOcclusionBox);
 		}
 	}
-	
 	return bytes_readed;
 };
 
@@ -697,6 +700,7 @@ f4d_ReaderWriter.prototype.readF4D_NeoSimpleBuilding = function(GL, arrayBuffer,
 		accesor.min_x = this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		accesor.min_y = this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		accesor.min_z = this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		
 	}
 	
 	// now, read the buffer.***
@@ -780,7 +784,6 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_V4_0 = function(GL, arrayBuffe
 				vt_array_cacheKey._texcoordsArray_cacheKey = GL.createBuffer ();
 				GL.bindBuffer(GL.ARRAY_BUFFER, vt_array_cacheKey._texcoordsArray_cacheKey);
 				GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(vt_array._texcoords_array), GL.STATIC_DRAW);
-				
 			}	
 		}
 	}
@@ -933,13 +936,12 @@ f4d_ReaderWriter.prototype.readF4D_NeoBlocks_inServer = function(GL, filePath_in
 
 	oReq.send(null);
 };
-
+		
 /**
  * 어떤 일을 하고 있습니까?
  */
 f4d_ReaderWriter.prototype.readF4D_CompoundReferences_inServer = function(GL, filePath_inServer, compRefList_Container, compoundReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, BR_BuildingProject, f4d_readerWriter, subOctreeNumberName)
-{
+																		  lodLevel, blocksList, transformMat, BR_BuildingProject, f4d_readerWriter, subOctreeNumberName) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -999,8 +1001,7 @@ f4d_ReaderWriter.prototype.readF4D_CompoundReferences_inServer = function(GL, fi
  * 어떤 일을 하고 있습니까?
  */
 f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, f4d_readerWriter, subOctreeNumberName)
-{
+																		  lodLevel, blocksList, transformMat, neoBuilding, f4d_readerWriter, subOctreeNumberName) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1062,7 +1063,6 @@ f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePat
 				  neoRefsList.multiplyReferencesMatrices(transformMat);
 			  }
 		  }
-		 
 	  }
 	  //arrayBuffer = null;
 	};
@@ -1095,9 +1095,8 @@ f4d_ReaderWriter.prototype.readF4D_neoSimpleBuilding_inServer = function(GL, fil
 	};
 
 	oReq.send(null);
-	
 };
-		
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -1438,7 +1437,7 @@ f4d_ReaderWriter.prototype.readF4D_Header_Original = function(GL, arrayBuffer, B
 										transformed_minPoint3d.y, transformed_maxPoint3d.y,  
 										transformed_minPoint3d.z, transformed_maxPoint3d.z);
 										*/
-			
+	
 	BR_Project.octree.setBoxSize(header._octZerothBox._minX, header._octZerothBox._maxX,  
 								header._octZerothBox._minY, header._octZerothBox._maxY,  
 								header._octZerothBox._minZ, header._octZerothBox._maxZ);
@@ -1700,7 +1699,6 @@ f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath
 			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
 			
 			//////////////////////////////////////////////////////////////////////////////////////////////////
-	
 		  if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
 		  
@@ -1890,8 +1888,6 @@ f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_in
 		
 		if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		
 	};
 	
 	simpleBuildingImage.onerror = function() {
@@ -1987,6 +1983,7 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 	
 	neoRefImage.onerror = function() {
 		// doesn't exist or error loading
+
 		return;
     };
 		neoRefImage.src = filePath_inServer;
@@ -1998,7 +1995,6 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 f4d_ReaderWriter.prototype.openF4d_TerranTile = function(GL, terranTile, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dTerranTileFile.txt";
 	f4d_readerWriter.readF4D_TerranTileFile_inServer(GL, filePath_inServer, terranTile, f4d_readerWriter);
-
 };	
 
 /**
@@ -2018,7 +2014,6 @@ f4d_ReaderWriter.prototype.openF4dProjects_TestFromXDO = function(GL, BR_Project
 f4d_ReaderWriter.prototype.openF4dProjects_TestFromCOLLADA = function(GL, BR_ProjectsList, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_collada2f4d/pCloud_IndexFile.txt";
 	f4d_readerWriter.readF4D_pCloudIndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
-	
 };
 
 /**
@@ -2075,7 +2070,6 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_A1 = function(GL, arrayBuffer,
 	// Finally read the 4byte color.***
 	var color_4byte_temp = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
-	
 	// Simple building texture(create 1pixel X 1pixel bitmap).****************************************************
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 	simpBuildingV1._simpleBuildingTexture = GL.createTexture();
@@ -2124,6 +2118,7 @@ f4d_ReaderWriter.prototype.readXDO_SimpleBuilding_A1 = function(GL, arrayBuffer,
 		simpBuildingV1._vnt_cacheKeys = new f4d_VNT_Interleaved_cacheKeys(); // For SPEEDTEST.***
 	
 	// Multi buffer mode.***
+	
 	
 	// Single buffer mode.***
 	simpBuildingV1._vnt_cacheKeys._vertices_count = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Vertex count (VNT) interleaved.***
@@ -2209,6 +2204,7 @@ f4d_ReaderWriter.prototype.readF4D_TileArrayBuffer_inServer = function(GL, fileP
 		  
 		  arrayBuffer = null;
 		}
+		
 	};
 
 	oReq.send(null);
@@ -2401,7 +2397,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	var blocksListContainer = neoBuilding._blocksList_Container;
 	var filePath_inServer = "";
 	
-	
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.get_BlockList("Blocks1");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter);
@@ -2445,7 +2440,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Bone";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
-	
 	// Now, read the interior objects in octree format.**********************************************************************************************
 	var interiorCRef_folderPath = this.geometryDataPath + "/"+buildingFileName+"/inLOD4";
 	lod_level = 0;
@@ -2468,7 +2462,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 			}
 		}
 	}
-	
 	// Now, read the simple building.************************
 	
 	neoBuilding.neoSimpleBuilding = new F4D_NeoSimpleBuilding();
@@ -2506,16 +2499,13 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	  gl.generateMipmap(gl.TEXTURE_2D);
 	  gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-		
 	
 	var BR_buildingProject = BR_ProjectsList.new_BR_Project(); // NEW F4D PROJECT. *** NEW F4D PROJECT. *** NEW F4D PROJECT. *** NEW F4D PROJECT. ***
 	var blocksListContainer = BR_buildingProject._blocksList_Container;
 	
 	var project_number = projectNumber; // House with car and mini park to children.***
 	
-	
 	var projectNumStr = project_number.toString();
-	
 	
 	//    	  Entity.prototype._getModelMatrix = function(time, result) {
 	//    	        var position = Property.getValueOrUndefined(this._position, time, positionScratch);
@@ -2580,8 +2570,6 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	if(BR_buildingProject.octree == undefined)
 		BR_buildingProject.octree = new f4d_octree(undefined);
-	
-	
 	
 	// 1) Blocks.*******************************************************************************************************************************
 	var filePath_inServer = this.geometryDataPath + "/"+projectNumStr+"/Blocks1";
@@ -2672,7 +2660,5 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	// Once reading finished, we must insert the project in to the corresponding quadtreeTile.***
 	// Pendent.***
-	
 };		
-	
 //# sourceURL=f4d_readWriter.js	
