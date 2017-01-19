@@ -425,7 +425,7 @@ var F4D_NeoSimpleBuilding = function() {
  * @returns accesor 
  */
 F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
-	var accesor = new F4D_Accesor();
+	var accesor = new F4DAccessor();
 	this.accesors_array.push(accesor);
 	return accesor;
 };

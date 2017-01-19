@@ -13,6 +13,8 @@ var convertEncoding = require('gulp-convert-encoding');
 var mocha = require('gulp-mocha');
 var watch = require('gulp-watch');
 var del = require('del');
+//var fileInclude = require('gulp-file-include');
+var eslint = require('gulp-eslint');
 var jsdoc = require('gulp-jsdoc3');
 var Server = require('karma').Server;
 
@@ -44,6 +46,18 @@ gulp.task('clean', function() {
 //			    ignoreFiles: ['.combo.js', '.min.js']
 //			}))
 //			.pipe(gulp.dest( paths.dest_js ))
+//});
+
+////Concatenate and Minify JS task
+//gulp.task('scripts', function() {
+//  return gulp.src('./public_html/assets/js/modules/*.js')
+//    .pipe(concat('webstoemp.js'))
+//    .pipe(gulp.dest('./public_html/assets/js/build'))
+//    .pipe(rename('webstoemp.min.js'))
+//    .pipe(stripdebug())
+//    .pipe(uglify())
+//    .pipe(gulp.dest('./public_html/assets/js/build'))
+//    .pipe(notify({ message: 'Scripts task complete' }));
 //});
 
 gulp.task('uglify', [ 'clean' ], function () {
@@ -86,17 +100,28 @@ gulp.task('watch', function() {
 //	    .pipe(jasmineBrowser.server({port: 8888}));
 //	});
 
-//gulp.task('karma-jasmine', function (done) {
-//	new Server({
-//		configFile: __dirname + '/karma.conf.js',
-//		singleRun: true
-//	}, done).start();
-//});
+gulp.task('karma', function (done) {
+	new Server({
+		configFile: __dirname + '/karma.conf.js',
+		singleRun: true
+	}, done).start();
+});
 
-gulp.task('test', function() {
-	return gulp.src([ './test/*.js' ], {read : false})
-		.pipe(mocha({reporter : 'tap'}))
-		.on('error', util.log);
+/**
+ * Watch for file changes and re-run tests on each change
+ */
+gulp.task('tdd', function (done) {
+	new Server({
+		configFile: __dirname + '/karma.conf.js'
+	}, done).start();
+});
+
+// eslint
+gulp.task('lint', function() {
+	return gulp.src(paths.source_js)
+		.pipe(eslint({configFile : 'eslintrc.json'}))
+		.pipe(eslint.format())
+		.pipe(eslint.failAfterError());
 });
 
 gulp.task('doc', function (cb) {
@@ -105,5 +130,4 @@ gulp.task('doc', function (cb) {
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'uglify', 'minify-css', 'test', 'doc' ]);
-
+gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
