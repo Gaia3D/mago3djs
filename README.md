@@ -1,4 +1,3 @@
-테스트
 1 프로젝트명
  - maog3djs 
 
@@ -22,4 +21,5 @@
  - eclipse neon(필수)
  - node
  
+3 아키텍처
  gulp, karma, jasmine(mocha + chai), jsdoc, eslint 
