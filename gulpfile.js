@@ -19,13 +19,13 @@ var jsdoc = require('gulp-jsdoc3');
 var Server = require('karma').Server;
 
 var paths = {
-	data : './3d_data',
-	source_js : [ './src/js/*.js', '!./src/js/cesium' ],
-	source_images : './images/*',
-	source_css : './src/css/*',
-	dest_js : './build/js',
-	dest_images : './images',
-	dest_css : './build/css',
+	data : './data',
+	source_js : [ './src/mago3d/*.js', '!./src/engine/cesium' ],
+//	source_images : './images/*',
+//	source_css : './src/css/*',
+	dest_js : './build/mago3d',
+//	dest_images : './images',
+//	dest_css : './build/css',
 	test : './test/*.js',
 	build : './build'
 };
@@ -76,11 +76,11 @@ gulp.task('uglify', [ 'clean' ], function () {
 //			.pipe(gulp.dest(paths.dest_js));
 //});
 
-gulp.task('minify-css', [ 'clean' ], function() {
-	return gulp.src(paths.source_css)
-		.pipe(cleanCss({compatibility : 'ie8'}))
-		.pipe(gulp.dest(paths.dest_css));
-});
+//gulp.task('minify-css', [ 'clean' ], function() {
+//	return gulp.src(paths.source_css)
+//		.pipe(cleanCss({compatibility : 'ie8'}))
+//		.pipe(gulp.dest(paths.dest_css));
+//});
 
 // // Copy all static images
 //gulp.task('images', [ 'clean' ], function() {
@@ -94,25 +94,10 @@ gulp.task('watch', function() {
 	gulp.watch( paths.source_js, ['uglify']);
 });
 
-//gulp.task('jasmine', function() {
-//	  return gulp.src(['./src/js/*.js', './test/*.js'])
-//	    .pipe(jasmineBrowser.specRunner())
-//	    .pipe(jasmineBrowser.server({port: 8888}));
-//	});
-
 gulp.task('karma', function (done) {
 	new Server({
 		configFile: __dirname + '/karma.conf.js',
 		singleRun: true
-	}, done).start();
-});
-
-/**
- * Watch for file changes and re-run tests on each change
- */
-gulp.task('tdd', function (done) {
-	new Server({
-		configFile: __dirname + '/karma.conf.js'
 	}, done).start();
 });
 
@@ -126,8 +111,8 @@ gulp.task('lint', function() {
 
 gulp.task('doc', function (cb) {
 	var config = require('./jsdoc.json');
-	gulp.src(['README.md', './src/js/*.js'], {read: false})
+	gulp.src(['README.md', './src/mago3d/*.js'], {read: false})
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'uglify', 'minify-css', 'doc' ]);
+gulp.task('default', [ 'uglify', 'doc' ]);
