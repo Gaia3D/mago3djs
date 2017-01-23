@@ -21,4 +21,4 @@
  - eclipse neon(필수)
  - node
  
- gulp, karma, jasmine(mocha + chai), jsdoc, eslint
+ gulp, karma, jasmine(mocha + chai), jsdoc, eslint 
