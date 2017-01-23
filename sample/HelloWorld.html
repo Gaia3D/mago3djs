@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium and F4D Viewer</title>
+  <script src="../src/js/cesium/Cesium.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Atmosphere.js"></script>
+  <script type="text/javascript" src="../src/js/MoveCubeLibsJScript.js"></script>
+  <script type="text/javascript" src="../src/js/SonGeometryJScript.js"></script>
+  <script type="text/javascript" src="../src/js/SonGeometryModifier.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Line.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Plane.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Point3D.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Projects.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Shader.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_ReaderWriter.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Renderer.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Selection.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_VBO_Manager.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Manager.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_PostFxShader.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_FBO.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Geometry.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_Accesor.js"></script>
+  <script type="text/javascript" src="../src/js/F4D_neoTexture.js"></script>
+  <style>
+      @import url(../src/js/cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+	
+	// Gaia Mago 3d code.*************************************************
+	// Create f4d_topManager.**************************************************
+	var GL = viewer.scene.context._gl;
+	viewer.scene.f4d_topManager = new f4d_manager(); // This is the top f4d class.***
+	viewer.scene.f4d_topManager.f4dSelection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+	viewer.scene.f4d_topManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
+	viewer.scene.f4d_topManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
+	viewer.scene.f4d_topManager.scene = viewer.scene;
+	
+	
+	// Start postRender version.***********************************************
+	var f4d_topManager = viewer.scene.f4d_topManager;
+	var scene = viewer.scene;
+	//scene.copyGlobeDepth = true;
+	f4d_topManager.scene = scene;
+	
+	var context = scene.context;
+	
+	viewer.scene.globe.depthTestAgainstTerrain = true;
+	
+	f4d_topManager.f4dSelection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
+	f4d_topManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
+	f4d_topManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
+	
+	var f4d_readerWriter = new f4d_ReaderWriter();
+	
+	f4d_topManager.load_TEST_Files();
+	
+	
+	//var texture = context.createTexture2D({ width : scene.drawingBufferWidth, height : scene.drawingBufferHeight });
+	//var myFramebuffer = context.createFramebuffer({ colorTexture : texture });
+	
+	
+	
+	var BR_ProjectsList = f4d_topManager.f4dBR_buildingProjectsList;
+	var neoBuildingsList = f4d_topManager.f4d_neoBuildingsList;
+	
+	// handlers.**************************************************************************
+	function disableCameraMotion(state){
+		viewer.scene.screenSpaceCameraController.enableRotate = state;
+		viewer.scene.screenSpaceCameraController.enableZoom = state;
+		viewer.scene.screenSpaceCameraController.enableLook = state;
+		viewer.scene.screenSpaceCameraController.enableTilt = state;
+		viewer.scene.screenSpaceCameraController.enableTranslate = state;
+	}
+
+	f4d_topManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+	f4d_topManager.handler.setInputAction(function(click) {
+	/*
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && pickedObject.id === myPolygon){
+          vm.pickedPolygon = true;
+          disableCameraMotion(false);
+          console.log('here');
+        }
+		*/
+		this.dateSC = new Date();
+		this.startTimeSC = this.dateSC.getTime();
+		//secondsUsed = this.currentTimeSC - this.startTimeSC;
+				
+		f4d_topManager.mouse_x = click.position.x;
+		f4d_topManager.mouse_y = click.position.y;
+		f4d_topManager.mouseLeftDown = true;
+		
+
+		
+		
+		var hola = 0;
+      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+
+      f4d_topManager.handler.setInputAction(function(movement) {
+        // move the myEllipse around
+        //if (!vm.pickedPolygon){
+        //  return;
+        //}
+
+		/*
+        var endPoint = viewer.camera.pickEllipsoid(movement.endPosition, scene.globe.ellipsoid);
+        var startPoint = viewer.camera.pickEllipsoid(movement.startPosition, scene.globe.ellipsoid);
+		
+		if(startPoint == undefined || endPoint == undefined)
+			return;
+			
+        var distances = {
+          x: endPoint.x-startPoint.x,
+          y: endPoint.y-startPoint.y,
+          z: endPoint.z-startPoint.z
+        };
+		*/
+		
+		if(f4d_topManager.mouseLeftDown)
+		{
+			if(movement.startPosition.x != movement.endPosition.x || movement.startPosition.y != movement.endPosition.y)
+			{
+				if(f4d_topManager.objectSelected != undefined)
+				{
+					// move the selected object.***
+					f4d_topManager.mouse_x = movement.startPosition.x;
+					f4d_topManager.mouse_y = movement.startPosition.y;
+					
+					// 1rst, check if there are objects to move.***
+					if(f4d_topManager.mustCheckIfDragging)
+					{
+						var gl = scene.context._gl;
+						if(f4d_topManager.isDragging(gl, scene))
+						{
+							f4d_topManager.mouseDragging = true;
+							disableCameraMotion(false);
+							
+							
+						}
+						
+						f4d_topManager.mustCheckIfDragging = false;
+					}
+					
+				}
+				else
+					f4d_topManager.isCameraMoving = true; // if no object is selected.***
+					
+					
+				if(f4d_topManager.mouseDragging)
+				{
+					var gl = scene.context._gl;
+					f4d_topManager.moveSelectedObject(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
+				}
+			}
+			
+			
+			
+		}
+		else{
+			f4d_topManager.mouseDragging = false;
+			disableCameraMotion(true);
+		}
+		
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+    f4d_topManager.handler.setInputAction(function(movement) {
+        // if picked
+        //vm.pickedPolygon = false;
+        //disableCameraMotion(true);
+		f4d_topManager.isCameraMoving = false;
+		f4d_topManager.mouseLeftDown = false;
+		f4d_topManager.mouseDragging = false;
+		f4d_topManager.selObjMovePlane = undefined;
+		f4d_topManager.mustCheckIfDragging = true;
+		f4d_topManager.thereAreStartMovePoint = false;
+		disableCameraMotion(true);
+		
+		this.dateSC = new Date();
+		this.currentTimeSC = this.dateSC.getTime();
+		var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
+		if(miliSecondsUsed < 500)
+		{
+			if(f4d_topManager.mouse_x == movement.position.x && f4d_topManager.mouse_y == movement.position.y)
+			{
+				f4d_topManager.bPicking = true;
+				//var gl = scene.context._gl;
+				//f4d_topManager.objectSelected = f4d_topManager.getSelectedObject_Picking(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
+			}
+		}
+		
+		var hola = 0;
+    }, Cesium.ScreenSpaceEventType.LEFT_UP);
+	// end handlers.-----------------------------------------------------------------------------
+	
+	// move objects in cesium example.*** http://webiks.com/cesiumjs-moving-entities-around/
+	
+	
+	//f4d_readerWriter.openF4d_TerranTile(GL, f4d_topManager.f4d_terranTile, f4d_readerWriter);
+	//f4d_readerWriter.openBuildingProject(GL, 130, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, BR_ProjectsList, f4d_topManager);
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	var buildingFileName = "F4D_gangnam_del";
+	//f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, f4d_readerWriter, neoBuildingsList, f4d_manager);
+
+	var entities = viewer.entities;
+		entities.add({
+			name : 'Blue box',
+			position: Cesium.Cartesian3.fromDegrees(126.92734533517019, 37.517207695444, 1500.0), // usa = (-114.0, 40.0, 300000.0), songdo = (126.6554, 37.3853, 300000.0)
+			box : {
+				dimensions : new Cesium.Cartesian3(300000.0, 300000.0, 300000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				material : Cesium.Color.TRANSPARENT 
+			}
+		});
+		
+		var entities = viewer.entities;
+                entities.add({
+                	name : 'Blue box',
+                    position: new Cesium.Cartesian3(1.0, 1.0, 1.0), // usa = (-114.0, 40.0, 300000.0), songdo = (126.6554, 37.3853, 300000.0)
+                    box : {
+                        dimensions : new Cesium.Cartesian3(300000.0*1000000, 300000.0*1000000, 300000.0*1000000), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+                        material : Cesium.Color.BLUE
+                    }
+                });
+		
+	
+	// End gaia Mago3d code.----------------------------------------------
+	
+  </script>
+</body>
+</html>
