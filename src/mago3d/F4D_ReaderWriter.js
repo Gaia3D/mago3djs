@@ -1,30 +1,5 @@
 
-// Code examples for the future.*********************************************************************
-/*
-var _getAllFilesFromFolder = function(dir) 
-	{
-		// http://stackoverflow.com/questions/20822273/best-way-to-get-folder-and-file-list-in-javascript
-		
-		var filesystem = require('fs');
-		var results = [];
 
-		filesystem.readdirSync(dir).forEach(function(file) {
-
-			file = dir+'/'+file;
-			var stat = filesystem.statSync(file);
-
-			if (stat && stat.isDirectory()) {
-				//results = results.concat(_getAllFilesFromFolder(file))
-			} else results.push(file);
-
-		});
-
-		return results;
-		
-	};
-	*/
-		
-// End code examples.------------------------------------------------------------------------------------
 
 var f4d_ReaderWriter = function()
 {
