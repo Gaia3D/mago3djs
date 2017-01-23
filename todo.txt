@@ -1,4 +1,4 @@
- * 해야 할 목록
+﻿ * 해야 할 목록
 
 1 디랙토리 구조
  1) 3d_data
@@ -29,7 +29,7 @@
  - 우선은 apache lounge
  
 4 javascript doc
- - jsdoc
+ - jsdoc 
  - https://github.com/jsdoc3/jsdoc
  - http://usejsdoc.org/
 
