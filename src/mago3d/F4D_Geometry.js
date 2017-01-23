@@ -177,7 +177,7 @@ var F4D_NeoReference = function() {
  * 어떤 일을 하고 있습니까?
  */
 F4D_NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
-	var multipliedMat = this._matrix4.getMultipliedByMatrix(matrix); // Original.***
+	var multipliedMat = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
 	this._matrix4 = multipliedMat;
 };
 

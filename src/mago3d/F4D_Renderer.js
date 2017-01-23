@@ -13,7 +13,6 @@ var f4d_renderer = function()
 	this.simpObj_scratch = undefined;
 };
 
-
 f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx)
 {
 	// render_neoRef
