@@ -1,6 +1,9 @@
 // Color.************************************************************************************* //
-  var f4d_color = function()
-  {
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_color = function() {
 	  this.r = 0;
 	  this.g = 0;
 	  this.b = 0;
@@ -8,22 +11,46 @@
 	  
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param _r = 변수
+   * @param _g = 변수
+   * @param _b = 변수
+   * @param _a = 변수
+   */
   f4d_color.prototype.set = function(_r, _g, _b, _a)
   {
   	this.r = _r; this.g = _g; this.b = _b; this.a = _a;
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param _r = 변수
+   * @param _g = 변수
+   * @param _b = 변수
+   */
   f4d_color.prototype.setRGB = function(_r, _g, _b)
   {
   	this.r = _r; this.g = _g; this.b = _b; 
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param _r = 변수
+   * @param _g = 변수
+   * @param _b = 변수
+   * @param _alpha = 변수
+   */
   f4d_color.prototype.setRGBA = function(_r, _g, _b, _alpha)
   {
   	this.r = _r; this.g = _g; this.b = _b;  this.a = _alpha;
   };
   
   // ByteColor .******************************************************************************* //
+  
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_ByteColor = function()
   {
 	  this._byte_r = 0;
@@ -32,6 +59,9 @@
 	  this._byte_alfa = 255;
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_ByteColor.prototype.destroy = function()
   {
 	  this._byte_r = null;
@@ -40,6 +70,12 @@
 	  this._byte_alfa = null;
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param byteRed = 변수
+   * @param byteGreen = 변수
+   * @param byteBlue = 변수
+   */
   f4d_ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue)
   {
 	  this._byte_r = byteRed;
@@ -48,6 +84,10 @@
   };
   
   // f4d_Point3dAux.*************************************************************************** //
+  
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_point3dAux = function()
   {
 	  this.x = 0.0;
@@ -58,6 +98,10 @@
   };
   
 // Point3D.********************************************************************************** //
+  
+/**
+* 어떤 일을 하고 있습니까?
+*/
 var f4d_point2d = function()
 {
   this.x = 0.0;
@@ -70,6 +114,10 @@ var f4d_point2d = function()
 
 // ******************************************************************************************* //
 // TTriangles.******************************************************************************* //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_tTriangle = function() // topological triangle.***
 {
 	this.m_vertex_1 = undefined;
@@ -78,6 +126,12 @@ var f4d_tTriangle = function() // topological triangle.***
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vtx_1 = 변수
+ * @param vtx_2 = 변수
+ * @param vtx_3 = 변수
+ */
 f4d_tTriangle.prototype.set_vertices = function(vtx_1, vtx_2, vtx_3)
 {
 	this.m_vertex_1 = vtx_1;
@@ -85,6 +139,9 @@ f4d_tTriangle.prototype.set_vertices = function(vtx_1, vtx_2, vtx_3)
   	this.m_vertex_3 = vtx_3;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_tTriangle.prototype.invert = function()
 {
 	var vertexAux = this.m_vertex_2;
@@ -94,12 +151,20 @@ f4d_tTriangle.prototype.invert = function()
 
 // ******************************************************************************************* //
 // TTrianglesList.**************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_tTrianglesList = function() // topological triangles.***
 {
 	this.tTrianglesArray = [];
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns tTri
+ */
 f4d_tTrianglesList.prototype.new_tTriangle = function()
 {
 	var tTri = new f4d_tTriangle();
@@ -107,6 +172,9 @@ f4d_tTrianglesList.prototype.new_tTriangle = function()
 	return tTri;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_tTrianglesList.prototype.invert_trianglesSense= function()
 {
 	var tri_count = this.tTrianglesArray.length;
@@ -116,6 +184,11 @@ f4d_tTrianglesList.prototype.invert_trianglesSense= function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx = 변수
+ * @returns tTrianglesArray[idx]
+ */
 f4d_tTrianglesList.prototype.get_tTriangle = function(idx)
 {
 	if(idx >=0 && idx < this.tTrianglesArray.length)
@@ -129,6 +202,10 @@ f4d_tTrianglesList.prototype.get_tTriangle = function(idx)
 
 // ******************************************************************************************* //
 // TTrianglesMatrix.************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_tTrianglesMatrix = function() // topological triangles.***
 {
 	this.tTrianglesListsArray = [];
@@ -138,6 +215,10 @@ var f4d_tTrianglesMatrix = function() // topological triangles.***
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns tTrianglesList
+ */
 f4d_tTrianglesMatrix.prototype.new_tTrianglesList = function()
 {
 	var tTrianglesList = new f4d_tTrianglesList();
@@ -145,6 +226,9 @@ f4d_tTrianglesMatrix.prototype.new_tTrianglesList = function()
 	return tTrianglesList;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_tTrianglesMatrix.prototype.invert_trianglesSense = function()
 {
 	var tTriLists_count = this.tTrianglesListsArray.length;
@@ -154,6 +238,11 @@ f4d_tTrianglesMatrix.prototype.invert_trianglesSense = function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultTotalTTrianglesArray = 변수
+ * @returns resultTotalTTrianglesArray
+ */
 f4d_tTrianglesMatrix.prototype.get_totalTTrianglesArray = function(resultTotalTTrianglesArray)
 {
 	var tTriangles_count = undefined;
@@ -172,6 +261,10 @@ f4d_tTrianglesMatrix.prototype.get_totalTTrianglesArray = function(resultTotalTT
 	return resultTotalTTrianglesArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns shortArray
+ */
 f4d_tTrianglesMatrix.prototype.get_vbo_indices_ShortArray = function()
 {
 	this.totalTTrianglesArraySC.length = 0;
@@ -193,6 +286,10 @@ f4d_tTrianglesMatrix.prototype.get_vbo_indices_ShortArray = function()
   
 //***********************************************************************************************//
 // F4D Vertex.***********************************************************************************//
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_vertex = function()
 {
 	this.point3d = new f4d_point3d();
@@ -202,11 +299,23 @@ var f4d_vertex = function()
 	this.m_idx_inList = -1;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x = 변수
+ * @param y = 변수
+ * @param z = 변수
+ */
 f4d_vertex.prototype.set_position = function(x, y, z)
 {
 	this.point3d.set(x, y, z);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param r = 변수
+ * @param g = 변수
+ * @param b = 변수
+ */
 f4d_vertex.prototype.set_colorRGB = function(r, g, b)
 {
 	if(this.color4 == undefined)
@@ -215,6 +324,13 @@ f4d_vertex.prototype.set_colorRGB = function(r, g, b)
 	this.color4.setRGB(r, g, b);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param r = 변수
+ * @param g = 변수
+ * @param b = 변수
+ * @param alpha = 변수
+ */
 f4d_vertex.prototype.set_colorRGBA = function(r, g, b, alpha)
 {
 	if(this.color4 == undefined)
@@ -223,6 +339,13 @@ f4d_vertex.prototype.set_colorRGBA = function(r, g, b, alpha)
 	this.color4.setRGBA(r, g, b, alpha);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param dir_x = 변수
+ * @param dir_y = 변수
+ * @param dir_z = 변수
+ * @param distance = 변수
+ */
 f4d_vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance)
 {
 	this.point3d.add(dir_x*distance, dir_y*distance, dir_z*distance);
@@ -230,11 +353,19 @@ f4d_vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance)
 
 //***********************************************************************************************//
 // F4D VertexList.*******************************************************************************//
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_vertexList = function()
 {
 	this.vertexArray = [];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertex
+ */
 f4d_vertexList.prototype.new_vertex = function()
 {
 	var vertex = new f4d_vertex();
@@ -242,16 +373,29 @@ f4d_vertexList.prototype.new_vertex = function()
 	return vertex;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx = 변수
+ * @returns vertexArray[idx]
+ */
 f4d_vertexList.prototype.get_vertex = function(idx)
 {
 	return this.vertexArray[idx];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexArray.length
+ */
 f4d_vertexList.prototype.get_vertexCount = function()
 {
 	return this.vertexArray.length;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vertexCount = 변수
+ */
 f4d_vertexList.prototype.create_nVertex = function(vertexCount)
 {
 	for(var i=0; i<vertexCount; i++)
@@ -260,6 +404,13 @@ f4d_vertexList.prototype.create_nVertex = function(vertexCount)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param dir_x = 변수
+ * @param dir_y = 변수
+ * @param dir_z = 변수
+ * @param distance = 변수
+ */
 f4d_vertexList.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance)
 {
 	var vertex_count = this.vertexArray.length;
@@ -269,6 +420,11 @@ f4d_vertexList.prototype.translate_vertices = function(dir_x, dir_y, dir_z, dist
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultBox = 변수
+ * @returns resultBox
+ */
 f4d_vertexList.prototype.get_boundingBox = function(resultBox)
 {
 	if(resultBox == undefined)
@@ -285,6 +441,10 @@ f4d_vertexList.prototype.get_boundingBox = function(resultBox)
 	return resultBox;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param transformMatrix = 변수
+ */
 f4d_vertexList.prototype.transformPoints_byMatrix4 = function(transformMatrix)
 {
 	var vertex = undefined;
@@ -299,6 +459,10 @@ f4d_vertexList.prototype.transformPoints_byMatrix4 = function(transformMatrix)
 
 //***********************************************************************************************//
 // F4D VertexMatrix.*******************************************************************************//
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_vertexMatrix = function()
 {
 	this.vertexListsArray = [];
@@ -307,6 +471,10 @@ var f4d_vertexMatrix = function()
 	this.totalVertexArraySC = [];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 f4d_vertexMatrix.prototype.new_vertexList = function()
 {
 	var vertexList = new f4d_vertexList();
@@ -314,6 +482,11 @@ f4d_vertexMatrix.prototype.new_vertexList = function()
 	return vertexList;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx = 변수
+ * @returns vertexListArray[idx]
+ */
 f4d_vertexMatrix.prototype.get_vertexList = function(idx)
 {
 	if(idx >= 0 && idx < this.vertexListsArray.length)
@@ -325,6 +498,11 @@ f4d_vertexMatrix.prototype.get_vertexList = function(idx)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultBox
+ * @returns resultBox
+ */
 f4d_vertexMatrix.prototype.get_boundingBox = function(resultBox)
 {
 	if(resultBox == undefined)
@@ -345,6 +523,9 @@ f4d_vertexMatrix.prototype.get_boundingBox = function(resultBox)
 	return resultBox;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_vertexMatrix.prototype.set_vertexIdxInList = function()
 {
 	var idx_in_list = 0;
@@ -364,6 +545,10 @@ f4d_vertexMatrix.prototype.set_vertexIdxInList = function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexCount
+ */
 f4d_vertexMatrix.prototype.get_vertexCount = function()
 {
 	var vertexCount = 0;
@@ -376,6 +561,11 @@ f4d_vertexMatrix.prototype.get_vertexCount = function()
 	return vertexCount;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultTotalVertexArray = 변수
+ * @returns resultTotalVertexArray
+ */
 f4d_vertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArray)
 {
 	var vertexLists_count = this.vertexListsArray.length;
@@ -393,6 +583,11 @@ f4d_vertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArra
 	return resultTotalVertexArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultFloatArray = 변수
+ * @returns resultFloatArray
+ */
 f4d_vertexMatrix.prototype.get_vbo_vertexColor_FloatArray = function(resultFloatArray)
 {
 	this.totalVertexArraySC.length = 0;
@@ -418,6 +613,11 @@ f4d_vertexMatrix.prototype.get_vbo_vertexColor_FloatArray = function(resultFloat
 	return resultFloatArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultFloatArray = 변수
+ * @returns resultFloatArray
+ */
 f4d_vertexMatrix.prototype.get_vbo_vertexColorRGBA_FloatArray = function(resultFloatArray)
 {
 	this.totalVertexArraySC.length = 0;
@@ -444,6 +644,11 @@ f4d_vertexMatrix.prototype.get_vbo_vertexColorRGBA_FloatArray = function(resultF
 	return resultFloatArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultFloatArray = 변수
+ * @returns resultFloatArray
+ */
 f4d_vertexMatrix.prototype.get_vbo_vertex_FloatArray = function(resultFloatArray)
 {
 	this.totalVertexArraySC.length = 0;
@@ -465,6 +670,13 @@ f4d_vertexMatrix.prototype.get_vbo_vertex_FloatArray = function(resultFloatArray
 	return resultFloatArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param dir_x = 변수
+ * @param dir_y = 변수
+ * @param dir_z = 변수
+ * @param distance = 변수
+ */
 f4d_vertexMatrix.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance)
 {
 	var vertexLists_count = this.vertexListsArray.length;
@@ -474,6 +686,10 @@ f4d_vertexMatrix.prototype.translate_vertices = function(dir_x, dir_y, dir_z, di
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param tTrianglesMatrix = 변수
+ */
 f4d_vertexMatrix.prototype.make_tTriangles_lateralSidesLOOP = function(tTrianglesMatrix)
 {
 	// condition: all the vertex lists must have the same number of vertex.***
@@ -512,6 +728,10 @@ f4d_vertexMatrix.prototype.make_tTriangles_lateralSidesLOOP = function(tTriangle
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param transformMatrix
+ */
 f4d_vertexMatrix.prototype.transformPoints_byMatrix4 = function(transformMatrix)
 {
 	var vtxList = undefined;
@@ -527,6 +747,10 @@ f4d_vertexMatrix.prototype.transformPoints_byMatrix4 = function(transformMatrix)
   
 //***********************************************************************************************//
 // F4D BoundingBox.**************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_boundingBox = function()
 {
 	this._minX = 1000000.0; 
@@ -539,6 +763,10 @@ var f4d_boundingBox = function()
   
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param point3d = 변수
+ */
 f4d_boundingBox.prototype.setInit = function(point3d)
 {
   this._minX = point3d.x;
@@ -550,6 +778,10 @@ f4d_boundingBox.prototype.setInit = function(point3d)
   this._maxZ = point3d.z;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param point3d
+ */
 f4d_boundingBox.prototype.addPoint3D = function(point3d)
 {
   if(point3d.x < this._minX)this._minX = point3d.x;
@@ -561,7 +793,11 @@ f4d_boundingBox.prototype.addPoint3D = function(point3d)
   if(point3d.z < this._minZ)this._minZ = point3d.z;
   else if(point3d.z > this._maxZ)this._maxZ = point3d.z;
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param boundingBox = 변수
+ */  
 f4d_boundingBox.prototype.addBox = function(boundingBox)
 {
   if(boundingBox._minX < this._minX)this._minX = boundingBox._minX;
@@ -574,6 +810,10 @@ f4d_boundingBox.prototype.addBox = function(boundingBox)
   if(boundingBox._maxZ > this._maxZ)this._maxZ = boundingBox._maxZ;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns result
+ */
 f4d_boundingBox.prototype.get_maxLength = function()
 {
   var result = this._maxX - this._minX;
@@ -585,6 +825,11 @@ f4d_boundingBox.prototype.get_maxLength = function()
   return result;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultPoint3d
+ * @returns resultPoint3d
+ */
 f4d_boundingBox.prototype.get_centerPoint3d = function(resultPoint3d)
 {
 	if(resultPoint3d == undefined)
@@ -594,6 +839,12 @@ f4d_boundingBox.prototype.get_centerPoint3d = function(resultPoint3d)
 	return resultPoint3d;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x = 변수
+ * @param y = 변수
+ * @param z = 변수
+ */
 f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 {
   if(x < this._minX || x > this._maxX)
@@ -616,6 +867,10 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   
   // ******************************************************************************************* //
   // FTriangles.******************************************************************************* //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
   var f4d_triangle= function()
   {
 	 this.m_point_1 = null;
@@ -632,7 +887,10 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   	this.m_color_3 = null;
   	
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_triangle.prototype.destroy = function()
   {
 	  // No destroy Points3d here, only assign NULL value. Points3d must be destroyed for the owner(ftrianglesSurface).***
@@ -659,7 +917,13 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   	this.m_color_2 = null;
   	this.m_color_3 = null;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param point_1_idx = 변수
+   * @param point_2_idx = 변수
+   * @param point_3_idx = 변수
+   */
   f4d_triangle.prototype.setPoints3DIndices = function(point_1_idx, point_2_idx, point_3_idx)
   {
 	  this.m_point_1_idx = point_1_idx;
@@ -667,32 +931,56 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   	this.m_point_3_idx = point_3_idx;
   };
 
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param point_1 = 변수
+   * @param point_2 = 변수
+   * @param point_3 = 변수
+   */
   f4d_triangle.prototype.setPoints3D = function(point_1, point_2, point_3)
   {
 	  this.m_point_1 = point_1;
   	this.m_point_2 = point_2;
   	this.m_point_3 = point_3;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param color_1 = 변수
+   * @param color_2 = 변수
+   * @param color_3 = 변수
+   */
   f4d_triangle.prototype.setColors = function(color_1, color_2, color_3)
   {
 	  this.m_color_1 = color_1;
   	this.m_color_2 = color_2;
   	this.m_color_3 = color_3;
   };
-
+  
 	// F4D_Polygon.************************************************************************************************************ //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
 	var f4d_Polygon = function()
 	{
 		this.mPoint3DArray = [];
 
 	};
 
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param point3d = 변수
+	 */
 	f4d_Polygon.prototype.addPoint3D = function(point3d)
 	  {
 		  this.mPoint3DArray.push(point3d);
 	  };
 
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @returns point3d
+	   */
 	f4d_Polygon.prototype.newPoint3D = function()
 	  {
 		  var point3d = new f4d_point3d();
@@ -701,13 +989,20 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  };
 
   // FTrianglesSurfaces.******************************************************************************************************* //
+
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   */
   var f4d_trianglesSurface= function()
   {
 	  this.mPoint3DArray = [];
 	  this.mTrianglesArray = [];
   	
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_trianglesSurface.prototype.destroy = function()
   {
 	  // 1rst, destroy ftriangles.**********************************
@@ -730,7 +1025,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  }
 	  this.mPoint3DArray = null;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param generalVBOArraysContainer = 변수
+   */
   f4d_trianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer)
   {
 	  var current_meshArrays = null;
@@ -798,7 +1097,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 		  
 	  }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param general_VertexIdxVBO_ArraysContainer = 변수
+   */
   f4d_trianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_ArraysContainer)
   {
 	  var current_meshArrays = null;
@@ -844,7 +1147,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 		  current_meshArrays.mesh_tri_indices.push(idx_p3 + curr_vtx_count);
 	  }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param general_VertexIdxVBO_ArraysContainer = 변수
+   */
   f4d_trianglesSurface.prototype.getVertexIndicesArrays_original = function(general_VertexIdxVBO_ArraysContainer)
   {
 	  var current_meshArrays = null;
@@ -901,21 +1208,34 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   };
   
   
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns point3d
+   */
   f4d_trianglesSurface.prototype.newPoint3D = function()
   {
 	  var point3d = new f4d_point3d();
 	  this.mPoint3DArray.push(point3d);
 	  return point3d;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns ftriangle
+   */
   f4d_trianglesSurface.prototype.newTriangle = function()
   {
 	  var ftriangle = new f4d_triangle();
 	  this.mTrianglesArray.push(ftriangle);
 	  return ftriangle;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param matrix4 = 변수
+   * @returns transformedTrianglesSurface
+   */
   f4d_trianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4)
   {
 	  var transformedTrianglesSurface = new f4d_trianglesSurface();
@@ -939,7 +1259,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  }
 	  return transformedTrianglesSurface;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns bb
+   */
   f4d_trianglesSurface.prototype.getBoundingBox = function()
   {
 	  var points_count = this.mPoint3DArray.length;
@@ -960,12 +1284,19 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   };
   
   // FPolyhedron.***************************************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_fpolyhedron= function()
   {
 	  this.mFTrianglesSurfacesArray = [];
 	  this.mIFCEntityType = -1;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_fpolyhedron.prototype.destroy = function()
   {
 	  var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
@@ -979,7 +1310,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  
 	  this.mIFCEntityType = null;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param generalVBOArraysContainer = 변수
+   */
   f4d_fpolyhedron.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer)
   {
 	  var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
@@ -989,7 +1324,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 		  ftriangles_surface.getVertexColorsIndicesArrays(generalVBOArraysContainer);
 	  }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param general_VertexIdxVBO_ArraysContainer = 변수
+   */
   f4d_fpolyhedron.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_ArraysContainer)
   {
 	  var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
@@ -1000,14 +1339,23 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  }
   };
   
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns ftrianglesSurface
+   */
   f4d_fpolyhedron.prototype.newFTrianglesSurface = function()
   {
 	  var ftrianglesSurface = new f4d_trianglesSurface();
 	  this.mFTrianglesSurfacesArray.push(ftrianglesSurface);
 	  return ftrianglesSurface;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param matrix4
+   * @returns transformedFPolyhedron
+   */
   f4d_fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4)
   {
 	  var transformedFPolyhedron = new f4d_fpolyhedron();
@@ -1022,7 +1370,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  
 	  return transformedFPolyhedron;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns bb
+   */
   f4d_fpolyhedron.prototype.getBoundingBox = function()
   {
 	  var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
@@ -1051,11 +1403,19 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
   };
   
   // FPolyhedronsList.**************************************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_fpolyhedronsList= function()
   {
 	  this.mFPolyhedronsArray = [];
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param generalVBOArraysContainer = 변수
+   */
   f4d_fpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer)
   {
 	  var fpolyhedrons_count = this.mFPolyhedronsArray.length;
@@ -1067,6 +1427,10 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	  }
   };
 
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns fpolyhedron 
+   */
   f4d_fpolyhedronsList.prototype.newFPolyhedron = function()
   {
 	  var fpolyhedron = new f4d_fpolyhedron();
@@ -1082,6 +1446,11 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 
 //*******************************************************************************************************************************//
 // F4D_Quaternion.***************************************************************************************************************//
+
+
+/**
+* 어떤 일을 하고 있습니까?
+*/
 var f4d_Quaternion = function()
 {
 	this.x = 0.0;
@@ -1090,11 +1459,18 @@ var f4d_Quaternion = function()
 	this.w = 1.0;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w )
+ */
 f4d_Quaternion.prototype.Modul = function()
 {
 	return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w );
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_Quaternion.prototype.Unitary = function()
 {
 	var modul = this.Modul();
@@ -1104,12 +1480,26 @@ f4d_Quaternion.prototype.Unitary = function()
 	this.w /= modul;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param angDeg = 변수
+ * @param axis_x = 변수
+ * @param axis_y = 변수
+ * @param axis_z = 변수
+ */
 f4d_Quaternion.prototype.Rotation_angDeg = function(angDeg, axis_x, axis_y, axis_z)
 {
 	var angRad = angDeg*Math.PI/180.0;
 	this.Rotation_angRad(angRad, axis_x, axis_y, axis_z);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param angRad = 변수
+ * @param axis_x = 변수
+ * @param axis_y = 변수
+ * @param axis_z = 변수
+ */
 f4d_Quaternion.prototype.Rotation_angRad = function(angRad, axis_x, axis_y, axis_z)
 {
 	var s = Math.sqrt(axis_x*axis_x + axis_y*axis_y + axis_z*axis_z);
@@ -1134,6 +1524,10 @@ f4d_Quaternion.prototype.Rotation_angRad = function(angRad, axis_x, axis_y, axis
 };
 	
 // F4D Matrix.************************************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_Matrix4 = function()
 {
 	this._floatArrays = [];
@@ -1160,7 +1554,10 @@ var f4d_Matrix4 = function()
 	
 	
 };
-	
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */	
 f4d_Matrix4.prototype.Identity = function()
 {
 	this._floatArrays[0] = 1;  // Col 0 - Row 0.***
@@ -1184,6 +1581,10 @@ f4d_Matrix4.prototype.Identity = function()
 	this._floatArrays[15] = 1; // Col 3 - Row 3.***
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns rowMajor_matrix
+ */
 f4d_Matrix4.prototype.get_RowMajorMatrix = function()
 {
 	var rowMajor_matrix = new Float32Array(16);
@@ -1211,6 +1612,13 @@ f4d_Matrix4.prototype.get_RowMajorMatrix = function()
 	return rowMajor_matrix;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param angDeg = 변수
+ * @param axis_x = 변수
+ * @param axis_y = 변수
+ * @param axis_z = 변수
+ */
 f4d_Matrix4.prototype.RotationAxis_angDeg = function(angDeg, axis_x, axis_y, axis_z)
 {
 	var quaternion = new f4d_Quaternion();
@@ -1218,6 +1626,13 @@ f4d_Matrix4.prototype.RotationAxis_angDeg = function(angDeg, axis_x, axis_y, axi
 	this.Rotation_byQuaternion(quaternion);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param angRad = 변수
+ * @param axis_x = 변수
+ * @param axis_y = 변수
+ * @param axis_z = 변수
+ */
 f4d_Matrix4.prototype.RotationAxis_angRad = function(angRad, axis_x, axis_y, axis_z)
 {
 	var quaternion = new f4d_Quaternion();
@@ -1225,6 +1640,10 @@ f4d_Matrix4.prototype.RotationAxis_angRad = function(angRad, axis_x, axis_y, axi
 	this.Rotation_byQuaternion(quaternion);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param quaternion = 변수
+ */
 f4d_Matrix4.prototype.Rotation_byQuaternion = function(quaternion)
 {
 	var w = quaternion.w;
@@ -1253,7 +1672,11 @@ f4d_Matrix4.prototype.Rotation_byQuaternion = function(quaternion)
 	this._floatArrays[this.getIndexOfArray(3,3)] = 1.0;
 	
 };
-	
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param float32array = 변수
+ */	
 f4d_Matrix4.prototype.setByFloat32Array = function(float32array)
 {
 	for(var i=0; i<16; i++)
@@ -1262,16 +1685,32 @@ f4d_Matrix4.prototype.setByFloat32Array = function(float32array)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param col = 변수
+ * @param row = 변수
+ */
 f4d_Matrix4.prototype.getIndexOfArray = function(col, row)
 {
 	return 4*col+row;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param col = 변수
+ * @param row = 변수
+ */
 f4d_Matrix4.prototype.get = function(col, row)
 {
 	return this._floatArrays[this.getIndexOfArray(col, row)];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param point3d = 변수
+ * @param result_point3d = 변수
+ * @returns result_point3d
+ */
 f4d_Matrix4.prototype.transformPoint3D = function(point3d, result_point3d)
 {
 	if(result_point3d == undefined)
@@ -1289,7 +1728,13 @@ f4d_Matrix4.prototype.transformPoint3D = function(point3d, result_point3d)
 	
 	return result_point3d;
 };
-	
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix = 변수
+ * @param resultMat = 변수
+ * @returns resultMat
+ */	
 f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 {
 	/*
@@ -1329,6 +1774,11 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 	
 	//************************************************************************************************************************************************//
 	// F4D_OcclusionCullingOctree_Cell.************************************************************************************************************* //
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param occlusionCullingOctree_Cell_Owner = 변수
+	 */
 	var f4d_OcclusionCullingOctree_Cell = function(occlusionCullingOctree_Cell_Owner)
 	{
 		this._ocCulling_Cell_owner = occlusionCullingOctree_Cell_Owner;
@@ -1343,14 +1793,21 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 	
 		this._indicesUInt32Array = [];
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @returns subBox
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.new_subBox = function()
 	{
 		var subBox = new f4d_OcclusionCullingOctree_Cell(this);
 		this._subBoxesArray.push(subBox);
 		return subBox;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.create_8_subBoxes = function()
 	{
 		this._subBoxesArray.length = 0; // reset the array.***
@@ -1361,7 +1818,16 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		}
 	
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param min_x = 변수
+	 * @param max_x = 변수
+	 * @param min_y = 변수
+	 * @param max_y = 변수
+	 * @param min_z = 변수
+	 * @param max_z = 변수
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.set_dimensions = function(min_x, max_x, min_y, max_y, min_z, max_z)
 	{
 		this._minX = min_x;
@@ -1371,7 +1837,10 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		this._minZ = min_z;
 		this._maxZ = max_z;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.set_sizesSubBoxes = function()
 	{
 		// Bottom                      Top
@@ -1409,7 +1878,14 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		}
 		
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param x = 변수
+	 * @param y = 변수
+	 * @param z = 변수
+	 * @returns intersects
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.intersects_withPoint3D = function(x, y, z)
 	{
 		var intersects = false;
@@ -1427,7 +1903,14 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		
 		return intersects;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param x = 변수
+	 * @param y = 변수
+	 * @param z = 변수
+	 * @returns intersectedSubBox
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.get_IntersectedSubBox_byPoint3D = function(x, y, z)
 	{
 		var intersectedSubBox = null;
@@ -1495,7 +1978,15 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		
 		return intersectedSubBox;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param eye_x = 변수
+	 * @param eye_y = 변수
+	 * @param eye_z = 변수
+	 * @param result_visibleIndicesArray = 변수
+	 * @returns result_visibleIndicesArray
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.get_IndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray)
 	{
 		var intersectedSubBox = this.get_IntersectedSubBox_byPoint3D(eye_x, eye_y, eye_z);
@@ -1507,7 +1998,11 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		
 		return result_visibleIndicesArray;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param expansionDist = 변수
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.expandBox = function(expansionDist)
 	{
 		this._minX -= expansionDist;
@@ -1517,7 +2012,14 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		this._minZ -= expansionDist;
 		this._maxZ += expansionDist;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param arrayBuffer = 변수
+	 * @param bytes_readed = 변수
+	 * @param f4dReaderWriter = 변수
+	 * @returns bytes_readed
+	 */
 	f4d_OcclusionCullingOctree_Cell.prototype.parse_arrayBuffer = function(arrayBuffer, bytes_readed, f4dReaderWriter)
 	{
 		// Important note: this is the version of neoGeometry.***
@@ -1565,6 +2067,10 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 //******************************************************************************************************************************************************
 //******************************************************************************************************************************************************
 	// F4D_OcclusionCullingOctree.****************************************************************************************************************** //
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 */
 	var f4d_OcclusionCullingOctree = function()
 	{
 		this._ocCulling_box = new f4d_OcclusionCullingOctree_Cell(null);
@@ -1575,6 +2081,10 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 //******************************************************************************************************************************************************
 //******************************************************************************************************************************************************
 	// F4D ReferenceObject.************************************************************************************************************************* // 
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 */
 	var f4d_Reference = function()
 	{
 		// 1) Object ID.***
@@ -1593,14 +2103,23 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		this._VBO_ByteColorsCacheKeys_Container_idx = -1; // Test. Do this for possibly use with workers.***
 
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param matrix = 변수
+	 */
 	f4d_Reference.prototype.multiplyTransformMatrix = function(matrix)
 	{
 		var multipliedMat = this._matrix4.getMultipliedByMatrix(matrix); // Original.***
 		//var multipliedMat = matrix.getMultipliedByMatrix(this._matrix4); // Test.***
 		this._matrix4 = multipliedMat;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @param blocksList = 변수
+	 * @returns bb
+	 */
 	f4d_Reference.prototype.getBoundingBox = function(blocksList)
 	{
 		var block = blocksList.getBlock(this._block_idx);
@@ -1612,7 +2131,11 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		var bb = transformed_fpolyhedron.getBoundingBox();
 		return bb;
 	};
-	
+
+	/**
+	 * 어떤 일을 하고 있습니까?
+	 * @returns byteColorsSurface
+	 */
 	f4d_Reference.prototype.newByteColorsSurface = function()
 	{
 		var byteColorsSurface = new f4d_ByteColorsSurface();
@@ -1621,12 +2144,21 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 	};
 
 // F4D CompoundReferenceObject.****************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_CompoundReference = function()
 {
 	this._referencesList = [];
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param blocksList = 변수
+ * @returns bb
+ */
 f4d_CompoundReference.prototype.getBoundingBox = function(blocksList)
 {
 	var bb = null;
@@ -1650,6 +2182,10 @@ f4d_CompoundReference.prototype.getBoundingBox = function(blocksList)
 	return bb;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns ref
+ */
 f4d_CompoundReference.prototype.newReference = function()
 {
 	var ref = new f4d_Reference();
@@ -1659,6 +2195,10 @@ f4d_CompoundReference.prototype.newReference = function()
 
 // ************************************************************************************************************************** //
 //F4D CompoundReferenceObject_List.****************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_CompoundReferencesList = function()
 {
 	this._name = "";
@@ -1670,6 +2210,12 @@ var f4d_CompoundReferencesList = function()
 	this._currentVisibleIndicesSC_2 = []; // Determined by occlusion culling.***
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
 f4d_CompoundReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z)
 {
 	this._currentVisibleIndicesSC = this._ocCulling._infinite_ocCulling_box.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
@@ -1677,12 +2223,23 @@ f4d_CompoundReferencesList.prototype.update_currentVisibleIndices = function(eye
 	this._currentVisibleIndices = this._currentVisibleIndicesSC.concat(this._currentVisibleIndicesSC_2);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
 f4d_CompoundReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z)
 {
 	this._currentVisibleIndices = this._ocCulling._ocCulling_box.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndices);
 };
 
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param blocksList = 변수
+ * @returns bb
+ */
 f4d_CompoundReferencesList.prototype.getBoundingBox = function(blocksList)
 {
 	var bb = null;
@@ -1705,6 +2262,10 @@ f4d_CompoundReferencesList.prototype.getBoundingBox = function(blocksList)
 	return bb;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns compRef
+ */
 f4d_CompoundReferencesList.prototype.newCompoundReference = function()
 {
 	var compRef = new f4d_CompoundReference();
@@ -1713,6 +2274,10 @@ f4d_CompoundReferencesList.prototype.newCompoundReference = function()
 	return compRef;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix = 변수
+ */
 f4d_CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix)
 {
 	var compRefs_count = this._compoundRefsArray.length;
@@ -1730,12 +2295,22 @@ f4d_CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matri
 	
 // ************************************************************************************************************************* //
 // F4D CompoundReferencesList Container.************************************************************************************ //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_CompoundReferencesList_Container = function() // This class must be an octree...
 {
 	this._compRefsList_Array = [];
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param compoundReferenceList_name = 변수
+ * @param lodLevel = 변수
+ * @retuns compoundRefList
+ */
 f4d_CompoundReferencesList_Container.prototype.newCompoundRefsList = function(compoundReferenceList_name, lodLevel)
 {
 	var compoundRefList = new f4d_CompoundReferencesList();
@@ -1745,6 +2320,12 @@ f4d_CompoundReferencesList_Container.prototype.newCompoundRefsList = function(co
 	return compoundRefList;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
 f4d_CompoundReferencesList_Container.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z)
 {
 	var compRefLists_count = this._compRefsList_Array.length;
@@ -1754,6 +2335,11 @@ f4d_CompoundReferencesList_Container.prototype.update_currentVisibleIndices_ofLi
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param compRefListsName = 변수
+ * @returns result_compRefList
+ */
 f4d_CompoundReferencesList_Container.prototype.get_CompRefList_byName = function(compRefListsName)
 {
 	var result_compRefList = undefined;
@@ -1801,7 +2387,10 @@ f4d_CompoundReferencesList_Container.prototype.get_CompRefList_byName = function
   
   // F4D Block - Reference with LightMapping.****************************************************************************** //
   // Vertices and Indices VBO.********************************************************************************************* // 
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
   var VertexIdx_Arrays = function() // VertexIdx_cacheKeys.***
   {
 	  this.indices_count = -1;
@@ -1809,12 +2398,19 @@ f4d_CompoundReferencesList_Container.prototype.get_CompRefList_byName = function
 	  this.MESH_VERTEX_cacheKey= null;
 	  this.MESH_FACES_cacheKey= null;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var VertexIdxVBO_ArraysContainer = function() // No!!. use "VBO_VertexIdxCacheKeys_Container" instead.***
   {
 	  this._meshArrays = [];
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns vi_array
+   */
   VertexIdxVBO_ArraysContainer.prototype.newVertexIdx_Array = function()
   {
 	  var vi_array = new VertexIdx_Arrays();
@@ -1824,6 +2420,10 @@ f4d_CompoundReferencesList_Container.prototype.get_CompRefList_byName = function
   
 //**************************************************************************************************************************** //
 // ByteColors VBO.*********************************************************************************************************** //
+
+/**
+* 어떤 일을 하고 있습니까?
+*/
 var ByteColorsVBO_Arrays = function()
 {
   this.MESH_COLORS_cacheKey= null;
@@ -1831,11 +2431,19 @@ var ByteColorsVBO_Arrays = function()
 
 //**************************************************************************************************************************** //
 // ByteColorsVBO_ArraysContainer.******************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var ByteColorsVBO_ArraysContainer = function()
 {
   this._meshArrays = [];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns byteColors_array
+ */
 ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // No!!. use "VBO_ByteColorCacheKeys_Container" instead.***
 {
   var byteColors_array = new ByteColorsVBO_Arrays();
@@ -1845,6 +2453,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 
   //**************************************************************************************************************************** //
   // F4D Block.**************************************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
   var f4d_Block = function()
   {
 	  // This has "VertexIdxVBO_ArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
@@ -1857,6 +2469,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
   //**************************************************************************************************************************** //
   // F4D BlocksList.*********************************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_BlocksList = function()
   {
 	  this._name = "";
@@ -1864,13 +2480,22 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 
   };
 
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns block
+   */
   f4d_BlocksList.prototype.newBlock = function()
   {
 	  var block = new f4d_Block();
 	  this._blocksArray.push(block);
 	  return block;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param idx = 변수
+   * @returns block
+   */
   f4d_BlocksList.prototype.getBlock = function(idx)
   {
 	  var block = null;
@@ -1884,12 +2509,21 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 
 	//**************************************************************************************************************************** //
   // F4D BlocksLists Container.********************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_BlocksLists_Container = function()
   {
 	  this._BlocksListsArray = [];
 	  
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param blocksList_name = 변수
+   * @returns f4d_blocksList
+   */
   f4d_BlocksLists_Container.prototype.newBlocksList = function(blocksList_name)
   {
 	  var f4d_blocksList = new f4d_BlocksList();
@@ -1898,6 +2532,11 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 	  return f4d_blocksList;
   };
 
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param blockList_name = 변수
+   * @retuns blocksList
+   */
   f4d_BlocksLists_Container.prototype.get_BlockList = function(blockList_name)
   {
   	var blocksLists_count = this._BlocksListsArray.length;
@@ -1919,6 +2558,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
   //**************************************************************************************************************************** //
   // F4D_VertexTexcoordsArrayList.********************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_VertexTexcoords_Arrays = function()
   {
 	  this._vertices_array = [];
@@ -1927,6 +2570,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
   //**************************************************************************************************************************** //
   // F4D_VNT_Interleaved_cacheKey.**************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_VNT_Interleaved_cacheKeys = function()
   {
 	  this.VNT_cacheKey = null;
@@ -1938,6 +2585,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
   //**************************************************************************************************************************** //
   // F4D_VertexTexcoordsArrays_cacheKey.**************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_VertexTexcoordsArrays_cacheKeys = function()
   {
 	  this._verticesArray_cacheKey = null;
@@ -1950,12 +2601,19 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 	  this.texCoordsArrayBuffer = undefined;
 	  this.normalsArrayBuffer = undefined;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_VertexTexcoordsArrays_cacheKeys_Container = function()
   {
 	  this._vtArrays_cacheKeys_array = [];
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns vt_cacheKey
+   */
   f4d_VertexTexcoordsArrays_cacheKeys_Container.prototype.new_VertexTexcoordsArraysCacheKey = function()
   {
 	  var vt_cacheKey = new f4d_VertexTexcoordsArrays_cacheKeys();
@@ -1967,23 +2625,37 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
   // **************************************************************************************************************************** //
   // SimpleBuilding.************************************************************************************************************ //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_simpleObject = function()
   {
 	  this._vtCacheKeys_container = new f4d_VertexTexcoordsArrays_cacheKeys_Container();
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_simpleStorey = function()
   {
 	  this._simpleObjects_array = [];
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns simpleObject
+   */
   f4d_simpleStorey.prototype.new_simpleObject = function()
   {
 	  var simpleObject = new f4d_simpleObject();
 	  this._simpleObjects_array.push(simpleObject);
 	  return simpleObject;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_simpleBuilding = function()
   {
 	  this._simpleStoreys_list = [];
@@ -1991,7 +2663,11 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
 	  this._simpleBuildingTexture = undefined;
 	  //this._simpleBuildingImage.onload = function() { handleTextureLoaded(this._simpleBuildingImage, this._simpleBuildingTexture); }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns storey
+   */
   f4d_simpleBuilding.prototype.new_simpleStorey = function()
   {
 	  var storey = new f4d_simpleStorey();
@@ -2004,6 +2680,10 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   
 // **************************************************************************************************************************** //
 // f4d_SimpleBuilding_v1.****************************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_simpleBuilding_v1 = function()
 {
 	// this class is for faster rendering XDO converted projects.***
@@ -2023,6 +2703,10 @@ var f4d_simpleBuilding_v1 = function()
 	this._vnt_cacheKeys = undefined;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns simpleObject
+ */
 f4d_simpleBuilding_v1.prototype.new_simpleObject = function()
 {
   var simpleObject = new f4d_simpleObject();
@@ -2032,6 +2716,11 @@ f4d_simpleBuilding_v1.prototype.new_simpleObject = function()
 
 // **************************************************************************************************************************** //
 // f4d_Octree.***************************************************************************************************************** //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param octreeOwner = 변수
+ */
 var f4d_octree = function(octreeOwner)
 {
 	// Note: an octree is a cube, not a box.***
@@ -2056,14 +2745,22 @@ var f4d_octree = function(octreeOwner)
     this._compRefsList_Array = []; // empty if this is not smallest octreeBox.***
 	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox.***
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns subOctree = 변수
+ */
   f4d_octree.prototype.new_subOctree = function()
   {
 	  var subOctree = new f4d_octree(this);
 	  this.subOctrees_array.push(subOctree);
 	  return subOctree;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param treeDepth = 변수
+   */
   f4d_octree.prototype.makeTree = function(treeDepth)
   {
 	  if(this.octree_level < treeDepth)
@@ -2083,7 +2780,12 @@ var f4d_octree = function(octreeOwner)
 		  
 	  }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param intNumber = 변수
+   * @returns numDigits
+   */
   f4d_octree.prototype.getNumberOfDigits = function(intNumber)
   {
 	  if(intNumber > 0)
@@ -2095,7 +2797,10 @@ var f4d_octree = function(octreeOwner)
 		  return 1;
 	  }
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_octree.prototype.getMotherOctree = function()
   {
 	  if(this.octree_owner == undefined)
@@ -2106,7 +2811,13 @@ var f4d_octree = function(octreeOwner)
 		  return this.octree_owner.getMotherOctree();
 	  }
   }
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param octreeNumberName = 변수
+   * @param numDigits = 변수
+   * @returns subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
+   */
   f4d_octree.prototype.getOctree = function(octreeNumberName, numDigits)
   {
 	  if(numDigits == 1)
@@ -2125,7 +2836,12 @@ var f4d_octree = function(octreeOwner)
 	  var rest_octreeNumberName = octreeNumberName - idx * denominator;
 	  return this.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
   }
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param octreeNumberName = 변수
+   * @returns motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
+   */
   f4d_octree.prototype.getOctree_byNumberName = function(octreeNumberName)
   {
 	  var motherOctree = this.getMotherOctree();
@@ -2152,7 +2868,10 @@ var f4d_octree = function(octreeOwner)
 	  return motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
 
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_octree.prototype.setSizesSubBoxes = function()
   {
 	// Octree number name.********************************
@@ -2197,7 +2916,16 @@ var f4d_octree = function(octreeOwner)
 		}
 	}
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param Min_x = 변수
+   * @param Max_x = 변수
+   * @param Min_y = 변수
+   * @param Max_y = 변수
+   * @param Min_z = 변수
+   * @param Max_z = 변수
+   */
   f4d_octree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y, Min_Z, Max_Z)
   { 
 	this.centerPos.x = (Max_X + Min_X)/2.0;
@@ -2208,17 +2936,29 @@ var f4d_octree = function(octreeOwner)
 	this.half_dy = (Max_Y - Min_Y)/2.0; // half length.***
 	this.half_dz = (Max_Z - Min_Z)/2.0; // half height.***
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns centerPos
+   */
   f4d_octree.prototype.getCenterPos = function()
   {
 	return this.centerPos;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns Math.abs(this.half_dx*1.2);
+   */
   f4d_octree.prototype.getRadiusAprox = function()
   {
 	  return Math.abs(this.half_dx*1.2);
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param result_CRefListsArray = 변수
+   */  
 f4d_octree.prototype.getCRefListArray = function(result_CRefListsArray)
 {
 	if(result_CRefListsArray == undefined)
@@ -2240,6 +2980,10 @@ f4d_octree.prototype.getCRefListArray = function(result_CRefListsArray)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_NeoRefListsArray = 변수
+ */
 f4d_octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
 {
 	if(result_NeoRefListsArray == undefined)
@@ -2260,7 +3004,16 @@ f4d_octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
 		}
 	}
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume = 변수
+ * @param result_CRefListsArray = 변수
+ * @param cesium_boundingSphere_scratch = 변수
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
   f4d_octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume, result_CRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z)
   {
 	  var visibleOctreesArray = [];
@@ -2310,7 +3063,16 @@ f4d_octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
 	  sortedOctreesArray.length = 0;
 	  excludedOctArray.length = 0;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param cesium_cullingVolume = 변수
+   * @param result_NeoRefListsArray = 변수
+   * @param cesium_boundingSphere_scratch = 변수
+   * @param eye_x = 변수
+   * @param eye_y = 변수
+   * @param eye_z = 변수
+   */
   f4d_octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolume, result_NeoRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z)
   {
 	  var visibleOctreesArray = [];
@@ -2346,7 +3108,13 @@ f4d_octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
 	  excludedOctArray.length = 0;
 	  
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?	
+   * @param cesium_cullingVolume = 변수
+   * @param result_octreesArray = 변수
+   * @param cesium_boundingSphere_scratch = 변수
+   */
   f4d_octree.prototype.getFrustumVisibleOctrees_NeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch)
 {
 	if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0)
@@ -2401,6 +3169,12 @@ f4d_octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
   // else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
 
+/**
+ * 어떤 일을 하고 있습니까?	
+ * @param cesium_cullingVolume = 변수
+ * @param result_octreesArray = 변수
+ * @param cesium_boundingSphere_scratch = 변수
+ */
 f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch)
 {
 	if(this.subOctrees_array.length == 0 && this._compRefsList_Array.length == 0) // For use with ifc buildings.***
@@ -2454,14 +3228,26 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
   // else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
   
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
   f4d_octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z)
   {
 	  this.squareDistToEye = (this.centerPos.x - eye_x)*(this.centerPos.x - eye_x) + 
 							(this.centerPos.y - eye_y)*(this.centerPos.y - eye_y) + 
 							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z) ;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param octreesArray = 변수
+   * @param octree = 변수
+   * @returns result_idx
+   */
   f4d_octree.prototype.getIndexToInsert_bySquaredDistToEye = function(octreesArray, octree)
   {
 	  // lineal implementation. In the future use dicotomic search technique.***
@@ -2486,7 +3272,15 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 	  
 	  return result_idx;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param result_octreesArray = 변수
+   * @param octree = 변수
+   * @param eye_x = 변수
+   * @param eye_y = 변수
+   * @param eye_z = 변수
+   */
   f4d_octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree, eye_x, eye_y, eye_z)
   {
 	  // sorting is from minDist to maxDist.***
@@ -2496,7 +3290,11 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 		
 		result_octreesArray.splice(insert_idx, 0, octree);
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param result_octreesArray = 변수
+   */
   f4d_octree.prototype.getAllSubOctrees = function(result_octreesArray)
   {
 	  if(result_octreesArray == undefined)
@@ -2520,6 +3318,10 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
   
   // **************************************************************************************************************************** //
   // f4d_Header.***************************************************************************************************************** //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_header = function()
   {
 	this._f4d_version = 1;
@@ -2549,6 +3351,10 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 	
   // **************************************************************************************************************************** //
   // BuildingProject.************************************************************************************************************ //
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   var f4d_BR_buildingProject = function()
   {
 	  this._header = new f4d_header();
@@ -2629,7 +3435,10 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 	this._xdo_simpleBuilding_readed_finished = false;
 	
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_BR_buildingProject.prototype.calculate_TotalTrianglesCount = function()
   {
 	  // This is temp function for debugging.***
@@ -2647,7 +3456,14 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 	  }
 	  
   };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param absolute_eye_x = 변수
+ * @param absolute_eye_y = 변수
+ * @param absolute_eye_z = 변수
+ * @returns point3d_scratch_2
+ */ 
 f4d_BR_buildingProject.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z)
 {
 	// 1rst, calculate the relative eye position.***
@@ -2667,17 +3483,37 @@ f4d_BR_buildingProject.prototype.getTransformedRelativeEyePosition_toBuilding = 
   
 	return this.point3d_scratch_2;
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_X = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ * @returns _header._boundingBox.isPoint3dInside(eye_x, eye_y, eye_z)
+ */
 f4d_BR_buildingProject.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z)
 {
 	return this._header._boundingBox.isPoint3dInside(eye_x, eye_y, eye_z);
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ */
 f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z)
 {
 	this._compRefList_Container.update_currentVisibleIndices_ofLists(eye_x, eye_y, eye_z);
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x = 변수
+ * @param eye_y = 변수
+ * @param eye_z = 변수
+ * @returns _visibleCompRefLists_scratch
+ */
   f4d_BR_buildingProject.prototype.getVisibleCompRefLists = function(eye_x, eye_y, eye_z)
   {
 	  // Old. Delete this.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2687,7 +3523,14 @@ f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = functio
 	  this._visibleCompRefLists_scratch = this._compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z, this._visibleCompRefLists_scratch);
 	  return this._visibleCompRefLists_scratch;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param eye_x = 변수
+   * @param eye_y = 변수
+   * @param eye_z = 변수
+   * @returns _compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z)
+   */
   f4d_BR_buildingProject.prototype.getVisibleEXTCompRefLists = function(eye_x, eye_y, eye_z)
   {
 	  // Old. Delete this.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2697,13 +3540,21 @@ f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = functio
 	  return this._compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z);
   };
   
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns allCompRefLists
+   */
   f4d_BR_buildingProject.prototype.getAllCompRefLists = function()
   {
 	  var allCompRefLists = this._compRefList_Container._compRefsList_Array.concat(this._interiorCompRefList_Container._compRefsList_Array);
 	  return allCompRefLists;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns radius_aprox
+   */
   f4d_BR_buildingProject.prototype.getRadiusAprox = function()
   {
 	  if(this._boundingBox == undefined)
@@ -2725,7 +3576,11 @@ f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = functio
 	  
 	  return this.radius_aprox;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @returns _boundingBox
+   */
   f4d_BR_buildingProject.prototype.getBoundingBox = function()
   {
 	  /*
@@ -2774,7 +3629,10 @@ f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = functio
 	  
 	  return this._boundingBox;
   };
-  
+
+  /**
+   * 어떤 일을 하고 있습니까?
+   */
   f4d_BR_buildingProject.prototype.create_DefaultBlockReferencesLists = function()
   {
 	  // Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
@@ -2789,6 +3647,10 @@ f4d_BR_buildingProject.prototype.update_currentVisibleIndices_exterior = functio
   
 // ************************************************************************************************************************* //
 // f4d geometry from point cloud.******************************************************************************************* //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_pCloudMesh = function()
 {
 	// this is a temporary class to render mesh from point cloud.***
@@ -2818,6 +3680,10 @@ var f4d_pCloudMesh = function()
 
 // ************************************************************************************************************************* //
 // BR Building ProjectsList.************************************************************************************************ //
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_BR_buildingProjectsList = function()
 {
   this._BR_buildingsArray = [];
@@ -2827,6 +3693,10 @@ var f4d_BR_buildingProjectsList = function()
   //this.compRefList_array = undefined; // Test.***
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns br_buildingProject
+ */
 f4d_BR_buildingProjectsList.prototype.new_BR_Project = function()
 {
 //var titol = "holes a tothom"
@@ -2835,7 +3705,11 @@ f4d_BR_buildingProjectsList.prototype.new_BR_Project = function()
   this._BR_buildingsArray.push(br_buildingProject);
   return br_buildingProject;
 };
-  
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns _boundingBox
+ */ 
 f4d_BR_buildingProjectsList.prototype.getBoundingBox = function()
 {
   if(this._boundingBox == undefined)
@@ -2864,6 +3738,10 @@ f4d_BR_buildingProjectsList.prototype.getBoundingBox = function()
   
 //**************************************************************************************************************************//
 // TerranTile.**************************************************************************************************************//
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_TerranTile = function()
 {
 	//           +-----+-----+
@@ -2915,6 +3793,10 @@ var f4d_TerranTile = function()
 	this.f4dReadWriter = undefined;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns br_buildingProject
+ */
 f4d_TerranTile.prototype.new_BR_Project = function()
 {
   var br_buildingProject = new f4d_BR_buildingProject();
@@ -2922,6 +3804,10 @@ f4d_TerranTile.prototype.new_BR_Project = function()
   return br_buildingProject;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns subTile
+ */
 f4d_TerranTile.prototype.new_subTerranTile = function()
 {
 	var subTiles_count = this.subTiles_array.length;
@@ -2932,6 +3818,9 @@ f4d_TerranTile.prototype.new_subTerranTile = function()
 	return subTile;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_TerranTile.prototype.make_4subTiles = function()
 {
 	for(var i=0; i<4; i++)
@@ -2940,6 +3829,13 @@ f4d_TerranTile.prototype.make_4subTiles = function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param lon_min = 변수
+ * @param lon_max = 변수
+ * @param lat_min = 변수
+ * @param lat_max = 변수
+ */
 f4d_TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, lat_max)
 {
 	// Old.***
@@ -2949,6 +3845,10 @@ f4d_TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, la
 	this.latitude_max = lat_max;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param max_depth = 변수
+ */
 f4d_TerranTile.prototype.make_tree = function(max_depth)
 {
 	if(this._depth < max_depth)
@@ -2963,6 +3863,9 @@ f4d_TerranTile.prototype.make_tree = function(max_depth)
 
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_TerranTile.prototype.calculate_position_byLonLat = function()
 {
 	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
@@ -2978,6 +3881,9 @@ f4d_TerranTile.prototype.calculate_position_byLonLat = function()
 	this.radius = Cesium.Cartesian3.distance(this.leftDown_position, this.rightUp_position)/2.0 * 0.9;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_TerranTile.prototype.calculate_position_byLonLat_subTiles = function()
 {
 	this.calculate_position_byLonLat();
@@ -2992,6 +3898,10 @@ f4d_TerranTile.prototype.calculate_position_byLonLat_subTiles = function()
 
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param BR_Project = 변수
+ */
 f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
@@ -3086,6 +3996,10 @@ f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
 };
 
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param BR_Project = 변수
+ */
 f4d_TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
@@ -3135,6 +4049,11 @@ f4d_TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project)
 };
 
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param BR_Project = 변수
+ * @param f4dManager = 변수
+ */
 f4d_TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
 {
 	
@@ -3162,6 +4081,10 @@ f4d_TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
 	this.fileBytesReaded = bytes_readed;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param f4dManager = 변수
+ */
 f4d_TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
@@ -3206,6 +4129,11 @@ f4d_TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
 	this.fileArrayBuffer = null;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param f4dManager = 변수
+ */
 f4d_TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
@@ -3266,6 +4194,9 @@ f4d_TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
 };
 
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_TerranTile.prototype.set_dimensionsSubTiles = function()
 {
 	var subTile = undefined;
@@ -3294,6 +4225,10 @@ f4d_TerranTile.prototype.set_dimensionsSubTiles = function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param smallefstTiles_array = 변수
+ */
 f4d_TerranTile.prototype.get_smallestTiles = function(smallestTiles_array)
 {
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
@@ -3311,6 +4246,12 @@ f4d_TerranTile.prototype.get_smallestTiles = function(smallestTiles_array)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume = 변수
+ * @param intersectedSmallestTiles_array = 변수
+ * @param boundingSphere_Aux = 변수
+ */
 f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux)
 {
 	var intersectedTiles_array = [];
@@ -3324,6 +4265,12 @@ f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, 
 	intersectedTiles_array.length = 0;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume = 변수
+ * @param intersectedTiles_array = 변수
+ * @param boundingSphere_Aux = 변수
+ */
 f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux)
 {
 	// Cesium dependency.***
@@ -3382,8 +4329,3 @@ f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersec
 	}
 	
 };
-  
-
-
-  
-

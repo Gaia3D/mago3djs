@@ -1,7 +1,9 @@
-
-
-
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
+ * @param width = 변수
+ * @param height = 변수
+ */
 function FBO(gl, width, height) {     
   this.gl = gl;
   this.width = width;
@@ -32,13 +34,20 @@ function FBO(gl, width, height) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }    
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 FBO.prototype.bind = function() {
   this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 }
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 FBO.prototype.unbind = function() {
   this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 } 
+
 //---------------------------------------------------------------------------------------------------------------- 
 //---------------------------------------------------------------------------------------------------------------- 
 //---------------------------------------------------------------------------------------------------------------- 

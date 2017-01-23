@@ -26,8 +26,10 @@ var _getAllFilesFromFolder = function(dir)
 		
 // End code examples.------------------------------------------------------------------------------------
 
-var f4d_ReaderWriter = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_ReaderWriter = function() {
 	this.rootPath = "";
 	this.geometryDataPath = "/3d_data";
 	this.vi_arrays_Container = new VertexIdxVBO_ArraysContainer();
@@ -72,62 +74,122 @@ var f4d_ReaderWriter = function()
 };
 
 // Basic readers.****************************************************************************************
-f4d_ReaderWriter.prototype.readUInt32 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns uint32[0]
+ */
+f4d_ReaderWriter.prototype.readUInt32 = function(buffer, start, end) {
 	 uint32 = new Uint32Array(buffer.slice(start, end));
 	 return uint32[0];
 };
 
-f4d_ReaderWriter.prototype.readInt32 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns int32[0]
+ */
+f4d_ReaderWriter.prototype.readInt32 = function(buffer, start, end) {
 	 int32 = new Int32Array(buffer.slice(start, end));
 	 return int32[0];
 };
 
-f4d_ReaderWriter.prototype.readUInt16 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns uint16[0]
+ */
+f4d_ReaderWriter.prototype.readUInt16 = function(buffer, start, end) {
 	 uint16 = new Uint16Array(buffer.slice(start, end));
 	 return uint16[0];
 };
 
-f4d_ReaderWriter.prototype.readInt16 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns int16[0]
+ */
+f4d_ReaderWriter.prototype.readInt16 = function(buffer, start, end) {
 	 int16 = new Int16Array(buffer.slice(start, end));
 	 return int16[0];
 };
 
-f4d_ReaderWriter.prototype.readFloat64 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns float64[0]
+ */
+f4d_ReaderWriter.prototype.readFloat64 = function(buffer, start, end) {
 	 float64 = new Float64Array(buffer.slice(start, end));
 	 return float64[0];
 };
 
-f4d_ReaderWriter.prototype.readFloat32 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns float32[0]
+ */
+f4d_ReaderWriter.prototype.readFloat32 = function(buffer, start, end) {
 	 float32 = new Float32Array(buffer.slice(start, end));
 	 return float32[0];
 };
 
-f4d_ReaderWriter.prototype.readFloat16 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns float16[0]
+ */
+f4d_ReaderWriter.prototype.readFloat16 = function(buffer, start, end) {
 	 float16 = new Float32Array(buffer.slice(start, end));
 	 return float16[0];
 };
 
-f4d_ReaderWriter.prototype.readInt8 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns int8[0]
+ */
+f4d_ReaderWriter.prototype.readInt8 = function(buffer, start, end) {
 	 int8 = new Int8Array(buffer.slice(start, end));
 	 return int8[0];
 };
 
-f4d_ReaderWriter.prototype.readUInt8 = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns uint8[0]
+ */
+f4d_ReaderWriter.prototype.readUInt8 = function(buffer, start, end) {
 	 uint8 = new Uint8Array(buffer.slice(start, end));
 	 return uint8[0];
 };
 
-f4d_ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer = 변수
+ * @param start = 변수
+ * @param end = 변수
+ * @returns int8_value
+ */
+f4d_ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end) {
 	int8 = new Int8Array(buffer.slice(start, end));
 	int8_value = int8[0];
 
@@ -141,8 +203,13 @@ f4d_ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end)
 };
 // End basic readers.----------------------------------------------------------------------------------------
 
-f4d_ReaderWriter.prototype.getBoundingBox_fromFloat32Array = function(float32Array, result_bbox)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param float32Array = 변수
+ * @param result_bbox = 변수
+ * @returns result_bbox
+ */
+f4d_ReaderWriter.prototype.getBoundingBox_fromFloat32Array = function(float32Array, result_bbox) {
 	if(result_bbox == undefined)
 		result_bbox = new f4d_boundingBox();
 	
@@ -163,11 +230,16 @@ f4d_ReaderWriter.prototype.getBoundingBox_fromFloat32Array = function(float32Arr
 	}
 	
 	return result_bbox;
-
 };
 
-f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, blocksList, BR_BuildingProject)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param blocksList = 변수
+ * @param BR_BuildingProject = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, blocksList, BR_BuildingProject) {
 	var bytes_readed = 0;
 	  var blocks_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		
@@ -199,8 +271,6 @@ f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, block
 			//var vi_arrays_Container = new VertexIdxVBO_ArraysContainer(); // Old.***
 			this.vi_arrays_Container._meshArrays.length = 0;
 			//var scale = 100.0;
-			
-			
 			
 			var vi_arrays_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<vi_arrays_count; j++)
@@ -234,15 +304,18 @@ f4d_ReaderWriter.prototype.readF4D_Blocks_V4_0 = function(GL, arrayBuffer, block
 				  GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 				  
 				  bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
-				  
 			}
-								  
 	   }
 };
 
-
-f4d_ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksList, neoBuilding)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param blocksList = 변수
+ * @param neoBuilding = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksList, neoBuilding) {
 	var bytes_readed = 0;
 	  var blocks_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
@@ -330,13 +403,19 @@ f4d_ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksL
 				 */ 
 				bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
 				vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
-				
 			}
 	   }
 };
 
-f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arrayBuffer, neoBuilding, f4dReadWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param neoRefsList = 변수
+ * @param arrayBuffer = 변수
+ * @param neoBuilding = 변수
+ * @param f4dReadWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arrayBuffer, neoBuilding, f4dReadWriter) {
 	var startBuff = undefined;
 	var endBuff = undefined;
 	var bytes_readed = 0;
@@ -350,8 +429,6 @@ f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arr
 	for(var i=0; i<neoRefs_count; i++)
 	{
 		var neoRef = neoRefsList.new_neoReference();
-		
-		
 
 		// 1) Id.***
 		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -386,7 +463,6 @@ f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arr
 		neoRef._matrix4._floatArrays[13] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
 		neoRef._matrix4._floatArrays[14] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
 		neoRef._matrix4._floatArrays[15] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
 		
 		//var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		/*
@@ -509,14 +585,11 @@ f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arr
 		else{
 			neoRef.hasTexture = false;
 		}
-
 	}
 	
 	// Now occlusion cullings.***
 	//bytes_readed = neoRefsList.exterior_ocCullOctree.parse_arrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
 	//bytes_readed = neoRefsList.interior_ocCullOctree.parse_arrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
-	
-	
 	
 	// Occlusion culling octree data.*****
 	var infiniteOcCullBox = neoRefsList.exterior_ocCullOctree;
@@ -527,13 +600,16 @@ f4d_ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arr
 	var ocCullBox = neoRefsList.interior_ocCullOctree; 
 	bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, ocCullBox);
 	ocCullBox.set_sizesSubBoxes();
-	
-	
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_CompoundReferences_V4_0 = function(GL, arrayBuffer, compoundRefsList, BR_BuildingProject)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param compoundRefsList = 변수
+ * @param BR_BuildingProject = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_CompoundReferences_V4_0 = function(GL, arrayBuffer, compoundRefsList, BR_BuildingProject) {
 	var bytes_readed = 0;
 	var compoundRefs_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
@@ -573,8 +649,6 @@ f4d_ReaderWriter.prototype.readF4D_CompoundReferences_V4_0 = function(GL, arrayB
 			reference._matrix4._floatArrays[13] =  this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Delete scale_temp!!!!!!!!!!!!!!!!
 			reference._matrix4._floatArrays[14] =  this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Delete scale_temp!!!!!!!!!!!!!!!!
 			reference._matrix4._floatArrays[15] =  this.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			
-			
 			
 			// 4) ByteColors List.***
 			this.byteColorsVBO_ArraysContainer._meshArrays.length = 0; // New mode.***
@@ -616,11 +690,16 @@ f4d_ReaderWriter.prototype.readF4D_CompoundReferences_V4_0 = function(GL, arrayB
 	bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, infiniteOcCullBox);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.set_sizesSubBoxes();
-			
 };
 
-f4d_ReaderWriter.prototype.readF4D_OcclusionCullingOctree_Cell = function(arrayBuffer, bytes_readed, ocCullingOctree_Cell)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param arrayBuffer = 변수
+ * @param bytes_readed = 변수
+ * @param ocCullingOctree_Cell = 변수
+ * @returns bytes_readed
+ */
+f4d_ReaderWriter.prototype.readF4D_OcclusionCullingOctree_Cell = function(arrayBuffer, bytes_readed, ocCullingOctree_Cell) {
 	// Note: This function must return the total_bytes_readed.***
 	
 	var is_mother_cell = this.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
@@ -659,12 +738,16 @@ f4d_ReaderWriter.prototype.readF4D_OcclusionCullingOctree_Cell = function(arrayB
 			bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, subOcclusionBox);
 		}
 	}
-	
 	return bytes_readed;
 };
 
-f4d_ReaderWriter.prototype.readF4D_NeoSimpleBuilding = function(GL, arrayBuffer, neoSimpleBuilding)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param neoSimpleBuilding = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NeoSimpleBuilding = function(GL, arrayBuffer, neoSimpleBuilding) {
 	var bytes_readed = 0;
 	var accessors_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
@@ -705,8 +788,13 @@ f4d_ReaderWriter.prototype.readF4D_NeoSimpleBuilding = function(GL, arrayBuffer,
 	//var h=0;
 };
 
-f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_V4_0 = function(GL, arrayBuffer, simpleBuilding)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param simpleBuilding = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_V4_0 = function(GL, arrayBuffer, simpleBuilding) {
 	var bytes_readed = 0;
 	var storeys_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
@@ -766,7 +854,6 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_V4_0 = function(GL, arrayBuffe
 				vt_array_cacheKey._texcoordsArray_cacheKey = GL.createBuffer ();
 				GL.bindBuffer(GL.ARRAY_BUFFER, vt_array_cacheKey._texcoordsArray_cacheKey);
 				GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(vt_array._texcoords_array), GL.STATIC_DRAW);
-				
 			}	
 		}
 	}
@@ -775,8 +862,14 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_V4_0 = function(GL, arrayBuffe
 	//var h=0;
 };
 
-f4d_ReaderWriter.prototype.readF4D_IndexFile = function(GL, arrayBuffer, BR_ProjectsList, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_IndexFile = function(GL, arrayBuffer, BR_ProjectsList, f4d_readerWriter) {
 	var bytes_readed = 0;
 	
 	var f4d_headerPathName_length = 0;
@@ -826,11 +919,16 @@ f4d_ReaderWriter.prototype.readF4D_IndexFile = function(GL, arrayBuffer, BR_Proj
 		}
 	}
 	*/
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_IndexFile_SPEEDTEST = function(GL, arrayBuffer, BR_ProjectsList, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_IndexFile_SPEEDTEST = function(GL, arrayBuffer, BR_ProjectsList, f4d_readerWriter) {
 	
 	var bytes_readed = 0;
 	
@@ -871,8 +969,15 @@ f4d_ReaderWriter.prototype.readF4D_IndexFile_SPEEDTEST = function(GL, arrayBuffe
 	
 };
 
-f4d_ReaderWriter.prototype.readF4D_Blocks_inServer = function(GL, filePath_inServer, blocksList, BR_BuildingProject, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param blocksList = 변수
+ * @param BR_BuildingProject = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Blocks_inServer = function(GL, filePath_inServer, blocksList, BR_BuildingProject, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -892,9 +997,15 @@ f4d_ReaderWriter.prototype.readF4D_Blocks_inServer = function(GL, filePath_inSer
 	oReq.send(null);
 };
 	
-	
-f4d_ReaderWriter.prototype.readF4D_NeoBlocks_inServer = function(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param blocksList = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NeoBlocks_inServer = function(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -914,9 +1025,21 @@ f4d_ReaderWriter.prototype.readF4D_NeoBlocks_inServer = function(GL, filePath_in
 	oReq.send(null);
 };
 		
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param compRefList_Container = 변수
+ * @param compoundReferenceList_name = 변수
+ * @param lodLevel = 변수
+ * @param blocksList = 변수
+ * @param transforMat = 변수
+ * @param BR_BuildingProject = 변수
+ * @param f4d_ReaderWriter = 변수
+ * @param subOctreeNumberName = 변수
+ */
 f4d_ReaderWriter.prototype.readF4D_CompoundReferences_inServer = function(GL, filePath_inServer, compRefList_Container, compoundReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, BR_BuildingProject, f4d_readerWriter, subOctreeNumberName)
-{
+																		  lodLevel, blocksList, transformMat, BR_BuildingProject, f4d_readerWriter, subOctreeNumberName) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -972,9 +1095,21 @@ f4d_ReaderWriter.prototype.readF4D_CompoundReferences_inServer = function(GL, fi
 	oReq.send(null);
 };		
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param compRefList_Container = 변수
+ * @param neoReferenceList_name = 변수
+ * @param lodLevel = 변수
+ * @param blocksList = 변수
+ * @param transforMat = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_ReaderWriter = 변수
+ * @param subOctreeNumberName = 변수
+ */
 f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, f4d_readerWriter, subOctreeNumberName)
-{
+																		  lodLevel, blocksList, transformMat, neoBuilding, f4d_readerWriter, subOctreeNumberName) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1036,7 +1171,6 @@ f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePat
 				  neoRefsList.multiplyReferencesMatrices(transformMat);
 			  }
 		  }
-		 
 	  }
 	  //arrayBuffer = null;
 	};
@@ -1044,8 +1178,14 @@ f4d_ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePat
 	oReq.send(null);
 };	
 
-f4d_ReaderWriter.prototype.readF4D_neoSimpleBuilding_inServer = function(GL, filePath_inServer, neoSimpleBuilding, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param neoSimpleBuilding = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_neoSimpleBuilding_inServer = function(GL, filePath_inServer, neoSimpleBuilding, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1067,12 +1207,16 @@ f4d_ReaderWriter.prototype.readF4D_neoSimpleBuilding_inServer = function(GL, fil
 	};
 
 	oReq.send(null);
-	
 };
-		
 
-f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_inServer = function(GL, filePath_inServer, simpleBuilding, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param simpleBuilding = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_inServer = function(GL, filePath_inServer, simpleBuilding, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1094,11 +1238,16 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_inServer = function(GL, filePa
 	};
 
 	oReq.send(null);
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer_SPEEDTEST = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer_SPEEDTEST = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1120,12 +1269,16 @@ f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer_SPEEDTEST = function(GL, f
 	};
 
 	oReq.send(null);
-	
 };	
 
-
-f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1147,11 +1300,19 @@ f4d_ReaderWriter.prototype.readF4D_IndexFile_inServer = function(GL, filePath_in
 	};
 
 	oReq.send(null);
-	
 };	
 
-f4d_ReaderWriter.prototype.readF4D_TerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, f4d_readerWriter, bytes_readed)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param filePath_inServer = 변수
+ * @param terranTile = 변수
+ * @param f4d_readerWriter = 변수
+ * @param bytes_readed = 변수
+ * @returns bytes_readed
+ */
+f4d_ReaderWriter.prototype.readF4D_TerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, f4d_readerWriter, bytes_readed) {
 	//var bytes_readed = 0;
 	var f4d_headerPathName_length = 0;
 	var BP_Project = undefined;
@@ -1217,8 +1378,14 @@ f4d_ReaderWriter.prototype.readF4D_TerranTileFile = function(GL, arrayBuffer, fi
 	return bytes_readed;
 };
 
-f4d_ReaderWriter.prototype.readF4D_TerranTileFile_inServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param terranTile = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_TerranTileFile_inServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1246,11 +1413,16 @@ f4d_ReaderWriter.prototype.readF4D_TerranTileFile_inServer = function(GL, filePa
 	};
 
 	oReq.send(null);
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -1268,7 +1440,6 @@ f4d_ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, fileP
 		    //---------------------------------------------------------------------------------------------------
 		    // write code here.***
 		    var pCloudProject = undefined;
-		  
 		  
 		    var bytes_readed = 0;
 	
@@ -1297,18 +1468,20 @@ f4d_ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, fileP
 				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
 				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
 			}
-		  
-		  
 	    }
 	    arrayBuffer = null;
 	};
 
 	oReq.send(null);
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_Header_Original = function(GL, arrayBuffer, BR_Project)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_Project = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Header_Original = function(GL, arrayBuffer, BR_Project) {
 	var bytes_readed = 0;
 	var version_string_length = 5;
 	var intAux_scratch = 0;
@@ -1406,9 +1579,6 @@ f4d_ReaderWriter.prototype.readF4D_Header_Original = function(GL, arrayBuffer, B
 										transformed_minPoint3d.y, transformed_maxPoint3d.y,  
 										transformed_minPoint3d.z, transformed_maxPoint3d.z);
 										*/
-			
-		
-		
 	
 	BR_Project.octree.setBoxSize(header._octZerothBox._minX, header._octZerothBox._maxX,  
 								header._octZerothBox._minY, header._octZerothBox._maxY,  
@@ -1416,18 +1586,20 @@ f4d_ReaderWriter.prototype.readF4D_Header_Original = function(GL, arrayBuffer, B
 										
 	BR_Project.octree.makeTree(3);
 	BR_Project.octree.setSizesSubBoxes();
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_Header = function(GL, arrayBuffer, BR_Project)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_Project = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Header = function(GL, arrayBuffer, BR_Project) {
 	var bytes_readed = 0;
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 	var auxScratch = undefined;
 	var header = BR_Project._header;
-	
-	
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -1525,11 +1697,17 @@ f4d_ReaderWriter.prototype.readF4D_Header = function(GL, arrayBuffer, BR_Project
 	
 	Cesium.Matrix4.inverse(BR_Project.move_matrix, BR_Project.move_matrix_inv);
 	*/
-	
 };
 
-f4d_ReaderWriter.prototype.readF4D_Header_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Header_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	BR_Project._f4d_header_readed = true;
 	
@@ -1559,8 +1737,15 @@ f4d_ReaderWriter.prototype.readF4D_Header_inServer = function(GL, filePath_inSer
 	oReq.send(null);
 };
 
-f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_header_readed = true;
 	
@@ -1585,8 +1770,6 @@ f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath
 			var intAux_scratch = 0;
 			var auxScratch = undefined;
 			var header = pCloud._header;
-			
-			
 			
 			// 1) Version(5 chars).***********
 			for(var j=0; j<version_string_length; j++){
@@ -1671,7 +1854,6 @@ f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath
 			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
 			
 			//////////////////////////////////////////////////////////////////////////////////////////////////
-	
 		  if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
 		  
@@ -1683,8 +1865,15 @@ f4d_ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath
 	oReq.send(null);
 };	
 
-f4d_ReaderWriter.prototype.readF4D_HeaderOriginal_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_HeaderOriginal_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	BR_Project._f4d_header_readed = true;
 	
@@ -1714,8 +1903,15 @@ f4d_ReaderWriter.prototype.readF4D_HeaderOriginal_inServer = function(GL, filePa
 	oReq.send(null);
 };	
 
-f4d_ReaderWriter.prototype.readF4D_NeoHeader_inServer = function(GL, filePath_inServer, neoBuilding, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NeoHeader_inServer = function(GL, filePath_inServer, neoBuilding, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	//BR_Project._f4d_header_readed = true;
 	
@@ -1743,7 +1939,6 @@ f4d_ReaderWriter.prototype.readF4D_NeoHeader_inServer = function(GL, filePath_in
 			neoBuilding.octree.makeTree(3);
 			neoBuilding.octree.setSizesSubBoxes();
 			
-		  
 		  if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
 		  
@@ -1755,8 +1950,16 @@ f4d_ReaderWriter.prototype.readF4D_NeoHeader_inServer = function(GL, filePath_in
 	oReq.send(null);
 };
 
-f4d_ReaderWriter.prototype.readF4D_NailImage_ofArrayBuffer = function(GL, imageArrayBuffer, BR_Project, f4d_readerWriter, f4d_manager, imageLod)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param imageArrayBuffer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ * @param imageLod = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NailImage_ofArrayBuffer = function(GL, imageArrayBuffer, BR_Project, f4d_readerWriter, f4d_manager, imageLod) {
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	//--------------------------------------------------------------------------
@@ -1792,11 +1995,18 @@ f4d_ReaderWriter.prototype.readF4D_NailImage_ofArrayBuffer = function(GL, imageA
 	};
 	
 	simpleBuildingImage.src = imagenUrl;
-							
 }
 
-f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager, imageLod)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ * @param imageLod = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager, imageLod) {
 	function handleTextureLoaded(gl, image, texture) 
 	{
 	  gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1807,8 +2017,6 @@ f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_in
 	  gl.generateMipmap(gl.TEXTURE_2D);
 	  gl.bindTexture(gl.TEXTURE_2D, null);
 	};
-	
-	
 	
 	if(imageLod == undefined)
 		imageLod = 3; // The lowest lod.***
@@ -1857,8 +2065,6 @@ f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_in
 		
 		if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		
 	};
 	
 	simpleBuildingImage.onerror = function() {
@@ -1874,8 +2080,14 @@ f4d_ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_in
 		simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
 };
 
-f4d_ReaderWriter.prototype.readF4D_Texture_inServer = function(GL, filePath_inServer, f4dTex, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param f4dTex = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_Texture_inServer = function(GL, filePath_inServer, f4dTex, f4d_manager) {
 	f4dTex.load_started = true;
 	f4dTex.texImage = new Image();
 	f4dTex.texImage.onload = function() 
@@ -1898,8 +2110,15 @@ f4d_ReaderWriter.prototype.readF4D_Texture_inServer = function(GL, filePath_inSe
 	f4dTex.texImage.src = filePath_inServer;
 };
 
-f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, filePath_inServer, texture, neoBuilding, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param texture = 변수
+ * @param neoBuilding = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, filePath_inServer, texture, neoBuilding, f4d_manager) {
 	// load neoTextures
 	function handleTextureLoaded(gl, image, texture) 
 	{
@@ -1922,7 +2141,6 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 	var neoRefImage = new Image();
 	neoRefImage.onload = function() 
 	{ 
-		
 		if(texture.tex_id == undefined)
 			texture.tex_id = GL.createTexture();
 		
@@ -1947,8 +2165,6 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 		
 		if(f4d_manager.backGround_fileReadings_count > 0 )
 			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		
 	};
 	
 	neoRefImage.onerror = function() {
@@ -1956,19 +2172,27 @@ f4d_ReaderWriter.prototype.readF4D_neoReferenceTexture_inServer = function(GL, f
 
 		return;
     };
-	
 		neoRefImage.src = filePath_inServer;
 };
 
-f4d_ReaderWriter.prototype.openF4d_TerranTile = function(GL, terranTile, f4d_readerWriter )
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param terranTile = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.openF4d_TerranTile = function(GL, terranTile, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dTerranTileFile.txt";
 	f4d_readerWriter.readF4D_TerranTileFile_inServer(GL, filePath_inServer, terranTile, f4d_readerWriter);
-
 };	
 
-f4d_ReaderWriter.prototype.openF4dProjects_TestFromXDO = function(GL, BR_ProjectsList, f4d_readerWriter )
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.openF4dProjects_TestFromXDO = function(GL, BR_ProjectsList, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dIndexFile.txt";
 	//f4d_readerWriter.readF4D_IndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 	
@@ -1976,22 +2200,35 @@ f4d_ReaderWriter.prototype.openF4dProjects_TestFromXDO = function(GL, BR_Project
 	f4d_readerWriter.readF4D_IndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 };	
 
-f4d_ReaderWriter.prototype.openF4dProjects_TestFromCOLLADA = function(GL, BR_ProjectsList, f4d_readerWriter )
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.openF4dProjects_TestFromCOLLADA = function(GL, BR_ProjectsList, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_collada2f4d/pCloud_IndexFile.txt";
 	f4d_readerWriter.readF4D_pCloudIndexFile_inServer(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
-	
 };
 
-f4d_ReaderWriter.prototype.openF4dandXDOProjects_forSPEEDTEST = function(GL, BR_ProjectsList, f4d_readerWriter )
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_readerWriter = 변수
+ */
+f4d_ReaderWriter.prototype.openF4dandXDOProjects_forSPEEDTEST = function(GL, BR_ProjectsList, f4d_readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dIndexFile.txt";
 	f4d_readerWriter.readF4D_IndexFile_inServer_SPEEDTEST(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter);
 };
 
-
-f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_A1 = function(GL, arrayBuffer, BR_Project)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_Project = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_A1 = function(GL, arrayBuffer, BR_Project) {
 	var bytes_readed = 0;
 	var startBuff = undefined;
 	var endBuff = undefined;
@@ -2034,7 +2271,6 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_A1 = function(GL, arrayBuffer,
 	// Finally read the 4byte color.***
 	var color_4byte_temp = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
-	
 	// Simple building texture(create 1pixel X 1pixel bitmap).****************************************************
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 	simpBuildingV1._simpleBuildingTexture = GL.createTexture();
@@ -2044,12 +2280,15 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuilding_A1 = function(GL, arrayBuffer,
 	GL.bindTexture(GL.TEXTURE_2D, simpBuildingV1._simpleBuildingTexture);
 	GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
 	GL.bindTexture(GL.TEXTURE_2D, null);
-
-	
 };
 
-f4d_ReaderWriter.prototype.readXDO_SimpleBuilding_A1 = function(GL, arrayBuffer, BR_Project)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param arrayBuffer = 변수
+ * @param BR_Project = 변수
+ */
+f4d_ReaderWriter.prototype.readXDO_SimpleBuilding_A1 = function(GL, arrayBuffer, BR_Project) {
 	var bytes_readed = 0;
 	var startBuff = undefined;
 	var endBuff = undefined;
@@ -2059,7 +2298,6 @@ f4d_ReaderWriter.prototype.readXDO_SimpleBuilding_A1 = function(GL, arrayBuffer,
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
-
 	this.temp_var_to_waste = this.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1; // type.***
 	this.temp_var_to_waste = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // objID.***
 	this.countSC = this.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1; // Key length.***
@@ -2109,12 +2347,17 @@ f4d_ReaderWriter.prototype.readXDO_SimpleBuilding_A1 = function(GL, arrayBuffer,
 	bytes_readed = bytes_readed + (2)*simpBuildingV1._vnt_cacheKeys._indices_count; // updating data.***
 	
 	// There are color, and others attributes, but No necessary read more for a speed test.***
-	
 };
 
-
-f4d_ReaderWriter.prototype.readF4D_SimpleBuinding_A1_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_SimpleBuinding_A1_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	BR_Project._f4d_simpleBuilding_readed = true;
 	var oReq = new XMLHttpRequest();
@@ -2144,8 +2387,15 @@ f4d_ReaderWriter.prototype.readF4D_SimpleBuinding_A1_inServer = function(GL, fil
 	oReq.send(null);
 };
 
-f4d_ReaderWriter.prototype.readF4D_TileArrayBuffer_inServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param terranTile = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_TileArrayBuffer_inServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	terranTile.fileReading_started = true;
 	var oReq = new XMLHttpRequest();
@@ -2174,8 +2424,15 @@ f4d_ReaderWriter.prototype.readF4D_TileArrayBuffer_inServer = function(GL, fileP
 	oReq.send(null);
 };
 
-f4d_ReaderWriter.prototype.readF4D_pCloudGeometry_inServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param pCloud = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readF4D_pCloudGeometry_inServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_geometry_readed = true;
 	var oReq = new XMLHttpRequest();
@@ -2265,8 +2522,15 @@ f4d_ReaderWriter.prototype.readF4D_pCloudGeometry_inServer = function(GL, filePa
 	oReq.send(null);
 };
 
-f4d_ReaderWriter.prototype.readXDO_SimpleBuinding_A1_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param filePath_inServer = 변수
+ * @param BR_Project = 변수
+ * @param f4d_readerWriter = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.readXDO_SimpleBuinding_A1_inServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	BR_Project._xdo_simpleBuilding_readed = true;
 	var oReq = new XMLHttpRequest();
@@ -2295,9 +2559,18 @@ f4d_ReaderWriter.prototype.readXDO_SimpleBuinding_A1_inServer = function(GL, fil
 	oReq.send(null);
 };
 
-
-f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude, longitude, height, f4d_readerWriter, NeoBuildingsList, f4d_manager)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param buildingFileName = 변수
+ * @param latitude = 변수
+ * @param longitude = 변수
+ * @param height = 변수
+ * @param f4d_readerWriter = 변수
+ * @param NeoBuildingsList = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude, longitude, height, f4d_readerWriter, NeoBuildingsList, f4d_manager) {
 	// This is a test function to read the new f4d format.***
 	// The location(latitude, longitude, height) is provisional.***
 	
@@ -2312,7 +2585,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 		neoBuilding.octree = new f4d_octree(undefined);
 	
 	f4d_readerWriter.readF4D_NeoHeader_inServer(GL, neoBuilding_header_path, neoBuilding, f4d_readerWriter, f4d_manager); // Here makes the tree of octree.***
-	
 	
 	// 0) PositionMatrix.************************************************************************
 	//var height = elevation;
@@ -2357,7 +2629,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	var blocksListContainer = neoBuilding._blocksList_Container;
 	var filePath_inServer = "";
 	
-	
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.get_BlockList("Blocks1");
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter);
@@ -2401,7 +2672,6 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Bone";
 	f4d_readerWriter.readF4D_NeoReferences_inServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
 	
-	
 	// Now, read the interior objects in octree format.**********************************************************************************************
 	var interiorCRef_folderPath = this.geometryDataPath + "/"+buildingFileName+"/inLOD4";
 	lod_level = 0;
@@ -2424,19 +2694,25 @@ f4d_ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, lati
 			}
 		}
 	}
-	
-	
 	// Now, read the simple building.************************
 	
 	neoBuilding.neoSimpleBuilding = new F4D_NeoSimpleBuilding();
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
 	f4d_readerWriter.readF4D_neoSimpleBuilding_inServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, f4d_readerWriter);
-	
-	
 };
-		
-f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, latitude, longitude, height, f4d_readerWriter, BR_ProjectsList, f4d_manager)
-{
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param projectNumber = 변수
+ * @param latitude = 변수
+ * @param longitude = 변수
+ * @param height = 변수
+ * @param f4d_readerWriter = 변수
+ * @param BR_ProjectsList = 변수
+ * @param f4d_manager = 변수
+ */
+f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, latitude, longitude, height, f4d_readerWriter, BR_ProjectsList, f4d_manager) {
 	this.filesReadings_count +=1;
 	//The problem is that all files are read at the same time and when the files have a total size (sum) that is very large the browser crashes.
 	//I want to read one file after another, so that the memory consumption is reduced.
@@ -2463,16 +2739,13 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	  gl.generateMipmap(gl.TEXTURE_2D);
 	  gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-		
 	
 	var BR_buildingProject = BR_ProjectsList.new_BR_Project(); // NEW F4D PROJECT. *** NEW F4D PROJECT. *** NEW F4D PROJECT. *** NEW F4D PROJECT. ***
 	var blocksListContainer = BR_buildingProject._blocksList_Container;
 	
 	var project_number = projectNumber; // House with car and mini park to children.***
 	
-	
 	var projectNumStr = project_number.toString();
-	
 	
 	//    	  Entity.prototype._getModelMatrix = function(time, result) {
 	//    	        var position = Property.getValueOrUndefined(this._position, time, positionScratch);
@@ -2537,8 +2810,6 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	if(BR_buildingProject.octree == undefined)
 		BR_buildingProject.octree = new f4d_octree(undefined);
-	
-	
 	
 	// 1) Blocks.*******************************************************************************************************************************
 	var filePath_inServer = this.geometryDataPath + "/"+projectNumStr+"/Blocks1";
@@ -2629,18 +2900,5 @@ f4d_ReaderWriter.prototype.openBuildingProject = function(GL, projectNumber, lat
 	
 	// Once reading finished, we must insert the project in to the corresponding quadtreeTile.***
 	// Pendent.***
-	
 };		
-	
-
 //# sourceURL=f4d_readWriter.js	
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		

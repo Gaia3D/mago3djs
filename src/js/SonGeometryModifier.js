@@ -1,9 +1,19 @@
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_geometryModifier = function()
   {
 	 
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param f4d_point3d = 변수
+   * @param px = 변수
+   * @param py = 변수
+   * @param pz = 변수
+   */
   // f4d_point3d.*************************************************************************
   f4d_geometryModifier.prototype.set_point3d = function(f4d_point3d, px, py, pz)
   {
@@ -12,6 +22,14 @@ var f4d_geometryModifier = function()
 	f4d_point3d.z = pz;
   };
   
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param f4d_point3d = 변수
+   * @param px = 변수
+   * @param py = 변수
+   * @param pz = 변수
+   * @retuns dx*dx + dy*dy + dz*dz
+   */
   f4d_geometryModifier.prototype.point3d_squareDistTo = function(f4d_point3d, px, py, pz)
   {
 	  var dx = f4d_point3d.x - px;
@@ -23,6 +41,12 @@ var f4d_geometryModifier = function()
   // End f4d_point3D.---------------------------------------------------------------------
   
   // f4d_Matrix4.**********************************************************************************
+  
+  /**
+   * 어떤 일을 하고 있습니까?
+   * @param matrix4 = 변수
+   * @param float32array = 변수
+   */
   f4d_geometryModifier.prototype.Matrix4_setByFloat32Array = function(matrix4, float32array)
 	{
 		for(var i=0; i<16; i++)
@@ -30,7 +54,13 @@ var f4d_geometryModifier = function()
 			matrix4._floatArrays[i] = float32array[i];
 		}
 	};
-	
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param matrix4 = 변수
+	   * @param point3d = 변수
+	   * @returns transformedPoint3d 
+	   */
 	f4d_geometryModifier.prototype.Matrix4_transformPoint3D = function(matrix4, point3d)
 	{
 		var transformedPoint3d = new f4d_point3d();
@@ -55,7 +85,13 @@ var f4d_geometryModifier = function()
 		
 		return transformedPoint3d;
 	};
-	
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param matrixA = 변수
+	   * @param matrixB = 변수
+	   * @retuns resultMat
+	   */
 	f4d_geometryModifier.prototype.Matrix4_getMultipliedByMatrix = function(matrixA, matrixB)
 	{
 		
@@ -95,6 +131,12 @@ var f4d_geometryModifier = function()
 	// End f4d_Matrix4.----------------------------------------------------------------------------
 	
 	// f4d_reference.*********************************************************************************************************
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param reference = 변수
+	   * @param matrix = 변수
+	   */
 	f4d_geometryModifier.prototype.f4dReference_multiplyTransformMatrix = function(reference, matrix)
 	{
 		//var multipliedMat = reference._matrix4.getMultipliedByMatrix(matrix); // Original.***
@@ -104,6 +146,12 @@ var f4d_geometryModifier = function()
 	// End f4d_reference.-----------------------------------------------------------------------------------------------------
 	
 	// f4d_compoundReferencesList.***********************************************************************************************
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param compRefList = 변수
+	   * @param matrix = 변수
+	   */
 	f4d_geometryModifier.prototype.f4dCompoundReferencesList_multiplyReferencesMatrices = function(compRefList, matrix)
 	{
 		var compRefs_count = compRefList._compoundRefsArray.length;
@@ -119,7 +167,15 @@ var f4d_geometryModifier = function()
 			}
 		}
 	};
-	
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param compRefList = 변수
+	   * @param eye_x = 변수
+	   * @param eye_y = 변수
+	   * @param eye_z = 변수
+	   * @returns visibleCompRefObjectsArray
+	   */
 	f4d_geometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsList = function(compRefList, eye_x, eye_y, eye_z)
 	{
 		/*
@@ -165,6 +221,15 @@ var f4d_geometryModifier = function()
 	// End f4d_compoundReferencesList.------------------------------------------------------------------------------------------------
 	
 	// f4d_CompoundReferencesList_Container.*****************************************************************************************************
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param compRefList_container = 변수
+    * @param eye_x = 변수
+    * @param eye_y = 변수
+    * @param eye_z = 변수
+    * @returns visibleCompRefObjectsArray_Total
+	*/
 	f4d_geometryModifier.prototype.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList = function(compRefList_container, eye_x, eye_y, eye_z)
 	{
 		var visibleCompRefObjectsArray_Total = [];
@@ -180,7 +245,15 @@ var f4d_geometryModifier = function()
 		return visibleCompRefObjectsArray_Total;
 	};
 	// End f4d_CompoundReferencesList_Container.-------------------------------------------------------------------------------------------------
-	
+	  
+	  /**
+	   * 어떤 일을 하고 있습니까?
+	   * @param buildingProject = 변수
+	   * @param eye_x = 변수
+	   * @param eye_y = 변수
+	   * @param eye_Z = 변수
+	   * @returns total_visibleCompRefLists
+	   */
 	// f4d_BR_buildingProject.************************************************************************************************************************
 	f4d_geometryModifier.prototype.f4dBRbuildingProject_getVisibleCompRefLists = function(buildingProject, eye_x, eye_y, eye_z)
 	  {
@@ -200,6 +273,17 @@ var f4d_geometryModifier = function()
 	// End f4d_BR_buildingProject.---------------------------------------------------------------------------------------------------------------------
 	
 	// f4d_OcclusionCullingOctree_Cell.*************************************************************************************************
+	  
+    /**
+	 * 어떤 일을 하고 있습니까?
+	 * @param ocCullOctreeCell = 변수
+	 * @param min_x = 변수
+	 * @param max_x = 변수
+	 * @param min_y = 변수
+	 * @param max_y = 변수
+	 * @param min_z = 변수
+	 * @param max_z = 변수
+	 */
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_setDimensions = function(ocCullOctreeCell, min_x, max_x, min_y, max_y, min_z, max_z)
 	{
 		ocCullOctreeCell._minX = min_x;
@@ -209,7 +293,11 @@ var f4d_geometryModifier = function()
 		ocCullOctreeCell._minZ = min_z;
 		ocCullOctreeCell._maxZ = max_z;
 	};
-	
+	  
+    /**
+	 * 어떤 일을 하고 있습니까?
+	 * @param ocCullOctreeCell = 변수
+	 */
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_setSizesSubBoxes = function(ocCullOctreeCell)
 	{
 		// Bottom                      Top
@@ -261,7 +349,15 @@ var f4d_geometryModifier = function()
 		}
 		
 	};
-	
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param ocCullOctreeCell = 변수
+    * @param x = 변수
+    * @param y = 변수
+    * @param z = 변수
+    * @returns intersects
+    */
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_intersectsWithPoint3D = function(ocCullOctreeCell, x, y, z)
 	{
 		var intersects = false;
@@ -279,7 +375,15 @@ var f4d_geometryModifier = function()
 		
 		return intersects;
 	};
-	
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param ocCullOctreeCell = 변수
+    * @param x = 변수
+    * @param y = 변수
+    * @param z = 변수
+    * @returns intersectedSubBox
+    */
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_byPoint3D = function(ocCullOctreeCell, x, y, z)
 	{
 		var intersectedSubBox = null;
@@ -347,7 +451,15 @@ var f4d_geometryModifier = function()
 		
 		return intersectedSubBox;
 	};
-	
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param ocCullOctreeCell = 변수
+    * @param x = 변수
+    * @param y = 변수
+    * @param z = 변수
+    * @returns indicesVisiblesArray
+    */	
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIndicesVisiblesForEye = function(ocCullOctreeCell, eye_x, eye_y, eye_z)
 	{
 		var indicesVisiblesArray = null;
@@ -360,7 +472,12 @@ var f4d_geometryModifier = function()
 		
 		return indicesVisiblesArray;
 	};
-	
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param ocCullOctreeCell = 변수
+    * @param expansionDist = 변수
+    */	
 	f4d_geometryModifier.prototype.f4dOcclusionCullingOctreeCell_expandBox = function(ocCullOctreeCell, expansionDist)
 	{
 		ocCullOctreeCell._minX -= expansionDist;
@@ -374,6 +491,12 @@ var f4d_geometryModifier = function()
 	
 	
 	// f4d_VertexTexcoordsArrays_cacheKeys_Container.*****************************************************************************************
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param vtArraysCacheKeys_container = 변수
+    * @returns vt_cacheKey
+    */
 	f4d_geometryModifier.prototype.f4dVertexTexcoordsArraysCacheKeysContainer_newVertexTexcoordsArraysCacheKey = function(vtArraysCacheKeys_container)
 	  {
 		  var vt_cacheKey = new f4d_VertexTexcoordsArrays_cacheKeys();
@@ -384,6 +507,13 @@ var f4d_geometryModifier = function()
 	
 	
 	// f4d_BlocksList.**********************************************************************************************************************
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param blockList = 변수
+    * @param idx = 변수
+    * @returns block 
+    */
 	f4d_geometryModifier.prototype.f4dBlocksList_getBlock = function(blockList, idx)
 	  {
 		  var block = null;
@@ -397,7 +527,14 @@ var f4d_geometryModifier = function()
 	// End f4d_BlocksList.------------------------------------------------------------------------------------------------------------------
 	
 	// f4d_BlocksLists_Container.************************************************************************************************************
-	f4d_geometryModifier.prototype.f4dBlocksListsContainer_newBlocksList = function(blockList_container, blocksList_name)
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param blockList_container = 변수
+    * @param blocksList_name = 변수
+    * @returns f4d_blocksList
+    */
+	 f4d_geometryModifier.prototype.f4dBlocksListsContainer_newBlocksList = function(blockList_container, blocksList_name)
 	  {
 		  var f4d_blocksList = new f4d_BlocksList();
 		  f4d_blocksList._name = blocksList_name;
@@ -405,6 +542,12 @@ var f4d_geometryModifier = function()
 		  return f4d_blocksList;
 	  };
 	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param blockList_container = 변수
+    * @param blockList_name = 변수
+    * @returns blocksList
+    */	  
 	  f4d_geometryModifier.prototype.f4dBlocksListsContainer_getBlockList = function(blockList_container, blockList_name)
 	  {
 		var blocksLists_count = blockList_container._BlocksListsArray.length;
@@ -427,7 +570,12 @@ var f4d_geometryModifier = function()
 	
 	
 	// f4d_BR_buildingProject.**************************************************************************************************************
-	f4d_geometryModifier.prototype.f4dBRbuildingProject_createDefaultBlockReferencesLists = function(buildingProject)
+	  
+  /**
+    * 어떤 일을 하고 있습니까?
+    * @param buildingProject = 변수
+    */	  
+	  f4d_geometryModifier.prototype.f4dBRbuildingProject_createDefaultBlockReferencesLists = function(buildingProject)
 	  {
 		  // Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
 		  
@@ -449,6 +597,12 @@ var f4d_geometryModifier = function()
 	// End f4d_BR_buildingProject.----------------------------------------------------------------------------------------------------------
 	
 	// f4d_BR_buildingProjectsList.***********************************************************************************************************
+	  
+	  /**
+	    * 어떤 일을 하고 있습니까?
+	    * @param buildingProjectsList = 변수
+	    * @returns br_buildingProject
+	    */
 	f4d_geometryModifier.prototype.f4dBRbuildingProjectsList_newBRProject = function(buildingProjectsList)
 	  {
 		//var titol = "holes a tothom"

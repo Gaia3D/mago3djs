@@ -2,8 +2,10 @@
 // tornado : https://www.html5rocks.com/en/tutorials/casestudies/oz/
 // https://www.html5rocks.com/static/demos/oz/tutorials/tornado/index.html
 
-var f4d_shadowBlendingCube = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_shadowBlendingCube = function() {
 	this.vertexMatrix = new f4d_vertexMatrix();
 	this.tTrianglesMatrix = new f4d_tTrianglesMatrix();
 	this.init(this.vertexMatrix, this.tTrianglesMatrix);
@@ -11,11 +13,14 @@ var f4d_shadowBlendingCube = function()
 	this.vbo_vertexCacheKey = undefined;
 	this.vbo_indexCacheKey = undefined;
 	this.indices_count = 0;
-	
 };
 
-f4d_shadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
+ * @param tTriMat = 변수
+ */
+f4d_shadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	// create a blending cube, with faces inverted.***
 	var cubeSideSemiLength = 150.5;
 	var vertex = undefined;
@@ -102,15 +107,20 @@ f4d_shadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 	//tTriMat.invert_trianglesSense();
 };
 
-
-f4d_shadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns floatArray
+ */
+f4d_shadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function() {
 	var floatArray = this.vertexMatrix.get_vbo_vertexColorRGBA_FloatArray(floatArray);
 	return floatArray;
 };
 
-f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns shortArray
+ */
+f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function() {
 	this.vertexMatrix.set_vertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.get_vbo_indices_ShortArray();
 	this.indices_count = shortArray.length;
@@ -118,27 +128,36 @@ f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function()
 	return shortArray;
 };
 
-//*******************************************************************
-var f4d_atmosphere = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * 
+ */
+var f4d_atmosphere = function() {
 	this.cloudsManager = new f4d_cloudsManager();
 	this.shadowBlendingCube = new f4d_shadowBlendingCube();
 };
 
-var f4d_cloudsManager = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_cloudsManager = function() {
 	this.circularCloudsArray = [];
 };
 
-f4d_cloudsManager.prototype.newCircularCloud = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns circularCloud
+ */
+f4d_cloudsManager.prototype.newCircularCloud = function() {
 	var circularCloud = new f4d_circularCloud();
 	this.circularCloudsArray.push(circularCloud);
 	return circularCloud;
 };
 
-var f4d_circularCloud = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var f4d_circularCloud = function() {
 	this.radius = 200.0;
 	this.depth = 150.0;
 	this.numPointsForCicle = 8;
@@ -147,12 +166,10 @@ var f4d_circularCloud = function()
 	this.tTrianglesMatrix = new f4d_tTrianglesMatrix();
 	this.shadowVertexMatrix = new f4d_vertexMatrix();
 	this.shadowTTrianglesMatrix = new f4d_tTrianglesMatrix();
-
 	
 	this.sunLightDirection = new f4d_point3d();
 	this.sunLightDirection.set(1, 1, -5);
 	this.sunLightDirection.unitary();
-	
 	
 	this.longitude = undefined;
 	this.latitude = undefined;
@@ -179,14 +196,20 @@ var f4d_circularCloud = function()
 	this.vertexSC = new f4d_vertex();
 };
 
-f4d_circularCloud.prototype.get_vbo_vertexColor_FloatArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns floatArray
+ */
+f4d_circularCloud.prototype.get_vbo_vertexColor_FloatArray = function() {
 	var floatArray = this.vertexMatrix.get_vbo_vertexColor_FloatArray(floatArray);
 	return floatArray;
 };
 
-f4d_circularCloud.prototype.get_vbo_indices_ShortArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns floatArray
+ */
+f4d_circularCloud.prototype.get_vbo_indices_ShortArray = function() {
 	this.vertexMatrix.set_vertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.get_vbo_indices_ShortArray();
 	this.indices_count = shortArray.length;
@@ -194,14 +217,20 @@ f4d_circularCloud.prototype.get_vbo_indices_ShortArray = function()
 	return shortArray;
 };
 
-f4d_circularCloud.prototype.get_vbo_shadowVertex_FloatArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns floatArray
+ */
+f4d_circularCloud.prototype.get_vbo_shadowVertex_FloatArray = function() {
 	var floatArray = this.shadowVertexMatrix.get_vbo_vertex_FloatArray(floatArray);
 	return floatArray;
 };
 
-f4d_circularCloud.prototype.get_vbo_shadowIndices_ShortArray = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns shortArray
+ */
+f4d_circularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
 	this.shadowVertexMatrix.set_vertexIdxInList();
 	var shortArray = this.shadowTTrianglesMatrix.get_vbo_indices_ShortArray();
 	this.indices_count = shortArray.length;
@@ -209,9 +238,11 @@ f4d_circularCloud.prototype.get_vbo_shadowIndices_ShortArray = function()
 	return shortArray;
 };
 
-
-f4d_circularCloud.prototype.rotateMesh_byLocation = function(vtxMat)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
+ */
+f4d_circularCloud.prototype.rotateMesh_byLocation = function(vtxMat) {
 	// we rotate the cloud mesh by longitude, latitude.***
 	var matrix = new f4d_Matrix4();
 	
@@ -236,8 +267,10 @@ f4d_circularCloud.prototype.rotateMesh_byLocation = function(vtxMat)
 	vtxMat.transformPoints_byMatrix4(matrix);
 };
 
-f4d_circularCloud.prototype.doShadowMesh_withSunDirection = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+f4d_circularCloud.prototype.doShadowMesh_withSunDirection = function() {
 	var distance = 3000.0;
 	var vertexList = this.shadowVertexMatrix.get_vertexList(5); // Bottom radius zero ring.***
 	vertexList.translate_vertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
@@ -249,8 +282,15 @@ f4d_circularCloud.prototype.doShadowMesh_withSunDirection = function()
 	vertexList.translate_vertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
 };
 
-f4d_circularCloud.prototype.createCloud = function(longitude, latitude, altitude, radius, depth, numPointsForCircle)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param logitude = 경도
+ * @param latitude = 위도
+ * @param radius = 반지름
+ * @param depth = 깊이
+ * @param numPointsForCircle = 변수
+ */
+f4d_circularCloud.prototype.createCloud = function(longitude, latitude, altitude, radius, depth, numPointsForCircle) {
 	this.longitude = longitude;
 	this.latitude = latitude;
 	this.altitude = altitude;
@@ -290,8 +330,14 @@ f4d_circularCloud.prototype.createCloud = function(longitude, latitude, altitude
 	this.cullingRadius = this.bbox.get_maxLength()/2;
 };
 
-f4d_circularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shadowTTriMat)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vtxMat = 변수
+ * @param tTriMat = 변수
+ * @param shadowVtxMat = 변수
+ * @param shadowTTriMat = 변수
+ */
+f4d_circularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shadowTTriMat) {
 	// use vertex_matrix.***
 	// our cloud has 6 rings. Top ring and the bottom ring has radius zero.***
 	var numPointsForRing = 16;
@@ -418,10 +464,4 @@ f4d_circularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, s
 	//tTriMat.invert_trianglesSense(); // No.***
 	
 	// Now, calculate the culling bbox.***
-	
 };
-
-
-
-
-

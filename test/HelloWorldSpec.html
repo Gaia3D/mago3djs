@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>HelloWorld Test</title>
+
+	<link rel="shortcut icon" type="image/png" href="/external/jasmine-2.5.2/jasmine_favicon.png">
+	<link rel="stylesheet" href="/external/jasmine-2.5.2/jasmine.css">
+
+	<script src="/external/jasmine-2.5.2/jasmine.js"></script>
+	<script src="/external/jasmine-2.5.2/jasmine-html.js"></script>
+	<script src="/external/jasmine-2.5.2/boot.js"></script>
+
+	<!-- include source files here... -->
+	<script src="/src/js/HelloWorld.js"></script>
+
+	<!-- include spec files here... -->
+	<script src="/test/HelloWorldSpec.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+	var console_reporter = new jasmine.ConsoleReporter()
+	jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+	jasmine.getEnv().addReporter(console_reporter);
+	jasmine.getEnv().execute();
+	</script>
+</body>
+</html>
