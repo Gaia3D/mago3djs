@@ -54,7 +54,7 @@ var f4d_ReaderWriter = function()
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return uint32[0]
+ * @returns uint32[0]
  */
 f4d_ReaderWriter.prototype.readUInt32 = function(buffer, start, end)
 {
@@ -67,7 +67,7 @@ f4d_ReaderWriter.prototype.readUInt32 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return int32[0]
+ * @returns int32[0]
  */
 f4d_ReaderWriter.prototype.readInt32 = function(buffer, start, end)
 {
@@ -80,7 +80,7 @@ f4d_ReaderWriter.prototype.readInt32 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return uint16[0]
+ * @returns uint16[0]
  */
 f4d_ReaderWriter.prototype.readUInt16 = function(buffer, start, end)
 {
@@ -93,7 +93,7 @@ f4d_ReaderWriter.prototype.readUInt16 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return int16[0]
+ * @returns int16[0]
  */
 f4d_ReaderWriter.prototype.readInt16 = function(buffer, start, end)
 {
@@ -106,7 +106,7 @@ f4d_ReaderWriter.prototype.readInt16 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return float64[0]
+ * @returns float64[0]
  */
 f4d_ReaderWriter.prototype.readFloat64 = function(buffer, start, end)
 {
@@ -119,7 +119,7 @@ f4d_ReaderWriter.prototype.readFloat64 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return float32[0]
+ * @returns float32[0]
  */
 f4d_ReaderWriter.prototype.readFloat32 = function(buffer, start, end)
 {
@@ -132,7 +132,7 @@ f4d_ReaderWriter.prototype.readFloat32 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return float16[0]
+ * @returns float16[0]
  */
 f4d_ReaderWriter.prototype.readFloat16 = function(buffer, start, end)
 {
@@ -145,7 +145,7 @@ f4d_ReaderWriter.prototype.readFloat16 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return int8[0]
+ * @returns int8[0]
  */
 f4d_ReaderWriter.prototype.readInt8 = function(buffer, start, end)
 {
@@ -158,7 +158,7 @@ f4d_ReaderWriter.prototype.readInt8 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return uint8[0]
+ * @returns uint8[0]
  */
 f4d_ReaderWriter.prototype.readUInt8 = function(buffer, start, end)
 {
@@ -171,7 +171,7 @@ f4d_ReaderWriter.prototype.readUInt8 = function(buffer, start, end)
  * @param buffer = 변수
  * @param start = 변수
  * @param end = 변수
- * @return int8_value
+ * @returns int8_value
  */
 f4d_ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end)
 {
