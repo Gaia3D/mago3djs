@@ -1,4 +1,3 @@
-Test6:06
 1 프로젝트명
  - maog3djs 
 
@@ -24,3 +23,22 @@ Test6:06
  
 3 아키텍처
  gulp, karma, jasmine(mocha + chai), jsdoc, eslint 
+ 
+4 웹서버 설정
+apache lounge를 다운 받아서 설치 했음
+
+1 httpd.conf
+ - 아파치 홈 디렉토리
+ ServerRoot "c:/apache"
+
+ServerName localhost:80
+
+ DocumentRoot "C:\git\repository\geomartian"
+
+
+
+eclipse node plugin을 사용하는 경우
+server.js를 cesium 꺼 복사해서 돌려 보니 잘 된다.
+port만 80번으로 변경 했는데...
+
+나중에 어떤걸 사용할지 결정해야 함
