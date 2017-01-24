@@ -203,7 +203,7 @@ var F4D_NeoReferencesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * return neoRef
+ * @returns neoRef
  */
 F4D_NeoReferencesList.prototype.new_neoReference = function() {
 	var neoRef = new F4D_NeoReference();
@@ -432,7 +432,7 @@ F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * return texture
+ * @returns texture
  */
 F4D_NeoSimpleBuilding.prototype.newTexture = function() {
 	var texture = new F4D_neoTexture();
