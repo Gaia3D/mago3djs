@@ -3,7 +3,14 @@
 
 // real time radiosity shader http://madebyevan.com/webgl-path-tracing/
 //http://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html // GOOD TUTORIALS !!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
+ * @param w = 변수
+ * @param h = 변수
+ * @param pixels = 변수
+ * @returns texture
+ */
 function genNoiseTextureRGBA(gl, w, h, pixels) {       
   var texture = gl.createTexture();
   gl.activeTexture(gl.TEXTURE0);
@@ -126,6 +133,9 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
   return texture;
 }
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var f4d_manager = function()
 {
 	// F4D Data structure & objects.*****************************************
@@ -402,6 +412,9 @@ var f4d_manager = function()
 	this.load_samsung= false;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_manager.prototype.create_clouds_TEST = function()
 {
 	var increLong = 0.004;
@@ -448,6 +461,12 @@ f4d_manager.prototype.create_clouds_TEST = function()
 	*/
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cameraPosition = 변수
+ * @param squareDistUmbral = 변수
+ * @returns camera_was_moved
+ */
 f4d_manager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral)
 {
 	// if camera is interior of building -> this.squareDistUmbral = 22.0;
@@ -475,6 +494,10 @@ f4d_manager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral)
 	return camera_was_moved;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cameraPosition = 변수
+ */
 f4d_manager.prototype.update_CameraMoved = function(cameraPosition)
 {
 	// This function must run in a background process.****
@@ -486,7 +509,15 @@ f4d_manager.prototype.update_CameraMoved = function(cameraPosition)
 	
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param cullingVolume = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ */
 f4d_manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
 {
 	var clouds_count = this.f4d_atmos.cloudsManager.circularCloudsArray.length;
@@ -569,6 +600,15 @@ f4d_manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, culli
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param cullingVolume = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ */
 f4d_manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
 {
 	//if(!isLastFrustum)
@@ -772,8 +812,12 @@ f4d_manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, cul
 	
 };
 
-
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param encodedCamPosMC_High = 변수
+ * @param encodedCamPosMC_Low = 변수
+ * @param cameraPosition = 변수
+ */
 f4d_manager.prototype.calculate_encodedCameraPositionMC_HighLow = function(encodedCamPosMC_High, encodedCamPosMC_Low, cameraPosition)
 {
 	var camSplitVelue_X  = Cesium.EncodedCartesian3.encode(cameraPosition.x);
@@ -797,6 +841,15 @@ f4d_manager.prototype.calculate_encodedCameraPositionMC_HighLow = function(encod
 	//this.encodedCamPosMC_Low[2] = us._encodedCameraPositionMC.low.z;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param cullingVolume = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ */
 f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
 {
 	//this.isCameraMoving = this.isButtonDown(scene);
@@ -882,8 +935,12 @@ f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, c
 	GL.disableVertexAttribArray(shader._position);
 };
 
-
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
+ * @param image = 변수
+ * @param texture
+ */
 function handleTextureLoaded(gl, image, texture) 
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
@@ -898,6 +955,14 @@ function handleTextureLoaded(gl, image, texture)
 };
 
 // render_neobuildings
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ */
 f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
 {
 	if(!isLastFrustum)
@@ -1192,7 +1257,14 @@ f4d_manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelVi
 	
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ */
 f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum)
 {
 	if(!isLastFrustum)
@@ -1479,6 +1551,13 @@ f4d_manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mode
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
+ * @param scene = 변수
+ * @param renderables_neoRefLists_array = 변수
+ * @returns selectionCandidateObjects_array[idx]
+ */
 f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_neoRefLists_array)
 {
 	// Picking render.***
@@ -1598,7 +1677,13 @@ f4d_manager.prototype.getSelectedObject_Picking = function(gl, scene, renderable
 	
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param scene = 변수
+ * @param resultRay = 변수
+ * @returns resultRay
+ */
 f4d_manager.prototype.getRayCamSpace = function(GL, scene, resultRay)
 {
 	var frustum_far = 1.0; // unitary frustum far.***
@@ -1620,7 +1705,14 @@ f4d_manager.prototype.getRayCamSpace = function(GL, scene, resultRay)
 	return resultRay;
 };
 
-f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, scene, renderables_neoRefLists_array)
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl = 변수
+ * @param cameraPosition = 변수
+ * @param scene = 변수
+ * @param renderables_neoRefLists_array = 변수
+ */
+f4d_manager.prototype.calculateSelObjMovePlane = function( )
 {
 	
 	// depth render.************************************************************************************************************
@@ -1753,7 +1845,12 @@ f4d_manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, sc
         return result;
     }
 	*/
-	
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param state = 변수
+ * @param scene = 변수
+ */	
 f4d_manager.prototype.enableCameraMotion = function(state, scene)
 {
 	scene.screenSpaceCameraController.enableRotate = state;
@@ -1763,6 +1860,11 @@ f4d_manager.prototype.enableCameraMotion = function(state, scene)
 	scene.screenSpaceCameraController.enableTranslate = state;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param scene = 변수
+ */
 f4d_manager.prototype.isDragging = function(GL, scene)
 {
 	// test function.***
@@ -1777,6 +1879,12 @@ f4d_manager.prototype.isDragging = function(GL, scene)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param scene = 변수
+ * @param renderables_neoRefLists_array = 변수
+ */
 f4d_manager.prototype.moveSelectedObject = function(GL, scene, renderables_neoRefLists_array)
 {
 	if(this.objectSelected == undefined)
@@ -1846,7 +1954,13 @@ f4d_manager.prototype.moveSelectedObject = function(GL, scene, renderables_neoRe
 	var hola = 0;
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param scene = 변수
+ * @param result_neoRefLists_array = 변수
+ * @returns result_neoRefLists_array
+ */
 f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, result_neoRefLists_array)
 {
 	result_neoRefLists_array.length = 0; // Init.***
@@ -1922,6 +2036,16 @@ f4d_manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, r
 	return result_neoRefLists_array;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param scene = 변수
+ * @param shader = 변수
+ * @param renderTexture = 변수
+ * @param ssao_idx = 변수
+ * @param neoRefLists_array = 변수
+ */
 f4d_manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array)
 {
 	
@@ -1979,7 +2103,11 @@ f4d_manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition,
 	
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param BR_Project = 변수
+ */
 f4d_manager.prototype.create_FirstTime_VBO_CacheKeys= function(GL, BR_Project)
 {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
@@ -2016,6 +2144,10 @@ f4d_manager.prototype.create_FirstTime_VBO_CacheKeys= function(GL, BR_Project)
 	BR_Project._f4d_nailImage_readed_finished = true;
 }
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param scene = 변수
+ */
 f4d_manager.prototype.reCalculate_ModelViewProjectionRelToEyeMatrix = function(scene)
 {
 	if(scene.context._us._modelView[0] == 0 && scene.context._us._modelView[1] == 0 && scene.context._us._modelView[2] == 0 && scene.context._us._modelView[3] == 0 && 
@@ -2035,6 +2167,16 @@ f4d_manager.prototype.reCalculate_ModelViewProjectionRelToEyeMatrix = function(s
 	Cesium.Matrix4.toArray(modelViewProjectionRelToEye, this.modelViewProjRelToEye_matrix); 
 }
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param cameraPosition = 변수
+ * @param cullingVolume = 변수
+ * @param _modelViewProjectionRelativeToEye = 변수
+ * @param scene = 변수
+ * @param isLastFrustum = 변수
+ * @param frustum_idx = 변수
+ */
 f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum, frustum_idx)
 {
 	if(this.isCameraInsideNeoBuilding)
@@ -2612,6 +2754,13 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume = 변수
+ * @param neoVisibleBuildings_array = 변수
+ * @param cameraPosition = 변수
+ * @returns neoVisibleBuildings_array
+ */
 f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, neoVisibleBuildings_array, cameraPosition)
 {
 	// This makes the visible buildings array.***
@@ -2784,6 +2933,14 @@ f4d_manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, ne
 	return neoVisibleBuildings_array;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL = 변수
+ * @param frustumVolume = 변수
+ * @param visibleBuildings_array = 변수
+ * @param cameraPosition = 변수
+ * @returns visibleBuildings_array
+ */
 f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, frustumVolume, visibleBuildings_array, cameraPosition)
 {
 	// This makes the visible buildings array.***
@@ -3122,6 +3279,13 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 	return visibleBuildings_array;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume = 변수
+ * @param visibleBuildings_array = 변수
+ * @param cameraPosition = 변수
+ * @returns visibleBuildings_array
+ */
 f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuildings_array, cameraPosition)
 {
 	// This makes the visible buildings array.***
@@ -3184,6 +3348,9 @@ f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleB
 	
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 f4d_manager.prototype.load_TEST_Files = function()
 		{
 			// Now, load sejong.***
