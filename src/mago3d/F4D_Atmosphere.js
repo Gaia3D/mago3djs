@@ -130,7 +130,6 @@ f4d_shadowBlendingCube.prototype.get_vbo_indices_ShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * 
  */
 var f4d_atmosphere = function() {
 	this.cloudsManager = new f4d_cloudsManager();
