@@ -1,10 +1,12 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
- * @param width = 변수
- * @param height = 변수
+ * @param gl 변수
+ * @param width 변수
+ * @param height 변수
  */
-function FBO(gl, width, height) {     
+var FBO = function(gl, width, height) {     
   this.gl = gl;
   this.width = width;
   this.height = height;

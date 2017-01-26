@@ -1,76 +1,78 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-function f4d_PostFx_Shader(gl) {
+var PostFxShader = function(gl) {
 	// shader program.***
-	this.program = undefined;
-	this.shader_vertex = undefined;
-	this.shader_fragment = undefined;
+	this.program;
+	this.shader_vertex;
+	this.shader_fragment;
 	
 	// attributes.***
-	this.position3_loc = undefined;
-	this.color3_loc = undefined;
-	this.normal3_loc = undefined;
-	this.texCoord2_loc = undefined;
+	this.position3_loc;
+	this.color3_loc;
+	this.normal3_loc;
+	this.texCoord2_loc;
 	
 	// uniforms matrix.***
-	this.projectionMatrix4_loc = undefined; // usually no used.***
-	this.modelViewMatrix4_loc = undefined;
-	this.modelViewProjectionMatrix4_loc = undefined;
-	this.modelViewMatrix4RelToEye_loc = undefined;
-	this.modelViewProjectionMatrix4RelToEye_loc = undefined;
-	this.normalMatrix4_loc = undefined;
-	this.normalMatrix3_loc = undefined;
-	this.RefTransfMatrix = undefined;
+	this.projectionMatrix4_loc; // usually no used.***
+	this.modelViewMatrix4_loc;
+	this.modelViewProjectionMatrix4_loc;
+	this.modelViewMatrix4RelToEye_loc;
+	this.modelViewProjectionMatrix4RelToEye_loc;
+	this.normalMatrix4_loc;
+	this.normalMatrix3_loc;
+	this.RefTransfMatrix;
 	
 	// uniform vectors.***
-	this.buildingPosHIGH_loc = undefined;
-	this.buildingPosLOW_loc = undefined;
-	this.cameraPosHIGH_loc = undefined;
-	this.cameraPosLOW_loc = undefined;
-	this.noiseScale2_loc = undefined;
-	this.kernel16_loc = undefined;
+	this.buildingPosHIGH_loc;
+	this.buildingPosLOW_loc;
+	this.cameraPosHIGH_loc;
+	this.cameraPosLOW_loc;
+	this.noiseScale2_loc;
+	this.kernel16_loc;
 	
 	// uniform values.***
-	this.near_loc = undefined;
-	this.far_loc = undefined;
-	this.fov_loc = undefined;
-	this.aspectRatio_loc = undefined;
-	this.screenWidth_loc = undefined;
-	this.screenHeight_loc = undefined;
+	this.near_loc;
+	this.far_loc;
+	this.fov_loc;
+	this.aspectRatio_loc;
+	this.screenWidth_loc;
+	this.screenHeight_loc;
 	
 	// uniform samplers.***
-	this.diffuseTex_loc = undefined;
-	this.depthTex_loc = undefined;
-	this.noiseTex_loc = undefined;
+	this.diffuseTex_loc;
+	this.depthTex_loc;
+	this.noiseTex_loc;
 	
 	// blur.***
-	this.texelSize_loc = undefined;
-	this.colorTex_loc = undefined;
+	this.texelSize_loc;
+	this.colorTex_loc;
 	
 	// Model Reference meshes.***
-	this.useRefTransfMatrix_loc = undefined;
-	this.useTexture_loc = undefined;
-	this.invertNormals_loc  = undefined;
+	this.useRefTransfMatrix_loc;
+	this.useTexture_loc;
+	this.invertNormals_loc;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-function f4d_PostFx_ShadersManager() {
+var PostFxShadersManager = function() {
 	this.pFx_shaders_array = [];
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL = 변수
- * @param source = 변수
- * @param type = 변수
- * @param typeString = 변수
+ * @param GL 변수
+ * @param source 변수
+ * @param type 변수
+ * @param typeString 변수
  * @returns shader
  */
-f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
+PostFxShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -84,9 +86,9 @@ f4d_PostFx_ShadersManager.prototype.get_shader = function(GL, source, type, type
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL = 변수
+ * @param GL 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL) {
+PostFxShadersManager.prototype.create_defaultShaders = function(GL) {
 	this.create_renderDepthShader(GL); // 0.***
 	this.create_ssaoShader(GL); // 1.***
 	this.create_blurShader(GL); // 2.***
@@ -104,10 +106,10 @@ f4d_PostFx_ShadersManager.prototype.create_defaultShaders = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL = 변수
+ * @param GL 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_blurShader = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
 	var blur_vs_source = "\n\
@@ -179,10 +181,10 @@ f4d_PostFx_ShadersManager.prototype.create_blurShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_ssaoShader = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
 	var ssao_vs_source = "\n\
@@ -351,10 +353,10 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL = 변수
+ * @param GL 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_renderDepthShader = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
 	var showDepth_vs_source = "\n\
@@ -448,10 +450,10 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader = function(gl) {
 // Ref Model.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
 	var ssao_vs_source = "\n\
@@ -758,10 +760,10 @@ f4d_PostFx_ShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
 	var showDepth_vs_source = "\n\
@@ -860,10 +862,10 @@ f4d_PostFx_ShadersManager.prototype.create_renderDepthShader_ModelRef = function
 // Selection shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl) {
-	var shader = new f4d_PostFx_Shader(this.gl);
+PostFxShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl) {
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
 	var ssao_vs_source = "\n\
@@ -923,11 +925,11 @@ f4d_PostFx_ShadersManager.prototype.create_ColorSelectionShader_ModelRef = funct
 // SimpleDepth shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl = 변수
+ * @param gl 변수
  */
-f4d_PostFx_ShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) {
+PostFxShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) {
 	// no used.!!!!!!!!!!!!!!!
-	var shader = new f4d_PostFx_Shader(this.gl);
+	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
 	var ssao_vs_source = "\n\

@@ -1,16 +1,18 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_MetaData = function() {
+var MetaData = function() {
 	this.guid = "";
 	this.version = "";
 	
-	this.latitude = undefined;
-	this.longitude = undefined;
-	this.altitude = undefined;
+	this.latitude;
+	this.longitude;
+	this.altitude;
 	
-	this.bbox = undefined; // f4d_boundingBox.***
-	this.imageLodCount = undefined;
+	this.bbox; // f4d_boundingBox.***
+	this.imageLodCount;
 	
 	// Buildings octree mother size.***
 	this.oct_min_x = 0.0;
@@ -25,20 +27,20 @@ var F4D_MetaData = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param arrayBuffer = 변수
- * @param f4dReadWriter = 변수
+ * @param arrayBuffer 변수
+ * @param f4dReadWriter 변수
  */
-F4D_MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
+MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
-	var auxScratch = undefined;
+	var auxScratch;
 	//var header = BR_Project._header;
 	//var arrayBuffer = this.fileArrayBuffer;
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
 	if(f4dReadWriter == undefined)
-		f4dReadWriter = new f4d_ReaderWriter();
+		f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -130,10 +132,10 @@ F4D_MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_Texture = function() {
+var Texture = function() {
 	this.texture_type_name = "";
 	this.texture_image_fileName = "";
-	this.tex_id = undefined;
+	this.tex_id;
 
 };
 
@@ -143,7 +145,7 @@ var F4D_Texture = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoReference = function() {
+var NeoReference = function() {
 	// 1) Object ID.***
 	this._id = 0;
 	
@@ -155,28 +157,28 @@ var F4D_NeoReference = function() {
 	this._originalMatrix4 = new f4d_Matrix4(); // 
 	
 	// 4) Tex coords cache_key.***
-	this.MESH_TEXCOORD_cacheKey = undefined;
+	this.MESH_TEXCOORD_cacheKey;
 	
 	// 5) The texture image.***
 	this.hasTexture = false;
-	this.texture = undefined; // F4D_Texture
+	this.texture; // Texture
 	
 	// 6) 1 color.***
-	this.color4 = undefined; //new f4d_color();
+	this.color4; //new f4d_color();
 	
 	// 7) selection color.***
-	this.selColor4 = undefined; //new f4d_color(); // use for selection only.***
+	this.selColor4; //new f4d_color(); // use for selection only.***
 	
 	this.vertex_count = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 	
 	// 8) movement of the object.***
-	this.moveVector = undefined; // f4d_point3d.***
+	this.moveVector; // Point3D.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-F4D_NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
+NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 	var multipliedMat = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
 	this._matrix4 = multipliedMat;
 };
@@ -187,10 +189,10 @@ F4D_NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoReferencesList = function() {
+var NeoReferencesList = function() {
 	this.name = "";
 	this.neoRefs_Array = [];
-	this.blocksList = undefined;
+	this.blocksList;
 	this.lod_level = -1;
 	
 	this.exterior_ocCullOctree = new f4d_OcclusionCullingOctree_Cell(); 
@@ -205,17 +207,17 @@ var F4D_NeoReferencesList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoRef
  */
-F4D_NeoReferencesList.prototype.new_neoReference = function() {
-	var neoRef = new F4D_NeoReference();
+NeoReferencesList.prototype.new_neoReference = function() {
+	var neoRef = new NeoReference();
 	this.neoRefs_Array.push(neoRef);
 	return neoRef;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param matrix = 변수
+ * @param matrix 변수
  */
-F4D_NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
+NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 	var neoRefs_count = this.neoRefs_Array.length;
 	for(var i=0; i<neoRefs_count; i++)
 	{
@@ -226,18 +228,18 @@ F4D_NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x = 변수
- * @param eye_y = 변수
- * @param eye_z = 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
  */
-F4D_NeoReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z) {
+NeoReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndices = this.interior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-F4D_NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
+NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
 	this._currentVisibleIndices.length = 0;
 	var neoRefs_count = this.neoRefs_Array.length;
 	for(var i=0; i<neoRefs_count; i++)
@@ -248,21 +250,21 @@ F4D_NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x = 변수
- * @param eye_y = 변수
- * @param eye_z = 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
  */
-F4D_NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function(eye_x, eye_y, eye_z) {
+NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndices = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x = 변수
- * @param eye_y = 변수
- * @param eye_z = 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
  */
-F4D_NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z) {
+NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z) {
 	this._currentVisibleIndicesSC = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
 	this._currentVisibleIndicesSC_2 = this.interior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 	this._currentVisibleIndices = this._currentVisibleIndicesSC.concat(this._currentVisibleIndicesSC_2);
@@ -270,14 +272,14 @@ F4D_NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, e
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL = 변수
- * @param arrayBuffer = 변수
- * @param neoBuilding = 변수
- * @param f4dReadWriter = 변수
+ * @param GL 변수
+ * @param arrayBuffer 변수
+ * @param neoBuilding 변수
+ * @param f4dReadWriter 변수
  */
-F4D_NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBuilding, f4dReadWriter) {
-	var startBuff = undefined;
-	var endBuff = undefined;
+NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBuilding, f4dReadWriter) {
+	var startBuff;
+	var endBuff;
 	var bytes_readed = 0;
 	var neoRefs_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
@@ -319,7 +321,7 @@ F4D_NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, ne
 		var textures_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0)
 		{
-			neoRef.texture = new F4D_Texture();
+			neoRef.texture = new Texture();
 			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			var texcoordShortValues_count = vertex_count * 2;
 			startBuff = bytes_readed;
@@ -368,16 +370,16 @@ F4D_NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, ne
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoReferencesLists_Container = function() {
+var NeoReferencesListsContainer = function() {
 	this.neoRefsLists_Array = [];
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param blocksList = 변수 
+ * @param blocksList 변수 
  */
-F4D_NeoReferencesLists_Container.prototype.new_NeoRefsList = function(blocksList) {
-	var neoRefList = new F4D_NeoReferencesList();
+NeoReferencesListsContainer.prototype.new_NeoRefsList = function(blocksList) {
+	var neoRefList = new NeoReferencesList();
 	neoRefList.blocksList = blocksList;
 	this.neoRefsLists_Array.push(neoRefList);
 	return neoRefList;
@@ -385,11 +387,11 @@ F4D_NeoReferencesLists_Container.prototype.new_NeoRefsList = function(blocksList
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x = 변수
- * @param eye_y = 변수
- * @param eye_z = 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
  */
-F4D_NeoReferencesLists_Container.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z) {
+NeoReferencesListsContainer.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z) {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
 	for(var i=0; i<neoRefLists_count; i++)
 	{
@@ -400,23 +402,20 @@ F4D_NeoReferencesLists_Container.prototype.update_currentVisibleIndices_ofLists 
 /**
  * 어떤 일을 하고 있습니까?
  */
-F4D_NeoReferencesLists_Container.prototype.update_currentAllIndices_ofLists = function() {
+NeoReferencesListsContainer.prototype.update_currentAllIndices_ofLists = function() {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
 	for(var i=0; i<neoRefLists_count; i++)
 	{
 		this.neoRefsLists_Array[i].update_currentAllIndices_Interior();
 	}
 };
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoSimpleBuilding = function() {
+var NeoSimpleBuilding = function() {
 	this.accesors_array = [];
-	this.vbo_vicks_container = new VBO_VertexIdxCacheKeys_Container();
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
 };
 
@@ -424,7 +423,7 @@ var F4D_NeoSimpleBuilding = function() {
  * 어떤 일을 하고 있습니까?
  * @returns accesor 
  */
-F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
+NeoSimpleBuilding.prototype.newAccesor = function() {
 	var accesor = new Accessor();
 	this.accesors_array.push(accesor);
 	return accesor;
@@ -434,14 +433,14 @@ F4D_NeoSimpleBuilding.prototype.newAccesor = function() {
  * 어떤 일을 하고 있습니까?
  * @returns texture
  */
-F4D_NeoSimpleBuilding.prototype.newTexture = function() {
-	var texture = new F4D_neoTexture();
+NeoSimpleBuilding.prototype.newTexture = function() {
+	var texture = new NeoTexture();
 	this.texturesArray.push(texture);
 	return texture;
 };
 
 /*
-F4D_NeoSimpleBuilding.prototype {
+NeoSimpleBuilding.prototype {
 	neoRefsLists_Array: [],
 	new_accesor: function() {},
 	update_currentAllIndices_ofLists:  function()
@@ -454,24 +453,21 @@ F4D_NeoSimpleBuilding.prototype {
 		},
 }
 */
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoBuilding = function() {
-	this.metaData = new F4D_MetaData();
+var NeoBuilding = function() {
+	this.metaData = new MetaData();
 	
-	this._buildingPosition = undefined;
-	this._buildingPositionHIGH = undefined;
-	this._buildingPositionLOW = undefined;
+	this._buildingPosition;
+	this._buildingPositionHIGH;
+	this._buildingPositionLOW;
 	
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
-	this.buildingPosMat_inv = undefined; // f4d matrix4.***
-	this.transfMat_inv = undefined; // cesium matrix4.***
+	this.buildingPosMat_inv; // f4d matrix4.***
+	this.transfMat_inv; // cesium matrix4.***
 	
 	// create the default blocks_lists.*****************************
 	this._blocksList_Container = new f4d_BlocksLists_Container();
@@ -484,36 +480,36 @@ var F4D_NeoBuilding = function() {
 	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************
-	this._neoRefLists_Container = new F4D_NeoReferencesLists_Container(); // Exterior and bone objects.***
+	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	
 	// Textures loaded.***************************************************
 	this.textures_loaded = [];
 	
 	// The octree.********************************************************
-	this.octree = undefined; // f4d_octree. Interior objects.***
+	this.octree; // f4d_octree. Interior objects.***
 	
 	this.buildingFileName = "";
 	
 	// The simple building.***********************************************
-	this.neoSimpleBuilding = undefined;
+	this.neoSimpleBuilding;
 	
 	// SCRATCH.*********************************
-	this.point3d_scratch = new f4d_point3d();
-	this.point3d_scratch_2 = new f4d_point3d();
+	this.point3d_scratch = new Point3D();
+	this.point3d_scratch_2 = new Point3D();
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param texture = 변수
+ * @param texture 변수
  * @returns tex_id
  */
-F4D_NeoBuilding.prototype.getTextureId = function(texture) {
+NeoBuilding.prototype.getTextureId = function(texture) {
 	/*
 	this.texture_type_name = "";
 	this.texture_image_fileName = "";
 	this.tex_id = undefined;
 	*/
-	var tex_id = undefined;
+	var tex_id;
 	var textures_loaded_count = this.textures_loaded.length;
 	var find = false;
 	var i=0;
@@ -532,37 +528,37 @@ F4D_NeoBuilding.prototype.getTextureId = function(texture) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x = 변수
- * @param eye_y = 변수
- * @param eye_z = 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
  */
-F4D_NeoBuilding.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z) {
+NeoBuilding.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z) {
 	this._neoRefLists_Container.update_currentVisibleIndices_ofLists(eye_x, eye_y, eye_z);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-F4D_NeoBuilding.prototype.update_currentAllIndices_exterior = function() {
+NeoBuilding.prototype.update_currentAllIndices_exterior = function() {
 	this._neoRefLists_Container.update_currentAllIndices_ofLists();
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns this.metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
+ * @returns metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
  */
-F4D_NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
+NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
 	return this.metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param absolute_eye_x = 변수
- * @param absolute_eye_y = 변수
- * @param absolute_eye_z = 변수
- * @returns this.point3d_scrath_2
+ * @param absolute_eye_x 변수
+ * @param absolute_eye_y 변수
+ * @param absolute_eye_z 변수
+ * @returns point3d_scrath_2
  */
-F4D_NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
+NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this._buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
@@ -584,7 +580,7 @@ F4D_NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = functio
 /**
  * 어떤 일을 하고 있습니까?
  */
-var F4D_NeoBuildingsList = function() {
+var NeoBuildingsList = function() {
 	this.neoBuildings_Array = [];
 };
 
@@ -592,8 +588,8 @@ var F4D_NeoBuildingsList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoBuilding
  */
-F4D_NeoBuildingsList.prototype.new_neoBuilding = function() {
-	var neoBuilding = new F4D_NeoBuilding();
+NeoBuildingsList.prototype.new_neoBuilding = function() {
+	var neoBuilding = new NeoBuilding();
 	this.neoBuildings_Array.push(neoBuilding);
 	return neoBuilding;
 };
