@@ -1,4 +1,4 @@
-// Color.************************************************************************************* //
+'use strict';
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -292,7 +292,7 @@ f4d_tTrianglesMatrix.prototype.get_vbo_indices_ShortArray = function()
  */
 var f4d_vertex = function()
 {
-	this.point3d = new f4d_point3d();
+	this.point3d = new Point3D();
 	this.normal = undefined;
 	this.texCoord = undefined;
 	this.color4 = undefined;
@@ -833,7 +833,7 @@ f4d_boundingBox.prototype.get_maxLength = function()
 f4d_boundingBox.prototype.get_centerPoint3d = function(resultPoint3d)
 {
 	if(resultPoint3d == undefined)
-		resultPoint3d = new f4d_point3d();
+		resultPoint3d = new Point3D();
 	
 	resultPoint3d.set((this._maxX + this._minX)/2, (this._maxY + this._minY)/2, (this._maxZ + this._minZ)/2);
 	return resultPoint3d;
@@ -983,7 +983,7 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
 	   */
 	f4d_Polygon.prototype.newPoint3D = function()
 	  {
-		  var point3d = new f4d_point3d();
+		  var point3d = new Point3D();
 		  this.mPoint3DArray.push(point3d);
 		  return point3d;
 	  };
@@ -1215,7 +1215,7 @@ f4d_boundingBox.prototype.isPoint3dInside = function(x, y, z)
    */
   f4d_trianglesSurface.prototype.newPoint3D = function()
   {
-	  var point3d = new f4d_point3d();
+	  var point3d = new Point3D();
 	  this.mPoint3DArray.push(point3d);
 	  return point3d;
   };
@@ -1715,7 +1715,7 @@ f4d_Matrix4.prototype.transformPoint3D = function(point3d, result_point3d)
 {
 	if(result_point3d == undefined)
 	{
-		result_point3d = new f4d_point3d();
+		result_point3d = new Point3D();
 	}
 
 	var x = point3d.x;
@@ -2097,7 +2097,7 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		this._matrix4 = new f4d_Matrix4();
 	
 		// 4) New. Only save the cache_key, and free geometry data.***
-		//this._VBO_ByteColorsCacheKeys_Container = new VBO_ByteColorCacheKeys_Container(); // provisionally delete this.***
+		//this._VBO_ByteColorsCacheKeys_Container = new VBOByteColorCacheKeysContainer(); // provisionally delete this.***
 		
 		// 4') may be only save the cache_key_idx.***
 		this._VBO_ByteColorsCacheKeys_Container_idx = -1; // Test. Do this for possibly use with workers.***
@@ -2402,7 +2402,7 @@ f4d_CompoundReferencesList_Container.prototype.get_CompRefList_byName = function
   /**
    * 어떤 일을 하고 있습니까?
    */
-  var VertexIdxVBO_ArraysContainer = function() // No!!. use "VBO_VertexIdxCacheKeys_Container" instead.***
+  var VertexIdxVBO_ArraysContainer = function() // No!!. use "VBOVertexIdxCacheKeysContainer" instead.***
   {
 	  this._meshArrays = [];
   };
@@ -2444,7 +2444,7 @@ var ByteColorsVBO_ArraysContainer = function()
  * 어떤 일을 하고 있습니까?
  * @returns byteColors_array
  */
-ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // No!!. use "VBO_ByteColorCacheKeys_Container" instead.***
+ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // No!!. use "VBOByteColorCacheKeysContainer" instead.***
 {
   var byteColors_array = new ByteColorsVBO_Arrays();
   this._meshArrays.push(byteColors_array);
@@ -2460,7 +2460,7 @@ ByteColorsVBO_ArraysContainer.prototype.newByteColorsVBO_Array = function() // N
   var f4d_Block = function()
   {
 	  // This has "VertexIdxVBO_ArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
-	  this._vbo_VertexIdx_CacheKeys_Container = new VBO_VertexIdxCacheKeys_Container(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+	  this._vbo_VertexIdx_CacheKeys_Container = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
 	  this.mIFCEntityType = -1;
 	  this.isSmallObj = false;
 	  
@@ -2724,7 +2724,7 @@ f4d_simpleBuilding_v1.prototype.new_simpleObject = function()
 var f4d_octree = function(octreeOwner)
 {
 	// Note: an octree is a cube, not a box.***
-	this.centerPos = new f4d_point3d();
+	this.centerPos = new Point3D();
 	this.half_dx = 0.0; // half width.***
 	this.half_dy = 0.0; // half length.***
 	this.half_dz = 0.0; // half height.***
@@ -3391,8 +3391,8 @@ f4d_octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, r
 	
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this._visibleCompRefLists_scratch = new f4d_CompoundReferencesList();
-	this.point3d_scratch = new f4d_point3d();
-	this.point3d_scratch_2 = new f4d_point3d();
+	this.point3d_scratch = new Point3D();
+	this.point3d_scratch_2 = new Point3D();
 	
 	// Header, SimpleBuildingGeometry and nailImage path-strings.**********************************
 	this._f4d_rawPathName = ""; // Use only this.***
@@ -3663,7 +3663,7 @@ var f4d_pCloudMesh = function()
 	//--------------------------------------------------------------------
 	
 	this._header = new f4d_header();
-	this.vbo_datas = new VBO_VertexIdxCacheKeys_Container(); // temp.***
+	this.vbo_datas = new VBOVertexIdxCacheKeysContainer(); // temp.***
 	
 	
 	this._f4d_rawPathName = "";
@@ -3684,8 +3684,7 @@ var f4d_pCloudMesh = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_BR_buildingProjectsList = function()
-{
+var BRBuildingProjectsList = function() {
   this._BR_buildingsArray = [];
   this._boundingBox = undefined;
   this._pCloudMesh_array = []; // 1rst aproximation to the pointCloud data. Test.***
@@ -3697,8 +3696,7 @@ var f4d_BR_buildingProjectsList = function()
  * 어떤 일을 하고 있습니까?
  * @returns br_buildingProject
  */
-f4d_BR_buildingProjectsList.prototype.new_BR_Project = function()
-{
+BRBuildingProjectsList.prototype.new_BR_Project = function() {
 //var titol = "holes a tothom"
   //var br_buildingProject = new f4d_BR_buildingProject({Titol : titol});
   var br_buildingProject = new f4d_BR_buildingProject();
@@ -3710,8 +3708,7 @@ f4d_BR_buildingProjectsList.prototype.new_BR_Project = function()
  * 어떤 일을 하고 있습니까?
  * @returns _boundingBox
  */ 
-f4d_BR_buildingProjectsList.prototype.getBoundingBox = function()
-{
+BRBuildingProjectsList.prototype.getBoundingBox = function() {
   if(this._boundingBox == undefined)
   {
 	  var buildingProjects_count = this._BR_buildingsArray.length;
@@ -3742,8 +3739,7 @@ f4d_BR_buildingProjectsList.prototype.getBoundingBox = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_TerranTile = function()
-{
+var TerranTile = function() {
 	//           +-----+-----+
 	//           |     |     |
 	//           |  3  |  2  |
@@ -3797,7 +3793,7 @@ var f4d_TerranTile = function()
  * 어떤 일을 하고 있습니까?
  * @returns br_buildingProject
  */
-f4d_TerranTile.prototype.new_BR_Project = function()
+TerranTile.prototype.new_BR_Project = function()
 {
   var br_buildingProject = new f4d_BR_buildingProject();
   this._BR_buildingsArray.push(br_buildingProject);
@@ -3808,10 +3804,10 @@ f4d_TerranTile.prototype.new_BR_Project = function()
  * 어떤 일을 하고 있습니까?
  * @returns subTile
  */
-f4d_TerranTile.prototype.new_subTerranTile = function()
+TerranTile.prototype.new_subTerranTile = function()
 {
 	var subTiles_count = this.subTiles_array.length;
-	var subTile = new f4d_TerranTile();
+	var subTile = new TerranTile();
 	subTile._depth = this._depth + 1;
 	subTile._numberName = this._numberName*10 + subTiles_count + 1;
 	this.subTiles_array.push(subTile);
@@ -3821,7 +3817,7 @@ f4d_TerranTile.prototype.new_subTerranTile = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_TerranTile.prototype.make_4subTiles = function()
+TerranTile.prototype.make_4subTiles = function()
 {
 	for(var i=0; i<4; i++)
 	{
@@ -3836,7 +3832,7 @@ f4d_TerranTile.prototype.make_4subTiles = function()
  * @param lat_min = 변수
  * @param lat_max = 변수
  */
-f4d_TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, lat_max)
+TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, lat_max)
 {
 	// Old.***
 	this.longitude_min = lon_min;
@@ -3849,7 +3845,7 @@ f4d_TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, la
  * 어떤 일을 하고 있습니까?
  * @param max_depth = 변수
  */
-f4d_TerranTile.prototype.make_tree = function(max_depth)
+TerranTile.prototype.make_tree = function(max_depth)
 {
 	if(this._depth < max_depth)
 	{
@@ -3866,7 +3862,7 @@ f4d_TerranTile.prototype.make_tree = function(max_depth)
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_TerranTile.prototype.calculate_position_byLonLat = function()
+TerranTile.prototype.calculate_position_byLonLat = function()
 {
 	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
 	var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
@@ -3884,7 +3880,7 @@ f4d_TerranTile.prototype.calculate_position_byLonLat = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_TerranTile.prototype.calculate_position_byLonLat_subTiles = function()
+TerranTile.prototype.calculate_position_byLonLat_subTiles = function()
 {
 	this.calculate_position_byLonLat();
 	
@@ -3902,7 +3898,7 @@ f4d_TerranTile.prototype.calculate_position_byLonLat_subTiles = function()
  * 어떤 일을 하고 있습니까?
  * @param BR_Project = 변수
  */
-f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
+TerranTile.prototype.parseFile_header = function(BR_Project)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
@@ -3916,7 +3912,7 @@ f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
 	var bytes_readed = this.fileBytesReaded;
 	
 	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new f4d_ReaderWriter();
+		this.f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -4000,14 +3996,14 @@ f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
  * 어떤 일을 하고 있습니까?
  * @param BR_Project = 변수
  */
-f4d_TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project)
+TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 		return;
 	
 	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new f4d_ReaderWriter();
+		this.f4dReadWriter = new ReaderWriter();
 	
 	var bytes_readed = this.fileBytesReaded;
 	var startBuff = undefined;
@@ -4054,7 +4050,7 @@ f4d_TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project)
  * @param BR_Project = 변수
  * @param f4dManager = 변수
  */
-f4d_TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
+TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
 {
 	
 	//BR_Project._f4d_nailImage_readed = true;
@@ -4063,7 +4059,7 @@ f4d_TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
 		BR_Project._simpleBuilding_v1 = new f4d_simpleBuilding_v1();
 	
 	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new f4d_ReaderWriter();
+		this.f4dReadWriter = new ReaderWriter();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
@@ -4085,7 +4081,7 @@ f4d_TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager)
  * 어떤 일을 하고 있습니까?
  * @param f4dManager = 변수
  */
-f4d_TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
+TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
@@ -4096,7 +4092,7 @@ f4d_TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
 	
 	
 	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new f4d_ReaderWriter();
+		this.f4dReadWriter = new ReaderWriter();
 	
 	var arrayBuffer = this.fileArrayBuffer;
 	var projects_count = this.f4dReadWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
@@ -4134,7 +4130,7 @@ f4d_TerranTile.prototype.parseFile_allBuildings = function(f4dManager)
  * @param GL = 변수
  * @param f4dManager = 변수
  */
-f4d_TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
+TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
 {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
@@ -4145,7 +4141,7 @@ f4d_TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
 	
 	
 	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new f4d_ReaderWriter();
+		this.f4dReadWriter = new ReaderWriter();
 	
 	var projects_count = this.f4dReadWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
 	
@@ -4197,7 +4193,7 @@ f4d_TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_TerranTile.prototype.set_dimensionsSubTiles = function()
+TerranTile.prototype.set_dimensionsSubTiles = function()
 {
 	var subTile = undefined;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
@@ -4229,7 +4225,7 @@ f4d_TerranTile.prototype.set_dimensionsSubTiles = function()
  * 어떤 일을 하고 있습니까?
  * @param smallefstTiles_array = 변수
  */
-f4d_TerranTile.prototype.get_smallestTiles = function(smallestTiles_array)
+TerranTile.prototype.get_smallestTiles = function(smallestTiles_array)
 {
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
 	if(this.subTiles_array.length > 0)
@@ -4252,7 +4248,7 @@ f4d_TerranTile.prototype.get_smallestTiles = function(smallestTiles_array)
  * @param intersectedSmallestTiles_array = 변수
  * @param boundingSphere_Aux = 변수
  */
-f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux)
+TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux)
 {
 	var intersectedTiles_array = [];
 	this.get_intersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
@@ -4271,7 +4267,7 @@ f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, 
  * @param intersectedTiles_array = 변수
  * @param boundingSphere_Aux = 변수
  */
-f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux)
+TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux)
 {
 	// Cesium dependency.***
 	if(this.position == undefined)

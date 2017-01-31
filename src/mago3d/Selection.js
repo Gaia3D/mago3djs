@@ -1,23 +1,26 @@
+'use strict';
 
-
-
-
-
-var f4d_selection = function()
-{
-	this.drawing_height = undefined;
-	this.drawing_width = undefined;
-	this.GAIA_selectFrameBuffer = undefined;
-	this.GAIA_selectRenderBuffer = undefined;
-	this.GAIA_selectRttTexture = undefined;
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var Selection = function() {
+	this.drawing_height;
+	this.drawing_width;
+	this.GAIA_selectFrameBuffer;
+	this.GAIA_selectRenderBuffer;
+	this.GAIA_selectRttTexture;
 	
 	this.currentByteColorPicked = new Uint8Array(4);
 	this.currentSelectedObj_idx = -1;
-	
 };
 
-f4d_selection.prototype.init = function(GL, drawingBufferWidth, drawingBufferHeight)
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param drawingBufferWidth 변수
+ * @param drawingBufferHeight 변수
+ */
+Selection.prototype.init = function(GL, drawingBufferWidth, drawingBufferHeight) {
 	// http://www.webglacademy.com/courses.php?courses=0|1|20|2|3|4|23|5|6|7|10#10
 	this.drawing_height = drawingBufferHeight;
 	this.drawing_width = drawingBufferWidth;

@@ -1,4 +1,8 @@
-// 사용안함
+'use strict';
+
+/**
+ * 사용하지 않음
+ */
 !function() {
 
 	var URL = window.URL || window.webkitURL;

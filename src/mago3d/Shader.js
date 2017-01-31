@@ -1,3 +1,4 @@
+'use strict';
 
 // An basic example.***********************************************************
 /*
@@ -64,44 +65,41 @@
 		}\n\
 		*/
 		
-// f4d_Shader.******************************************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_Shader = function() {
-	this.shader_name = undefined;
-    this.shader_vertex_source = undefined;
-	this.shader_fragment_source = undefined;
-	this.SHADER_PROGRAM = undefined;
+var Shader = function() {
+	this.shader_name;
+    this.shader_vertex_source;
+	this.shader_fragment_source;
+	this.SHADER_PROGRAM;
 	
-	this.shader_vertex = undefined;
-	this.shader_fragment = undefined;
-	//---------------------------------------------------
+	this.shader_vertex;
+	this.shader_fragment;
 	
-	this._ModelViewProjectionMatrixRelToEye = undefined;
-	this._RefTransfMatrix = undefined;
-	this._NormalMatrix = undefined;
+	this._ModelViewProjectionMatrixRelToEye;
+	this._RefTransfMatrix;
+	this._NormalMatrix;
 	
-	this._encodedCamPosHIGH = undefined;
-	this._encodedCamPosLOW = undefined;
-	this._BuildingPosHIGH = undefined;
-	this._BuildingPosLOW = undefined;
-	this._lightDirection = undefined;
+	this._encodedCamPosHIGH;
+	this._encodedCamPosLOW;
+	this._BuildingPosHIGH;
+	this._BuildingPosLOW;
+	this._lightDirection;
 
-	this._color = undefined;
-	this._position = undefined;
-	this._texcoord = undefined;
-	this._normal = undefined;
+	this._color;
+	this._position;
+	this._texcoord;
+	this._normal;
 	
 	// test.***
-	this.samplerUniform = undefined;
+	this.samplerUniform;
 };
 
-// f4d_ShadersManager.************************************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_ShadersManager = function() {
+var ShadersManager = function() {
 	this.shaders_array = [];
 	
 	// Create shaders to render F4D_Format.**********************
@@ -113,8 +111,8 @@ var f4d_ShadersManager = function() {
  * @param idx = 변수
  * returns shader
  */
-f4d_ShadersManager.prototype.get_f4dShader = function(idx) {
-	var shader = undefined;
+ShadersManager.prototype.get_f4dShader = function(idx) {
+	var shader;
 	
 	if(idx >= 0 && idx < this.shaders_array.length)
 	{
@@ -127,7 +125,7 @@ f4d_ShadersManager.prototype.get_f4dShader = function(idx) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
+ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -142,7 +140,7 @@ f4d_ShadersManager.prototype.get_shader = function(GL, source, type, typeString)
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
+ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
 	this.create_f4dStandardShader(GL);                // 0.***
 	this.create_f4dTextureSimpleObjectShader(GL);     // 1.***
 	this.create_f4dColorSelectionShader(GL);          // 2.***
@@ -156,8 +154,8 @@ f4d_ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
-	var shader = new f4d_Shader();
+ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
+	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
 	shader.shader_vertex_source="\n\
@@ -211,8 +209,8 @@ f4d_ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
-	var shader = new f4d_Shader();
+ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
+	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
 	shader.shader_vertex_source="\n\
@@ -273,8 +271,8 @@ f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) 
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
-	var shader = new f4d_Shader();
+ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
+	var shader = new Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
@@ -332,9 +330,9 @@ f4d_ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dStandardShader = function(GL) {
+ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 	// This shader renders the normal f4d geometry.***
-	var standard_shader = new f4d_Shader();
+	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 	
 	standard_shader.shader_vertex_source="\n\
@@ -389,9 +387,9 @@ f4d_ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dCloudShader = function(GL) {
+ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
-	var standard_shader = new f4d_Shader();
+	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 	
 	standard_shader.shader_vertex_source="\n\
@@ -443,9 +441,9 @@ f4d_ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
+ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 	// This shader renders the f4d clouds.***
-	var standard_shader = new f4d_Shader();
+	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
 		standard_shader.shader_vertex_source="\n\
@@ -491,9 +489,9 @@ f4d_ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
+ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
-	var standard_shader = new f4d_Shader();
+	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
 		standard_shader.shader_vertex_source="\n\
@@ -544,8 +542,8 @@ f4d_ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) {
-	var shader = new f4d_Shader();
+ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) {
+	var shader = new Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
@@ -621,4 +619,4 @@ f4d_ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(
 	shader._normal = GL.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
   
-//# sourceURL=f4d_Shader.js
+//# sourceURL=Shader.js

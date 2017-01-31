@@ -1,25 +1,25 @@
+'use strict';
 
 //importScripts('../Build/CesiumUnminified/SonGeometryJScript.js'); // No.***
 //importScripts('SonGeometryJScript.js'); // Yes.***
 //importScripts('SonGeometryModifier.js'); 
-//importScripts('F4D_Point3D.js'); 
+//importScripts('Point3D.js'); 
 //importScripts('CullingVolume.js');
 
-
-
 // Test son.*****************************************************
-var currentCamPos = new f4d_point3d();
-var lastCamPos = new f4d_point3d();
+var currentCamPos = new Point3D();
+var lastCamPos = new Point3D();
 var squareDistUmbral = 22.0;
-var building_project = undefined;
-var compRefList_array_background = undefined;
+var building_project;
+var compRefList_array_background;
 
 //var compRefList_Container = new f4d_CompoundReferencesList_Container();
 //var interiorCompRefList_Container = new f4d_CompoundReferencesList_Container();
+
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_geoModifier = new f4d_geometryModifier();
+var f4d_geoModifier = new GeometryModifier();
 // End test son.-------------------------------------------------
 
 onmessage = function(e) {
