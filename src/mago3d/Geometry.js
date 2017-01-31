@@ -11,7 +11,7 @@ var MetaData = function() {
 	this.longitude;
 	this.altitude;
 	
-	this.bbox; // f4d_boundingBox.***
+	this.bbox; // BoundingBox.***
 	this.imageLodCount;
 	
 	// Buildings octree mother size.***
@@ -61,7 +61,7 @@ MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
 	
 	//header._elevation += 70.0; // delete this. TEST.!!!
 	if(this.bbox == undefined)
-		this.bbox = new f4d_boundingBox();
+		this.bbox = new BoundingBox();
 	
 	// 6) BoundingBox.************************
 	this.bbox._minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
@@ -153,8 +153,8 @@ var NeoReference = function() {
 	this._block_idx = -1;
 	
 	// 3) Transformation Matrix.***
-	this._matrix4 = new f4d_Matrix4();
-	this._originalMatrix4 = new f4d_Matrix4(); // 
+	this._matrix4 = new Matrix4();
+	this._originalMatrix4 = new Matrix4(); // 
 	
 	// 4) Tex coords cache_key.***
 	this.MESH_TEXCOORD_cacheKey;
@@ -164,10 +164,10 @@ var NeoReference = function() {
 	this.texture; // Texture
 	
 	// 6) 1 color.***
-	this.color4; //new f4d_color();
+	this.color4; //new Color();
 	
 	// 7) selection color.***
-	this.selColor4; //new f4d_color(); // use for selection only.***
+	this.selColor4; //new Color(); // use for selection only.***
 	
 	this.vertex_count = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 	
@@ -195,8 +195,8 @@ var NeoReferencesList = function() {
 	this.blocksList;
 	this.lod_level = -1;
 	
-	this.exterior_ocCullOctree = new f4d_OcclusionCullingOctree_Cell(); 
-	this.interior_ocCullOctree = new f4d_OcclusionCullingOctree_Cell(); 
+	this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); 
+	this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); 
 	
 	this._currentVisibleIndices = []; // Determined by occlusion culling.***
 	this._currentVisibleIndicesSC = []; // Determined by occlusion culling.***
@@ -470,7 +470,7 @@ var NeoBuilding = function() {
 	this.transfMat_inv; // cesium matrix4.***
 	
 	// create the default blocks_lists.*****************************
-	this._blocksList_Container = new f4d_BlocksLists_Container();
+	this._blocksList_Container = new BlocksListsContainer();
 	this._blocksList_Container.newBlocksList("Blocks1");
 	this._blocksList_Container.newBlocksList("Blocks2");
 	this._blocksList_Container.newBlocksList("Blocks3");
@@ -567,7 +567,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = function(ab
 	
 	if(this.buildingPosMat_inv == undefined)
 	{
-		this.buildingPosMat_inv = new f4d_Matrix4();
+		this.buildingPosMat_inv = new Matrix4();
 		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
 	}
 

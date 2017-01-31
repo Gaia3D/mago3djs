@@ -13,34 +13,31 @@ var squareDistUmbral = 22.0;
 var building_project;
 var compRefList_array_background;
 
-//var compRefList_Container = new f4d_CompoundReferencesList_Container();
-//var interiorCompRefList_Container = new f4d_CompoundReferencesList_Container();
+//var compRefList_Container = new CompoundReferencesListContainer();
+//var interiorCompRefList_Container = new CompoundReferencesListContainer();
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-var f4d_geoModifier = new GeometryModifier();
+var geoModifier = new GeometryModifier();
 // End test son.-------------------------------------------------
 
 onmessage = function(e) {
-  console.log('Message received from main script');
-  var workerResult = 'Result: sonete';
+	console.log('Message received from main script');
+	var workerResult = 'Result: sonete';
   
-  
-  
-  console.log('Posting message back to main script');
-  //postMessage(workerResult);
-  var result = possibleCameraPositionChanged(e);
-  postMessage([result]);
+	console.log('Posting message back to main script');
+	//postMessage(workerResult);
+	var result = possibleCameraPositionChanged(e);
+	postMessage([result]);
 };
+
 /**
  * 어떤 일을 하고 있습니까?
- * @param value = 변수
+ * @param value 변수
  */
-function setTest(value)
-{
+function setTest(value) {
 	squareDistUmbral = value;
-	
 };
 
 /*
@@ -101,12 +98,12 @@ function getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume)
 	return buildings_array;
 };
 */
+
 /**
  * 어떤 일을 하고 있습니까?
- * @param e = 변수
+ * @param e 변수
  */
-function possibleCameraPositionChanged(e)
-{
+function possibleCameraPositionChanged(e) {
 	var compRefList_Container = e.data[0];
 	var interiorCompRefList_Container = e.data[1];
 	var camPos = e.data[2];
@@ -116,8 +113,8 @@ function possibleCameraPositionChanged(e)
 	var eye_y = camPos.y;
 	var eye_z = camPos.z;
 	
-	var interior_visibleCompRefLists = f4d_geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
-	var visibleCompRefLists = f4d_geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
+	var interior_visibleCompRefLists = geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
+	var visibleCompRefLists = geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 	//var interior_visibleCompRefLists = interiorCompRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
 	//var visibleCompRefLists = compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***

@@ -6,8 +6,8 @@
 var ReaderWriter = function() {
 	this.rootPath = "";
 	this.geometryDataPath = "/F4D_GeometryData";
-	this.vi_arrays_Container = new VertexIdxVBO_ArraysContainer();
-	this.byteColorsVBO_ArraysContainer = new ByteColorsVBO_ArraysContainer();
+	this.vi_arrays_Container = new VertexIdxVBOArraysContainer();
+	this.byteColorsVBO_ArraysContainer = new ByteColorsVBOArraysContainer();
 		//var simpleBuildingImage = new Image();
 		
 	this.i_counter;
@@ -44,7 +44,7 @@ var ReaderWriter = function() {
 	this.ySC;
 	this.zSC;
 	this.point3dSC = new Point3D();
-	this.bboxSC = new f4d_boundingBox();
+	this.bboxSC = new BoundingBox();
 };
 
 /**
@@ -183,7 +183,7 @@ ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end) {
  */
 ReaderWriter.prototype.getBoundingBox_fromFloat32Array = function(float32Array, result_bbox) {
 	if(result_bbox == undefined)
-		result_bbox = new f4d_boundingBox();
+		result_bbox = new BoundingBox();
 	
 	var values_count = float32Array.length;
 	for(var i=0; i<values_count; i+=3)
@@ -229,7 +229,7 @@ ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksList,
 		  }
 		  
 			// 1rst, read bbox.***
-			var bbox = new f4d_boundingBox();
+			var bbox = new BoundingBox();
 			bbox._minX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
 			bbox._minY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
 			bbox._minZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
@@ -398,7 +398,7 @@ ReaderWriter.prototype.readF4D_neoReferences = function(GL, neoRefsList, arrayBu
 			if(dim == 4)
 				alfa = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			
-			neoRef.color4 = new f4d_color();
+			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
 		else{
@@ -665,7 +665,7 @@ ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePath_in
 			  if(neoBuilding.octree == undefined)
 			  {
 				  var hola = 0;
-				  neoBuilding.octree = new f4d_octree(undefined);
+				  neoBuilding.octree = new Octree(undefined);
 			  }
 			  
 			  octree = neoBuilding.octree.getOctree_byNumberName(subOctreeNumberName);
@@ -891,7 +891,7 @@ ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, filePath_
 			
 			for(var i=0; i<pCloudProjects_count; i++)
 			{
-				pCloudProject = new f4d_pCloudMesh();
+				pCloudProject = new PCloudMesh();
 				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
 				pCloudProject._header._f4d_version = 2;
 				// ********************************************************************************************************************************************
@@ -1165,7 +1165,7 @@ ReaderWriter.prototype.readF4D_NailImage_inServer = function(GL, filePath_inServ
 		BR_Project._f4d_lod0Image_readed  = true;
 	
 	if(BR_Project._simpleBuilding_v1 == undefined)
-		BR_Project._simpleBuilding_v1 = new f4d_simpleBuilding_v1();
+		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
@@ -1332,7 +1332,7 @@ ReaderWriter.prototype.readF4D_TileArrayBuffer_inServer = function(GL, filePath_
 		var arrayBuffer = oReq.response; // Note: not oReq.responseText
 		if (arrayBuffer)
 		{
-			//var BR_Project = new f4d_BR_buildingProject(); // Test.***
+			//var BR_Project = new BRBuildingProject(); // Test.***
 			//f4d_readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
 			terranTile.fileArrayBuffer = arrayBuffer;
 			terranTile.fileReading_finished = true;
@@ -1469,7 +1469,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	neoBuilding.buildingFileName = buildingFileName;
 	
 	if(neoBuilding.octree == undefined)
-		neoBuilding.octree = new f4d_octree(undefined);
+		neoBuilding.octree = new Octree(undefined);
 	
 	f4d_readerWriter.readF4D_NeoHeader_inServer(GL, neoBuilding_header_path, neoBuilding, f4d_readerWriter, f4d_manager); // Here makes the tree of octree.***
 	
@@ -1538,7 +1538,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	f4d_readerWriter.readF4D_NeoBlocks_inServer(GL, filePath_inServer_4, blocksList_4, neoBuilding, f4d_readerWriter);
 	
 	// 2) References.****************************************************************************************************************************
-	var moveMatrix = new f4d_Matrix4();
+	var moveMatrix = new Matrix4();
 	moveMatrix.setByFloat32Array(neoBuilding.move_matrix);
 	var lod_level = 0;
 	
