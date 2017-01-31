@@ -13,7 +13,7 @@
 		gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);\n\
 		vColor=color;\n\
 		}";
-		
+
 	var shader_fragment_source="\n\
 		precision mediump float;\n\
 		varying vec3 vColor;\n\
@@ -28,7 +28,7 @@
 		http://blogs.agi.com/insight3d/index.php/2008/09/03/precisions-precisions/ // GPU RTE HighValue-LowValue
 		uniform vec3 uViewerHigh;
 		uniform vec3 uViewerLow;
-		 
+
 		void main(void)
 		{
 			vec3 highDifference = vec3(gl_Vertex.xyz - uViewerHigh);
@@ -64,7 +64,7 @@
 			return vec4(highDifference + lowDifference, 1.0);\n\
 		}\n\
 		*/
-		
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -73,14 +73,14 @@ var Shader = function() {
     this.shader_vertex_source;
 	this.shader_fragment_source;
 	this.SHADER_PROGRAM;
-	
+
 	this.shader_vertex;
 	this.shader_fragment;
-	
+
 	this._ModelViewProjectionMatrixRelToEye;
 	this._RefTransfMatrix;
 	this._NormalMatrix;
-	
+
 	this._encodedCamPosHIGH;
 	this._encodedCamPosLOW;
 	this._BuildingPosHIGH;
@@ -91,7 +91,7 @@ var Shader = function() {
 	this._position;
 	this._texcoord;
 	this._normal;
-	
+
 	// test.***
 	this.samplerUniform;
 };
@@ -101,24 +101,24 @@ var Shader = function() {
  */
 var ShadersManager = function() {
 	this.shaders_array = [];
-	
+
 	// Create shaders to render F4D_Format.**********************
 	// 1) Standard shader, that can render light mapping.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param idx = 변수
+ * @param idx 변수
  * returns shader
  */
 ShadersManager.prototype.get_f4dShader = function(idx) {
 	var shader;
-	
+
 	if(idx >= 0 && idx < this.shaders_array.length)
 	{
 		shader = this.shaders_array[idx];
 	}
-	
+
 	return shader;
 };
 
@@ -157,7 +157,7 @@ ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
 ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	
+
 	shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
 		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -176,7 +176,7 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 		}";
 		//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
-		
+
 	shader.shader_fragment_source="\n\
 		precision mediump float;\n\
 		uniform int byteColor_r;\n\
@@ -186,8 +186,8 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 		float byteMaxValue = 255.0;\n\
 			gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
 		}";
-		
-		
+
+
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
 	shader.SHADER_PROGRAM = GL.createProgram();
 	shader.shader_vertex = this.get_shader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
@@ -195,7 +195,7 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	GL.linkProgram(shader.SHADER_PROGRAM);
-	
+
 	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
 	shader._encodedCamPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
 	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
@@ -212,7 +212,7 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	
+
 	shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
 		attribute vec4 aVertexColor;\n\
@@ -236,7 +236,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 			vColor=aVertexColor;\n\
 			vTextureCoord = aTextureCoord;\n\
 		}";
-	
+
 	shader.shader_fragment_source="\n\
 		precision mediump float;\n\
 		varying vec4 vColor;\n\
@@ -246,7 +246,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 			gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 		}";
 
-		
+
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = GL.createProgram();
@@ -296,7 +296,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
 			vTextureCoord = aTextureCoord;\n\
 		}";
 
-	
+
 	shader.shader_fragment_source="\n\
 		precision mediump float;\n\
 		varying vec4 vColor;\n\
@@ -306,7 +306,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
 			gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 		}";
 
-		
+
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = GL.createProgram();
@@ -334,7 +334,7 @@ ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
-	
+
 	standard_shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
 		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -363,7 +363,7 @@ ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 		void main(void) {\n\
 			gl_FragColor = vec4(vColor, 1.);\n\
 		}";
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
 	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
@@ -391,7 +391,7 @@ ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
-	
+
 	standard_shader.shader_vertex_source="\n\
 		attribute vec3 position;\n\
 		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -418,7 +418,7 @@ ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 		void main(void) {\n\
 			gl_FragColor = vec4(vColor, 1.);\n\
 		}";
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
 	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
@@ -468,7 +468,7 @@ ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 		void main(void) {\n\
 			gl_FragColor = vColor;\n\
 		}";
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
 	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
@@ -512,14 +512,14 @@ ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 			vColor=color;\n\
 		}";
-		
+
 	standard_shader.shader_fragment_source="\n\
 		precision lowp float;\n\
 		varying vec4 vColor;\n\
 		void main(void) {\n\
 			gl_FragColor = vColor;\n\
 		}";
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
 	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
@@ -579,7 +579,7 @@ ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) 
 			float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
 			vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		}";
-	
+
 	shader.shader_fragment_source="\n\
 		precision mediump float;\n\
 		varying vec4 vColor;\n\
@@ -590,7 +590,7 @@ ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) 
 			vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 			gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
 		}";
-		
+
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
@@ -606,10 +606,10 @@ ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) 
 	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
 	shader._BuildingPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
 	shader._BuildingPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	
+
 	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
 	shader._NormalMatrix = GL.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
-	
+
 	//shader.SHADER_PROGRAM.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 	shader.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 	shader._lightDirection = GL.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
@@ -618,5 +618,5 @@ ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) 
 	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 	shader._normal = GL.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
-  
+
 //# sourceURL=Shader.js
