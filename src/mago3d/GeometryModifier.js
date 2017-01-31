@@ -97,7 +97,7 @@ GeometryModifier.prototype.Matrix4_getMultipliedByMatrix = function(matrixA, mat
 	//	return c;
 	//}
 	
-	var resultMat = new f4d_Matrix4();
+	var resultMat = new Matrix4();
 	for(var i=0; i<4; i++)
 	{
 		for(var j=0; j<4; j++)
@@ -165,7 +165,7 @@ GeometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsLis
 };
 */
 	
-	var visibleCompRefObjectsArray = new f4d_CompoundReferencesList();
+	var visibleCompRefObjectsArray = new CompoundReferencesList();
 	visibleCompRefObjectsArray._myBlocksList = compRefList._myBlocksList;
 	
 	var ocCulling_box = compRefList._ocCulling._ocCulling_box;
@@ -448,7 +448,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_expandBox = function(oc
  * @returns vt_cacheKey
  */
 GeometryModifier.prototype.f4dVertexTexcoordsArraysCacheKeysContainer_newVertexTexcoordsArraysCacheKey = function(vtArraysCacheKeys_container) {
-	var vt_cacheKey = new f4d_VertexTexcoordsArrays_cacheKeys();
+	var vt_cacheKey = new VertexTexcoordsArraysCacheKeys();
 	vtArraysCacheKeys_container._vtArrays_cacheKeys_array.push(vt_cacheKey);
 	return vt_cacheKey;
 };
@@ -475,7 +475,7 @@ GeometryModifier.prototype.f4dBlocksList_getBlock = function(blockList, idx) {
  * @returns f4d_blocksList
  */
 GeometryModifier.prototype.f4dBlocksListsContainer_newBlocksList = function(blockList_container, blocksList_name) {
-	var f4d_blocksList = new f4d_BlocksList();
+	var f4d_blocksList = new BlocksList();
 	f4d_blocksList._name = blocksList_name;
 	blockList_container._BlocksListsArray.push(f4d_blocksList);
 	return f4d_blocksList;
@@ -534,8 +534,8 @@ GeometryModifier.prototype.f4dBRbuildingProject_createDefaultBlockReferencesList
  */
 GeometryModifier.prototype.f4dBRbuildingProjectsList_newBRProject = function(buildingProjectsList) {
 	//var titol = "holes a tothom"
-	//var br_buildingProject = new f4d_BR_buildingProject({Titol : titol});
-	var br_buildingProject = new f4d_BR_buildingProject();
+	//var br_buildingProject = new BRBuildingProject({Titol : titol});
+	var br_buildingProject = new BRBuildingProject();
 	  
 	// Create the blocks lists default.***
 	this.f4dBRbuildingProject_createDefaultBlockReferencesLists(br_buildingProject);

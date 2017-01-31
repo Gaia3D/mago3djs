@@ -23,27 +23,26 @@ var Manager = function() {
 	
 	this.pixels = new Uint8Array(4*4*4); // really this is no necessary.***
 	
-	this.depthFboNeo = undefined;    
-	this.ssaoFboNeo = undefined;
-	this.selectionFbo = undefined; // framebuffer for selection.***
+	this.depthFboNeo;    
+	this.ssaoFboNeo;
+	this.selectionFbo; // framebuffer for selection.***
 	
 	// Mouse handler.***********************************************************************
-	this.handler = undefined; // mouse handlers. mouse_DOWN, mouse_MOVE, mouse_UP.***
+	this.handler; // mouse handlers. mouse_DOWN, mouse_MOVE, mouse_UP.***
 	this.mouse_x = 0;
 	this.mouse_y = 0;
 	this.mouseLeftDown = false;
 	this.mouseDragging = false;
-	this.selObjMovePlane = undefined;
+	this.selObjMovePlane;
 	
 	this.selectionCandidateObjects_array = [];
-	this.objectSelected = undefined;
+	this.objectSelected;
 	this.objMovState = 0; // 0 = no started. 1 = mov started. 
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
-	
-	//this.ssaoFSQuad = undefined;// No use this.***
+	//this.ssaoFSQuad;// No use this.***
 	this.kernel = [];
 	var kernelSize = 16;
 	
@@ -169,10 +168,10 @@ var Manager = function() {
 	
 	this.currentVisibleNeoBuildings_array = [];
 	this.currentVisibleClouds_array = [];
-	this.detailed_building = undefined;
-	this.detailed_neoBuilding = undefined;
+	this.detailed_building;
+	this.detailed_neoBuilding;
 	this.boundingSphere_Aux = new Cesium.BoundingSphere(); // Cesium dependency.***
-	this.radiusAprox_aux = undefined;
+	this.radiusAprox_aux;
 	
 	this.currentRenderables_neoRefLists_array = [];
 	
@@ -186,8 +185,8 @@ var Manager = function() {
 	this.encodedCamPosMC_High = new Float32Array(3);
 	this.encodedCamPosMC_Low = new Float32Array(3);
 	
-	this.compRefList_array = undefined;
-	this.compRefList_array_background = undefined;
+	this.compRefList_array;
+	this.compRefList_array_background;
 	this.intCRefList_array = [];
 	this.intNeoRefList_array = [];
 	
@@ -209,7 +208,7 @@ var Manager = function() {
 	this.render_time = 0;
 	this.bPicking = false;
 	
-	this.scene = undefined;
+	this.scene;
 	
 	// SPEED TEST.********************************************************
 	this.f4d_rendering_time = 0;
@@ -233,16 +232,16 @@ var Manager = function() {
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
 	this.pointSC_2= new Point3D();
-	var myCameraSC = undefined;
+	var myCameraSC;
 	
-	this.currentTimeSC = undefined;
-	this.dateSC = undefined;
-	this.startTimeSC = undefined;
+	this.currentTimeSC;
+	this.dateSC;
+	this.startTimeSC;
 	this.maxMilisecondsForRender = 10;
 	
-	this.terranTileSC = undefined;
+	this.terranTileSC;
 	
-	this.textureAux_1x1 = undefined;
+	this.textureAux_1x1;
 	
 	// Workers.****************************************************************************
 	/*
@@ -252,7 +251,6 @@ var Manager = function() {
 	{
 		//document.getElementById('result').textContent = event.data;
 		this.compRefList_array = event.data[0];
-		
 	};
 	*/
 	
@@ -265,7 +263,6 @@ var Manager = function() {
 	// End workers.------------------------------------------------------------------------
 	
 	this.create_clouds_TEST();
-	
 	this.load_samsung= false;
 };
 
@@ -414,7 +411,7 @@ Manager.prototype.create_clouds_TEST = function() {
 	var randomRadius = 0;
 	var randomDepth = 0;
 	
-	var cloud = undefined;
+	var cloud;
 	
 	for(var i =0; i<10; i++)
 	{
@@ -542,7 +539,7 @@ Manager.prototype.render_F4D_Atmosphere = function(GL, cameraPosition, cullingVo
 	GL.depthRange(0, 1);
 	
 	// Clouds.***************************************************
-	var cloud = undefined;
+	var cloud;
 	
 	for(var i=0; i<clouds_count; i++)
 	{
@@ -635,7 +632,7 @@ Manager.prototype.render_F4D_cloudShadows = function(GL, cameraPosition, culling
 	GL.depthFunc(GL.LEQUAL); 
 	GL.depthRange(0, 1);
 	
-	var cloud = undefined;
+	var cloud;
 	
 	// SHADOW SETTINGS.**********************************************************************************
 	GL.colorMask(false, false, false, false);
@@ -863,7 +860,7 @@ Manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, culli
 	var filePath_scratch = "";
 	
 	// Now, render LOD0 texture buildings.***
-	var pCloudProject = undefined;
+	var pCloudProject;
 	var pCloud_projectsCount = this.f4dBR_buildingProjectsList._pCloudMesh_array.length;
 	for(var i=0; i<pCloud_projectsCount; i++)
 	{
@@ -1910,14 +1907,14 @@ Manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, resul
 			
 			if(this.detailed_neoBuilding.buildingPosMat_inv == undefined)
 			{
-			  this.detailed_neoBuilding.buildingPosMat_inv = new f4d_Matrix4();
+			  this.detailed_neoBuilding.buildingPosMat_inv = new Matrix4();
 			  this.detailed_neoBuilding.buildingPosMat_inv.setByFloat32Array(this.detailed_neoBuilding.move_matrix_inv);
 			}
 			
 			var camera = scene.frameState.camera;
 			var cameraDir = camera.direction;
-			var transformedCamDir = undefined;
-			var transformedCamUp = undefined;
+			var transformedCamDir;
+			var transformedCamUp;
 			
 			this.pointSC.set(cameraDir.x, cameraDir.y, cameraDir.z);
 			transformedCamDir = this.detailed_neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
@@ -1994,7 +1991,7 @@ Manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition, sce
 			{
 				var neoRef = neoRefList.neoRefs_Array[j];
 				if(neoRef.selColor4 == undefined)
-					neoRef.selColor4 = new f4d_color();
+					neoRef.selColor4 = new Color();
 				
 				neoRef.selColor4.set(red, green, blue, alfa);
 				this.selectionCandidateObjects_array.push(neoRef);
@@ -2132,7 +2129,7 @@ Manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = fun
 	{
 		this.currentVisibleBuildings_array.length = 0; // Init.***
 		this.currentVisibleBuildings_LOD0_array.length = 0; // Init.***
-		this.detailed_building = undefined;
+		this.detailed_building;
 	
 		//this.doFrustumCulling(cullingVolume, this.currentVisibleBuildings_array, cameraPosition); // delete this.***
 		this.doFrustumCulling_terranTile_serviceFormat(GL, cullingVolume, this.currentVisibleBuildings_array, cameraPosition); 
@@ -2153,8 +2150,8 @@ Manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = fun
 	// *************************************************************************************************************************************************
 	// Now, render the detailed building if exist.******************************************************************************************************
 	// This is OLD.************************************
-	var transformedCamPos = undefined;
-	var currentShader = undefined;
+	var transformedCamPos;
+	var currentShader;
 	if(this.detailed_building && isLastFrustum)
 	{
 		currentShader = this.f4d_shadersManager.get_f4dShader(0);
@@ -2171,7 +2168,7 @@ Manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = fun
 	  GL.depthFunc(GL.LEQUAL); 
 	  GL.depthRange(0, 1);
 	  
-	  var shaderProgram = undefined;
+	  var shaderProgram;
 	
 	// Calculate the normal_matrix.***
 	//https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
@@ -2200,7 +2197,7 @@ Manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = fun
 	if(this.isCameraMoving)
 	{
 		this.dateSC = new Date();
-		this.currentTimeSC = undefined;
+		this.currentTimeSC;
 		this.startTimeSC = this.dateSC.getTime();
 	}
 	
@@ -2510,7 +2507,6 @@ Manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader = fun
 						GL.disableVertexAttribArray(shader._position);
 						return;
 					}
-					
 				}
 				*/
 				
@@ -2659,9 +2655,9 @@ Manager.prototype.doFrustumCulling_neoBuildings = function(frustumVolume, neoVis
 	
 	//this.min_squaredDist_to_see_detailed = 1000000; // Test for samsung.***
 	
-	var squaredDistToCamera = undefined;
-	var last_squared_dist = undefined;
-	this.detailed_neoBuilding = undefined;
+	var squaredDistToCamera;
+	var last_squared_dist;
+	this.detailed_neoBuilding;
 	
 	var neoBuildings_count = this.f4d_neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++)
@@ -2830,25 +2826,25 @@ Manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, frust
 	// Init the visible buildings array.***************************
 	//visibleBuildings_array.length = 0; // Init.***
 	//this.currentVisibleBuildings_LOD0_array.length = 0; // Init.***
-	//this.detailed_building = undefined;
+	//this.detailed_building;
 	
 	//this.min_squaredDist_to_see_detailed = 40000; // 200m.***
 	//this.min_squaredDist_to_see_LOD0 = 250000; // 600m.***
 	//this.min_squaredDist_to_see = 10000000;
 	//this.min_squaredDist_to_see_smallBuildings = 700000;
 	
-	var squaredDistToCamera = undefined;
-	var squaredDistToCamera_candidate = undefined;
-	var last_squared_dist = undefined;
-	var buildings_count = undefined;
-	var nearestTile = undefined;
-	var nearestTile_candidate = undefined;
+	var squaredDistToCamera;
+	var squaredDistToCamera_candidate;
+	var last_squared_dist;
+	var buildings_count;
+	var nearestTile;
+	var nearestTile_candidate;
 	
 	this.filteredVisibleTiles_array.length = 0;
 	this.detailedVisibleTiles_array.length = 0;
 	this.LOD0VisibleTiles_array.length = 0;
 	
-	var BR_Project = undefined;
+	var BR_Project;
 	
 	var max_tileFilesReading = 10;
 	
@@ -2886,8 +2882,8 @@ Manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, frust
 	// Make the visible buildings list.******************************************************************************
 	this.boundingSphere_Aux.radius = 50.0;
 	var need_frustumCulling = false;
-	var filePath_scratch = undefined;
-	var tileNumberNameString = undefined;
+	var filePath_scratch;
+	var tileNumberNameString;
 	
 	var detailedVisibleTiles_count = this.detailedVisibleTiles_array.length;
 	for(var i=0; i<detailedVisibleTiles_count; i++)
@@ -3172,8 +3168,8 @@ Manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuild
 	var min_squaredDist_to_see = 10000000;
 	var min_squaredDist_to_see_smallBuildings = 700000;
 	
-	var squaredDistToCamera = undefined;
-	var last_squared_dist = undefined;
+	var squaredDistToCamera;
+	var last_squared_dist;
 	
 	var clouds_count = this.f4d_atmos.cloudsManager.circularCloudsArray.length;
 	for(var p_counter = 0; p_counter<clouds_count; p_counter++)
@@ -3210,7 +3206,6 @@ Manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuild
 		if(frustumCull !== Cesium.Intersect.OUTSIDE) 
 		{
 			this.currentVisibleClouds_array.push(cloud);
-
 		}
 	}
 	

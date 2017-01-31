@@ -5,7 +5,7 @@
  */
 var Renderer = function() {
 	this.vbo_vi_cacheKey_aux;
-	this.byteColorAux = new f4d_ByteColor();
+	this.byteColorAux = new ByteColor();
 	
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	

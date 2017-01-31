@@ -15,8 +15,8 @@ var Atmosphere = function() {
  * 어떤 일을 하고 있습니까?
  */
 var ShadowBlendingCube = function() {
-	this.vertexMatrix = new f4d_vertexMatrix();
-	this.tTrianglesMatrix = new f4d_tTrianglesMatrix();
+	this.vertexMatrix = new VertexMatrix();
+	this.tTrianglesMatrix = new TTrianglesMatrix();
 	this.init(this.vertexMatrix, this.tTrianglesMatrix);
 	
 	this.vbo_vertexCacheKey;
@@ -162,10 +162,10 @@ var CircularCloud = function() {
 	this.depth = 150.0;
 	this.numPointsForCicle = 8;
 	
-	this.vertexMatrix = new f4d_vertexMatrix();
-	this.tTrianglesMatrix = new f4d_tTrianglesMatrix();
-	this.shadowVertexMatrix = new f4d_vertexMatrix();
-	this.shadowTTrianglesMatrix = new f4d_tTrianglesMatrix();
+	this.vertexMatrix = new VertexMatrix();
+	this.tTrianglesMatrix = new TTrianglesMatrix();
+	this.shadowVertexMatrix = new VertexMatrix();
+	this.shadowTTrianglesMatrix = new TTrianglesMatrix();
 	
 	this.sunLightDirection = new Point3D();
 	this.sunLightDirection.set(1, 1, -5);
@@ -178,7 +178,7 @@ var CircularCloud = function() {
 	this.positionHIGH;
 	this.positionLOW;
 	
-	this.bbox = new f4d_boundingBox();
+	this.bbox = new BoundingBox();
 	this.cullingPosition;
 	this.cullingRadius;
 	
@@ -192,7 +192,7 @@ var CircularCloud = function() {
 	
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.point3dSC = new Point3D();
-	this.vertexSC = new f4d_vertex();
+	this.vertexSC = new Vertex();
 };
 
 /**
@@ -243,7 +243,7 @@ CircularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
  */
 CircularCloud.prototype.rotateMesh_byLocation = function(vtxMat) {
 	// we rotate the cloud mesh by longitude, latitude.***
-	var matrix = new f4d_Matrix4();
+	var matrix = new Matrix4();
 	
 	// 1) Rotation Z. Longitude.***
 	var vertex;
