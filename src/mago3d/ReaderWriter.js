@@ -5,7 +5,8 @@
  */
 var ReaderWriter = function() {
 	this.rootPath = "";
-	this.geometryDataPath = "/F4D_GeometryData";
+	//this.geometryDataPath = "/F4D_GeometryData";
+	this.geometryDataPath = "/data";
 	this.vi_arrays_Container = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBO_ArraysContainer = new ByteColorsVBOArraysContainer();
 		//var simpleBuildingImage = new Image();
@@ -55,7 +56,7 @@ var ReaderWriter = function() {
  * @returns uint32[0]
  */
 ReaderWriter.prototype.readUInt32 = function(buffer, start, end) {
-	uint32 = new Uint32Array(buffer.slice(start, end));
+	var uint32 = new Uint32Array(buffer.slice(start, end));
 	return uint32[0];
 };
 
@@ -67,7 +68,7 @@ ReaderWriter.prototype.readUInt32 = function(buffer, start, end) {
  * @returns int32[0]
  */
 ReaderWriter.prototype.readInt32 = function(buffer, start, end) {
-	int32 = new Int32Array(buffer.slice(start, end));
+	var int32 = new Int32Array(buffer.slice(start, end));
 	return int32[0];
 };
 
@@ -79,7 +80,7 @@ ReaderWriter.prototype.readInt32 = function(buffer, start, end) {
  * @returns uint16[0]
  */
 ReaderWriter.prototype.readUInt16 = function(buffer, start, end) {
-	uint16 = new Uint16Array(buffer.slice(start, end));
+	var uint16 = new Uint16Array(buffer.slice(start, end));
 	return uint16[0];
 };
 
@@ -91,7 +92,7 @@ ReaderWriter.prototype.readUInt16 = function(buffer, start, end) {
  * @returns int16[0]
  */
 ReaderWriter.prototype.readInt16 = function(buffer, start, end) {
-	int16 = new Int16Array(buffer.slice(start, end));
+	var int16 = new Int16Array(buffer.slice(start, end));
 	return int16[0];
 };
 
@@ -103,7 +104,7 @@ ReaderWriter.prototype.readInt16 = function(buffer, start, end) {
  * @returns float64[0]
  */
 ReaderWriter.prototype.readFloat64 = function(buffer, start, end) {
-	float64 = new Float64Array(buffer.slice(start, end));
+	var float64 = new Float64Array(buffer.slice(start, end));
 	return float64[0];
 };
 
@@ -115,7 +116,7 @@ ReaderWriter.prototype.readFloat64 = function(buffer, start, end) {
  * @returns float32[0]
  */
 ReaderWriter.prototype.readFloat32 = function(buffer, start, end) {
-	float32 = new Float32Array(buffer.slice(start, end));
+	var float32 = new Float32Array(buffer.slice(start, end));
 	return float32[0];
 };
 
@@ -127,7 +128,7 @@ ReaderWriter.prototype.readFloat32 = function(buffer, start, end) {
  * @returns float16[0]
  */
 ReaderWriter.prototype.readFloat16 = function(buffer, start, end) {
-	float16 = new Float32Array(buffer.slice(start, end));
+	var float16 = new Float32Array(buffer.slice(start, end));
 	return float16[0];
 };
 
@@ -139,7 +140,7 @@ ReaderWriter.prototype.readFloat16 = function(buffer, start, end) {
  * @returns int8[0]
  */
 ReaderWriter.prototype.readInt8 = function(buffer, start, end) {
-	int8 = new Int8Array(buffer.slice(start, end));
+	var int8 = new Int8Array(buffer.slice(start, end));
 	return int8[0];
 };
 
@@ -151,7 +152,7 @@ ReaderWriter.prototype.readInt8 = function(buffer, start, end) {
  * @returns uint8[0]
  */
 ReaderWriter.prototype.readUInt8 = function(buffer, start, end) {
-	uint8 = new Uint8Array(buffer.slice(start, end));
+	var uint8 = new Uint8Array(buffer.slice(start, end));
 	return uint8[0];
 };
 
@@ -163,8 +164,8 @@ ReaderWriter.prototype.readUInt8 = function(buffer, start, end) {
  * @returns int8_value
  */
 ReaderWriter.prototype.readInt8_byteColor = function(buffer, start, end) {
-	int8 = new Int8Array(buffer.slice(start, end));
-	int8_value = int8[0];
+	var int8 = new Int8Array(buffer.slice(start, end));
+	var int8_value = int8[0];
 
 	if(int8_value > max_color_value)
 	   int8_value = max_color_value;
@@ -255,8 +256,8 @@ ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksList,
 				
 				block.vertex_count = vertex_count;
 
-				startBuff = bytes_readed;
-				endBuff = bytes_readed + 4*verticesFloatValues_count;
+				var startBuff = bytes_readed;
+				var endBuff = bytes_readed + 4*verticesFloatValues_count;
 
 				var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.new_VBO_VertexIdxCacheKey();
 				vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
@@ -270,7 +271,7 @@ ReaderWriter.prototype.readF4D_NeoBlocks = function(GL, arrayBuffer, blocksList,
 				 
 				// 2) Normals.************************************************************************************************
 				vertex_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				normalByteValues_count = vertex_count * 3;
+				var normalByteValues_count = vertex_count * 3;
 				//Test.***********************
 				//for(var j=0; j<normalByteValues_count; j++)
 				//{

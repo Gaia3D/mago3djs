@@ -962,7 +962,7 @@ Manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewPr
 	// do frustum culling.***
 	if(!this.isCameraMoving)
 	{
-		frustumVolume = scene._frameState.cullingVolume;
+		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCulling_neoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
 	}
@@ -1013,7 +1013,7 @@ Manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewPr
 		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 		GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);  
 	
-		shaderProgram = currentShader.program;
+		var shaderProgram = currentShader.program;
 		GL.useProgram(shaderProgram);
 		//GL.enableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
 		GL.enableVertexAttribArray(currentShader.position3_loc);
@@ -1039,8 +1039,8 @@ Manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewPr
 		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
 		
 		var renderTexture = false;
-
-		this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		var cameraPosition = null;
+		this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 		// now, render depth of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
@@ -1152,7 +1152,8 @@ Manager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewPr
 		renderTexture = true;
 
 		ssao_idx = 1;
-		this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		var cameraPosition = null;
+		this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
@@ -1326,8 +1327,8 @@ Manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelVie
 		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
 		
 		var renderTexture = false;
-
-		//this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		//var cameraPosition = null;
+		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 		// now, render depth of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
@@ -1439,7 +1440,8 @@ Manager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelVie
 		renderTexture = true;
 
 		ssao_idx = 1;
-		//this.render_Detailed_neoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		//var cameraPosition = null;
+		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
@@ -1523,7 +1525,7 @@ Manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_ne
 	// do frustum culling.***
 	if(!this.isCameraMoving)
 	{
-		frustumVolume = scene._frameState.cullingVolume;
+		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCulling_neoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
 	}
@@ -1574,7 +1576,7 @@ Manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_ne
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 		//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
 		
-		shaderProgram = currentShader.program;
+		var shaderProgram = currentShader.program;
 		gl.useProgram(shaderProgram);
 		gl.enableVertexAttribArray(currentShader.position3_loc);
 		//gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1590,7 +1592,8 @@ Manager.prototype.getSelectedObject_Picking = function(gl, scene, renderables_ne
 		var ssao_idx = -1; // selection code.***
 		//ssao_idx = 1; // test.***
 		var renderTexture = false;
-		this.render_Detailed_neoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		var cameraPosition = null;
+		this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 		
 		gl.disableVertexAttribArray(currentShader.position3_loc);
 		//gl.disableVertexAttribArray(currentShader.normal3_loc);
@@ -1646,7 +1649,7 @@ Manager.prototype.getRayCamSpace = function(GL, scene, resultRay) {
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
  */
-Manager.prototype.calculateSelObjMovePlane = function( ) {
+Manager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, scene, renderables_neoRefLists_array) {
 	
 	// depth render.************************************************************************************************************
 	// depth render.************************************************************************************************************
@@ -1673,7 +1676,7 @@ Manager.prototype.calculateSelObjMovePlane = function( ) {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 	//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	
-	shaderProgram = currentShader.program;
+	var shaderProgram = currentShader.program;
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	//gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1691,7 +1694,7 @@ Manager.prototype.calculateSelObjMovePlane = function( ) {
 	var ssao_idx = -1; // selection code.***
 	//ssao_idx = 1; // test.***
 	var renderTexture = false;
-	this.render_Detailed_neoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+	this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
 	
 	gl.disableVertexAttribArray(currentShader.position3_loc);
 	//gl.disableVertexAttribArray(currentShader.normal3_loc);
@@ -1962,14 +1965,14 @@ Manager.prototype.getRenderables_detailedNeoBuilding = function(GL, scene, resul
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
- * @param cameraPosition 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
  * @param scene 변수
  * @param shader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  * @param neoRefLists_array 변수
  */
-Manager.prototype.render_Detailed_neoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array) {
+Manager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array) {
 	
 	if(ssao_idx == -1)// picking mode.***********************************************************************************
 	{
@@ -3250,23 +3253,24 @@ Manager.prototype.load_TEST_Files = function() {
 			var lat = 37.5172076;
 			var lon = 126.929;
 			
-			//var buildingFileName = "F4D_gangnam_del";
+			/*
+			 * TODO buildingFileName 이 실제로 표시될 이름이다. github 테스트시 F4D_Duplex_A_20110907_optimized 로 바꿔서 테스트 해야 함
+			 */
 			var buildingFileName = "F4D_KICT_main_Arc_v3_with_spaces";
-			//var buildingFileName = "F4D_Duplex_A_20110907_optimized";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
 			
-			var buildingFileName = "F4D_gangbuk_cultur_del";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			buildingFileName = "F4D_gangbuk_cultur_del";
+			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
 			
-			var buildingFileName = "F4D_KANGBUK_del";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			buildingFileName = "F4D_KANGBUK_del";
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
 			
-			var buildingFileName = "F4D_gangnam_del";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			buildingFileName = "F4D_gangnam_del";
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.f4d_readerWriter, neoBuildingsList, this);
 			
-			var buildingFileName = "F4D_7117_M320P";
+			buildingFileName = "F4D_7117_M320P";
 			//var buildingFileName = "F4D_7117_M320P_low";
-			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, f4d_manager);
+			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
 
 			deltaLat = 0.0002;
 			deltaLon = 0.0002;

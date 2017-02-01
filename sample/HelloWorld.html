@@ -8,28 +8,26 @@
   <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>Cesium and F4D Viewer</title>
-  <script src="../src/js/cesium/Cesium.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Atmosphere.js"></script>
-  <script type="text/javascript" src="../src/js/MoveCubeLibsJScript.js"></script>
-  <script type="text/javascript" src="../src/js/SonGeometryJScript.js"></script>
-  <script type="text/javascript" src="../src/js/SonGeometryModifier.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Line.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Plane.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Point3D.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Projects.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Shader.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_ReaderWriter.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Renderer.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Selection.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_VBO_Manager.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Manager.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_PostFxShader.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_FBO.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Geometry.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_Accesor.js"></script>
-  <script type="text/javascript" src="../src/js/F4D_neoTexture.js"></script>
+  <script src="../src/engine/cesium/Cesium.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Atmosphere.js"></script>
+  <script type="text/javascript" src="../src/mago3d/GeometryUtil.js"></script>
+  <script type="text/javascript" src="../src/mago3d/GeometryModifier.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Line.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Plane.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Point3D.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Shader.js"></script>
+  <script type="text/javascript" src="../src/mago3d/ReaderWriter.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Renderer.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Selection.js"></script>
+  <script type="text/javascript" src="../src/mago3d/VBOManager.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Manager.js"></script>
+  <script type="text/javascript" src="../src/mago3d/PostFxShader.js"></script>
+  <script type="text/javascript" src="../src/mago3d/FBO.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Geometry.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Accessor.js"></script>
+  <script type="text/javascript" src="../src/mago3d/NeoTexture.js"></script>
   <style>
-      @import url(../src/js/cesium/Widgets/widgets.css);
+      @import url(../src/engine/cesium/Widgets/widgets.css);
       html, body, #cesiumContainer {
           width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
       }
@@ -43,7 +41,7 @@
 	// Gaia Mago 3d code.*************************************************
 	// Create f4d_topManager.**************************************************
 	var GL = viewer.scene.context._gl;
-	viewer.scene.f4d_topManager = new f4d_manager(); // This is the top f4d class.***
+	viewer.scene.f4d_topManager = new Manager();
 	viewer.scene.f4d_topManager.f4dSelection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
 	viewer.scene.f4d_topManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
 	viewer.scene.f4d_topManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
@@ -64,7 +62,7 @@
 	f4d_topManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
 	f4d_topManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
 	
-	var f4d_readerWriter = new f4d_ReaderWriter();
+	var f4d_readerWriter = new ReaderWriter();
 	
 	f4d_topManager.load_TEST_Files();
 	
@@ -208,12 +206,6 @@
 	
 	// move objects in cesium example.*** http://webiks.com/cesiumjs-moving-entities-around/
 	
-	
-	//f4d_readerWriter.openF4d_TerranTile(GL, f4d_topManager.f4d_terranTile, f4d_readerWriter);
-	//f4d_readerWriter.openBuildingProject(GL, 130, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, BR_ProjectsList, f4d_topManager);
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------
-	var buildingFileName = "F4D_gangnam_del";
-	//f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, f4d_readerWriter, neoBuildingsList, f4d_manager);
 
 	var entities = viewer.entities;
 		entities.add({

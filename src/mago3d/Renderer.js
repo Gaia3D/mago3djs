@@ -293,7 +293,7 @@ Renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBu
 							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = GL.createBuffer ();
 							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
 							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, GL.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.pos_vboDataArray.length = 0;
+							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
 								continue;
 						}
 						
@@ -305,7 +305,7 @@ Renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBu
 							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = GL.createBuffer ();
 							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
 							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, GL.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.nor_vboDataArray.length = 0;
+							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
 								continue;
 						}
 						
@@ -318,7 +318,7 @@ Renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, neoBu
 							GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, GL.STATIC_DRAW);
 							//this.vbo_vi_cacheKey_aux.indices_count = this.vbo_vi_cacheKey_aux.idx_vboDataArray.length;
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray.length = 0;
+							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
 						}
 						
@@ -554,7 +554,7 @@ Renderer.prototype.render_F4D_neoRefLists_ColorSelection = function(GL, neoRefLi
 							GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, GL.STATIC_DRAW);
 							//this.vbo_vi_cacheKey_aux.indices_count = this.vbo_vi_cacheKey_aux.idx_vboDataArray.length;
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray.length = 0;
+							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
 						}
 						

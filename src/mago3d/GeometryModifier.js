@@ -3,7 +3,8 @@
 /**
  * 어떤 일을 하고 있습니까?
  */
-var GeometryModifier = GeometryModifier || {};
+var GeometryModifier = function() {
+};
   
 /**
  * 어떤 일을 하고 있습니까?
@@ -544,4 +545,4 @@ GeometryModifier.prototype.f4dBRbuildingProjectsList_newBRProject = function(bui
 	return br_buildingProject;
 };
 	
-//# sourceURL=sonGeometryModifier.js
+//# sourceURL=GeometryModifier.js

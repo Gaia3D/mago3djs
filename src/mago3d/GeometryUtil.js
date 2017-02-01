@@ -352,7 +352,7 @@ VertexList.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance
 	var vertex_count = this.vertexArray.length;
 	for(var i=0; i<vertex_count; i++)
 	{
-		vertex = this.vertexArray[i].translate(dir_x, dir_y, dir_z, distance);
+		this.vertexArray[i].translate(dir_x, dir_y, dir_z, distance);
 	}
 };
 
@@ -495,11 +495,11 @@ VertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArray) {
 	var vertexLists_count = this.vertexListsArray.length;
 	for(var i=0; i<vertexLists_count; i++)
 	{
-		vtxList = this.vertexListsArray[i];
-		vertex_count = vtxList.vertexArray.length;
+		var vtxList = this.vertexListsArray[i];
+		var vertex_count = vtxList.vertexArray.length;
 		for(var j=0; j<vertex_count; j++)
 		{
-			vertex = vtxList.get_vertex(j);
+			var vertex = vtxList.get_vertex(j);
 			resultTotalVertexArray.push(vertex);
 		}
 	}
