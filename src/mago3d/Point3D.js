@@ -4,9 +4,13 @@
  * 어떤 일을 하고 있습니까?
  */
 var Point3D = function() {
-  this.x = 0.0;
-  this.y = 0.0;
-  this.z = 0.0;
+	if(!(this instanceof Point3D)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
+	this.x = 0.0;
+	this.y = 0.0;
+	this.z = 0.0;
 };
 
 /**

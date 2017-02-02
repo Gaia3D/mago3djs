@@ -4,6 +4,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var ReaderWriter = function() {
+	if(!(this instanceof ReaderWriter)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	this.rootPath = "";
 	//this.geometryDataPath = "/F4D_GeometryData";
 	this.geometryDataPath = Mago3DConfig.getInformation.getDataPath();
@@ -659,7 +663,7 @@ ReaderWriter.prototype.readF4D_NeoReferences_inServer = function(GL, filePath_in
 		  }
 		  //------------------------------------------------------
 		  
-		  var octree = undefined;
+		  var octree;
 		  if(subOctreeNumberName != undefined)
 		  {
 			  // we are reading interior comRefs.***
@@ -880,7 +884,7 @@ ReaderWriter.prototype.readF4D_pCloudIndexFile_inServer = function(GL, filePath_
 		    }
 		    //---------------------------------------------------------------------------------------------------
 		    // write code here.***
-		    var pCloudProject = undefined;
+		    var pCloudProject;
 		  
 		    var bytes_readed = 0;
 	
@@ -947,7 +951,7 @@ ReaderWriter.prototype.readF4D_pCloudHeader_inServer = function(GL, filePath_inS
 		    var bytes_readed = 0;
 			var version_string_length = 5;
 			var intAux_scratch = 0;
-			var auxScratch = undefined;
+			var auxScratch;
 			var header = pCloud._header;
 			
 			// 1) Version(5 chars).***********

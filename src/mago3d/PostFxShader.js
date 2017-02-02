@@ -5,6 +5,10 @@
  * @param gl 변수
  */
 var PostFxShader = function(gl) {
+	if(!(this instanceof PostFxShader)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	// shader program.***
 	this.program;
 	this.shader_vertex;

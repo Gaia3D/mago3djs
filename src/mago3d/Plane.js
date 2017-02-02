@@ -4,6 +4,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var Plane = function() {
+	if(!(this instanceof Plane)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	// ax+by+cz+d = 0 plane.***
 	this.a = 0.0;
 	this.b = 0.0;

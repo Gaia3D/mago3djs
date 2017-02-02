@@ -7,6 +7,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var Atmosphere = function() {
+	if(!(this instanceof Atmosphere)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	this.cloudsManager = new CloudsManager();
 	this.shadowBlendingCube = new ShadowBlendingCube();
 };
@@ -15,6 +19,10 @@ var Atmosphere = function() {
  * 어떤 일을 하고 있습니까?
  */
 var ShadowBlendingCube = function() {
+	if(!(this instanceof ShadowBlendingCube)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	this.vertexMatrix = new VertexMatrix();
 	this.tTrianglesMatrix = new TTrianglesMatrix();
 	this.init(this.vertexMatrix, this.tTrianglesMatrix);
