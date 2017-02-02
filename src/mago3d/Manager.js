@@ -4,6 +4,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var Manager = function() {
+	if(!(this instanceof Manager)) {
+		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+	}
+	
 	// F4D Data structure & objects.*****************************************
 	this.f4dBR_buildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for f4d projects.*** !!!
 	this.f4d_terranTile = new TerranTile();// use this.***

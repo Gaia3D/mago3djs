@@ -1,0 +1,26 @@
+.navbar {
+	position : relative;
+	min-height : 50px;
+	border : 1px solid transparent;
+}
+
+.navbar-green {
+  background: #16a7cc;
+}
+
+.navbar-ul {
+	padding-right: 100px;	
+}
+
+.navbar-li {
+	display: inline;
+	width: 100px;
+}
+
+#cesiumContainer {
+	width: 1500px; height: 750px; margin: 0; padding: 0; overflow: hidden;
+}
+
+.col-md-2 {
+    width: 16.6667%;
+}
