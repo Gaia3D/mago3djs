@@ -8,7 +8,8 @@
   <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>Cesium and F4D Viewer</title>
-  <script src="../src/engine/cesium/Cesium.js"></script>
+  <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+  <script type="text/javascript" src="../src/mago3d/Config.js"></script>
   <script type="text/javascript" src="../src/mago3d/Atmosphere.js"></script>
   <script type="text/javascript" src="../src/mago3d/GeometryUtil.js"></script>
   <script type="text/javascript" src="../src/mago3d/GeometryModifier.js"></script>
@@ -36,7 +37,7 @@
 <body>
   <div id="cesiumContainer"></div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+	var viewer = new Cesium.Viewer('cesiumContainer');
 	
 	// Gaia Mago 3d code.*************************************************
 	// Create f4d_topManager.**************************************************

@@ -3219,64 +3219,75 @@ Manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleBuild
  * 어떤 일을 하고 있습니까?
  */
 Manager.prototype.load_TEST_Files = function() {
-			// Now, load sejong.***
-			var project_number = 7500; // House with car and mini park to children.***
-			var GAIA3D__counter =1;
-			//GAIA3D__offset_latitude += 0.0021;
-			//GAIA3D__offset_longitude += 0.0021;
-			
-			var incre_latAng = 0.0005;
-			var incre_longAng = 0.0005;
-			
-			// Test modularitzing.*******************************************************
-			var BR_ProjectsList = this.f4dBR_buildingProjectsList;
-			var neoBuildingsList = this.f4d_neoBuildingsList;
+	// Now, load sejong.***
+	var project_number = 7500; // House with car and mini park to children.***
+	var GAIA3D__counter =1;
+	//GAIA3D__offset_latitude += 0.0021;
+	//GAIA3D__offset_longitude += 0.0021;
+	
+	var incre_latAng = 0.0005;
+	var incre_longAng = 0.0005;
+	
+	// Test modularitzing.*******************************************************
+	var BR_ProjectsList = this.f4dBR_buildingProjectsList;
+	var neoBuildingsList = this.f4d_neoBuildingsList;
 
-			var height = 1635.0;
-			var GL = this.scene.context._gl;
-			//viewer.f4d_readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.f4d_readerWriter, BR_ProjectsList);
-			// End test modularitzing.---------------------------------------------------
-			
-			/*
-			var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
-			url : '//assets.agi.com/stk-terrain/world',
-			requestWaterMask : false,
-			requestVertexNormals : true
-			});
-			this.terrainProvider = cesiumTerrainProviderMeshes;
-			*/
-	var h=0;
-
-			this.f4d_readerWriter.openF4d_TerranTile(GL, this.f4d_terranTile, this.f4d_readerWriter);
-			var deltaLat = -0.0015;
-			var deltaLon = 0.0015;
-			var lat = 37.5172076;
-			var lon = 126.929;
-			
-			/*
-			 * TODO buildingFileName 이 실제로 표시될 이름이다. github 테스트시 F4D_Duplex_A_20110907_optimized 로 바꿔서 테스트 해야 함
-			 */
-			var buildingFileName = "F4D_KICT_main_Arc_v3_with_spaces";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
-			
-			buildingFileName = "F4D_gangbuk_cultur_del";
-			this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
-			
-			buildingFileName = "F4D_KANGBUK_del";
-			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
-			
-			buildingFileName = "F4D_gangnam_del";
-			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.f4d_readerWriter, neoBuildingsList, this);
-			
-			buildingFileName = "F4D_7117_M320P";
-			//var buildingFileName = "F4D_7117_M320P_low";
-			//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
-
-			deltaLat = 0.0002;
-			deltaLon = 0.0002;
-			var latitude = 37.5168;
-			var longitude = 126.95;
-			var elev = 48.0;
-		};
+	var height = 1635.0;
+	var GL = this.scene.context._gl;
+	//viewer.f4d_readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.f4d_readerWriter, BR_ProjectsList);
+	// End test modularitzing.---------------------------------------------------
+	
+	/*
+	var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+	url : '//assets.agi.com/stk-terrain/world',
+	requestWaterMask : false,
+	requestVertexNormals : true
+	});
+	this.terrainProvider = cesiumTerrainProviderMeshes;
+	*/
+	
+	var deployType = Mago3DConfig.getInformation.getDeployType();
+	if(deployType !== 'production') {
+		this.f4d_readerWriter.openF4d_TerranTile(GL, this.f4d_terranTile, this.f4d_readerWriter);
+	}
+	var deltaLat = -0.0015;
+	var deltaLon = 0.0015;
+	var lat = 37.5172076;
+	var lon = 126.929;
+	
+	/*
+	 * TODO buildingFileName 이 실제로 표시될 이름이다. github 테스트시 F4D_Duplex_A_20110907_optimized 로 바꿔서 테스트 해야 함
+	 */
+	var buildingFileName;
+	if(deployType === 'github') {
+		buildingFileName = "F4D_Duplex_A_20110907_optimized";
+	} else if(deployType === 'dev' || deployType === 'stage') {
+		buildingFileName = "F4D_KICT_main_Arc_v3_with_spaces";
+	} else {
+		buildingFileName = '';
+	}
+	this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+	
+	if(deployType === 'dev' || deployType === 'stage') {
+		buildingFileName = "F4D_gangbuk_cultur_del";
+		this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+		
+		buildingFileName = "F4D_KANGBUK_del";
+		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+		
+		buildingFileName = "F4D_gangnam_del";
+		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.f4d_readerWriter, neoBuildingsList, this);
+		
+		buildingFileName = "F4D_7117_M320P";
+		//var buildingFileName = "F4D_7117_M320P_low";
+		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+	}
+		
+	deltaLat = 0.0002;
+	deltaLon = 0.0002;
+	var latitude = 37.5168;
+	var longitude = 126.95;
+	var elev = 48.0;
+};
 
 //# sourceURL=Manager.js

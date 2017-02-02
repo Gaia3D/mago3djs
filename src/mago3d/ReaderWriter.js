@@ -6,7 +6,7 @@
 var ReaderWriter = function() {
 	this.rootPath = "";
 	//this.geometryDataPath = "/F4D_GeometryData";
-	this.geometryDataPath = "/data";
+	this.geometryDataPath = Mago3DConfig.getInformation.getDataPath();
 	this.vi_arrays_Container = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBO_ArraysContainer = new ByteColorsVBOArraysContainer();
 		//var simpleBuildingImage = new Image();
