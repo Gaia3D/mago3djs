@@ -5,7 +5,7 @@
  */
 var NeoTexture = function() {
 	if(!(this instanceof NeoTexture)) {
-		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+		throw new Error(MESSAGES.classNewError);
 	}
 	
 	this.lod;
