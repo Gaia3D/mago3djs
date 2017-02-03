@@ -5,7 +5,7 @@
  */
 var Plane = function() {
 	if(!(this instanceof Plane)) {
-		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+		throw new Error(MESSAGES.classNewError);
 	}
 	
 	// ax+by+cz+d = 0 plane.***

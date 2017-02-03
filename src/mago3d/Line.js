@@ -5,7 +5,7 @@
  */
 var Line = function() {
 	if(!(this instanceof Line)) {
-		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+		throw new Error(MESSAGES.classNewError);
 	}
 	
 	// (x,y,z) = (x0,y0,z0) + lambda * (u, v, w);
