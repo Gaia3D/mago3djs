@@ -48,79 +48,79 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	var alpha = 0.6;
 	
 	// Center Bottom of the cube.***
-	var vertex_list = vtxMat.new_vertexList();
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	var vertex_list = vtxMat.newVertexList();
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
 	// Bottom of the cube.***
-	vertex_list = vtxMat.new_vertexList();
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(-cubeSideSemiLength, -cubeSideSemiLength, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex_list = vtxMat.newVertexList();
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(cubeSideSemiLength, -cubeSideSemiLength, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(cubeSideSemiLength, -cubeSideSemiLength, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(cubeSideSemiLength, cubeSideSemiLength, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(cubeSideSemiLength, cubeSideSemiLength, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(-cubeSideSemiLength, cubeSideSemiLength, -cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(-cubeSideSemiLength, cubeSideSemiLength, -cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
 	// Top of the cube.***
-	vertex_list = vtxMat.new_vertexList();
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(-cubeSideSemiLength, -cubeSideSemiLength, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex_list = vtxMat.newVertexList();
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(cubeSideSemiLength, -cubeSideSemiLength, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(cubeSideSemiLength, -cubeSideSemiLength, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(cubeSideSemiLength, cubeSideSemiLength, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(cubeSideSemiLength, cubeSideSemiLength, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(-cubeSideSemiLength, cubeSideSemiLength, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(-cubeSideSemiLength, cubeSideSemiLength, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
 	// Center Top of the cube.***
-	vertex_list = vtxMat.new_vertexList();
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex_list = vtxMat.newVertexList();
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
-	vertex = vertex_list.new_vertex();
-	vertex.set_position(0.0, 0.0, cubeSideSemiLength);
-	vertex.set_colorRGBA(r, g, b, alpha);
+	vertex = vertex_list.newVertex();
+	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
+	vertex.setColorRGBA(r, g, b, alpha);
 	
 	// Now, make the tTrianglesMatrix.***
-	vtxMat.make_tTriangles_lateralSidesLOOP(tTriMat);
+	vtxMat.makeTTrianglesLateralSidesLOOP(tTriMat);
 	//tTriMat.invert_trianglesSense();
 };
 
@@ -128,8 +128,8 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
  * 어떤 일을 하고 있습니까?
  * @returns floatArray
  */
-ShadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function() {
-	var floatArray = this.vertexMatrix.get_vbo_vertexColorRGBA_FloatArray(floatArray);
+ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
+	var floatArray = this.vertexMatrix.getVBOVertexColorRGBAFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -137,9 +137,9 @@ ShadowBlendingCube.prototype.get_vbo_vertexColorRGBA_FloatArray = function() {
  * 어떤 일을 하고 있습니까?
  * @returns shortArray
  */
-ShadowBlendingCube.prototype.get_vbo_indices_ShortArray = function() {
-	this.vertexMatrix.set_vertexIdxInList();
-	var shortArray = this.tTrianglesMatrix.get_vbo_indices_ShortArray();
+ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
+	this.vertexMatrix.setVertexIdxInList();
+	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
 	this.indices_count = shortArray.length;
 	
 	return shortArray;
@@ -207,8 +207,8 @@ var CircularCloud = function() {
  * 어떤 일을 하고 있습니까?
  * @returns floatArray
  */
-CircularCloud.prototype.get_vbo_vertexColor_FloatArray = function() {
-	var floatArray = this.vertexMatrix.get_vbo_vertexColor_FloatArray(floatArray);
+CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
+	var floatArray = this.vertexMatrix.getVBOVertexColorFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -216,9 +216,9 @@ CircularCloud.prototype.get_vbo_vertexColor_FloatArray = function() {
  * 어떤 일을 하고 있습니까?
  * @returns floatArray
  */
-CircularCloud.prototype.get_vbo_indices_ShortArray = function() {
-	this.vertexMatrix.set_vertexIdxInList();
-	var shortArray = this.tTrianglesMatrix.get_vbo_indices_ShortArray();
+CircularCloud.prototype.getVBOIndicesShortArray = function() {
+	this.vertexMatrix.setVertexIdxInList();
+	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
 	this.indices_count = shortArray.length;
 	
 	return shortArray;
@@ -228,8 +228,8 @@ CircularCloud.prototype.get_vbo_indices_ShortArray = function() {
  * 어떤 일을 하고 있습니까?
  * @returns floatArray
  */
-CircularCloud.prototype.get_vbo_shadowVertex_FloatArray = function() {
-	var floatArray = this.shadowVertexMatrix.get_vbo_vertex_FloatArray(floatArray);
+CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
+	var floatArray = this.shadowVertexMatrix.getVBOVertexFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -237,9 +237,9 @@ CircularCloud.prototype.get_vbo_shadowVertex_FloatArray = function() {
  * 어떤 일을 하고 있습니까?
  * @returns shortArray
  */
-CircularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
-	this.shadowVertexMatrix.set_vertexIdxInList();
-	var shortArray = this.shadowTTrianglesMatrix.get_vbo_indices_ShortArray();
+CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
+	this.shadowVertexMatrix.setVertexIdxInList();
+	var shortArray = this.shadowTTrianglesMatrix.getVBOIndicesShortArray();
 	this.indices_count = shortArray.length;
 	
 	return shortArray;
@@ -249,14 +249,14 @@ CircularCloud.prototype.get_vbo_shadowIndices_ShortArray = function() {
  * 어떤 일을 하고 있습니까?
  * @param vtxMat 변수
  */
-CircularCloud.prototype.rotateMesh_byLocation = function(vtxMat) {
+CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
 	// we rotate the cloud mesh by longitude, latitude.***
 	var matrix = new Matrix4();
 	
 	// 1) Rotation Z. Longitude.***
 	var vertex;
-	matrix.RotationAxis_angDeg(-this.longitude, 0.0, 0.0, 1.0);
-	vtxMat.transformPoints_byMatrix4(matrix);
+	matrix.rotationAxisAngDeg(-this.longitude, 0.0, 0.0, 1.0);
+	vtxMat.transformPointsByMatrix4(matrix);
 	
 	// 2) Rotation X'. Latitude.***
 	var longitudeRad = this.longitude * Math.PI/180.0;
@@ -269,24 +269,24 @@ CircularCloud.prototype.rotateMesh_byLocation = function(vtxMat) {
 	pitchAxis = cloudEquatorialPos.crossProduct(zAxis, pitchAxis);
 	pitchAxis.unitary();
 
-	//matrix.RotationAxis_angDeg(90.0-this.latitude, Math.cos(longitudeRad-90), -Math.sin(longitudeRad-90), 0.0);
-	matrix.RotationAxis_angDeg(90.0-this.latitude, pitchAxis.x, pitchAxis.y, 0.0);
-	vtxMat.transformPoints_byMatrix4(matrix);
+	//matrix.rotationAxisAngDeg(90.0-this.latitude, Math.cos(longitudeRad-90), -Math.sin(longitudeRad-90), 0.0);
+	matrix.rotationAxisAngDeg(90.0-this.latitude, pitchAxis.x, pitchAxis.y, 0.0);
+	vtxMat.transformPointsByMatrix4(matrix);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-CircularCloud.prototype.doShadowMesh_withSunDirection = function() {
+CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 	var distance = 3000.0;
-	var vertexList = this.shadowVertexMatrix.get_vertexList(5); // Bottom radius zero ring.***
-	vertexList.translate_vertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
+	var vertexList = this.shadowVertexMatrix.getVertexList(5); // Bottom radius zero ring.***
+	vertexList.translateVertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
 	
-	vertexList = this.shadowVertexMatrix.get_vertexList(4); // Bottom minor ring.***
-	vertexList.translate_vertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
+	vertexList = this.shadowVertexMatrix.getVertexList(4); // Bottom minor ring.***
+	vertexList.translateVertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
 	
-	vertexList = this.shadowVertexMatrix.get_vertexList(3); // Bottom major ring.***
-	vertexList.translate_vertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
+	vertexList = this.shadowVertexMatrix.getVertexList(3); // Bottom major ring.***
+	vertexList.translateVertices(this.sunLightDirection.x, this.sunLightDirection.y, this.sunLightDirection.z, distance);
 };
 
 /**
@@ -307,11 +307,11 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 	
 	this.makeMesh(this.vertexMatrix, this.tTrianglesMatrix, this.shadowVertexMatrix, this.shadowTTrianglesMatrix);
 	//this.makeMesh(this.shadowVertexMatrix, this.shadowTTrianglesMatrix, true);
-	//this.shadowTTrianglesMatrix.invert_trianglesSense();// TEST!!!!!!
-	this.doShadowMesh_withSunDirection();
+	//this.shadowTTrianglesMatrix.invertTrianglesSense();// TEST!!!!!!
+	this.doShadowMeshWithSunDirection();
 	
-	this.rotateMesh_byLocation(this.vertexMatrix);
-	this.rotateMesh_byLocation(this.shadowVertexMatrix);
+	this.rotateMeshByLocation(this.vertexMatrix);
+	this.rotateMeshByLocation(this.shadowVertexMatrix);
 	
 	var position = Cesium.Cartesian3.fromDegrees(this.longitude, this.latitude, this.altitude); 
 	this.position = position; 
@@ -331,10 +331,10 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 	this.positionLOW[1] = splitVelue_Y.low;
 	this.positionLOW[2] = splitVelue_Z.low;
 	
-	this.bbox = this.shadowVertexMatrix.get_boundingBox(this.bbox);
-	var cloud_point3d = this.bbox.get_centerPoint3d(cloud_point3d);
+	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
+	var cloud_point3d = this.bbox.getCenterPoint3d(cloud_point3d);
 	this.cullingPosition = new Cesium.Cartesian3(cloud_point3d.x + this.position.x,  cloud_point3d.y + this.position.y,  cloud_point3d.z + this.position.z) ;
-	this.cullingRadius = this.bbox.get_maxLength()/2;
+	this.cullingRadius = this.bbox.getMaxLength()/2;
 };
 
 /**
@@ -359,116 +359,116 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	var cloudWhite = 0.98;
 	
 	// 1) Top ring. radius zero.***
-	var vertex_list = vtxMat.new_vertexList();
-	var shadow_vertex_list = shadowVtxMat.new_vertexList();
+	var vertex_list = vtxMat.newVertexList();
+	var shadow_vertex_list = shadowVtxMat.newVertexList();
 	randomValue = 0.9+0.3*Math.random();
 	for(var i=0; i<numPointsForRing; i++)
 	{
-		vertex = vertex_list.new_vertex();
-		vertex.set_position(x, y, semi_depth);
-		shadow_vertex = shadow_vertex_list.new_vertex();
-		shadow_vertex.set_position(x, y, -semi_depth*1.2);
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
+		vertex = vertex_list.newVertex();
+		vertex.setPosition(x, y, semi_depth);
+		shadow_vertex = shadow_vertex_list.newVertex();
+		shadow_vertex.setPosition(x, y, -semi_depth*1.2);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
 	}
 	
 	// 2) Top menor_ring.***
 	angRad = 0.0;
 	var menor_ring_radius = this.radius * 0.7;
-	vertex_list = vtxMat.new_vertexList();
-	shadow_vertex_list = shadowVtxMat.new_vertexList();
+	vertex_list = vtxMat.newVertexList();
+	shadow_vertex_list = shadowVtxMat.newVertexList();
 	for(var i=0; i<numPointsForRing; i++)
 	{
 		//Math.random(); // returns from 0.0 to 1.0.***
 		randomValue = (2+Math.random())/2;
-		vertex = vertex_list.new_vertex();
-		shadow_vertex = shadow_vertex_list.new_vertex();
+		vertex = vertex_list.newVertex();
+		shadow_vertex = shadow_vertex_list.newVertex();
 		x = menor_ring_radius*Math.cos(angRad)*randomValue;
 		y = menor_ring_radius*Math.sin(angRad)*randomValue;
-		shadow_vertex.set_position(x, y, -semi_depth*2);
-		vertex.set_position(x, y, semi_depth*0.8);
+		shadow_vertex.setPosition(x, y, -semi_depth*2);
+		vertex.setPosition(x, y, semi_depth*0.8);
 		randomValue = 0.9+0.3*Math.random();
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
 		angRad += increAngRad;
 	}
 	
 	// 3) Top major_ring.***
 	angRad = 0.0;
-	vertex_list = vtxMat.new_vertexList();
-	shadow_vertex_list = shadowVtxMat.new_vertexList();
+	vertex_list = vtxMat.newVertexList();
+	shadow_vertex_list = shadowVtxMat.newVertexList();
 	for(var i=0; i<numPointsForRing; i++)
 	{
 		randomValue = (2+Math.random())/2;
-		vertex = vertex_list.new_vertex();
-		shadow_vertex = shadow_vertex_list.new_vertex();
+		vertex = vertex_list.newVertex();
+		shadow_vertex = shadow_vertex_list.newVertex();
 		x = this.radius*Math.cos(angRad)*randomValue;
 		y = this.radius*Math.sin(angRad)*randomValue;
-		shadow_vertex.set_position(x, y, -semi_depth*2);
-		vertex.set_position(x, y, semi_depth*0.4);
+		shadow_vertex.setPosition(x, y, -semi_depth*2);
+		vertex.setPosition(x, y, semi_depth*0.4);
 		
 		randomValue = 0.9+0.3*Math.random();
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
 		angRad += increAngRad;
 	}
 	
 	// 4) Bottom major_ring.***
 	angRad = 0.0;
-	vertex_list = vtxMat.new_vertexList();
-	shadow_vertex_list = shadowVtxMat.new_vertexList();
+	vertex_list = vtxMat.newVertexList();
+	shadow_vertex_list = shadowVtxMat.newVertexList();
 	for(var i=0; i<numPointsForRing; i++)
 	{
 		randomValue = (2+Math.random())/2;
-		vertex = vertex_list.new_vertex();
-		shadow_vertex = shadow_vertex_list.new_vertex();
+		vertex = vertex_list.newVertex();
+		shadow_vertex = shadow_vertex_list.newVertex();
 		x = this.radius*Math.cos(angRad)*randomValue;
 		y = this.radius*Math.sin(angRad)*randomValue;
-		shadow_vertex.set_position(x, y, -semi_depth*2);
-		vertex.set_position(x, y, -semi_depth*0.4);
+		shadow_vertex.setPosition(x, y, -semi_depth*2);
+		vertex.setPosition(x, y, -semi_depth*0.4);
 		randomValue = 0.8+0.3*Math.random();
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
 		angRad += increAngRad;
 	}
 	
 	// 5) Bottom menor_ring.***
 	angRad = 0.0;
 	menor_ring_radius = this.radius * 0.7;
-	vertex_list = vtxMat.new_vertexList();
-	shadow_vertex_list = shadowVtxMat.new_vertexList();
+	vertex_list = vtxMat.newVertexList();
+	shadow_vertex_list = shadowVtxMat.newVertexList();
 	for(var i=0; i<numPointsForRing; i++)
 	{
 		randomValue = (2+Math.random())/2;
-		vertex = vertex_list.new_vertex();
-		shadow_vertex = shadow_vertex_list.new_vertex();
+		vertex = vertex_list.newVertex();
+		shadow_vertex = shadow_vertex_list.newVertex();
 		x = menor_ring_radius*Math.cos(angRad)*randomValue;
 		y = menor_ring_radius*Math.sin(angRad)*randomValue;
-		vertex.set_position(x, y, -semi_depth*0.8);
-		shadow_vertex.set_position(x, y, -semi_depth*1.2);
+		vertex.setPosition(x, y, -semi_depth*0.8);
+		shadow_vertex.setPosition(x, y, -semi_depth*1.2);
 		
 		randomValue = 0.6+0.3*Math.random();
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
-		//vertex.set_colorRGB(0.58, 0.58, 0.58);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
+		//vertex.setColorRGB(0.58, 0.58, 0.58);
 		angRad += increAngRad;
 	}
 	
 	// 6) Bottom ring. radius zero.***
-	vertex_list = vtxMat.new_vertexList();
-	shadow_vertex_list = shadowVtxMat.new_vertexList();
+	vertex_list = vtxMat.newVertexList();
+	shadow_vertex_list = shadowVtxMat.newVertexList();
 	randomValue = 0.6+0.3*Math.random();
 	for(var i=0; i<numPointsForRing; i++)
 	{
 		//randomValue = (2+Math.random())/2;
-		vertex = vertex_list.new_vertex();
-		shadow_vertex = shadow_vertex_list.new_vertex();
-		vertex.set_position(0.0, 0.0, -semi_depth);
-		shadow_vertex.set_position(0.0, 0.0, -semi_depth);
+		vertex = vertex_list.newVertex();
+		shadow_vertex = shadow_vertex_list.newVertex();
+		vertex.setPosition(0.0, 0.0, -semi_depth);
+		shadow_vertex.setPosition(0.0, 0.0, -semi_depth);
 		
-		vertex.set_colorRGB(randomValue, randomValue, randomValue);
-		//vertex.set_colorRGB(0.58, 0.58, 0.58);
+		vertex.setColorRGB(randomValue, randomValue, randomValue);
+		//vertex.setColorRGB(0.58, 0.58, 0.58);
 	}
 	
 	// Now, make the tTrianglesMatrix.***
-	vtxMat.make_tTriangles_lateralSidesLOOP(tTriMat);
-	shadowVtxMat.make_tTriangles_lateralSidesLOOP(shadowTTriMat);
-	//tTriMat.invert_trianglesSense(); // No.***
+	vtxMat.makeTTrianglesLateralSidesLOOP(tTriMat);
+	shadowVtxMat.makeTTrianglesLateralSidesLOOP(shadowTTriMat);
+	//tTriMat.invertTrianglesSense(); // No.***
 	
 	// Now, calculate the culling bbox.***
 };

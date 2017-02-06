@@ -113,8 +113,8 @@ function possibleCameraPositionChanged(e) {
 	var eye_y = camPos.y;
 	var eye_z = camPos.z;
 	
-	var interior_visibleCompRefLists = geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
-	var visibleCompRefLists = geoModifier.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
+	var interior_visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
+	var visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 	//var interior_visibleCompRefLists = interiorCompRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
 	//var visibleCompRefLists = compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***

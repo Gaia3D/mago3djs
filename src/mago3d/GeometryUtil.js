@@ -108,7 +108,7 @@ var TTriangle = function() {
  * @param vtx_2 변수
  * @param vtx_3 변수
  */
-TTriangle.prototype.set_vertices = function(vtx_1, vtx_2, vtx_3) {
+TTriangle.prototype.setVertices = function(vtx_1, vtx_2, vtx_3) {
 	this.m_vertex_1 = vtx_1;
   	this.m_vertex_2 = vtx_2;
   	this.m_vertex_3 = vtx_3;
@@ -134,7 +134,7 @@ var TTrianglesList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns tTri
  */
-TTrianglesList.prototype.new_tTriangle = function() {
+TTrianglesList.prototype.newTTriangle = function() {
 	var tTri = new TTriangle();
 	this.tTrianglesArray.push(tTri);
 	return tTri;
@@ -143,7 +143,7 @@ TTrianglesList.prototype.new_tTriangle = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TTrianglesList.prototype.invert_trianglesSense= function() {
+TTrianglesList.prototype.invertTrianglesSense= function() {
 	var tri_count = this.tTrianglesArray.length;
 	for(var i=0; i<tri_count; i++) {
 		this.tTrianglesArray[i].invert();
@@ -155,7 +155,7 @@ TTrianglesList.prototype.invert_trianglesSense= function() {
  * @param idx 변수
  * @returns tTrianglesArray[idx]
  */
-TTrianglesList.prototype.get_tTriangle = function(idx) {
+TTrianglesList.prototype.getTTriangle = function(idx) {
 	if(idx >=0 && idx < this.tTrianglesArray.length) {
 		return this.tTrianglesArray[idx];
 	} else{
@@ -176,7 +176,7 @@ var TTrianglesMatrix = function() {
  * 어떤 일을 하고 있습니까?
  * @returns tTrianglesList
  */
-TTrianglesMatrix.prototype.new_tTrianglesList = function() {
+TTrianglesMatrix.prototype.newTTrianglesList = function() {
 	var tTrianglesList = new TTrianglesList();
 	this.tTrianglesListsArray.push(tTrianglesList);
 	return tTrianglesList;
@@ -185,11 +185,11 @@ TTrianglesMatrix.prototype.new_tTrianglesList = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TTrianglesMatrix.prototype.invert_trianglesSense = function() {
+TTrianglesMatrix.prototype.invertTrianglesSense = function() {
 	var tTriLists_count = this.tTrianglesListsArray.length;
 	for(var i=0; i<tTriLists_count; i++)
 	{
-		this.tTrianglesListsArray[i].invert_trianglesSense();
+		this.tTrianglesListsArray[i].invertTrianglesSense();
 	}
 };
 
@@ -198,7 +198,7 @@ TTrianglesMatrix.prototype.invert_trianglesSense = function() {
  * @param resultTotalTTrianglesArray 변수
  * @returns resultTotalTTrianglesArray
  */
-TTrianglesMatrix.prototype.get_totalTTrianglesArray = function(resultTotalTTrianglesArray) {
+TTrianglesMatrix.prototype.getTotalTTrianglesArray = function(resultTotalTTrianglesArray) {
 	var tTriangles_count;
 	var tTriangle;
 	var tTriLists_count = this.tTrianglesListsArray.length;
@@ -207,7 +207,7 @@ TTrianglesMatrix.prototype.get_totalTTrianglesArray = function(resultTotalTTrian
 		tTriangles_count = this.tTrianglesListsArray[i].tTrianglesArray.length;
 		for(var j=0; j<tTriangles_count; j++)
 		{
-			tTriangle = this.tTrianglesListsArray[i].get_tTriangle(j);
+			tTriangle = this.tTrianglesListsArray[i].getTTriangle(j);
 			resultTotalTTrianglesArray.push(tTriangle);
 		}
 	}
@@ -219,9 +219,9 @@ TTrianglesMatrix.prototype.get_totalTTrianglesArray = function(resultTotalTTrian
  * 어떤 일을 하고 있습니까?
  * @returns shortArray
  */
-TTrianglesMatrix.prototype.get_vbo_indices_ShortArray = function() {
+TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
 	this.totalTTrianglesArraySC.length = 0;
-	this.totalTTrianglesArraySC = this.get_totalTTrianglesArray(this.totalTTrianglesArraySC);
+	this.totalTTrianglesArraySC = this.getTotalTTrianglesArray(this.totalTTrianglesArraySC);
 	
 	var tTriangle;
 	var tTriangles_count = this.totalTTrianglesArraySC.length;
@@ -254,7 +254,7 @@ var Vertex = function() {
  * @param y 변수
  * @param z 변수
  */
-Vertex.prototype.set_position = function(x, y, z) {
+Vertex.prototype.setPosition = function(x, y, z) {
 	this.point3d.set(x, y, z);
 };
 
@@ -264,7 +264,7 @@ Vertex.prototype.set_position = function(x, y, z) {
  * @param g 변수
  * @param b 변수
  */
-Vertex.prototype.set_colorRGB = function(r, g, b) {
+Vertex.prototype.setColorRGB = function(r, g, b) {
 	if(this.color4 == undefined)
 		this.color4 = new Color();
 	
@@ -278,7 +278,7 @@ Vertex.prototype.set_colorRGB = function(r, g, b) {
  * @param b 변수
  * @param alpha 변수
  */
-Vertex.prototype.set_colorRGBA = function(r, g, b, alpha) {
+Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
 	if(this.color4 == undefined)
 		this.color4 = new Color();
 	
@@ -307,7 +307,7 @@ var VertexList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vertex
  */
-VertexList.prototype.new_vertex = function() {
+VertexList.prototype.newVertex = function() {
 	var vertex = new Vertex();
 	this.vertexArray.push(vertex);
 	return vertex;
@@ -318,7 +318,7 @@ VertexList.prototype.new_vertex = function() {
  * @param idx 변수
  * @returns vertexArray[idx]
  */
-VertexList.prototype.get_vertex = function(idx) {
+VertexList.prototype.getVertex = function(idx) {
 	return this.vertexArray[idx];
 };
 
@@ -326,7 +326,7 @@ VertexList.prototype.get_vertex = function(idx) {
  * 어떤 일을 하고 있습니까?
  * @returns vertexArray.length
  */
-VertexList.prototype.get_vertexCount = function() {
+VertexList.prototype.getVertexCount = function() {
 	return this.vertexArray.length;
 };
 
@@ -334,10 +334,10 @@ VertexList.prototype.get_vertexCount = function() {
  * 어떤 일을 하고 있습니까?
  * @param vertexCount 변수
  */
-VertexList.prototype.create_nVertex = function(vertexCount) {
+VertexList.prototype.createNVertex = function(vertexCount) {
 	for(var i=0; i<vertexCount; i++)
 	{
-		this.new_vertex();
+		this.newVertex();
 	}
 };
 
@@ -348,7 +348,7 @@ VertexList.prototype.create_nVertex = function(vertexCount) {
  * @param dir_z 변수
  * @param distance 변수
  */
-VertexList.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance) {
+VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
 	var vertex_count = this.vertexArray.length;
 	for(var i=0; i<vertex_count; i++)
 	{
@@ -361,7 +361,7 @@ VertexList.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance
  * @param resultBox 변수
  * @returns resultBox
  */
-VertexList.prototype.get_boundingBox = function(resultBox) {
+VertexList.prototype.getBoundingBox = function(resultBox) {
 	if(resultBox == undefined)
 		resultBox = new BoundingBox();
 	
@@ -380,7 +380,7 @@ VertexList.prototype.get_boundingBox = function(resultBox) {
  * 어떤 일을 하고 있습니까?
  * @param transformMatrix 변수
  */
-VertexList.prototype.transformPoints_byMatrix4 = function(transformMatrix) {
+VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 	var vertex;
 	
 	var vertex_count = this.vertexArray.length;
@@ -405,7 +405,7 @@ var VertexMatrix = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-VertexMatrix.prototype.new_vertexList = function() {
+VertexMatrix.prototype.newVertexList = function() {
 	var vertexList = new VertexList();
 	this.vertexListsArray.push(vertexList);
 	return vertexList;
@@ -416,7 +416,7 @@ VertexMatrix.prototype.new_vertexList = function() {
  * @param idx 변수
  * @returns vertexListArray[idx]
  */
-VertexMatrix.prototype.get_vertexList = function(idx) {
+VertexMatrix.prototype.getVertexList = function(idx) {
 	if(idx >= 0 && idx < this.vertexListsArray.length)
 	{
 		return this.vertexListsArray[idx];
@@ -431,12 +431,12 @@ VertexMatrix.prototype.get_vertexList = function(idx) {
  * @param resultBox
  * @returns resultBox
  */
-VertexMatrix.prototype.get_boundingBox = function(resultBox) {
+VertexMatrix.prototype.getBoundingBox = function(resultBox) {
 	if(resultBox == undefined)
 		resultBox = new BoundingBox();
 	
 	this.totalVertexArraySC.length = 0;
-	this.totalVertexArraySC = this.get_totalVertexArray(this.totalVertexArraySC);
+	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	var total_vertex_count = this.totalVertexArraySC.length;
 	
 	for(var i=0; i<total_vertex_count; i++)
@@ -453,7 +453,7 @@ VertexMatrix.prototype.get_boundingBox = function(resultBox) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-VertexMatrix.prototype.set_vertexIdxInList = function() {
+VertexMatrix.prototype.setVertexIdxInList = function() {
 	var idx_in_list = 0;
 	var vertex;
 	var vtxList;
@@ -464,7 +464,7 @@ VertexMatrix.prototype.set_vertexIdxInList = function() {
 		vertex_count = vtxList.vertexArray.length;
 		for(var j=0; j<vertex_count; j++)
 		{
-			vertex = vtxList.get_vertex(j);
+			vertex = vtxList.getVertex(j);
 			vertex.m_idx_inList = idx_in_list;
 			idx_in_list++;
 		}
@@ -475,12 +475,12 @@ VertexMatrix.prototype.set_vertexIdxInList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vertexCount
  */
-VertexMatrix.prototype.get_vertexCount = function() {
+VertexMatrix.prototype.getVertexCount = function() {
 	var vertexCount = 0;
 	var vertexLists_count = this.vertexListsArray.length;
 	for(var i=0; i<vertexLists_count; i++)
 	{
-		vertexCount += this.vertexListsArray[i].get_vertexCount();
+		vertexCount += this.vertexListsArray[i].getVertexCount();
 	}
 	
 	return vertexCount;
@@ -491,7 +491,7 @@ VertexMatrix.prototype.get_vertexCount = function() {
  * @param resultTotalVertexArray 변수
  * @returns resultTotalVertexArray
  */
-VertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArray) {
+VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
 	var vertexLists_count = this.vertexListsArray.length;
 	for(var i=0; i<vertexLists_count; i++)
 	{
@@ -499,7 +499,7 @@ VertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArray) {
 		var vertex_count = vtxList.vertexArray.length;
 		for(var j=0; j<vertex_count; j++)
 		{
-			var vertex = vtxList.get_vertex(j);
+			var vertex = vtxList.getVertex(j);
 			resultTotalVertexArray.push(vertex);
 		}
 	}
@@ -512,9 +512,9 @@ VertexMatrix.prototype.get_totalVertexArray = function(resultTotalVertexArray) {
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.get_vbo_vertexColor_FloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
-	this.totalVertexArraySC = this.get_totalVertexArray(this.totalVertexArraySC);
+	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined)
@@ -541,9 +541,9 @@ VertexMatrix.prototype.get_vbo_vertexColor_FloatArray = function(resultFloatArra
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.get_vbo_vertexColorRGBA_FloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
-	this.totalVertexArraySC = this.get_totalVertexArray(this.totalVertexArraySC);
+	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined)
@@ -571,9 +571,9 @@ VertexMatrix.prototype.get_vbo_vertexColorRGBA_FloatArray = function(resultFloat
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.get_vbo_vertex_FloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
-	this.totalVertexArraySC = this.get_totalVertexArray(this.totalVertexArraySC);
+	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined)
@@ -598,11 +598,11 @@ VertexMatrix.prototype.get_vbo_vertex_FloatArray = function(resultFloatArray) {
  * @param dir_z 변수
  * @param distance 변수
  */
-VertexMatrix.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distance) {
+VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
 	var vertexLists_count = this.vertexListsArray.length;
 	for(var i=0; i<vertexLists_count; i++)
 	{
-		this.vertexListsArray[i].translate_vertices(dir_x, dir_y, dir_z, distance);
+		this.vertexListsArray[i].translateVertices(dir_x, dir_y, dir_z, distance);
 	}
 };
 
@@ -610,7 +610,7 @@ VertexMatrix.prototype.translate_vertices = function(dir_x, dir_y, dir_z, distan
  * 어떤 일을 하고 있습니까?
  * @param tTrianglesMatrix 변수
  */
-VertexMatrix.prototype.make_tTriangles_lateralSidesLOOP = function(tTrianglesMatrix) {
+VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) {
 	// condition: all the vertex lists must have the same number of vertex.***
 	//--------------------------------------------------------------------------
 	var vtxList_1;
@@ -625,23 +625,23 @@ VertexMatrix.prototype.make_tTriangles_lateralSidesLOOP = function(tTrianglesMat
 	{
 		vtxList_1 = this.vertexListsArray[i];
 		vtxList_2 = this.vertexListsArray[i+1];
-		tTrianglesList = tTrianglesMatrix.new_tTrianglesList();
+		tTrianglesList = tTrianglesMatrix.newTTrianglesList();
 		
 		vertex_count = vtxList_1.vertexArray.length;
 		for(var j=0; j<vertex_count; j++)
 		{
-			tTriangle_1 = tTrianglesList.new_tTriangle();
-			tTriangle_2 = tTrianglesList.new_tTriangle();
+			tTriangle_1 = tTrianglesList.newTTriangle();
+			tTriangle_2 = tTrianglesList.newTTriangle();
 			
 			if(j == vertex_count-1)
 			{
-				tTriangle_1.set_vertices(vtxList_1.get_vertex(j), vtxList_2.get_vertex(j), vtxList_2.get_vertex(0)); 
-				tTriangle_2.set_vertices(vtxList_1.get_vertex(j), vtxList_2.get_vertex(0), vtxList_1.get_vertex(0)); 
+				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(0)); 
+				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(0), vtxList_1.getVertex(0)); 
 			}
 			else
 			{
-				tTriangle_1.set_vertices(vtxList_1.get_vertex(j), vtxList_2.get_vertex(j), vtxList_2.get_vertex(j+1)); 
-				tTriangle_2.set_vertices(vtxList_1.get_vertex(j), vtxList_2.get_vertex(j+1), vtxList_1.get_vertex(j+1)); 
+				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(j+1)); 
+				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j+1), vtxList_1.getVertex(j+1)); 
 			}
 		}
 	}
@@ -651,13 +651,13 @@ VertexMatrix.prototype.make_tTriangles_lateralSidesLOOP = function(tTrianglesMat
  * 어떤 일을 하고 있습니까?
  * @param transformMatrix
  */
-VertexMatrix.prototype.transformPoints_byMatrix4 = function(transformMatrix) {
+VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 	var vtxList;
 	var vertexLists_count = this.vertexListsArray.length;
 	for(var i=0; i<vertexLists_count; i++)
 	{
 		vtxList = this.vertexListsArray[i];
-		vtxList.transformPoints_byMatrix4(transformMatrix);
+		vtxList.transformPointsByMatrix4(transformMatrix);
 	}
 };
 
@@ -723,7 +723,7 @@ BoundingBox.prototype.addBox = function(boundingBox) {
  * 어떤 일을 하고 있습니까?
  * @returns result
  */
-BoundingBox.prototype.get_maxLength = function() {
+BoundingBox.prototype.getMaxLength = function() {
   var result = this._maxX - this._minX;
   var dim_y = this._maxY - this._minY;
   var dim_z = this._maxZ - this._minZ;
@@ -738,7 +738,7 @@ BoundingBox.prototype.get_maxLength = function() {
  * @param resultPoint3d
  * @returns resultPoint3d
  */
-BoundingBox.prototype.get_centerPoint3d = function(resultPoint3d) {
+BoundingBox.prototype.getCenterPoint3d = function(resultPoint3d) {
 	if(resultPoint3d == undefined)
 		resultPoint3d = new Point3D();
 	
@@ -980,7 +980,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 	var current_meshArrays = null;
 	var meshArrays_count = general_VertexIdxVBO_ArraysContainer._meshArrays.length;
 	if(meshArrays_count == 0) {
-		current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdx_Array();
+		current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 	} else {
 		current_meshArrays = general_VertexIdxVBO_ArraysContainer._meshArrays[meshArrays_count-1]; // take the last.***
 	}
@@ -1000,7 +1000,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 	  
 	for(var i=0; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
-			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdx_Array();
+			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 			curr_vtx_count = 0;
 		}
 		  
@@ -1019,11 +1019,11 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
  * 어떤 일을 하고 있습니까?
  * @param general_VertexIdxVBO_ArraysContainer 변수
  */
-TrianglesSurface.prototype.getVertexIndicesArrays_original = function(general_VertexIdxVBO_ArraysContainer) {
+TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_VertexIdxVBO_ArraysContainer) {
 	var current_meshArrays = null;
 	var meshArrays_count = general_VertexIdxVBO_ArraysContainer._meshArrays.length;
 	if(meshArrays_count == 0) {
-		current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdx_Array();
+		current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 	} else {
 		current_meshArrays = general_VertexIdxVBO_ArraysContainer._meshArrays[meshArrays_count-1]; // take the last.***
 	}
@@ -1034,7 +1034,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays_original = function(general_Ve
 	var ftriangles_count = this.mTrianglesArray.length;
 	for(var i=0; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
-			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdx_Array();
+			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 		}
 		  
 		var ftriangle = this.mTrianglesArray[i];
@@ -1304,9 +1304,9 @@ Quaternion.prototype.Unitary = function() {
  * @param axis_y 변수
  * @param axis_z 변수
  */
-Quaternion.prototype.Rotation_angDeg = function(angDeg, axis_x, axis_y, axis_z) {
+Quaternion.prototype.rotationAngDeg = function(angDeg, axis_x, axis_y, axis_z) {
 	var angRad = angDeg*Math.PI/180.0;
-	this.Rotation_angRad(angRad, axis_x, axis_y, axis_z);
+	this.rotationAngRad(angRad, axis_x, axis_y, axis_z);
 };
 
 /**
@@ -1316,7 +1316,7 @@ Quaternion.prototype.Rotation_angDeg = function(angDeg, axis_x, axis_y, axis_z) 
  * @param axis_y 변수
  * @param axis_z 변수
  */
-Quaternion.prototype.Rotation_angRad = function(angRad, axis_x, axis_y, axis_z) {
+Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
 	var s = Math.sqrt(axis_x*axis_x + axis_y*axis_y + axis_z*axis_z);
 	var error = 10E-13;
 	if(!s < error)
@@ -1394,7 +1394,7 @@ Matrix4.prototype.Identity = function() {
  * 어떤 일을 하고 있습니까?
  * @returns rowMajor_matrix
  */
-Matrix4.prototype.get_RowMajorMatrix = function() {
+Matrix4.prototype.getRowMajorMatrix = function() {
 	var rowMajor_matrix = new Float32Array(16);
 	
 	rowMajor_matrix[0] = this.get(0,0);
@@ -1427,10 +1427,10 @@ Matrix4.prototype.get_RowMajorMatrix = function() {
  * @param axis_y 변수
  * @param axis_z 변수
  */
-Matrix4.prototype.RotationAxis_angDeg = function(angDeg, axis_x, axis_y, axis_z) {
+Matrix4.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z) {
 	var quaternion = new Quaternion();
-	quaternion.Rotation_angDeg(angDeg, axis_x, axis_y, axis_z);
-	this.Rotation_byQuaternion(quaternion);
+	quaternion.rotationAngDeg(angDeg, axis_x, axis_y, axis_z);
+	this.rotationByQuaternion(quaternion);
 };
 
 /**
@@ -1440,17 +1440,17 @@ Matrix4.prototype.RotationAxis_angDeg = function(angDeg, axis_x, axis_y, axis_z)
  * @param axis_y 변수
  * @param axis_z 변수
  */
-Matrix4.prototype.RotationAxis_angRad = function(angRad, axis_x, axis_y, axis_z) {
+Matrix4.prototype.rotationAxisAngRad = function(angRad, axis_x, axis_y, axis_z) {
 	var quaternion = new Quaternion();
-	quaternion.Rotation_angRad(angRad, axis_x, axis_y, axis_z);
-	this.Rotation_byQuaternion(quaternion);
+	quaternion.rotationAngRad(angRad, axis_x, axis_y, axis_z);
+	this.rotationByQuaternion(quaternion);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @param quaternion 변수
  */
-Matrix4.prototype.Rotation_byQuaternion = function(quaternion) {
+Matrix4.prototype.rotationByQuaternion = function(quaternion) {
 	var w = quaternion.w;
 	var x = quaternion.x;
 	var y = quaternion.y;
@@ -1592,7 +1592,7 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
  * 어떤 일을 하고 있습니까?
  * @returns subBox
  */
-OcclusionCullingOctreeCell.prototype.new_subBox = function() {
+OcclusionCullingOctreeCell.prototype.newSubBox = function() {
 	var subBox = new OcclusionCullingOctreeCell(this);
 	this._subBoxesArray.push(subBox);
 	return subBox;
@@ -1601,12 +1601,12 @@ OcclusionCullingOctreeCell.prototype.new_subBox = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-OcclusionCullingOctreeCell.prototype.create_8_subBoxes = function() {
+OcclusionCullingOctreeCell.prototype.create8SubBoxes = function() {
 	this._subBoxesArray.length = 0; // reset the array.***
 	
 	for(var i=0; i<8; i++)
 	{
-		this.new_subBox();
+		this.newSubBox();
 	}
 };
 
@@ -1619,7 +1619,7 @@ OcclusionCullingOctreeCell.prototype.create_8_subBoxes = function() {
  * @param min_z 변수
  * @param max_z 변수
  */
-OcclusionCullingOctreeCell.prototype.set_dimensions = function(min_x, max_x, min_y, max_y, min_z, max_z) {
+OcclusionCullingOctreeCell.prototype.setDimensions = function(min_x, max_x, min_y, max_y, min_z, max_z) {
 	this._minX = min_x;
 	this._maxX = max_x;
 	this._minY = min_y;
@@ -1631,7 +1631,7 @@ OcclusionCullingOctreeCell.prototype.set_dimensions = function(min_x, max_x, min
 /**
  * 어떤 일을 하고 있습니까?
  */
-OcclusionCullingOctreeCell.prototype.set_sizesSubBoxes = function() {
+OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 	// Bottom                      Top
 	// |----------|----------|     |----------|----------|
 	// |          |          |     |          |          |       Y
@@ -1649,19 +1649,19 @@ OcclusionCullingOctreeCell.prototype.set_sizesSubBoxes = function() {
 		var half_y= (this._maxY + this._minY)/2.0;
 		var half_z= (this._maxZ + this._minZ)/2.0;
 		
-		this._subBoxesArray[0].set_dimensions(this._minX, half_x,   this._minY, half_y,   this._minZ, half_z);
-		this._subBoxesArray[1].set_dimensions(half_x, this._maxX,   this._minY, half_y,   this._minZ, half_z);
-		this._subBoxesArray[2].set_dimensions(half_x, this._maxX,   half_y, this._maxY,   this._minZ, half_z);
-		this._subBoxesArray[3].set_dimensions(this._minX, half_x,   half_y, this._maxY,   this._minZ, half_z);
+		this._subBoxesArray[0].setDimensions(this._minX, half_x,   this._minY, half_y,   this._minZ, half_z);
+		this._subBoxesArray[1].setDimensions(half_x, this._maxX,   this._minY, half_y,   this._minZ, half_z);
+		this._subBoxesArray[2].setDimensions(half_x, this._maxX,   half_y, this._maxY,   this._minZ, half_z);
+		this._subBoxesArray[3].setDimensions(this._minX, half_x,   half_y, this._maxY,   this._minZ, half_z);
 
-		this._subBoxesArray[4].set_dimensions(this._minX, half_x,   this._minY, half_y,   half_z, this._maxZ);
-		this._subBoxesArray[5].set_dimensions(half_x, this._maxX,   this._minY, half_y,   half_z, this._maxZ);
-		this._subBoxesArray[6].set_dimensions(half_x, this._maxX,   half_y, this._maxY,   half_z, this._maxZ);
-		this._subBoxesArray[7].set_dimensions(this._minX, half_x,   half_y, this._maxY,   half_z, this._maxZ);
+		this._subBoxesArray[4].setDimensions(this._minX, half_x,   this._minY, half_y,   half_z, this._maxZ);
+		this._subBoxesArray[5].setDimensions(half_x, this._maxX,   this._minY, half_y,   half_z, this._maxZ);
+		this._subBoxesArray[6].setDimensions(half_x, this._maxX,   half_y, this._maxY,   half_z, this._maxZ);
+		this._subBoxesArray[7].setDimensions(this._minX, half_x,   half_y, this._maxY,   half_z, this._maxZ);
 		
 		for(var i=0; i<this._subBoxesArray.length; i++)
 		{
-			this._subBoxesArray[i].set_sizesSubBoxes();
+			this._subBoxesArray[i].setSizesSubBoxes();
 		}
 	}
 };
@@ -1673,7 +1673,7 @@ OcclusionCullingOctreeCell.prototype.set_sizesSubBoxes = function() {
  * @param z 변수
  * @returns intersects
  */
-OcclusionCullingOctreeCell.prototype.intersects_withPoint3D = function(x, y, z) {
+OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z) {
 	var intersects = false;
 	
 	if(x>this._minX && x<this._maxX)
@@ -1697,13 +1697,13 @@ OcclusionCullingOctreeCell.prototype.intersects_withPoint3D = function(x, y, z) 
  * @param z 변수
  * @returns intersectedSubBox
  */
-OcclusionCullingOctreeCell.prototype.get_IntersectedSubBox_byPoint3D = function(x, y, z) {
+OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z) {
 	var intersectedSubBox = null;
 	
 	if(this._ocCulling_Cell_owner == null)
 	{
 		// This is the mother_cell.***
-		if(!this.intersects_withPoint3D(x, y, z))
+		if(!this.intersectsWithPoint3D(x, y, z))
 		{
 			return null;
 		}
@@ -1753,7 +1753,7 @@ OcclusionCullingOctreeCell.prototype.get_IntersectedSubBox_byPoint3D = function(
 		}
 		
 		intersectedSubBox_aux = this._subBoxesArray[intersectedSubBox_idx];
-		intersectedSubBox = intersectedSubBox_aux.get_IntersectedSubBox_byPoint3D(x, y, z);
+		intersectedSubBox = intersectedSubBox_aux.getIntersectedSubBoxByPoint3D(x, y, z);
 		
 	}
 	else
@@ -1772,8 +1772,8 @@ OcclusionCullingOctreeCell.prototype.get_IntersectedSubBox_byPoint3D = function(
  * @param result_visibleIndicesArray 변수
  * @returns result_visibleIndicesArray
  */
-OcclusionCullingOctreeCell.prototype.get_IndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray) {
-	var intersectedSubBox = this.get_IntersectedSubBox_byPoint3D(eye_x, eye_y, eye_z);
+OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray) {
+	var intersectedSubBox = this.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
 	
 	if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
 	{
@@ -1803,7 +1803,7 @@ OcclusionCullingOctreeCell.prototype.expandBox = function(expansionDist) {
  * @param f4dReaderWriter 변수
  * @returns bytes_readed
  */
-OcclusionCullingOctreeCell.prototype.parse_arrayBuffer = function(arrayBuffer, bytes_readed, f4dReaderWriter) {
+OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, bytes_readed, f4dReaderWriter) {
 	// Important note: this is the version of neoGeometry.***
 	// Important note: this is the version of neoGeometry.***
 	// Important note: this is the version of neoGeometry.***
@@ -1818,7 +1818,7 @@ OcclusionCullingOctreeCell.prototype.parse_arrayBuffer = function(arrayBuffer, b
 		var minZ = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var maxZ = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		
-		this.set_dimensions(minX, maxX, minY, maxY, minZ, maxZ);
+		this.setDimensions(minX, maxX, minY, maxY, minZ, maxZ);
 	}
 	else{
 		// do nothing.***
@@ -1838,8 +1838,8 @@ OcclusionCullingOctreeCell.prototype.parse_arrayBuffer = function(arrayBuffer, b
 	else{
 		for(var i=0; i<subBoxes_count; i++)
 		{
-			var subOcclusionBox = this.new_subBox();
-			bytes_readed = this.parse_arrayBuffer(arrayBuffer, bytes_readed, f4dReaderWriter);
+			var subOcclusionBox = this.newSubBox();
+			bytes_readed = this.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReaderWriter);
 		}
 	}
 	
@@ -1974,9 +1974,9 @@ var CompoundReferencesList = function() {
  * @param eye_y 변수
  * @param eye_z 변수
  */
-CompoundReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z) {
-	this._currentVisibleIndicesSC = this._ocCulling._infinite_ocCulling_box.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
-	this._currentVisibleIndicesSC_2 = this._ocCulling._ocCulling_box.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
+CompoundReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y, eye_z) {
+	this._currentVisibleIndicesSC = this._ocCulling._infinite_ocCulling_box.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
+	this._currentVisibleIndicesSC_2 = this._ocCulling._ocCulling_box.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 	this._currentVisibleIndices = this._currentVisibleIndicesSC.concat(this._currentVisibleIndicesSC_2);
 };
 
@@ -1986,8 +1986,8 @@ CompoundReferencesList.prototype.update_currentVisibleIndices = function(eye_x, 
  * @param eye_y 변수
  * @param eye_z 변수
  */
-CompoundReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z) {
-	this._currentVisibleIndices = this._ocCulling._ocCulling_box.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndices);
+CompoundReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(eye_x, eye_y, eye_z) {
+	this._currentVisibleIndices = this._ocCulling._ocCulling_box.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndices);
 };
 
 /**
@@ -2072,11 +2072,11 @@ CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoun
  * @param eye_y 변수
  * @param eye_z 변수
  */
-CompoundReferencesListContainer.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z) {
+CompoundReferencesListContainer.prototype.updateCurrentVisibleIndicesOfLists = function(eye_x, eye_y, eye_z) {
 	var compRefLists_count = this._compRefsList_Array.length;
 	for(var i=0; i<compRefLists_count; i++)
 	{
-		this._compRefsList_Array[i].update_currentVisibleIndices(eye_x, eye_y, eye_z);
+		this._compRefsList_Array[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
 	}
 };
 
@@ -2085,7 +2085,7 @@ CompoundReferencesListContainer.prototype.update_currentVisibleIndices_ofLists =
  * @param compRefListsName 변수
  * @returns result_compRefList
  */
-CompoundReferencesListContainer.prototype.get_CompRefList_byName = function(compRefListsName) {
+CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRefListsName) {
 	var result_compRefList;
 	var found = false;
 	var compRefLists_count = this._compRefsList_Array.length;
@@ -2153,7 +2153,7 @@ var VertexIdxVBOArraysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vi_array
  */
-VertexIdxVBOArraysContainer.prototype.newVertexIdx_Array = function() {
+VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
 	var vi_array = new VertexIdxArrays();
 	this._meshArrays.push(vi_array);
 	return vi_array;
@@ -2177,7 +2177,7 @@ var ByteColorsVBOArraysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @returns byteColors_array
  */
-ByteColorsVBOArraysContainer.prototype.newByteColorsVBO_Array = function() {
+ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
 	var byteColors_array = new ByteColorsVBOArrays();
 	this._meshArrays.push(byteColors_array);
 	return byteColors_array;
@@ -2251,7 +2251,7 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
  * @param blockList_name = 변수
  * @returns blocksList
  */
-BlocksListsContainer.prototype.get_BlockList = function(blockList_name) {
+BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
 	var blocksLists_count = this._BlocksListsArray.length;
   	var found = false;
   	var i=0;
@@ -2313,7 +2313,7 @@ var VertexTexcoordsArraysCacheKeysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vt_cacheKey
  */
-VertexTexcoordsArraysCacheKeysContainer.prototype.new_VertexTexcoordsArraysCacheKey = function() {
+VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheKey = function() {
 	var vt_cacheKey = new VertexTexcoordsArraysCacheKeys();
 	this._vtArrays_cacheKeys_array.push(vt_cacheKey);
 	return vt_cacheKey;
@@ -2337,7 +2337,7 @@ var SimpleStorey = function() {
  * 어떤 일을 하고 있습니까?
  * @returns simpleObject
  */
-SimpleStorey.prototype.new_simpleObject = function() {
+SimpleStorey.prototype.newSimpleObject = function() {
 	var simpleObject = new SimpleObject();
 	this._simpleObjects_array.push(simpleObject);
 	return simpleObject;
@@ -2357,7 +2357,7 @@ var SimpleBuilding = function() {
  * 어떤 일을 하고 있습니까?
  * @returns storey
  */
-SimpleBuilding.prototype.new_simpleStorey = function() {
+SimpleBuilding.prototype.newSimpleStorey = function() {
 	var storey = new SimpleStorey();
 	this._simpleStoreys_list.push(storey);
 	return storey;
@@ -2388,7 +2388,7 @@ var SimpleBuildingV1 = function() {
  * 어떤 일을 하고 있습니까?
  * @returns simpleObject
  */
-SimpleBuildingV1.prototype.new_simpleObject = function() {
+SimpleBuildingV1.prototype.newSimpleObject = function() {
 	var simpleObject = new SimpleObject();
 	this._simpleObjects_array.push(simpleObject);
 	return simpleObject;
@@ -2504,7 +2504,7 @@ Octree.prototype.getOctree = function(octreeNumberName, numDigits) {
  * @param octreeNumberName 변수
  * @returns motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
  */
-Octree.prototype.getOctree_byNumberName = function(octreeNumberName) {
+Octree.prototype.getOctreeByNumberName = function(octreeNumberName) {
 	var motherOctree = this.getMotherOctree();
 	  
 	var numDigits = this.getNumberOfDigits(octreeNumberName);
@@ -2734,7 +2734,7 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 		var hola=0;
 	}
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	this.getFrustumVisibleOctrees_NeoBuilding(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
+	this.getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
 	
 	// Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
@@ -2759,7 +2759,7 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  * @param result_octreesArray 변수
  * @param cesium_boundingSphere_scratch 변수
  */
-Octree.prototype.getFrustumVisibleOctrees_NeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
+Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
 	if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0)
 	//if(this.subOctrees_array.length == 0 && this._compRefsList_Array.length == 0) // For use with ifc buildings.***
 		return;
@@ -2805,7 +2805,7 @@ Octree.prototype.getFrustumVisibleOctrees_NeoBuilding = function(cesium_cullingV
 		{
 			for(var i=0; i<this.subOctrees_array.length; i++ )
 			{
-				this.subOctrees_array[i].getFrustumVisibleOctrees_NeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
+				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
 	}
@@ -2889,7 +2889,7 @@ Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z) {
  * @param octree 변수
  * @returns result_idx
  */
-Octree.prototype.getIndexToInsert_bySquaredDistToEye = function(octreesArray, octree) {
+Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree) {
 	// lineal implementation. In the future use dicotomic search technique.***
 	var finished = false;
 	var octrees_count = octreesArray.length;
@@ -2922,7 +2922,7 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
 	// sorting is from minDist to maxDist.***
 	// http://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index
 				
-	var insert_idx= this.getIndexToInsert_bySquaredDistToEye(result_octreesArray, octree);
+	var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree);
 		
 	result_octreesArray.splice(insert_idx, 0, octree);
 };
@@ -2991,7 +2991,7 @@ var BRBuildingProject = function() {
 	  
 	// Blocks data.***************************************************************
 	this._blocksList_Container = new BlocksListsContainer();
-	this.create_DefaultBlockReferencesLists();
+	this.createDefaultBlockReferencesLists();
 	  
 	// Compound references data.**************************************************
 	this.octree;
@@ -3060,7 +3060,7 @@ var BRBuildingProject = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-BRBuildingProject.prototype.calculate_TotalTrianglesCount = function() {
+BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
 	// This is temp function for debugging.***
 	var compRefList;
 	var compRefs_count = 0;
@@ -3081,7 +3081,7 @@ BRBuildingProject.prototype.calculate_TotalTrianglesCount = function() {
  * @param absolute_eye_z 변수
  * @returns point3d_scratch_2
  */ 
-BRBuildingProject.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
+BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this._buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
@@ -3117,8 +3117,8 @@ BRBuildingProject.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, ey
  * @param eye_y 변수
  * @param eye_z 변수
  */
-BRBuildingProject.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z) {
-	this._compRefList_Container.update_currentVisibleIndices_ofLists(eye_x, eye_y, eye_z);
+BRBuildingProject.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_y, eye_z) {
+	this._compRefList_Container.updateCurrentVisibleIndicesOfLists(eye_x, eye_y, eye_z);
 };
 
 /**
@@ -3161,7 +3161,7 @@ BRBuildingProject.prototype.getAllCompRefLists = function() {
  */
 BRBuildingProject.prototype.getRadiusAprox = function() {
 	if(this._boundingBox == undefined) {
-		var compRefList = this._compRefList_Container.get_CompRefList_byName("Ref_Skin1");
+		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
 			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
@@ -3171,7 +3171,7 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
 			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
 			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
 			
-			this.radius_aprox = this._boundingBox.get_maxLength() / 2.0;
+			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
 	}
 	  
@@ -3211,7 +3211,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 	  
 	// Return the compReflList's occlussionCullingMotherBox.***
 	if(this._boundingBox == undefined) {
-		var compRefList = this._compRefList_Container.get_CompRefList_byName("Ref_Skin1");
+		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
 			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
@@ -3221,7 +3221,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
 			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
 			
-			this.radius_aprox = this._boundingBox.get_maxLength() / 2.0;
+			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
 	}
 	  
@@ -3231,7 +3231,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-BRBuildingProject.prototype.create_DefaultBlockReferencesLists = function() {
+BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
 	this._blocksList_Container.newBlocksList("Blocks1");
 	this._blocksList_Container.newBlocksList("Blocks2");
@@ -3282,7 +3282,7 @@ var BRBuildingProjectsList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns br_buildingProject
  */
-BRBuildingProjectsList.prototype.new_BR_Project = function() {
+BRBuildingProjectsList.prototype.newBRProject = function() {
 	//var titol = "holes a tothom"
 	//var br_buildingProject = new BRBuildingProject({Titol : titol});
 	var br_buildingProject = new BRBuildingProject();
@@ -3371,7 +3371,7 @@ var TerranTile = function() {
  * 어떤 일을 하고 있습니까?
  * @returns br_buildingProject
  */
-TerranTile.prototype.new_BR_Project = function() {
+TerranTile.prototype.newBRProject = function() {
 	var br_buildingProject = new BRBuildingProject();
 	this._BR_buildingsArray.push(br_buildingProject);
 	return br_buildingProject;
@@ -3381,7 +3381,7 @@ TerranTile.prototype.new_BR_Project = function() {
  * 어떤 일을 하고 있습니까?
  * @returns subTile
  */
-TerranTile.prototype.new_subTerranTile = function() {
+TerranTile.prototype.newSubTerranTile = function() {
 	var subTiles_count = this.subTiles_array.length;
 	var subTile = new TerranTile();
 	subTile._depth = this._depth + 1;
@@ -3395,7 +3395,7 @@ TerranTile.prototype.new_subTerranTile = function() {
  */
 TerranTile.prototype.make_4subTiles = function() {
 	for(var i=0; i<4; i++) {
-		var subTile = this.new_subTerranTile();
+		var subTile = this.newSubTerranTile();
 	}
 };
 
@@ -3406,7 +3406,7 @@ TerranTile.prototype.make_4subTiles = function() {
  * @param lat_min 변수
  * @param lat_max 변수
  */
-TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, lat_max) {
+TerranTile.prototype.setDimensions = function(lon_min, lon_max, lat_min, lat_max) {
 	this.longitude_min = lon_min;
 	this.longitude_max = lon_max;
 	this.latitude_min = lat_min;
@@ -3417,14 +3417,14 @@ TerranTile.prototype.set_dimensions = function(lon_min, lon_max, lat_min, lat_ma
  * 어떤 일을 하고 있습니까?
  * @param max_depth 변수
  */
-TerranTile.prototype.make_tree = function(max_depth) {
+TerranTile.prototype.makeTree = function(max_depth) {
 	if(this._depth < max_depth)
 	{
 		var subTile_aux;
 		for(var i=0; i<4; i++)
 		{
-			subTile_aux = this.new_subTerranTile();
-			subTile_aux.make_tree(max_depth);
+			subTile_aux = this.newSubTerranTile();
+			subTile_aux.makeTree(max_depth);
 		}
 	}
 };
@@ -3432,7 +3432,7 @@ TerranTile.prototype.make_tree = function(max_depth) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.calculate_position_byLonLat = function() {
+TerranTile.prototype.calculatePositionByLonLat = function() {
 	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
 	var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
 	
@@ -3449,15 +3449,15 @@ TerranTile.prototype.calculate_position_byLonLat = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.calculate_position_byLonLat_subTiles = function() {
-	this.calculate_position_byLonLat();
+TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
+	this.calculatePositionByLonLat();
 	
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
 
 	for(var i=0; i<subTiles_count; i++)
 	{
-		this.subTiles_array[i].calculate_position_byLonLat_subTiles();
+		this.subTiles_array[i].calculatePositionByLonLatSubTiles();
 	}
 };
 
@@ -3465,7 +3465,7 @@ TerranTile.prototype.calculate_position_byLonLat_subTiles = function() {
  * 어떤 일을 하고 있습니까?
  * @param BR_Project 변수
  */
-TerranTile.prototype.parseFile_header = function(BR_Project) {
+TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 		return;
@@ -3561,7 +3561,7 @@ TerranTile.prototype.parseFile_header = function(BR_Project) {
  * 어떤 일을 하고 있습니까?
  * @param BR_Project 변수
  */
-TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project) {
+TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 		return;
@@ -3583,8 +3583,8 @@ TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project) {
 	// single interleaved buffer mode.*********************************************************************************
 	for(var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
 	{
-		var simpObj = simpBuildingV1.new_simpleObject();
-		var vt_cacheKey = simpObj._vtCacheKeys_container.new_VertexTexcoordsArraysCacheKey();
+		var simpObj = simpBuildingV1.newSimpleObject();
+		var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
 		
 		var iDatas_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		startBuff = bytes_readed;
@@ -3613,7 +3613,7 @@ TerranTile.prototype.parseFile_simpleBuilding = function(BR_Project) {
  * @param BR_Project 변수
  * @param f4dManager 변수
  */
-TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager) {
+TerranTile.prototype.parseFileNailImage = function(BR_Project, f4dManager) {
 	//BR_Project._f4d_nailImage_readed = true;
 
 	if(BR_Project._simpleBuilding_v1 == undefined)
@@ -3642,7 +3642,7 @@ TerranTile.prototype.parseFile_nailImage = function(BR_Project, f4dManager) {
  * 어떤 일을 하고 있습니까?
  * @param f4dManager 변수
  */
-TerranTile.prototype.parseFile_allBuildings = function(f4dManager) {
+TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 	{
@@ -3673,12 +3673,12 @@ TerranTile.prototype.parseFile_allBuildings = function(f4dManager) {
 		var bytes_readed = this.fileBytesReaded;
 		this.fileBytesReaded = bytes_readed;
 		
-		this.current_BRProject_parsing = this.new_BR_Project();
+		this.current_BRProject_parsing = this.newBRProject();
 		//this.current_BRProject_parsing._f4d_rawPathName = rawFileNamePath;
 		
-		this.parseFile_header(this.current_BRProject_parsing);
-		this.parseFile_simpleBuilding(this.current_BRProject_parsing);
-		this.parseFile_nailImage(this.current_BRProject_parsing, f4dManager);
+		this.parseFileHeader(this.current_BRProject_parsing);
+		this.parseFileSimpleBuilding(this.current_BRProject_parsing);
+		this.parseFileNailImage(this.current_BRProject_parsing, f4dManager);
 	}
 	this.fileParsingFinished = true;
 	this.fileArrayBuffer = null;
@@ -3689,7 +3689,7 @@ TerranTile.prototype.parseFile_allBuildings = function(f4dManager) {
  * @param GL 변수
  * @param f4dManager 변수
  */
-TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager) {
+TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 	{
@@ -3714,7 +3714,7 @@ TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager) {
 		if(this.projectsParsed_count == 0)
 			this.fileBytesReaded = 4;
 		
-		this.current_BRProject_parsing = this.new_BR_Project();
+		this.current_BRProject_parsing = this.newBRProject();
 	}
 	
 	var BR_Project = this.current_BRProject_parsing;
@@ -3722,7 +3722,7 @@ TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager) {
 	// Read header, simpleBuilding, and the nailImage.***
 	if(this.current_BRProject_parsing_state == 0)
 	{
-		this.parseFile_header(BR_Project);
+		this.parseFileHeader(BR_Project);
 		this.current_BRProject_parsing_state=1;
 	}
 	else if(this.current_BRProject_parsing_state == 1)
@@ -3748,7 +3748,7 @@ TerranTile.prototype.parseFile_oneBuilding = function(GL, f4dManager) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.set_dimensionsSubTiles = function() {
+TerranTile.prototype.setDimensionsSubTiles = function() {
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
 	if(subTiles_count == 4)
@@ -3757,20 +3757,20 @@ TerranTile.prototype.set_dimensionsSubTiles = function() {
 		var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
 		
 		subTile = this.subTiles_array[0];
-		subTile.set_dimensions(this.longitude_min, lon_mid, this.latitude_min, lat_mid);
+		subTile.setDimensions(this.longitude_min, lon_mid, this.latitude_min, lat_mid);
 		
 		subTile = this.subTiles_array[1];
-		subTile.set_dimensions(lon_mid, this.longitude_max, this.latitude_min, lat_mid);
+		subTile.setDimensions(lon_mid, this.longitude_max, this.latitude_min, lat_mid);
 		
 		subTile = this.subTiles_array[2];
-		subTile.set_dimensions(lon_mid, this.longitude_max, lat_mid, this.latitude_max);
+		subTile.setDimensions(lon_mid, this.longitude_max, lat_mid, this.latitude_max);
 		
 		subTile = this.subTiles_array[3];
-		subTile.set_dimensions(this.longitude_min, lon_mid, lat_mid, this.latitude_max);
+		subTile.setDimensions(this.longitude_min, lon_mid, lat_mid, this.latitude_max);
 		
 		for(var i=0; i<subTiles_count; i++)
 		{
-			this.subTiles_array[i].set_dimensionsSubTiles();
+			this.subTiles_array[i].setDimensionsSubTiles();
 		}
 	}
 };
@@ -3779,14 +3779,14 @@ TerranTile.prototype.set_dimensionsSubTiles = function() {
  * 어떤 일을 하고 있습니까?
  * @param smallefstTiles_array 변수
  */
-TerranTile.prototype.get_smallestTiles = function(smallestTiles_array) {
+TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
 	if(this.subTiles_array.length > 0)
 	{
 		for(var i=0; i<this.subTiles_array.length; i++)
 		{
 			this.subTiles_array[i].visibilityType = this.visibilityType;
-			this.subTiles_array[i].get_smallestTiles(smallestTiles_array);
+			this.subTiles_array[i].getSmallestTiles(smallestTiles_array);
 		}
 	}
 	else{
@@ -3801,14 +3801,14 @@ TerranTile.prototype.get_smallestTiles = function(smallestTiles_array) {
  * @param intersectedSmallestTiles_array 변수
  * @param boundingSphere_Aux 변수
  */
-TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux) {
+TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux) {
 	var intersectedTiles_array = [];
-	this.get_intersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
+	this.getIntersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
 	
 	var intersectedTiles_count = intersectedTiles_array.length;
 	for(var i=0; i<intersectedTiles_count; i++)
 	{
-		intersectedTiles_array[i].get_smallestTiles(intersectedSmallestTiles_array);
+		intersectedTiles_array[i].getSmallestTiles(intersectedSmallestTiles_array);
 	}
 	intersectedTiles_array.length = 0;
 };
@@ -3819,7 +3819,7 @@ TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, inte
  * @param intersectedTiles_array 변수
  * @param boundingSphere_Aux 변수
  */
-TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
+TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
 	// Cesium dependency.***
 	if(this.position == undefined)
 		return;
@@ -3867,7 +3867,7 @@ TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedT
 		{
 			for(var i=0; i<this.subTiles_array.length; i++)
 			{
-				this.subTiles_array[i].get_intersectedTiles(frustumVolume, intersectedTiles_array);
+				this.subTiles_array[i].getIntersectedTiles(frustumVolume, intersectedTiles_array);
 			}
 		}
 		else{

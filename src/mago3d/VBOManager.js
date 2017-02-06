@@ -49,7 +49,7 @@ var VBOVertexIdxCacheKeysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vbo_VIcacheKey
  */
-VBOVertexIdxCacheKeysContainer.prototype.new_VBO_VertexIdxCacheKey = function() {
+VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
 	var vbo_VIcacheKey = new VBOVertexIdxCacheKey();
 	this._vbo_cacheKeysArray.push(vbo_VIcacheKey);
 	return vbo_VIcacheKey;
@@ -74,7 +74,7 @@ var VBOByteColorCacheKeysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @return vbo_byteCol_cacheKey
  */
-VBOByteColorCacheKeysContainer.prototype.new_VBO_ByteColorsCacheKey = function() {
+VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function() {
     var vbo_byteCol_cacheKey = new VBOByteColorCacheKey();
     this._vbo_byteColors_cacheKeysArray.push(vbo_byteCol_cacheKey);
     return vbo_byteCol_cacheKey;
