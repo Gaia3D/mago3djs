@@ -13,7 +13,7 @@ var GeometryModifier = function() {
  * @param py 변수
  * @param pz 변수
  */
-GeometryModifier.prototype.set_point3d = function(f4d_point3d, px, py, pz) {
+GeometryModifier.prototype.setPoint3d = function(f4d_point3d, px, py, pz) {
 	f4d_point3d.x = px;
 	f4d_point3d.y = py;
 	f4d_point3d.z = pz;
@@ -27,7 +27,7 @@ GeometryModifier.prototype.set_point3d = function(f4d_point3d, px, py, pz) {
  * @param pz 변수
  * @retuns dx*dx + dy*dy + dz*dz
  */
-GeometryModifier.prototype.point3d_squareDistTo = function(f4d_point3d, px, py, pz) {
+GeometryModifier.prototype.point3dSquareDistTo = function(f4d_point3d, px, py, pz) {
 	var dx = f4d_point3d.x - px;
 	var dy = f4d_point3d.y - py;
 	var dz = f4d_point3d.z - pz;
@@ -40,7 +40,7 @@ GeometryModifier.prototype.point3d_squareDistTo = function(f4d_point3d, px, py, 
  * @param matrix4 변수
  * @param float32array 변수
  */
-GeometryModifier.prototype.Matrix4_setByFloat32Array = function(matrix4, float32array) {
+GeometryModifier.prototype.Matrix4SetByFloat32Array = function(matrix4, float32array) {
 	for(var i=0; i<16; i++) {
 		matrix4._floatArrays[i] = float32array[i];
 	}
@@ -52,7 +52,7 @@ GeometryModifier.prototype.Matrix4_setByFloat32Array = function(matrix4, float32
  * @param point3d 변수
  * @returns transformedPoint3d 
  */
-GeometryModifier.prototype.Matrix4_transformPoint3D = function(matrix4, point3d) {
+GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) {
 	var transformedPoint3d = new Point3D();
 //		t.x= q.x*m[0][0] + q.y*m[1][0] + q.z*m[2][0] + m[3][0];
 //		t.y= q.x*m[0][1] + q.y*m[1][1] + q.z*m[2][1] + m[3][1];
@@ -82,7 +82,7 @@ GeometryModifier.prototype.Matrix4_transformPoint3D = function(matrix4, point3d)
  * @param matrixB 변수
  * @retuns resultMat
  */
-GeometryModifier.prototype.Matrix4_getMultipliedByMatrix = function(matrixA, matrixB) {
+GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matrixB) {
 	//CKK_Matrix4 operator*(const CKK_Matrix4 &A) 
 	//{
 	//	// Copied From Carve.***
@@ -121,9 +121,9 @@ GeometryModifier.prototype.Matrix4_getMultipliedByMatrix = function(matrixA, mat
  * @param reference 변수
  * @param matrix 변수
  */
-GeometryModifier.prototype.f4dReference_multiplyTransformMatrix = function(reference, matrix) {
+GeometryModifier.prototype.referenceMultiplyTransformMatrix = function(reference, matrix) {
 	//var multipliedMat = reference._matrix4.getMultipliedByMatrix(matrix); // Original.***
-	var multipliedMat = this.Matrix4_getMultipliedByMatrix(reference._matrix4, matrix); // Original.***
+	var multipliedMat = this.Matrix4GetMultipliedByMatrix(reference._matrix4, matrix); // Original.***
 	reference._matrix4 = multipliedMat;
 };
 
@@ -132,7 +132,7 @@ GeometryModifier.prototype.f4dReference_multiplyTransformMatrix = function(refer
  * @param compRefList 변수
  * @param matrix 변수
  */
-GeometryModifier.prototype.f4dCompoundReferencesList_multiplyReferencesMatrices = function(compRefList, matrix) {
+GeometryModifier.prototype.compoundReferencesListMultiplyReferencesMatrices = function(compRefList, matrix) {
 	var compRefs_count = compRefList._compoundRefsArray.length;
 	for(var i=0; i<compRefs_count; i++)
 	{
@@ -142,7 +142,7 @@ GeometryModifier.prototype.f4dCompoundReferencesList_multiplyReferencesMatrices 
 		{
 			var reference = compRef._referencesList[j];
 			//reference.multiplyTransformMatrix(matrix);// Old.***
-			this.f4dReference_multiplyTransformMatrix(reference, matrix);
+			this.referenceMultiplyTransformMatrix(reference, matrix);
 		}
 	}
 };
@@ -155,7 +155,7 @@ GeometryModifier.prototype.f4dCompoundReferencesList_multiplyReferencesMatrices 
  * @param eye_z 변수
  * @returns visibleCompRefObjectsArray
  */
-GeometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsList = function(compRefList, eye_x, eye_y, eye_z) {
+GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = function(compRefList, eye_x, eye_y, eye_z) {
 	/*
 	// https://gist.github.com/72lions/4528834
 	var _appendBuffer = function(buffer1, buffer2) {
@@ -170,7 +170,7 @@ GeometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsLis
 	visibleCompRefObjectsArray._myBlocksList = compRefList._myBlocksList;
 	
 	var ocCulling_box = compRefList._ocCulling._ocCulling_box;
-	var indicesVisiblesArray_interior = this.f4dOcclusionCullingOctreeCell_getIndicesVisiblesForEye(ocCulling_box, eye_x, eye_y, eye_z);
+	var indicesVisiblesArray_interior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_interior)
 	{
 		var indices_count = indicesVisiblesArray_interior.length;
@@ -182,7 +182,7 @@ GeometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsLis
 	}
 	
 	var infinite_ocCulling_box = compRefList._ocCulling._infinite_ocCulling_box;
-	var indicesVisiblesArray_exterior = this.f4dOcclusionCullingOctreeCell_getIndicesVisiblesForEye(infinite_ocCulling_box, eye_x, eye_y, eye_z);
+	var indicesVisiblesArray_exterior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(infinite_ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_exterior)
 	{
 		var indices_count = indicesVisiblesArray_exterior.length;
@@ -205,14 +205,14 @@ GeometryModifier.prototype.f4dCompoundReferencesList_getVisibleCompRefObjectsLis
  * @param eye_z 변수
  * @returns visibleCompRefObjectsArray_Total
  */
-GeometryModifier.prototype.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList = function(compRefList_container, eye_x, eye_y, eye_z) {
+GeometryModifier.prototype.compoundReferencesListContainerGetVisibleCompRefObjectsList = function(compRefList_container, eye_x, eye_y, eye_z) {
 	var visibleCompRefObjectsArray_Total = [];
 	var compRefList = undefined;
 	var compRefLists_count = compRefList_container._compRefsList_Array.length;
 	for(var i=0; i<compRefLists_count; i++)
 	{
 		compRefList = compRefList_container._compRefsList_Array[i];
-		var visibleCompRefObjectsArray = this.f4dCompoundReferencesList_getVisibleCompRefObjectsList(compRefList, eye_x, eye_y, eye_z);
+		var visibleCompRefObjectsArray = this.compoundReferencesListGetVisibleCompRefObjectsList(compRefList, eye_x, eye_y, eye_z);
 		if(visibleCompRefObjectsArray != null)
 			visibleCompRefObjectsArray_Total.push(visibleCompRefObjectsArray);
 	}
@@ -227,13 +227,13 @@ GeometryModifier.prototype.f4dCompoundReferencesListContainer_getVisibleCompRefO
  * @param eye_Z 변수
  * @returns total_visibleCompRefLists
  */
-GeometryModifier.prototype.f4dBRbuildingProject_getVisibleCompRefLists = function(buildingProject, eye_x, eye_y, eye_z) {
+GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(buildingProject, eye_x, eye_y, eye_z) {
 	// 1rst, check if the eye is in the building.***
 	var InteriorCompRefList_container = buildingProject._interiorCompRefList_Container;
-	var interior_visibleCompRefLists = this.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(InteriorCompRefList_container, eye_x, eye_y, eye_z);
+	var interior_visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(InteriorCompRefList_container, eye_x, eye_y, eye_z);
 		
 	var compRefList_container = buildingProject._compRefList_Container;
-	var visibleCompRefLists = this.f4dCompoundReferencesListContainer_getVisibleCompRefObjectsList(compRefList_container, eye_x, eye_y, eye_z);
+	var visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_container, eye_x, eye_y, eye_z);
 	  
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 
@@ -250,7 +250,7 @@ GeometryModifier.prototype.f4dBRbuildingProject_getVisibleCompRefLists = functio
  * @param min_z 변수
  * @param max_z 변수
  */
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_setDimensions = function(ocCullOctreeCell, min_x, max_x, min_y, max_y, min_z, max_z) {
+GeometryModifier.prototype.occlusionCullingOctreeCellSetDimensions = function(ocCullOctreeCell, min_x, max_x, min_y, max_y, min_z, max_z) {
 	ocCullOctreeCell._minX = min_x;
 	ocCullOctreeCell._maxX = max_x;
 	ocCullOctreeCell._minY = min_y;
@@ -263,7 +263,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_setDimensions = functio
  * 어떤 일을 하고 있습니까?
  * @param ocCullOctreeCell 변수
  */
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_setSizesSubBoxes = function(ocCullOctreeCell) {
+GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function(ocCullOctreeCell) {
 	// Bottom                      Top
 	// |----------|----------|     |----------|----------|
 	// |          |          |     |          |          |       Y
@@ -282,32 +282,32 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_setSizesSubBoxes = func
 		var half_z= (ocCullOctreeCell._maxZ + ocCullOctreeCell._minZ)/2.0;
 		
 		// Old.***************************************************************************************************************************************************
-		//ocCullOctreeCell._subBoxesArray[0].set_dimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[1].set_dimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[2].set_dimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[3].set_dimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[2].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[3].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
 
-		//ocCullOctreeCell._subBoxesArray[4].set_dimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[5].set_dimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[6].set_dimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[7].set_dimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[4].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
 		
 		// New version.*********************************************************************************************************************************************
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
 		
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		this.f4dOcclusionCullingOctreeCell_setDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 		for(var i=0; i<ocCullOctreeCell._subBoxesArray.length; i++)
 		{
-			//ocCullOctreeCell._subBoxesArray[i].set_sizesSubBoxes(); // Old.***
-			this.f4dOcclusionCullingOctreeCell_setSizesSubBoxes(ocCullOctreeCell._subBoxesArray[i]);
+			//ocCullOctreeCell._subBoxesArray[i].setSizesSubBoxes(); // Old.***
+			this.occlusionCullingOctreeCellSetSizesSubBoxes(ocCullOctreeCell._subBoxesArray[i]);
 		}
 	}
 };
@@ -320,7 +320,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_setSizesSubBoxes = func
  * @param z 변수
  * @returns intersects
  */
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_intersectsWithPoint3D = function(ocCullOctreeCell, x, y, z) {
+GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersects = false;
 	
 	if(x>ocCullOctreeCell._minX && x<ocCullOctreeCell._maxX) {
@@ -342,13 +342,13 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_intersectsWithPoint3D =
  * @param z 변수
  * @returns intersectedSubBox
  */
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_byPoint3D = function(ocCullOctreeCell, x, y, z) {
+GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersectedSubBox = null;
 	
 	if(ocCullOctreeCell._ocCulling_Cell_owner == null)
 	{
 		// This is the mother_cell.***
-		if(!this.f4dOcclusionCullingOctreeCell_intersectsWithPoint3D(ocCullOctreeCell, x, y, z))
+		if(!this.occlusionCullingOctreeCellIntersectsWithPoint3D(ocCullOctreeCell, x, y, z))
 		{
 			return null;
 		}
@@ -398,7 +398,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_by
 		}
 		
 		intersectedSubBox_aux = ocCullOctreeCell._subBoxesArray[intersectedSubBox_idx];
-		intersectedSubBox = this.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_byPoint3D(intersectedSubBox_aux, x, y, z);
+		intersectedSubBox = this.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D(intersectedSubBox_aux, x, y, z);
 		
 	}
 	else
@@ -417,9 +417,9 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_by
  * @param z 변수
  * @returns indicesVisiblesArray
  */	
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIndicesVisiblesForEye = function(ocCullOctreeCell, eye_x, eye_y, eye_z) {
+GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = function(ocCullOctreeCell, eye_x, eye_y, eye_z) {
 	var indicesVisiblesArray = null;
-	var intersectedSubBox = this.f4dOcclusionCullingOctreeCell_getIntersectedSubBox_byPoint3D(ocCullOctreeCell, eye_x, eye_y, eye_z);
+	var intersectedSubBox = this.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D(ocCullOctreeCell, eye_x, eye_y, eye_z);
 	
 	if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
 	{
@@ -434,7 +434,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_getIndicesVisiblesForEy
  * @param ocCullOctreeCell 변수
  * @param expansionDist 변수
  */	
-GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_expandBox = function(ocCullOctreeCell, expansionDist) {
+GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCullOctreeCell, expansionDist) {
 	ocCullOctreeCell._minX -= expansionDist;
 	ocCullOctreeCell._maxX += expansionDist;
 	ocCullOctreeCell._minY -= expansionDist;
@@ -448,7 +448,7 @@ GeometryModifier.prototype.f4dOcclusionCullingOctreeCell_expandBox = function(oc
  * @param vtArraysCacheKeys_container 변수
  * @returns vt_cacheKey
  */
-GeometryModifier.prototype.f4dVertexTexcoordsArraysCacheKeysContainer_newVertexTexcoordsArraysCacheKey = function(vtArraysCacheKeys_container) {
+GeometryModifier.prototype.vertexTexcoordsArraysCacheKeysContainerNewVertexTexcoordsArraysCacheKey = function(vtArraysCacheKeys_container) {
 	var vt_cacheKey = new VertexTexcoordsArraysCacheKeys();
 	vtArraysCacheKeys_container._vtArrays_cacheKeys_array.push(vt_cacheKey);
 	return vt_cacheKey;
@@ -460,7 +460,7 @@ GeometryModifier.prototype.f4dVertexTexcoordsArraysCacheKeysContainer_newVertexT
  * @param idx 변수
  * @returns block 
  */
-GeometryModifier.prototype.f4dBlocksList_getBlock = function(blockList, idx) {
+GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
 	var block = null;
 	  
 	if(idx >= 0 && idx <blockList._blocksArray.length) {
@@ -475,7 +475,7 @@ GeometryModifier.prototype.f4dBlocksList_getBlock = function(blockList, idx) {
  * @param blocksList_name 변수
  * @returns f4d_blocksList
  */
-GeometryModifier.prototype.f4dBlocksListsContainer_newBlocksList = function(blockList_container, blocksList_name) {
+GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockList_container, blocksList_name) {
 	var f4d_blocksList = new BlocksList();
 	f4d_blocksList._name = blocksList_name;
 	blockList_container._BlocksListsArray.push(f4d_blocksList);
@@ -488,7 +488,7 @@ GeometryModifier.prototype.f4dBlocksListsContainer_newBlocksList = function(bloc
  * @param blockList_name 변수
  * @returns blocksList
  */	  
-GeometryModifier.prototype.f4dBlocksListsContainer_getBlockList = function(blockList_container, blockList_name) {
+GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList_container, blockList_name) {
 	var blocksLists_count = blockList_container._BlocksListsArray.length;
 	var found = false;
 	var i=0;
@@ -510,7 +510,7 @@ GeometryModifier.prototype.f4dBlocksListsContainer_getBlockList = function(block
  * 어떤 일을 하고 있습니까?
  * @param buildingProject 변수
  */	  
-GeometryModifier.prototype.f4dBRbuildingProject_createDefaultBlockReferencesLists = function(buildingProject) {
+GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = function(buildingProject) {
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
 	  
 	// Old.*********************************************************
@@ -533,16 +533,14 @@ GeometryModifier.prototype.f4dBRbuildingProject_createDefaultBlockReferencesList
  * @param buildingProjectsList 변수
  * @returns br_buildingProject
  */
-GeometryModifier.prototype.f4dBRbuildingProjectsList_newBRProject = function(buildingProjectsList) {
+GeometryModifier.prototype.bRbuildingProjectsListNewBRProject = function(buildingProjectsList) {
 	//var titol = "holes a tothom"
 	//var br_buildingProject = new BRBuildingProject({Titol : titol});
 	var br_buildingProject = new BRBuildingProject();
 	  
 	// Create the blocks lists default.***
-	this.f4dBRbuildingProject_createDefaultBlockReferencesLists(br_buildingProject);
+	this.bRbuildingProjectCreateDefaultBlockReferencesLists(br_buildingProject);
 	  
 	buildingProjectsList._BR_buildingsArray.push(br_buildingProject);
 	return br_buildingProject;
 };
-	
-//# sourceURL=GeometryModifier.js

@@ -23,8 +23,8 @@ var ManagerFactory = function(productType, containerId) {
 		
 		var GL = viewer.scene.context._gl;
 		viewer.scene.magoManager.f4dSelection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
-		viewer.scene.magoManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
+		viewer.scene.magoManager.f4d_shadersManager.createDefaultShader(GL); 
+		viewer.scene.magoManager.f4d_postFxShadersManager.createDefaultShaders(GL); 
 		viewer.scene.magoManager.scene = viewer.scene;
 		
 		// Start postRender version.***********************************************
@@ -35,12 +35,12 @@ var ManagerFactory = function(productType, containerId) {
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		
 		magoManager.f4dSelection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		magoManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
-		magoManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
+		magoManager.f4d_shadersManager.createDefaultShader(GL); 
+		magoManager.f4d_postFxShadersManager.createDefaultShaders(GL); 
 		
 		var f4d_readerWriter = new ReaderWriter();
 		
-		magoManager.load_TEST_Files();
+		magoManager.loadTESTFiles();
 		
 		var BR_ProjectsList = magoManager.f4dBR_buildingProjectsList;
 		var neoBuildingsList = magoManager.f4d_neoBuildingsList;
@@ -126,7 +126,7 @@ var ManagerFactory = function(productType, containerId) {
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObject_Picking(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
+					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
 				}
 			}
 			

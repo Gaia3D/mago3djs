@@ -76,7 +76,7 @@ var PostFxShadersManager = function() {
  * @param typeString 변수
  * @returns shader
  */
-PostFxShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
+PostFxShadersManager.prototype.getShader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -92,18 +92,18 @@ PostFxShadersManager.prototype.get_shader = function(GL, source, type, typeStrin
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  */
-PostFxShadersManager.prototype.create_defaultShaders = function(GL) {
-	this.create_renderDepthShader(GL); // 0.***
-	this.create_ssaoShader(GL); // 1.***
-	this.create_blurShader(GL); // 2.***
+PostFxShadersManager.prototype.createDefaultShaders = function(GL) {
+	this.createRenderDepthShader(GL); // 0.***
+	this.createSsaoShader(GL); // 1.***
+	this.createBlurShader(GL); // 2.***
 	
 	// Now, create shaders for modelReference geometries.****
-	this.create_renderDepthShader_ModelRef(GL); // 3.***
-	this.create_ssaoShader_ModelRef(GL); // 4.***
-	//this.create_blurShader_ModelRef(GL); // 5.***
+	this.createRenderDepthShaderModelRef(GL); // 3.***
+	this.createSsaoShaderModelRef(GL); // 4.***
+	//this.createBlurShader_ModelRef(GL); // 5.***
 	
-	this.create_ColorSelectionShader_ModelRef(GL);// 5.***
-	this.create_SimpleDepthShader_ModelRef(GL);// 6.***
+	this.createColorSelectionShaderModelRef(GL);// 5.***
+	this.createSimpleDepthShaderModelRef(GL);// 6.***
 	
 	//this.create_renderDepthShader_TEST_ModelRef(GL); // 5
 };
@@ -112,7 +112,7 @@ PostFxShadersManager.prototype.create_defaultShaders = function(GL) {
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  */
-PostFxShadersManager.prototype.create_blurShader = function(gl) {
+PostFxShadersManager.prototype.createBlurShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -152,8 +152,8 @@ PostFxShadersManager.prototype.create_blurShader = function(gl) {
 		}";
 		
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, blur_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, blur_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
@@ -187,7 +187,7 @@ PostFxShadersManager.prototype.create_blurShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.create_ssaoShader = function(gl) {
+PostFxShadersManager.prototype.createSsaoShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -313,8 +313,8 @@ PostFxShadersManager.prototype.create_ssaoShader = function(gl) {
 		
 		
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
@@ -359,7 +359,7 @@ PostFxShadersManager.prototype.create_ssaoShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  */
-PostFxShadersManager.prototype.create_renderDepthShader = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -427,8 +427,8 @@ PostFxShadersManager.prototype.create_renderDepthShader = function(gl) {
 			}";
 			
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
 	gl.linkProgram(shader.program);
@@ -456,7 +456,7 @@ PostFxShadersManager.prototype.create_renderDepthShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
+PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -706,8 +706,8 @@ PostFxShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
 		*/
 		
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
@@ -766,7 +766,7 @@ PostFxShadersManager.prototype.create_ssaoShader_ModelRef = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 	
@@ -829,8 +829,8 @@ PostFxShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) 
 			}";
 			
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
 	gl.linkProgram(shader.program);
@@ -868,7 +868,7 @@ PostFxShadersManager.prototype.create_renderDepthShader_ModelRef = function(gl) 
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(gl) {
+PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 		
@@ -902,8 +902,8 @@ PostFxShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(g
 		}";
 		
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
@@ -931,7 +931,7 @@ PostFxShadersManager.prototype.create_ColorSelectionShader_ModelRef = function(g
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) {
+PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {
 	// no used.!!!!!!!!!!!!!!!
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
@@ -979,8 +979,8 @@ PostFxShadersManager.prototype.create_SimpleDepthShader_ModelRef = function(gl) 
 		
 		
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.get_shader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);

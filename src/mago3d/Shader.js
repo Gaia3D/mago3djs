@@ -70,7 +70,7 @@
  */
 var Shader = function() {
 	if(!(this instanceof Shader)) {
-		throw new Error("이 객체는 new를 사용하여 생성해야 합니다.");
+		throw new Error(MESSAGES.classNewError);
 	}
 	
 	this.shader_name;
@@ -115,7 +115,7 @@ var ShadersManager = function() {
  * @param idx = 변수
  * returns shader
  */
-ShadersManager.prototype.get_f4dShader = function(idx) {
+ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
 	
 	if(idx >= 0 && idx < this.shaders_array.length)
@@ -129,7 +129,7 @@ ShadersManager.prototype.get_f4dShader = function(idx) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
+ShadersManager.prototype.getShader = function(GL, source, type, typeString) {
 	// Source from internet.***
 	var shader = GL.createShader(type);
 	GL.shaderSource(shader, source);
@@ -144,21 +144,21 @@ ShadersManager.prototype.get_shader = function(GL, source, type, typeString) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dDefaultShader = function(GL) {
-	this.create_f4dStandardShader(GL);                // 0.***
-	this.create_f4dTextureSimpleObjectShader(GL);     // 1.***
-	this.create_f4dColorSelectionShader(GL);          // 2.***
-	this.create_f4dTextureSimpleObjectA1Shader(GL);   // 3.***
-	this.create_f4dCloudShader(GL);                   // 4.***
-	this.create_f4dBlendingCubeShader(GL);            // 5.***
-	this.create_f4dPCloudShader(GL);                  // 6.***
-	this.create_f4d_SimpleObjectTexNormal_Shader(GL); // 7.***
+ShadersManager.prototype.createDefaultShader = function(GL) {
+	this.createStandardShader(GL);                // 0.***
+	this.createTextureSimpleObjectShader(GL);     // 1.***
+	this.createColorSelectionShader(GL);          // 2.***
+	this.createTextureSimpleObjectA1Shader(GL);   // 3.***
+	this.createCloudShader(GL);                   // 4.***
+	this.createBlendingCubeShader(GL);            // 5.***
+	this.createPCloudShader(GL);                  // 6.***
+	this.createSimpleObjectTexNormalShader(GL); // 7.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
+ShadersManager.prototype.createColorSelectionShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
@@ -194,8 +194,8 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 		
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
 	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.get_shader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	GL.linkProgram(shader.SHADER_PROGRAM);
@@ -213,7 +213,7 @@ ShadersManager.prototype.create_f4dColorSelectionShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
+ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
@@ -254,8 +254,8 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.get_shader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	GL.linkProgram(shader.SHADER_PROGRAM);
@@ -275,7 +275,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
+ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
@@ -314,8 +314,8 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.get_shader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	GL.linkProgram(shader.SHADER_PROGRAM);
@@ -334,7 +334,7 @@ ShadersManager.prototype.create_f4dTextureSimpleObjectA1Shader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dStandardShader = function(GL) {
+ShadersManager.prototype.createStandardShader = function(GL) {
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -370,8 +370,8 @@ ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.get_shader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
@@ -391,7 +391,7 @@ ShadersManager.prototype.create_f4dStandardShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dCloudShader = function(GL) {
+ShadersManager.prototype.createCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -425,8 +425,8 @@ ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.get_shader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
@@ -445,7 +445,7 @@ ShadersManager.prototype.create_f4dCloudShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
+ShadersManager.prototype.createBlendingCubeShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -475,8 +475,8 @@ ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.get_shader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
@@ -493,7 +493,7 @@ ShadersManager.prototype.create_f4dBlendingCubeShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
+ShadersManager.prototype.createPCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -526,8 +526,8 @@ ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.get_shader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.get_shader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
 	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
@@ -546,7 +546,7 @@ ShadersManager.prototype.create_f4dPCloudShader = function(GL) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) {
+ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source="\n\
@@ -600,8 +600,8 @@ ShadersManager.prototype.create_f4d_SimpleObjectTexNormal_Shader = function(GL) 
 	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
 	//http://learningwebgl.com/blog/?p=684 // good.***
 	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.get_shader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.get_shader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	GL.linkProgram(shader.SHADER_PROGRAM);

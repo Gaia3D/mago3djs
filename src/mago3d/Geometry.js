@@ -30,7 +30,7 @@ var MetaData = function() {
  * @param arrayBuffer 변수
  * @param f4dReadWriter 변수
  */
-MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
+MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 	var auxScratch;
@@ -126,8 +126,6 @@ MetaData.prototype.parseFile_header = function(arrayBuffer, f4dReadWriter) {
 	*/
 };
 
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 // F4D ReferenceObject.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
@@ -139,8 +137,6 @@ var Texture = function() {
 
 };
 
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 // F4D ReferenceObject.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
@@ -183,8 +179,6 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 	this._matrix4 = multipliedMat;
 };
 
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 // F4D References list.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
@@ -207,7 +201,7 @@ var NeoReferencesList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoRef
  */
-NeoReferencesList.prototype.new_neoReference = function() {
+NeoReferencesList.prototype.newNeoReference = function() {
 	var neoRef = new NeoReference();
 	this.neoRefs_Array.push(neoRef);
 	return neoRef;
@@ -232,14 +226,14 @@ NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
  * @param eye_y 변수
  * @param eye_z 변수
  */
-NeoReferencesList.prototype.update_currentVisibleIndices_Interior = function(eye_x, eye_y, eye_z) {
-	this._currentVisibleIndices = this.interior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
+NeoReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(eye_x, eye_y, eye_z) {
+	this._currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
+NeoReferencesList.prototype.updateCurrentAllIndicesInterior = function() {
 	this._currentVisibleIndices.length = 0;
 	var neoRefs_count = this.neoRefs_Array.length;
 	for(var i=0; i<neoRefs_count; i++)
@@ -254,8 +248,8 @@ NeoReferencesList.prototype.update_currentAllIndices_Interior = function() {
  * @param eye_y 변수
  * @param eye_z 변수
  */
-NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function(eye_x, eye_y, eye_z) {
-	this._currentVisibleIndices = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
+NeoReferencesList.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_y, eye_z) {
+	this._currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 };
 
 /**
@@ -264,9 +258,9 @@ NeoReferencesList.prototype.update_currentVisibleIndices_Exterior = function(eye
  * @param eye_y 변수
  * @param eye_z 변수
  */
-NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y, eye_z) {
-	this._currentVisibleIndicesSC = this.exterior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
-	this._currentVisibleIndicesSC_2 = this.interior_ocCullOctree.get_IndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
+NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y, eye_z) {
+	this._currentVisibleIndicesSC = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC);
+	this._currentVisibleIndicesSC_2 = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this._currentVisibleIndicesSC_2);
 	this._currentVisibleIndices = this._currentVisibleIndicesSC.concat(this._currentVisibleIndicesSC_2);
 };
 
@@ -277,7 +271,7 @@ NeoReferencesList.prototype.update_currentVisibleIndices = function(eye_x, eye_y
  * @param neoBuilding 변수
  * @param f4dReadWriter 변수
  */
-NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBuilding, f4dReadWriter) {
+NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, neoBuilding, f4dReadWriter) {
 	var startBuff;
 	var endBuff;
 	var bytes_readed = 0;
@@ -285,7 +279,7 @@ NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBui
 	
 	for(var i=0; i<neoRefs_count; i++)
 	{
-		var neoRef = this.new_neoReference();
+		var neoRef = this.newNeoReference();
 
 		// 1) Id.***
 		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -316,7 +310,6 @@ NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBui
 		neoRef._matrix4._floatArrays[14] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
 		neoRef._matrix4._floatArrays[15] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		
-		
 		// 4) short texcoords.*****
 		var textures_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0)
@@ -344,28 +337,25 @@ NeoReferencesList.prototype.parse_arrayBuffer = function(GL, arrayBuffer, neoBui
 				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
 		}
-
 	}
 	
 	// Now occlusion cullings.***
-	bytes_readed = this.exterior_ocCullOctree.parse_arrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
-	bytes_readed = this.interior_ocCullOctree.parse_arrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
+	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
+	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
 	
 	/*
 	// Occlusion culling octree data.*****
 	var ocCullBox = compoundRefsList._ocCulling._ocCulling_box; 
-	bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, ocCullBox);
-	ocCullBox.set_sizesSubBoxes();
+	bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox);
+	ocCullBox.setSizesSubBoxes();
 	
 	var infiniteOcCullBox = compoundRefsList._ocCulling._infinite_ocCulling_box;
-	bytes_readed = this.readF4D_OcclusionCullingOctree_Cell(arrayBuffer, bytes_readed, infiniteOcCullBox);
+	bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
-	infiniteOcCullBox.set_sizesSubBoxes();
+	infiniteOcCullBox.setSizesSubBoxes();
 	*/
 };
 
-//******************************************************************************************************************************************************
-//******************************************************************************************************************************************************
 // F4D References list container ********************************************************************************************************** // 
 /**
  * 어떤 일을 하고 있습니까?
@@ -378,7 +368,7 @@ var NeoReferencesListsContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @param blocksList 변수 
  */
-NeoReferencesListsContainer.prototype.new_NeoRefsList = function(blocksList) {
+NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
 	var neoRefList = new NeoReferencesList();
 	neoRefList.blocksList = blocksList;
 	this.neoRefsLists_Array.push(neoRefList);
@@ -391,22 +381,22 @@ NeoReferencesListsContainer.prototype.new_NeoRefsList = function(blocksList) {
  * @param eye_y 변수
  * @param eye_z 변수
  */
-NeoReferencesListsContainer.prototype.update_currentVisibleIndices_ofLists = function(eye_x, eye_y, eye_z) {
+NeoReferencesListsContainer.prototype.updateCurrentVisibleIndicesOfLists = function(eye_x, eye_y, eye_z) {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
 	for(var i=0; i<neoRefLists_count; i++)
 	{
-		this.neoRefsLists_Array[i].update_currentVisibleIndices(eye_x, eye_y, eye_z);
+		this.neoRefsLists_Array[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
 	}
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReferencesListsContainer.prototype.update_currentAllIndices_ofLists = function() {
+NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function() {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
 	for(var i=0; i<neoRefLists_count; i++)
 	{
-		this.neoRefsLists_Array[i].update_currentAllIndices_Interior();
+		this.neoRefsLists_Array[i].updateCurrentAllIndicesInterior();
 	}
 };
 
@@ -443,12 +433,12 @@ NeoSimpleBuilding.prototype.newTexture = function() {
 NeoSimpleBuilding.prototype {
 	neoRefsLists_Array: [],
 	new_accesor: function() {},
-	update_currentAllIndices_ofLists:  function()
+	updateCurrentAllIndicesOfLists:  function()
 		{
 			var neoRefLists_count = this.neoRefsLists_Array.length;
 			for(var i=0; i<neoRefLists_count; i++)
 			{
-				this.neoRefsLists_Array[i].update_currentAllIndices_Interior();
+				this.neoRefsLists_Array[i].updateCurrentAllIndicesInterior();
 			}
 		},
 }
@@ -532,15 +522,15 @@ NeoBuilding.prototype.getTextureId = function(texture) {
  * @param eye_y 변수
  * @param eye_z 변수
  */
-NeoBuilding.prototype.update_currentVisibleIndices_exterior = function(eye_x, eye_y, eye_z) {
-	this._neoRefLists_Container.update_currentVisibleIndices_ofLists(eye_x, eye_y, eye_z);
+NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_y, eye_z) {
+	this._neoRefLists_Container.updateCurrentVisibleIndicesOfLists(eye_x, eye_y, eye_z);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.update_currentAllIndices_exterior = function() {
-	this._neoRefLists_Container.update_currentAllIndices_ofLists();
+NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
+	this._neoRefLists_Container.updateCurrentAllIndicesOfLists();
 };
 
 /**
@@ -558,7 +548,7 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
  * @param absolute_eye_z 변수
  * @returns point3d_scrath_2
  */
-NeoBuilding.prototype.getTransformedRelativeEyePosition_toBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
+NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this._buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
@@ -588,7 +578,7 @@ var NeoBuildingsList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoBuilding
  */
-NeoBuildingsList.prototype.new_neoBuilding = function() {
+NeoBuildingsList.prototype.newNeoBuilding = function() {
 	var neoBuilding = new NeoBuilding();
 	this.neoBuildings_Array.push(neoBuilding);
 	return neoBuilding;
