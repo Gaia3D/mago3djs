@@ -149,6 +149,9 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
  * 어떤 일을 하고 있습니까?
  */
 var CloudsManager = function() {
+	if(!(this instanceof CloudsManager)) {
+		throw new Error(MESSAGES.classNewError);
+	}
 	this.circularCloudsArray = [];
 };
 
@@ -166,6 +169,10 @@ CloudsManager.prototype.newCircularCloud = function() {
  * 어떤 일을 하고 있습니까?
  */
 var CircularCloud = function() {
+	if(!(this instanceof CircularCloud)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.radius = 200.0;
 	this.depth = 150.0;
 	this.numPointsForCicle = 8;

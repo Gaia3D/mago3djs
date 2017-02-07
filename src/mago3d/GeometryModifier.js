@@ -4,6 +4,9 @@
  * 어떤 일을 하고 있습니까?
  */
 var GeometryModifier = function() {
+	if(!(this instanceof GeometryModifier)) {
+		throw new Error(MESSAGES.classNewError);
+	}
 };
   
 /**
