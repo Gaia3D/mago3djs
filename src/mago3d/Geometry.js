@@ -5,7 +5,7 @@
  */
 var MetaData = function() {
 	if(!(this instanceof MetaData)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.guid = "";
@@ -136,7 +136,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
  */
 var Texture = function() {
 	if(!(this instanceof Texture)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.texture_type_name = "";
@@ -151,7 +151,7 @@ var Texture = function() {
  */
 var NeoReference = function() {
 	if(!(this instanceof NeoReference)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// 1) Object ID.***
@@ -197,7 +197,7 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
  */
 var NeoReferencesList = function() {
 	if(!(this instanceof NeoReferencesList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.name = "";
@@ -378,7 +378,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, neoBuil
  */
 var NeoReferencesListsContainer = function() {
 	if(!(this instanceof NeoReferencesListsContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.neoRefsLists_Array = [];
@@ -425,7 +425,7 @@ NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function(
  */
 var NeoSimpleBuilding = function() {
 	if(!(this instanceof NeoSimpleBuilding)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.accesors_array = [];
@@ -473,7 +473,7 @@ NeoSimpleBuilding.prototype {
  */
 var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.metaData = new MetaData();
@@ -600,7 +600,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  */
 var NeoBuildingsList = function() {
 	if(!(this instanceof NeoBuildingsList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.neoBuildings_Array = [];

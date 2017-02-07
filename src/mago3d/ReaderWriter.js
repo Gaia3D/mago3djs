@@ -5,7 +5,7 @@
  */
 var ReaderWriter = function() {
 	if(!(this instanceof ReaderWriter)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.rootPath = "";
@@ -610,9 +610,9 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(GL, arrayBuffer, neoSimp
  * @param filePath_inServer 변수
  * @param blocksList 변수
  * @param neoBuilding 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter) {
+ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, blocksList, neoBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -623,7 +623,7 @@ ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, b
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer)
 	  {
-		 f4d_readerWriter.readNeoBlocks(GL, arrayBuffer, blocksList, neoBuilding);
+		  readerWriter.readNeoBlocks(GL, arrayBuffer, blocksList, neoBuilding);
 	  }
 	  
 	  arrayBuffer = null;
@@ -642,11 +642,11 @@ ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, b
  * @param blocksList 변수
  * @param transformMat 변수
  * @param neoBuilding 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param subOctreeNumberName 변수
  */
 ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, f4d_readerWriter, subOctreeNumberName) {
+																		  lodLevel, blocksList, transformMat, neoBuilding, readerWriter, subOctreeNumberName) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -657,9 +657,9 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServe
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer)
 	  {
-		   if(f4d_readerWriter == undefined)
+		   if(readerWriter == undefined)
 		  {
-			  f4d_readerWriter = new ReaderWriter();
+			   readerWriter = new ReaderWriter();
 		  }
 		  //------------------------------------------------------
 		  
@@ -678,8 +678,8 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServe
 			  neoRefsList.lod_level = lodLevel;
 			  neoRefsList.blocksList = blocksList;
 			  neoRefsList.name = neoReferenceList_name;
-			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, f4d_readerWriter);
-			  f4d_readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, f4d_readerWriter);
+			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+			  readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
 			  if(transformMat)
 			  {
 				  neoRefsList.multiplyReferencesMatrices(transformMat);
@@ -701,8 +701,8 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServe
 			  neoRefsList.lod_level = lodLevel;
 			  neoRefsList.name = neoReferenceList_name;
 			  neoRefsList.blocksList = blocksList;
-			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, f4d_readerWriter);
-			  f4d_readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, f4d_readerWriter);
+			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+			  readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
 			  if(transformMat)
 			  {
 				  neoRefsList.multiplyReferencesMatrices(transformMat);
@@ -721,9 +721,9 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServe
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoSimpleBuilding 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inServer, neoSimpleBuilding, f4d_readerWriter) {
+ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inServer, neoSimpleBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -734,12 +734,12 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inS
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer)
 	  {
-		   if(f4d_readerWriter == undefined)
+		   if(readerWriter == undefined)
 		  {
-			  f4d_readerWriter = new ReaderWriter();
+			   readerWriter = new ReaderWriter();
 		  }
 		  //------------------------------------------------------
-		  f4d_readerWriter.readNeoSimpleBuilding(GL, arrayBuffer, neoSimpleBuilding );
+		   readerWriter.readNeoSimpleBuilding(GL, arrayBuffer, neoSimpleBuilding );
 	  }
 	  arrayBuffer = null;
 	};
@@ -753,11 +753,11 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inS
  * @param arrayBuffer 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param bytes_readed 변수
  * @returns bytes_readed
  */
-ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, f4d_readerWriter, bytes_readed) {
+ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) {
 	//var bytes_readed = 0;
 	var f4d_headerPathName_length = 0;
 	var BP_Project;
@@ -816,7 +816,7 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 		for(var i=0; i<4; i++)
 		{
 			subTile = terranTile.newSubTerranTile();
-			bytes_readed = this.readTerranTileFile(GL, arrayBuffer, filePath_inServer, subTile, f4d_readerWriter, bytes_readed);
+			bytes_readed = this.readTerranTileFile(GL, arrayBuffer, filePath_inServer, subTile, readerWriter, bytes_readed);
 		}
 	}
 	*/
@@ -828,9 +828,9 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  */
-ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter) {
+ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServer, terranTile, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -841,13 +841,13 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServ
 		var arrayBuffer = oReq.response; // Note: not oReq.responseText
 		if (arrayBuffer)
 		{
-			if(f4d_readerWriter == undefined)
+			if(readerWriter == undefined)
 			{
-				f4d_readerWriter = new ReaderWriter();
+				readerWriter = new ReaderWriter();
 			}
 			//------------------------------------------------------
 			var bytes_readed = 0;
-			f4d_readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, f4d_readerWriter, bytes_readed)
+			readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed)
 			
 			// Once readed the terranTilesFile, must make all the quadtree.***
 			terranTile.setDimensionsSubTiles();
@@ -865,9 +865,9 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServ
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param BR_ProjectsList 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  */
-ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inServer, BR_ProjectsList, f4d_readerWriter) {
+ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inServer, BR_ProjectsList, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
@@ -878,9 +878,9 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inSer
 	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	    if (arrayBuffer)
 	   {
-		    if(f4d_readerWriter == undefined)
+		    if(readerWriter == undefined)
 		    {
-		    	f4d_readerWriter = new ReaderWriter();
+		    	readerWriter = new ReaderWriter();
 		    }
 		    //---------------------------------------------------------------------------------------------------
 		    // write code here.***
@@ -892,7 +892,7 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inSer
 			var f4d_simpleBuildingPathName_length = 0;
 			var f4d_nailImagePathName_length = 0;
 			
-			var pCloudProjects_count = f4d_readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			
 			for(var i=0; i<pCloudProjects_count; i++)
 			{
@@ -901,7 +901,7 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inSer
 				pCloudProject._header._f4d_version = 2;
 				// ********************************************************************************************************************************************
 				// 1rst, read the files path names.************************************************************************************************************
-				f4d_rawPathName_length = f4d_readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				for(var j=0; j<f4d_rawPathName_length; j++){
 					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 				}
@@ -925,10 +925,10 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inSer
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager) {
+ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer, pCloud, readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_header_readed = true;
 	
@@ -941,9 +941,9 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	    if (arrayBuffer)
 	    {
-		    if(f4d_readerWriter == undefined)
+		    if(readerWriter == undefined)
 		    {
-			    f4d_readerWriter = new ReaderWriter();
+		    	readerWriter = new ReaderWriter();
 		    }
 		    //--------------------------------------------------------------
 		    // write code here.***
@@ -963,7 +963,7 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 			header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			
 			// 3) Global unique ID.*********************
-			intAux_scratch = f4d_readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<intAux_scratch; j++){
 				header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
@@ -1008,7 +1008,7 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 			header._octZerothBox._maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 			
 			// 8) Data file name.********************
-			intAux_scratch = f4d_readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<intAux_scratch; j++){
 				header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
@@ -1052,10 +1052,10 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoBuilding 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, f4d_readerWriter, f4d_manager) {
+ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	//BR_Project._f4d_header_readed = true;
 	
@@ -1068,12 +1068,12 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer)
 	  {
-		   if(f4d_readerWriter == undefined)
+		   if(readerWriter == undefined)
 		  {
-			  f4d_readerWriter = new ReaderWriter();
+			   readerWriter = new ReaderWriter();
 		  }
 		  //------------------------------------------------------
-		  neoBuilding.metaData.parseFileHeader(arrayBuffer, f4d_readerWriter);
+		  neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
 		  
 			// Now, make the neoBuilding's octree.***
 			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
@@ -1100,11 +1100,11 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
  * @param GL 변수
  * @param imageArrayBuffer 변수
  * @param BR_Project 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffer, BR_Project, f4d_readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffer, BR_Project, readerWriter, f4d_manager, imageLod) {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
 	var urlCreator = window.URL || window.webkitURL;
@@ -1145,11 +1145,11 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param BR_Project 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, BR_Project, f4d_readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, BR_Project, readerWriter, f4d_manager, imageLod) {
 	function handleTextureLoaded(gl, image, texture) 
 	{
 	  gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1309,11 +1309,11 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param terranTile 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  */
-ReaderWriter.prototype.openTerranTile = function(GL, terranTile, f4d_readerWriter ) {
+ReaderWriter.prototype.openTerranTile = function(GL, terranTile, readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dTerranTileFile.txt";
-	f4d_readerWriter.readTerranTileFileInServer(GL, filePath_inServer, terranTile, f4d_readerWriter);
+	readerWriter.readTerranTileFileInServer(GL, filePath_inServer, terranTile, readerWriter);
 };	
 
 /**
@@ -1321,10 +1321,10 @@ ReaderWriter.prototype.openTerranTile = function(GL, terranTile, f4d_readerWrite
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inServer, terranTile, f4d_readerWriter, f4d_manager) {
+ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inServer, terranTile, readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	terranTile.fileReading_started = true;
 	var oReq = new XMLHttpRequest();
@@ -1338,7 +1338,7 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inSer
 		if (arrayBuffer)
 		{
 			//var BR_Project = new BRBuildingProject(); // Test.***
-			//f4d_readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
+			//readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
 			terranTile.fileArrayBuffer = arrayBuffer;
 			terranTile.fileReading_finished = true;
 			
@@ -1358,10 +1358,10 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inSer
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServer, pCloud, f4d_readerWriter, f4d_manager) {
+ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServer, pCloud, readerWriter, f4d_manager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_geometry_readed = true;
 	var oReq = new XMLHttpRequest();
@@ -1374,9 +1374,9 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
 	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	    if (arrayBuffer)
 	    {
-		    if(f4d_readerWriter == undefined)
+		    if(readerWriter == undefined)
 		    {
-			    f4d_readerWriter = new ReaderWriter();
+		    	readerWriter = new ReaderWriter();
 		    }
 		    //------------------------------------------------------
 		    // write code here.***
@@ -1384,10 +1384,10 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
 			var startBuff;
 			var endBuff;
 			
-			var meshes_count = f4d_readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+			var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
 			for(var a=0; a<meshes_count; a++)
 			{
-				var vbo_objects_count = f4d_readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+				var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
 				
 				// single interleaved buffer mode.*********************************************************************************
 				for(var i=0; i<vbo_objects_count; i++) 
@@ -1395,7 +1395,7 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
 					var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
 					//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
 					
-					var iDatas_count = f4d_readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertex_count.***
+					var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertex_count.***
 					startBuff = bytes_readed;
 					//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
 					endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
@@ -1410,7 +1410,7 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
 					
 					//vt_cacheKey._vertices_count = iDatas_count;
 					// Now, read short indices.***
-					var shortIndices_count = f4d_readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+					var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
 					
 					vbo_vertexIdx_data.indices_count = shortIndices_count;
 
@@ -1458,11 +1458,11 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
  * @param latitude 변수
  * @param longitude 변수
  * @param height 변수
- * @param f4d_readerWriter 변수
+ * @param readerWriter 변수
  * @param NeoBuildingsList 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude, longitude, height, f4d_readerWriter, NeoBuildingsList, f4d_manager) {
+ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, f4d_manager) {
 	// This is a test function to read the new f4d format.***
 	// The location(latitude, longitude, height) is provisional.***
 	
@@ -1476,7 +1476,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	if(neoBuilding.octree == undefined)
 		neoBuilding.octree = new Octree(undefined);
 	
-	f4d_readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, f4d_readerWriter, f4d_manager); // Here makes the tree of octree.***
+	readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, readerWriter, f4d_manager); // Here makes the tree of octree.***
 	
 	// 0) PositionMatrix.************************************************************************
 	//var height = elevation;
@@ -1524,23 +1524,23 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.getBlockList("Blocks1");
-	f4d_readerWriter.readNeoBlocksInServer(GL, filePath_inServer, blocksList, neoBuilding, f4d_readerWriter);
+	readerWriter.readNeoBlocksInServer(GL, filePath_inServer, blocksList, neoBuilding, readerWriter);
 	
 	var filePath_inServer_2 = this.geometryDataPath + "/"+buildingFileName+"/Blocks2";
 	var blocksList_2 = blocksListContainer.getBlockList("Blocks2");
-	f4d_readerWriter.readNeoBlocksInServer(GL, filePath_inServer_2, blocksList_2, neoBuilding, f4d_readerWriter);
+	readerWriter.readNeoBlocksInServer(GL, filePath_inServer_2, blocksList_2, neoBuilding, readerWriter);
 	
 	var filePath_inServer_3 = this.geometryDataPath + "/"+buildingFileName+"/Blocks3";
 	var blocksList_3 = blocksListContainer.getBlockList("Blocks3");
-	f4d_readerWriter.readNeoBlocksInServer(GL, filePath_inServer_3, blocksList_3, neoBuilding, f4d_readerWriter);
+	readerWriter.readNeoBlocksInServer(GL, filePath_inServer_3, blocksList_3, neoBuilding, readerWriter);
 	
 	var filePath_inServer_bone = this.geometryDataPath + "/"+buildingFileName+"/BlocksBone";
 	var blocksList_bone = blocksListContainer.getBlockList("BlocksBone");
-	f4d_readerWriter.readNeoBlocksInServer(GL, filePath_inServer_bone, blocksList_bone, neoBuilding, f4d_readerWriter);
+	readerWriter.readNeoBlocksInServer(GL, filePath_inServer_bone, blocksList_bone, neoBuilding, readerWriter);
 	
 	var filePath_inServer_4 = this.geometryDataPath + "/"+buildingFileName+"/Blocks4"; // Interior Objects.***
 	var blocksList_4 = blocksListContainer.getBlockList("Blocks4");
-	f4d_readerWriter.readNeoBlocksInServer(GL, filePath_inServer_4, blocksList_4, neoBuilding, f4d_readerWriter);
+	readerWriter.readNeoBlocksInServer(GL, filePath_inServer_4, blocksList_4, neoBuilding, readerWriter);
 	
 	// 2) References.****************************************************************************************************************************
 	var moveMatrix = new Matrix4();
@@ -1551,19 +1551,19 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	lod_level = 0;
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin1";
-	f4d_readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
+	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 1;
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin2";
-	f4d_readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
+	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 2;
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin3";
-	f4d_readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
+	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 0;
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Bone";
-	f4d_readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, f4d_readerWriter, undefined);
+	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************
 	var interiorCRef_folderPath = this.geometryDataPath + "/"+buildingFileName+"/inLOD4";
@@ -1582,8 +1582,8 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 
 				// Create a "compoundRefList".************************************************
 				var intCompRef_filePath = interiorCRef_folderPath + "/" + interiorCRef_fileName;
-				//f4d_readerWriter.readF4D_CompoundReferences_inServer(GL, intCompRef_filePath, null, interiorCRef_fileName, 4, blocksList_4, moveMatrix, BR_buildingProject, f4d_readerWriter, subOctreeName_counter);
-				f4d_readerWriter.readNeoReferencesInServer(GL, intCompRef_filePath, null, interiorCRef_fileName, lod_level, blocksList_4, moveMatrix, neoBuilding, f4d_readerWriter, subOctreeName_counter);
+				//readerWriter.readF4D_CompoundReferences_inServer(GL, intCompRef_filePath, null, interiorCRef_fileName, 4, blocksList_4, moveMatrix, BR_buildingProject, readerWriter, subOctreeName_counter);
+				readerWriter.readNeoReferencesInServer(GL, intCompRef_filePath, null, interiorCRef_fileName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
 			}
 		}
 	}
@@ -1591,7 +1591,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	// Now, read the simple building.************************
 	neoBuilding.neoSimpleBuilding = new NeoSimpleBuilding();
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
-	f4d_readerWriter.readNeoSimpleBuildingInServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, f4d_readerWriter);
+	readerWriter.readNeoSimpleBuildingInServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
 };
 			
 //# sourceURL=f4d_readWriter.js	

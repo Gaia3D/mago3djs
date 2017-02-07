@@ -1,3 +1,3 @@
-var MESSAGES = {};
+var Messages = {};
 
-MESSAGES.classNewError = "이 객체는 new를 사용하여 생성해야 합니다.";
+Messages.CONSTRUCT_ERROR = "이 객체는 new를 사용하여 생성해야 합니다.";

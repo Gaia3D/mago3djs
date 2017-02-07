@@ -5,7 +5,7 @@
  */
 var Selection = function() {
 	if(!(this instanceof Selection)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.drawing_height;

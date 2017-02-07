@@ -8,7 +8,7 @@
  */
 var FBO = function(gl, width, height) {
 	if(!(this instanceof FBO)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.gl = gl;

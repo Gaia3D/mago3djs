@@ -5,7 +5,7 @@
  */
 var Color = function() {
 	if(!(this instanceof Color)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.r = 0;
@@ -51,7 +51,7 @@ Color.prototype.setRGBA = function(_r, _g, _b, _alpha) {
  */
 var ByteColor = function() {
 	if(!(this instanceof ByteColor)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._byte_r = 0;
@@ -87,7 +87,7 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue) {
 */
 var Point2D = function() {
 	if(!(this instanceof Point2D)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.x = 0.0;
@@ -100,7 +100,7 @@ var Point2D = function() {
  */
 var Point3DAux = function() {
 	if(!(this instanceof Point3DAux)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.x = 0.0;
@@ -114,7 +114,7 @@ var Point3DAux = function() {
  */
 var TTriangle = function() {
 	if(!(this instanceof TTriangle)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.m_vertex_1;
@@ -148,7 +148,7 @@ TTriangle.prototype.invert = function() {
  */
 var TTrianglesList = function() {
 	if(!(this instanceof TTrianglesList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.tTrianglesArray = [];
@@ -192,7 +192,7 @@ TTrianglesList.prototype.getTTriangle = function(idx) {
  */
 var TTrianglesMatrix = function() {
 	if(!(this instanceof TTrianglesMatrix)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.tTrianglesListsArray = [];
@@ -270,7 +270,7 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
  */
 var Vertex = function() {
 	if(!(this instanceof Vertex)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.point3d = new Point3D();
@@ -333,7 +333,7 @@ Vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance) {
  */
 var VertexList = function() {
 	if(!(this instanceof VertexList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.vertexArray = [];
@@ -432,7 +432,7 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
  */
 var VertexMatrix = function() {
 	if(!(this instanceof VertexMatrix)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.vertexListsArray = [];
@@ -706,7 +706,7 @@ VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
  */
 var BoundingBox = function() {
 	if(!(this instanceof BoundingBox)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._minX = 1000000.0; 
@@ -818,7 +818,7 @@ BoundingBox.prototype.isPoint3dInside = function(x, y, z) {
  */
 var Triangle= function() {
 	if(!(this instanceof Triangle)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.m_point_1 = null;
@@ -905,7 +905,7 @@ Triangle.prototype.setColors = function(color_1, color_2, color_3) {
  */
 var Polygon = function() {
 	if(!(this instanceof Polygon)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.mPoint3DArray = [];
@@ -934,7 +934,7 @@ Polygon.prototype.newPoint3D = function() {
  */
 var TrianglesSurface= function() {
 	if(!(this instanceof TrianglesSurface)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.mPoint3DArray = [];
@@ -1195,7 +1195,7 @@ TrianglesSurface.prototype.getBoundingBox = function() {
  */
 var Fpolyhedron= function() {
 	if(!(this instanceof Fpolyhedron)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.mFTrianglesSurfacesArray = [];
@@ -1297,7 +1297,7 @@ Fpolyhedron.prototype.getBoundingBox = function() {
  */
 var FpolyhedronsList= function() {
 	if(!(this instanceof FpolyhedronsList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.mFPolyhedronsArray = [];
@@ -1337,7 +1337,7 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 */
 var Quaternion = function() {
 	if(!(this instanceof Quaternion)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.x = 0.0;
@@ -1411,7 +1411,7 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
  */
 var Matrix4 = function() {
 	if(!(this instanceof Matrix4)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._floatArrays = [];
@@ -1648,7 +1648,7 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
  */
 var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
 	if(!(this instanceof OcclusionCullingOctreeCell)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._ocCulling_Cell_owner = occlusionCullingOctree_Cell_Owner;
@@ -1927,7 +1927,7 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
  */
 var OcclusionCullingOctree = function() {
 	if(!(this instanceof OcclusionCullingOctree)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._ocCulling_box = new OcclusionCullingOctreeCell(null);
@@ -1940,7 +1940,7 @@ var OcclusionCullingOctree = function() {
  */
 var Reference = function() {
 	if(!(this instanceof Reference)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// 1) Object ID.***
@@ -1999,7 +1999,7 @@ Reference.prototype.newByteColorsSurface = function() {
  */
 var CompoundReference = function() {
 	if(!(this instanceof CompoundReference)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._referencesList = [];
@@ -2047,7 +2047,7 @@ CompoundReference.prototype.newReference = function() {
  */
 var CompoundReferencesList = function() {
 	if(!(this instanceof CompoundReferencesList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._name = "";
@@ -2141,7 +2141,7 @@ CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
  */
 var CompoundReferencesListContainer = function() {
 	if(!(this instanceof CompoundReferencesListContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._compRefsList_Array = [];
@@ -2232,7 +2232,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
  */
 var VertexIdxArrays = function() {
 	if(!(this instanceof VertexIdxArrays)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.indices_count = -1;
@@ -2246,7 +2246,7 @@ var VertexIdxArrays = function() {
  */
 var VertexIdxVBOArraysContainer = function() {
 	if(!(this instanceof VertexIdxVBOArraysContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._meshArrays = [];
@@ -2267,7 +2267,7 @@ VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
 */
 var ByteColorsVBOArrays = function() {
 	if(!(this instanceof ByteColorsVBOArrays)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.MESH_COLORS_cacheKey= null;
@@ -2278,7 +2278,7 @@ var ByteColorsVBOArrays = function() {
  */
 var ByteColorsVBOArraysContainer = function() {
 	if(!(this instanceof ByteColorsVBOArraysContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._meshArrays = [];
@@ -2299,7 +2299,7 @@ ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
  */
 var Block = function() {
 	if(!(this instanceof Block)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
@@ -2315,7 +2315,7 @@ var Block = function() {
  */
 var BlocksList = function() {
 	if(!(this instanceof BlocksList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._name = "";
@@ -2351,7 +2351,7 @@ BlocksList.prototype.getBlock = function(idx) {
  */
 var BlocksListsContainer = function() {
 	if(!(this instanceof BlocksListsContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this._BlocksListsArray = [];
 };
@@ -2396,7 +2396,7 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
  */
 var VertexTexcoordsArrays = function() {
 	if(!(this instanceof VertexTexcoordsArrays)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._vertices_array = [];
@@ -2408,7 +2408,7 @@ var VertexTexcoordsArrays = function() {
  */
 var VNTInterleavedCacheKeys = function() {
 	if(!(this instanceof VNTInterleavedCacheKeys)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.VNT_cacheKey = null;
@@ -2422,7 +2422,7 @@ var VNTInterleavedCacheKeys = function() {
  */
 var VertexTexcoordsArraysCacheKeys = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeys)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._verticesArray_cacheKey = null;
@@ -2441,7 +2441,7 @@ var VertexTexcoordsArraysCacheKeys = function() {
  */
 var VertexTexcoordsArraysCacheKeysContainer = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeysContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._vtArrays_cacheKeys_array = [];
@@ -2462,7 +2462,7 @@ VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheK
  */
 var SimpleObject = function() {
 	if(!(this instanceof SimpleObject)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._vtCacheKeys_container = new VertexTexcoordsArraysCacheKeysContainer();
@@ -2473,7 +2473,7 @@ var SimpleObject = function() {
  */
 var SimpleStorey = function() {
 	if(!(this instanceof SimpleStorey)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._simpleObjects_array = [];
@@ -2494,7 +2494,7 @@ SimpleStorey.prototype.newSimpleObject = function() {
  */
 var SimpleBuilding = function() {
 	if(!(this instanceof SimpleBuilding)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._simpleStoreys_list = [];
@@ -2518,7 +2518,7 @@ SimpleBuilding.prototype.newSimpleStorey = function() {
  */
 var SimpleBuildingV1 = function() {
 	if(!(this instanceof SimpleBuildingV1)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// this class is for faster rendering XDO converted projects.***
@@ -2554,7 +2554,7 @@ SimpleBuildingV1.prototype.newSimpleObject = function() {
  */
 var Octree = function(octreeOwner) {
 	if(!(this instanceof Octree)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// Note: an octree is a cube, not a box.***
@@ -3110,7 +3110,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
  */
 var Header = function() {
 	if(!(this instanceof Header)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._f4d_version = 1;
@@ -3142,7 +3142,7 @@ var Header = function() {
  */
 var BRBuildingProject = function() {
 	if(!(this instanceof BRBuildingProject)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._header = new Header();
@@ -3412,7 +3412,7 @@ BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
  */
 var PCloudMesh = function() {
 	if(!(this instanceof PCloudMesh)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// this is a temporary class to render mesh from point cloud.***
@@ -3442,7 +3442,7 @@ var PCloudMesh = function() {
  */
 var BRBuildingProjectsList = function() {
 	if(!(this instanceof BRBuildingProjectsList)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._BR_buildingsArray = [];
@@ -3493,7 +3493,7 @@ BRBuildingProjectsList.prototype.getBoundingBox = function() {
  */
 var TerranTile = function() {
 	if(!(this instanceof TerranTile)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	//           +-----+-----+

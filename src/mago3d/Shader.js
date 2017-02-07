@@ -70,7 +70,7 @@
  */
 var Shader = function() {
 	if(!(this instanceof Shader)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.shader_name;
@@ -105,7 +105,7 @@ var Shader = function() {
  */
 var ShadersManager = function() {
 	if(!(this instanceof ShadersManager)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.shaders_array = [];

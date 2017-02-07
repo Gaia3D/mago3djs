@@ -5,19 +5,19 @@
  */
 var CesiumManager = function() {
 	if(!(this instanceof CesiumManager)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// F4D Data structure & objects.*****************************************
-	this.f4dBR_buildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for f4d projects.*** !!!
-	this.f4d_terranTile = new TerranTile();// use this.***
-	this.f4d_neoBuildingsList = new NeoBuildingsList();
-	this.f4dRenderer = new Renderer();
-	this.f4dSelection = new Selection();
-	this.f4d_shadersManager = new ShadersManager();
-	this.f4d_postFxShadersManager = new PostFxShadersManager();
-	this.f4d_vboManager = new VBOManager();
-	this.f4d_readerWriter = new ReaderWriter();
+	this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for f4d projects.*** !!!
+	this.terranTile = new TerranTile();// use this.***
+	this.neoBuildingsList = new NeoBuildingsList();
+	this.renderer = new Renderer();
+	this.selection = new Selection();
+	this.shadersManager = new ShadersManager();
+	this.postFxShadersManager = new PostFxShadersManager();
+	this.vBOManager = new VBOManager();
+	this.readerWriter = new ReaderWriter();
 	
 	// SSAO.***************************************************
 	this.noiseTexture;
@@ -517,8 +517,8 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 	this.encodedCamPosMC_Low[2] = camSplitVelue_Z.low;
 	//-----------------------------------------------------------------------------------------
 	// Test using f4d_shaderManager.************************
-	var f4d_shadersManager = this.f4d_shadersManager;
-	var standardShader = f4d_shadersManager.getMagoShader(4); // 4 = cloud-shader.***
+	var shadersManager = this.shadersManager;
+	var standardShader = shadersManager.getMagoShader(4); // 4 = cloud-shader.***
 	var shaderProgram = standardShader.SHADER_PROGRAM;
 	GL.useProgram(shaderProgram);
 
@@ -610,8 +610,8 @@ CesiumManager.prototype.renderCloudShadows = function(GL, cameraPosition, cullin
 	this.encodedCamPosMC_Low[2] = camSplitVelue_Z.low;
 	//-----------------------------------------------------------------------------------------
 	// Test using f4d_shaderManager.************************
-	var f4d_shadersManager = this.f4d_shadersManager;
-	var standardShader = f4d_shadersManager.getMagoShader(4); // 4 = cloud-shader.***
+	var shadersManager = this.shadersManager;
+	var standardShader = shadersManager.getMagoShader(4); // 4 = cloud-shader.***
 	var shaderProgram = standardShader.SHADER_PROGRAM;
 	GL.useProgram(shaderProgram);
 	
@@ -740,7 +740,7 @@ CesiumManager.prototype.renderCloudShadows = function(GL, cameraPosition, cullin
 		GL.cullFace(GL.FRONT);
 
 		// render the shadowBlendingCube.***
-				standardShader = f4d_shadersManager.getMagoShader(5); // 5 = blendingCube-shader.***
+				standardShader = shadersManager.getMagoShader(5); // 5 = blendingCube-shader.***
 				var shaderProgram_blendingCube = standardShader.SHADER_PROGRAM;
 				GL.useProgram(shaderProgram_blendingCube);
 				
@@ -840,7 +840,7 @@ CesiumManager.prototype.renderPCloudProjects = function(GL, cameraPosition, cull
 	
 	// Now, render the simple visible buildings.***************************************************************************
 	// http://learningwebgl.com/blog/?p=684 // tutorial for shader with normals.***
-	var shader = this.f4d_shadersManager.getMagoShader(6);
+	var shader = this.shadersManager.getMagoShader(6);
 	var shaderProgram = shader.SHADER_PROGRAM;
 	GL.useProgram(shaderProgram);
 	GL.enableVertexAttribArray(shader._color);
@@ -861,19 +861,19 @@ CesiumManager.prototype.renderPCloudProjects = function(GL, cameraPosition, cull
 	
 	// Now, render LOD0 texture buildings.***
 	var pCloudProject;
-	var pCloud_projectsCount = this.f4dBR_buildingProjectsList._pCloudMesh_array.length;
+	var pCloud_projectsCount = this.bRBuildingProjectsList._pCloudMesh_array.length;
 	for(var i=0; i<pCloud_projectsCount; i++)
 	{
-		pCloudProject = this.f4dBR_buildingProjectsList._pCloudMesh_array[i];
+		pCloudProject = this.bRBuildingProjectsList._pCloudMesh_array[i];
 		
 		if(!pCloudProject._f4d_header_readed)
 		{
 			// Must read the header file.***
 			if(this.backGround_fileReadings_count < 20)
 			{
-				filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/" + pCloudProject._f4d_headerPathName;
+				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject._f4d_headerPathName;
 				
-				this.f4d_readerWriter.readPCloudHeaderInServer(GL, filePath_scratch, pCloudProject, this.f4d_readerWriter, this);
+				this.readerWriter.readPCloudHeaderInServer(GL, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -882,9 +882,9 @@ CesiumManager.prototype.renderPCloudProjects = function(GL, cameraPosition, cull
 		{
 			if(this.backGround_fileReadings_count < 20)
 			{
-				filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/" + pCloudProject._f4d_geometryPathName;
+				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject._f4d_geometryPathName;
 				
-				this.f4d_readerWriter.readPCloudGeometryInServer(GL, filePath_scratch, pCloudProject, this.f4d_readerWriter, this);
+				this.readerWriter.readPCloudGeometryInServer(GL, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -892,7 +892,7 @@ CesiumManager.prototype.renderPCloudProjects = function(GL, cameraPosition, cull
 		
 		// Now, render the pCloud project.***
 		if(pCloudProject._f4d_geometry_readed_finished)
-			this.f4dRenderer.renderPCloudProject(GL, pCloudProject, this.modelViewProjRelToEye_matrix, this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this);
+			this.renderer.renderPCloudProject(GL, pCloudProject, this.modelViewProjRelToEye_matrix, this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this);
 
 	}
 	
@@ -1006,8 +1006,8 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
-		var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
-		//var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
+		var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
+		//var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
 		this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
 		GL.clearColor(0, 0, 0, 1);
 		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -1056,8 +1056,8 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
-					this.f4d_readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
 			else
@@ -1068,7 +1068,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 					if(simpBuildTexture.textureId != undefined)
 					{
 						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.f4dRenderer.renderNeoSimpleBuildingDepthShader(GL, neoBuilding, this, currentShader); 
+						//this.renderer.renderNeoSimpleBuildingDepthShader(GL, neoBuilding, this, currentShader); 
 					}
 					else
 					{
@@ -1102,7 +1102,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		// 2) ssao render.************************************************************************************************************
 		// 2) ssao render.************************************************************************************************************
 		scene._context._currentFramebuffer._bind();
-		currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[4];
+		currentShader = this.postFxShadersManager.pFx_shaders_array[4];
 		
 		//GL.clearColor(0, 0, 0, 1);
 		//GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -1169,8 +1169,8 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
-					this.f4d_readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
 			else
@@ -1181,7 +1181,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 					if(simpBuildTexture.textureId != undefined)
 					{
 						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.f4dRenderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
+						//this.renderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
 					}
 					else
 					{
@@ -1294,8 +1294,8 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
-		var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
-		//var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
+		var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
+		//var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
 		this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
 		GL.clearColor(0, 0, 0, 1);
 		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -1344,8 +1344,8 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
-					this.f4d_readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
 			else
@@ -1356,7 +1356,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 					if(simpBuildTexture.textureId != undefined)
 					{
 						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.f4dRenderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
+						//this.renderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
 					}
 					else
 					{
@@ -1390,7 +1390,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 		// 2) ssao render.************************************************************************************************************
 		// 2) ssao render.************************************************************************************************************
 		scene._context._currentFramebuffer._bind();
-		currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[4];
+		currentShader = this.postFxShadersManager.pFx_shaders_array[4];
 		
 		//GL.clearColor(0, 0, 0, 1);
 		//GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -1457,8 +1457,8 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.f4d_readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
-					this.f4d_readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
 			else
@@ -1469,7 +1469,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 					if(simpBuildTexture.textureId != undefined)
 					{
 						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.f4dRenderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
+						//this.renderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
 					}
 					else
 					{
@@ -1570,7 +1570,7 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
 		this.selectionFbo.bind(); // framebuffer for color selection.***
 		//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.selectionFbo.colorBuffer, 0);
 		
-		var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
+		var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
 		
 		gl.clearColor(1, 1, 1, 1); // white background.***
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
@@ -1669,8 +1669,8 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, 
 	this.selectionFbo.bind(); // framebuffer for color selection.***
 	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.selectionFbo.colorBuffer, 0);
 	
-	//var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[6]; // depth shader.***
-	var currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[3]; // ssao_depth shader.***
+	//var currentShader = this.postFxShadersManager.pFx_shaders_array[6]; // depth shader.***
+	var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // ssao_depth shader.***
 	
 	gl.clearColor(1, 1, 1, 1); // white background.***
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
@@ -2016,13 +2016,13 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 	{
 		var isInterior = false; // no used.***
 
-		this.f4dRenderer.renderNeoRefListsColorSelection(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+		this.renderer.renderNeoRefListsColorSelection(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 	else{
 	
 		var isInterior = false; // no used.***
 
-		this.f4dRenderer.renderNeoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+		this.renderer.renderNeoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 };
 
@@ -2157,7 +2157,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 	var currentShader;
 	if(this.detailed_building && isLastFrustum)
 	{
-		currentShader = this.f4d_shadersManager.getMagoShader(0);
+		currentShader = this.shadersManager.getMagoShader(0);
 		//this.render_DetailedBuilding(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, currentShader);
 	}
 	// End render the detailed building if exist.---------------------------------------------------------------------------------------------------------------
@@ -2221,7 +2221,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 		GL.viewport(0, 0, this.depthFbo.width, this.depthFbo.height);  
 		
-		currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[0];
+		currentShader = this.postFxShadersManager.pFx_shaders_array[0];
 	
 	shaderProgram = currentShader.program;
 	GL.useProgram(shaderProgram);
@@ -2274,7 +2274,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 						
 						var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 						///////////////////////////////////////////////////////////
-						this.f4d_readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.f4d_readerWriter, this, 3);
+						this.readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
 						//--------------------------------------------------------------------------
 					}
 					continue;
@@ -2283,10 +2283,10 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 				{
 					if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 					{
-						//filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-						filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+						//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
+						filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
 						
-						this.f4d_readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
+						this.readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 						this.backGround_fileReadings_count ++;
 						
 					}
@@ -2302,21 +2302,21 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 		if(BR_Project._simpleBuilding_v1)// Test
 		{
 			//renderSimpleBuildingV1PostFxShader
-			this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
+			this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
 			/*
 			if(BR_Project._f4d_lod0Image_exists)
 			{
 				if(BR_Project._f4d_lod0Image_readed_finished)
-					this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 0 = lod0.***
+					this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 0 = lod0.***
 
 				else if(BR_Project._f4d_nailImage_readed_finished)
 				{
-					this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
+					this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
 				}
 			}
 			else if(BR_Project._f4d_nailImage_readed_finished)
 			{
-				this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
+				this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
 			}
 			*/
 		}
@@ -2347,7 +2347,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 						BR_Project._f4d_nailImage_readed = true;
 						
 						var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-						this.f4d_readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.f4d_readerWriter, this, 3);
+						this.readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
 					}
 					continue;
 				}
@@ -2361,7 +2361,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
 		if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished)// Test
 		{
-			this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
+			this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, -1, currentShader); // 3 = lod3.***
 		}
 	}
 	//GL.disableVertexAttribArray(currentShader.texCoord2_loc);
@@ -2388,7 +2388,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 		if(this.noiseTexture == undefined)
 		this.noiseTexture = genNoiseTextureRGBA(GL, 4, 4, this.pixels);
 	
-	currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[1];
+	currentShader = this.postFxShadersManager.pFx_shaders_array[1];
 	
 	shaderProgram = currentShader.program;
 	GL.useProgram(shaderProgram);
@@ -2450,7 +2450,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 								BR_Project._f4d_nailImage_readed = true;
 								
 								var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-								this.f4d_readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.f4d_readerWriter, this, 3);
+								this.readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
 							}
 							continue;
 						}
@@ -2458,10 +2458,10 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 						{
 							if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 							{
-								//filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-								filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+								//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
+								filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
 								
-								this.f4d_readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
+								this.readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 								this.backGround_fileReadings_count ++;
 
 							}
@@ -2481,16 +2481,16 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 					if(BR_Project._f4d_lod0Image_exists)
 					{
 						if(BR_Project._f4d_lod0Image_readed_finished)
-							this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 0, currentShader); // 0 = lod0.***
+							this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 0, currentShader); // 0 = lod0.***
 
 						else if(BR_Project._f4d_nailImage_readed_finished)
 						{
-							this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
+							this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
 						}
 					}
 					else if(BR_Project._f4d_nailImage_readed_finished)
 					{
-						this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
+						this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
 					}
 				}
 			}
@@ -2535,7 +2535,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 								BR_Project._f4d_nailImage_readed = true;
 								
 								var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-								this.f4d_readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.f4d_readerWriter, this, 3);
+								this.readerWriter.readNailImageOfArrayBuffer(GL, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
 							}
 							continue;
 						}
@@ -2549,7 +2549,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 				//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
 				if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished)// Test
 				{
-					this.f4dRenderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
+					this.renderer.renderSimpleBuildingV1PostFxShader(GL, BR_Project, this, 3, currentShader); // 3 = lod3.***
 				}
 				/*
 				if(this.isCameraMoving)
@@ -2583,7 +2583,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix); 
 	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix); 
 	
-	currentShader = this.f4d_postFxShadersManager.pFx_shaders_array[2]; // blur.***
+	currentShader = this.postFxShadersManager.pFx_shaders_array[2]; // blur.***
 	
 	shaderProgram = currentShader.program;
 	GL.useProgram(shaderProgram);
@@ -2625,8 +2625,8 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 	
 	for(var i=0; i<last_simpBuilds_count; i++)
 	{
-		this.f4dRenderer.render_F4D_simpleBuilding(GL, this.currentVisibleBuildingsPost_array[i], this.modelViewProjRelToEye_matrix, 
-				this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this.f4d_shadersManager);
+		this.renderer.render_F4D_simpleBuilding(GL, this.currentVisibleBuildingsPost_array[i], this.modelViewProjRelToEye_matrix, 
+				this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this.shadersManager);
 	}
 	
 	//GL.useProgram(null);
@@ -2662,10 +2662,10 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var neoBuildings_count = this.f4d_neoBuildingsList.neoBuildings_Array.length;
+	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++)
 	{
-		var neoBuilding = this.f4d_neoBuildingsList.neoBuildings_Array[i];
+		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		
 		if(neoBuilding._buildingPosition == undefined)
 		{
@@ -2738,7 +2738,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	// old code. works ok.***
 	for(var i=0; i<neoBuildings_count; i++)
 	{
-		var neoBuilding = this.f4d_neoBuildingsList.neoBuildings_Array[i];
+		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		
 		if(neoBuilding._buildingPosition == undefined)
 		{
@@ -2852,7 +2852,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 	var max_tileFilesReading = 10;
 	
 	this.currentVisible_terranTiles_array.length = 0;// Init.***
-	this.f4d_terranTile.getIntersectedSmallestTiles(frustumVolume, this.currentVisible_terranTiles_array, this.boundingSphere_Aux);
+	this.terranTile.getIntersectedSmallestTiles(frustumVolume, this.currentVisible_terranTiles_array, this.boundingSphere_Aux);
 	
 	// Find the nearest tile to camera.***
 	var visibleTiles_count = this.currentVisible_terranTiles_array.length;
@@ -2898,8 +2898,8 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
-				this.f4d_readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
+				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
@@ -3000,8 +3000,8 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
-				this.f4d_readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
+				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
@@ -3067,8 +3067,8 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.f4d_readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
-				this.f4d_readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
+				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
@@ -3229,12 +3229,12 @@ CesiumManager.prototype.loadTESTFiles = function() {
 	var incre_longAng = 0.0005;
 	
 	// Test modularitzing.*******************************************************
-	var BR_ProjectsList = this.f4dBR_buildingProjectsList;
-	var neoBuildingsList = this.f4d_neoBuildingsList;
+	var BR_ProjectsList = this.bRBuildingProjectsList;
+	var neoBuildingsList = this.neoBuildingsList;
 
 	var height = 1635.0;
 	var GL = this.scene.context._gl;
-	//viewer.f4d_readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.f4d_readerWriter, BR_ProjectsList);
+	//viewer.readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.readerWriter, BR_ProjectsList);
 	// End test modularitzing.---------------------------------------------------
 	
 	/*
@@ -3248,7 +3248,7 @@ CesiumManager.prototype.loadTESTFiles = function() {
 	
 	var deployType = Mago3DConfig.getInformation.getDeployType();
 	if(deployType !== 'production') {
-		this.f4d_readerWriter.openTerranTile(GL, this.f4d_terranTile, this.f4d_readerWriter);
+		this.readerWriter.openTerranTile(GL, this.terranTile, this.readerWriter);
 	}
 	var deltaLat = -0.0015;
 	var deltaLon = 0.0015;
@@ -3266,21 +3266,21 @@ CesiumManager.prototype.loadTESTFiles = function() {
 	} else {
 		buildingFileName = '';
 	}
-	this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+	this.readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
 	
 	if(deployType === 'dev' || deployType === 'stage') {
 		buildingFileName = "F4D_gangbuk_cultur_del";
-		this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+		this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
 		
 		buildingFileName = "F4D_KANGBUK_del";
-		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.readerWriter, neoBuildingsList, this);
 		
 		buildingFileName = "F4D_gangnam_del";
-		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.f4d_readerWriter, neoBuildingsList, this);
+		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.readerWriter, neoBuildingsList, this);
 		
 		buildingFileName = "F4D_7117_M320P";
 		//var buildingFileName = "F4D_7117_M320P_low";
-		//this.f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, neoBuildingsList, this);
+		//this.readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.readerWriter, neoBuildingsList, this);
 	}
 		
 	deltaLat = 0.0002;

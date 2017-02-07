@@ -5,7 +5,7 @@
  */
 var Renderer = function() {
 	if(!(this instanceof Renderer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.vbo_vi_cacheKey_aux;
@@ -68,7 +68,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		GL.bindTexture(GL.TEXTURE_2D, f4d_manager.textureAux_1x1);
 	}
 	 
-	var geometryDataPath = f4d_manager.f4d_readerWriter.geometryDataPath;
+	var geometryDataPath = f4d_manager.readerWriter.geometryDataPath;
 	  
 	for(var j=0; j<neoRefLists_count; j++) {
 		var neoRefList = neoRefList_array[j];
@@ -157,7 +157,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 				{
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.f4d_readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				}
@@ -468,7 +468,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 				{
 					// Load the texture.***
 					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.f4d_readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				}
@@ -603,7 +603,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuilding, f4d_manager, imageLod, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
+	var shadersManager = f4d_manager.shadersManager;
 	
 	// check if has vbos.***
 	if(simpBuild.vbo_vicks_container._vbo_cacheKeysArray.length == 0)
@@ -738,7 +738,7 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuildin
 Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding, f4d_manager, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
+	var shadersManager = f4d_manager.shadersManager;
 	
 	// check if has vbos.***
 	if(simpBuild.vbo_vicks_container._vbo_cacheKeysArray.length == 0)
@@ -839,7 +839,7 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding
 Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project, f4d_manager, imageLod, shader) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
+	var shadersManager = f4d_manager.shadersManager;
 	
 	if(simpBuildV1._simpleObjects_array.length == 0)
 	{
@@ -903,7 +903,7 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project,
  * @param f4d_manager 변수
  */
 Renderer.prototype.renderPCloudProject = function(GL, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
-	var f4d_shadersManager = f4d_manager.f4d_shadersManager;
+	var shadersManager = f4d_manager.shadersManager;
 	
 	//if(simpBuildV1._simpleObjects_array.length == 0)
 	//{
@@ -911,7 +911,7 @@ Renderer.prototype.renderPCloudProject = function(GL, pCloudProject, modelViewPr
 	//}
 	
 	// Test using f4d_shaderManager.************************
-	var shader = f4d_shadersManager.getMagoShader(6);
+	var shader = shadersManager.getMagoShader(6);
 	var shaderProgram = shader.SHADER_PROGRAM;
 	//------------------------------------------------------
 

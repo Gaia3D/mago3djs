@@ -5,7 +5,7 @@
  */
 var Plane = function() {
 	if(!(this instanceof Plane)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// ax+by+cz+d = 0 plane.***
