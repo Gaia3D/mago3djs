@@ -6,7 +6,7 @@
  */
 var PostFxShader = function(gl) {
 	if(!(this instanceof PostFxShader)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// shader program.***
@@ -66,7 +66,7 @@ var PostFxShader = function(gl) {
  */
 var PostFxShadersManager = function() {
 	if(!(this instanceof PostFxShadersManager)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.pFx_shaders_array = [];

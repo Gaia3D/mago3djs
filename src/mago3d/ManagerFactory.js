@@ -4,11 +4,11 @@
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
  * @param productType 화면 3d 표현시 사용할 library name 값
  * @param containerId 뷰에서 표시할 위치 id
- * @return 
+ * @return api
  */
 var ManagerFactory = function(productType, containerId) {
 	if(!(this instanceof ManagerFactory)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	var viewer = null;
@@ -25,9 +25,9 @@ var ManagerFactory = function(productType, containerId) {
 	function drawCesium() {
 		
 		var GL = viewer.scene.context._gl;
-		viewer.scene.magoManager.f4dSelection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.f4d_shadersManager.createDefaultShader(GL); 
-		viewer.scene.magoManager.f4d_postFxShadersManager.createDefaultShaders(GL); 
+		viewer.scene.magoManager.selection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+		viewer.scene.magoManager.shadersManager.createDefaultShader(GL); 
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(GL); 
 		viewer.scene.magoManager.scene = viewer.scene;
 		
 		// Start postRender version.***********************************************
@@ -37,16 +37,16 @@ var ManagerFactory = function(productType, containerId) {
 		
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		
-		magoManager.f4dSelection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		magoManager.f4d_shadersManager.createDefaultShader(GL); 
-		magoManager.f4d_postFxShadersManager.createDefaultShaders(GL); 
+		magoManager.selection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
+		magoManager.shadersManager.createDefaultShader(GL); 
+		magoManager.postFxShadersManager.createDefaultShaders(GL); 
 		
-		var f4d_readerWriter = new ReaderWriter();
+		var readerWriter = new ReaderWriter();
 		
 		magoManager.loadTESTFiles();
 		
-		var BR_ProjectsList = magoManager.f4dBR_buildingProjectsList;
-		var neoBuildingsList = magoManager.f4d_neoBuildingsList;
+		var BR_ProjectsList = magoManager.bRBuildingProjectsList;
+		var neoBuildingsList = magoManager.neoBuildingsList;
 		
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
@@ -142,7 +142,7 @@ var ManagerFactory = function(productType, containerId) {
 	
 	/**
 	 * zoomTo 할 Entity
-	 * @returns
+	 * @returns entities
 	 */
 	function getEntity() {
 		return viewer.entities.add({

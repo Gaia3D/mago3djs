@@ -1,11 +1,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선
  */
 var Line = function() {
 	if(!(this instanceof Line)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	// (x,y,z) = (x0,y0,z0) + lambda * (u, v, w);

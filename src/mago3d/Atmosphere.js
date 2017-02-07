@@ -8,7 +8,7 @@
  */
 var Atmosphere = function() {
 	if(!(this instanceof Atmosphere)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.cloudsManager = new CloudsManager();
@@ -20,7 +20,7 @@ var Atmosphere = function() {
  */
 var ShadowBlendingCube = function() {
 	if(!(this instanceof ShadowBlendingCube)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.vertexMatrix = new VertexMatrix();
@@ -150,7 +150,7 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
  */
 var CloudsManager = function() {
 	if(!(this instanceof CloudsManager)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.circularCloudsArray = [];
 };
@@ -170,7 +170,7 @@ CloudsManager.prototype.newCircularCloud = function() {
  */
 var CircularCloud = function() {
 	if(!(this instanceof CircularCloud)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.radius = 200.0;

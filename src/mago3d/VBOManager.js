@@ -5,7 +5,7 @@
  */
 var VBOManager = function() {
 	if(!(this instanceof VBOManager)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 };
 
@@ -14,7 +14,7 @@ var VBOManager = function() {
  */
 var Buffer = function() {
 	if(!(this instanceof Buffer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.dataArray;
@@ -26,7 +26,7 @@ var Buffer = function() {
  */
 var VBOVertexIdxCacheKey = function() {
 	if(!(this instanceof VBOVertexIdxCacheKey)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
     this.indices_count = -1;
@@ -51,7 +51,7 @@ var VBOVertexIdxCacheKey = function() {
  */
 var VBOVertexIdxCacheKeysContainer = function() {
 	if(!(this instanceof VBOVertexIdxCacheKeysContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this._vbo_cacheKeysArray = [];
@@ -72,7 +72,7 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
  */
 var VBOByteColorCacheKey = function() {
 	if(!(this instanceof VBOByteColorCacheKey)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
     this.MESH_COLORS_cacheKey = null;
@@ -84,7 +84,7 @@ var VBOByteColorCacheKey = function() {
  */
 var VBOByteColorCacheKeysContainer = function() {
 	if(!(this instanceof VBOByteColorCacheKeysContainer)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
     this._vbo_byteColors_cacheKeysArray = [];

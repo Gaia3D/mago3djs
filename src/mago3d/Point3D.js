@@ -1,11 +1,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 3차원 정보
  */
 var Point3D = function() {
 	if(!(this instanceof Point3D)) {
-		throw new Error(MESSAGES.classNewError);
+		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
 	this.x = 0.0;
