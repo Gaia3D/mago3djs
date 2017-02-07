@@ -5,7 +5,7 @@
 
 ## 2. mago3djsArchitecture
 
-<img src ="http://i.imgur.com/CMJ0fKA.png" width = 400>
+<img src ="http://i.imgur.com/Yckn8qA.png" width = 400>
 
 | tool | description |
 | :------------ | :-----------:
@@ -14,8 +14,7 @@
 | Build     | used [**Gulp**](https://github.com/Gaia3D/mago3djs/wiki/Build)  |
 | 정적검사(lint) | used [**eslint**]() |
 
-
------------
+---
 
 ## mago3djs 개발 환경
  - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html )
