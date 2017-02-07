@@ -41,11 +41,11 @@ var ManagerFactory = function(productType, containerId) {
 		magoManager.shadersManager.createDefaultShader(GL); 
 		magoManager.postFxShadersManager.createDefaultShaders(GL); 
 		
-		var readerWriter = new ReaderWriter();
+//		var readerWriter = new ReaderWriter();
 		
-		magoManager.loadTESTFiles();
+		magoManager.loadData();
 		
-		var BR_ProjectsList = magoManager.bRBuildingProjectsList;
+//		var bRBuildingProjectsList = magoManager.bRBuildingProjectsList;
 		var neoBuildingsList = magoManager.neoBuildingsList;
 		
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
