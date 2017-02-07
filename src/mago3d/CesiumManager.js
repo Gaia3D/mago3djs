@@ -1056,7 +1056,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
@@ -1169,7 +1169,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
@@ -1344,7 +1344,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
@@ -1457,7 +1457,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 				{
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + "/SimpleBuildingTexture3x3.bmp";
+					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
 				}
 			}
@@ -2284,7 +2284,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 					if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 					{
 						//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-						filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+						filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 						
 						this.readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 						this.backGround_fileReadings_count ++;
@@ -2459,7 +2459,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 							if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 							{
 								//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-								filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+								filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 								
 								this.readerWriter.readNailImageInServer(GL, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 								this.backGround_fileReadings_count ++;
@@ -2898,7 +2898,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
 				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -3000,7 +3000,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
 				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -3067,7 +3067,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
 				this.readerWriter.readTileArrayBufferInServer(GL, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -3218,7 +3218,7 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 /**
  * 어떤 일을 하고 있습니까?
  */
-CesiumManager.prototype.loadTESTFiles = function() {
+CesiumManager.prototype.loadData = function() {
 	// Now, load sejong.***
 	var project_number = 7500; // House with car and mini park to children.***
 	var GAIA3D__counter =1;

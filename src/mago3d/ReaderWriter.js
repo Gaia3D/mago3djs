@@ -1312,7 +1312,7 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
  * @param readerWriter 변수
  */
 ReaderWriter.prototype.openTerranTile = function(GL, terranTile, readerWriter ) {
-	var filePath_inServer = this.geometryDataPath + "/Result_xdo2f4d/f4dTerranTileFile.txt";
+	var filePath_inServer = this.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILEFILE_TXT;
 	readerWriter.readTerranTileFileInServer(GL, filePath_inServer, terranTile, readerWriter);
 };	
 
