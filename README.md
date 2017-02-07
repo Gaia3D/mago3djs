@@ -9,7 +9,7 @@
 
 | tool | description |
 | :------------ | :-----------:
-| Test     | used TestRunner(**Karma**) and used Test([**Jasmine**](https://github.com/Gaia3D/mago3djs/wiki/Jasmine))         
+| Test     | used TestRunner(**Karma**) and used Test([**Jasmine**](https://github.com/Gaia3D/mago3djs/wiki/Test))         
 | Documentaion    | used [**jsdoc**](https://github.com/Gaia3D/mago3djs/wiki/jsdoc)    
 | Build     | used [**Gulp**](https://github.com/Gaia3D/mago3djs/wiki/Build)  |
 | 정적검사(lint) | used [**eslint**]() |
