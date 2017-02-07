@@ -13,6 +13,10 @@ var VBOManager = function() {
  * 어떤 일을 하고 있습니까?
  */
 var Buffer = function() {
+	if(!(this instanceof Buffer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.dataArray;
 	this.dataArray_byteLength = 0;
 };
@@ -21,6 +25,10 @@ var Buffer = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VBOVertexIdxCacheKey = function() {
+	if(!(this instanceof VBOVertexIdxCacheKey)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
     this.indices_count = -1;
     
     this.MESH_VERTEX_cacheKey = null;
@@ -42,6 +50,10 @@ var VBOVertexIdxCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VBOVertexIdxCacheKeysContainer = function() {
+	if(!(this instanceof VBOVertexIdxCacheKeysContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._vbo_cacheKeysArray = [];
 }; 
 
@@ -59,6 +71,10 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VBOByteColorCacheKey = function() {
+	if(!(this instanceof VBOByteColorCacheKey)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
     this.MESH_COLORS_cacheKey = null;
 	this.MESH_TEXCOORDS_cacheKey = null;
 };
@@ -67,6 +83,10 @@ var VBOByteColorCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VBOByteColorCacheKeysContainer = function() {
+	if(!(this instanceof VBOByteColorCacheKeysContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
     this._vbo_byteColors_cacheKeysArray = [];
 };
 

@@ -281,35 +281,34 @@ var CesiumManager = function() {
  * @returns texture
  */
 function genNoiseTextureRGBA(gl, w, h, pixels) {       
-  var texture = gl.createTexture();
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  var b = new ArrayBuffer(w*h*4);
-  //var pixels = new Uint8Array(b);
+	var texture = gl.createTexture();
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	var b = new ArrayBuffer(w*h*4);
+	//var pixels = new Uint8Array(b);
   
-  if(w == 4 && h == 4)
-  {
-	  /*
-	  pixels[0] = 149; pixels[1] = 16; pixels[2] = 2; pixels[3] = 197;
-	  pixels[4] = 79; pixels[5] = 76; pixels[6] = 11; pixels[7] = 53;
-	  pixels[8] = 83; pixels[9] = 74; pixels[10] = 155; pixels[11] = 159;
-	  pixels[12] = 19; pixels[13] = 232; pixels[14] = 183; pixels[15] = 27;
+	if(w == 4 && h == 4) {
+		/*
+	  	pixels[0] = 149; pixels[1] = 16; pixels[2] = 2; pixels[3] = 197;
+	  	pixels[4] = 79; pixels[5] = 76; pixels[6] = 11; pixels[7] = 53;
+	  	pixels[8] = 83; pixels[9] = 74; pixels[10] = 155; pixels[11] = 159;
+	  	pixels[12] = 19; pixels[13] = 232; pixels[14] = 183; pixels[15] = 27;
 	  
-	  pixels[16] = 200; pixels[17] = 248; pixels[18] = 98; pixels[19] = 10;
-	  pixels[20] = 63; pixels[21] = 75; pixels[22] = 229; pixels[23] = 231;
-	  pixels[24] = 162; pixels[25] = 85; pixels[26] = 114; pixels[27] = 243;
-	  pixels[28] = 149; pixels[29] = 136; pixels[30] = 210; pixels[31] = 59;
+	  	pixels[16] = 200; pixels[17] = 248; pixels[18] = 98; pixels[19] = 10;
+	  	pixels[20] = 63; pixels[21] = 75; pixels[22] = 229; pixels[23] = 231;
+	  	pixels[24] = 162; pixels[25] = 85; pixels[26] = 114; pixels[27] = 243;
+	  	pixels[28] = 149; pixels[29] = 136; pixels[30] = 210; pixels[31] = 59;
 	  
-	  pixels[32] = 210; pixels[33] = 233; pixels[34] = 117; pixels[35] = 103;
-	  pixels[36] = 83; pixels[37] = 214; pixels[38] = 42; pixels[39] = 175;
-	  pixels[40] = 117; pixels[41] = 223; pixels[42] = 87; pixels[43] = 197;
-	  pixels[44] = 99; pixels[45] = 254; pixels[46] = 128; pixels[47] = 9;
+	  	pixels[32] = 210; pixels[33] = 233; pixels[34] = 117; pixels[35] = 103;
+	  	pixels[36] = 83; pixels[37] = 214; pixels[38] = 42; pixels[39] = 175;
+	  	pixels[40] = 117; pixels[41] = 223; pixels[42] = 87; pixels[43] = 197;
+	  	pixels[44] = 99; pixels[45] = 254; pixels[46] = 128; pixels[47] = 9;
 	  
-	  pixels[48] = 137; pixels[49] = 99; pixels[50] = 146; pixels[51] = 38;
-	  pixels[52] = 145; pixels[53] = 76; pixels[54] = 178; pixels[55] = 133;
-	  pixels[56] = 202; pixels[57] = 11; pixels[58] = 220; pixels[59] = 34;
-	  pixels[60] = 61; pixels[61] = 216; pixels[62] = 95; pixels[63] = 249;
-	  */
+	  	pixels[48] = 137; pixels[49] = 99; pixels[50] = 146; pixels[51] = 38;
+	  	pixels[52] = 145; pixels[53] = 76; pixels[54] = 178; pixels[55] = 133;
+	  	pixels[56] = 202; pixels[57] = 11; pixels[58] = 220; pixels[59] = 34;
+	  	pixels[60] = 61; pixels[61] = 216; pixels[62] = 95; pixels[63] = 249;
+		 */
 		var i = 0;
 	    pixels[i] = 50; i++;
 		pixels[i] = 58; i++;
@@ -375,31 +374,28 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
 		pixels[i] = 125; i++;
 		pixels[i] = 185; i++;
 		pixels[i] = 28; i++;
-  }
-  else
-	 
-  {
-	  for(var y=0; y<h; y++) {
-		for(var x=0; x<w; x++) {
-		  pixels[(y*w + x)*4+0] = Math.floor(255 * Math.random());
-		  pixels[(y*w + x)*4+1] = Math.floor(255 * Math.random());
-		  pixels[(y*w + x)*4+2] = Math.floor(255 * Math.random());
-		  pixels[(y*w + x)*4+3] = Math.floor(255 * Math.random());
-		}
-	  } 
-  }
-  gl.texImage2D(
-    gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels
-  );
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);   
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-  gl.bindTexture(gl.TEXTURE_2D, null);  
+	} else {
+		for(var y=0; y<h; y++) {
+			for(var x=0; x<w; x++) {
+				pixels[(y*w + x)*4+0] = Math.floor(255 * Math.random());
+				pixels[(y*w + x)*4+1] = Math.floor(255 * Math.random());
+				pixels[(y*w + x)*4+2] = Math.floor(255 * Math.random());
+				pixels[(y*w + x)*4+3] = Math.floor(255 * Math.random());
+			}
+		} 
+	}
+	gl.texImage2D(
+			gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels
+	);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);   
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.bindTexture(gl.TEXTURE_2D, null);  
   
-  texture.width = w;
-  texture.height = h; 
-  return texture;
+	texture.width = w;
+	texture.height = h; 
+	return texture;
 }
 
 /**
@@ -1228,12 +1224,12 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
 	if(!isLastFrustum)
 		return;
 	
-			if(this.bPicking == true)
-			{
-				//this.objectSelected = this.getSelectedObjectPicking(GL, scene, renderables_neoRefLists_array);
+	if(this.bPicking == true)
+	{
+		//this.objectSelected = this.getSelectedObjectPicking(GL, scene, renderables_neoRefLists_array);
 
-			}
-			//moveSelectedObject
+	}
+	//moveSelectedObject
 	
 	//this.isCameraMoving = this.isButtonDown(scene);
 	if(this.textureAux_1x1 == undefined)

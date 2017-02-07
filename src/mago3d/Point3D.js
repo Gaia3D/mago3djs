@@ -27,7 +27,7 @@ Point3D.prototype.destroy = function() {
  * 어떤 일을 하고 있습니까?
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  */
-Point3D.prototype.get_Modul = function() {
+Point3D.prototype.getModul = function() {
 	return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
 };
 
@@ -35,7 +35,7 @@ Point3D.prototype.get_Modul = function() {
  * 어떤 일을 하고 있습니까?
  */
 Point3D.prototype.unitary = function() {
-	var modul = this.get_Modul();
+	var modul = this.getModul();
 	this.x /= modul;
 	this.y /= modul;
 	this.z /= modul;

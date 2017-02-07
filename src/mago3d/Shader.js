@@ -104,6 +104,10 @@ var Shader = function() {
  * 어떤 일을 하고 있습니까?
  */
 var ShadersManager = function() {
+	if(!(this instanceof ShadersManager)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.shaders_array = [];
 	
 	// Create shaders to render F4D_Format.**********************
@@ -162,35 +166,10 @@ ShadersManager.prototype.createColorSelectionShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
-	shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		uniform mat4 RefTransfMatrix;\n\
-		void main(void) { //pre-built function\n\
-			vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-		}";
+	shader.shader_vertex_source = ShaderSource.colorShaderVertexSource;
 		//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
 		
-	shader.shader_fragment_source="\n\
-		precision mediump float;\n\
-		uniform int byteColor_r;\n\
-		uniform int byteColor_g;\n\
-		uniform int byteColor_b;\n\
-		void main(void) {\n\
-		float byteMaxValue = 255.0;\n\
-			gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
-		}";
-		
+	shader.shader_fragment_source = ShaderSource.colorShaderFragmentSource;
 		
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
 	shader.SHADER_PROGRAM = GL.createProgram();
@@ -217,39 +196,8 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
-	shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		attribute vec4 aVertexColor;\n\
-		attribute vec2 aTextureCoord;\n\
-		uniform mat4 Mmatrix;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		void main(void) { //pre-built function\n\
-			vec4 rotatedPos = Mmatrix * vec4(position.xyz, 1.0);\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=aVertexColor;\n\
-			vTextureCoord = aTextureCoord;\n\
-		}";
-	
-	shader.shader_fragment_source="\n\
-		precision mediump float;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		uniform sampler2D uSampler;\n\
-		void main(void) {\n\
-			gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-		}";
-
+	shader.shader_vertex_source = ShaderSource.textureShaderVertexSource;
+	shader.shader_fragment_source = ShaderSource.textureShaderFragmentSource;
 		
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
@@ -278,39 +226,10 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		attribute vec4 aVertexColor;\n\
-		attribute vec2 aTextureCoord;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		void main(void) { //pre-built function\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=aVertexColor;\n\
-			vTextureCoord = aTextureCoord;\n\
-		}";
-
 	
-	shader.shader_fragment_source="\n\
-		precision mediump float;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		uniform sampler2D uSampler;\n\
-		void main(void) {\n\
-			gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-		}";
+	shader.shader_vertex_source = ShaderSource.textureA1ShaderVertexSource;
+	shader.shader_fragment_source = ShaderSource.textureA1ShaderFragmentSource;
 
-		
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = GL.createProgram();
@@ -339,34 +258,8 @@ ShadersManager.prototype.createStandardShader = function(GL) {
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 	
-	standard_shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		uniform mat4 RefTransfMatrix;\n\
-		attribute vec3 color; //the color of the point\n\
-		varying vec3 vColor;\n\
-		void main(void) { //pre-built function\n\
-			vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=color;\n\
-		}";
-
-
-	standard_shader.shader_fragment_source="\n\
-		precision lowp float;\n\
-		varying vec3 vColor;\n\
-		void main(void) {\n\
-			gl_FragColor = vec4(vColor, 1.);\n\
-		}";
+	standard_shader.shader_vertex_source = ShaderSource.standardShaderVertexSource;
+	standard_shader.shader_fragment_source = ShaderSource.standardShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
@@ -396,32 +289,8 @@ ShadersManager.prototype.createCloudShader = function(GL) {
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 	
-	standard_shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 cloudPosHIGH;\n\
-		uniform vec3 cloudPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		attribute vec3 color; //the color of the point\n\
-		varying vec3 vColor;\n\
-		void main(void) { //pre-built function\n\
-			vec3 objPosHigh = cloudPosHIGH;\n\
-			vec3 objPosLow = cloudPosLOW.xyz + position.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=color;\n\
-		}";
-
-
-	standard_shader.shader_fragment_source="\n\
-		precision lowp float;\n\
-		varying vec3 vColor;\n\
-		void main(void) {\n\
-			gl_FragColor = vec4(vColor, 1.);\n\
-		}";
+	standard_shader.shader_vertex_source = ShaderSource.cloudShaderVertexSource;
+	standard_shader.shader_fragment_source = ShaderSource.cloudShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
@@ -450,28 +319,8 @@ ShadersManager.prototype.createBlendingCubeShader = function(GL) {
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-		standard_shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		attribute vec4 color; //the color of the point\n\
-		varying vec4 vColor;\n\
-		void main(void) { //pre-built function\n\
-			vec3 highDifference = -encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = position.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(position.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=color;\n\
-		}";
-
-
-	standard_shader.shader_fragment_source="\n\
-		precision lowp float;\n\
-		varying vec4 vColor;\n\
-		void main(void) {\n\
-			gl_FragColor = vColor;\n\
-		}";
+	standard_shader.shader_vertex_source = ShaderSource.blendingCubeShaderVertexSource;
+	standard_shader.shader_fragment_source = ShaderSource.blendingCubeShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
@@ -498,31 +347,8 @@ ShadersManager.prototype.createPCloudShader = function(GL) {
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-		standard_shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		attribute vec4 color; //the color of the point\n\
-		varying vec4 vColor;\n\
-		void main(void) { //pre-built function\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor=color;\n\
-		}";
-		
-	standard_shader.shader_fragment_source="\n\
-		precision lowp float;\n\
-		varying vec4 vColor;\n\
-		void main(void) {\n\
-			gl_FragColor = vColor;\n\
-		}";
+	standard_shader.shader_vertex_source = ShaderSource.pCloudShaderVertexSource
+	standard_shader.shader_fragment_source = ShaderSource.pCloundShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = GL.createProgram();
@@ -549,51 +375,8 @@ ShadersManager.prototype.createPCloudShader = function(GL) {
 ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	shader.shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		attribute vec4 aVertexColor;\n\
-		attribute vec2 aTextureCoord;\n\
-		uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-		uniform vec3 buildingPosHIGH;\n\
-		uniform vec3 buildingPosLOW;\n\
-		uniform vec3 encodedCameraPositionMCHigh;\n\
-		uniform vec3 encodedCameraPositionMCLow;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		attribute vec3 aVertexNormal;\n\
-		varying vec3 uAmbientColor;\n\
-		varying vec3 vLightWeighting;\n\
-		//uniform vec3 uLightingDirection;\n\
-		uniform mat3 uNMatrix;\n\
-		void main(void) { //pre-built function\n\
-			vec3 objPosHigh = buildingPosHIGH;\n\
-			vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-			vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-			vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-			vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-			gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-			vColor = aVertexColor;\n\
-			vTextureCoord = aTextureCoord;\n\
-			\n\
-			vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-			uAmbientColor = vec3(0.7, 0.7, 0.7);\n\
-			vec3 uLightingDirection = vec3(0.8, 0.2, -0.9);\n\
-			vec3 directionalLightColor = vec3(0.4, 0.4, 0.4);\n\
-			vec3 transformedNormal = uNMatrix * aVertexNormal;\n\
-			float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
-			vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-		}";
-	
-	shader.shader_fragment_source="\n\
-		precision mediump float;\n\
-		varying vec4 vColor;\n\
-		varying vec2 vTextureCoord;\n\
-		uniform sampler2D uSampler;\n\
-		varying vec3 vLightWeighting;\n\
-		void main(void) {\n\
-			vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-			gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
-		}";
+	shader.shader_vertex_source = ShaderSource.texNormalShaderVertexSource;
+	shader.shader_fragment_source = ShaderSource.texNormalShaderFragmentSource;
 		
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979

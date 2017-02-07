@@ -4,6 +4,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var Color = function() {
+	if(!(this instanceof Color)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.r = 0;
 	this.g = 0;
 	this.b = 0;
@@ -46,6 +50,10 @@ Color.prototype.setRGBA = function(_r, _g, _b, _alpha) {
  * 어떤 일을 하고 있습니까?
  */
 var ByteColor = function() {
+	if(!(this instanceof ByteColor)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._byte_r = 0;
 	this._byte_g = 0;
 	this._byte_b = 0;
@@ -75,19 +83,13 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue) {
 };
   
 /**
- * 어떤 일을 하고 있습니까?
- */
-var Point3DAux = function() {
-	this.x = 0.0;
-	this.y = 0.0;
-	this.z = 0.0;
-	//this._idx_in_list;
-};
-  
-/**
 * 어떤 일을 하고 있습니까?
 */
 var Point2D = function() {
+	if(!(this instanceof Point2D)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.x = 0.0;
 	this.y = 0.0;
 	this._idx_in_list;
@@ -96,7 +98,25 @@ var Point2D = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
+var Point3DAux = function() {
+	if(!(this instanceof Point3DAux)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
+	this.x = 0.0;
+	this.y = 0.0;
+	this.z = 0.0;
+	//this._idx_in_list;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var TTriangle = function() {
+	if(!(this instanceof TTriangle)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.m_vertex_1;
 	this.m_vertex_2;
 	this.m_vertex_3;
@@ -127,6 +147,10 @@ TTriangle.prototype.invert = function() {
  * 어떤 일을 하고 있습니까?
  */
 var TTrianglesList = function() {
+	if(!(this instanceof TTrianglesList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.tTrianglesArray = [];
 };
 
@@ -167,6 +191,10 @@ TTrianglesList.prototype.getTTriangle = function(idx) {
  * 어떤 일을 하고 있습니까?
  */
 var TTrianglesMatrix = function() {
+	if(!(this instanceof TTrianglesMatrix)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.tTrianglesListsArray = [];
 	// SCRATX.*********************
 	this.totalTTrianglesArraySC = [];
@@ -241,6 +269,10 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
  * 어떤 일을 하고 있습니까?
  */
 var Vertex = function() {
+	if(!(this instanceof Vertex)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.point3d = new Point3D();
 	this.normal;
 	this.texCoord;
@@ -300,6 +332,10 @@ Vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance) {
  * 어떤 일을 하고 있습니까?
  */
 var VertexList = function() {
+	if(!(this instanceof VertexList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.vertexArray = [];
 };
 
@@ -395,6 +431,10 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
  * 어떤 일을 하고 있습니까?
  */
 var VertexMatrix = function() {
+	if(!(this instanceof VertexMatrix)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.vertexListsArray = [];
 	
 	// SCTRATXH.******************
@@ -665,6 +705,10 @@ VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
  * 어떤 일을 하고 있습니까?
  */
 var BoundingBox = function() {
+	if(!(this instanceof BoundingBox)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._minX = 1000000.0; 
 	this._minY = 1000000.0;
 	this._minZ = 1000000.0;
@@ -773,6 +817,10 @@ BoundingBox.prototype.isPoint3dInside = function(x, y, z) {
  * 어떤 일을 하고 있습니까?
  */
 var Triangle= function() {
+	if(!(this instanceof Triangle)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.m_point_1 = null;
 	this.m_point_2 = null;
 	this.m_point_3 = null;
@@ -856,6 +904,10 @@ Triangle.prototype.setColors = function(color_1, color_2, color_3) {
  * 어떤 일을 하고 있습니까?
  */
 var Polygon = function() {
+	if(!(this instanceof Polygon)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.mPoint3DArray = [];
 };
 
@@ -881,6 +933,10 @@ Polygon.prototype.newPoint3D = function() {
  * 어떤 일을 하고 있습니까?
  */
 var TrianglesSurface= function() {
+	if(!(this instanceof TrianglesSurface)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.mPoint3DArray = [];
 	this.mTrianglesArray = [];
 };
@@ -1138,6 +1194,10 @@ TrianglesSurface.prototype.getBoundingBox = function() {
  * 어떤 일을 하고 있습니까?
  */
 var Fpolyhedron= function() {
+	if(!(this instanceof Fpolyhedron)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.mFTrianglesSurfacesArray = [];
 	this.mIFCEntityType = -1;
 };
@@ -1236,6 +1296,10 @@ Fpolyhedron.prototype.getBoundingBox = function() {
  * 어떤 일을 하고 있습니까?
  */
 var FpolyhedronsList= function() {
+	if(!(this instanceof FpolyhedronsList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.mFPolyhedronsArray = [];
 };
 
@@ -1272,6 +1336,10 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 * 어떤 일을 하고 있습니까?
 */
 var Quaternion = function() {
+	if(!(this instanceof Quaternion)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.x = 0.0;
 	this.y = 0.0;
 	this.z = 0.0;
@@ -1342,6 +1410,10 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
  * 어떤 일을 하고 있습니까?
  */
 var Matrix4 = function() {
+	if(!(this instanceof Matrix4)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._floatArrays = [];
 	
 	this._floatArrays.push(1);
@@ -1575,6 +1647,10 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
  * @param occlusionCullingOctree_Cell_Owner = 변수
  */
 var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
+	if(!(this instanceof OcclusionCullingOctreeCell)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._ocCulling_Cell_owner = occlusionCullingOctree_Cell_Owner;
 	this._minX = 0.0;
 	this._maxX = 0.0;
@@ -1850,6 +1926,10 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
  * 어떤 일을 하고 있습니까?
  */
 var OcclusionCullingOctree = function() {
+	if(!(this instanceof OcclusionCullingOctree)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._ocCulling_box = new OcclusionCullingOctreeCell(null);
 	this._infinite_ocCulling_box = new OcclusionCullingOctreeCell(null);
 	
@@ -1859,6 +1939,10 @@ var OcclusionCullingOctree = function() {
  * 어떤 일을 하고 있습니까?
  */
 var Reference = function() {
+	if(!(this instanceof Reference)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// 1) Object ID.***
 	this._id = 0;
 	
@@ -1914,8 +1998,11 @@ Reference.prototype.newByteColorsSurface = function() {
  * 어떤 일을 하고 있습니까?
  */
 var CompoundReference = function() {
-	this._referencesList = [];
+	if(!(this instanceof CompoundReference)) {
+		throw new Error(MESSAGES.classNewError);
+	}
 	
+	this._referencesList = [];
 };
 
 /**
@@ -1959,6 +2046,10 @@ CompoundReference.prototype.newReference = function() {
  * 어떤 일을 하고 있습니까?
  */
 var CompoundReferencesList = function() {
+	if(!(this instanceof CompoundReferencesList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._name = "";
 	this._compoundRefsArray = [];
 	this._lodLevel = -1;
@@ -2049,6 +2140,10 @@ CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
  * 어떤 일을 하고 있습니까?
  */
 var CompoundReferencesListContainer = function() {
+	if(!(this instanceof CompoundReferencesListContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._compRefsList_Array = [];
 };
 
@@ -2136,6 +2231,10 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
  * 어떤 일을 하고 있습니까?
  */
 var VertexIdxArrays = function() {
+	if(!(this instanceof VertexIdxArrays)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.indices_count = -1;
 	  
 	this.MESH_VERTEX_cacheKey= null;
@@ -2146,6 +2245,10 @@ var VertexIdxArrays = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VertexIdxVBOArraysContainer = function() {
+	if(!(this instanceof VertexIdxVBOArraysContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._meshArrays = [];
 };
 
@@ -2163,6 +2266,10 @@ VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
 * 어떤 일을 하고 있습니까?
 */
 var ByteColorsVBOArrays = function() {
+	if(!(this instanceof ByteColorsVBOArrays)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.MESH_COLORS_cacheKey= null;
 };
 
@@ -2170,6 +2277,10 @@ var ByteColorsVBOArrays = function() {
  * 어떤 일을 하고 있습니까?
  */
 var ByteColorsVBOArraysContainer = function() {
+	if(!(this instanceof ByteColorsVBOArraysContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._meshArrays = [];
 };
 
@@ -2187,6 +2298,10 @@ ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
  * 어떤 일을 하고 있습니까?
  */
 var Block = function() {
+	if(!(this instanceof Block)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
 	this._vbo_VertexIdx_CacheKeys_Container = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
 	this.mIFCEntityType = -1;
@@ -2199,6 +2314,10 @@ var Block = function() {
  * 어떤 일을 하고 있습니까?
  */
 var BlocksList = function() {
+	if(!(this instanceof BlocksList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._name = "";
 	this._blocksArray = [];
 };
@@ -2231,6 +2350,9 @@ BlocksList.prototype.getBlock = function(idx) {
  * 어떤 일을 하고 있습니까?
  */
 var BlocksListsContainer = function() {
+	if(!(this instanceof BlocksListsContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
 	this._BlocksListsArray = [];
 };
 
@@ -2273,6 +2395,10 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
  * 어떤 일을 하고 있습니까?
  */
 var VertexTexcoordsArrays = function() {
+	if(!(this instanceof VertexTexcoordsArrays)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._vertices_array = [];
 	this._texcoords_array = [];
 };
@@ -2281,6 +2407,10 @@ var VertexTexcoordsArrays = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VNTInterleavedCacheKeys = function() {
+	if(!(this instanceof VNTInterleavedCacheKeys)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.VNT_cacheKey = null;
 	this.indices_cacheKey = null;
 	this._vertices_count = 0;
@@ -2291,6 +2421,10 @@ var VNTInterleavedCacheKeys = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VertexTexcoordsArraysCacheKeys = function() {
+	if(!(this instanceof VertexTexcoordsArraysCacheKeys)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._verticesArray_cacheKey = null;
 	this._texcoordsArray_cacheKey = null;
 	this._vertices_count = 0;
@@ -2306,6 +2440,10 @@ var VertexTexcoordsArraysCacheKeys = function() {
  * 어떤 일을 하고 있습니까?
  */
 var VertexTexcoordsArraysCacheKeysContainer = function() {
+	if(!(this instanceof VertexTexcoordsArraysCacheKeysContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._vtArrays_cacheKeys_array = [];
 };
 
@@ -2323,6 +2461,10 @@ VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheK
  * 어떤 일을 하고 있습니까?
  */
 var SimpleObject = function() {
+	if(!(this instanceof SimpleObject)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._vtCacheKeys_container = new VertexTexcoordsArraysCacheKeysContainer();
 };
 
@@ -2330,6 +2472,10 @@ var SimpleObject = function() {
  * 어떤 일을 하고 있습니까?
  */
 var SimpleStorey = function() {
+	if(!(this instanceof SimpleStorey)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._simpleObjects_array = [];
 };
 
@@ -2347,6 +2493,10 @@ SimpleStorey.prototype.newSimpleObject = function() {
  * 어떤 일을 하고 있습니까?
  */
 var SimpleBuilding = function() {
+	if(!(this instanceof SimpleBuilding)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._simpleStoreys_list = [];
 	//this._simpleBuildingImage = new Image();
 	this._simpleBuildingTexture;
@@ -2367,6 +2517,10 @@ SimpleBuilding.prototype.newSimpleStorey = function() {
  * 어떤 일을 하고 있습니까?
  */
 var SimpleBuildingV1 = function() {
+	if(!(this instanceof SimpleBuildingV1)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// this class is for faster rendering XDO converted projects.***
 	this._simpleObjects_array = [];
 	this._simpleBuildingTexture; // Mini texture. Possibly coincident with texture_3.***
@@ -2399,6 +2553,10 @@ SimpleBuildingV1.prototype.newSimpleObject = function() {
  * @param octreeOwner 변수
  */
 var Octree = function(octreeOwner) {
+	if(!(this instanceof Octree)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// Note: an octree is a cube, not a box.***
 	this.centerPos = new Point3D();
 	this.half_dx = 0.0; // half width.***
@@ -2951,6 +3109,10 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
  * 어떤 일을 하고 있습니까?
  */
 var Header = function() {
+	if(!(this instanceof Header)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._f4d_version = 1;
 	this._version = ""; // provisional for xdo.***
 	this._type = -1;
@@ -2979,6 +3141,10 @@ var Header = function() {
  * 어떤 일을 하고 있습니까?
  */
 var BRBuildingProject = function() {
+	if(!(this instanceof BRBuildingProject)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._header = new Header();
 	  
 	// Block-Reference version of buildingProjects.***
@@ -3245,6 +3411,10 @@ BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
  * 어떤 일을 하고 있습니까?
  */
 var PCloudMesh = function() {
+	if(!(this instanceof PCloudMesh)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// this is a temporary class to render mesh from point cloud.***
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
@@ -3271,6 +3441,10 @@ var PCloudMesh = function() {
  * 어떤 일을 하고 있습니까?
  */
 var BRBuildingProjectsList = function() {
+	if(!(this instanceof BRBuildingProjectsList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this._BR_buildingsArray = [];
 	this._boundingBox;
 	this._pCloudMesh_array = []; // 1rst aproximation to the pointCloud data. Test.***
@@ -3318,6 +3492,10 @@ BRBuildingProjectsList.prototype.getBoundingBox = function() {
  * 어떤 일을 하고 있습니까?
  */
 var TerranTile = function() {
+	if(!(this instanceof TerranTile)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	//           +-----+-----+
 	//           |     |     |
 	//           |  3  |  2  |
@@ -3393,7 +3571,7 @@ TerranTile.prototype.newSubTerranTile = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.make_4subTiles = function() {
+TerranTile.prototype.make4subTiles = function() {
 	for(var i=0; i<4; i++) {
 		var subTile = this.newSubTerranTile();
 	}

@@ -7,6 +7,9 @@
  * @return 
  */
 var ManagerFactory = function(productType, containerId) {
+	if(!(this instanceof ManagerFactory)) {
+		throw new Error(MESSAGES.classNewError);
+	}
 	
 	var viewer = null;
 	var manager = null;

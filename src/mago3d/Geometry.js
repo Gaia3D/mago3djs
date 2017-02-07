@@ -4,6 +4,10 @@
  * 어떤 일을 하고 있습니까?
  */
 var MetaData = function() {
+	if(!(this instanceof MetaData)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.guid = "";
 	this.version = "";
 	
@@ -131,6 +135,10 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
  * 어떤 일을 하고 있습니까?
  */
 var Texture = function() {
+	if(!(this instanceof Texture)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.texture_type_name = "";
 	this.texture_image_fileName = "";
 	this.tex_id;
@@ -142,6 +150,10 @@ var Texture = function() {
  * 어떤 일을 하고 있습니까?
  */
 var NeoReference = function() {
+	if(!(this instanceof NeoReference)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	// 1) Object ID.***
 	this._id = 0;
 	
@@ -184,6 +196,10 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
  * 어떤 일을 하고 있습니까?
  */
 var NeoReferencesList = function() {
+	if(!(this instanceof NeoReferencesList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.name = "";
 	this.neoRefs_Array = [];
 	this.blocksList;
@@ -361,6 +377,10 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, neoBuil
  * 어떤 일을 하고 있습니까?
  */
 var NeoReferencesListsContainer = function() {
+	if(!(this instanceof NeoReferencesListsContainer)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.neoRefsLists_Array = [];
 };
 
@@ -404,6 +424,10 @@ NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function(
  * 어떤 일을 하고 있습니까?
  */
 var NeoSimpleBuilding = function() {
+	if(!(this instanceof NeoSimpleBuilding)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.accesors_array = [];
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
@@ -448,6 +472,10 @@ NeoSimpleBuilding.prototype {
  * 어떤 일을 하고 있습니까?
  */
 var NeoBuilding = function() {
+	if(!(this instanceof NeoBuilding)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.metaData = new MetaData();
 	
 	this._buildingPosition;
@@ -571,6 +599,10 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  * 어떤 일을 하고 있습니까?
  */
 var NeoBuildingsList = function() {
+	if(!(this instanceof NeoBuildingsList)) {
+		throw new Error(MESSAGES.classNewError);
+	}
+	
 	this.neoBuildings_Array = [];
 };
 
