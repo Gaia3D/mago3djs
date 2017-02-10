@@ -10,7 +10,7 @@ var ReaderWriter = function() {
 	
 	this.rootPath = "";
 	//this.geometryDataPath = "/F4D_GeometryData";
-	this.geometryDataPath = Mago3DConfig.getInformation.getDataPath();
+	this.geometryDataPath = MagoConfig.getInformation().deployConfig.dataPath;
 	this.vi_arrays_Container = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBO_ArraysContainer = new ByteColorsVBOArraysContainer();
 		//var simpleBuildingImage = new Image();
@@ -1059,40 +1059,42 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	//BR_Project._f4d_header_readed = true;
 	
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	  if (arrayBuffer)
-	  {
-		   if(readerWriter == undefined)
-		  {
-			   readerWriter = new ReaderWriter();
-		  }
-		  //------------------------------------------------------
-		  neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
-		  
-			// Now, make the neoBuilding's octree.***
-			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
-										  neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
-										  neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-										
-			neoBuilding.octree.makeTree(3);
-			neoBuilding.octree.setSizesSubBoxes();
-			
-		  
-		  if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		  //BR_Project._f4d_header_readed_finished = true;
-	  }
-	  arrayBuffer = null;
-	};
-
-	oReq.send(null);
+	$.ajax({
+		url: filePath_inServer,
+		type: "GET",
+		dataType: "text",
+		processData: false,
+		responseType:'arraybuffer',
+		success: function(result){
+			var arrayBuffer = result; // Note: not oReq.responseText
+			if (arrayBuffer) {
+				if(readerWriter == undefined) {
+					readerWriter = new ReaderWriter();
+				}
+				
+				neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
+				// Now, make the neoBuilding's octree.***
+				neoBuilding.octree.setBoxSize(	neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
+												neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
+												neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
+				neoBuilding.octree.makeTree(3);
+				neoBuilding.octree.setSizesSubBoxes();
+				if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+			}
+			arrayBuffer = null;
+		},
+//		error: function(jqXHR, textStatus, errorThrown) {
+//			var errorMsg = 'status(code): ' + jqXHR.status + '\n';
+//			errorMsg += 'statusText: ' + jqXHR.statusText + '\n';
+//			errorMsg += 'responseText: ' + jqXHR.responseText + '\n';
+//			errorMsg += 'textStatus: ' + textStatus + '\n';
+//			errorMsg += 'errorThrown: ' + errorThrown;
+//			alert(errorMsg);
+//		}
+		error: function(e){
+			alert(e.responseText);
+		} 
+	});
 };
 
 /**
@@ -1594,4 +1596,4 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	readerWriter.readNeoSimpleBuildingInServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
 };
 			
-//# sourceURL=f4d_readWriter.js	
+//# sourceURL=ReaderWriter.js	

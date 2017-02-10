@@ -39,7 +39,7 @@ var CesiumManager = function() {
 	this.mouseDragging = false;
 	this.selObjMovePlane;
 	
-	this.selectionCandidateObjects_array = [];
+	this.selectionCandidateObjectsArray = [];
 	this.objectSelected;
 	this.objMovState = 0; // 0 = no started. 1 = mov started. 
 	this.mustCheckIfDragging = true;
@@ -997,7 +997,11 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		var current_frustum_near = scene._context._us._currentFrustum.x;
 		var current_frustum_far = scene._context._us._currentFrustum.y;
 		
-		GL.enable(GL.CULL_FACE);
+		if(MagoConfig.getInformation().renderingConfg.glEnable) {
+			GL.enable(GL.CULL_FACE);
+		} else {
+			GL.disable(GL.CULL_FACE);
+		}
 		
 		//scene._context._currentFramebuffer._bind();
 		
@@ -1504,7 +1508,7 @@ CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _mo
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
- * @returns selectionCandidateObjects_array[idx]
+ * @returns selectionCandidateObjectsArray[idx]
  */
 CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderables_neoRefLists_array) {
 	// Picking render.***
@@ -1606,9 +1610,9 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
 		
 		// now, select the object.***
 		var idx = 64516*pixels[0] + 254*pixels[1] + pixels[2];
-		//this.objectSelected = this.selectionCandidateObjects_array[idx];
+		//this.objectSelected = this.selectionCandidateObjectsArray[idx];
 		
-		return this.selectionCandidateObjects_array[idx];
+		return this.selectionCandidateObjectsArray[idx];
 	}
 	else{
 		return undefined;
@@ -1977,7 +1981,7 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 	if(ssao_idx == -1)// picking mode.***********************************************************************************
 	{
 		// picking mode.***
-		this.selectionCandidateObjects_array.length = 0; // init.***
+		this.selectionCandidateObjectsArray.length = 0; // init.***
 		
 		// set byteColor codes for references objects.***
 		var red = 0, green = 0, blue = 0, alfa = 255;
@@ -1997,7 +2001,7 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 					neoRef.selColor4 = new Color();
 				
 				neoRef.selColor4.set(red, green, blue, alfa);
-				this.selectionCandidateObjects_array.push(neoRef);
+				this.selectionCandidateObjectsArray.push(neoRef);
 				blue++;
 				if(blue >= 254)
 				{
@@ -3218,7 +3222,7 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 /**
  * 어떤 일을 하고 있습니까?
  */
-CesiumManager.prototype.loadData = function() {
+CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
 	// Now, load sejong.***
 	var project_number = 7500; // House with car and mini park to children.***
 	var GAIA3D__counter =1;
@@ -3246,48 +3250,18 @@ CesiumManager.prototype.loadData = function() {
 	this.terrainProvider = cesiumTerrainProviderMeshes;
 	*/
 	
-	var deployType = Mago3DConfig.getInformation.getDeployType();
-	if(deployType !== 'production') {
-		this.readerWriter.openTerranTile(GL, this.terranTile, this.readerWriter);
-	}
-	var deltaLat = -0.0015;
-	var deltaLon = 0.0015;
-	var lat = 37.5172076;
-	var lon = 126.929;
+	this.readerWriter.openTerranTile(GL, this.terranTile, this.readerWriter);
 	
-	/*
-	 * TODO buildingFileName 이 실제로 표시될 이름이다. github 테스트시 F4D_Duplex_A_20110907_optimized 로 바꿔서 테스트 해야 함
-	 */
-	var buildingFileName;
-	if(deployType === 'github') {
-		buildingFileName = "F4D_Duplex_A_20110907_optimized";
-	} else if(deployType === 'dev' || deployType === 'stage') {
-		buildingFileName = "F4D_KICT_main_Arc_v3_with_spaces";
-	} else {
-		buildingFileName = '';
+	var buildingCount = jsonBuildingInformation.latitude.length;
+	for(var i=0; i<buildingCount; i++) {
+//		var deltaLat = -0.0015;
+//		var deltaLon = 0.0015;
+		var latitude = jsonBuildingInformation.latitude;
+		var longitude = jsonBuildingInformation.longitude;
+		var height = jsonBuildingInformation.height;
+		var buildingFileName = jsonBuildingInformation.buildingFileName;
+		this.readerWriter.openNeoBuilding(GL, buildingFileName[i], latitude[i], longitude[i], height[i], this.readerWriter, neoBuildingsList, this);
 	}
-	this.readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
-	
-	if(deployType === 'dev' || deployType === 'stage') {
-		buildingFileName = "F4D_gangbuk_cultur_del";
-		this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
-		
-		buildingFileName = "F4D_KANGBUK_del";
-		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.readerWriter, neoBuildingsList, this);
-		
-		buildingFileName = "F4D_gangnam_del";
-		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*3, lon, 80.0, this.readerWriter, neoBuildingsList, this);
-		
-		buildingFileName = "F4D_7117_M320P";
-		//var buildingFileName = "F4D_7117_M320P_low";
-		//this.readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.readerWriter, neoBuildingsList, this);
-	}
-		
-	deltaLat = 0.0002;
-	deltaLon = 0.0002;
-	var latitude = 37.5168;
-	var longitude = 126.95;
-	var elev = 48.0;
 };
 
 //# sourceURL=CesiumManager.js

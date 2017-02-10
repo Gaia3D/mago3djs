@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="/sample/style.css" />
 		<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
 		<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+		<script type="text/javascript" src="../thirdparty/jquery/jquery.js"></script>
 		<script type="text/javascript" src="../src/mago3d/Config.js"></script>
 		<script type="text/javascript" src="../src/mago3d/Constant.js"></script>
 		<script type="text/javascript" src="../src/mago3d/Message.js"></script>
@@ -52,7 +53,7 @@
 			</ul>
 		</div>
 		<div style="float: left; padding-top: 30px; padding-left: 20px;">
-			<div id="cesiumContainer"></div>
+			<div id="magoContainer"></div>
 		</div>
 	</div>
 	
@@ -62,8 +63,20 @@
 	</footer>
 
 <script>
-	var managerFactory = new ManagerFactory(null, "cesiumContainer");
-	managerFactory.draw();
+	var MAGO_CONFIG = null;
+	$.ajax({
+		url: "/sample/database.json",
+		type: "GET",
+		dataType: "json",
+		async : true,
+		success: function(result){
+			// TODO DB 에서 고객사별 환경 설정을 읽어서 초기화
+			var managerFactory = new ManagerFactory("magoContainer", result);
+		},
+		error: function(e){
+			alert(e.responseText);
+		}
+	});
 </script>
 </body>
 </html>
