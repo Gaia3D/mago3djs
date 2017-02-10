@@ -522,6 +522,12 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
 		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		if(vNormal.z < 0.0)\n\
+		{\n\
+			vNormal.x *= -1.0;\n\
+			vNormal.y *= -1.0;\n\
+			vNormal.z *= -1.0;\n\
+		}\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\

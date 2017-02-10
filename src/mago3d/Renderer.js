@@ -46,9 +46,12 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 	//GL.disable(GL.DEPTH_TEST);
 	GL.depthFunc(GL.LEQUAL); 
 	GL.depthRange(0, 1);
-	GL.enable(GL.CULL_FACE);
-	//GL.disable(GL.CULL_FACE);
-	
+	if(MagoConfig.getInformation().renderingConfg.glEnable) {
+		GL.enable(GL.CULL_FACE);
+	} else {
+		GL.disable(GL.CULL_FACE);
+	}
+		
 	//if(ssao_idx == 0)
 	//	GL.disable(GL.CULL_FACE);
 	

@@ -1,0 +1,34 @@
+{
+	"information" : {
+		"name" : "mago3djs",
+		"version" : "1.0",
+		"description" : "mago3djs is a JavaScript library for creating 3D globes and 2D maps in a web browser without a plugin.",
+		"homepage" : "https://github.com/Gaia3D/mago3djs",
+		"license" : "Apache-2.0",
+		"author" : {
+			"name" : "Gaia3D",
+			"url" : "http://www.gaia3d.com/ko/"
+		}
+	},
+	"deployConfig" : {
+		"deployType" : "github",
+		"viewLibrary" : "cesium",
+		"dataPath" : "/data"
+	},
+	"renderingConfg" : {
+		"glEnable" : "false"
+	},
+	"geoConfig" : {
+		"initEntity" : {
+			"name" : "여의도",
+			"longitudeAndLatitude" : [126.924185, 37.521168, 126.935680, 37.520479, 126.934331, 37.514298, 126.924598, 37.514565],
+			"height" : 0
+		},
+		"initBuilding" : {
+			"latitude" : [ 37.5172076, 37.5157076 ],
+			"longitude" : [ 126.929, 126.929],
+			"height" : [ 60.0, 60.0 ],
+			"buildingFileName" : [ "F4D_KICT_main_Arc_v3_with_spaces", "F4D_gangbuk_cultur_del"]
+		}
+	}
+}

@@ -2,11 +2,12 @@
 
 /**
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
- * @param productType 화면 3d 표현시 사용할 library name 값
+ * 
  * @param containerId 뷰에서 표시할 위치 id
+ * @param magoConfig mago3d 설정값 json object
  * @return api
  */
-var ManagerFactory = function(productType, containerId) {
+var ManagerFactory = function(containerId, magoConfig) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -15,11 +16,32 @@ var ManagerFactory = function(productType, containerId) {
 	var manager = null;
 	var magoManager = null;
 	var scene = null;
-	if(productType === undefined || productType === null || productType === 'cesium') {
+	
+	if(magoConfig.deployConfig === null 
+			|| magoConfig.deployConfig === '' 
+			|| magoConfig.deployConfig.viewLibrary === null 
+			|| magoConfig.deployConfig.viewLibrary === '' 
+			|| magoConfig.deployConfig.viewLibrary === 'cesium') {
+		// 환경 설정
+		MagoConfig.init(magoConfig);
+		
 		viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
-	} else if(productType === 'worldwind') {
+	} else if(viewLibrary === 'worldwind') {
 		viewer = null;
+	}
+	
+	draw();
+	initEntity()
+	viewer.zoomTo(viewer.entities);
+	
+	
+	function draw() {
+		if(magoConfig.deployConfig.viewLibrary === 'cesium') {
+			drawCesium();
+		} else if(magoConfig.deployConfig.viewLibrary === 'worldwind') {
+			//
+		}
 	}
 	
 	function drawCesium() {
@@ -41,18 +63,16 @@ var ManagerFactory = function(productType, containerId) {
 		magoManager.shadersManager.createDefaultShader(GL); 
 		magoManager.postFxShadersManager.createDefaultShaders(GL); 
 		
-//		var readerWriter = new ReaderWriter();
+		var readerWriter = new ReaderWriter();
 		
-		magoManager.loadData();
+		// 실제 빌딩을 읽어 들임
+		magoManager.loadData(magoConfig.geoConfig.initBuilding);
 		
 //		var bRBuildingProjectsList = magoManager.bRBuildingProjectsList;
 		var neoBuildingsList = magoManager.neoBuildingsList;
 		
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
-		
-		getEntity()
-		viewer.zoomTo(viewer.entities);
 	}
 	
 	// handlers.**************************************************************************
@@ -144,29 +164,32 @@ var ManagerFactory = function(productType, containerId) {
 	 * zoomTo 할 Entity
 	 * @returns entities
 	 */
-	function getEntity() {
+	function initEntity() {
 		return viewer.entities.add({
-			name : 'Blue box',
-			position: Cesium.Cartesian3.fromDegrees(126.92734533517019, 37.517207695444, 1500.0),
-			box : {
-				dimensions : new Cesium.Cartesian3(300000.0, 300000.0, 300000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
-				//material : Cesium.Color.TRANSPARENT
+			name : magoConfig.geoConfig.initEntity.name,
+			polygon : {
+				hierarchy : Cesium.Cartesian3.fromDegreesArray(magoConfig.geoConfig.initEntity.longitudeAndLatitude),
+				height : magoConfig.geoConfig.initEntity.height,
 				fill : false,
-				outline : true,
-				material : Cesium.Color.BLUE 
+			    material : Cesium.Color.TRANSPARENT,
+			    outline : true,
+			    outlineWidth : 3.0,
+			    outlineColor : Cesium.Color.BLACK
 			}
+//				name : 'Blue box',
+//	            position: new Cesium.Cartesian3(1.0, 1.0, 1.0), // usa = (-114.0, 40.0, 300000.0), songdo = (126.6554, 37.3853, 300000.0)
+//	            box : {
+//	                dimensions : new Cesium.Cartesian3(300000.0*1000000, 300000.0*1000000, 300000.0*1000000), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+//	                material : Cesium.Color.BLUE
+//	            }
 		});
 	}
 	
 	return {
-		draw : function() {
-			if(productType === undefined || productType === null || productType === 'cesium') {
-				drawCesium();
-			} else if(productType === 'worldwind') {
-				//
-			}
+		drawAPI : function() {
+			draw();
 		},
-		highlight : function(type) {
+		highlightAPI : function(type) {
 			
 		}
 	};
