@@ -170,6 +170,8 @@ var CesiumManager = function() {
 	this.currentVisibleBuildings_LOD0_array = [];
 	this.currentVisibleBuildingsPost_array = [];
 	
+	this.fileRequestControler = new FileRequestControler();
+	this.visibleObjectsControler = new VisibleObjectsControler();
 	this.currentVisibleNeoBuildings_array = [];
 	this.currentVisibleClouds_array = [];
 	this.detailed_building;
@@ -918,6 +920,179 @@ function handleTextureLoaded(gl, image, texture) {
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
 
+CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
+{
+	
+	// for all renderables, prepare data.***
+	// LOD_0.***
+	var neoBuilding;
+	var metaData;
+	var neoBuilding_header_path = "";
+	var buildingFolderName = "";
+	var filePathInServer = "";
+	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var blocksList;
+	var neoReferencesList;
+	var neoReferencesListName;
+	var subOctree;
+	var buildingRotationMatrix;
+	
+	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array;
+	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD1_array;
+	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD2_array;
+	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD3_array;
+	
+	var buildingsCount = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array.length;
+	for(var i=0; i<buildingsCount; i++)
+	{
+		neoBuilding = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array[i];
+		
+		// check if this building is ready to render.***
+		if(!neoBuilding.allFilesLoaded)
+		{
+			buildingFolderName = neoBuilding.buildingFileName;
+			
+			// 1) The buildings metaData.*************************************************************************************
+			metaData = neoBuilding.metaData;
+			if(metaData.fileLoadState == 0)
+			{
+				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+				{
+					// must read metadata file.***
+					neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
+					this.readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+					continue;
+				}
+			}
+			
+			// 2) The block models.********************************************************************************************
+			// the InteriorBlock must load only if the camera is very cloesd.***
+			var blocksListsCount = neoBuilding._blocksList_Container._BlocksListsArray.length;
+			for(var j=0; j<blocksListsCount-1; j++) // blocksListsCount-1 bcos interiorLOD4 only load if cam is inside of building.***
+			{
+				blocksList = neoBuilding._blocksList_Container._BlocksListsArray[j];
+				if(blocksList.fileLoadState == 0)
+				{
+					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+					{
+						// must read blocksList.***
+						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList._name;
+						this.readerWriter.readNeoBlocksArraybufferInServer(GL, filePathInServer, blocksList, neoBuilding, this);
+						continue;
+					}
+				}
+			}
+			
+			// 3) The references (Exteriors & Bone).*************************************************************************
+			var neoReferencesListsCount = neoBuilding._neoRefLists_Container.neoRefsLists_Array.length;
+			if(neoReferencesListsCount == 0)
+			{
+				// if there are no referencesList then make it.***
+				// there are 4 neoReferencesLists (lodExt0, lodExt1, lodExt2, lodBone).****
+				for(var j=0; j<4; j++)
+				{
+					blocksList = neoBuilding._blocksList_Container._BlocksListsArray[j];
+					neoReferencesList = neoBuilding._neoRefLists_Container.newNeoRefsList(blocksList);
+					if(j == 0)
+						neoReferencesListName = "Ref_Skin1";
+					else if(j == 1)
+						neoReferencesListName = "Ref_Skin2";
+					else if(j == 2)
+						neoReferencesListName = "Ref_Skin3";
+					else if(j == 3)
+						neoReferencesListName = "Ref_Bone";
+						
+					neoReferencesList.name = neoReferencesListName;
+				}
+			}
+			
+			for(var j=0; j<neoReferencesListsCount; j++)
+			{
+				neoReferencesList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[j];
+				if(neoReferencesList.fileLoadState == 0)
+				{
+					filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
+					this.readerWriter.readNeoReferencesArraybufferInServer(GL, filePathInServer, neoReferencesList, neoBuilding, this);
+					// remember multiply reference matrices by the building transform matrix.***
+					//var transformMat = new Matrix4();
+					//transformMat.setByFloat32Array(neoBuilding.move_matrix);
+					//if(transformMat)
+					//{
+						//neoRefsList.multiplyReferencesMatrices(transformMat);
+					//}
+					continue;
+				}
+			}
+			
+			// 4) The references (Interiors Octree).*************************************************************************
+			// octree must load if the camera is very closed.***
+			/*
+			if(neoBuilding.octree != undefined && !neoBuilding.octreeLoadedAllFiles)
+			{
+				var interiorCRef_folderPath = geometryDataPath + "/" + buildingFolderName + "/inLOD4";
+				//var lod_level = 4;
+				//var interior_base_name = "Ref_NodeData";
+				var subOctreeName_counter = -1;
+				var areAllSubOctreesLoadedFile = true; // init on true.***
+				blocksList = neoBuilding._blocksList_Container.getBlockList("Blocks4");
+				
+				for(var a=1; a<9; a++)
+				{
+					for(var b=1; b<9; b++)
+					{
+						for(var c=1; c<9; c++)
+						{
+							subOctreeName_counter = a*100 + b*10 + c;
+							var subOctreeNumberName = subOctreeName_counter.toString();
+							
+							subOctree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
+							if(subOctree.neoRefsList_Array.length == 0)
+							{
+								if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+								{
+									neoReferencesList = new NeoReferencesList();
+									//if(transformMat)
+									//{
+									//	neoReferencesList.multiplyReferencesMatrices(transformMat); // after parse, multiply transfMat by the buildings mat.***
+									//}
+									neoReferencesList.blocksList = blocksList;
+									subOctree.neoRefsList_Array.push(neoReferencesList);
+									
+									var intRef_filePath = interiorCRef_folderPath + "/" + subOctreeNumberName;
+									this.readerWriter.readNeoReferencesArraybufferInServer(GL, intRef_filePath, neoReferencesList, neoBuilding, this);
+								}
+								areAllSubOctreesLoadedFile = false;
+							}
+							else{
+								neoReferencesList = subOctree.neoRefsList_Array[0];
+								if(neoReferencesList != undefined && neoReferencesList.fileLoadState == 0)
+									areAllSubOctreesLoadedFile = false;
+							}
+							////readerWriter.readNeoReferencesInServer(GL, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
+						}
+					}
+				}
+				
+				if(areAllSubOctreesLoadedFile)
+				{
+					neoBuilding.octreeLoadedAllFiles = true;
+				}
+				
+			}
+			*/
+		}
+		else
+		{
+			// Now, must check if the blocks and references was parsed the dataArrayBuffer.***
+			
+		}
+		
+	}
+};
+
+
+
+
 // render_neobuildings
 /**
  * 어떤 일을 하고 있습니까?
@@ -931,19 +1106,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 	if(!isLastFrustum)
 		return;
 	
-	this.currentRenderables_neoRefLists_array.length = 0;
-		this.getRenderablesDetailedNeoBuilding(GL, scene, this.currentRenderables_neoRefLists_array);
-		
-	var renderables_neoRefLists_array = this.currentRenderables_neoRefLists_array;
 	
-			if(this.bPicking == true)
-			{
-				this.objectSelected = this.getSelectedObjectPicking(GL, scene, renderables_neoRefLists_array);
-				//return;
-			}
-			//moveSelectedObject
-	
-	//this.isCameraMoving = this.isButtonDown(scene);
 	if(this.textureAux_1x1 == undefined)
 	{
 		this.textureAux_1x1 = GL.createTexture();
@@ -955,7 +1118,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 	}
 	
 	if(this.depthFboNeo == undefined)this.depthFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
+	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
 	
 	var neoVisibleBuildings_array = [];
 	
@@ -965,10 +1128,37 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
+		this.prepareNeoBuildings(GL, scene);
 	}
 	
-	if(this.detailed_neoBuilding) // original.***
-	//if(this.currentVisibleNeoBuildings_array.length > 0)
+	//var currentVisibleNeoBuildings_LOD0_array = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array;
+	//var currentVisibleNeoBuildings_LOD1_array = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD1_array;
+	//var currentVisibleNeoBuildings_LOD2_array = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD2_array;
+	//var currentVisibleNeoBuildings_LOD3_array = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD3_array;
+	
+	if(this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array.length > 0)
+	{
+		// PROVISIONAL.***
+		this.detailed_neoBuilding = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array[0]; // provisionally take the 1rst.***
+	}
+	else{
+		this.detailed_neoBuilding = undefined;
+	}
+	
+	//if(!this.isCameraMoving)
+	//{
+	//	this.currentRenderables_neoRefLists_array.length = 0;
+	//	this.getRenderablesDetailedNeoBuilding(GL, scene, this.detailed_neoBuilding , this.currentRenderables_neoRefLists_array);
+	//}
+
+	if(this.bPicking == true)
+	{
+		this.objectSelected = this.getSelectedObjectPicking(GL, scene, this.currentRenderables_neoRefLists_array);
+	}
+	
+	//return;
+	
+	if(this.detailed_neoBuilding) // Provisional.***
 	{
 		// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 		Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
@@ -1024,12 +1214,9 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
 		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
 		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-		GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.detailed_neoBuilding.move_matrix);
 		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 		
-		  GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
 		
 		GL.uniform1f(currentShader.near_loc, frustum._near);	
 		//GL.uniform1f(currentShader.far_loc, frustum._far);	
@@ -1040,13 +1227,30 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		
 		var renderTexture = false;
 		var cameraPosition = null;
-		this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
-		// now, render depth of the neoSimpleBuildings.**********************************************************************************
+		var neoBuilding;
+		
+		// renderDepth for all buildings.***
+		// 1) LOD 0.***
+		var buildingsCount = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array.length;
+		for(var i=0; i<buildingsCount; i++)
+		{
+			neoBuilding = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array[i];
+			if(!this.isCameraMoving)
+			{
+				this.getRenderablesDetailedNeoBuilding(GL, scene, neoBuilding , this.currentRenderables_neoRefLists_array);
+			}
+			GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+		}
+		
+		// now, render depth of the neoSimpleBuildings.**********************************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
 		for(var i=0; i<neoSkinsCount; i++)
 		{
-			var neoBuilding = this.currentVisibleNeoBuildings_array[i];
+			neoBuilding = this.currentVisibleNeoBuildings_array[i];
 			var neoSkin = neoBuilding.neoSimpleBuilding;
 			// check if loaded the simplebuilding texture.***
 			if(neoSkin.texturesArray.length == 0)
@@ -1123,10 +1327,6 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
 		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
-		GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.detailed_neoBuilding.move_matrix);
-		
-			GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
 
 		GL.uniform1f(currentShader.near_loc, frustum._near);	
 		//GL.uniform1f(currentShader.far_loc, frustum._far); // Original.***
@@ -1153,7 +1353,16 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 
 		ssao_idx = 1;
 		var cameraPosition = null;
-		this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
+		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.currentRenderables_neoRefLists_array);
+		buildingsCount = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array.length;
+		for(var i=0; i<buildingsCount; i++)
+		{
+			neoBuilding = this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array[i];
+			GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+		}
 		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
 		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
@@ -1212,292 +1421,6 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 	}
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param cameraPosition 변수
- * @param _modelViewProjectionRelativeToEye 변수
- * @param scene 변수
- * @param isLastFrustum 변수
- */
-CesiumManager.prototype.renderNeoLODBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
-	if(!isLastFrustum)
-		return;
-	
-	if(this.bPicking == true)
-	{
-		//this.objectSelected = this.getSelectedObjectPicking(GL, scene, renderables_neoRefLists_array);
-
-	}
-	//moveSelectedObject
-	
-	//this.isCameraMoving = this.isButtonDown(scene);
-	if(this.textureAux_1x1 == undefined)
-	{
-		this.textureAux_1x1 = GL.createTexture();
-		// Test wait for texture to load.********************************************
-		GL.bindTexture(GL.TEXTURE_2D, this.textureAux_1x1);
-		//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
-		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
-		GL.bindTexture(GL.TEXTURE_2D, null);
-	}
-	
-	if(this.depthFboNeo == undefined)this.depthFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
-	
-	var neoVisibleBuildings_array = [];
-	
-	// do frustum culling.***
-	if(!this.isCameraMoving)
-	{
-		frustumVolume = scene._frameState.cullingVolume;
-		this.currentVisibleNeoBuildings_array.length = 0;
-		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
-	}
-	
-	//if(this.detailed_neoBuilding) // original.***
-	//if(this.currentVisibleNeoBuildings_array.length > 0)
-	{
-		// Calculate "modelViewProjectionRelativeToEye".*********************************************************
-		Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
-		Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.*** 
-		Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix); 
-		Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix); 
-		//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
-	
-		// Calculate encodedCamPosMC high and low values.********************************************************
-		this.calculateEncodedCameraPositionMCHighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
-		
-		// Normal matrix.********************************************************************
-		var mvMat = scene._context._us._modelView; // original.***
-		var mvMat_inv = new Cesium.Matrix4();
-		mvMat_inv = Cesium.Matrix4.inverse(mvMat, mvMat_inv);
-		//var normalMat = new Cesium.Matrix4();
-		this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
-		//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
-		this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
-
-		Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array); 
-		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
-	
-		var camera = scene._camera;
-		var frustum = camera.frustum;
-		var current_frustum_near = scene._context._us._currentFrustum.x;
-		var current_frustum_far = scene._context._us._currentFrustum.y;
-		
-		GL.enable(GL.CULL_FACE);
-		
-		//scene._context._currentFramebuffer._bind();
-		
-		var ssao_idx = 0; // 0= depth. 1= ssao.***
-		
-		// 1) The depth render.***************************************************************************************************
-		// 1) The depth render.***************************************************************************************************
-		// 1) The depth render.***************************************************************************************************
-		var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
-		//var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
-		this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
-		GL.clearColor(0, 0, 0, 1);
-		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-		GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);  
-	
-		shaderProgram = currentShader.program;
-		GL.useProgram(shaderProgram);
-		//GL.enableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
-		GL.enableVertexAttribArray(currentShader.position3_loc);
-		if(currentShader.normal3_loc != -1)
-			GL.enableVertexAttribArray(currentShader.normal3_loc);
-
-		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-		GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.detailed_neoBuilding.move_matrix);
-		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-		
-		  GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
-		
-		GL.uniform1f(currentShader.near_loc, frustum._near);	
-		//GL.uniform1f(currentShader.far_loc, frustum._far);	
-		GL.uniform1f(currentShader.far_loc, current_frustum_far); 
-		
-		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-		
-		var renderTexture = false;
-		//var cameraPosition = null;
-		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
-		// now, render depth of the neoSimpleBuildings.**********************************************************************************
-		var imageLod = 3;
-		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
-		for(var i=0; i<neoSkinsCount; i++)
-		{
-			var neoBuilding = this.currentVisibleNeoBuildings_array[i];
-			var neoSkin = neoBuilding.neoSimpleBuilding;
-			// check if loaded the simplebuilding texture.***
-			if(neoSkin.texturesArray.length == 0)
-			{
-				// must load the texture.***
-				if(this.backGround_imageReadings_count < 10)
-				{
-					var simpBuild_tex = neoSkin.newTexture();
-					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
-				}
-			}
-			else
-			{
-				var simpBuildTexture = neoSkin.texturesArray[0]; 
-				if(simpBuildTexture.load_finished)
-				{
-					if(simpBuildTexture.textureId != undefined)
-					{
-						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.renderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
-					}
-					else
-					{
-						
-						//simpBuildTexture.textureId = GL.createTexture();
-		
-						// must upload the texture to gl.***
-						//GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
-						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
-						//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
-						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-						//GL.generateMipmap(GL.TEXTURE_2D);
-						//GL.bindTexture(GL.TEXTURE_2D, null);
-						  
-						//delete simpBuildTexture.texImage;
-						
-					}
-				}
-			}
-		}
-		
-		if(currentShader.normal3_loc != -1)
-			GL.disableVertexAttribArray(currentShader.normal3_loc);
-		GL.disableVertexAttribArray(currentShader.position3_loc);
-		//GL.disableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
-	
-		this.depthFboNeo.unbind();
-		
-		// 2) ssao render.************************************************************************************************************
-		// 2) ssao render.************************************************************************************************************
-		// 2) ssao render.************************************************************************************************************
-		scene._context._currentFramebuffer._bind();
-		currentShader = this.postFxShadersManager.pFx_shaders_array[4];
-		
-		//GL.clearColor(0, 0, 0, 1);
-		//GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-		//GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		
-		if(this.noiseTexture == undefined)
-			this.noiseTexture = genNoiseTextureRGBA(GL, 4, 4, this.pixels);
-		
-		shaderProgram = currentShader.program;
-		GL.useProgram(shaderProgram);
-		GL.enableVertexAttribArray(currentShader.texCoord2_loc);
-		GL.enableVertexAttribArray(currentShader.position3_loc);
-		if(currentShader.normal3_loc != -1)
-			GL.enableVertexAttribArray(currentShader.normal3_loc);
-
-		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
-		GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.detailed_neoBuilding.move_matrix);
-		
-			GL.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-		  GL.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
-
-		GL.uniform1f(currentShader.near_loc, frustum._near);	
-		//GL.uniform1f(currentShader.far_loc, frustum._far); // Original.***
-		GL.uniform1f(currentShader.far_loc, current_frustum_far); // test.***	
-		
-		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-			
-		GL.uniform1i(currentShader.depthTex_loc, 0);	
-		GL.uniform1i(currentShader.noiseTex_loc, 1);	
-		GL.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-		GL.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-		GL.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
-		GL.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
-		GL.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
-		GL.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);	
-		GL.uniform3fv(currentShader.kernel16_loc, this.kernel);	
-			GL.activeTexture(GL.TEXTURE0);
-			GL.bindTexture(GL.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***		
-			GL.activeTexture(GL.TEXTURE1);            
-			GL.bindTexture(GL.TEXTURE_2D, this.noiseTexture); 
-			
-		renderTexture = true;
-
-		ssao_idx = 1;
-		//var cameraPosition = null;
-		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
-		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
-		var imageLod = 3;
-		var neoSkinsCount = this.currentVisibleNeoBuildings_array.length;
-		for(var i=0; i<neoSkinsCount; i++)
-		{
-			var neoBuilding = this.currentVisibleNeoBuildings_array[i];
-			var neoSkin = neoBuilding.neoSimpleBuilding;
-			// check if loaded the simplebuilding texture.***
-			if(neoSkin.texturesArray.length == 0)
-			{
-				// must load the texture.***
-				if(this.backGround_imageReadings_count < 10)
-				{
-					var simpBuild_tex = neoSkin.newTexture();
-					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
-				}
-			}
-			else
-			{
-				var simpBuildTexture = neoSkin.texturesArray[0]; 
-				if(simpBuildTexture.load_finished)
-				{
-					if(simpBuildTexture.textureId != undefined)
-					{
-						// RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.*** RENDER.***
-						//this.renderer.renderNeoSimpleBuildingPostFxShader(GL, neoBuilding, this, imageLod, currentShader); 
-					}
-					else
-					{
-						//simpBuildTexture.textureId = GL.createTexture();
-		
-						// must upload the texture to gl.***
-						//GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
-						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
-						//GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
-						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-						//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-						//GL.generateMipmap(GL.TEXTURE_2D);
-						//GL.bindTexture(GL.TEXTURE_2D, null);
-						  
-						//delete simpBuildTexture.texImage;
-						
-					}
-				}
-			}
-		}
-		
-		if(currentShader.normal3_loc != -1)
-			GL.disableVertexAttribArray(currentShader.normal3_loc);
-		GL.disableVertexAttribArray(currentShader.position3_loc);
-		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
-		
-	}
-};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1889,29 +1812,40 @@ CesiumManager.prototype.moveSelectedObject = function(GL, scene, renderables_neo
  * @param result_neoRefLists_array 변수
  * @returns result_neoRefLists_array
  */
-CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, result_neoRefLists_array) {
+CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, neoBuilding, result_neoRefLists_array) {
 	result_neoRefLists_array.length = 0; // Init.***
+	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
 	
-	if(this.detailed_neoBuilding == undefined)
+	if(neoBuilding == undefined)
 		return result_neoRefLists_array;
 	
+	if(neoBuilding.move_matrix == undefined)
+	{
+		ManagerUtils.calculateBuildingPositionMatrix(neoBuilding);
+		return result_neoRefLists_array;
+	}
+	
 	var cameraPosition = scene.context._us._cameraPosition;
-	var transformedCamPos = this.detailed_neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-	this.isCameraInsideNeoBuilding = this.detailed_neoBuilding.isCameraInsideOfBuilding(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+	var transformedCamPos = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+	this.isCameraInsideNeoBuilding = neoBuilding.isCameraInsideOfBuilding(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 	//if(!this.isCameraMoving)
 	{
 		result_neoRefLists_array.length = 0; // init.***
+		var refList;
+		var maxRefListParsingCount = 10;
+		var refListsParsingCount = 0;
+		var buildingRotationMatrix;
 		
 		// Determine if the camera is inside of the building.***
 		
-		if(this.isCameraInsideNeoBuilding)
+		if(this.isCameraInsideNeoBuilding && neoBuilding.octree != undefined)
 		{
 			if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 			
-			if(this.detailed_neoBuilding.buildingPosMat_inv == undefined)
+			if(neoBuilding.buildingPosMat_inv == undefined)
 			{
-			  this.detailed_neoBuilding.buildingPosMat_inv = new Matrix4();
-			  this.detailed_neoBuilding.buildingPosMat_inv.setByFloat32Array(this.detailed_neoBuilding.move_matrix_inv);
+			    neoBuilding.buildingPosMat_inv = new Matrix4();
+			    neoBuilding.buildingPosMat_inv.setByFloat32Array(neoBuilding.move_matrix_inv);
 			}
 			
 			var camera = scene.frameState.camera;
@@ -1920,9 +1854,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 			var transformedCamUp;
 			
 			this.pointSC.set(cameraDir.x, cameraDir.y, cameraDir.z);
-			transformedCamDir = this.detailed_neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
+			transformedCamDir = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
 			this.pointSC.set(camera.up.x, camera.up.y, camera.up.z);
-			transformedCamUp = this.detailed_neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
+			transformedCamUp = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
 			
 			
 			this.myCameraSC.position.x = transformedCamPos.x;
@@ -1941,25 +1875,84 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 		
 			// then do frustum culling for interior octree.***
 			this.intNeoRefList_array.length = 0;
-			this.detailed_neoBuilding.octree.getFrustumVisibleNeoRefListArray(myCullingVolume, this.intNeoRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+			neoBuilding.octree.getFrustumVisibleNeoRefListArray(myCullingVolume, this.intNeoRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+			buildingRotationMatrix = new Matrix4();
+			buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
+			
 			for(var i=0; i<this.intNeoRefList_array.length; i++)
 			{
-				this.intNeoRefList_array[i].updateCurrentVisibleIndicesInterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
-				result_neoRefLists_array.push(this.intNeoRefList_array[i]); // GET INTERIORS.****
+				// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
+				refList = this.intNeoRefList_array[i];
+				if(refList.fileLoadState == 2 ) // 2 = file loading finished.***
+				{
+					if(refListsParsingCount < maxRefListParsingCount)
+					{
+						// must parse the arraybuffer data.***
+						refList.parseArrayBuffer(GL, refList.dataArraybuffer, this.readerWriter);
+						refList.dataArraybuffer = null;
+						if(buildingRotationMatrix)
+						{
+							refList.multiplyReferencesMatrices(buildingRotationMatrix);
+						}
+			  
+						refListsParsingCount += 1;
+					}
+				}
+				else if(refList.fileLoadState == 4 )
+				{
+					refList.updateCurrentVisibleIndicesInterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+					//result_neoRefLists_array.push(refList); // GET INTERIORS.****
+					neoBuilding.currentRenderablesNeoRefLists.push(refList);
+				}
 			}
 		}
-		this.detailed_neoBuilding.updateCurrentVisibleIndicesExterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+		
+		
+		// Exterior and "bone" neoReferences.***************************
+		// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
+		buildingRotationMatrix = new Matrix4();
+		buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
+			
+		var extNeoRefsCount = neoBuilding._neoRefLists_Container.neoRefsLists_Array.length;
+		for(var i=0; i<extNeoRefsCount; i++)
+		{
+			refList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[i];
+			if(refList.fileLoadState == 2 ) // 2 = file loading finished.***
+			{
+				if(refListsParsingCount < maxRefListParsingCount)
+				{
+					// must parse the arraybuffer data.***
+					refList.parseArrayBuffer(GL, refList.dataArraybuffer, this.readerWriter);
+					refList.dataArraybuffer = null;
+					if(buildingRotationMatrix)
+					{
+						refList.multiplyReferencesMatrices(buildingRotationMatrix);
+					}
+		  
+					refListsParsingCount += 1;
+				}
+			}
+			//else if(refList.fileLoadState == 4 )
+			//{
+			//	refList.updateCurrentVisibleIndicesInterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+			//	result_neoRefLists_array.push(refList); // GET INTERIORS.****
+			//}
+		}
+		
+		neoBuilding.updateCurrentVisibleIndicesExterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 		
 		// now, make the result list.***
-		var neoRefListsContainer_exterior = this.detailed_neoBuilding._neoRefLists_Container;
+		var neoRefListsContainer_exterior = neoBuilding._neoRefLists_Container;
 		var count = neoRefListsContainer_exterior.neoRefsLists_Array.length;
 		for(var i=0; i<count; i++)
 		{
-			result_neoRefLists_array.push(neoRefListsContainer_exterior.neoRefsLists_Array[i]); // GET EXTERIORS.****
+			//result_neoRefLists_array.push(neoRefListsContainer_exterior.neoRefsLists_Array[i]); // GET EXTERIORS.****
+			neoBuilding.currentRenderablesNeoRefLists.push(neoRefListsContainer_exterior.neoRefsLists_Array[i]);
 		}
 	}
 	
-	return result_neoRefLists_array;
+	//return result_neoRefLists_array;
+	return neoBuilding.currentRenderablesNeoRefLists;
 };
 
 /**
@@ -2662,6 +2655,103 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
+	var lod0_minSquaredDist = 100000*0.6;
+	var lod1_minSquaredDist = 100000*3;
+	var lod2_minSquaredDist = 100000*6;
+	var lod3_minSquaredDist = 100000*9;
+	
+	
+	this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array = []; // init.***
+	this.visibleObjectsControler.currentVisibleNeoBuildings_LOD1_array = []; // init.***
+	this.visibleObjectsControler.currentVisibleNeoBuildings_LOD2_array = []; // init.***
+	this.visibleObjectsControler.currentVisibleNeoBuildings_LOD3_array = []; // init.***
+	
+	var maxNumberOfCalculatingPositions = 50;
+	var currentCalculatingPositionsCount = 0;
+	
+	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
+	for(var i=0; i<neoBuildings_count; i++)
+	{
+		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+		
+		// 1) check if there are cartesian position.***
+		if(neoBuilding._buildingPosition == undefined)
+		{
+			// check if there are the metadata. if exist metadata try to calculate the position.***
+			// we must fix the max number of this calculation to preserve smoothing rendering.***
+			if(currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
+			{
+				if(neoBuilding.metaData != undefined)
+				{
+					// check if there are the geodetic location (longitude, latitude, altitude) inside of the metadata.***
+					var longitude = neoBuilding.metaData.longitude;
+					var latitude = neoBuilding.metaData.latitude;
+					var altitude = neoBuilding.metaData.altitude;
+					
+					if(longitude != undefined && latitude != undefined && altitude != undefined )
+					{
+						var position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude); 
+						//var position = absolutePosition;
+						neoBuilding._buildingPosition = position; 
+						
+						// High and Low values of the position.****************************************************
+						var splitValue = Cesium.EncodedCartesian3.encode(position); // no works!.***
+						var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
+						var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
+						var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
+						
+						neoBuilding._buildingPositionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
+						neoBuilding._buildingPositionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
+						
+						currentCalculatingPositionsCount += 1;
+					}
+				}
+			}
+			continue; 
+		}
+		
+		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition);
+		if(squaredDistToCamera > this.min_squaredDist_to_see)
+			continue;
+		
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
+		this.radiusAprox_aux = 1000.0;
+		
+		if(this.radiusAprox_aux)
+		{
+			this.boundingSphere_Aux.radius = this.radiusAprox_aux; 
+		}
+		else
+		{
+			this.boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
+		}
+		
+		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
+		if(frustumCull != Cesium.Intersect.OUTSIDE) 
+		{
+			if(squaredDistToCamera < lod0_minSquaredDist)// min dist to see detailed.***
+			{
+				this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array.push(neoBuilding);
+			}
+			else if(squaredDistToCamera < lod1_minSquaredDist)
+			{
+				this.visibleObjectsControler.currentVisibleNeoBuildings_LOD1_array.push(neoBuilding);
+			}
+			else if(squaredDistToCamera < lod2_minSquaredDist)
+			{
+				this.visibleObjectsControler.currentVisibleNeoBuildings_LOD2_array.push(neoBuilding);
+			}
+			else if(squaredDistToCamera < lod3_minSquaredDist)
+			{
+				this.visibleObjectsControler.currentVisibleNeoBuildings_LOD3_array.push(neoBuilding);
+			}
+		}
+		else{
+			
+		}
+		
+	}
+	/*
 	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++)
 	{
@@ -2733,80 +2823,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				neoVisibleBuildings_array.push(neoBuilding);
 			}
 		}
-	}
-	/*
-	// old code. works ok.***
-	for(var i=0; i<neoBuildings_count; i++)
-	{
-		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
-		
-		if(neoBuilding._buildingPosition == undefined)
-		{
-			continue;
-		}
-		
-		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition);
-		if(squaredDistToCamera > this.min_squaredDist_to_see)
-			continue;
-		
-		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
-		this.radiusAprox_aux = 1000.0;
-		
-		if(this.radiusAprox_aux)
-		{
-			this.boundingSphere_Aux.radius = this.radiusAprox_aux; 
-		}
-		else
-		{
-			this.boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
-		}
-		
-		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
-		if(frustumCull !== Cesium.Intersect.OUTSIDE) 
-		{
-			
-			if(squaredDistToCamera < this.min_squaredDist_to_see_detailed)// min dist to see detailed.***
-			{
-				if(neoBuilding._neoRefLists_Container.neoRefsLists_Array.length > 0)
-				{
-					// Detect the Detailed building.***
-					//if(neoBuilding._header._f4d_version == 1)	
-					{
-						if(last_squared_dist)
-						{
-							if(squaredDistToCamera < last_squared_dist)
-							{
-								last_squared_dist = squaredDistToCamera;
-								neoVisibleBuildings_array.push(this.detailed_neoBuilding);
-								this.detailed_neoBuilding = neoBuilding;
-							}
-							else{
-									neoVisibleBuildings_array.push(neoBuilding);
-							}
-						}
-						else{
-							last_squared_dist = squaredDistToCamera;
-							this.detailed_neoBuilding = neoBuilding;
-							//neoVisibleBuildings_array.push(neoBuilding);
-						}
-					}
-				}
-				else{
-					if(neoBuilding._header && neoBuilding._header.isSmall)
-						neoVisibleBuildings_array.push(neoBuilding);
-					else
-					{
-						neoVisibleBuildings_array.push(neoBuilding);
-						//this.currentVisibleBuildings_LOD0_array.push(neoBuilding);
-					}
-				}
-				
-			}
-			else{
-				neoVisibleBuildings_array.push(neoBuilding);
-			}
-		}
-		
 	}
 	*/
 	return neoVisibleBuildings_array;
@@ -3266,11 +3282,11 @@ CesiumManager.prototype.loadData = function() {
 	} else {
 		buildingFileName = '';
 	}
-	this.readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
+	//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
 	
 	if(deployType === 'dev' || deployType === 'stage') {
 		buildingFileName = "F4D_gangbuk_cultur_del";
-		this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
+		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat, lon, 60.0, this.readerWriter, neoBuildingsList, this);
 		
 		buildingFileName = "F4D_KANGBUK_del";
 		//this.readerWriter.openNeoBuilding(GL, buildingFileName, lat + deltaLat*2, lon, 60.0, this.readerWriter, neoBuildingsList, this);
@@ -3283,11 +3299,16 @@ CesiumManager.prototype.loadData = function() {
 		//this.readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, this.readerWriter, neoBuildingsList, this);
 	}
 		
-	deltaLat = 0.0002;
-	deltaLon = 0.0002;
-	var latitude = 37.5168;
-	var longitude = 126.95;
-	var elev = 48.0;
+	var filePathInServer = this.readerWriter.geometryDataPath + "/samsungIndexFile.ihe";
+	this.readerWriter.readF4dSamsungIndexFileInServer(GL, filePathInServer, this.readerWriter, this);
+	
 };
 
 //# sourceURL=CesiumManager.js
+
+
+
+
+
+
+
