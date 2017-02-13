@@ -83,7 +83,7 @@ Octree.prototype.getMotherOctree = function() {
 	} else {
 		return this.octree_owner.getMotherOctree();
 	}
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -106,7 +106,7 @@ Octree.prototype.getOctree = function(octreeNumberName, numDigits) {
 	var idx = Math.floor(octreeNumberName /denominator) % 10;
 	var rest_octreeNumberName = octreeNumberName - idx * denominator;
 	return this.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?

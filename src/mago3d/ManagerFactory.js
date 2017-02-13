@@ -13,7 +13,6 @@ var ManagerFactory = function(containerId, magoConfig) {
 	}
 	
 	var viewer = null;
-	var manager = null;
 	var magoManager = null;
 	var scene = null;
 	
@@ -27,19 +26,27 @@ var ManagerFactory = function(containerId, magoConfig) {
 		
 		viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
+		
+		if(MagoConfig.getInformation().terrainConfig.enable) {
+			var terrainProvider = new Cesium.CesiumTerrainProvider({
+				url : MagoConfig.getInformation().terrainConfig.url,
+			    requestWaterMask: MagoConfig.getInformation().terrainConfig.requestWaterMask,
+				requestVertexNormals: MagoConfig.getInformation().terrainConfig.requestVertexNormals
+			});
+			viewer.terrainProvider = terrainProvider;
+		}
+			
+		draw();
+		initEntity();
+		viewer.zoomTo(viewer.entities);
 	} else if(viewLibrary === 'worldwind') {
 		viewer = null;
 	}
 	
-	draw();
-	initEntity()
-	viewer.zoomTo(viewer.entities);
-	
-	
 	function draw() {
-		if(magoConfig.deployConfig.viewLibrary === 'cesium') {
+		if(MagoConfig.getInformation().deployConfig.viewLibrary === 'cesium') {
 			drawCesium();
-		} else if(magoConfig.deployConfig.viewLibrary === 'worldwind') {
+		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === 'worldwind') {
 			//
 		}
 	}
@@ -66,7 +73,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 		var readerWriter = new ReaderWriter();
 		
 		// 실제 빌딩을 읽어 들임
-		magoManager.loadData(magoConfig.geoConfig.initBuilding);
+		magoManager.loadData(MagoConfig.getInformation().geoConfig.initBuilding);
 		
 //		var bRBuildingProjectsList = magoManager.bRBuildingProjectsList;
 		var neoBuildingsList = magoManager.neoBuildingsList;
@@ -171,32 +178,19 @@ var ManagerFactory = function(containerId, magoConfig) {
 	 */
 	function initEntity() {
 		return viewer.entities.add({
-
-				/*
-			name : magoConfig.geoConfig.initEntity.name,
-			polygon : {
-				hierarchy : Cesium.Cartesian3.fromDegreesArray(magoConfig.geoConfig.initEntity.longitudeAndLatitude),
-				height : magoConfig.geoConfig.initEntity.height,
-				*/
-
-			name : 'Blue box',
-			position: Cesium.Cartesian3.fromDegrees(126.92734533517019, 37.517207695444, 1500.0),
+			name : MagoConfig.getInformation().geoConfig.initEntity.name,
+			position: Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initEntity.longitude, 
+													MagoConfig.getInformation().geoConfig.initEntity.latitude, 
+													MagoConfig.getInformation().geoConfig.initEntity.height),
 			box : {
 				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
 				//material : Cesium.Color.TRANSPARENT
-
 				fill : false,
 			    material : Cesium.Color.TRANSPARENT,
 			    outline : true,
 			    outlineWidth : 3.0,
 			    outlineColor : Cesium.Color.BLACK
 			}
-//				name : 'Blue box',
-//	            position: new Cesium.Cartesian3(1.0, 1.0, 1.0), // usa = (-114.0, 40.0, 300000.0), songdo = (126.6554, 37.3853, 300000.0)
-//	            box : {
-//	                dimensions : new Cesium.Cartesian3(300000.0*1000000, 300000.0*1000000, 300000.0*1000000), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
-//	                material : Cesium.Color.BLUE
-//	            }
 		});
 	}
 	
@@ -208,4 +202,4 @@ var ManagerFactory = function(containerId, magoConfig) {
 			
 		}
 	};
-}
+};

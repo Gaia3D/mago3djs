@@ -21,6 +21,8 @@ MagoConfig.init = function(jsonConfig) {
 	MagoConfig.initRenderingConfig(jsonConfig);
 	// 초기화 할 공간 정보 설정
 	MagoConfig.initGeoConfig(jsonConfig);
+	// 초기화 Terrain Provider
+	MagoConfig.initTerrain(jsonConfig);
 };
 
 /**
@@ -30,7 +32,7 @@ MagoConfig.init = function(jsonConfig) {
  */
 MagoConfig.initDeployConfig = function(jsonConfig) {
 	// 배포 관련 설정
-	if(jsonConfig.deployConfig !== null && jsonConfig.deployConfig !== null ) {
+	if(jsonConfig.deployConfig !== null && jsonConfig.deployConfig !== '' ) {
 		if(jsonConfig.deployConfig.deployType === undefined 
 				|| jsonConfig.deployConfig.deployType === null 
 				|| jsonConfig.deployConfig.deployType === '') {
@@ -56,10 +58,11 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
  */
 MagoConfig.initRenderingConfig = function(jsonConfig) {
 	// 화면 rendering 관련 설정
-	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== null ) {
+	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== '' ) {
 		if(jsonConfig.renderingConfg.glEnable === undefined
 				|| jsonConfig.renderingConfg.glEnable === null 
 				|| jsonConfig.renderingConfg.glEnable === '' 
+				|| jsonConfig.renderingConfg.glEnable === false
 				|| jsonConfig.renderingConfg.glEnable === 'false') {
 			jsonConfig.renderingConfg.glEnable = false;
 		} else {
@@ -77,7 +80,7 @@ MagoConfig.initRenderingConfig = function(jsonConfig) {
  */
 MagoConfig.initGeoConfig = function(jsonConfig) {
 	// 초기화 할 공간 정보. github에 공개되어 있는 여의도 sample 자료
-	if(jsonConfig.geoConfig !== null && jsonConfig.geoConfig !== null ) {
+	if(jsonConfig.geoConfig !== null && jsonConfig.geoConfig !== '' ) {
 		// 최초 로딩시 지도가 표시할 공간 enitity 정보
 		if(jsonConfig.geoConfig.initEntity === undefined 
 				|| jsonConfig.geoConfig.initEntity === null 
@@ -88,10 +91,15 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 					|| jsonConfig.geoConfig.initEntity.name === '') {
 				jsonConfig.geoConfig.initEntity.name = ["여의도"];
 			}
-			if(jsonConfig.geoConfig.initEntity.longitudeAndLatitude === undefined 
-					|| jsonConfig.geoConfig.initEntity.longitudeAndLatitude === null 
-					|| jsonConfig.geoConfig.initEntity.longitudeAndLatitude.length === 0) {
-				jsonConfig.geoConfig.initEntity.longitudeAndLatitude = [ 128.578740, 34.911826, 128.617838, 34.913655, 128.615028, 34.894553, 128.582938, 34.892353 ];
+			if(jsonConfig.geoConfig.initEntity.longitude === undefined 
+					|| jsonConfig.geoConfig.initEntity.longitude === null 
+					|| jsonConfig.geoConfig.initEntity.longitude === '') {
+				jsonConfig.geoConfig.initEntity.longitude = 126.924185;
+			}
+			if(jsonConfig.geoConfig.initEntity.latitude === undefined 
+					|| jsonConfig.geoConfig.initEntity.latitude === null 
+					|| jsonConfig.geoConfig.initEntity.latitude === '') {
+				jsonConfig.geoConfig.initEntity.latitude = 37.521168;
 			}
 			if(jsonConfig.geoConfig.initEntity.height === undefined 
 					|| jsonConfig.geoConfig.initEntity.height === null) {
@@ -128,4 +136,40 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 	}
 	
 	this.jsonConfig.geoConfig = jsonConfig.geoConfig;
+};
+
+MagoConfig.initTerrain = function(jsonConfig) {
+	// 화면 rendering 관련 설정
+	if(jsonConfig.terrainConfig !== null && jsonConfig.terrainConfig !== '' ) {
+		if(jsonConfig.terrainConfig.enable === undefined
+				|| jsonConfig.terrainConfig.enable === null 
+				|| jsonConfig.terrainConfig.enable === ''
+				|| jsonConfig.terrainConfig.enable === true	
+				|| jsonConfig.terrainConfig.enable === 'true') {
+			jsonConfig.terrainConfig.enable = true;
+		} else {
+			jsonConfig.terrainConfig.enable = false;
+		}
+		if(jsonConfig.terrainConfig.url === undefined
+				|| jsonConfig.terrainConfig.url === null 
+				|| jsonConfig.terrainConfig.url === '') {
+			jsonConfig.terrainConfig.url = 'https://assets.agi.com/stk-terrain/world';
+		}
+		if(jsonConfig.terrainConfig.requestWaterMask === undefined
+				|| jsonConfig.terrainConfig.requestWaterMask === null 
+				|| jsonConfig.terrainConfig.requestWaterMask === ''
+				|| jsonConfig.terrainConfig.requestWaterMask === true		
+				|| jsonConfig.terrainConfig.requestWaterMask === 'true') {
+			jsonConfig.terrainConfig.requestWaterMask = true;
+		}
+		if(jsonConfig.terrainConfig.requestVertexNormals === undefined
+				|| jsonConfig.terrainConfig.requestVertexNormals === null 
+				|| jsonConfig.terrainConfig.requestVertexNormals === ''
+				|| jsonConfig.terrainConfig.requestWaterMask === true		
+				|| jsonConfig.terrainConfig.requestVertexNormals === 'true') {
+			jsonConfig.terrainConfig.requestVertexNormals = true;
+		}
+	}
+	
+	this.jsonConfig.terrainConfig = jsonConfig.terrainConfig;
 };

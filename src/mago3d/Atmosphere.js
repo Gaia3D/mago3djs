@@ -261,7 +261,6 @@ CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
 	var matrix = new Matrix4();
 	
 	// 1) Rotation Z. Longitude.***
-	var vertex;
 	matrix.rotationAxisAngDeg(-this.longitude, 0.0, 0.0, 1.0);
 	vtxMat.transformPointsByMatrix4(matrix);
 	

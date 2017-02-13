@@ -1,7 +1,9 @@
+'use strict';
 
-
-var VisibleObjectsControler = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var VisibleObjectsControler = function() {
 	this.currentVisibleNeoBuildings_LOD0_array = [];
 	this.currentVisibleNeoBuildings_LOD1_array = [];
 	this.currentVisibleNeoBuildings_LOD2_array = [];
@@ -13,5 +15,4 @@ var VisibleObjectsControler = function()
 	this.currentRenderableNeoBuildings_LOD3_array = [];
 	
 	this.currentRenderableRefArray = [];
-	
 };
