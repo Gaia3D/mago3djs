@@ -5,14 +5,15 @@
 
 ## 2. mago3djsArchitecture
 
-<img src ="http://i.imgur.com/Yckn8qA.png" width = 400>
+<img src ="http://i.imgur.com/HtcQ8vC.png" width = 400>
 
 | tool | description |
 | :------------ | :-----------:
 | Test     | used TestRunner(**Karma**) and used Test([**Jasmine**](https://github.com/Gaia3D/mago3djs/wiki/Test))         
 | Documentation    | used [**jsdoc**](https://github.com/Gaia3D/mago3djs/wiki/Documentation)    
 | Build     | used [**Gulp**](https://github.com/Gaia3D/mago3djs/wiki/Build)  |
-| 정적검사(lint) | used [**eslint**]() |
+| 정적검사(lint) | used [**eslint**](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC) |
+| Third Party | used [**JQuery**](https://github.com/Gaia3D/mago3djs/wiki/Third-Party) |
 
 ---
 
@@ -27,15 +28,15 @@
 - build : gulp를 이용해서 project를 build 하면 자동 생성되는 디렉토리
   - build/mago3d : Javascript 파일을 압축 혹은 통합한 min 파일이 저장됩니다.
   - build/documentaion : jsdoec으로 자동 생성됩니다.
-- external : 외부 Javascript library를 저장합니다.
- - external/jasmine : jasmine 테스트 라이브러리
-- node_modules : node package
+- thirdparty : 외부 Javascript library를 저장합니다.
+ - thirdparty/jasmine : jasmine 테스트 라이브러리
+ - thirdparty/JQuery : JQuery 라이브러리
+- node_modules : Dependenciesmanagement
 - src
   - src/engine/cesium : cesium customizing source
   - src/mago3d : Javascript 소스
   - src/mago3d/images 이미지 폴더
 - test : 테스트 소스 jasmine은 spec 이란 이름을 사용하지만 범용적으로 test 라고합니다.
-
 
 
 ## 웹서버 설정
