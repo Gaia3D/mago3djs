@@ -269,7 +269,7 @@ var CesiumManager = function() {
 	// End workers.------------------------------------------------------------------------
 	
 	this.createCloudsTEST();
-	this.load_samsung= false;
+	this.loadObjectIndexFile = false;
 };
 
 // real time radiosity shader http://madebyevan.com/webgl-path-tracing/
@@ -918,7 +918,7 @@ function handleTextureLoaded(gl, image, texture) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
-};
+}
 
 CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 {
@@ -2057,7 +2057,7 @@ CesiumManager.prototype.createFirstTimeVBOCacheKeys = function(GL, BR_Project) {
 	GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([240, 240, 240, 255])); // red
 	GL.bindTexture(GL.TEXTURE_2D, null);
 	BR_Project._f4d_nailImage_readed_finished = true;
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -2079,7 +2079,7 @@ CesiumManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(
 	var modelViewProjectionRelToEye = new Cesium.Matrix4();
 	Cesium.Matrix4.multiply(scene.context._us._projection, modelViewRelToEye, modelViewProjectionRelToEye);
 	Cesium.Matrix4.toArray(modelViewProjectionRelToEye, this.modelViewProjRelToEye_matrix); 
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -2649,7 +2649,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	//this.min_squaredDist_to_see = 10000000;
 	//this.min_squaredDist_to_see_smallBuildings = 700000;
 	
-	//this.min_squaredDist_to_see_detailed = 1000000; // Test for samsung.***
+	//this.min_squaredDist_to_see_detailed = 1000000; // Test for xxxx.***
 	
 	var squaredDistToCamera;
 	var last_squared_dist;
@@ -2715,7 +2715,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue;
 		
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
-		this.radiusAprox_aux = 1000.0;
+		this.radiusAprox_aux = 20.0;
 		
 		if(this.radiusAprox_aux)
 		{
@@ -3275,8 +3275,8 @@ CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
 		//this.readerWriter.openNeoBuilding(GL, buildingFileName[i], latitude[i], longitude[i], height[i], this.readerWriter, neoBuildingsList, this);
 	}
 	
-	var filePathInServer = this.readerWriter.geometryDataPath + "/samsungIndexFile.ihe";
-	this.readerWriter.readF4dSamsungIndexFileInServer(GL, filePathInServer, this.readerWriter, this);
+	var filePathInServer = this.readerWriter.geometryDataPath + "/objectIndexFile.ihe";
+	this.readerWriter.readObjectIndexFileInServer(GL, filePathInServer, this.readerWriter, this);
 
 };
 

@@ -370,7 +370,7 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 		bytes_readed = bytes_readed + 2*texcoordShortValues_count; // updating data.***
 		*/
 		// Float mode.**************************************************************
-		// New modifications for samsung 20161013.*****************************
+		// New modifications for xxxx 20161013.*****************************
 		var has_1_color = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_1_color)
 		{
@@ -423,7 +423,7 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 		
 		var has_texCoords = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		
-		// End New modifications for samsung 20161013.-------------------------
+		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords)
 		{
 			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
@@ -924,7 +924,7 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServ
 			}
 			//------------------------------------------------------
 			var bytes_readed = 0;
-			readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed)
+			readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed);
 			
 			// Once readed the terranTilesFile, must make all the quadtree.***
 			terranTile.setDimensionsSubTiles();
@@ -1124,7 +1124,7 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	oReq.send(null);
 };	
 
-ReaderWriter.prototype.parseF4dSamsungIndexFile = function(GL, arrayBuffer, f4dManager)
+ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManager)
 {
 	var bytesReaded = 0;
 	var buildingNameLength;
@@ -1190,7 +1190,7 @@ ReaderWriter.prototype.parseF4dSamsungIndexFile = function(GL, arrayBuffer, f4dM
 	}
 };
 
-ReaderWriter.prototype.readF4dSamsungIndexFileInServer = function(GL, filePathInServer, readerWriter, manager)
+ReaderWriter.prototype.readObjectIndexFileInServer = function(GL, filePathInServer, readerWriter, manager)
 {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePathInServer, true);
@@ -1205,16 +1205,12 @@ ReaderWriter.prototype.readF4dSamsungIndexFileInServer = function(GL, filePathIn
 			{
 				readerWriter = new ReaderWriter();
 			}
-			//------------------------------------------------------
-			readerWriter.parseF4dSamsungIndexFile(GL, arrayBuffer, manager)
-			
-			
+			readerWriter.parseObjectIndexFile(GL, arrayBuffer, manager);
 	    }
 	    arrayBuffer = null;
 	};
 
 	oReq.send(null);
-	
 };
 
 /**
@@ -1330,7 +1326,7 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
 	};
 	
 	simpleBuildingImage.src = imagenUrl;
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1351,7 +1347,7 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 	  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 	  gl.generateMipmap(gl.TEXTURE_2D);
 	  gl.bindTexture(gl.TEXTURE_2D, null);
-	};
+	}
 	
 	if(imageLod == undefined)
 		imageLod = 3; // The lowest lod.***
@@ -1470,7 +1466,7 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 		gl.generateMipmap(gl.TEXTURE_2D);
 		gl.bindTexture(gl.TEXTURE_2D, null);
-	};
+	}
 	
 	var neoRefImage = new Image();
 	neoRefImage.onload = function() 
@@ -1494,7 +1490,7 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
 		return;
     };
 	
-		neoRefImage.src = filePath_inServer;
+	neoRefImage.src = filePath_inServer;
 };
 
 /**

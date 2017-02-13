@@ -1,8 +1,9 @@
+'use strict';
 
-
-
-var FileRequestControler = function()
-{
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+var FileRequestControler = function() {
 	this.maxFilesRequestedCount = 10;
 	this.filesRequestedCount = 0;
 	

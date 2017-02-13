@@ -199,7 +199,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 		bytes_readed = bytes_readed + 2*texcoordShortValues_count; // updating data.***
 		*/
 		// Float mode.**************************************************************
-		// New modifications for samsung 20161013.*****************************
+		// New modifications for xxxx 20161013.*****************************
 		var has_1_color = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_1_color)
 		{
@@ -252,7 +252,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 		
 		var has_texCoords = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		
-		// End New modifications for samsung 20161013.-------------------------
+		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords)
 		{
 			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;

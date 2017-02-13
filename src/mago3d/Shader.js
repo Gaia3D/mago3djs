@@ -347,7 +347,7 @@ ShadersManager.prototype.createPCloudShader = function(GL) {
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-	standard_shader.shader_vertex_source = ShaderSource.pCloudShaderVertexSource
+	standard_shader.shader_vertex_source = ShaderSource.pCloudShaderVertexSource;
 	standard_shader.shader_fragment_source = ShaderSource.pCloundShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
