@@ -77,6 +77,20 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		var neoRefList = neoRefList_array[j];
 		var myBlocksList = neoRefList_array[j].blocksList;
 		
+		//var visibleIndices_count = neoRefList._currentVisibleIndices.length;
+		
+		if(myBlocksList == undefined)
+			continue;
+		
+		if(myBlocksList.fileLoadState == 2)
+		{
+			myBlocksList.parseArrayBuffer(GL, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			continue;
+		}
+		
+		if(myBlocksList.fileLoadState != 4)
+			continue;
+		
 		//if(!isInterior && neoRefList.name == "Ref_Bone")
 		//	continue;
 
@@ -296,6 +310,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = GL.createBuffer ();
 							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
 							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, GL.STATIC_DRAW);
+							this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
 								continue;
 						}
@@ -308,6 +323,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = GL.createBuffer ();
 							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
 							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, GL.STATIC_DRAW);
+							this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
 								continue;
 						}
@@ -321,6 +337,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, GL.STATIC_DRAW);
 							//this.vbo_vi_cacheKey_aux.indices_count = this.vbo_vi_cacheKey_aux.idx_vboDataArray.length;
+							this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
 						}

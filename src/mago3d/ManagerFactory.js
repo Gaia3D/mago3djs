@@ -73,6 +73,11 @@ var ManagerFactory = function(containerId, magoConfig) {
 		
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
+
+		
+		//getEntity()
+		//viewer.zoomTo(viewer.entities);
+
 	}
 	
 	// handlers.**************************************************************************
@@ -166,10 +171,20 @@ var ManagerFactory = function(containerId, magoConfig) {
 	 */
 	function initEntity() {
 		return viewer.entities.add({
+
+				/*
 			name : magoConfig.geoConfig.initEntity.name,
 			polygon : {
 				hierarchy : Cesium.Cartesian3.fromDegreesArray(magoConfig.geoConfig.initEntity.longitudeAndLatitude),
 				height : magoConfig.geoConfig.initEntity.height,
+				*/
+
+			name : 'Blue box',
+			position: Cesium.Cartesian3.fromDegrees(126.92734533517019, 37.517207695444, 1500.0),
+			box : {
+				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				//material : Cesium.Color.TRANSPARENT
+
 				fill : false,
 			    material : Cesium.Color.TRANSPARENT,
 			    outline : true,

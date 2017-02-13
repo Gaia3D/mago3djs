@@ -221,93 +221,86 @@ ReaderWriter.prototype.readNeoBlocks = function(GL, arrayBuffer, blocksList, neo
 	var bytes_readed = 0;
 	var blocks_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
-	  for(var i=0; i<blocks_count; i++)
-	  {
-		  var block = blocksList.newBlock();
+	for(var i=0; i<blocks_count; i++)
+	{
+		var block = blocksList.newBlock();
 		  
-		  if(blocksList._name == "BlocksBone")
-		  {
-			  if(i== 1495 || i== 1497 || i== 1145)
-			  {
-				  var hola = 0 ;
-			  }
-		  }
 		  
-			// 1rst, read bbox.***
-			var bbox = new BoundingBox();
-			bbox._minX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-			bbox._minY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-			bbox._minZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		// 1rst, read bbox.***
+		var bbox = new BoundingBox();
+		bbox._minX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox._minY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox._minZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		  
+		bbox._maxX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox._maxY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox._maxZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		
+		var maxLength = bbox.getMaxLength();
+		if(maxLength < 1.0)
+			block.isSmallObj = true;
+		else
+			block.isSmallObj = false;
+		
+		// New for read multiple vbo datas (indices cannot superate 65535 value).***
+		var vboDatasCount = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		for(var j=0; j<vboDatasCount; j++)
+		{
+		
+			// 1) Positions array.***************************************************************************************
+			var vertex_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var verticesFloatValues_count = vertex_count * 3;
+			
+			block.vertex_count = vertex_count;
+
+			var startBuff = bytes_readed;
+			var endBuff = bytes_readed + 4*verticesFloatValues_count;
+
+			var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.newVBOVertexIdxCacheKey();
+			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			
+			/*
+			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = GL.createBuffer ();
+			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			  */
+			bytes_readed = bytes_readed + 4*verticesFloatValues_count; // updating data.***
+			 
+			// 2) Normals.************************************************************************************************
+			vertex_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var normalByteValues_count = vertex_count * 3;
+			//Test.***********************
+			//for(var j=0; j<normalByteValues_count; j++)
+			//{
+			//	var value_x = this.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			//}
+			startBuff = bytes_readed;
+			endBuff = bytes_readed + 1*normalByteValues_count;
+			
+			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			/*
+			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = GL.createBuffer ();
+			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			  */
+			bytes_readed = bytes_readed + 1*normalByteValues_count; // updating data.***
+			
+			// 3) Indices.*************************************************************************************************
+			var shortIndicesValues_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			startBuff = bytes_readed;
+			endBuff = bytes_readed + 2*shortIndicesValues_count;
 			  
-			bbox._maxX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-			bbox._maxY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-			bbox._maxZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
+			/*
+			vbo_vi_cacheKey.MESH_FACES_cacheKey= GL.createBuffer ();
+			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			 */ 
+			bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
+			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
 			
-			var maxLength = bbox.getMaxLength();
-			if(maxLength < 1.0)
-				block.isSmallObj = true;
-			else
-				block.isSmallObj = false;
-			
-			// New for read multiple vbo datas (indices cannot superate 65535 value).***
-			var vboDatasCount = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j=0; j<vboDatasCount; j++)
-			{
-			
-				// 1) Positions array.***************************************************************************************
-				var vertex_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				var verticesFloatValues_count = vertex_count * 3;
-				
-				block.vertex_count = vertex_count;
-
-				var startBuff = bytes_readed;
-				var endBuff = bytes_readed + 4*verticesFloatValues_count;
-
-				var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.newVBOVertexIdxCacheKey();
-				vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-				
-				/*
-				vbo_vi_cacheKey.MESH_VERTEX_cacheKey = GL.createBuffer ();
-				GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
-				GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
-				  */
-				bytes_readed = bytes_readed + 4*verticesFloatValues_count; // updating data.***
-				 
-				// 2) Normals.************************************************************************************************
-				vertex_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				var normalByteValues_count = vertex_count * 3;
-				//Test.***********************
-				//for(var j=0; j<normalByteValues_count; j++)
-				//{
-				//	var value_x = this.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-				//}
-				startBuff = bytes_readed;
-				endBuff = bytes_readed + 1*normalByteValues_count;
-				
-				vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-				/*
-				vbo_vi_cacheKey.MESH_NORMAL_cacheKey = GL.createBuffer ();
-				GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
-				GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
-				  */
-				bytes_readed = bytes_readed + 1*normalByteValues_count; // updating data.***
-				
-				// 3) Indices.*************************************************************************************************
-				var shortIndicesValues_count = this.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				startBuff = bytes_readed;
-				endBuff = bytes_readed + 2*shortIndicesValues_count;
-				  
-				vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
-				/*
-				vbo_vi_cacheKey.MESH_FACES_cacheKey= GL.createBuffer ();
-				GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
-				GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
-				 */ 
-				bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
-				vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
-				
-			}
-	   }
+		}
+	}
 };
 
 /**
@@ -323,11 +316,6 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 	var endBuff;
 	var bytes_readed = 0;
 	var neoRefs_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	
-	if(neoRefsList.name == "111" || neoRefsList.name == "112" || neoRefsList.name == "113" || neoRefsList.name == "114")
-	{
-		var hola = 0;
-	}
 	
 	for(var i=0; i<neoRefs_count; i++)
 	{
@@ -612,21 +600,118 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(GL, arrayBuffer, neoSimp
  * @param neoBuilding 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, blocksList, neoBuilding, readerWriter) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+ReaderWriter.prototype.readNeoBlocksArraybufferInServer = function(GL, filePath_inServer, blocksList, neoBuilding, manager) {
+
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
 	oReq.responseType = "arraybuffer";
+	
+	if(manager != undefined)
+	{
+		manager.fileRequestControler.filesRequestedCount += 1;
+	}
+	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 
 	oReq.onload = function (oEvent)
 	{
-	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	  if (arrayBuffer)
-	  {
-		  readerWriter.readNeoBlocks(GL, arrayBuffer, blocksList, neoBuilding);
-	  }
+	    blocksList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
+		blocksList.fileLoadState = 2; // 2 = file loading finished.***
+		
+		if(manager != undefined)
+		{
+			manager.fileRequestControler.filesRequestedCount -= 1;
+			if(manager.fileRequestControler.filesRequestedCount < 0)
+				manager.fileRequestControler.filesRequestedCount = 0;
+		}
+
+	};
+
+	oReq.send(null);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param filePath_inServer 변수
+ * @param blocksList 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ */
+ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, blocksList, neoBuilding, readerWriter, manager) {
+	// this is old function, but is in use.***
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePath_inServer, true);
+	oReq.responseType = "arraybuffer";
+	
+	if(manager != undefined)
+	{
+		manager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
+	}
+	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+
+	oReq.onload = function (oEvent)
+	{
+	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+	    if (arrayBuffer)
+	    {
+		    readerWriter.readNeoBlocks(GL, arrayBuffer, blocksList, neoBuilding);
+			blocksList.fileLoadState = 2; // 2 = file loading finished.***
+			
+		    if(manager != undefined)
+			{
+				manager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
+				if(manager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0)
+					manager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
+			}
+	    }
 	  
-	  arrayBuffer = null;
+	    arrayBuffer = null;
+	};
+
+	oReq.send(null);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param filePathInServer 변수
+ * @param neoRefList_container 변수
+ * @param neoReferenceList_name 변수
+ * @param lodLevel 변수
+ * @param blocksList 변수
+ * @param transformMat 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ * @param subOctreeNumberName 변수
+ */
+ReaderWriter.prototype.readNeoReferencesArraybufferInServer = function(GL, filePathInServer, neoRefsList, neoBuilding, manager) {
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePathInServer, true);
+	oReq.responseType = "arraybuffer";
+	
+	if(manager != undefined)
+	{
+		manager.fileRequestControler.filesRequestedCount += 1;
+	}
+	neoRefsList.fileLoadState = 1;	
+
+	oReq.onload = function (oEvent)
+	{
+	    neoRefsList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
+		if(neoRefsList.dataArraybuffer)
+		{
+			neoRefsList.fileLoadState = 2;	
+			if(manager != undefined)
+			{
+				manager.fileRequestControler.filesRequestedCount -= 1;
+				if(manager.fileRequestControler.filesRequestedCount < 0)
+					manager.fileRequestControler.filesRequestedCount = 0;
+			}
+		}
+		else{
+			neoRefsList.fileLoadState = 0;	
+		}
 	};
 
 	oReq.send(null);
@@ -646,71 +731,63 @@ ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, b
  * @param subOctreeNumberName 변수
  */
 ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, readerWriter, subOctreeNumberName) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+																		  lodLevel, blocksList, transformMat, neoBuilding, readerWriter, subOctreeNumberName, manager) {
+
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePath_inServer, true);
 	oReq.responseType = "arraybuffer";
 
 	oReq.onload = function (oEvent)
 	{
-	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	  if (arrayBuffer)
-	  {
-		   if(readerWriter == undefined)
-		  {
-			   readerWriter = new ReaderWriter();
-		  }
-		  //------------------------------------------------------
+	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+	    if (arrayBuffer)
+	    {
+		    if(readerWriter == undefined)
+		    {
+			    readerWriter = new ReaderWriter();
+		    }
+		    //------------------------------------------------------
 		  
-		  var octree;
-		  if(subOctreeNumberName != undefined)
-		  {
-			  // we are reading interior comRefs.***
-			  if(neoBuilding.octree == undefined)
-			  {
-				  var hola = 0;
-				  neoBuilding.octree = new Octree(undefined);
-			  }
+		    var octree;
+		    if(subOctreeNumberName != undefined)
+		    {
+		    	// we are reading interior comRefs.***
+			    if(neoBuilding.octree == undefined)
+			    {
+		  		    neoBuilding.octree = new Octree(undefined);
+			    }
 			  
-			  octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
-			  var neoRefsList = new NeoReferencesList();
-			  neoRefsList.lod_level = lodLevel;
-			  neoRefsList.blocksList = blocksList;
-			  neoRefsList.name = neoReferenceList_name;
-			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			  readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			  if(transformMat)
-			  {
-				  neoRefsList.multiplyReferencesMatrices(transformMat);
-			  }
-			  octree.neoRefsList_Array.push(neoRefsList);
-			  if(subOctreeNumberName == 111)
-			  {
-				  var hola_1 = 0;
-			  }
-		  }
-		  else
-		  {
-			  if(neoReferenceList_name == "Ref_Bone")
-			  {
-				  var hola = 0;
-			  }
+			    octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
+			    var neoRefsList = new NeoReferencesList();
+			    neoRefsList.lod_level = lodLevel;
+			    neoRefsList.blocksList = blocksList;
+			    neoRefsList.name = neoReferenceList_name;
+			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+			    if(transformMat)
+			    {
+			  	    neoRefsList.multiplyReferencesMatrices(transformMat);
+			    }
+			    octree.neoRefsList_Array.push(neoRefsList);
+
+		    }
+		    else
+		    {
 			  
-			  var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
-			  neoRefsList.lod_level = lodLevel;
-			  neoRefsList.name = neoReferenceList_name;
-			  neoRefsList.blocksList = blocksList;
-			  //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			  readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			  if(transformMat)
-			  {
-				  neoRefsList.multiplyReferencesMatrices(transformMat);
-			  }
-		  }
+			    var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
+			    neoRefsList.lod_level = lodLevel;
+			    neoRefsList.name = neoReferenceList_name;
+			    neoRefsList.blocksList = blocksList; // no necessary.***
+			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+			    if(transformMat)
+			    {
+				    neoRefsList.multiplyReferencesMatrices(transformMat);
+			    }
+		    }
 		 
-	  }
-	  //arrayBuffer = null;
+	    }
+	    //arrayBuffer = null;
 	};
 
 	oReq.send(null);
@@ -1047,6 +1124,99 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	oReq.send(null);
 };	
 
+ReaderWriter.prototype.parseF4dSamsungIndexFile = function(GL, arrayBuffer, f4dManager)
+{
+	var bytesReaded = 0;
+	var buildingNameLength;
+	var buildingName = "";
+	var longitude;
+	var latitude;
+	var altitude;
+	var bbLengthX;
+	var bbLengthY;
+	var bbLengthZ;
+	
+	var neoBuildingsList = f4dManager.neoBuildingsList;
+	
+	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	for(var i =0; i<buildingsCount; i++)
+	{
+		// read the building location data.***
+		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		buildingName = "";
+		for(var j=0; j<buildingNameLength; j++)
+		{
+			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
+		}
+		
+		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
+		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
+		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		// TEST.*********
+		altitude = 50.0;
+		
+		bbLengthX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		bbLengthY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		bbLengthZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		// create a building and set the location.***
+		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
+		var neoBuilding = neoBuildingsList.newNeoBuilding();
+		
+		neoBuilding.buildingFileName = buildingName;
+		if(neoBuilding.metaData == undefined)
+		{
+			neoBuilding.metaData = new MetaData();
+		}
+		neoBuilding.metaData.latitude = latitude;
+		neoBuilding.metaData.longitude = longitude;
+		neoBuilding.metaData.altitude = altitude;
+		
+		if(neoBuilding.metaData.bbox == undefined)
+		{
+			neoBuilding.metaData.bbox = new BoundingBox();
+		}
+		
+		var bbox = neoBuilding.metaData.bbox;
+		
+		bbox._minX = -bbLengthX/2.0; 
+		bbox._minY = -bbLengthY/2.0;
+		bbox._minZ = -bbLengthZ/2.0;
+	  
+		bbox._maxX = bbLengthX/2.0; 
+		bbox._maxY = bbLengthY/2.0; 
+		bbox._maxZ = bbLengthZ/2.0; 
+	}
+};
+
+ReaderWriter.prototype.readF4dSamsungIndexFileInServer = function(GL, filePathInServer, readerWriter, manager)
+{
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePathInServer, true);
+	oReq.responseType = "arraybuffer";
+
+	oReq.onload = function (oEvent)
+	{
+		var arrayBuffer = oReq.response; // Note: not oReq.responseText
+		if (arrayBuffer)
+		{
+			if(readerWriter == undefined)
+			{
+				readerWriter = new ReaderWriter();
+			}
+			//------------------------------------------------------
+			readerWriter.parseF4dSamsungIndexFile(GL, arrayBuffer, manager)
+			
+			
+	    }
+	    arrayBuffer = null;
+	};
+
+	oReq.send(null);
+	
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
@@ -1056,45 +1226,65 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
  * @param f4d_manager 변수
  */
 ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, f4d_manager) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	//BR_Project._f4d_header_readed = true;
 	
-	$.ajax({
-		url: filePath_inServer,
-		type: "GET",
-		dataType: "text",
-		processData: false,
-		responseType:'arraybuffer',
-		success: function(result){
-			var arrayBuffer = result; // Note: not oReq.responseText
-			if (arrayBuffer) {
-				if(readerWriter == undefined) {
-					readerWriter = new ReaderWriter();
-				}
-				
-				neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
-				// Now, make the neoBuilding's octree.***
-				neoBuilding.octree.setBoxSize(	neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
-												neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
-												neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-				neoBuilding.octree.makeTree(3);
-				neoBuilding.octree.setSizesSubBoxes();
-				if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePath_inServer, true);
+	oReq.responseType = "arraybuffer";
+	
+	f4d_manager.fileRequestControler.filesRequestedCount += 1; // increment of files requested count.***
+	neoBuilding.metaData.fileLoadState = 1; // 1 = load strated.***
+
+	oReq.onload = function (oEvent)
+	{
+	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+	    if (arrayBuffer)
+	    {
+		    if(readerWriter == undefined)
+		    {
+			    readerWriter = new ReaderWriter();
+		    }
+		    //------------------------------------------------------
+		    if(neoBuilding.metaData == undefined)
+		    {
+			    neoBuilding.metaData = new MetaData();
+		    }
+		    neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
+		  
+			// Now, make the neoBuilding's octree.***
+			if(neoBuilding.octree == undefined)
+				neoBuilding.octree = new Octree(undefined);
+			
+			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
+										  neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
+										  neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
+										
+			neoBuilding.octree.makeTree(3);
+			neoBuilding.octree.setSizesSubBoxes();
+			
+			neoBuilding.metaData.fileLoadState = 2; // 2 = loading finished.***
+			
+			// finally decrement of files requested count.***
+			if(f4d_manager.fileRequestControler.filesRequestedCount > 0 )
+			{
+				f4d_manager.fileRequestControler.filesRequestedCount -= 1;
 			}
-			arrayBuffer = null;
-		},
-//		error: function(jqXHR, textStatus, errorThrown) {
-//			var errorMsg = 'status(code): ' + jqXHR.status + '\n';
-//			errorMsg += 'statusText: ' + jqXHR.statusText + '\n';
-//			errorMsg += 'responseText: ' + jqXHR.responseText + '\n';
-//			errorMsg += 'textStatus: ' + textStatus + '\n';
-//			errorMsg += 'errorThrown: ' + errorThrown;
-//			alert(errorMsg);
-//		}
-		error: function(e){
-			alert(e.responseText);
-		} 
-	});
+			else{
+				f4d_manager.fileRequestControler.filesRequestedCount = 0;
+			}
+			
+		  
+		    //if(f4d_manager.backGround_fileReadings_count > 0 )
+			//    f4d_manager.backGround_fileReadings_count -= 1; // old.***
+		  
+		    //BR_Project._f4d_header_readed_finished = true;
+	    }
+	    arrayBuffer = null;
+	};
+
+	oReq.send(null);
+
 };
 
 /**
@@ -1487,7 +1677,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	neoBuilding._buildingPosition = position; 
 	
 	// High and Low values of the position.****************************************************
-	var splitValue = Cesium.EncodedCartesian3.encode(position);
+	var splitValue = Cesium.EncodedCartesian3.encode(position); // no works.***
 	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
@@ -1507,6 +1697,8 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
     var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
+	neoBuilding.move_matrix = new Float32Array(16); // PositionMatrix.***
+	neoBuilding.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
 	
 	Cesium.Transforms.eastNorthUpToFixedFrame(position, undefined, neoBuilding.move_matrix);
 	neoBuilding.transfMat_inv = new Float32Array(16);
@@ -1552,24 +1744,24 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	var neoRefList_container = neoBuilding._neoRefLists_Container;
 	
 	lod_level = 0;
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin1";
+	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin1";
 	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 1;
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin2";
+	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin2";
 	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 2;
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Skin3";
+	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin3";
 	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, readerWriter, undefined);
 	
-	lod_level = 0;
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Ref_Bone";
+	lod_level = 3;
+	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Bone";
 	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************
-	var interiorCRef_folderPath = this.geometryDataPath + "/"+buildingFileName+"/inLOD4";
-	lod_level = 0;
+	var interiorCRef_folderPath = this.geometryDataPath + "/" + buildingFileName + "/inLOD4";
+	lod_level = 4;
 	//var interior_base_name = "Ref_NodeData";
 	var subOctreeName_counter = -1;
 	
