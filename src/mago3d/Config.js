@@ -21,8 +21,6 @@ MagoConfig.init = function(jsonConfig) {
 	MagoConfig.initRenderingConfig(jsonConfig);
 	// 초기화 할 공간 정보 설정
 	MagoConfig.initGeoConfig(jsonConfig);
-	// 초기화 Terrain Provider
-	MagoConfig.initTerrain(jsonConfig);
 };
 
 /**
@@ -133,43 +131,64 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 				jsonConfig.geoConfig.initBuilding.buildingFileName = ["F4D_Duplex_A_20110907_optimized"];
 			}
 		}
+		
+		// 화면 rendering 관련 설정
+		if(jsonConfig.geoConfig.initTerrain !== null && jsonConfig.geoConfig.initTerrain !== '' ) {
+			if(jsonConfig.geoConfig.initTerrain.enable === undefined
+					|| jsonConfig.geoConfig.initTerrain.enable === null 
+					|| jsonConfig.geoConfig.initTerrain.enable === ''
+					|| jsonConfig.geoConfig.initTerrain.enable === true	
+					|| jsonConfig.geoConfig.initTerrain.enable === 'true') {
+				jsonConfig.geoConfig.initTerrain.enable = true;
+			} else {
+				jsonConfig.geoConfig.initTerrain.enable = false;
+			}
+			if(jsonConfig.geoConfig.initTerrain.url === undefined
+					|| jsonConfig.geoConfig.initTerrain.url === null 
+					|| jsonConfig.geoConfig.initTerrain.url === '') {
+				jsonConfig.geoConfig.initTerrain.url = 'https://assets.agi.com/stk-terrain/world';
+			}
+			if(jsonConfig.geoConfig.initTerrain.requestWaterMask === undefined
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === null 
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === ''
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === true		
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === 'true') {
+				jsonConfig.geoConfig.initTerrain.requestWaterMask = true;
+			}
+			if(jsonConfig.geoConfig.initTerrain.requestVertexNormals === undefined
+					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === null 
+					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === ''
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === true		
+					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === 'true') {
+				jsonConfig.geoConfig.initTerrain.requestVertexNormals = true;
+			}
+		}
+		
+		// 최초 로딩시 camera가 이동할 공간 정보
+		if(jsonConfig.geoConfig.initCamera === undefined 
+				|| jsonConfig.geoConfig.initCamera === null 
+				|| jsonConfig.geoConfig.initCamera === '') {
+			
+			if(jsonConfig.geoConfig.initCamera.longitude === undefined 
+					|| jsonConfig.geoConfig.initCamera.longitude === null 
+					|| jsonConfig.geoConfig.initCamera.longitude === '') {
+				jsonConfig.geoConfig.initCamera.longitude = 126.924185;
+			}
+			if(jsonConfig.geoConfig.initCamera.latitude === undefined 
+					|| jsonConfig.geoConfig.initCamera.latitude === null 
+					|| jsonConfig.geoConfig.initCamera.latitude === '') {
+				jsonConfig.geoConfig.initCamera.latitude = 37.521168;
+			}
+			if(jsonConfig.geoConfig.initCamera.height === undefined 
+					|| jsonConfig.geoConfig.initCamera.height === null) {
+				jsonConfig.geoConfig.initCamera.height = 0;
+			}
+			if(jsonConfig.geoConfig.initCamera.duration === undefined 
+					|| jsonConfig.geoConfig.initCamera.duration === null) {
+				jsonConfig.geoConfig.initCamera.duration = 3;
+			}	
+		}
 	}
 	
 	this.jsonConfig.geoConfig = jsonConfig.geoConfig;
-};
-
-MagoConfig.initTerrain = function(jsonConfig) {
-	// 화면 rendering 관련 설정
-	if(jsonConfig.terrainConfig !== null && jsonConfig.terrainConfig !== '' ) {
-		if(jsonConfig.terrainConfig.enable === undefined
-				|| jsonConfig.terrainConfig.enable === null 
-				|| jsonConfig.terrainConfig.enable === ''
-				|| jsonConfig.terrainConfig.enable === true	
-				|| jsonConfig.terrainConfig.enable === 'true') {
-			jsonConfig.terrainConfig.enable = true;
-		} else {
-			jsonConfig.terrainConfig.enable = false;
-		}
-		if(jsonConfig.terrainConfig.url === undefined
-				|| jsonConfig.terrainConfig.url === null 
-				|| jsonConfig.terrainConfig.url === '') {
-			jsonConfig.terrainConfig.url = 'https://assets.agi.com/stk-terrain/world';
-		}
-		if(jsonConfig.terrainConfig.requestWaterMask === undefined
-				|| jsonConfig.terrainConfig.requestWaterMask === null 
-				|| jsonConfig.terrainConfig.requestWaterMask === ''
-				|| jsonConfig.terrainConfig.requestWaterMask === true		
-				|| jsonConfig.terrainConfig.requestWaterMask === 'true') {
-			jsonConfig.terrainConfig.requestWaterMask = true;
-		}
-		if(jsonConfig.terrainConfig.requestVertexNormals === undefined
-				|| jsonConfig.terrainConfig.requestVertexNormals === null 
-				|| jsonConfig.terrainConfig.requestVertexNormals === ''
-				|| jsonConfig.terrainConfig.requestWaterMask === true		
-				|| jsonConfig.terrainConfig.requestVertexNormals === 'true') {
-			jsonConfig.terrainConfig.requestVertexNormals = true;
-		}
-	}
-	
-	this.jsonConfig.terrainConfig = jsonConfig.terrainConfig;
 };

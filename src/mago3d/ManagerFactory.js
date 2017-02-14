@@ -27,18 +27,10 @@ var ManagerFactory = function(containerId, magoConfig) {
 		viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
 		
-		if(MagoConfig.getInformation().terrainConfig.enable) {
-			var terrainProvider = new Cesium.CesiumTerrainProvider({
-				url : MagoConfig.getInformation().terrainConfig.url,
-			    requestWaterMask: MagoConfig.getInformation().terrainConfig.requestWaterMask,
-				requestVertexNormals: MagoConfig.getInformation().terrainConfig.requestVertexNormals
-			});
-			viewer.terrainProvider = terrainProvider;
-		}
-			
 		draw();
 		initEntity();
-		viewer.zoomTo(viewer.entities);
+		initTerrain();
+		initCamera();
 	} else if(viewLibrary === 'worldwind') {
 		viewer = null;
 	}
@@ -191,6 +183,26 @@ var ManagerFactory = function(containerId, magoConfig) {
 			    outlineWidth : 3.0,
 			    outlineColor : Cesium.Color.BLACK
 			}
+		});
+	}
+	
+	function initTerrain() {
+		if(MagoConfig.getInformation().geoConfig.initTerrain.enable) {
+			var terrainProvider = new Cesium.CesiumTerrainProvider({
+				url : MagoConfig.getInformation().geoConfig.initTerrain.url,
+			    requestWaterMask: MagoConfig.getInformation().geoConfig.initTerrain.requestWaterMask,
+				requestVertexNormals: MagoConfig.getInformation().geoConfig.initTerrain.requestVertexNormals
+			});
+			viewer.terrainProvider = terrainProvider;
+		}
+	}
+	
+	function initCamera() {
+		viewer.camera.flyTo({
+		    destination : Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initCamera.longitude, 
+														MagoConfig.getInformation().geoConfig.initCamera.latitude, 
+														MagoConfig.getInformation().geoConfig.initCamera.height),
+		    duration: MagoConfig.getInformation().geoConfig.initCamera.duration
 		});
 	}
 	
