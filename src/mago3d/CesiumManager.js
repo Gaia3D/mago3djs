@@ -2715,7 +2715,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue;
 		
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
-		this.radiusAprox_aux = 1000.0;
+		this.radiusAprox_aux = 30.0;
 		
 		if(this.radiusAprox_aux)
 		{
