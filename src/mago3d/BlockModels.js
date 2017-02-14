@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -176,7 +177,7 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param blockList_name = 변수
+ * @param blockList_name 변수
  * @returns blocksList
  */
 BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
@@ -196,5 +197,3 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
   	}
   	return blocksList;
 };
-
-

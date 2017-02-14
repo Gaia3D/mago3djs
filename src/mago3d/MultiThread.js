@@ -52,7 +52,7 @@
 				}
 				self.postMessage(buffer, [buffer]);
 				self.close();
-			})
+			});
 		},
 		Int32: function() {
 			var /**/name/**/ = (/**/func/**/);
@@ -74,7 +74,7 @@
 				}
 				self.postMessage(buffer, [buffer]);
 				self.close();
-			})
+			});
 		},
 		Float64: function() {
 			var /**/name/**/ = (/**/func/**/);
@@ -96,7 +96,7 @@
 				}
 				self.postMessage(buffer, [buffer]);
 				self.close();
-			})
+			});
 		}
 	};
 
@@ -242,7 +242,7 @@
 		var self = this;
 
 		return function() {
-			self._execute(resource, [].slice.call(arguments), 'JSON', callback)
+			self._execute(resource, [].slice.call(arguments), 'JSON', callback);
 		};
 
 	};
@@ -253,7 +253,7 @@
 		var self = this;
 
 		return function() {
-			self._execute(resource, [].slice.call(arguments), 'Int32', callback)
+			self._execute(resource, [].slice.call(arguments), 'Int32', callback);
 		};
 
 	};
@@ -264,7 +264,7 @@
 		var self = this;
 
 		return function() {
-			self._execute(resource, [].slice.call(arguments), 'Float64', callback)
+			self._execute(resource, [].slice.call(arguments), 'Float64', callback);
 		};
 
 	};
