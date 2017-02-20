@@ -11,7 +11,7 @@
 
 	var yargs = require('yargs').options({
 		'port' : {
-			'default' : 80, 
+			'default' : 8080, 
 			'description' : 'Port to listen on.'
 		},
 		'public' : {
