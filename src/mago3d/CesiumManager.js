@@ -1903,7 +1903,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 			this.pointSC.set(camera.up.x, camera.up.y, camera.up.z);
 			transformedCamUp = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
 			
-			
 			this.myCameraSC.position.x = transformedCamPos.x; 
 			this.myCameraSC.position.y = transformedCamPos.y;
 			this.myCameraSC.position.z = transformedCamPos.z;
