@@ -48,7 +48,6 @@ var CesiumManager = function() {
 	
 	//this.ssaoFSQuad;// No use this.***
 	this.kernel = [];
-	var kernelSize = 16;
 	
 	// Original for hemisphere.***
 	/*
@@ -143,15 +142,13 @@ var CesiumManager = function() {
 	this.kernel.push(0.3);
 	this.kernel.push(0.35);
 	
-	/*
-	// Test for sphere.***
+	/* Test for sphere.***
 	for(var i=0; i<kernelSize; i++) {
 		this.kernel.push(2.0 * (Math.random() - 0.5));
 		this.kernel.push(2.0 * (Math.random() - 0.5));
 		this.kernel.push(2.0 * (Math.random() - 0.5));				
 	}
 	*/
-	// End ssao.------------------------------------------------
 	
 	this.f4d_atmos = new Atmosphere();
 	
@@ -238,7 +235,6 @@ var CesiumManager = function() {
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
 	this.pointSC_2= new Point3D();
-	var myCameraSC;
 	
 	this.currentTimeSC;
 	this.dateSC;
@@ -286,7 +282,6 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
 	var texture = gl.createTexture();
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	var b = new ArrayBuffer(w*h*4);
 	//var pixels = new Uint8Array(b);
   
 	if(w == 4 && h == 4) {
@@ -404,9 +399,6 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
  * 어떤 일을 하고 있습니까?
  */
 CesiumManager.prototype.createCloudsTEST = function() {
-	var increLong = 0.004;
-	var increLat = 0.004;
-	
 	var randomLongitude = 0;
 	var randomLatitude = 0;
 	var randomAltitude = 0;
@@ -487,7 +479,6 @@ CesiumManager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbra
 CesiumManager.prototype.updateCameraMoved = function(cameraPosition) {
 	// This function must run in a background process.****
 	// call this function if camera was moved.****
-	//----------------------------------------------------------------
 	
 	// 1rst, do frustum culling and find a detailed building.***
 };
@@ -517,7 +508,7 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 	this.encodedCamPosMC_Low[0] = camSplitVelue_X.low;
 	this.encodedCamPosMC_Low[1] = camSplitVelue_Y.low;
 	this.encodedCamPosMC_Low[2] = camSplitVelue_Z.low;
-	//-----------------------------------------------------------------------------------------
+	
 	// Test using f4d_shaderManager.************************
 	var shadersManager = this.shadersManager;
 	var standardShader = shadersManager.getMagoShader(4); // 4 = cloud-shader.***
@@ -526,7 +517,6 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 
 	GL.enableVertexAttribArray(standardShader._color);
 	GL.enableVertexAttribArray(standardShader._position);
-	//------------------------------------------------------
 	
 	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 	Cesium.Matrix4.toArray(_modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
@@ -542,9 +532,7 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 	
 	// Clouds.***************************************************
 	var cloud;
-	
-	for(var i=0; i<clouds_count; i++)
-	{
+	for(var i=0; i<clouds_count; i++) {
 		cloud = this.f4d_atmos.cloudsManager.circularCloudsArray[i];
 		
 		GL.uniform3fv(standardShader._cloudPosHIGH, cloud.positionHIGH);
@@ -573,7 +561,6 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 		//GL.drawElements(GL.LINE_LOOP, cloud.indices_count, GL.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	
-	//-------------------------------------------------------
 	GL.disableVertexAttribArray(standardShader._color);
 	GL.disableVertexAttribArray(standardShader._position);
 	
@@ -610,7 +597,7 @@ CesiumManager.prototype.renderCloudShadows = function(GL, cameraPosition, cullin
 	this.encodedCamPosMC_Low[0] = camSplitVelue_X.low;
 	this.encodedCamPosMC_Low[1] = camSplitVelue_Y.low;
 	this.encodedCamPosMC_Low[2] = camSplitVelue_Z.low;
-	//-----------------------------------------------------------------------------------------
+	
 	// Test using f4d_shaderManager.************************
 	var shadersManager = this.shadersManager;
 	var standardShader = shadersManager.getMagoShader(4); // 4 = cloud-shader.***
@@ -620,7 +607,6 @@ CesiumManager.prototype.renderCloudShadows = function(GL, cameraPosition, cullin
 	//GL.enableVertexAttribArray(standardShader._color);
 	//GL.disableVertexAttribArray(standardShader._color);
 	GL.enableVertexAttribArray(standardShader._position);
-	//------------------------------------------------------
 	
 	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 	Cesium.Matrix4.toArray(_modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
@@ -934,8 +920,6 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 	var blocksList;
 	var neoReferencesList;
 	var neoReferencesListName;
-	var subOctree;
-	var buildingRotationMatrix;
 	
 	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD0_array;
 	//this.visibleObjectsControler.currentVisibleNeoBuildings_LOD1_array;
@@ -1119,8 +1103,6 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 	
 	if(this.depthFboNeo == undefined)this.depthFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
-	
-	var neoVisibleBuildings_array = [];
 	
 	// do frustum culling.***
 	if(!this.isCameraMoving)
@@ -1668,7 +1650,6 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, 
 		*/
 	
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	var hola = 0;
 };
 	/*
 	// camera function.***
@@ -1802,7 +1783,6 @@ CesiumManager.prototype.moveSelectedObject = function(GL, scene, renderables_neo
 		this.objectSelected.moveVector.set(difX, difY, difZ);
 	}
 	
-	var hola = 0;
 };
 
 /**

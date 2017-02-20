@@ -175,18 +175,18 @@
 		}
 		if(this._activeThreads < this.threads) {
 			this._activeThreads++;
-			var t = (new Date()).valueOf();
 			var worker = new Worker(resource);
 			var buffer = this._encode[type](args);
 			var decode = this._decode[type];
 			var self = this;
+			var listener;
 			if(type==='JSON') {
-				var listener = function(e) {
+				listener = function(e) {
 					callback.call(self, decode(e.data));
 					self.ready();
 				};
 			} else {
-				var listener = function(e) {
+				listener = function(e) {
 					callback.apply(self, decode(e.data));
 					self.ready();
 				};
@@ -212,6 +212,7 @@
 
 	Multithread.prototype._prepare = function(fn, type) {
 
+		// TODO 버그
 		fn = fn;
 
 		var name = fn.name;

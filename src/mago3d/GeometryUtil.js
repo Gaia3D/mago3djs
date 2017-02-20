@@ -404,10 +404,8 @@ VertexList.prototype.getBoundingBox = function(resultBox) {
 	var vertex_count = this.vertexArray.length;
 	for(var i=0; i<vertex_count; i++)
 	{
-		if(i==0)
-		resultBox.setInit (this.vertexArray[i].point3d);
-		else
-			resultBox.addPoint3D(this.vertexArray[i].point3d);
+		if(i==0) resultBox.setInit(this.vertexArray[i].point3d);
+		else resultBox.addPoint3D(this.vertexArray[i].point3d);
 	}
 	return resultBox;
 };
@@ -472,20 +470,15 @@ VertexMatrix.prototype.getVertexList = function(idx) {
  * @returns resultBox
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) {
-	if(resultBox == undefined)
-		resultBox = new BoundingBox();
+	if(resultBox == undefined) resultBox = new BoundingBox();
 	
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	var total_vertex_count = this.totalVertexArraySC.length;
 	
-	for(var i=0; i<total_vertex_count; i++)
-	{
-		if(i==0)
-		resultBox.setInit (this.totalVertexArraySC[i].point3d);
-		else
-			resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
-		
+	for(var i=0; i<total_vertex_count; i++) {
+		if(i==0) resultBox.setInit (this.totalVertexArraySC[i].point3d);
+		else resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
 	}
 	return resultBox;
 };
@@ -2083,7 +2076,7 @@ var Header = function() {
 	// Depending the bbox size, determine the LOD.***
 	//this.bbox.maxLegth = 0.0;
 	this.isSmall = false;
-  };
+};
   
 /**
  * 어떤 일을 하고 있습니까?
