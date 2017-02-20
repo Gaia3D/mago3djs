@@ -339,9 +339,6 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
 	  
-	if(this.octree_number_name == 535) {
-		var hola=0;
-	}
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
 	

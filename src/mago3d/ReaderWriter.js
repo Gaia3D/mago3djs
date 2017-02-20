@@ -684,7 +684,7 @@ ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, b
  * @param readerWriter 변수
  * @param subOctreeNumberName 변수
  */
-ReaderWriter.prototype.readNeoReferencesArraybufferInServer = function(GL, filePathInServer, neoRefsList, neoBuilding, manager) {
+ReaderWriter.prototype.readNeoReferencesArraybufferInServer = function(filePathInServer, neoRefsList, neoBuilding, manager) {
 
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", filePathInServer, true);
