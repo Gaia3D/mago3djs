@@ -362,7 +362,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	var x = 0.0;
 	var y = 0.0;
 	var randomValue = 0;
-	var cloudWhite = 0.98;
+//	var cloudWhite = 0.98;
 	
 	// 1) Top ring. radius zero.***
 	var vertex_list = vtxMat.newVertexList();

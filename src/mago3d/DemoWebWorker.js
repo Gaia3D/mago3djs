@@ -1,3 +1,5 @@
+'use strict';
+
 // http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
 /*
  * 

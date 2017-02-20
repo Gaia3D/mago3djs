@@ -66,20 +66,10 @@ var ManagerFactory = function(containerId, magoConfig) {
 		
 		// 실제 빌딩을 읽어 들임
 		magoManager.loadData(MagoConfig.getInformation().geoConfig.initBuilding);
-		
-//		var bRBuildingProjectsList = magoManager.bRBuildingProjectsList;
-		var neoBuildingsList = magoManager.neoBuildingsList;
-		
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
-
-		
-		//getEntity()
-		//viewer.zoomTo(viewer.entities);
-
 	}
 	
-	// handlers.**************************************************************************
 	function disableCameraMotion(state){
 		viewer.scene.screenSpaceCameraController.enableRotate = state;
 		viewer.scene.screenSpaceCameraController.enableZoom = state;
@@ -98,7 +88,6 @@ var ManagerFactory = function(containerId, magoConfig) {
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
 			
-			var hola = 0;
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 		magoManager.handler.setInputAction(function(movement) {
@@ -157,7 +146,6 @@ var ManagerFactory = function(containerId, magoConfig) {
 				}
 			}
 			
-			var hola = 0;
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 	}
 	

@@ -9,7 +9,7 @@ var Block = function() {
 	}
 	
 	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
-	this._vbo_VertexIdx_CacheKeys_Container = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
 	this.mIFCEntityType = -1;
 	this.isSmallObj = false;
 	  
@@ -65,10 +65,11 @@ BlocksList.prototype.getBlock = function(idx) {
  * @param idx 변수
  * @returns block
  */
-BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter) {
+BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 	this.fileLoadState = 3;// 3 = parsing started.***
 	var bytes_readed = 0;
-	var blocks_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var blocks_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); 
+	bytes_readed += 4;
 	
 	for(var i=0; i<blocks_count; i++)
 	{
@@ -92,12 +93,12 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter)
 			block.isSmallObj = false;
 		
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		for(var j=0; j<vboDatasCount; j++)
 		{
 		
 			// 1) Positions array.***************************************************************************************
-			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			var verticesFloatValues_count = vertex_count * 3;
 			
 			block.vertex_count = vertex_count;
@@ -105,7 +106,7 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter)
 			var startBuff = bytes_readed;
 			var endBuff = bytes_readed + 4*verticesFloatValues_count;
 
-			var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.newVBOVertexIdxCacheKey();
+			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*
@@ -116,12 +117,12 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter)
 			bytes_readed = bytes_readed + 4*verticesFloatValues_count; // updating data.***
 			 
 			// 2) Normals.************************************************************************************************
-			vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			var normalByteValues_count = vertex_count * 3;
 			//Test.***********************
 			//for(var j=0; j<normalByteValues_count; j++)
 			//{
-			//	var value_x = f4dReadWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			//	var value_x = readWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			//}
 			startBuff = bytes_readed;
 			endBuff = bytes_readed + 1*normalByteValues_count;
@@ -135,7 +136,7 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter)
 			bytes_readed = bytes_readed + 1*normalByteValues_count; // updating data.***
 			
 			// 3) Indices.*************************************************************************************************
-			var shortIndicesValues_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			startBuff = bytes_readed;
 			endBuff = bytes_readed + 2*shortIndicesValues_count;
 			  
@@ -166,13 +167,13 @@ var BlocksListsContainer = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param blocksList_name 변수
- * @returns f4d_blocksList
+ * @returns blocksList
  */
 BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
-	var f4d_blocksList = new BlocksList();
-	f4d_blocksList._name = blocksList_name;
-	this._BlocksListsArray.push(f4d_blocksList);
-	return f4d_blocksList;
+	var blocksList = new BlocksList();
+	blocksList._name = blocksList_name;
+	this._BlocksListsArray.push(blocksList);
+	return blocksList;
 };
 
 /**

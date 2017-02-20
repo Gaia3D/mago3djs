@@ -38,7 +38,7 @@ onmessage = function(e) {
  */
 function setTest(value) {
 	squareDistUmbral = value;
-};
+}
 
 /*
 function getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume)
@@ -139,7 +139,7 @@ function possibleCameraPositionChanged(e) {
 		// Camera doesnt moved.***
 	}
 	*/
-};
+}
 
 /*
 // An example.***

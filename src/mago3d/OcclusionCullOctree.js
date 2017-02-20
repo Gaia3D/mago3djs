@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param occlusionCullingOctree_Cell_Owner 변수
@@ -289,5 +291,4 @@ var OcclusionCullingOctree = function() {
 	
 	this._ocCulling_box = new OcclusionCullingOctreeCell(null);
 	this._infinite_ocCulling_box = new OcclusionCullingOctreeCell(null);
-	
 };
