@@ -14,32 +14,32 @@ var GeometryModifier = function() {
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier 
  * 
- * @param f4d_point3d 변수
+ * @param point3D 변수
  * @param px 변수
  * @param py 변수
  * @param pz 변수
  */
-GeometryModifier.prototype.setPoint3d = function(f4d_point3d, px, py, pz) {
-	f4d_point3d.x = px;
-	f4d_point3d.y = py;
-	f4d_point3d.z = pz;
+GeometryModifier.prototype.setPoint3d = function(point3D, px, py, pz) {
+	point3D.x = px;
+	point3D.y = py;
+	point3D.z = pz;
 };
   
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
  * 
- * @param f4d_point3d 변수
+ * @param point3D 변수
  * @param px 변수
  * @param py 변수
  * @param pz 변수
  * @retuns dx*dx + dy*dy + dz*dz
  */
-GeometryModifier.prototype.point3dSquareDistTo = function(f4d_point3d, px, py, pz) {
-	var dx = f4d_point3d.x - px;
-	var dy = f4d_point3d.y - py;
-	var dz = f4d_point3d.z - pz;
-	  
+GeometryModifier.prototype.point3dSquareDistTo = function(point3D, px, py, pz) {
+	var dx = point3D.x - px;
+	var dy = point3D.y - py;
+	var dz = point3D.z - pz;
+	
 	return dx*dx + dy*dy + dz*dz;
 };
   
@@ -55,7 +55,7 @@ GeometryModifier.prototype.Matrix4SetByFloat32Array = function(matrix4, float32a
 		matrix4._floatArrays[i] = float32array[i];
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -129,7 +129,7 @@ GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matr
 	}
 	return resultMat;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -164,7 +164,7 @@ GeometryModifier.prototype.compoundReferencesListMultiplyReferencesMatrices = fu
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -216,7 +216,7 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 
 	return visibleCompRefObjectsArray;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -258,7 +258,7 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
 		
 	var compRefList_container = buildingProject._compRefList_Container;
 	var visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_container, eye_x, eye_y, eye_z);
-	  
+
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 
 	return total_visibleCompRefLists;
@@ -339,7 +339,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -363,7 +363,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = fun
 	
 	return intersects;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -515,13 +515,13 @@ GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
  * 
  * @param blockList_container 변수
  * @param blocksList_name 변수
- * @returns f4d_blocksList
+ * @returns blocksList
  */
 GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockList_container, blocksList_name) {
-	var f4d_blocksList = new BlocksList();
-	f4d_blocksList._name = blocksList_name;
-	blockList_container._BlocksListsArray.push(f4d_blocksList);
-	return f4d_blocksList;
+	var blocksList = new BlocksList();
+	blocksList._name = blocksList_name;
+	blockList_container._BlocksListsArray.push(blocksList);
+	return blocksList;
 };
 	  
 /**
@@ -567,11 +567,11 @@ GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = 
 	//this._blocksList_Container.newBlocksList("BlocksBone");
 	//----------------------------------------------------------------
 	  
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks1");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks2");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks3");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks4");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "BlocksBone");
+	this.blocksListsContainerNewBlocksList(buildingProject._blocksList_Container, "Blocks1");
+	this.blocksListsContainerNewBlocksList(buildingProject._blocksList_Container, "Blocks2");
+	this.blocksListsContainerNewBlocksList(buildingProject._blocksList_Container, "Blocks3");
+	this.blocksListsContainerNewBlocksList(buildingProject._blocksList_Container, "Blocks4");
+	this.blocksListsContainerNewBlocksList(buildingProject._blocksList_Container, "BlocksBone");
 };
 	
 /**

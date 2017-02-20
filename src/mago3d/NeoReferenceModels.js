@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -223,9 +224,6 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
-		else{
-			var hola = 0 ;
-		}
 		
 		var has_colors = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_colors)
@@ -257,10 +255,6 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 		{
 			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if(vertex_count == 0)
-			{
-				var hola = 0;
-			}
 			neoRef.vertex_count = vertex_count;
 			
 			var texcoordFloatValues_count = vertex_count * 2;
@@ -373,25 +367,3 @@ NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function(
 		this.neoRefsLists_Array[i].updateCurrentAllIndicesInterior();
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

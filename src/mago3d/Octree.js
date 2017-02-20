@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param octreeOwner 변수
@@ -23,19 +25,17 @@ var Octree = function(octreeOwner) {
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
-	
 
     this.subOctrees_array = [];
     this._compRefsList_Array = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
 	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox.***
-	
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @returns subOctree 변수
  */
-Octree.prototype.new_subOctree = function() {
+Octree.prototype.newSubOctree = function() {
 	var subOctree = new Octree(this);
 	this.subOctrees_array.push(subOctree);
 	return subOctree;
@@ -48,7 +48,7 @@ Octree.prototype.new_subOctree = function() {
 Octree.prototype.makeTree = function(treeDepth) {
 	if(this.octree_level < treeDepth) {
 		for(var i=0; i<8; i++) {
-			var subOctree = this.new_subOctree();
+			var subOctree = this.newSubOctree();
 			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
 		}
 		  
@@ -280,7 +280,6 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 	var visibleOctreesArray = [];
 	var excludedOctArray = [];
 	var sortedOctreesArray = [];
-	var distAux = 0.0;
 	  
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
@@ -390,11 +389,6 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-    if(this.octree_level == 3)
-    {
-	    var hola = 0;
-    }
-  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) 
 	{
@@ -446,11 +440,6 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
     }
     else{
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-    }
-  
-    if(this.octree_level == 3)
-    {
-	    var hola = 0;
     }
   
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);

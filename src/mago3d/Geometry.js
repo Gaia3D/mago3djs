@@ -33,19 +33,17 @@ var MetaData = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
- * @param f4dReadWriter 변수
+ * @param readWriter 변수
  */
-MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
+MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
-	var auxScratch;
 	//var header = BR_Project._header;
 	//var arrayBuffer = this.fileArrayBuffer;
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
-	if(f4dReadWriter == undefined)
-		f4dReadWriter = new ReaderWriter();
+	if(readWriter == undefined) readWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -56,7 +54,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	if(this.guid == undefined)
 		this.guid ="";
 	
-	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
 		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
@@ -102,7 +100,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	//this.bbox.expand(20.0);
 	//-------------------------------
 	
-	var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	// 7) Buildings octree mother size.***
 	this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 

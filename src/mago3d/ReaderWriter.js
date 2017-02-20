@@ -256,7 +256,7 @@ ReaderWriter.prototype.readNeoBlocks = function(GL, arrayBuffer, blocksList, neo
 			var startBuff = bytes_readed;
 			var endBuff = bytes_readed + 4*verticesFloatValues_count;
 
-			var vbo_vi_cacheKey = block._vbo_VertexIdx_CacheKeys_Container.newVBOVertexIdxCacheKey();
+			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*
@@ -325,9 +325,7 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
 		
-		if(neoRef._id == 85 || neoRef._id == 6365)
-		{
-			var hola = 0;
+		if(neoRef._id == 85 || neoRef._id == 6365) {
 		}
 		
 		// 2) Block's Idx.***
@@ -394,9 +392,6 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
-		else{
-			var hola = 0 ;
-		}
 		
 		var has_colors = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_colors)
@@ -428,10 +423,6 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 		{
 			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if(vertex_count == 0)
-			{
-				var hola = 0;
-			}
 			neoRef.vertex_count = vertex_count;
 			
 			var texcoordFloatValues_count = vertex_count * 2;
