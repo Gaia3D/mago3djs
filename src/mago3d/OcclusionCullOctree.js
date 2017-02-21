@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class OcclusionCullingOctreeCell
  * @param occlusionCullingOctree_Cell_Owner 변수
  */
 var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
@@ -24,6 +25,7 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @returns subBox
  */
 OcclusionCullingOctreeCell.prototype.newSubBox = function() {
@@ -34,6 +36,7 @@ OcclusionCullingOctreeCell.prototype.newSubBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  */
 OcclusionCullingOctreeCell.prototype.create8SubBoxes = function() {
 	this._subBoxesArray.length = 0; // reset the array.***
@@ -46,6 +49,7 @@ OcclusionCullingOctreeCell.prototype.create8SubBoxes = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param min_x 변수
  * @param max_x 변수
  * @param min_y 변수
@@ -64,6 +68,7 @@ OcclusionCullingOctreeCell.prototype.setDimensions = function(min_x, max_x, min_
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  */
 OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 	// Bottom                      Top
@@ -102,6 +107,7 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param x 변수
  * @param y 변수
  * @param z 변수
@@ -126,6 +132,7 @@ OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param x 변수
  * @param y 변수
  * @param z 변수
@@ -200,6 +207,7 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -219,6 +227,7 @@ OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param expansionDist 변수
  */
 OcclusionCullingOctreeCell.prototype.expandBox = function(expansionDist) {
@@ -232,6 +241,7 @@ OcclusionCullingOctreeCell.prototype.expandBox = function(expansionDist) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof OcclusionCullingOctreeCell
  * @param arrayBuffer 변수
  * @param bytes_readed 변수
  * @param f4dReaderWriter 변수
@@ -283,6 +293,7 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 	
 /**
  * 어떤 일을 하고 있습니까?
+ * @class OcclusionCullingOctree
  */
 var OcclusionCullingOctree = function() {
 	if(!(this instanceof OcclusionCullingOctree)) {

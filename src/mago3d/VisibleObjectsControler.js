@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VisibleObjectsControler
  */
 var VisibleObjectsControler = function() {
 	this.currentVisibles0 = [];
@@ -17,6 +18,10 @@ var VisibleObjectsControler = function() {
 	this.currentRenderableRefArray = [];
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @memberof VisibleObjectsControler
+ */
 VisibleObjectsControler.prototype.initArrays = function()
 {
 	this.currentVisibles0 = [];

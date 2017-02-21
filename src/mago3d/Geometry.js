@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * class MetaData
  */
 var MetaData = function() {
 	if(!(this instanceof MetaData)) {
@@ -32,6 +33,7 @@ var MetaData = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof MetaData
  * @param arrayBuffer 변수
  * @param readWriter 변수
  */
@@ -158,6 +160,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 // F4D ReferenceObject.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Texture
  */
 var Texture = function() {
 	if(!(this instanceof Texture)) {
@@ -174,6 +177,7 @@ var Texture = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoSimpleBuilding
  */
 var NeoSimpleBuilding = function() {
 	if(!(this instanceof NeoSimpleBuilding)) {
@@ -197,6 +201,7 @@ NeoSimpleBuilding.prototype.newAccesor = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoSimpleBuilding
  * @returns texture
  */
 NeoSimpleBuilding.prototype.newTexture = function() {
@@ -222,6 +227,7 @@ NeoSimpleBuilding.prototype {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoBuilding
  */
 var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
@@ -274,6 +280,7 @@ var NeoBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuilding
  * @param texture 변수
  * @returns tex_id
  */
@@ -302,6 +309,7 @@ NeoBuilding.prototype.getTextureId = function(texture) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuilding
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -312,6 +320,7 @@ NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuilding
  */
 NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
 	this._neoRefLists_Container.updateCurrentAllIndicesOfLists();
@@ -319,6 +328,7 @@ NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuilding
  * @returns metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
  */
 NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
@@ -327,6 +337,7 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuilding
  * @param absolute_eye_x 변수
  * @param absolute_eye_y 변수
  * @param absolute_eye_z 변수
@@ -353,6 +364,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoBuildingsList
  */
 var NeoBuildingsList = function() {
 	if(!(this instanceof NeoBuildingsList)) {
@@ -364,6 +376,7 @@ var NeoBuildingsList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoBuildingsList
  * @returns neoBuilding
  */
 NeoBuildingsList.prototype.newNeoBuilding = function() {

@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Octree
  * @param octreeOwner 변수
  */
 var Octree = function(octreeOwner) {
@@ -33,6 +34,7 @@ var Octree = function(octreeOwner) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @returns subOctree 변수
  */
 Octree.prototype.newSubOctree = function() {
@@ -43,6 +45,7 @@ Octree.prototype.newSubOctree = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param treeDepth 변수
  */
 Octree.prototype.makeTree = function(treeDepth) {
@@ -62,6 +65,7 @@ Octree.prototype.makeTree = function(treeDepth) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param intNumber 변수
  * @returns numDigits
  */
@@ -76,6 +80,7 @@ Octree.prototype.getNumberOfDigits = function(intNumber) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  */
 Octree.prototype.getMotherOctree = function() {
 	if(this.octree_owner == undefined) {
@@ -87,6 +92,7 @@ Octree.prototype.getMotherOctree = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param octreeNumberName 변수
  * @param numDigits 변수
  * @returns subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
@@ -110,6 +116,7 @@ Octree.prototype.getOctree = function(octreeNumberName, numDigits) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param octreeNumberName 변수
  * @returns motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
  */
@@ -139,6 +146,7 @@ Octree.prototype.getOctreeByNumberName = function(octreeNumberName) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  */
 Octree.prototype.setSizesSubBoxes = function() {
 	// Octree number name.********************************
@@ -186,6 +194,7 @@ Octree.prototype.setSizesSubBoxes = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param Min_x 변수
  * @param Max_x 변수
  * @param Min_y 변수
@@ -205,6 +214,7 @@ Octree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y, Min_Z, Max_Z)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @returns centerPos
  */
 Octree.prototype.getCenterPos = function() {
@@ -213,6 +223,7 @@ Octree.prototype.getCenterPos = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @returns Math.abs(this.half_dx*1.2);
  */
 Octree.prototype.getRadiusAprox = function() {
@@ -221,6 +232,7 @@ Octree.prototype.getRadiusAprox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param result_CRefListsArray 변수
  */  
 Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
@@ -245,6 +257,7 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param result_NeoRefListsArray 변수
  */
 Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
@@ -269,6 +282,7 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param cesium_cullingVolume 변수
  * @param result_CRefListsArray 변수
  * @param cesium_boundingSphere_scratch 변수
@@ -325,6 +339,7 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param cesium_cullingVolume 변수
  * @param result_NeoRefListsArray 변수
  * @param cesium_boundingSphere_scratch 변수
@@ -360,6 +375,7 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 
 /**
  * 어떤 일을 하고 있습니까?	
+ * @memberof Octree
  * @param cesium_cullingVolume 변수
  * @param result_octreesArray 변수
  * @param cesium_boundingSphere_scratch 변수
@@ -414,6 +430,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 
 /**
  * 어떤 일을 하고 있습니까?	
+ * @memberof Octree
  * @param cesium_cullingVolume 변수
  * @param result_octreesArray 변수
  * @param cesium_boundingSphere_scratch 변수
@@ -468,6 +485,7 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -480,6 +498,7 @@ Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param octreesArray 변수
  * @param octree 변수
  * @returns result_idx
@@ -507,6 +526,7 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param result_octreesArray 변수
  * @param octree 변수
  * @param eye_x 변수
@@ -524,6 +544,7 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Octree
  * @param result_octreesArray 변수
  */
 Octree.prototype.getAllSubOctrees = function(result_octreesArray) {

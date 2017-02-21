@@ -13,7 +13,6 @@ var GeometryModifier = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier 
- * 
  * @param point3D 변수
  * @param px 변수
  * @param py 변수
@@ -28,7 +27,6 @@ GeometryModifier.prototype.setPoint3d = function(point3D, px, py, pz) {
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param point3D 변수
  * @param px 변수
  * @param py 변수
@@ -46,7 +44,6 @@ GeometryModifier.prototype.point3dSquareDistTo = function(point3D, px, py, pz) {
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param matrix4 변수
  * @param float32array 변수
  */
@@ -59,7 +56,6 @@ GeometryModifier.prototype.Matrix4SetByFloat32Array = function(matrix4, float32a
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param matrix4 변수
  * @param point3d 변수
  * @returns transformedPoint3d 
@@ -91,7 +87,6 @@ GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) 
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param matrixA 변수
  * @param matrixB 변수
  * @retuns resultMat
@@ -133,7 +128,6 @@ GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matr
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param reference 변수
  * @param matrix 변수
  */
@@ -146,7 +140,6 @@ GeometryModifier.prototype.referenceMultiplyTransformMatrix = function(reference
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param compRefList 변수
  * @param matrix 변수
  */
@@ -168,7 +161,6 @@ GeometryModifier.prototype.compoundReferencesListMultiplyReferencesMatrices = fu
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param compRefList 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -220,7 +212,6 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param compRefList_container 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -244,7 +235,6 @@ GeometryModifier.prototype.compoundReferencesListContainerGetVisibleCompRefObjec
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param buildingProject 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -267,7 +257,6 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  * @param min_x 변수
  * @param max_x 변수
@@ -288,7 +277,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetDimensions = function(oc
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function(ocCullOctreeCell) {
@@ -343,7 +331,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
@@ -367,7 +354,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = fun
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
@@ -444,7 +430,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
@@ -466,7 +451,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = 
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param ocCullOctreeCell 변수
  * @param expansionDist 변수
  */	
@@ -482,7 +466,6 @@ GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCull
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param vtArraysCacheKeys_container 변수
  * @returns vt_cacheKey
  */
@@ -495,7 +478,6 @@ GeometryModifier.prototype.vertexTexcoordsArraysCacheKeysContainerNewVertexTexco
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param blockList 변수
  * @param idx 변수
  * @returns block 
@@ -512,7 +494,6 @@ GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param blockList_container 변수
  * @param blocksList_name 변수
  * @returns blocksList
@@ -527,7 +508,6 @@ GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockLis
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param blockList_container 변수
  * @param blockList_name 변수
  * @returns blocksList
@@ -553,7 +533,6 @@ GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param buildingProject 변수
  */	  
 GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = function(buildingProject) {
@@ -577,7 +556,6 @@ GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = 
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
  * @param buildingProjectsList 변수
  * @returns br_buildingProject
  */

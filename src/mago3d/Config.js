@@ -2,6 +2,7 @@
 
 /**
  * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
+ * @class MagoConfig
  */
 var MagoConfig = MagoConfig || {};
 
@@ -11,7 +12,7 @@ MagoConfig.getInformation = function() {
 
 /**
  * 환경설정 세팅
- * 
+ * @memberof MagoConfig
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
  */
 MagoConfig.init = function(jsonConfig) {
@@ -27,7 +28,7 @@ MagoConfig.init = function(jsonConfig) {
 
 /**
  * 배포관련 환경 설정
- * 
+ * @memberof MagoConfig
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
  */
 MagoConfig.initDeployConfig = function(jsonConfig) {
@@ -53,7 +54,7 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
 
 /**
  * 화면 rendering 관련 설정
- * 
+ * @memberof MagoConfig
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
  */
 MagoConfig.initRenderingConfig = function(jsonConfig) {
@@ -75,7 +76,7 @@ MagoConfig.initRenderingConfig = function(jsonConfig) {
 
 /**
  * 초기화 할 공간 정보 설정
- * 
+ * @memberof MagoConfig
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
  */
 MagoConfig.initGeoConfig = function(jsonConfig) {

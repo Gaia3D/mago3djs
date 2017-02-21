@@ -3,6 +3,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @clas Matrix4
  */
 var Matrix4 = function() {
 	if(!(this instanceof Matrix4)) {
@@ -34,6 +35,7 @@ var Matrix4 = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  */	
 Matrix4.prototype.Identity = function() {
 	this._floatArrays[0] = 1;  // Col 0 - Row 0.***
@@ -59,6 +61,7 @@ Matrix4.prototype.Identity = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @returns rowMajor_matrix
  */
 Matrix4.prototype.getRowMajorMatrix = function() {
@@ -89,6 +92,7 @@ Matrix4.prototype.getRowMajorMatrix = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param angDeg 변수
  * @param axis_x 변수
  * @param axis_y 변수
@@ -102,6 +106,7 @@ Matrix4.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z) 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param angRad 변수
  * @param axis_x 변수
  * @param axis_y 변수
@@ -115,6 +120,7 @@ Matrix4.prototype.rotationAxisAngRad = function(angRad, axis_x, axis_y, axis_z) 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param quaternion 변수
  */
 Matrix4.prototype.rotationByQuaternion = function(quaternion) {
@@ -146,6 +152,7 @@ Matrix4.prototype.rotationByQuaternion = function(quaternion) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param float32array 변수
  */	
 Matrix4.prototype.setByFloat32Array = function(float32array) {
@@ -157,6 +164,7 @@ Matrix4.prototype.setByFloat32Array = function(float32array) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param col 변수
  * @param row 변수
  */
@@ -166,6 +174,7 @@ Matrix4.prototype.getIndexOfArray = function(col, row) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param col 변수
  * @param row 변수
  */
@@ -175,6 +184,7 @@ Matrix4.prototype.get = function(col, row) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param point3d 변수
  * @param result_point3d 변수
  * @returns result_point3d
@@ -198,6 +208,7 @@ Matrix4.prototype.transformPoint3D = function(point3d, result_point3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Matrix4
  * @param matrix 변수
  * @param resultMat 변수
  * @returns resultMat

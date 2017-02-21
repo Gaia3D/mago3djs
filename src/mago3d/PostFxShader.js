@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PostFxShader
  * @param gl 변수
  */
 var PostFxShader = function(gl) {
@@ -63,6 +64,7 @@ var PostFxShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PostFxShadersManager
  */
 var PostFxShadersManager = function() {
 	if(!(this instanceof PostFxShadersManager)) {
@@ -74,6 +76,7 @@ var PostFxShadersManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param GL 변수
  * @param source 변수
  * @param type 변수
@@ -94,6 +97,7 @@ PostFxShadersManager.prototype.getShader = function(GL, source, type, typeString
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param GL 변수
  */
 PostFxShadersManager.prototype.createDefaultShaders = function(GL) {
@@ -114,6 +118,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param GL 변수
  */
 PostFxShadersManager.prototype.createBlurShader = function(gl) {
@@ -157,6 +162,7 @@ PostFxShadersManager.prototype.createBlurShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createSsaoShader = function(gl) {
@@ -211,6 +217,7 @@ PostFxShadersManager.prototype.createSsaoShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param GL 변수
  */
 PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
@@ -248,6 +255,7 @@ PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
 // Ref Model.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
@@ -419,6 +427,7 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl) {
@@ -466,6 +475,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl) {
 // Selection shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) {
@@ -503,6 +513,7 @@ PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl)
 // SimpleDepth shader.***********************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof PostFxShadersManager
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {

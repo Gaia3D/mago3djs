@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Renderer
  */
 var Renderer = function() {
 	if(!(this instanceof Renderer)) {
@@ -22,6 +23,7 @@ var Renderer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
@@ -383,6 +385,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
@@ -598,6 +601,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param neoBuilding 변수
  * @param f4d_manager 변수
@@ -732,6 +736,7 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuildin
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param neoBuilding 변수
  * @param f4d_manager 변수
@@ -829,6 +834,7 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param BR_Project 변수
  * @param f4d_manager 변수
@@ -892,6 +898,7 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Renderer
  * @param GL 변수
  * @param pCloudProject 변수
  * @param modelViewProjRelToEye_matrix 변수

@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOManager 
  */
 var VBOManager = function() {
 	if(!(this instanceof VBOManager)) {
@@ -11,6 +12,7 @@ var VBOManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Buffer
  */
 var Buffer = function() {
 	if(!(this instanceof Buffer)) {
@@ -23,6 +25,7 @@ var Buffer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOVertexIdxCacheKey
  */
 var VBOVertexIdxCacheKey = function() {
 	if(!(this instanceof VBOVertexIdxCacheKey)) {
@@ -48,6 +51,7 @@ var VBOVertexIdxCacheKey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOVertexIdxCacheKeysContainer
  */
 var VBOVertexIdxCacheKeysContainer = function() {
 	if(!(this instanceof VBOVertexIdxCacheKeysContainer)) {
@@ -59,6 +63,7 @@ var VBOVertexIdxCacheKeysContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VBOVertexIdxCacheKeysContainer
  * @returns vbo_VIcacheKey
  */
 VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
@@ -69,6 +74,7 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOByteColorCacheKey
  */
 var VBOByteColorCacheKey = function() {
 	if(!(this instanceof VBOByteColorCacheKey)) {
@@ -81,6 +87,7 @@ var VBOByteColorCacheKey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOByteColorCacheKeysContainer
  */
 var VBOByteColorCacheKeysContainer = function() {
 	if(!(this instanceof VBOByteColorCacheKeysContainer)) {
@@ -92,6 +99,7 @@ var VBOByteColorCacheKeysContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VBOByteColorCacheKeysContainer
  * @return vbo_byteCol_cacheKey
  */
 VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function() {

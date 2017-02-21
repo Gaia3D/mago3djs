@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Plane
  */
 var Plane = function() {
 	if(!(this instanceof Plane)) {
@@ -17,6 +18,7 @@ var Plane = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Plane
  * @param px 변수
  * @param py 변수
  * @param pz 변수
@@ -33,6 +35,7 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Plane
  * @param line 변수
  * @param intersectionPoint 변수
  */

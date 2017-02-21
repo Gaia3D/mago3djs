@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReference
  */
 var NeoReference = function() {
 	if(!(this instanceof NeoReference)) {
@@ -39,6 +40,7 @@ var NeoReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReference
  */
 NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 	var multipliedMat = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
@@ -48,6 +50,7 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 // F4D References list.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReferencesList
  */
 var NeoReferencesList = function() {
 	if(!(this instanceof NeoReferencesList)) {
@@ -71,6 +74,7 @@ var NeoReferencesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @returns neoRef
  */
 NeoReferencesList.prototype.newNeoReference = function() {
@@ -81,6 +85,7 @@ NeoReferencesList.prototype.newNeoReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @param matrix 변수
  */
 NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
@@ -94,6 +99,7 @@ NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -104,6 +110,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(eye_x
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  */
 NeoReferencesList.prototype.updateCurrentAllIndicesInterior = function() {
 	this._currentVisibleIndices.length = 0;
@@ -116,6 +123,7 @@ NeoReferencesList.prototype.updateCurrentAllIndicesInterior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -126,6 +134,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndicesExterior = function(eye_x
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -138,6 +147,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesList
  * @param GL 변수
  * @param arrayBuffer 변수
  * @param neoBuilding 변수
@@ -323,6 +333,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 // F4D References list container ********************************************************************************************************** // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReferencesListsContainer
  */
 var NeoReferencesListsContainer = function() {
 	if(!(this instanceof NeoReferencesListsContainer)) {
@@ -334,6 +345,7 @@ var NeoReferencesListsContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesListsContainer
  * @param blocksList 변수 
  */
 NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
@@ -345,6 +357,7 @@ NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesListsContainer
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -359,6 +372,7 @@ NeoReferencesListsContainer.prototype.updateCurrentVisibleIndicesOfLists = funct
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof NeoReferencesListsContainer
  */
 NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function() {
 	var neoRefLists_count = this.neoRefsLists_Array.length;

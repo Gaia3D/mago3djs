@@ -2,6 +2,7 @@
 
 /**
  * 선
+ * @class Line
  */
 var Line = function() {
 	if(!(this instanceof Line)) {
@@ -15,6 +16,7 @@ var Line = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Line
  * @param px 변수
  * @param py 변수
  * @param pz 변수

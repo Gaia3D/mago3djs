@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Color
  */
 var Color = function() {
 	if(!(this instanceof Color)) {
@@ -16,6 +17,7 @@ var Color = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Color
  * @param _r 변수
  * @param _g 변수
  * @param _b 변수
@@ -27,6 +29,7 @@ Color.prototype.set = function(_r, _g, _b, _a) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Color
  * @param _r 변수
  * @param _g 변수
  * @param _b 변수
@@ -37,6 +40,7 @@ Color.prototype.setRGB = function(_r, _g, _b) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Color
  * @param _r 변수
  * @param _g 변수
  * @param _b 변수
@@ -48,6 +52,7 @@ Color.prototype.setRGBA = function(_r, _g, _b, _alpha) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ByteColor
  */
 var ByteColor = function() {
 	if(!(this instanceof ByteColor)) {
@@ -62,6 +67,7 @@ var ByteColor = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ByteColor
  */
 ByteColor.prototype.destroy = function() {
 	this._byte_r = null;
@@ -72,6 +78,7 @@ ByteColor.prototype.destroy = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ByteColor
  * @param byteRed 변수
  * @param byteGreen 변수
  * @param byteBlue 변수
@@ -84,6 +91,7 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue) {
   
 /**
 * 어떤 일을 하고 있습니까?
+* @class Point2D
 */
 var Point2D = function() {
 	if(!(this instanceof Point2D)) {
@@ -97,6 +105,7 @@ var Point2D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Point3DAux
  */
 var Point3DAux = function() {
 	if(!(this instanceof Point3DAux)) {
@@ -111,6 +120,7 @@ var Point3DAux = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTriangle
  */
 var TTriangle = function() {
 	if(!(this instanceof TTriangle)) {
@@ -124,6 +134,7 @@ var TTriangle = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTriangle
  * @param vtx_1 변수
  * @param vtx_2 변수
  * @param vtx_3 변수
@@ -136,6 +147,7 @@ TTriangle.prototype.setVertices = function(vtx_1, vtx_2, vtx_3) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTriangle
  */
 TTriangle.prototype.invert = function() {
 	var vertexAux = this.m_vertex_2;
@@ -145,6 +157,7 @@ TTriangle.prototype.invert = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTrianglesList
  */
 var TTrianglesList = function() {
 	if(!(this instanceof TTrianglesList)) {
@@ -156,6 +169,7 @@ var TTrianglesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesList
  * @returns tTri
  */
 TTrianglesList.prototype.newTTriangle = function() {
@@ -166,6 +180,7 @@ TTrianglesList.prototype.newTTriangle = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesList
  */
 TTrianglesList.prototype.invertTrianglesSense= function() {
 	var tri_count = this.tTrianglesArray.length;
@@ -176,6 +191,7 @@ TTrianglesList.prototype.invertTrianglesSense= function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesList
  * @param idx 변수
  * @returns tTrianglesArray[idx]
  */
@@ -189,6 +205,7 @@ TTrianglesList.prototype.getTTriangle = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTrianglesMatrix
  */
 var TTrianglesMatrix = function() {
 	if(!(this instanceof TTrianglesMatrix)) {
@@ -202,6 +219,7 @@ var TTrianglesMatrix = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesMatrix
  * @returns tTrianglesList
  */
 TTrianglesMatrix.prototype.newTTrianglesList = function() {
@@ -212,6 +230,7 @@ TTrianglesMatrix.prototype.newTTrianglesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesMatrix
  */
 TTrianglesMatrix.prototype.invertTrianglesSense = function() {
 	var tTriLists_count = this.tTrianglesListsArray.length;
@@ -223,6 +242,7 @@ TTrianglesMatrix.prototype.invertTrianglesSense = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesMatrix
  * @param resultTotalTTrianglesArray 변수
  * @returns resultTotalTTrianglesArray
  */
@@ -245,6 +265,7 @@ TTrianglesMatrix.prototype.getTotalTTrianglesArray = function(resultTotalTTriang
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TTrianglesMatrix
  * @returns shortArray
  */
 TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
@@ -267,6 +288,7 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Vertex
  */
 var Vertex = function() {
 	if(!(this instanceof Vertex)) {
@@ -282,6 +304,7 @@ var Vertex = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Vertex
  * @param x 변수
  * @param y 변수
  * @param z 변수
@@ -292,6 +315,7 @@ Vertex.prototype.setPosition = function(x, y, z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Vertex
  * @param r 변수
  * @param g 변수
  * @param b 변수
@@ -305,6 +329,7 @@ Vertex.prototype.setColorRGB = function(r, g, b) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Vertex
  * @param r 변수
  * @param g 변수
  * @param b 변수
@@ -319,6 +344,7 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Vertex
  * @param dir_x 변수
  * @param dir_y 변수
  * @param dir_z 변수
@@ -330,6 +356,7 @@ Vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexList
  */
 var VertexList = function() {
 	if(!(this instanceof VertexList)) {
@@ -341,6 +368,7 @@ var VertexList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @returns vertex
  */
 VertexList.prototype.newVertex = function() {
@@ -351,6 +379,7 @@ VertexList.prototype.newVertex = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @param idx 변수
  * @returns vertexArray[idx]
  */
@@ -360,6 +389,7 @@ VertexList.prototype.getVertex = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @returns vertexArray.length
  */
 VertexList.prototype.getVertexCount = function() {
@@ -368,6 +398,7 @@ VertexList.prototype.getVertexCount = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @param vertexCount 변수
  */
 VertexList.prototype.createNVertex = function(vertexCount) {
@@ -379,6 +410,7 @@ VertexList.prototype.createNVertex = function(vertexCount) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @param dir_x 변수
  * @param dir_y 변수
  * @param dir_z 변수
@@ -394,6 +426,7 @@ VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @param resultBox 변수
  * @returns resultBox
  */
@@ -412,6 +445,7 @@ VertexList.prototype.getBoundingBox = function(resultBox) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexList
  * @param transformMatrix 변수
  */
 VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
@@ -427,6 +461,7 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexMatrix
  */
 var VertexMatrix = function() {
 	if(!(this instanceof VertexMatrix)) {
@@ -441,6 +476,7 @@ var VertexMatrix = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @returns vertexList
  */
 VertexMatrix.prototype.newVertexList = function() {
@@ -451,6 +487,7 @@ VertexMatrix.prototype.newVertexList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param idx 변수
  * @returns vertexListArray[idx]
  */
@@ -466,6 +503,7 @@ VertexMatrix.prototype.getVertexList = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param resultBox
  * @returns resultBox
  */
@@ -485,6 +523,7 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  */
 VertexMatrix.prototype.setVertexIdxInList = function() {
 	var idx_in_list = 0;
@@ -506,6 +545,7 @@ VertexMatrix.prototype.setVertexIdxInList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @returns vertexCount
  */
 VertexMatrix.prototype.getVertexCount = function() {
@@ -521,6 +561,7 @@ VertexMatrix.prototype.getVertexCount = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param resultTotalVertexArray 변수
  * @returns resultTotalVertexArray
  */
@@ -542,6 +583,7 @@ VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
@@ -571,6 +613,7 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
@@ -601,6 +644,7 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
@@ -626,6 +670,7 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param dir_x 변수
  * @param dir_y 변수
  * @param dir_z 변수
@@ -641,6 +686,7 @@ VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distanc
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param tTrianglesMatrix 변수
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) {
@@ -682,6 +728,7 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexMatrix
  * @param transformMatrix
  */
 VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
@@ -698,6 +745,7 @@ VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Triangle
  */
 var Triangle= function() {
 	if(!(this instanceof Triangle)) {
@@ -720,6 +768,7 @@ var Triangle= function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Triangle
  */
 Triangle.prototype.destroy = function() {
 	  // No destroy Points3d here, only assign NULL value. Points3d must be destroyed for the owner(ftrianglesSurface).***
@@ -749,6 +798,7 @@ Triangle.prototype.destroy = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Triangle
  * @param point_1_idx 변수
  * @param point_2_idx 변수
  * @param point_3_idx 변수
@@ -761,6 +811,7 @@ Triangle.prototype.setPoints3DIndices = function(point_1_idx, point_2_idx, point
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Triangle
  * @param point_1 변수
  * @param point_2 변수
  * @param point_3 변수
@@ -773,6 +824,7 @@ Triangle.prototype.setPoints3D = function(point_1, point_2, point_3) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Triangle
  * @param color_1 = 변수
  * @param color_2 = 변수
  * @param color_3 = 변수
@@ -785,6 +837,7 @@ Triangle.prototype.setColors = function(color_1, color_2, color_3) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Polygon
  */
 var Polygon = function() {
 	if(!(this instanceof Polygon)) {
@@ -796,6 +849,7 @@ var Polygon = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Polygon
  * @param point3d 변수
  */
 Polygon.prototype.addPoint3D = function(point3d) {
@@ -804,6 +858,7 @@ Polygon.prototype.addPoint3D = function(point3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Polygon
  * @returns point3d
  */
 Polygon.prototype.newPoint3D = function() {
@@ -814,6 +869,7 @@ Polygon.prototype.newPoint3D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TrianglesSurface
  */
 var TrianglesSurface= function() {
 	if(!(this instanceof TrianglesSurface)) {
@@ -826,6 +882,7 @@ var TrianglesSurface= function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  */
 TrianglesSurface.prototype.destroy = function() {
 	// 1rst, destroy ftriangles.**********************************
@@ -849,6 +906,7 @@ TrianglesSurface.prototype.destroy = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @param generalVBOArraysContainer 변수
  */
 TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer) {
@@ -913,6 +971,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @param general_VertexIdxVBO_ArraysContainer = 변수
  */
 TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_ArraysContainer) {
@@ -956,6 +1015,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @param general_VertexIdxVBO_ArraysContainer 변수
  */
 TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_VertexIdxVBO_ArraysContainer) {
@@ -1008,6 +1068,7 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_Ver
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @returns point3d
  */
 TrianglesSurface.prototype.newPoint3D = function() {
@@ -1018,6 +1079,7 @@ TrianglesSurface.prototype.newPoint3D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @returns ftriangle
  */
 TrianglesSurface.prototype.newTriangle = function() {
@@ -1028,6 +1090,7 @@ TrianglesSurface.prototype.newTriangle = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @param matrix4 변수
  * @returns transformedTrianglesSurface
  */
@@ -1054,6 +1117,7 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TrianglesSurface
  * @returns bb
  */
 TrianglesSurface.prototype.getBoundingBox = function() {
@@ -1075,6 +1139,7 @@ TrianglesSurface.prototype.getBoundingBox = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Fpolyhedron
  */
 var Fpolyhedron= function() {
 	if(!(this instanceof Fpolyhedron)) {
@@ -1087,6 +1152,7 @@ var Fpolyhedron= function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  */
 Fpolyhedron.prototype.destroy = function() {
 	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
@@ -1102,6 +1168,7 @@ Fpolyhedron.prototype.destroy = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  * @param generalVBOArraysContainer 변수
  */
 Fpolyhedron.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer) {
@@ -1114,6 +1181,7 @@ Fpolyhedron.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysCo
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  * @param general_VertexIdxVBO_ArraysContainer 변수
  */
 Fpolyhedron.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_ArraysContainer) {
@@ -1126,6 +1194,7 @@ Fpolyhedron.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_Arr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  * @returns ftrianglesSurface
  */
 Fpolyhedron.prototype.newFTrianglesSurface = function() {
@@ -1136,6 +1205,7 @@ Fpolyhedron.prototype.newFTrianglesSurface = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  * @param matrix4
  * @returns transformedFPolyhedron
  */
@@ -1154,6 +1224,7 @@ Fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Fpolyhedron
  * @returns bb
  */
 Fpolyhedron.prototype.getBoundingBox = function() {
@@ -1176,6 +1247,7 @@ Fpolyhedron.prototype.getBoundingBox = function() {
 };
 
 /**
+ * @class FpolyhedronsList
  * 어떤 일을 하고 있습니까?
  */
 var FpolyhedronsList= function() {
@@ -1188,6 +1260,7 @@ var FpolyhedronsList= function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof FpolyhedronsList
  * @param generalVBOArraysContainer 변수
  */
 FpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer) {
@@ -1201,6 +1274,7 @@ FpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof FpolyhedronsList
  * @returns fpolyhedron 
  */
 FpolyhedronsList.prototype.newFPolyhedron = function() {
@@ -1217,6 +1291,7 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 
 /**
 * 어떤 일을 하고 있습니까?
+* @class Quaternion
 */
 var Quaternion = function() {
 	if(!(this instanceof Quaternion)) {
@@ -1231,6 +1306,7 @@ var Quaternion = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Quaternion
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w )
  */
 Quaternion.prototype.Modul = function() {
@@ -1239,6 +1315,7 @@ Quaternion.prototype.Modul = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Quaternion
  */
 Quaternion.prototype.Unitary = function() {
 	var modul = this.Modul();
@@ -1250,6 +1327,7 @@ Quaternion.prototype.Unitary = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Quaternion
  * @param angDeg 변수
  * @param axis_x 변수
  * @param axis_y 변수
@@ -1262,6 +1340,7 @@ Quaternion.prototype.rotationAngDeg = function(angDeg, axis_x, axis_y, axis_z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Quaternion
  * @param angRad 변수
  * @param axis_x 변수
  * @param axis_y 변수
@@ -1294,6 +1373,7 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Reference
  */
 var Reference = function() {
 	if(!(this instanceof Reference)) {
@@ -1318,6 +1398,7 @@ var Reference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Reference
  * @param matrix 변수
  */
 Reference.prototype.multiplyTransformMatrix = function(matrix) {
@@ -1328,6 +1409,7 @@ Reference.prototype.multiplyTransformMatrix = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Reference
  * @param blocksList 변수
  * @returns bb
  */
@@ -1343,6 +1425,7 @@ Reference.prototype.getBoundingBox = function(blocksList) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Reference
  * @returns byteColorsSurface
  */
 Reference.prototype.newByteColorsSurface = function() {
@@ -1353,6 +1436,7 @@ Reference.prototype.newByteColorsSurface = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReference
  */
 var CompoundReference = function() {
 	if(!(this instanceof CompoundReference)) {
@@ -1364,6 +1448,7 @@ var CompoundReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReference
  * @param blocksList 변수
  * @returns bb
  */
@@ -1391,6 +1476,7 @@ CompoundReference.prototype.getBoundingBox = function(blocksList) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReference
  * @returns ref
  */
 CompoundReference.prototype.newReference = function() {
@@ -1401,6 +1487,7 @@ CompoundReference.prototype.newReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReferencesList
  */
 var CompoundReferencesList = function() {
 	if(!(this instanceof CompoundReferencesList)) {
@@ -1418,6 +1505,7 @@ var CompoundReferencesList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesList
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -1430,6 +1518,7 @@ CompoundReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, e
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesList
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -1440,6 +1529,7 @@ CompoundReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesList
  * @param blocksList 변수
  * @returns bb
  */
@@ -1466,6 +1556,7 @@ CompoundReferencesList.prototype.getBoundingBox = function(blocksList) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesList
  * @returns compRef
  */
 CompoundReferencesList.prototype.newCompoundReference = function() {
@@ -1477,6 +1568,7 @@ CompoundReferencesList.prototype.newCompoundReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesList
  * @param matrix 변수
  */
 CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
@@ -1495,6 +1587,7 @@ CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReferencesListContainer
  */
 var CompoundReferencesListContainer = function() {
 	if(!(this instanceof CompoundReferencesListContainer)) {
@@ -1506,6 +1599,7 @@ var CompoundReferencesListContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesListContainer
  * @param compoundReferenceList_name 변수
  * @param lodLevel 변수
  * @returns compoundRefList
@@ -1520,6 +1614,7 @@ CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoun
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesListContainer
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -1534,6 +1629,7 @@ CompoundReferencesListContainer.prototype.updateCurrentVisibleIndicesOfLists = f
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CompoundReferencesListContainer
  * @param compRefListsName 변수
  * @returns result_compRefList
  */
@@ -1586,6 +1682,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexIdxArrays
  */
 var VertexIdxArrays = function() {
 	if(!(this instanceof VertexIdxArrays)) {
@@ -1600,6 +1697,7 @@ var VertexIdxArrays = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexIdxVBOArraysContainer
  */
 var VertexIdxVBOArraysContainer = function() {
 	if(!(this instanceof VertexIdxVBOArraysContainer)) {
@@ -1611,6 +1709,7 @@ var VertexIdxVBOArraysContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexIdxVBOArraysContainer
  * @returns vi_array
  */
 VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
@@ -1621,6 +1720,7 @@ VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
 
 /**
 * 어떤 일을 하고 있습니까?
+* @class ByteColorsVBOArrays
 */
 var ByteColorsVBOArrays = function() {
 	if(!(this instanceof ByteColorsVBOArrays)) {
@@ -1632,6 +1732,7 @@ var ByteColorsVBOArrays = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ByteColorsVBOArraysContainer
  */
 var ByteColorsVBOArraysContainer = function() {
 	if(!(this instanceof ByteColorsVBOArraysContainer)) {
@@ -1643,6 +1744,7 @@ var ByteColorsVBOArraysContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ByteColorsVBOArraysContainer
  * @returns byteColors_array
  */
 ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
@@ -1655,6 +1757,7 @@ ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArrays
  */
 var VertexTexcoordsArrays = function() {
 	if(!(this instanceof VertexTexcoordsArrays)) {
@@ -1667,6 +1770,7 @@ var VertexTexcoordsArrays = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VNTInterleavedCacheKeys
  */
 var VNTInterleavedCacheKeys = function() {
 	if(!(this instanceof VNTInterleavedCacheKeys)) {
@@ -1681,6 +1785,7 @@ var VNTInterleavedCacheKeys = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArraysCacheKeys
  */
 var VertexTexcoordsArraysCacheKeys = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeys)) {
@@ -1700,6 +1805,7 @@ var VertexTexcoordsArraysCacheKeys = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArraysCacheKeysContainer
  */
 var VertexTexcoordsArraysCacheKeysContainer = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeysContainer)) {
@@ -1711,6 +1817,7 @@ var VertexTexcoordsArraysCacheKeysContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof VertexTexcoordsArraysCacheKeysContainer
  * @returns vt_cacheKey
  */
 VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheKey = function() {
@@ -1721,6 +1828,7 @@ VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheK
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleObject
  */
 var SimpleObject = function() {
 	if(!(this instanceof SimpleObject)) {
@@ -1732,6 +1840,7 @@ var SimpleObject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleStorey
  */
 var SimpleStorey = function() {
 	if(!(this instanceof SimpleStorey)) {
@@ -1743,6 +1852,7 @@ var SimpleStorey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof SimpleStorey
  * @returns simpleObject
  */
 SimpleStorey.prototype.newSimpleObject = function() {
@@ -1753,6 +1863,7 @@ SimpleStorey.prototype.newSimpleObject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleBuilding
  */
 var SimpleBuilding = function() {
 	if(!(this instanceof SimpleBuilding)) {
@@ -1767,6 +1878,7 @@ var SimpleBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof SimpleBuilding
  * @returns storey
  */
 SimpleBuilding.prototype.newSimpleStorey = function() {
@@ -1777,6 +1889,7 @@ SimpleBuilding.prototype.newSimpleStorey = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleBuildingV1
  */
 var SimpleBuildingV1 = function() {
 	if(!(this instanceof SimpleBuildingV1)) {
@@ -1802,6 +1915,7 @@ var SimpleBuildingV1 = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof SimpleBuildingV1
  * @returns simpleObject
  */
 SimpleBuildingV1.prototype.newSimpleObject = function() {
@@ -1814,6 +1928,7 @@ SimpleBuildingV1.prototype.newSimpleObject = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Header
  */
 var Header = function() {
 	if(!(this instanceof Header)) {
@@ -1846,6 +1961,7 @@ var Header = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BRBuildingProject
  */
 var BRBuildingProject = function() {
 	if(!(this instanceof BRBuildingProject)) {
@@ -1932,6 +2048,7 @@ var BRBuildingProject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  */
 BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
 	// This is temp function for debugging.***
@@ -1949,6 +2066,7 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @param absolute_eye_x 변수
  * @param absolute_eye_y 변수
  * @param absolute_eye_z 변수
@@ -1975,6 +2093,7 @@ BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = functi
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @param eye_X 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -1986,6 +2105,7 @@ BRBuildingProject.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, ey
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -1996,6 +2116,7 @@ BRBuildingProject.prototype.updateCurrentVisibleIndicesExterior = function(eye_x
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -2009,6 +2130,7 @@ BRBuildingProject.prototype.getVisibleCompRefLists = function(eye_x, eye_y, eye_
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @param eye_x 변수
  * @param eye_y 변수
  * @param eye_z 변수
@@ -2021,6 +2143,7 @@ BRBuildingProject.prototype.getVisibleEXTCompRefLists = function(eye_x, eye_y, e
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @returns allCompRefLists
  */
 BRBuildingProject.prototype.getAllCompRefLists = function() {
@@ -2030,6 +2153,7 @@ BRBuildingProject.prototype.getAllCompRefLists = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @returns radius_aprox
  */
 BRBuildingProject.prototype.getRadiusAprox = function() {
@@ -2053,6 +2177,7 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  * @returns _boundingBox
  */
 BRBuildingProject.prototype.getBoundingBox = function() {
@@ -2103,6 +2228,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProject
  */
 BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
@@ -2116,6 +2242,7 @@ BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PCloudMesh
  */
 var PCloudMesh = function() {
 	if(!(this instanceof PCloudMesh)) {
@@ -2146,6 +2273,7 @@ var PCloudMesh = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BRBuildingProjectsList
  */
 var BRBuildingProjectsList = function() {
 	if(!(this instanceof BRBuildingProjectsList)) {
@@ -2161,6 +2289,7 @@ var BRBuildingProjectsList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProjectsList
  * @returns br_buildingProject
  */
 BRBuildingProjectsList.prototype.newBRProject = function() {
@@ -2173,6 +2302,7 @@ BRBuildingProjectsList.prototype.newBRProject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BRBuildingProjectsList
  * @returns _boundingBox
  */ 
 BRBuildingProjectsList.prototype.getBoundingBox = function() {
@@ -2197,6 +2327,7 @@ BRBuildingProjectsList.prototype.getBoundingBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TerranTile
  */
 var TerranTile = function() {
 	if(!(this instanceof TerranTile)) {
@@ -2254,6 +2385,7 @@ var TerranTile = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @returns br_buildingProject
  */
 TerranTile.prototype.newBRProject = function() {
@@ -2264,6 +2396,7 @@ TerranTile.prototype.newBRProject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @returns subTile
  */
 TerranTile.prototype.newSubTerranTile = function() {
@@ -2277,6 +2410,7 @@ TerranTile.prototype.newSubTerranTile = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  */
 TerranTile.prototype.make4subTiles = function() {
 	for(var i=0; i<4; i++) {
@@ -2286,6 +2420,7 @@ TerranTile.prototype.make4subTiles = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param lon_min 변수
  * @param lon_max 변수
  * @param lat_min 변수
@@ -2300,6 +2435,7 @@ TerranTile.prototype.setDimensions = function(lon_min, lon_max, lat_min, lat_max
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param max_depth 변수
  */
 TerranTile.prototype.makeTree = function(max_depth) {
@@ -2316,6 +2452,7 @@ TerranTile.prototype.makeTree = function(max_depth) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  */
 TerranTile.prototype.calculatePositionByLonLat = function() {
 	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
@@ -2333,6 +2470,7 @@ TerranTile.prototype.calculatePositionByLonLat = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  */
 TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
 	this.calculatePositionByLonLat();
@@ -2348,6 +2486,7 @@ TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param BR_Project 변수
  */
 TerranTile.prototype.parseFileHeader = function(BR_Project) {
@@ -2444,6 +2583,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param BR_Project 변수
  */
 TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
@@ -2495,6 +2635,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param BR_Project 변수
  * @param f4dManager 변수
  */
@@ -2525,6 +2666,7 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param f4dManager 변수
  */
 TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
@@ -2571,6 +2713,7 @@ TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param GL 변수
  * @param f4dManager 변수
  */
@@ -2632,6 +2775,7 @@ TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  */
 TerranTile.prototype.setDimensionsSubTiles = function() {
 	var subTile;
@@ -2662,6 +2806,7 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param smallefstTiles_array 변수
  */
 TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
@@ -2682,6 +2827,7 @@ TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param frustumVolume 변수
  * @param intersectedSmallestTiles_array 변수
  * @param boundingSphere_Aux 변수
@@ -2700,6 +2846,7 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof TerranTile
  * @param frustumVolume 변수
  * @param intersectedTiles_array 변수
  * @param boundingSphere_Aux 변수

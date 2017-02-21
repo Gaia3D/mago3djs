@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ReaderWriter
  */
 var ReaderWriter = function() {
 	if(!(this instanceof ReaderWriter)) {
@@ -54,6 +55,7 @@ var ReaderWriter = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -66,6 +68,7 @@ ReaderWriter.prototype.readUInt32 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -78,6 +81,7 @@ ReaderWriter.prototype.readInt32 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -90,6 +94,7 @@ ReaderWriter.prototype.readUInt16 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -102,6 +107,7 @@ ReaderWriter.prototype.readInt16 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -114,6 +120,7 @@ ReaderWriter.prototype.readFloat64 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -126,6 +133,7 @@ ReaderWriter.prototype.readFloat32 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -138,6 +146,7 @@ ReaderWriter.prototype.readFloat16 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -150,6 +159,7 @@ ReaderWriter.prototype.readInt8 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -162,6 +172,7 @@ ReaderWriter.prototype.readUInt8 = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param buffer 변수
  * @param start 변수
  * @param end 변수
@@ -182,6 +193,7 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param float32Array 변수
  * @param result_bbox 변수
  * @returns result_bbox
@@ -212,6 +224,7 @@ ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, r
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param arrayBuffer 변수
  * @param blocksList 변수
@@ -305,6 +318,7 @@ ReaderWriter.prototype.readNeoBlocks = function(GL, arrayBuffer, blocksList, neo
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param neoRefsList 변수
  * @param arrayBuffer 변수
@@ -488,6 +502,7 @@ ReaderWriter.prototype.readNeoReferences = function(GL, neoRefsList, arrayBuffer
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param arrayBuffer 변수
  * @param bytes_readed 변수
  * @param ocCullingOctree_Cell 변수
@@ -538,6 +553,7 @@ ReaderWriter.prototype.readOcclusionCullingOctreeCell = function(arrayBuffer, by
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param arrayBuffer 변수
  * @param neoSimpleBuilding 변수
@@ -585,6 +601,7 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(GL, arrayBuffer, neoSimp
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param blocksList 변수
@@ -622,6 +639,7 @@ ReaderWriter.prototype.readNeoBlocksArraybufferInServer = function(GL, filePath_
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param blocksList 변수
@@ -664,6 +682,7 @@ ReaderWriter.prototype.readNeoBlocksInServer = function(GL, filePath_inServer, b
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePathInServer 변수
  * @param neoRefList_container 변수
@@ -710,6 +729,7 @@ ReaderWriter.prototype.readNeoReferencesArraybufferInServer = function(filePathI
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoRefList_container 변수
@@ -786,6 +806,7 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServe
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoSimpleBuilding 변수
@@ -817,6 +838,7 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inS
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param arrayBuffer 변수
  * @param filePath_inServer 변수
@@ -893,6 +915,7 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
@@ -930,6 +953,7 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServ
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param BR_ProjectsList 변수
@@ -990,6 +1014,7 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inSer
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
@@ -1115,6 +1140,13 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	oReq.send(null);
 };	
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
+ * @param GL 변수
+ * @param filePath_inServer 변수
+ * @param f4dManager 변수
+ */
 ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManager)
 {
 	var bytesReaded = 0;
@@ -1181,6 +1213,14 @@ ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManag
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
+ * @param GL 변수
+ * @param filePath_inServer 변수
+ * @param readerWriter 변수
+ * @param manager 변수
+ */
 ReaderWriter.prototype.readObjectIndexFileInServer = function(GL, filePathInServer, readerWriter, manager)
 {
 	var oReq = new XMLHttpRequest();
@@ -1206,6 +1246,7 @@ ReaderWriter.prototype.readObjectIndexFileInServer = function(GL, filePathInServ
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoBuilding 변수
@@ -1276,6 +1317,7 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param imageArrayBuffer 변수
  * @param BR_Project 변수
@@ -1321,6 +1363,7 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param BR_Project 변수
@@ -1404,6 +1447,7 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param f4dTex 변수
@@ -1433,6 +1477,7 @@ ReaderWriter.prototype.readTextureInServer = function(GL, filePath_inServer, f4d
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param texture 변수
@@ -1486,6 +1531,7 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param terranTile 변수
  * @param readerWriter 변수
@@ -1497,6 +1543,7 @@ ReaderWriter.prototype.openTerranTile = function(GL, terranTile, readerWriter ) 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
@@ -1534,6 +1581,7 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inSer
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
@@ -1632,6 +1680,7 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServ
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ReaderWriter
  * @param GL 변수
  * @param buildingFileName 변수
  * @param latitude 변수

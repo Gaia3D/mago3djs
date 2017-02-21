@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CesiumManager
  */
 var CesiumManager = function() {
 	if(!(this instanceof CesiumManager)) {
@@ -398,6 +399,7 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  */
 CesiumManager.prototype.createCloudsTEST = function() {
 	var randomLongitude = 0;
@@ -443,6 +445,7 @@ CesiumManager.prototype.createCloudsTEST = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param cameraPosition 변수
  * @param squareDistUmbral 변수
  * @returns camera_was_moved
@@ -475,6 +478,7 @@ CesiumManager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbra
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param cameraPosition 변수
  */
 CesiumManager.prototype.updateCameraMoved = function(cameraPosition) {
@@ -486,6 +490,7 @@ CesiumManager.prototype.updateCameraMoved = function(cameraPosition) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 변수
  * @param cullingVolume 변수
@@ -571,6 +576,7 @@ CesiumManager.prototype.renderAtmosphere = function(GL, cameraPosition, cullingV
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 변수
  * @param cullingVolume 변수
@@ -772,6 +778,7 @@ CesiumManager.prototype.renderCloudShadows = function(GL, cameraPosition, cullin
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param encodedCamPosMC_High 변수
  * @param encodedCamPosMC_Low 변수
  * @param cameraPosition 변수
@@ -800,6 +807,7 @@ CesiumManager.prototype.calculateEncodedCameraPositionMCHighLow = function(encod
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 변수
  * @param cullingVolume 변수
@@ -891,6 +899,7 @@ CesiumManager.prototype.renderPCloudProjects = function(GL, cameraPosition, cull
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @function handleTextureLoaded
  * @param gl 변수
  * @param image 변수
  * @param texture
@@ -1073,6 +1082,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param neoBuilding 변수
  */
 CesiumManager.prototype.loadBuildingOctree = function(neoBuilding)
@@ -1145,6 +1155,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding)
 // render_neobuildings
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 변수
  * @param _modelViewProjectionRelativeToEye 변수
@@ -1468,6 +1479,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
@@ -1583,6 +1595,7 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
 };
 
 /**
+ * @memberof CesiumManager
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param scene 변수
@@ -1610,6 +1623,7 @@ CesiumManager.prototype.getRayCamSpace = function(GL, scene, resultRay) {
 };
 
 /**
+ * @@memberof CesiumManager
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param cameraPosition 변수
@@ -1745,6 +1759,7 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(GL, cameraPosition, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param state 변수
  * @param scene 변수
  */	
@@ -1758,6 +1773,7 @@ CesiumManager.prototype.enableCameraMotion = function(state, scene) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param scene 변수
  */
@@ -1776,6 +1792,7 @@ CesiumManager.prototype.isDragging = function(GL, scene) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
@@ -1849,6 +1866,7 @@ CesiumManager.prototype.moveSelectedObject = function(GL, scene, renderables_neo
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param scene 변수
  * @param result_neoRefLists_array 변수
@@ -2015,6 +2033,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
  * @param scene 변수
@@ -2079,6 +2098,7 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param BR_Project 변수
  */
@@ -2119,6 +2139,7 @@ CesiumManager.prototype.createFirstTimeVBOCacheKeys = function(GL, BR_Project) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param scene 변수
  */
 CesiumManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(scene) {
@@ -2141,6 +2162,7 @@ CesiumManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param cameraPosition 변수
  * @param cullingVolume 변수
@@ -2688,6 +2710,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param frustumVolume 변수
  * @param neoVisibleBuildings_array 변수
  * @param cameraPosition 변수
@@ -2886,10 +2909,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  * @param GL 변수
  * @param frustumVolume 변수
  * @param visibleBuildings_array 변수
- * @param cameraPosition 변수
+ * @param cameraPositn ion 변수
  * @returns visibleBuildings_array
  */
 CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, frustumVolume, visibleBuildings_array, cameraPosition) {
@@ -3223,6 +3247,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @member CesiumManager
  * @param frustumVolume 변수
  * @param visibleBuildings_array 변수
  * @param cameraPosition 변수
@@ -3289,6 +3314,7 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CesiumManager
  */
 CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
 	// Now, load sejong.***

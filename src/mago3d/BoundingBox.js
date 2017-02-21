@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BoundingBox
  */
 var BoundingBox = function() {
 	if(!(this instanceof BoundingBox)) {
@@ -20,6 +21,7 @@ var BoundingBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param point3d 변수
  */
 BoundingBox.prototype.setInit = function(point3d) {
@@ -34,6 +36,7 @@ BoundingBox.prototype.setInit = function(point3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param point3d 변수
  */
 BoundingBox.prototype.expand = function(dist) {
@@ -48,6 +51,7 @@ BoundingBox.prototype.expand = function(dist) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param point3d
  */
 BoundingBox.prototype.addPoint3D = function(point3d) {
@@ -63,6 +67,7 @@ BoundingBox.prototype.addPoint3D = function(point3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param boundingBox 변수
  */  
 BoundingBox.prototype.addBox = function(boundingBox) {
@@ -78,6 +83,7 @@ BoundingBox.prototype.addBox = function(boundingBox) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @returns result
  */
 BoundingBox.prototype.getMaxLength = function() {
@@ -92,6 +98,7 @@ BoundingBox.prototype.getMaxLength = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param resultPoint3d
  * @returns resultPoint3d
  */
@@ -104,6 +111,7 @@ BoundingBox.prototype.getCenterPoint3d = function(resultPoint3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BoundingBox
  * @param x 변수
  * @param y 변수
  * @param z 변수

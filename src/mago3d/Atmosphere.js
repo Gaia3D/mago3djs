@@ -5,6 +5,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Atmosphere 
  */
 var Atmosphere = function() {
 	if(!(this instanceof Atmosphere)) {
@@ -17,6 +18,7 @@ var Atmosphere = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ShadowBlendingCube
  */
 var ShadowBlendingCube = function() {
 	if(!(this instanceof ShadowBlendingCube)) {
@@ -34,6 +36,7 @@ var ShadowBlendingCube = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadowBlendingCube
  * @param vtxMat 변수
  * @param tTriMat 변수
  */
@@ -126,6 +129,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadowBlendingCube
  * @returns floatArray
  */
 ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
@@ -135,6 +139,7 @@ ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadowBlendingCube
  * @returns shortArray
  */
 ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
@@ -147,6 +152,7 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CludsManager
  */
 var CloudsManager = function() {
 	if(!(this instanceof CloudsManager)) {
@@ -157,6 +163,7 @@ var CloudsManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CludsManager
  * @returns circularCloud
  */
 CloudsManager.prototype.newCircularCloud = function() {
@@ -167,6 +174,7 @@ CloudsManager.prototype.newCircularCloud = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CircularCloud
  */
 var CircularCloud = function() {
 	if(!(this instanceof CircularCloud)) {
@@ -212,6 +220,7 @@ var CircularCloud = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
@@ -221,6 +230,7 @@ CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOIndicesShortArray = function() {
@@ -233,6 +243,7 @@ CircularCloud.prototype.getVBOIndicesShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
@@ -242,6 +253,7 @@ CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @returns shortArray
  */
 CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
@@ -254,6 +266,7 @@ CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @param vtxMat 변수
  */
 CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
@@ -282,6 +295,7 @@ CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  */
 CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 	var distance = 3000.0;
@@ -297,6 +311,7 @@ CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @param logitude 경도
  * @param latitude 위도
  * @param radius 반지름
@@ -345,6 +360,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof CircularCloud
  * @param vtxMat 변수
  * @param tTriMat 변수
  * @param shadowVtxMat 변수

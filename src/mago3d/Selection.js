@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Selection
  */
 var Selection = function() {
 	if(!(this instanceof Selection)) {
@@ -20,6 +21,7 @@ var Selection = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Selection
  * @param GL 변수
  * @param drawingBufferWidth 변수
  * @param drawingBufferHeight 변수

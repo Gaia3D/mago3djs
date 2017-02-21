@@ -67,6 +67,7 @@
 		
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Shader
  */
 var Shader = function() {
 	if(!(this instanceof Shader)) {
@@ -102,6 +103,7 @@ var Shader = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ShadersManager
  */
 var ShadersManager = function() {
 	if(!(this instanceof ShadersManager)) {
@@ -116,8 +118,9 @@ var ShadersManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param idx = 변수
- * returns shader
+ * @memberof ShadersManager
+ * @param idx 변수
+ * @returns shader
  */
 ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
@@ -132,6 +135,11 @@ ShadersManager.prototype.getMagoShader = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
+ * @param source 변수
+ * @param type 변수
+ * @param typeString 변수
  */
 ShadersManager.prototype.getShader = function(GL, source, type, typeString) {
 	// Source from internet.***
@@ -147,6 +155,8 @@ ShadersManager.prototype.getShader = function(GL, source, type, typeString) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createDefaultShader = function(GL) {
 	this.createStandardShader(GL);                // 0.***
@@ -161,6 +171,8 @@ ShadersManager.prototype.createDefaultShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createColorSelectionShader = function(GL) {
 	var shader = new Shader();
@@ -191,6 +203,8 @@ ShadersManager.prototype.createColorSelectionShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 	var shader = new Shader();
@@ -222,6 +236,8 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
 	var shader = new Shader();
@@ -252,6 +268,8 @@ ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createStandardShader = function(GL) {
 	// This shader renders the normal f4d geometry.***
@@ -283,6 +301,8 @@ ShadersManager.prototype.createStandardShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
@@ -313,6 +333,8 @@ ShadersManager.prototype.createCloudShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createBlendingCubeShader = function(GL) {
 	// This shader renders the f4d clouds.***
@@ -341,6 +363,8 @@ ShadersManager.prototype.createBlendingCubeShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createPCloudShader = function(GL) {
 	// This shader renders the f4d clouds.***
@@ -371,6 +395,8 @@ ShadersManager.prototype.createPCloudShader = function(GL) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof ShadersManager
+ * @param GL 변수
  */
 ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
 	var shader = new Shader();

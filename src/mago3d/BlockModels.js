@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Block
  */
 var Block = function() {
 	if(!(this instanceof Block)) {
@@ -18,6 +19,7 @@ var Block = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BlockList
  */
 var BlocksList = function() {
 	if(!(this instanceof BlocksList)) {
@@ -32,6 +34,7 @@ var BlocksList = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BlocksList
  * @returns block
  */
 BlocksList.prototype.newBlock = function() {
@@ -45,6 +48,7 @@ BlocksList.prototype.newBlock = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BlocksList
  * @param idx 변수
  * @returns block
  */
@@ -62,6 +66,7 @@ BlocksList.prototype.getBlock = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BlocksList
  * @param idx 변수
  * @returns block
  */
@@ -156,6 +161,7 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BlocksListsContainer
  */
 var BlocksListsContainer = function() {
 	if(!(this instanceof BlocksListsContainer)) {
@@ -166,6 +172,7 @@ var BlocksListsContainer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BlocksListsContainer
  * @param blocksList_name 변수
  * @returns blocksList
  */
@@ -178,6 +185,7 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof BlocksListsContainer
  * @param blockList_name 변수
  * @returns blocksList
  */

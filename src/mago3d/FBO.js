@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class FBO
  * @param gl 변수
  * @param width 변수
  * @param height 변수
@@ -42,12 +43,14 @@ var FBO = function(gl, width, height) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof FBO
  */
 FBO.prototype.bind = function() {
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 };
 
 /**
+ * @memberof FBO
  * 어떤 일을 하고 있습니까?
  */
 FBO.prototype.unbind = function() {

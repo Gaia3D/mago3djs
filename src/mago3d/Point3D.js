@@ -2,6 +2,7 @@
 
 /**
  * 3차원 정보
+ * @class Point3D
  */
 var Point3D = function() {
 	if(!(this instanceof Point3D)) {
@@ -15,6 +16,7 @@ var Point3D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  */
 Point3D.prototype.destroy = function() {
     this.x = null;
@@ -25,6 +27,7 @@ Point3D.prototype.destroy = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  */
 Point3D.prototype.getModul = function() {
@@ -33,6 +36,7 @@ Point3D.prototype.getModul = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  */
 Point3D.prototype.unitary = function() {
 	var modul = this.getModul();
@@ -43,6 +47,7 @@ Point3D.prototype.unitary = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  * @param point 변수
  * @param resultPoint 변수
  * @returns resultPoint 
@@ -64,6 +69,7 @@ Point3D.prototype.crossProduct = function(point, resultPoint) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  * @param px 변수
  * @param py 변수
  * @param pz 변수
@@ -79,6 +85,7 @@ Point3D.prototype.squareDistTo = function(px, py, pz) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  * @param _x 변수
  * @param _y 변수
  * @param _z 변수
@@ -89,6 +96,7 @@ Point3D.prototype.set = function(_x, _y, _z) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @memberof Point3D
  * @param _x 변수
  * @param _y 변수
  * @param _z 변수

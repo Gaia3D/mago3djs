@@ -2,7 +2,7 @@
 
 /**
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
- * 
+ * @class ManagerFactory
  * @param containerId 뷰에서 표시할 위치 id
  * @param magoConfig mago3d 설정값 json object
  * @return api

@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class FileRequestControler
  */
 var FileRequestControler = function() {
 	this.maxFilesRequestedCount = 10;
