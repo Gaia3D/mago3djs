@@ -113,7 +113,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 						
 					if(magoManager.mouseDragging) {
 						var gl = scene.context._gl;
-						magoManager.moveSelectedObject(gl, scene, magoManager.currentRenderables_neoRefLists_array);
+						magoManager.moveSelectedObject(gl, scene, magoManager.currentRenderablesNeoRefListsArray);
 					}
 				}
 			} else{
@@ -142,7 +142,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
+					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(gl, scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
 			

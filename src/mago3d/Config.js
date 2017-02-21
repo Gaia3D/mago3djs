@@ -59,14 +59,14 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
 MagoConfig.initRenderingConfig = function(jsonConfig) {
 	// 화면 rendering 관련 설정
 	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== '' ) {
-		if(jsonConfig.renderingConfg.glEnable === undefined
-				|| jsonConfig.renderingConfg.glEnable === null 
-				|| jsonConfig.renderingConfg.glEnable === '' 
-				|| jsonConfig.renderingConfg.glEnable === false
-				|| jsonConfig.renderingConfg.glEnable === 'false') {
-			jsonConfig.renderingConfg.glEnable = false;
+		if(jsonConfig.renderingConfg.cullFaceEnable === undefined
+				|| jsonConfig.renderingConfg.cullFaceEnable === null 
+				|| jsonConfig.renderingConfg.cullFaceEnable === '' 
+				|| jsonConfig.renderingConfg.cullFaceEnable === false
+				|| jsonConfig.renderingConfg.cullFaceEnable === 'false') {
+			jsonConfig.renderingConfg.cullFaceEnable = false;
 		} else {
-			jsonConfig.renderingConfg.glEnable = true;
+			jsonConfig.renderingConfg.cullFaceEnable = true;
 		}
 	}
 	

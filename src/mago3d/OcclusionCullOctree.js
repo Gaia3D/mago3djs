@@ -10,12 +10,12 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
 	}
 	
 	this._ocCulling_Cell_owner = occlusionCullingOctree_Cell_Owner;
-	this._minX = 0.0;
-	this._maxX = 0.0;
-	this._minY = 0.0;
-	this._maxY = 0.0;
-	this._minZ = 0.0;
-	this._maxZ = 0.0;
+	this.minX = 0.0;
+	this.maxX = 0.0;
+	this.minY = 0.0;
+	this.maxY = 0.0;
+	this.minZ = 0.0;
+	this.maxZ = 0.0;
 	this._indicesArray = []; // Visible objects indices.***
 	this._subBoxesArray = [];
 
@@ -54,12 +54,12 @@ OcclusionCullingOctreeCell.prototype.create8SubBoxes = function() {
  * @param max_z 변수
  */
 OcclusionCullingOctreeCell.prototype.setDimensions = function(min_x, max_x, min_y, max_y, min_z, max_z) {
-	this._minX = min_x;
-	this._maxX = max_x;
-	this._minY = min_y;
-	this._maxY = max_y;
-	this._minZ = min_z;
-	this._maxZ = max_z;
+	this.minX = min_x;
+	this.maxX = max_x;
+	this.minY = min_y;
+	this.maxY = max_y;
+	this.minZ = min_z;
+	this.maxZ = max_z;
 };
 
 /**
@@ -79,21 +79,22 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 	
 	if(this._subBoxesArray.length > 0)
 	{
-		var half_x= (this._maxX + this._minX)/2.0;
-		var half_y= (this._maxY + this._minY)/2.0;
-		var half_z= (this._maxZ + this._minZ)/2.0;
+		var half_x= (this.maxX + this.minX)/2.0;
+		var half_y= (this.maxY + this.minY)/2.0;
+		var half_z= (this.maxZ + this.minZ)/2.0;
 		
-		this._subBoxesArray[0].setDimensions(this._minX, half_x,   this._minY, half_y,   this._minZ, half_z);
-		this._subBoxesArray[1].setDimensions(half_x, this._maxX,   this._minY, half_y,   this._minZ, half_z);
-		this._subBoxesArray[2].setDimensions(half_x, this._maxX,   half_y, this._maxY,   this._minZ, half_z);
-		this._subBoxesArray[3].setDimensions(this._minX, half_x,   half_y, this._maxY,   this._minZ, half_z);
+		this._subBoxesArray[0].setDimensions(this.minX, half_x,   this.minY, half_y,   this.minZ, half_z);
+		this._subBoxesArray[1].setDimensions(half_x, this.maxX,   this.minY, half_y,   this.minZ, half_z);
+		this._subBoxesArray[2].setDimensions(half_x, this.maxX,   half_y, this.maxY,   this.minZ, half_z);
+		this._subBoxesArray[3].setDimensions(this.minX, half_x,   half_y, this.maxY,   this.minZ, half_z);
 
-		this._subBoxesArray[4].setDimensions(this._minX, half_x,   this._minY, half_y,   half_z, this._maxZ);
-		this._subBoxesArray[5].setDimensions(half_x, this._maxX,   this._minY, half_y,   half_z, this._maxZ);
-		this._subBoxesArray[6].setDimensions(half_x, this._maxX,   half_y, this._maxY,   half_z, this._maxZ);
-		this._subBoxesArray[7].setDimensions(this._minX, half_x,   half_y, this._maxY,   half_z, this._maxZ);
+		this._subBoxesArray[4].setDimensions(this.minX, half_x,   this.minY, half_y,   half_z, this.maxZ);
+		this._subBoxesArray[5].setDimensions(half_x, this.maxX,   this.minY, half_y,   half_z, this.maxZ);
+		this._subBoxesArray[6].setDimensions(half_x, this.maxX,   half_y, this.maxY,   half_z, this.maxZ);
+		this._subBoxesArray[7].setDimensions(this.minX, half_x,   half_y, this.maxY,   half_z, this.maxZ);
 		
-		for(var i=0; i<this._subBoxesArray.length; i++)
+		var subBoxesArrayLength = this._subBoxesArray.length;
+		for(var i=0; i<subBoxesArrayLength; i++)
 		{
 			this._subBoxesArray[i].setSizesSubBoxes();
 		}
@@ -110,11 +111,11 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z) {
 	var intersects = false;
 	
-	if(x>this._minX && x<this._maxX)
+	if(x>this.minX && x<this.maxX)
 	{
-		if(y>this._minY && y<this._maxY)
+		if(y>this.minY && y<this.maxY)
 		{
-			if(z>this._minZ && z<this._maxZ)
+			if(z>this.minZ && z<this.maxZ)
 			{
 				intersects = true;
 			}
@@ -146,9 +147,9 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 	var subBoxes_count = this._subBoxesArray.length;
 	if(subBoxes_count > 0)
 	{
-		var center_x = (this._minX + this._maxX)/2.0;
-		var center_y = (this._minY + this._maxY)/2.0;
-		var center_z = (this._minZ + this._maxZ)/2.0;
+		var center_x = (this.minX + this.maxX)/2.0;
+		var center_y = (this.minY + this.maxY)/2.0;
+		var center_z = (this.minZ + this.maxZ)/2.0;
 		
 		var intersectedSubBox_aux = null;
 		var intersectedSubBox_idx;
@@ -222,35 +223,35 @@ OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, 
  * @param expansionDist 변수
  */
 OcclusionCullingOctreeCell.prototype.expandBox = function(expansionDist) {
-	this._minX -= expansionDist;
-	this._maxX += expansionDist;
-	this._minY -= expansionDist;
-	this._maxY += expansionDist;
-	this._minZ -= expansionDist;
-	this._maxZ += expansionDist;
+	this.minX -= expansionDist;
+	this.maxX += expansionDist;
+	this.minY -= expansionDist;
+	this.maxY += expansionDist;
+	this.minZ -= expansionDist;
+	this.maxZ += expansionDist;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
- * @param bytes_readed 변수
+ * @param bytesReaded 변수
  * @param f4dReaderWriter 변수
- * @returns bytes_readed
+ * @returns bytesReaded
  */
-OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, bytes_readed, f4dReaderWriter) {
+OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, bytesReaded, f4dReaderWriter) {
 	// Important note: this is the version of neoGeometry.***
 	// Important note: this is the version of neoGeometry.***
 	// Important note: this is the version of neoGeometry.***
-	var is_mother_cell = f4dReaderWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	var is_mother_cell = f4dReaderWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 	if(is_mother_cell)
 	{
 		// read the mother dimensions.***
-		var minX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		var maxX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		var minY = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		var maxY = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		var minZ = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		var maxZ = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var minX = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxX = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minY = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxY = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minZ = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxZ = f4dReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
 		this.setDimensions(minX, maxX, minY, maxY, minZ, maxZ);
 	}
@@ -258,14 +259,14 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		// do nothing.***
 	}
 	
-	var subBoxes_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var subBoxes_count = f4dReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	
 	if(subBoxes_count == 0)
 	{
-		var objects_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var objects_count = f4dReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		for(var i=0; i<objects_count; i++)
 		{
-			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			this._indicesArray.push(objects_idxInList);
 		}
 	}
@@ -273,11 +274,11 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		for(var i=0; i<subBoxes_count; i++)
 		{
 			var subOcclusionBox = this.newSubBox();
-			bytes_readed = subOcclusionBox.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReaderWriter);
+			bytesReaded = subOcclusionBox.parseArrayBuffer(arrayBuffer, bytesReaded, f4dReaderWriter);
 		}
 	}
 	
-	return bytes_readed;
+	return bytesReaded;
 	
 };
 	

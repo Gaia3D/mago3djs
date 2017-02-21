@@ -327,15 +327,8 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 	
-	this.positionHIGH = new Float32Array(3);
-	this.positionHIGH[0] = splitVelue_X.high;
-	this.positionHIGH[1] = splitVelue_Y.high;
-	this.positionHIGH[2] = splitVelue_Z.high;
-	
-	this.positionLOW = new Float32Array(3);
-	this.positionLOW[0] = splitVelue_X.low;
-	this.positionLOW[1] = splitVelue_Y.low;
-	this.positionLOW[2] = splitVelue_Z.low;
+	this.positionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
+	this.positionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
 	
 	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
 	var cloud_point3d = this.bbox.getCenterPoint3d(cloud_point3d);

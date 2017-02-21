@@ -148,129 +148,113 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 	
 	var startBuff;
 	var endBuff;
-	var bytes_readed = 0;
-	var neoRefs_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var bytesReaded = 0;
+	var neoRefs_count = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	
 	for(var i=0; i<neoRefs_count; i++)
 	{
 		var neoRef = this.newNeoReference();
 		
 		// 1) Id.***
-		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoRef._id = ref_ID;
-	
 		
 		// 2) Block's Idx.***
-		var blockIdx =   f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var blockIdx =   f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoRef._block_idx = blockIdx;
 		
 		// 3) Transform Matrix4.***
-		neoRef._originalMatrix4._floatArrays[0] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[1] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[2] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[3] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var floatArraysLength = neoRef._originalMatrix4.floatArrays.length;
+		for(var idx=0; idx<floatArraysLength; idx++) {
+			neoRef._originalMatrix4.floatArrays[idx] =  f4dReadWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+		}
 		
-		neoRef._originalMatrix4._floatArrays[4] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[5] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[6] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[7] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
-		neoRef._originalMatrix4._floatArrays[8] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[9] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[10] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._originalMatrix4._floatArrays[11] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
-		neoRef._originalMatrix4._floatArrays[12] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[13] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[14] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[15] =  f4dReadWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
-		
-		//var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		//var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		/*
 		// Short mode. NO, can not use gl_repeat.***
 		var texcoordShortValues_count = vertex_count * 2;
-		startBuff = bytes_readed;
-		endBuff = bytes_readed + 2*texcoordShortValues_count;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 2*texcoordShortValues_count;
 		
 		neoRef.MESH_TEXCOORD_cacheKey = GL.createBuffer ();
 		GL.bindBuffer(GL.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 		GL.bufferData(GL.ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 		  
-		bytes_readed = bytes_readed + 2*texcoordShortValues_count; // updating data.***
+		bytesReaded = bytesReaded + 2*texcoordShortValues_count; // updating data.***
 		*/
 		// Float mode.**************************************************************
 		// New modifications for xxxx 20161013.*****************************
-		var has_1_color = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		var has_1_color = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(has_1_color)
 		{
 			// "type" : one of following
 			// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
-			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			var dim = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;
+			var dim = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 			
 			var daya_bytes;
 			if(data_type == 5121)
 				daya_bytes = 1;
 			
-			var r = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-			var g = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-			var b = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+			var r = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
+			var g = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
+			var b = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
 			var alfa = 255;
 			
 			if(dim == 4)
-				alfa = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				alfa = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
 			
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
 		
-		var has_colors = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		var has_colors = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(has_colors)
 		{
-			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			var dim = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;
+			var dim = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 			
 			var daya_bytes;
 			if(data_type == 5121)
 				daya_bytes = 1;
 			
-			var colors_count = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+			var colors_count = f4dReadWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4; 
 			for(var j = 0; j<colors_count; j++)
 			{
 				// temporally, waste data.***
-				var r = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var r = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
+				var g = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
+				var b = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
 				
 				if(dim == 4)
-					var alfa = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+					var alfa = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+daya_bytes); bytesReaded += daya_bytes;
 			}
 		}
 		
-		var has_texCoords = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		var has_texCoords = f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		
 		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords)
 		{
-			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var data_type = f4dReadWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;
+			var vertex_count = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			neoRef.vertex_count = vertex_count;
 			
 			var texcoordFloatValues_count = vertex_count * 2;
-			startBuff = bytes_readed;
-			endBuff = bytes_readed + 4*texcoordFloatValues_count;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 4*texcoordFloatValues_count;
 			
 			neoRef.MESH_TEXCOORD_cacheKey = GL.createBuffer ();
 			GL.bindBuffer(GL.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 			  
-			bytes_readed = bytes_readed + 4*texcoordFloatValues_count; // updating data.***
+			bytesReaded = bytesReaded + 4*texcoordFloatValues_count; // updating data.***
 		}
 		// End texcoords float mode.-------------------------------------------------
 			
 		// 4) short texcoords.*****
-		var textures_count = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
+		var textures_count = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0)
 		{
 
@@ -278,14 +262,14 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			neoRef.hasTexture = true;
 			
 			// Now, read the texture_type and texture_file_name.***
-			var texture_type_nameLegth = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var texture_type_nameLegth = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			for(var j=0; j<texture_type_nameLegth; j++){
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
 			}
 			
-			var texture_fileName_Legth = f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var texture_fileName_Legth = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			for(var j=0; j<texture_fileName_Legth; j++){
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 			}
 			
 			/*
@@ -307,14 +291,14 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 	
 	// Occlusion culling octree data.*****
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
-	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
+	//bytesReaded = this.readOcclusionCullingOctreeCell(arrayBuffer, bytesReaded, infiniteOcCullBox); // old.***
+	bytesReaded = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytesReaded, f4dReadWriter);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
 	
 	var ocCullBox = this.interior_ocCullOctree; 
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
-	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
+	//bytesReaded = this.readOcclusionCullingOctreeCell(arrayBuffer, bytesReaded, ocCullBox); // old.***
+	bytesReaded = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytesReaded, f4dReadWriter);
 	ocCullBox.setSizesSubBoxes();
 	
 	this.fileLoadState = 4; // file data parsed.***
