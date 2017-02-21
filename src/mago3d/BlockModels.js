@@ -24,8 +24,8 @@ var BlocksList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this._name = "";
-	this._blocksArray;
+	this.name = "";
+	this.blocksArray;
 	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 };
@@ -35,11 +35,10 @@ var BlocksList = function() {
  * @returns block
  */
 BlocksList.prototype.newBlock = function() {
-	if(this._blocksArray == undefined)
-		this._blocksArray = [];
+	if(this.blocksArray == undefined) this.blocksArray = [];
 	
 	var block = new Block();
-	this._blocksArray.push(block);
+	this.blocksArray.push(block);
 	return block;
 };
 
@@ -49,13 +48,12 @@ BlocksList.prototype.newBlock = function() {
  * @returns block
  */
 BlocksList.prototype.getBlock = function(idx) {
-	if(this._blocksArray == undefined)
-		return null;
+	if(this.blocksArray == undefined) return null;
 	
 	var block = null;
 	  
-	if(idx >= 0 && idx <this._blocksArray.length) {
-		block = this._blocksArray[idx];
+	if(idx >= 0 && idx <this.blocksArray.length) {
+		block = this.blocksArray[idx];
 	}
 	return block;
 };
@@ -67,44 +65,47 @@ BlocksList.prototype.getBlock = function(idx) {
  */
 BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 	this.fileLoadState = 3;// 3 = parsing started.***
-	var bytes_readed = 0;
-	var blocks_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); 
-	bytes_readed += 4;
+	var bytesReaded = 0;
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
+	bytesReaded += 4;
 	
-	for(var i=0; i<blocks_count; i++)
-	{
+	for(var i=0; i<blocksCount; i++) {
 		var block = this.newBlock();
-		  
 		  
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
-		bbox._minX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-		bbox._minY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-		bbox._minZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
 		  
-		bbox._maxX = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-		bbox._maxY = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
-		bbox._maxZ = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4;
+		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
 		
 		var maxLength = bbox.getMaxLength();
-		if(maxLength < 1.0)
-			block.isSmallObj = true;
-		else
-			block.isSmallObj = false;
+		if(maxLength < 1.0) block.isSmallObj = true;
+		else block.isSmallObj = false;
 		
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		for(var j=0; j<vboDatasCount; j++)
-		{
+		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		bytesReaded += 4;
+		for(var j=0; j<vboDatasCount; j++) {
 		
 			// 1) Positions array.***************************************************************************************
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
 			var verticesFloatValues_count = vertex_count * 3;
 			
 			block.vertex_count = vertex_count;
 
-			var startBuff = bytes_readed;
-			var endBuff = bytes_readed + 4*verticesFloatValues_count;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 4*verticesFloatValues_count;
 
 			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
@@ -114,18 +115,19 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
 			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 			  */
-			bytes_readed = bytes_readed + 4*verticesFloatValues_count; // updating data.***
+			bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
 			 
 			// 2) Normals.************************************************************************************************
-			vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
 			var normalByteValues_count = vertex_count * 3;
 			//Test.***********************
 			//for(var j=0; j<normalByteValues_count; j++)
 			//{
-			//	var value_x = readWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			//	var value_x = readWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 			//}
-			startBuff = bytes_readed;
-			endBuff = bytes_readed + 1*normalByteValues_count;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 1*normalByteValues_count;
 			
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
@@ -133,12 +135,13 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
 			GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 			  */
-			bytes_readed = bytes_readed + 1*normalByteValues_count; // updating data.***
+			bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
 			
 			// 3) Indices.*************************************************************************************************
-			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			startBuff = bytes_readed;
-			endBuff = bytes_readed + 2*shortIndicesValues_count;
+			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 2*shortIndicesValues_count;
 			  
 			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
@@ -146,9 +149,8 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
 			GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
 			 */ 
-			bytes_readed = bytes_readed + 2*shortIndicesValues_count; // updating data.***
+			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
 			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
-			
 		}
 	}
 	this.fileLoadState = 4; // 4 = parsing finished.***
@@ -161,7 +163,7 @@ var BlocksListsContainer = function() {
 	if(!(this instanceof BlocksListsContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	this._BlocksListsArray = [];
+	this.blocksListsArray = [];
 };
 
 /**
@@ -171,8 +173,8 @@ var BlocksListsContainer = function() {
  */
 BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
 	var blocksList = new BlocksList();
-	blocksList._name = blocksList_name;
-	this._BlocksListsArray.push(blocksList);
+	blocksList.name = blocksList_name;
+	this.blocksListsArray.push(blocksList);
 	return blocksList;
 };
 
@@ -182,17 +184,17 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
  * @returns blocksList
  */
 BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
-	var blocksLists_count = this._BlocksListsArray.length;
+	var blocksListsCount = this.blocksListsArray.length;
   	var found = false;
   	var i=0;
   	var blocksList = null;
-  	while(!found && i<blocksLists_count)
+  	while(!found && i<blocksListsCount)
   	{
-  		var current_blocksList = this._BlocksListsArray[i];
-  		if(current_blocksList._name == blockList_name)
+  		var currentBlocksList = this.blocksListsArray[i];
+  		if(currentBlocksList.name == blockList_name)
   		{
   			found = true;
-  			blocksList =current_blocksList;
+  			blocksList = currentBlocksList;
   		}
   		i++;
   	}

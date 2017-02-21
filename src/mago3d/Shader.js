@@ -122,8 +122,7 @@ var ShadersManager = function() {
 ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
 	
-	if(idx >= 0 && idx < this.shaders_array.length)
-	{
+	if(idx >= 0 && idx < this.shaders_array.length) {
 		shader = this.shaders_array[idx];
 	}
 	

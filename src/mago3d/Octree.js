@@ -227,17 +227,13 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 	if(result_CRefListsArray == undefined)
 		result_CRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0)
-	{
-		for(var i=0; i<this.subOctrees_array.length; i++)
-		{
+	if(this.subOctrees_array.length > 0) {
+		var subOctrees_arrayLength = this.subOctrees_array.length;
+		for(var i=0; i<subOctrees_arrayLength; i++) {
 			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
 		}
-	}
-	else
-	{
-		if(this._compRefsList_Array.length>0)
-		{
+	} else {
+		if(this._compRefsList_Array.length>0) {
 			result_CRefListsArray.push(this._compRefsList_Array[0]); // there are only 1.***
 		}
 	}
@@ -251,17 +247,13 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
 	if(result_NeoRefListsArray == undefined)
 		result_NeoRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0)
-	{
-		for(var i=0; i<this.subOctrees_array.length; i++)
-		{
+	if(this.subOctrees_array.length > 0) {
+		var subOctreesArrayLength = this.subOctrees_array.length;
+		for(var i=0; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getCRefListArray(result_NeoRefListsArray);
 		}
-	}
-	else
-	{
-		if(this.neoRefsList_Array.length>0)
-		{
+	} else {
+		if(this.neoRefsList_Array.length>0) {
 			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
 		}
 	}
@@ -401,10 +393,9 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 		{
 			result_octreesArray.push(this);
 		}
-		else
-		{
-			for(var i=0; i<this.subOctrees_array.length; i++ )
-			{
+		else {
+			var subOctreesArrayLength = this.subOctrees_array.length;
+			for(var i=0; i<subOctreesArrayLength; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -453,10 +444,9 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) // original, good.***
 		{
 			result_octreesArray.push(this);
-		}
-		else
-		{
-			for(var i=0; i<this.subOctrees_array.length; i++ )
+		} else {
+			var subOctreesArrayLength = this.subOctrees_array.length;
+			for(var i=0; i<subOctreesArrayLength; i++ )
 			{
 				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
@@ -531,7 +521,8 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
 		result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
-		for(var i=0; i<this.subOctrees_array.length; i++) {
+		var subOctreesArrayLength = this.subOctrees_array.length;
+		for(var i=0; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
 		}
 	} else {

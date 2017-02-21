@@ -25,13 +25,13 @@ var Renderer = function() {
  * @param GL 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuilding, manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -45,7 +45,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 	//GL.disable(GL.DEPTH_TEST);
 	GL.depthFunc(GL.LEQUAL); 
 	GL.depthRange(0, 1);
-	if(MagoConfig.getInformation().renderingConfg.glEnable) {
+	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
 		GL.enable(GL.CULL_FACE);
 	} else {
 		GL.disable(GL.CULL_FACE);
@@ -64,10 +64,10 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		if(ssao_idx == 1)
 			GL.uniform1i(standardShader.hasTexture_loc, true); //.***	
 	} else{
-		GL.bindTexture(GL.TEXTURE_2D, f4d_manager.textureAux_1x1);
+		GL.bindTexture(GL.TEXTURE_2D, manager.textureAux_1x1);
 	}
 	 
-	var geometryDataPath = f4d_manager.readerWriter.geometryDataPath;
+	var geometryDataPath = manager.readerWriter.geometryDataPath;
 	  
 	for(var j=0; j<neoRefLists_count; j++) {
 		var neoRefList = neoRefList_array[j];
@@ -80,7 +80,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		
 		if(myBlocksList.fileLoadState == 2)
 		{
-			myBlocksList.parseArrayBuffer(GL, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			myBlocksList.parseArrayBuffer(GL, myBlocksList.dataArraybuffer, manager.readerWriter);
 			continue;
 		}
 		
@@ -94,7 +94,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
 
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+		if(manager.isCameraMoving)// && !isInterior && manager.isCameraInsideBuilding)
 		{
 			/*
 			if(neoRefList._lodLevel == 1 || neoRefList._lodLevel == 2)
@@ -117,8 +117,8 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 
 		for(var k=0; k<visibleIndices_count; k++)
 		{
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
+			//if(manager.isCameraMoving && isInterior && timeControlCounter == 0)
+			if(manager.isCameraMoving && timeControlCounter == 0)
 			{
 				//if(j==4)return;
 				
@@ -142,17 +142,17 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 			
 			block_idx = neoReference._block_idx;
 				
-			if(block_idx >= myBlocksList._blocksArray.length)
+			if(block_idx >= myBlocksList.blocksArray.length)
 			{
 				continue;
 			}
 			block = myBlocksList.getBlock(block_idx);
 			
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+			if(manager.isCameraMoving)// && !isInterior && manager.isCameraInsideBuilding)
 			{
 				if(block != null)
 				{
-					if(block.isSmallObj && f4d_manager.objectSelected != neoReference)
+					if(block.isSmallObj && manager.objectSelected != neoReference)
 						continue;
 				}
 			}
@@ -160,7 +160,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined)
 			{
-				if(f4d_manager.backGround_fileReadings_count > 10)
+				if(manager.backGround_fileReadings_count > 10)
 					continue;
 				
 				// 1rst, check if the texture is loaded.***
@@ -169,8 +169,8 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 				{
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, manager);
+					manager.backGround_fileReadings_count ++;
 					continue;
 				}
 				else{
@@ -179,7 +179,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 			}
 				
 			// **************************************************************************************************************************
-			if(f4d_manager.objectSelected == neoReference)
+			if(manager.objectSelected == neoReference)
 			{
 				GL.uniform1i(standardShader.hasTexture_loc, false); //.***	
 				GL.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -268,13 +268,13 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 				//if( ifc_entity==26 || ifc_entity==27 || ifc_entity==14)
 				//	continue;
 				
-				//if(f4d_manager.isCameraMoving && block.isSmallObj)
+				//if(manager.isCameraMoving && block.isSmallObj)
 				//	continue;
 				
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
 
-				GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+				GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4.floatArrays);
 					
 				if(neoReference.moveVector != undefined)
 				{
@@ -386,13 +386,13 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
  * @param GL 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_array, neoBuilding, manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -427,8 +427,8 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		for(var k=0; k<visibleIndices_count; k++)
 		{
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
+			//if(manager.isCameraMoving && isInterior && timeControlCounter == 0)
+			if(manager.isCameraMoving && timeControlCounter == 0)
 			{
 			}
 			var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
@@ -440,14 +440,14 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 			
 			block_idx = neoReference._block_idx;
 				
-			if(block_idx >= myBlocksList._blocksArray.length)
+			if(block_idx >= myBlocksList.blocksArray.length)
 			{
 				continue;
 			}
 			block = myBlocksList.getBlock(block_idx);
 			
 			/*
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+			if(manager.isCameraMoving)// && !isInterior && manager.isCameraInsideBuilding)
 			{
 				if(block != null)
 				{
@@ -463,7 +463,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 			/*
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined)
 			{
-				if(f4d_manager.backGround_fileReadings_count > 10)
+				if(manager.backGround_fileReadings_count > 10)
 					continue;
 				
 				// 1rst, check if the texture is loaded.***
@@ -472,8 +472,8 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 				{
 					// Load the texture.***
 					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					manager.readerWriter.readNeoReferenceTextureInServer(GL, filePath_inServer, neoReference.texture, neoBuilding, manager);
+					manager.backGround_fileReadings_count ++;
 					continue;
 				}
 				else{
@@ -503,7 +503,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 
 					cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 					// Must applicate the transformMatrix of the reference object.***
-					GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+					GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4.floatArrays);
 					
 					if(neoReference.moveVector != undefined)
 					{
@@ -600,11 +600,11 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  * @param imageLod 변수
  * @param shader 변수
  */
-Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuilding, f4d_manager, imageLod, shader) {
+Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuilding, manager, imageLod, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	
@@ -617,11 +617,11 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuildin
 	if(imageLod == undefined)
 		imageLod = 3; // The lowest lod.***
 	
-	//if(f4d_manager.isCameraMoving)
+	//if(manager.isCameraMoving)
 	//	imageLod = 3; // The lowest lod.***
 	
-	GL.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-	GL.uniform3fv(shader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+	GL.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+	GL.uniform3fv(shader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 	//GL.activeTexture(GL.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
@@ -734,10 +734,10 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(GL, neoBuildin
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  * @param shader 변수
  */
-Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding, f4d_manager, shader) {
+Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding, manager, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	
@@ -747,8 +747,8 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding
 		return;
 	}
 
-	GL.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-	GL.uniform3fv(shader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+	GL.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+	GL.uniform3fv(shader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 	//GL.activeTexture(GL.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
@@ -831,11 +831,11 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(GL, neoBuilding
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param BR_Project 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  * @param imageLod 변수
  * @param shader 변수
  */
-Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project, f4d_manager, imageLod, shader) {
+Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project, manager, imageLod, shader) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
 	
@@ -847,11 +847,11 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project,
 	if(imageLod == undefined)
 		imageLod = 3; // The lowest lod.***
 	
-	//if(f4d_manager.isCameraMoving)
+	//if(manager.isCameraMoving)
 	//	imageLod = 3; // The lowest lod.***
 	
-	GL.uniform3fv(shader.buildingPosHIGH_loc, BR_Project._buildingPositionHIGH);
-	GL.uniform3fv(shader.buildingPosLOW_loc, BR_Project._buildingPositionLOW);
+	GL.uniform3fv(shader.buildingPosHIGH_loc, BR_Project.buildingPositionHIGH);
+	GL.uniform3fv(shader.buildingPosLOW_loc, BR_Project.buildingPositionLOW);
 
 	//GL.activeTexture(GL.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
@@ -894,20 +894,20 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(GL, BR_Project,
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
  * @param pCloudProject 변수
- * @param modelViewProjRelToEye_matrix 변수
+ * @param modelViewProjRelToEyeMatrix 변수
  * @param encodedCamPosMC_High 변수
  * @param encodedCamPosMC_Low 변수
- * @param f4d_manager 변수
+ * @param manager 변수
  */
-Renderer.prototype.renderPCloudProject = function(GL, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
-	var shadersManager = f4d_manager.shadersManager;
+Renderer.prototype.renderPCloudProject = function(GL, pCloudProject, modelViewProjRelToEyeMatrix, encodedCamPosMC_High, encodedCamPosMC_Low, manager) {
+	var shadersManager = manager.shadersManager;
 	
 	//if(simpBuildV1._simpleObjects_array.length == 0)
 	//{
 	//	return;
 	//}
 	
-	// Test using f4d_shaderManager.************************
+	// Test using shaderManager.************************
 	var shader = shadersManager.getMagoShader(6);
 	var shaderProgram = shader.SHADER_PROGRAM;
 	//------------------------------------------------------
@@ -937,7 +937,7 @@ Renderer.prototype.renderPCloudProject = function(GL, pCloudProject, modelViewPr
 			
 			//this.dateSC = new Date();
 			//this.currentTimeSC = this.dateSC.getTime();
-			//f4d_manager.f4d_rendering_time += this.currentTimeSC - this.startTimeSC;
+			//manager.renderingTime += this.currentTimeSC - this.startTimeSC;
 		}
 	
 	}

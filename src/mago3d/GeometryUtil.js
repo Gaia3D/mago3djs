@@ -1209,12 +1209,6 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 	return fpolyhedron;
 };
 
-  // F4D Fitted Box.************************************************************************************************************* //
-//	var f4d_FittedBox = function()
-//	{
-//
-//	};
-
 /**
 * 어떤 일을 하고 있습니까?
 */
@@ -1407,7 +1401,7 @@ var CompoundReferencesList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this._name = "";
+	this.name = "";
 	this._compoundRefsArray = [];
 	this._lodLevel = -1;
 	this._ocCulling = new OcclusionCullingOctree();
@@ -1512,7 +1506,7 @@ var CompoundReferencesListContainer = function() {
  */
 CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoundReferenceList_name, lodLevel) {
 	var compoundRefList = new CompoundReferencesList();
-	compoundRefList._name = compoundReferenceList_name;
+	compoundRefList.name = compoundReferenceList_name;
 	compoundRefList._lodLevel = lodLevel;
 	this._compRefsList_Array.push(compoundRefList);
 	return compoundRefList;
@@ -1544,7 +1538,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	var i=0;
 	while(!found && i<compRefLists_count)
 	{
-		if(this._compRefsList_Array[i]._name == compRefListsName)
+		if(this._compRefsList_Array[i].name == compRefListsName)
 		{
 			result_compRefList = this._compRefsList_Array[i];
 		}
@@ -1858,12 +1852,12 @@ var BRBuildingProject = function() {
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
 	this.buildingPosMat_inv;
-	this._buildingPosition;
-	this._buildingPositionHIGH;
-	this._buildingPositionLOW;
+	this.buildingPosition;
+	this.buildingPositionHIGH;
+	this.buildingPositionLOW;
 	  
 	// Blocks data.***************************************************************
-	this._blocksList_Container = new BlocksListsContainer();
+	this.blocksListContainer = new BlocksListsContainer();
 	this.createDefaultBlockReferencesLists();
 	  
 	// Compound references data.**************************************************
@@ -1890,11 +1884,11 @@ var BRBuildingProject = function() {
 	this.point3d_scratch_2 = new Point3D();
 	
 	// Header, SimpleBuildingGeometry and nailImage path-strings.**********************************
-	this._f4d_rawPathName = ""; // Use only this.***
+	this.rawPathName = ""; // Use only this.***
 	
-	this._f4d_headerPathName = "";
-	this._f4d_header_readed = false;
-	this._f4d_header_readed_finished = false;
+	this.headerPathName = "";
+	this.headerReaded = false;
+	this.headerReadedFinished = false;
 	
 	this._f4d_simpleBuildingPathName = "";
 	this._f4d_simpleBuilding_readed = false;
@@ -1956,7 +1950,7 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
  */ 
 BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this._buildingPosition;
+	var buildingPosition = this.buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
@@ -2037,12 +2031,12 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
-			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
-			this._boundingBox._maxX = compRefList._ocCulling._ocCulling_box._maxX;
-			this._boundingBox._minY = compRefList._ocCulling._ocCulling_box._minY;
-			this._boundingBox._maxY = compRefList._ocCulling._ocCulling_box._maxY;
-			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
-			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
+			this._boundingBox.minX = compRefList._ocCulling._ocCulling_box.minX;
+			this._boundingBox.maxX = compRefList._ocCulling._ocCulling_box.maxX;
+			this._boundingBox.minY = compRefList._ocCulling._ocCulling_box.minY;
+			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
+			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
+			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
 			
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
@@ -2065,7 +2059,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 		  for(var i=0; i<compRefLists_count; i++)
 		  {
 			  var compRefList = this._compRefList_Container._compRefsList_Array[i];
-			  var blocksList = this._blocksList_Container._BlocksListsArray[i];
+			  var blocksList = this.blocksListContainer.blocksListsArray[i];
 			  var bb = compRefList.getBoundingBox(blocksList);
 			  if(this._boundingBox == undefined)
 			  {
@@ -2087,12 +2081,12 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
-			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
-			this._boundingBox._maxX = compRefList._ocCulling._ocCulling_box._maxX;
-			this._boundingBox._minY = compRefList._ocCulling._ocCulling_box._minY;
-			this._boundingBox._maxY = compRefList._ocCulling._ocCulling_box._maxY;
-			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
-			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
+			this._boundingBox.minX = compRefList._ocCulling._ocCulling_box.minX;
+			this._boundingBox.maxX = compRefList._ocCulling._ocCulling_box.maxX;
+			this._boundingBox.minY = compRefList._ocCulling._ocCulling_box.minY;
+			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
+			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
+			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
 			
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
@@ -2106,12 +2100,12 @@ BRBuildingProject.prototype.getBoundingBox = function() {
  */
 BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
-	this._blocksList_Container.newBlocksList("Blocks1");
-	this._blocksList_Container.newBlocksList("Blocks2");
-	this._blocksList_Container.newBlocksList("Blocks3");
+	this.blocksListContainer.newBlocksList("Blocks1");
+	this.blocksListContainer.newBlocksList("Blocks2");
+	this.blocksListContainer.newBlocksList("Blocks3");
 	 
-	this._blocksList_Container.newBlocksList("BlocksBone");
-	this._blocksList_Container.newBlocksList("Blocks4");
+	this.blocksListContainer.newBlocksList("BlocksBone");
+	this.blocksListContainer.newBlocksList("Blocks4");
 };
   
 /**
@@ -2133,15 +2127,15 @@ var PCloudMesh = function() {
 	this._header = new Header();
 	this.vbo_datas = new VBOVertexIdxCacheKeysContainer(); // temp.***
 	
-	this._f4d_rawPathName = "";
+	this.rawPathName = "";
 	
-	this._f4d_headerPathName = "";
-	this._f4d_header_readed = false;
-	this._f4d_header_readed_finished = false;
+	this.headerPathName = "";
+	this.headerReaded = false;
+	this.headerReadedFinished = false;
 	
-	this._f4d_geometryPathName = "";
-	this._f4d_geometry_readed = false;
-	this._f4d_geometry_readed_finished = false;
+	this.geometryPathName = "";
+	this.geometryReaded = false;
+	this.geometryReadedFinished = false;
 };
 
 /**
@@ -2360,54 +2354,54 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var auxScratch;
 	var header = BR_Project._header;
 	var arrayBuffer = this.fileArrayBuffer;
-	var bytes_readed = this.fileBytesReaded;
+	var bytesReaded = this.fileBytesReaded;
 	
 	if(this.f4dReadWriter == undefined)
 		this.f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
-		header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+		header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 	}
 	
 	header._f4d_version = 2;
 	
 	// 3) Global unique ID.*********************
-	intAux_scratch = this.f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = this.f4dReadWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	for(var j=0; j<intAux_scratch; j++){
-		header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+		header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 	}
 	
 	// 4) Location.*************************
-	header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._longitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	header._latitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	header._elevation = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	
 	//header._elevation += 70.0; // delete this. TEST.!!!
 	
 	// 6) BoundingBox.************************
-	header._boundingBox._minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	header._boundingBox._maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
+	header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
+	header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
+	header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
+	header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	
-	var semiHeight = (header._boundingBox._maxZ - header._boundingBox._minZ )/2.0;
+	var semiHeight = (header._boundingBox.maxZ - header._boundingBox.minZ )/2.0;
 	header._elevation = 45.0 + semiHeight-0.5;
 	
 	var isLarge = false;
-	if(header._boundingBox._maxX - header._boundingBox._minX > 40.0 || header._boundingBox._maxY - header._boundingBox._minY > 40.0)
+	if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
 	{
 		isLarge = true;
 	}
 	
-	if(!isLarge && header._boundingBox._maxZ - header._boundingBox._minZ < 30.0)
+	if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
 	{
 		header.isSmall = true;
 	}
 	
-	var imageLODs_count = this.f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	var imageLODs_count = this.f4dReadWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 	
 	// Now, must calculate some params of the project.**********************************************
 	// 0) PositionMatrix.************************************************************************
@@ -2420,7 +2414,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	//var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);  // Original.***
 	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height); 
 	
-	BR_Project._buildingPosition = position; 
+	BR_Project.buildingPosition = position; 
 	
 	// High and Low values of the position.****************************************************
 	var splitValue = Cesium.EncodedCartesian3.encode(position);
@@ -2428,17 +2422,10 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 	
-	BR_Project._buildingPositionHIGH = new Float32Array(3);
-	BR_Project._buildingPositionHIGH[0] = splitVelue_X.high;
-	BR_Project._buildingPositionHIGH[1] = splitVelue_Y.high;
-	BR_Project._buildingPositionHIGH[2] = splitVelue_Z.high;
+	BR_Project.buildingPositionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
+	BR_Project.buildingPositionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
 	
-	BR_Project._buildingPositionLOW = new Float32Array(3);
-	BR_Project._buildingPositionLOW[0] = splitVelue_X.low;
-	BR_Project._buildingPositionLOW[1] = splitVelue_Y.low;
-	BR_Project._buildingPositionLOW[2] = splitVelue_Z.low;
-	
-	this.fileBytesReaded = bytes_readed;
+	this.fileBytesReaded = bytesReaded;
 };
 
 
@@ -2454,7 +2441,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	if(this.f4dReadWriter == undefined)
 		this.f4dReadWriter = new ReaderWriter();
 	
-	var bytes_readed = this.fileBytesReaded;
+	var bytesReaded = this.fileBytesReaded;
 	var startBuff;
 	var endBuff;
 	var arrayBuffer = this.fileArrayBuffer;
@@ -2463,7 +2450,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	var vbo_objects_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+	var vbo_objects_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4; // Almost allways is 1.***
 	
 	// single interleaved buffer mode.*********************************************************************************
 	for(var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
@@ -2471,26 +2458,26 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 		var simpObj = simpBuildingV1.newSimpleObject();
 		var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
 		
-		var iDatas_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		startBuff = bytes_readed;
-		endBuff = bytes_readed + (4*3+2*2+1*4)*iDatas_count; // fPos_usTex_bNor.****
+		var iDatas_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + (4*3+2*2+1*4)*iDatas_count; // fPos_usTex_bNor.****
 		vt_cacheKey.verticesArrayBuffer = arrayBuffer.slice(startBuff, endBuff);
 		
-		bytes_readed = bytes_readed + (4*3+2*2+1*4)*iDatas_count; // updating data.***
+		bytesReaded = bytesReaded + (4*3+2*2+1*4)*iDatas_count; // updating data.***
 		
 		vt_cacheKey._vertices_count = iDatas_count;
 		
 	}
 	
 	// Finally read the 4byte color.***
-	var color_4byte_temp = this.f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var color_4byte_temp = this.f4dReadWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	
 	//var b = color_4byte_temp & 0xFF;
     //var g = (color_4byte_temp & 0xFF00) >>> 8;
     //var r = (color_4byte_temp & 0xFF0000) >>> 16;
     //var a = ( (color_4byte_temp & 0xFF000000) >>> 24 ) / 255 ;
 	
-	this.fileBytesReaded = bytes_readed;
+	this.fileBytesReaded = bytesReaded;
 };
 
 /**
@@ -2510,17 +2497,17 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, f4dManager) {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
 	// Read the image.**********************************************************************************
-	var bytes_readed = this.fileBytesReaded;
+	var bytesReaded = this.fileBytesReaded;
 	var arrayBuffer = this.fileArrayBuffer;
 	
-	var nailImageSize = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	var startBuff = bytes_readed;
-	var endBuff = bytes_readed + nailImageSize;
+	var nailImageSize = this.f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	var startBuff = bytesReaded;
+	var endBuff = bytesReaded + nailImageSize;
 	simpBuildingV1.textureArrayBuffer = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
 	
-	bytes_readed += nailImageSize;
+	bytesReaded += nailImageSize;
 
-	this.fileBytesReaded = bytes_readed;
+	this.fileBytesReaded = bytesReaded;
 };
 
 /**
@@ -2535,31 +2522,29 @@ TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 		return;
 	}
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.f4dReadWriter == undefined) this.f4dReadWriter = new ReaderWriter();
 	
 	var arrayBuffer = this.fileArrayBuffer;
 	var projects_count = this.f4dReadWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
 	
-	if(projects_count == 0)
-		this.empty_tile = true;
+	if(projects_count == 0) this.empty_tile = true;
 
 	for(var i=0; i<projects_count; i++)
 	{
 		/*
 		// 1rst, read the relative rawFile_path.***
-		var rawFileNamePath_length = this.f4dReadWriter.readInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;// only debug test.***
+		var rawFileNamePath_length = this.f4dReadWriter.readInt16(arrayBuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;// only debug test.***
 		var rawFileNamePath = "";
 		
 		for(var j=0; j<rawFileNamePath_length; j++){
-			rawFileNamePath += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+			rawFileNamePath += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
 		*/
-		var bytes_readed = this.fileBytesReaded;
-		this.fileBytesReaded = bytes_readed;
+		var bytesReaded = this.fileBytesReaded;
+		this.fileBytesReaded = bytesReaded;
 		
 		this.current_BRProject_parsing = this.newBRProject();
-		//this.current_BRProject_parsing._f4d_rawPathName = rawFileNamePath;
+		//this.current_BRProject_parsing.rawPathName = rawFileNamePath;
 		
 		this.parseFileHeader(this.current_BRProject_parsing);
 		this.parseFileSimpleBuilding(this.current_BRProject_parsing);
@@ -2666,17 +2651,14 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
  */
 TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
-	if(this.subTiles_array.length > 0)
-	{
-		for(var i=0; i<this.subTiles_array.length; i++)
-		{
+	if(this.subTiles_array.length > 0) {
+		var subTiles_arrayLength = this.subTiles_array.length;
+		for(var i=0; i<subTiles_arrayLength; i++) {
 			this.subTiles_array[i].visibilityType = this.visibilityType;
 			this.subTiles_array[i].getSmallestTiles(smallestTiles_array);
 		}
-	}
-	else{
-		if(!this.empty_tile.length)
-			smallestTiles_array.push(this);
+	} else {
+		if(!this.empty_tile.length) smallestTiles_array.push(this);
 	}
 };
 
@@ -2706,11 +2688,8 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
  */
 TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
 	// Cesium dependency.***
-	if(this.position == undefined)
-		return;
-	
-	if(boundingSphere_Aux == undefined)
-		boundingSphere_Aux = new Cesium.BoundingSphere();
+	if(this.position == undefined) return;
+	if(boundingSphere_Aux == undefined) boundingSphere_Aux = new Cesium.BoundingSphere();
 	
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
@@ -2736,26 +2715,20 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 		intersectedPoints_count++;
 	*/
 	
-	if(this.visibilityType == Cesium.Intersect.OUTSIDE)
-	{
+	if(this.visibilityType == Cesium.Intersect.OUTSIDE) {
 		// OUTSIDE.***
 		// do nothing.***
-	}
-	else if(this.visibilityType == Cesium.Intersect.INSIDE)
-	{
+	} else if(this.visibilityType == Cesium.Intersect.INSIDE) {
 		// INSIDE.***
 		intersectedTiles_array.push(this);
-	}
-	else{
+	} else {
 		// INTERSECTED.***
-		if(this.subTiles_array.length > 0)
-		{
-			for(var i=0; i<this.subTiles_array.length; i++)
-			{
+		if(this.subTiles_array.length > 0) {
+			var subTiles_arrayLength = this.subTiles_array.length;
+			for(var i=0; i<subTiles_arrayLength; i++) {
 				this.subTiles_array[i].getIntersectedTiles(frustumVolume, intersectedTiles_array);
 			}
-		}
-		else{
+		} else {
 			intersectedTiles_array.push(this);
 		}
 	}
