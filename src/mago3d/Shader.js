@@ -404,5 +404,3 @@ ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
 	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 	shader._normal = GL.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
-  
-//# sourceURL=Shader.js
