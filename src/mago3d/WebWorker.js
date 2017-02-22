@@ -164,4 +164,3 @@ search: while (true) {
   postMessage(n);
 }
 */
-//# sourceURL=sonWorker.js

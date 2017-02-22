@@ -352,7 +352,7 @@ var NeoBuildingsList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.neoBuildings_Array = [];
+	this.neoBuildingsArray = [];
 };
 
 /**
@@ -361,6 +361,6 @@ var NeoBuildingsList = function() {
  */
 NeoBuildingsList.prototype.newNeoBuilding = function() {
 	var neoBuilding = new NeoBuilding();
-	this.neoBuildings_Array.push(neoBuilding);
+	this.neoBuildingsArray.push(neoBuilding);
 	return neoBuilding;
 };

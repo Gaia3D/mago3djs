@@ -1076,7 +1076,40 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	oReq.send(null);
 };	
 
-ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, magoManager) {
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param GL gl context
+ * @param filePathInServer object index file full 경로
+ * @param readerWriter 파일 처리를 담당
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.getObjectIndexFile = function(GL, filePathInServer, readerWriter, neoBuildingsList) {
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePathInServer, true);
+	oReq.responseType = "arraybuffer";
+
+	oReq.onload = function (oEvent) {
+		var arrayBuffer = oReq.response; // Note: not oReq.responseText
+		if (arrayBuffer) {
+			// TODO 이 구문은 말이 되지 않는다. readerWriter가 undefined 라고 한다면 filePathServer가 없어서 오류가 발생함
+//			if(readerWriter == undefined) {
+//				magoManager.readerWriter = new ReaderWriter();
+//			}
+			readerWriter.parseObjectIndexFile(GL, arrayBuffer, neoBuildingsList);
+	    }
+	    arrayBuffer = null;
+	};
+
+	oReq.send(null);
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param GL gl context
+ * @param arrayBuffer object index file binary data
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, neoBuildingsList) {
 	var bytesReaded = 0;
 	var buildingNameLength;
 	var buildingName = "";
@@ -1087,7 +1120,7 @@ ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, magoMana
 	var bbLengthY;
 	var bbLengthZ;
 	
-	var neoBuildingsList = magoManager.neoBuildingsList;
+	var neoBuildingsList = neoBuildingsList;
 	
 	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); 
 	bytesReaded += 4;
@@ -1137,28 +1170,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, magoMana
 		bbox.maxY = bbLengthY/2.0; 
 		bbox.maxZ = bbLengthZ/2.0; 
 	}
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
-ReaderWriter.prototype.readObjectIndexFileInServer = function(GL, filePathInServer, readerWriter, magoManager) {
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePathInServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent) {
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer) {
-			if(readerWriter == undefined) {
-				readerWriter = new ReaderWriter();
-			}
-			readerWriter.parseObjectIndexFile(GL, arrayBuffer, magoManager);
-	    }
-	    arrayBuffer = null;
-	};
-
-	oReq.send(null);
 };
 
 /**
@@ -1731,5 +1742,3 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
 	readerWriter.readNeoSimpleBuildingInServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
 };
-			
-//# sourceURL=ReaderWriter.js	

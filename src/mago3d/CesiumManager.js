@@ -47,7 +47,22 @@ var CesiumManager = function() {
 	this.startMovPoint = new Point3D();
 	
 	//this.ssaoFSQuad;// No use this.***
-	this.kernel = [];
+	this.kernel = [ 0.33, 0.0, 0.85,
+					0.25, 0.3, 0.5,
+					0.1, 0.3, 0.85,
+					-0.15, 0.2, 0.85, 
+					-0.33, 0.05, 0.6,
+					-0.1, -0.15, 0.85,
+					-0.05, -0.32, 0.25,
+					0.2, -0.15, 0.85,
+					0.6, 0.0, 0.55,
+					0.5, 0.6, 0.45,
+					-0.01, 0.7, 0.35,
+					-0.33, 0.5, 0.45,
+					-0.45, 0.0, 0.55,
+					-0.65, -0.5, 0.7,
+					0.0, -0.5, 0.55,
+					0.33, 0.3, 0.35];
 	
 	// Original for hemisphere.***
 	/*
@@ -61,86 +76,6 @@ var CesiumManager = function() {
 		this.kernel.push(z);				
 	}
 	*/
-	
-	// 1.***
-	this.kernel.push(0.33);
-	this.kernel.push(0.0);
-	this.kernel.push(0.85);
-	
-	// 2.***
-	this.kernel.push(0.25);
-	this.kernel.push(0.3);
-	this.kernel.push(0.5);
-	
-	// 3.***
-	this.kernel.push(0.1);
-	this.kernel.push(0.3);
-	this.kernel.push(0.85);
-	
-	// 4.***
-	this.kernel.push(-0.15);
-	this.kernel.push(0.2);
-	this.kernel.push(0.85);
-	
-	// 5.***
-	this.kernel.push(-0.33);
-	this.kernel.push(0.05);
-	this.kernel.push(0.6);
-	
-	// 6.***
-	this.kernel.push(-0.1);
-	this.kernel.push(-0.15);
-	this.kernel.push(0.85);
-	
-	// 7.***
-	this.kernel.push(-0.05);
-	this.kernel.push(-0.32);
-	this.kernel.push(0.25);
-	
-	// 8.***
-	this.kernel.push(0.2);
-	this.kernel.push(-0.15);
-	this.kernel.push(0.85);
-	
-	// 9.***
-	this.kernel.push(0.6);
-	this.kernel.push(0.0);
-	this.kernel.push(0.55);
-	
-	// 10.***
-	this.kernel.push(0.5);
-	this.kernel.push(0.6);
-	this.kernel.push(0.45);
-	
-	// 11.***
-	this.kernel.push(-0.01);
-	this.kernel.push(0.7);
-	this.kernel.push(0.35);
-	
-	// 12.***
-	this.kernel.push(-0.33);
-	this.kernel.push(0.5);
-	this.kernel.push(0.45);
-	
-	// 13.***
-	this.kernel.push(-0.45);
-	this.kernel.push(0.0);
-	this.kernel.push(0.55);
-	
-	// 14.***
-	this.kernel.push(-0.65);
-	this.kernel.push(-0.5);
-	this.kernel.push(0.7);
-	
-	// 15.***
-	this.kernel.push(0.0);
-	this.kernel.push(-0.5);
-	this.kernel.push(0.55);
-	
-	// 16.***
-	this.kernel.push(0.33);
-	this.kernel.push(0.3);
-	this.kernel.push(0.35);
 	
 	/* Test for sphere.***
 	for(var i=0; i<kernelSize; i++) {
@@ -1136,7 +1071,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, modelV
 	if(this.depthFboNeo == undefined) this.depthFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(GL, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
 	
-	// do frustum culling.***
+	// do frustum culling
 	if(!this.isCameraMoving) {
 		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
@@ -2503,7 +2438,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL,
 };
 
 /**
- * object index file을 읽어서 object 개수만큼 루핑을 돌면서 화면에 표시
+ * object index file 정보가 존재할 경우 화면에 rendering
  * @param frustumVolume 변수
  * @param neoVisibleBuildings_array 변수
  * @param cameraPosition 변수
@@ -2527,23 +2462,20 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	
 	var squaredDistToCamera;
 	var last_squared_dist;
-	this.detailed_neoBuilding;
 	
 	var lod0_minSquaredDist = 100000*0.6;
 	var lod1_minSquaredDist = 100000*3;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
 	
-	
 	this.visibleObjControlerBuildings.initArrays(); 
 	
 	var maxNumberOfCalculatingPositions = 50;
 	var currentCalculatingPositionsCount = 0;
 	
-	// ajax 통신을 통해 header file은 후 neoBuilding_Array 에 geo 정보를 입력함
-	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
-	for(var i=0; i<neoBuildings_count; i++) {
-		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+	var neoBuildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
+	for(var i=0; i<neoBuildingsCount; i++) {
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
 		
 		// 1) check if there are cartesian position.***
 		if(neoBuilding.buildingPosition == undefined) {
@@ -2604,10 +2536,10 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 	}
 	/*
-	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
-	for(var i=0; i<neoBuildings_count; i++)
+	var neoBuildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
+	for(var i=0; i<neoBuildingsCount; i++)
 	{
-		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
 		
 		if(neoBuilding.buildingPosition == undefined)
 		{
@@ -2997,52 +2929,11 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
-	// Now, load sejong.***
-	var project_number = 7500; // House with car and mini park to children.***
-	var GAIA3D__counter =1;
-	//GAIA3D__offset_latitude += 0.0021;
-	//GAIA3D__offset_longitude += 0.0021;
-	
-	var incre_latAng = 0.0005;
-	var incre_longAng = 0.0005;
-	
-	// Test modularitzing.*******************************************************
-	var BR_ProjectsList = this.bRBuildingProjectsList;
-	var neoBuildingsList = this.neoBuildingsList;
-
-	var height = 1635.0;
-	var GL = this.scene.context._gl;
-	//viewer.readerWriter.openBuildingProject(GL, 100,  latitude, longitude, height, viewer.readerWriter, BR_ProjectsList);
-	// End test modularitzing.---------------------------------------------------
-	
-	/*
-	var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
-	url : '//assets.agi.com/stk-terrain/world',
-	requestWaterMask : false,
-	requestVertexNormals : true
-	});
-	this.terrainProvider = cesiumTerrainProviderMeshes;
-	*/
-
-	//this.readerWriter.openTerranTile(GL, this.terranTile, this.readerWriter);
-	
-	var buildingCount = jsonBuildingInformation.latitude.length;
-	for(var i=0; i<buildingCount; i++) {
-//		var deltaLat = -0.0015;
-//		var deltaLon = 0.0015;
-		var latitude = jsonBuildingInformation.latitude;
-		var longitude = jsonBuildingInformation.longitude;
-		var height = jsonBuildingInformation.height;
-		var buildingFileName = jsonBuildingInformation.buildingFileName;
-		//this.readerWriter.openNeoBuilding(GL, buildingFileName[i], latitude[i], longitude[i], height[i], this.readerWriter, neoBuildingsList, this);
-	}
-	
-	var filePathInServer = this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE;
-	this.readerWriter.readObjectIndexFileInServer(GL, filePathInServer, this.readerWriter, this);
-
+CesiumManager.prototype.getObjectIndexFile = function() {
+	this.readerWriter.getObjectIndexFile(	this.scene.context._gl,
+											this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE,
+											this.readerWriter,
+											this.neoBuildingsList);
 };
-
-//# sourceURL=CesiumManager.js

@@ -64,8 +64,8 @@ var ManagerFactory = function(containerId, magoConfig) {
 		
 		var readerWriter = new ReaderWriter();
 		
-		// 실제 빌딩을 읽어 들임
-		magoManager.loadData(MagoConfig.getInformation().geoConfig.initBuilding);
+		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+		magoManager.getObjectIndexFile();
 		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
 	}
