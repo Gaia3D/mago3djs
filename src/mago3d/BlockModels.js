@@ -51,7 +51,6 @@ BlocksList.prototype.getBlock = function(idx) {
 	if(this.blocksArray == undefined) return null;
 	
 	var block = null;
-	  
 	if(idx >= 0 && idx <this.blocksArray.length) {
 		block = this.blocksArray[idx];
 	}
@@ -63,7 +62,7 @@ BlocksList.prototype.getBlock = function(idx) {
  * @param idx 변수
  * @returns block
  */
-BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
+BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 	this.fileLoadState = 3;// 3 = parsing started.***
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
@@ -111,9 +110,9 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*
-			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = GL.createBuffer ();
-			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
-			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
 			 
@@ -131,9 +130,9 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = GL.createBuffer ();
-			GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
-			GL.bufferData(GL.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
 			
@@ -145,9 +144,9 @@ BlocksList.prototype.parseArrayBuffer = function(GL, arrayBuffer, readWriter) {
 			  
 			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_FACES_cacheKey= GL.createBuffer ();
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
-			GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			vbo_vi_cacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
 			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
@@ -188,11 +187,9 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
   	var found = false;
   	var i=0;
   	var blocksList = null;
-  	while(!found && i<blocksListsCount)
-  	{
+  	while(!found && i<blocksListsCount) {
   		var currentBlocksList = this.blocksListsArray[i];
-  		if(currentBlocksList.name == blockList_name)
-  		{
+  		if(currentBlocksList.name == blockList_name) {
   			found = true;
   			blocksList = currentBlocksList;
   		}

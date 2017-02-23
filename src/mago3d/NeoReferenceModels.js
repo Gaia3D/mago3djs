@@ -138,12 +138,12 @@ NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y,
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param arrayBuffer 변수
  * @param neoBuilding 변수
  * @param f4dReadWriter 변수
  */
-NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter) {
+NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, f4dReadWriter) {
 	this.fileLoadState = 3; // parsing started.***
 	
 	var startBuff;
@@ -177,9 +177,9 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 2*texcoordShortValues_count;
 		
-		neoRef.MESH_TEXCOORD_cacheKey = GL.createBuffer ();
-		GL.bindBuffer(GL.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
-		GL.bufferData(GL.ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+		neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
+		gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
+		gl.bufferData(gl.ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 		  
 		bytesReaded = bytesReaded + 2*texcoordShortValues_count; // updating data.***
 		*/
@@ -245,9 +245,9 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 4*texcoordFloatValues_count;
 			
-			neoRef.MESH_TEXCOORD_cacheKey = GL.createBuffer ();
-			GL.bindBuffer(GL.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
-			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+			neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  
 			bytesReaded = bytesReaded + 4*texcoordFloatValues_count; // updating data.***
 		}
@@ -255,8 +255,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			
 		// 4) short texcoords.*****
 		var textures_count = f4dReadWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4; // this is only indicative that there are a texcoords.***
-		if(textures_count > 0)
-		{
+		if(textures_count > 0) {
 
 			neoRef.texture = new Texture();
 			neoRef.hasTexture = true;
@@ -275,16 +274,14 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
 			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = GL.createTexture();
-			GL.bindTexture(GL.TEXTURE_2D, neoRef.texture.tex_id);
-			GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
-			GL.bindTexture(GL.TEXTURE_2D, null);
+				neoRef.texture.tex_id = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
+			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/
-		}
-		else{
+		} else {
 			neoRef.hasTexture = false;
 		}
-
 	}
 	
 	// Now occlusion cullings.***
