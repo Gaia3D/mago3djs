@@ -45,10 +45,10 @@ var ManagerFactory = function(containerId, magoConfig) {
 	
 	function drawCesium() {
 		
-		var GL = viewer.scene.context._gl;
-		viewer.scene.magoManager.selection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(GL); 
-		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(GL); 
+		var gl = viewer.scene.context._gl;
+		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+		viewer.scene.magoManager.shadersManager.createDefaultShader(gl); 
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); 
 		viewer.scene.magoManager.scene = viewer.scene;
 		
 		// Start postRender version.***********************************************
@@ -58,9 +58,9 @@ var ManagerFactory = function(containerId, magoConfig) {
 		
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		
-		magoManager.selection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		magoManager.shadersManager.createDefaultShader(GL); 
-		magoManager.postFxShadersManager.createDefaultShaders(GL); 
+		magoManager.selection.init(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
+		magoManager.shadersManager.createDefaultShader(gl); 
+		magoManager.postFxShadersManager.createDefaultShaders(gl); 
 		
 		var readerWriter = new ReaderWriter();
 		
@@ -100,8 +100,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 						
 						// 1rst, check if there are objects to move.***
 						if(magoManager.mustCheckIfDragging) {
-							var gl = scene.context._gl;
-							if(magoManager.isDragging(gl, scene)) {
+							if(magoManager.isDragging(scene)) {
 								magoManager.mouseDragging = true;
 								disableCameraMotion(false);
 							}
@@ -112,8 +111,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 					}	
 						
 					if(magoManager.mouseDragging) {
-						var gl = scene.context._gl;
-						magoManager.moveSelectedObject(gl, scene, magoManager.currentRenderablesNeoRefListsArray);
+						magoManager.moveSelectedObject(scene, magoManager.currentRenderablesNeoRefListsArray);
 					}
 				}
 			} else{
@@ -142,7 +140,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(gl, scene, f4d_topManager.currentRenderablesNeoRefListsArray);
+					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
 			

@@ -2556,10 +2556,10 @@ TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param f4dManager 변수
  */
-TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
+TerranTile.prototype.parseFileOneBuilding = function(gl, f4dManager) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 	{
@@ -2599,7 +2599,7 @@ TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 	{
 		if(f4dManager.backGround_imageReadings_count < 1)
 		{
-			this.parseFile_simpleBuilding_old(GL, BR_Project);
+			this.parseFile_simpleBuilding_old(gl, BR_Project);
 			this.current_BRProject_parsing_state=2;
 		}
 	}
@@ -2607,7 +2607,7 @@ TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 	{
 		if(f4dManager.backGround_imageReadings_count < 1)
 		{
-			this.parseFile_nailImage_old(GL, BR_Project, f4dManager);
+			this.parseFile_nailImage_old(gl, BR_Project, f4dManager);
 			this.current_BRProject_parsing_state=0;
 			this.projectsParsed_count++;
 			f4dManager.backGround_imageReadings_count ++;
