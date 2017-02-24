@@ -20,7 +20,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 			|| magoConfig.deployConfig === '' 
 			|| magoConfig.deployConfig.viewLibrary === null 
 			|| magoConfig.deployConfig.viewLibrary === '' 
-			|| magoConfig.deployConfig.viewLibrary === 'cesium') {
+			|| magoConfig.deployConfig.viewLibrary === Constant.CESIUM) {
 		// 환경 설정
 		MagoConfig.init(magoConfig);
 		
@@ -31,14 +31,14 @@ var ManagerFactory = function(containerId, magoConfig) {
 		initEntity();
 		initTerrain();
 		initCamera();
-	} else if(viewLibrary === 'worldwind') {
+	} else if(viewLibrary === WORLDWIND) {
 		viewer = null;
 	}
 	
 	function draw() {
-		if(MagoConfig.getInformation().deployConfig.viewLibrary === 'cesium') {
+		if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.CESIUM) {
 			drawCesium();
-		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === 'worldwind') {
+		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === WORLDWIND) {
 			//
 		}
 	}
@@ -55,18 +55,11 @@ var ManagerFactory = function(containerId, magoConfig) {
 		magoManager = viewer.scene.magoManager;
 		scene = viewer.scene;
 		//scene.copyGlobeDepth = true;
-		
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		
-		magoManager.selection.init(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		magoManager.shadersManager.createDefaultShader(gl); 
-		magoManager.postFxShadersManager.createDefaultShaders(gl); 
-		
-		var readerWriter = new ReaderWriter();
-		
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		magoManager.getObjectIndexFile();
-		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+		viewer.scene.magoManager.getObjectIndexFile();
+		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
 	}
 	

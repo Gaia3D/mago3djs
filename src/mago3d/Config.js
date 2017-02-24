@@ -40,7 +40,7 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
 		}
 		if(jsonConfig.deployConfig.viewLibrary === undefined
 				|| jsonConfig.deployConfig.viewLibrary === null || jsonConfig.deployConfig.viewLibrary === '') {
-			jsonConfig.deployConfig.viewLibrary = "cesium";
+			jsonConfig.deployConfig.viewLibrary = Constant.CESIUM;
 		}
 		if(jsonConfig.deployConfig.dataPath === undefined
 				|| jsonConfig.deployConfig.dataPath === null || jsonConfig.deployConfig.dataPath === '') {
