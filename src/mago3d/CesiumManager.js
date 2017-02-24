@@ -129,7 +129,7 @@ var CesiumManager = function() {
 	this.intCRefList_array = [];
 	this.intNeoRefList_array = [];
 	
-	this.currentSelectedObj_idx = -1;
+	this.currentSelectedObjIdx = -1;
 	this.currentByteColorPicked = new Uint8Array(4);
 	
 	this.backGround_fileReadings_count = 0; // this can be as max = 9.***
@@ -778,7 +778,7 @@ CesiumManager.prototype.renderPCloudProjects = function(scene, isLastFrustum) {
 			if(this.backGround_fileReadings_count < 20) {
 				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject.headerPathName;
 				
-				this.readerWriter.readPCloudHeaderInServer(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
+				this.readerWriter.getPCloudHeader(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -786,7 +786,7 @@ CesiumManager.prototype.renderPCloudProjects = function(scene, isLastFrustum) {
 			if(this.backGround_fileReadings_count < 20) {
 				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject.geometryPathName;
 				
-				this.readerWriter.readPCloudGeometryInServer(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
+				this.readerWriter.getPCloudGeometry(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -834,7 +834,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
 					neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
-					this.readerWriter.readNeoHeaderInServer(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+					this.readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 					continue;
 				}
 			}
@@ -849,7 +849,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 						// must read blocksList.***
 						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList.name;
-						this.readerWriter.readNeoBlocksArraybufferInServer(filePathInServer, blocksList, this);
+						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 						continue;
 					}
 				}
@@ -877,7 +877,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 				neoReferencesList = neoBuilding.neoRefListsContainer.neoRefsLists_Array[j];
 				if(neoReferencesList.fileLoadState == 0) {
 					filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
-					this.readerWriter.readNeoReferencesArraybufferInServer(filePathInServer, neoReferencesList, neoBuilding, this);
+					this.readerWriter.getNeoReferencesArraybuffer(filePathInServer, neoReferencesList, neoBuilding, this);
 					// remember multiply reference matrices by the building transform matrix.***
 					//var transformMat = new Matrix4();
 					//transformMat.setByFloat32Array(neoBuilding.move_matrix);
@@ -924,7 +924,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 									subOctree.neoRefsList_Array.push(neoReferencesList);
 									
 									var intRef_filePath = interiorCRef_folderPath + "/" + subOctreeNumberName;
-									this.readerWriter.readNeoReferencesArraybufferInServer(intRef_filePath, neoReferencesList, neoBuilding, this);
+									this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
 								}
 								areAllSubOctreesLoadedFile = false;
 							}
@@ -933,7 +933,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 								if(neoReferencesList != undefined && neoReferencesList.fileLoadState == 0)
 									areAllSubOctreesLoadedFile = false;
 							}
-							////readerWriter.readNeoReferencesInServer(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
+							////readerWriter.getNeoReferences(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
 						}
 					}
 				}
@@ -992,14 +992,14 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
 							subOctree.neoRefsList_Array.push(neoReferencesList);
 							
 							var intRef_filePath = interiorCRef_folderPath + "/" + subOctreeNumberName;
-							this.readerWriter.readNeoReferencesArraybufferInServer(intRef_filePath, neoReferencesList, neoBuilding, this);
+							this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
 						}
 						areAllSubOctreesLoadedFile = false;
 					} else{
 						neoReferencesList = subOctree.neoRefsList_Array[0];
 						if(neoReferencesList != undefined && neoReferencesList.fileLoadState == 0) areAllSubOctreesLoadedFile = false;
 					}
-					////readerWriter.readNeoReferencesInServer(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
+					////readerWriter.getNeoReferences(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
 				}
 			}
 		}
@@ -1153,8 +1153,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 				if(this.backGround_imageReadings_count < 10) {
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-					this.readerWriter.readTextureInServer(filePath_inServer, simpBuild_tex, this);
+					var fileName = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
+					this.readerWriter.getTexture(fileName, simpBuild_tex, this);
 				}
 			} else {
 				var simpBuildTexture = neoSkin.texturesArray[0]; 
@@ -1258,8 +1258,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 				if(this.backGround_imageReadings_count < 10) {
 					var simpBuild_tex = neoSkin.newTexture();
 					
-					var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-					this.readerWriter.readTextureInServer(filePath_inServer, simpBuild_tex, this);
+					var fileName = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
+					this.readerWriter.getTexture(fileName, simpBuild_tex, this);
 				}
 			} else {
 				var simpBuildTexture = neoSkin.texturesArray[0]; 
@@ -1752,7 +1752,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(scene, neoB
 						var buildingFolderName = neoBuilding.buildingFileName;
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList.name;
-						this.readerWriter.readNeoBlocksArraybufferInServer(filePathInServer, blocksList, this);
+						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 					}
 					continue;
 				}
@@ -2085,7 +2085,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
 					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project.rawPathName + ".jpg"; // Old.***
 					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 					
-					this.readerWriter.readNailImageInServer(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
+					this.readerWriter.getNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 					this.backGround_fileReadings_count ++;
 					
 				}
@@ -2233,7 +2233,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
 					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project.rawPathName + ".jpg"; // Old.***
 					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 					
-					this.readerWriter.readNailImageInServer(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
+					this.readerWriter.getNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 					this.backGround_fileReadings_count ++;
 				}
 			}
@@ -2565,7 +2565,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -2637,7 +2637,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
@@ -2687,7 +2687,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
