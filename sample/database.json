@@ -16,10 +16,14 @@
 		"dataPath" : "/data"
 	},
 	"renderingConfg" : {
-		"cullFaceEnable" : false
+		"glEnable" : "false"
 	},
 	"geoConfig" : {
 		"initEntity" : {
+			"name" : "여의도",
+			"latitude" : 37.521168,
+			"longitude" : 126.924185,
+			"height" : 3000.0
 		},
 		"initTerrain" : {
 			"enable" : true,

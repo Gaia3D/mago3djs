@@ -1003,6 +1003,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 				}
 			}
 			
+
 			for(var j=0; j<neoReferencesListsCount; j++)
 			{
 				neoReferencesList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[j];
@@ -1031,6 +1032,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 			
 		}
 		
+
 	}
 	
 	// LOD Buildings.***********************************************************************************
@@ -1324,6 +1326,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 					
 					var filePath_inServer = this.readerWriter.geometryDataPath + "/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+
 				}
 			}
 			else
@@ -2095,6 +2098,11 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 			}
 		}
 	}
+	
+	// ssao_idx = -1 -> pickingMode.***
+	// ssao_idx = 0 -> depth.***
+	// ssao_idx = 1 -> ssao.***
+	
 
 	if(ssao_idx == -1)
 	{
@@ -2125,6 +2133,8 @@ CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, 
 	{
 		lodBuilding.parseArrayBuffer(gl, this.readerWriter);
 	}
+	
+	this.renderer.renderLodBuilding(gl, lodBuilding, this, shader, ssao_idx);
 	/*
 	if(ssao_idx == -1)// picking mode.***********************************************************************************
 	{
@@ -2179,6 +2189,7 @@ CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, 
 	}
 	*/
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -2875,6 +2886,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue; 
 		}
 		
+
 		// must calculate the realBuildingPosition (bbox_center_position).***
 		var realBuildingPos;
 		if(neoBuilding.octree != undefined && neoBuilding.f4dTransfMat != undefined)
@@ -2901,6 +2913,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 		else
 			this.radiusAprox_aux = 50.0;
+
 		
 		if(this.radiusAprox_aux)
 		{
