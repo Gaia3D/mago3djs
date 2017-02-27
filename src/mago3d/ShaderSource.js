@@ -775,7 +775,7 @@ ShaderSource.simpleDepthSsaoFsSource = "\n\
 ShaderSource.LodBuildingSsaoVsSource = "\n\
 	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
-	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
 	\n\
 	uniform mat4 projectionMatrix;  \n\
 	uniform mat4 modelViewMatrix;// No used. *** \n\
@@ -814,7 +814,6 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 			vNormal.y *= -1.0;\n\
 			vNormal.z *= -1.0;\n\
 		}\n\
-		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 	}";
@@ -921,12 +920,13 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
 	
-	
+// LOD Building Depth Shader.************************************************************************************************
+// LOD Building Depth Shader.************************************************************************************************
+// LOD Building Depth Shader.************************************************************************************************
+
 	//어떤 용도
 ShaderSource.lodBuildingDepthVsSource = "\n\
 	attribute vec3 position;\n\
-	attribute vec3 normal;\n\
-	attribute vec2 texCoord;\n\
 	\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\

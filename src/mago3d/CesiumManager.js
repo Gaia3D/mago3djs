@@ -2095,6 +2095,11 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 			}
 		}
 	}
+	
+	// ssao_idx = -1 -> pickingMode.***
+	// ssao_idx = 0 -> depth.***
+	// ssao_idx = 1 -> ssao.***
+	
 
 	if(ssao_idx == -1)
 	{
@@ -2125,6 +2130,8 @@ CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, 
 	{
 		lodBuilding.parseArrayBuffer(gl, this.readerWriter);
 	}
+	
+	this.renderer.renderLodBuilding(gl, lodBuilding, this, shader, ssao_idx);
 	/*
 	if(ssao_idx == -1)// picking mode.***********************************************************************************
 	{
@@ -2816,7 +2823,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*100;
+	var lod0_minSquaredDist = 100000*2;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;

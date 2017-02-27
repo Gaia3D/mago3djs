@@ -54,6 +54,10 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		
 	//if(ssao_idx == 0)
 	//	GL.disable(GL.CULL_FACE);
+
+	// ssao_idx = -1 -> pickingMode.***
+	// ssao_idx = 0 -> depth.***
+	// ssao_idx = 1 -> ssao.***
 	
 	var cacheKeys_count;
 	var reference;
@@ -623,8 +627,60 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, neoBuilding, magoManager, shader, renderTexture, ssao_idx) {
-
+Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, shader, ssao_idx) {
+	if(lodBuilding.vbo_vicks_container._vbo_cacheKeysArray.length == 0)
+	{
+		return;
+	}
+	
+	// ssao_idx = -1 -> pickingMode.***
+	// ssao_idx = 0 -> depth.***
+	// ssao_idx = 1 -> ssao.***
+	
+	if(ssao_idx == 0) // depth.***
+	{
+		// 1) Position.*********************************************
+		 
+		
+		var vbo_vicky = lodBuilding.vbo_vicks_container._vbo_cacheKeysArray[0]; // there are only one.***
+		if(vbo_vicky.MESH_VERTEX_cacheKey == null)
+		{
+			if(vbo_vicky.pos_vboDataArray != undefined) //dataArray_byteLength > 0
+			{
+				vbo_vicky.MESH_VERTEX_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.pos_vboDataArray, gl.STATIC_DRAW);
+				
+				vbo_vicky.pos_vboDataArray = undefined;
+			}
+			
+			return;
+		}
+		
+		var vertices_count = vbo_vicky.vertexCount;
+		
+		gl.enableVertexAttribArray(shader.position3_loc);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		
+		//-------------------------------------------------------------------------------------------------------------------------------------
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+	}
+	else if(ssao_idx == 1) // ssao.***
+	{
+		// 1) Position.*********************************************
+		gl.enableVertexAttribArray(shader.position3_loc);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0); 
+		
+		// 2) Normal.*********************************************
+		gl.enableVertexAttribArray(shader.position3_loc);
+		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0); 
+		
+		// 3) Color.*********************************************
+		gl.enableVertexAttribArray(shader.position3_loc);
+		gl.vertexAttribPointer(shader.color4_loc, 2, gl.UNSIGNED_BYTE, true, 0, 0); 
+	}
+	
 	
 }
 
