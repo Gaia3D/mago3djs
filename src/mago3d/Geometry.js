@@ -260,6 +260,8 @@ NeoSimpleBuilding.prototype {
 		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
 		
+		vbo_vi_cacheKey.vertexCount = vertexCount;
+		
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasNormals)
@@ -292,6 +294,9 @@ NeoSimpleBuilding.prototype {
 		{
 			// TODO:
 		}
+		
+		this.fileLoadState = 4; // 4 = parsing finished.***
+
 	}	
  };
 

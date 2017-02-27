@@ -30,6 +30,7 @@ var VBOVertexIdxCacheKey = function() {
 	}
 	
     this.indices_count = -1;
+	this.vertexCount = -1;
     
     this.MESH_VERTEX_cacheKey = null;
     this.MESH_FACES_cacheKey = null;
