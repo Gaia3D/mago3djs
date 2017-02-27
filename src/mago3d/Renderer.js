@@ -33,6 +33,7 @@ var Renderer = function() {
  */
 Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
+	var gl = GL;
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
 	
