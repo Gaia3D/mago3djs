@@ -327,15 +327,8 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 	
-	this.positionHIGH = new Float32Array(3);
-	this.positionHIGH[0] = splitVelue_X.high;
-	this.positionHIGH[1] = splitVelue_Y.high;
-	this.positionHIGH[2] = splitVelue_Z.high;
-	
-	this.positionLOW = new Float32Array(3);
-	this.positionLOW[0] = splitVelue_X.low;
-	this.positionLOW[1] = splitVelue_Y.low;
-	this.positionLOW[2] = splitVelue_Z.low;
+	this.positionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
+	this.positionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
 	
 	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
 	var cloud_point3d = this.bbox.getCenterPoint3d(cloud_point3d);
@@ -362,14 +355,13 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	var x = 0.0;
 	var y = 0.0;
 	var randomValue = 0;
-	var cloudWhite = 0.98;
+//	var cloudWhite = 0.98;
 	
 	// 1) Top ring. radius zero.***
 	var vertex_list = vtxMat.newVertexList();
 	var shadow_vertex_list = shadowVtxMat.newVertexList();
 	randomValue = 0.9+0.3*Math.random();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		vertex = vertex_list.newVertex();
 		vertex.setPosition(x, y, semi_depth);
 		shadow_vertex = shadow_vertex_list.newVertex();
@@ -382,8 +374,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	var menor_ring_radius = this.radius * 0.7;
 	vertex_list = vtxMat.newVertexList();
 	shadow_vertex_list = shadowVtxMat.newVertexList();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		//Math.random(); // returns from 0.0 to 1.0.***
 		randomValue = (2+Math.random())/2;
 		vertex = vertex_list.newVertex();
@@ -401,8 +392,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	angRad = 0.0;
 	vertex_list = vtxMat.newVertexList();
 	shadow_vertex_list = shadowVtxMat.newVertexList();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		randomValue = (2+Math.random())/2;
 		vertex = vertex_list.newVertex();
 		shadow_vertex = shadow_vertex_list.newVertex();
@@ -420,8 +410,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	angRad = 0.0;
 	vertex_list = vtxMat.newVertexList();
 	shadow_vertex_list = shadowVtxMat.newVertexList();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		randomValue = (2+Math.random())/2;
 		vertex = vertex_list.newVertex();
 		shadow_vertex = shadow_vertex_list.newVertex();
@@ -439,8 +428,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	menor_ring_radius = this.radius * 0.7;
 	vertex_list = vtxMat.newVertexList();
 	shadow_vertex_list = shadowVtxMat.newVertexList();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		randomValue = (2+Math.random())/2;
 		vertex = vertex_list.newVertex();
 		shadow_vertex = shadow_vertex_list.newVertex();
@@ -459,8 +447,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	vertex_list = vtxMat.newVertexList();
 	shadow_vertex_list = shadowVtxMat.newVertexList();
 	randomValue = 0.6+0.3*Math.random();
-	for(var i=0; i<numPointsForRing; i++)
-	{
+	for(var i=0; i<numPointsForRing; i++) {
 		//randomValue = (2+Math.random())/2;
 		vertex = vertex_list.newVertex();
 		shadow_vertex = shadow_vertex_list.newVertex();

@@ -122,8 +122,7 @@ var ShadersManager = function() {
 ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
 	
-	if(idx >= 0 && idx < this.shaders_array.length)
-	{
+	if(idx >= 0 && idx < this.shaders_array.length) {
 		shader = this.shaders_array[idx];
 	}
 	
@@ -133,13 +132,13 @@ ShadersManager.prototype.getMagoShader = function(idx) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.getShader = function(GL, source, type, typeString) {
+ShadersManager.prototype.getShader = function(gl, source, type, typeString) {
 	// Source from internet.***
-	var shader = GL.createShader(type);
-	GL.shaderSource(shader, source);
-	GL.compileShader(shader);
-	if (!GL.getShaderParameter(shader, GL.COMPILE_STATUS)) {
-	  alert("ERROR IN "+typeString+ " SHADER : " + GL.getShaderInfoLog(shader));
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+	  alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
 	  return false;
 	}
 	return shader;
@@ -148,21 +147,21 @@ ShadersManager.prototype.getShader = function(GL, source, type, typeString) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createDefaultShader = function(GL) {
-	this.createStandardShader(GL);                // 0.***
-	this.createTextureSimpleObjectShader(GL);     // 1.***
-	this.createColorSelectionShader(GL);          // 2.***
-	this.createTextureSimpleObjectA1Shader(GL);   // 3.***
-	this.createCloudShader(GL);                   // 4.***
-	this.createBlendingCubeShader(GL);            // 5.***
-	this.createPCloudShader(GL);                  // 6.***
-	this.createSimpleObjectTexNormalShader(GL); // 7.***
+ShadersManager.prototype.createDefaultShader = function(gl) {
+	this.createStandardShader(gl);                // 0.***
+	this.createTextureSimpleObjectShader(gl);     // 1.***
+	this.createColorSelectionShader(gl);          // 2.***
+	this.createTextureSimpleObjectA1Shader(gl);   // 3.***
+	this.createCloudShader(gl);                   // 4.***
+	this.createBlendingCubeShader(gl);            // 5.***
+	this.createPCloudShader(gl);                  // 6.***
+	this.createSimpleObjectTexNormalShader(gl); // 7.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createColorSelectionShader = function(GL) {
+ShadersManager.prototype.createColorSelectionShader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
@@ -172,27 +171,27 @@ ShadersManager.prototype.createColorSelectionShader = function(GL) {
 	shader.shader_fragment_source = ShaderSource.colorShaderFragmentSource;
 		
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
-	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	GL.linkProgram(shader.SHADER_PROGRAM);
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
 	
-	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader._encodedCamPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._RefTransfMatrix = GL.getUniformLocation(shader.SHADER_PROGRAM, "RefTransfMatrix");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._RefTransfMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "RefTransfMatrix");
 
-	shader._position = GL.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
+ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
@@ -201,29 +200,29 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(GL) {
 		
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
-	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	GL.linkProgram(shader.SHADER_PROGRAM);
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
 
-	shader._encodedCamPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._Mmatrix = GL.getUniformLocation(shader.SHADER_PROGRAM, "Mmatrix");
-	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader.SHADER_PROGRAM.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._Mmatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "Mmatrix");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 
-	shader._position = GL.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
+ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	
@@ -232,28 +231,28 @@ ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(GL) {
 
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
-	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	GL.linkProgram(shader.SHADER_PROGRAM);
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
 
-	shader._encodedCamPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader.SHADER_PROGRAM.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 
-	shader._position = GL.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createStandardShader = function(GL) {
+ShadersManager.prototype.createStandardShader = function(gl) {
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -262,29 +261,29 @@ ShadersManager.prototype.createStandardShader = function(GL) {
 	standard_shader.shader_fragment_source = ShaderSource.standardShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	GL.linkProgram(standard_shader.SHADER_PROGRAM);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
 
-	standard_shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._RefTransfMatrix = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "RefTransfMatrix");
-	standard_shader._encodedCamPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._BuildingPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
-	standard_shader._BuildingPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._RefTransfMatrix = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "RefTransfMatrix");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
+	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
 
-	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createCloudShader = function(GL) {
+ShadersManager.prototype.createCloudShader = function(gl) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -293,28 +292,28 @@ ShadersManager.prototype.createCloudShader = function(GL) {
 	standard_shader.shader_fragment_source = ShaderSource.cloudShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	GL.linkProgram(standard_shader.SHADER_PROGRAM);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
 
-	standard_shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._cloudPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosHIGH");
-	standard_shader._cloudPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosLOW");
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._cloudPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosHIGH");
+	standard_shader._cloudPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosLOW");
 
-	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createBlendingCubeShader = function(GL) {
+ShadersManager.prototype.createBlendingCubeShader = function(gl) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -323,26 +322,26 @@ ShadersManager.prototype.createBlendingCubeShader = function(GL) {
 	standard_shader.shader_fragment_source = ShaderSource.blendingCubeShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	GL.linkProgram(standard_shader.SHADER_PROGRAM);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
 
-	standard_shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
 
-	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createPCloudShader = function(GL) {
+ShadersManager.prototype.createPCloudShader = function(gl) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
@@ -351,28 +350,28 @@ ShadersManager.prototype.createPCloudShader = function(GL) {
 	standard_shader.shader_fragment_source = ShaderSource.pCloundShaderFragmentSource;
 		
 	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = GL.createProgram();
-	standard_shader.shader_vertex = this.getShader(GL, standard_shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(GL, standard_shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	GL.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	GL.linkProgram(standard_shader.SHADER_PROGRAM);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
 
-	standard_shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._BuildingPosHIGH = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
-	standard_shader._BuildingPosLOW = GL.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
+	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
 
-	standard_shader._color = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = GL.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
+ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source = ShaderSource.texNormalShaderVertexSource;
@@ -382,28 +381,26 @@ ShadersManager.prototype.createSimpleObjectTexNormalShader = function(GL) {
 	//https://gist.github.com/elnaqah/5070979
 	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
 	//http://learningwebgl.com/blog/?p=684 // good.***
-	shader.SHADER_PROGRAM = GL.createProgram();
-	shader.shader_vertex = this.getShader(GL, shader.shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(GL, shader.shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	GL.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	GL.linkProgram(shader.SHADER_PROGRAM);
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
 
-	shader._encodedCamPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = GL.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
 	
-	shader._ModelViewProjectionMatrixRelToEye = GL.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader._NormalMatrix = GL.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader._NormalMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
 	
-	//shader.SHADER_PROGRAM.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-	shader.samplerUniform = GL.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-	shader._lightDirection = GL.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
+	//shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader._lightDirection = gl.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
 
-	shader._position = GL.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = GL.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
-	shader._normal = GL.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
+	shader._normal = gl.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
-  
-//# sourceURL=Shader.js

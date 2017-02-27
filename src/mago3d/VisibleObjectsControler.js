@@ -17,8 +17,7 @@ var VisibleObjectsControler = function() {
 	this.currentRenderableRefArray = [];
 };
 
-VisibleObjectsControler.prototype.initArrays = function()
-{
+VisibleObjectsControler.prototype.initArrays = function() {
 	this.currentVisibles0 = [];
 	this.currentVisibles1 = [];
 	this.currentVisibles2 = [];

@@ -14,32 +14,32 @@ var GeometryModifier = function() {
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier 
  * 
- * @param f4d_point3d 변수
+ * @param point3D 변수
  * @param px 변수
  * @param py 변수
  * @param pz 변수
  */
-GeometryModifier.prototype.setPoint3d = function(f4d_point3d, px, py, pz) {
-	f4d_point3d.x = px;
-	f4d_point3d.y = py;
-	f4d_point3d.z = pz;
+GeometryModifier.prototype.setPoint3d = function(point3D, px, py, pz) {
+	point3D.x = px;
+	point3D.y = py;
+	point3D.z = pz;
 };
   
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
  * 
- * @param f4d_point3d 변수
+ * @param point3D 변수
  * @param px 변수
  * @param py 변수
  * @param pz 변수
  * @retuns dx*dx + dy*dy + dz*dz
  */
-GeometryModifier.prototype.point3dSquareDistTo = function(f4d_point3d, px, py, pz) {
-	var dx = f4d_point3d.x - px;
-	var dy = f4d_point3d.y - py;
-	var dz = f4d_point3d.z - pz;
-	  
+GeometryModifier.prototype.point3dSquareDistTo = function(point3D, px, py, pz) {
+	var dx = point3D.x - px;
+	var dy = point3D.y - py;
+	var dz = point3D.z - pz;
+	
 	return dx*dx + dy*dy + dz*dz;
 };
   
@@ -52,10 +52,10 @@ GeometryModifier.prototype.point3dSquareDistTo = function(f4d_point3d, px, py, p
  */
 GeometryModifier.prototype.Matrix4SetByFloat32Array = function(matrix4, float32array) {
 	for(var i=0; i<16; i++) {
-		matrix4._floatArrays[i] = float32array[i];
+		matrix4.floatArrays[i] = float32array[i];
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -71,7 +71,7 @@ GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) 
 //		t.z= q.x*m[0][2] + q.y*m[1][2] + q.z*m[2][2] + m[3][2];
 
 	// Note: idx = 4*col+row;.***
-	//_floatArrays
+	//floatArrays
 		
 	// Old version.*************************************************************************************************************************
 	//transformedPoint3d.x = point3d.x*matrix4.get(0,0) + point3d.y*matrix4.get(1,0) + point3d.z*matrix4.get(2,0) + matrix4.get(3,0);
@@ -80,9 +80,9 @@ GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) 
 	//--------------------------------------------------------------------------------------------------------------------------------------
 		
 	// New version. Acces directly to the array.**********************************************************************************************************************
-	transformedPoint3d.x = point3d.x*matrix4._floatArrays[0] + point3d.y*matrix4._floatArrays[4] + point3d.z*matrix4._floatArrays[8] + matrix4._floatArrays[12];
-	transformedPoint3d.y = point3d.x*matrix4._floatArrays[1] + point3d.y*matrix4._floatArrays[5] + point3d.z*matrix4._floatArrays[9] + matrix4._floatArrays[13];
-	transformedPoint3d.z = point3d.x*matrix4._floatArrays[2] + point3d.y*matrix4._floatArrays[6] + point3d.z*matrix4._floatArrays[10] + matrix4._floatArrays[14];
+	transformedPoint3d.x = point3d.x*matrix4.floatArrays[0] + point3d.y*matrix4.floatArrays[4] + point3d.z*matrix4.floatArrays[8] + matrix4.floatArrays[12];
+	transformedPoint3d.y = point3d.x*matrix4.floatArrays[1] + point3d.y*matrix4.floatArrays[5] + point3d.z*matrix4.floatArrays[9] + matrix4.floatArrays[13];
+	transformedPoint3d.z = point3d.x*matrix4.floatArrays[2] + point3d.y*matrix4.floatArrays[6] + point3d.z*matrix4.floatArrays[10] + matrix4.floatArrays[14];
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 	return transformedPoint3d;
@@ -120,16 +120,16 @@ GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matr
 			// Note: idx = 4*col+row;.***
 			//var idx = matrixA.getIndexOfArray(i, j); // Old.***
 			var idx = 4*i+j;
-			resultMat._floatArrays[idx] = 0.0;
+			resultMat.floatArrays[idx] = 0.0;
 			for(var k=0; k<4; k++)
 			{
-				resultMat._floatArrays[idx] += matrixB._floatArrays[4*k+j] * matrixA._floatArrays[4*i+k];
+				resultMat.floatArrays[idx] += matrixB.floatArrays[4*k+j] * matrixA.floatArrays[4*i+k];
 			}
 		}
 	}
 	return resultMat;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -164,7 +164,7 @@ GeometryModifier.prototype.compoundReferencesListMultiplyReferencesMatrices = fu
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -216,7 +216,7 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 
 	return visibleCompRefObjectsArray;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -258,7 +258,7 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
 		
 	var compRefList_container = buildingProject._compRefList_Container;
 	var visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_container, eye_x, eye_y, eye_z);
-	  
+
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 
 	return total_visibleCompRefLists;
@@ -277,12 +277,12 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
  * @param max_z 변수
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellSetDimensions = function(ocCullOctreeCell, min_x, max_x, min_y, max_y, min_z, max_z) {
-	ocCullOctreeCell._minX = min_x;
-	ocCullOctreeCell._maxX = max_x;
-	ocCullOctreeCell._minY = min_y;
-	ocCullOctreeCell._maxY = max_y;
-	ocCullOctreeCell._minZ = min_z;
-	ocCullOctreeCell._maxZ = max_z;
+	ocCullOctreeCell.minX = min_x;
+	ocCullOctreeCell.maxX = max_x;
+	ocCullOctreeCell.minY = min_y;
+	ocCullOctreeCell.maxY = max_y;
+	ocCullOctreeCell.minZ = min_z;
+	ocCullOctreeCell.maxZ = max_z;
 };
   
 /**
@@ -305,41 +305,42 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 	
 	if(ocCullOctreeCell._subBoxesArray.length > 0)
 	{
-		var half_x= (ocCullOctreeCell._maxX + ocCullOctreeCell._minX)/2.0;
-		var half_y= (ocCullOctreeCell._maxY + ocCullOctreeCell._minY)/2.0;
-		var half_z= (ocCullOctreeCell._maxZ + ocCullOctreeCell._minZ)/2.0;
+		var half_x= (ocCullOctreeCell.maxX + ocCullOctreeCell.minX)/2.0;
+		var half_y= (ocCullOctreeCell.maxY + ocCullOctreeCell.minY)/2.0;
+		var half_z= (ocCullOctreeCell.maxZ + ocCullOctreeCell.minZ)/2.0;
 		
 		// Old.***************************************************************************************************************************************************
-		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[2].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[3].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[2].setDimensions(half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[3].setDimensions(ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
 
-		//ocCullOctreeCell._subBoxesArray[4].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[4].setDimensions(ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		
 		// New version.*********************************************************************************************************************************************
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
 		
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
-		for(var i=0; i<ocCullOctreeCell._subBoxesArray.length; i++)
+		var subBoxesArrayLength = ocCullOctreeCell._subBoxesArray.length;
+		for(var i=0; i<subBoxesArrayLength; i++)
 		{
 			//ocCullOctreeCell._subBoxesArray[i].setSizesSubBoxes(); // Old.***
 			this.occlusionCullingOctreeCellSetSizesSubBoxes(ocCullOctreeCell._subBoxesArray[i]);
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -353,9 +354,9 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersects = false;
 	
-	if(x>ocCullOctreeCell._minX && x<ocCullOctreeCell._maxX) {
-		if(y>ocCullOctreeCell._minY && y<ocCullOctreeCell._maxY) {
-			if(z>ocCullOctreeCell._minZ && z<ocCullOctreeCell._maxZ) {
+	if(x>ocCullOctreeCell.minX && x<ocCullOctreeCell.maxX) {
+		if(y>ocCullOctreeCell.minY && y<ocCullOctreeCell.maxY) {
+			if(z>ocCullOctreeCell.minZ && z<ocCullOctreeCell.maxZ) {
 				intersects = true;
 			}
 		}
@@ -363,7 +364,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = fun
 	
 	return intersects;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
@@ -389,9 +390,9 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 	var subBoxes_count = ocCullOctreeCell._subBoxesArray.length;
 	if(subBoxes_count > 0)
 	{
-		var center_x = (ocCullOctreeCell._minX + ocCullOctreeCell._maxX)/2.0;
-		var center_y = (ocCullOctreeCell._minY + ocCullOctreeCell._maxY)/2.0;
-		var center_z = (ocCullOctreeCell._minZ + ocCullOctreeCell._maxZ)/2.0;
+		var center_x = (ocCullOctreeCell.minX + ocCullOctreeCell.maxX)/2.0;
+		var center_y = (ocCullOctreeCell.minY + ocCullOctreeCell.maxY)/2.0;
+		var center_z = (ocCullOctreeCell.minZ + ocCullOctreeCell.maxZ)/2.0;
 		
 		var intersectedSubBox_aux = null;
 		var intersectedSubBox_idx = undefined;
@@ -471,12 +472,12 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = 
  * @param expansionDist 변수
  */	
 GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCullOctreeCell, expansionDist) {
-	ocCullOctreeCell._minX -= expansionDist;
-	ocCullOctreeCell._maxX += expansionDist;
-	ocCullOctreeCell._minY -= expansionDist;
-	ocCullOctreeCell._maxY += expansionDist;
-	ocCullOctreeCell._minZ -= expansionDist;
-	ocCullOctreeCell._maxZ += expansionDist;
+	ocCullOctreeCell.minX -= expansionDist;
+	ocCullOctreeCell.maxX += expansionDist;
+	ocCullOctreeCell.minY -= expansionDist;
+	ocCullOctreeCell.maxY += expansionDist;
+	ocCullOctreeCell.minZ -= expansionDist;
+	ocCullOctreeCell.maxZ += expansionDist;
 };
 	  
 /**
@@ -503,8 +504,8 @@ GeometryModifier.prototype.vertexTexcoordsArraysCacheKeysContainerNewVertexTexco
 GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
 	var block = null;
 	  
-	if(idx >= 0 && idx <blockList._blocksArray.length) {
-		block = blockList._blocksArray[idx];
+	if(idx >= 0 && idx <blockList.blocksArray.length) {
+		block = blockList.blocksArray[idx];
 	}
 	return block;
 };
@@ -515,13 +516,13 @@ GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
  * 
  * @param blockList_container 변수
  * @param blocksList_name 변수
- * @returns f4d_blocksList
+ * @returns blocksList
  */
 GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockList_container, blocksList_name) {
-	var f4d_blocksList = new BlocksList();
-	f4d_blocksList._name = blocksList_name;
-	blockList_container._BlocksListsArray.push(f4d_blocksList);
-	return f4d_blocksList;
+	var blocksList = new BlocksList();
+	blocksList.name = blocksList_name;
+	blockList_container.blocksListsArray.push(blocksList);
+	return blocksList;
 };
 	  
 /**
@@ -533,14 +534,14 @@ GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockLis
  * @returns blocksList
  */	  
 GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList_container, blockList_name) {
-	var blocksLists_count = blockList_container._BlocksListsArray.length;
+	var blocksLists_count = blockList_container.blocksListsArray.length;
 	var found = false;
 	var i=0;
 	var blocksList = null;
 	while(!found && i<blocksLists_count)
 	{
-		var current_blocksList = blockList_container._BlocksListsArray[i];
-		if(current_blocksList._name == blockList_name)
+		var current_blocksList = blockList_container.blocksListsArray[i];
+		if(current_blocksList.name == blockList_name)
 		{
 			found = true;
 			blocksList =current_blocksList;
@@ -560,18 +561,18 @@ GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = 
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
 	  
 	// Old.*********************************************************
-	//this._blocksList_Container.newBlocksList("Blocks1");
-	//this._blocksList_Container.newBlocksList("Blocks2");
-	//this._blocksList_Container.newBlocksList("Blocks3");
-	//this._blocksList_Container.newBlocksList("Blocks4");
-	//this._blocksList_Container.newBlocksList("BlocksBone");
+	//this.blocksListContainer.newBlocksList("Blocks1");
+	//this.blocksListContainer.newBlocksList("Blocks2");
+	//this.blocksListContainer.newBlocksList("Blocks3");
+	//this.blocksListContainer.newBlocksList("Blocks4");
+	//this.blocksListContainer.newBlocksList("BlocksBone");
 	//----------------------------------------------------------------
 	  
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks1");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks2");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks3");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks4");
-	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "BlocksBone");
+	this.blocksListsContainerNewBlocksList(buildingProject.blocksListContainer, "Blocks1");
+	this.blocksListsContainerNewBlocksList(buildingProject.blocksListContainer, "Blocks2");
+	this.blocksListsContainerNewBlocksList(buildingProject.blocksListContainer, "Blocks3");
+	this.blocksListsContainerNewBlocksList(buildingProject.blocksListContainer, "Blocks4");
+	this.blocksListsContainerNewBlocksList(buildingProject.blocksListContainer, "BlocksBone");
 };
 	
 /**
