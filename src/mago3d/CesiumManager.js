@@ -1003,6 +1003,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 				}
 			}
 			
+
 			for(var j=0; j<neoReferencesListsCount; j++)
 			{
 				neoReferencesList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[j];
@@ -1031,6 +1032,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 			
 		}
 		
+
 	}
 	
 	// LOD Buildings.***********************************************************************************
@@ -1324,6 +1326,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 					
 					var filePath_inServer = this.readerWriter.geometryDataPath + "/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
 					this.readerWriter.readTextureInServer(GL, filePath_inServer, simpBuild_tex, this);
+
 				}
 			}
 			else
@@ -2952,6 +2955,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue; 
 		}
 		
+
 		// must calculate the realBuildingPosition (bbox_center_position).***
 		var realBuildingPos;
 		if(neoBuilding.octree != undefined && neoBuilding.f4dTransfMat != undefined)
@@ -2978,6 +2982,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 		else
 			this.radiusAprox_aux = 50.0;
+
 		
 		if(this.radiusAprox_aux)
 		{

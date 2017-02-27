@@ -36,10 +36,12 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
 	
+
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
 	//this.currentTimeSC;
 	//var secondsUsed;
+
 	var timeControlCounter = 0;
 	
 	GL.enable(GL.DEPTH_TEST);
@@ -101,7 +103,9 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		// New version. Use occlussion indices.***
 		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
 
+
 		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
+		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
 		{
 			/*
@@ -312,9 +316,9 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							if(this.vbo_vi_cacheKey_aux.pos_vboDataArray == undefined)
 								continue;
 						
-							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = GL.createBuffer ();
-							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
-							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, GL.STATIC_DRAW);
+							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
+							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
+							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
 							this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
 								continue;
@@ -325,9 +329,9 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							if(this.vbo_vi_cacheKey_aux.nor_vboDataArray == undefined)
 								continue;
 						
-							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = GL.createBuffer ();
-							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
-							GL.bufferData(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, GL.STATIC_DRAW);
+							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
+							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
+							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
 							this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
 								continue;
@@ -338,9 +342,9 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							if(this.vbo_vi_cacheKey_aux.idx_vboDataArray == undefined)
 								continue;
 						
-							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = GL.createBuffer ();
-							GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
-							GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, GL.STATIC_DRAW);
+							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
+							gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
+							gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
@@ -351,44 +355,48 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 						//----------------------------------------------------------------------------------------------------AAA
 						
 						// Positions.***
-						GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
-						GL.vertexAttribPointer(standardShader.position3_loc, 3, GL.FLOAT, false,0,0);
+
+						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
+						gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false,0,0);
+
+
 						
 						// Normals.***
 						if(standardShader.normal3_loc != -1)
 						{
-							GL.bindBuffer(GL.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
-							GL.vertexAttribPointer(standardShader.normal3_loc, 3, GL.BYTE, true,0,0);
+							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
+							gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true,0,0);
 						}
 
 						if(renderTexture && neoReference.hasTexture)
 						{
 							if(block.vertex_count <= neoReference.vertex_count)
 							{
-								GL.enableVertexAttribArray(standardShader.texCoord2_loc);
-								GL.bindBuffer(GL.ARRAY_BUFFER, neoReference.MESH_TEXCOORD_cacheKey);
-								GL.vertexAttribPointer(standardShader.texCoord2_loc, 2, GL.FLOAT, false,0,0);
+								gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+								gl.bindBuffer(gl.ARRAY_BUFFER, neoReference.MESH_TEXCOORD_cacheKey);
+								gl.vertexAttribPointer(standardShader.texCoord2_loc, 2, gl.FLOAT, false,0,0);
 							}
 							else{
 								if(standardShader.texCoord2_loc != -1)
-									GL.disableVertexAttribArray(standardShader.texCoord2_loc);
+									gl.disableVertexAttribArray(standardShader.texCoord2_loc);
 							}
 						}
 						else{
 							if(standardShader.texCoord2_loc != -1)
-								GL.disableVertexAttribArray(standardShader.texCoord2_loc);
+								gl.disableVertexAttribArray(standardShader.texCoord2_loc);
 						}
 						  
 						// Indices.***
-						GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
-						GL.drawElements(GL.TRIANGLES, this.vbo_vi_cacheKey_aux.indices_count, GL.UNSIGNED_SHORT, 0); // Fill.***
-						//GL.drawElements(GL.LINES, this.vbo_vi_cacheKey_aux.indices_count, GL.UNSIGNED_SHORT, 0); // Wireframe.***
+						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
+						gl.drawElements(gl.TRIANGLES, this.vbo_vi_cacheKey_aux.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
+						//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 
 					}
 				}
 			//timeControlCounter++;
 			//if(timeControlCounter > 20)
 			//	timeControlCounter = 0;
+
 		}
 	}
 	
