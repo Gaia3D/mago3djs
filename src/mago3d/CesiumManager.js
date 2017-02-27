@@ -2190,6 +2190,76 @@ CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, 
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
+ * @param scene 변수
+ * @param shader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ * @param neoRefLists_array 변수
+ */
+CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, shader, renderTexture, ssao_idx, lodBuilding) {
+	if(lodBuilding.fileLoadState == 2)// file loaded but not parsed.***
+	{
+		lodBuilding.parseArrayBuffer(gl, this.readerWriter);
+	}
+	/*
+	if(ssao_idx == -1)// picking mode.***********************************************************************************
+	{
+		// picking mode.***
+		this.selectionCandidateObjectsArray.length = 0; // init.***
+		
+		// set byteColor codes for references objects.***
+		var red = 0, green = 0, blue = 0, alfa = 255;
+		
+		// 1) Exterior objects.***
+		var neoRefListsArray = neoRefLists_array;
+		//var neoRefListsArray = this.detailed_neoBuilding._neoRefLists_Container.neoRefsLists_Array;
+		var neoRefLists_count = neoRefListsArray.length;
+		for(var i = 0; i<neoRefLists_count; i++)
+		{
+			var neoRefList = neoRefListsArray[i];
+			var neoRefs_count = neoRefList.neoRefs_Array.length;
+			for(var j=0; j<neoRefs_count; j++)
+			{
+				var neoRef = neoRefList.neoRefs_Array[j];
+				if(neoRef.selColor4 == undefined)
+					neoRef.selColor4 = new Color();
+				
+				neoRef.selColor4.set(red, green, blue, alfa);
+				this.selectionCandidateObjectsArray.push(neoRef);
+				blue++;
+				if(blue >= 254)
+				{
+					blue = 0;
+					green++;
+					if(green >= 254)
+					{
+						red++;
+					}
+				}
+			}
+		}
+	}
+	
+
+	if(ssao_idx == -1)
+	{
+		var isInterior = false; // no used.***
+
+		this.renderer.renderNeoRefListsColorSelection(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+	}
+	else{
+	
+		var isInterior = false; // no used.***
+
+		this.renderer.renderNeoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+	}
+	*/
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
  * @param BR_Project 변수
  */
 CesiumManager.prototype.createFirstTimeVBOCacheKeys = function(GL, BR_Project) {
@@ -2823,7 +2893,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*2;
+	var lod0_minSquaredDist = 100000*100;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;

@@ -296,6 +296,7 @@ NeoSimpleBuilding.prototype {
 		}
 		
 		this.fileLoadState = 4; // 4 = parsing finished.***
+
 	}	
  };
 
