@@ -720,6 +720,52 @@ ReaderWriter.prototype.readNeoReferencesArraybufferInServer = function(filePathI
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
+ * @param filePathInServer 변수
+ * @param neoRefList_container 변수
+ * @param neoReferenceList_name 변수
+ * @param lodLevel 변수
+ * @param blocksList 변수
+ * @param transformMat 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ * @param subOctreeNumberName 변수
+ */
+ReaderWriter.prototype.readLodBuildingArraybufferInServer = function(filePathInServer, lodBuilding, manager) {
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePathInServer, true);
+	oReq.responseType = "arraybuffer";
+	
+	if(manager != undefined)
+	{
+		manager.fileRequestControler.filesRequestedCount += 1;
+	}
+	lodBuilding.fileLoadState = 1;	
+
+	oReq.onload = function (oEvent)
+	{
+	    lodBuilding.dataArraybuffer = oReq.response; // Note: not oReq.responseText
+		if(lodBuilding.dataArraybuffer)
+		{
+			lodBuilding.fileLoadState = 2;	
+			if(manager != undefined)
+			{
+				manager.fileRequestControler.filesRequestedCount -= 1;
+				if(manager.fileRequestControler.filesRequestedCount < 0)
+					manager.fileRequestControler.filesRequestedCount = 0;
+			}
+		}
+		else{
+			lodBuilding.fileLoadState = 0;	
+		}
+	};
+
+	oReq.send(null);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
  * @param filePath_inServer 변수
  * @param neoRefList_container 변수
  * @param neoReferenceList_name 변수

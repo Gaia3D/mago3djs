@@ -1008,16 +1008,19 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 				neoReferencesList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[j];
 				if(neoReferencesList.fileLoadState == 0)
 				{
-					filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
-					this.readerWriter.readNeoReferencesArraybufferInServer(filePathInServer, neoReferencesList, neoBuilding, this);
-					// remember multiply reference matrices by the building transform matrix.***
-					//var transformMat = new Matrix4();
-					//transformMat.setByFloat32Array(neoBuilding.move_matrix);
-					//if(transformMat)
-					//{
-						//neoRefsList.multiplyReferencesMatrices(transformMat);
-					//}
-					continue;
+					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+					{
+						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
+						this.readerWriter.readNeoReferencesArraybufferInServer(filePathInServer, neoReferencesList, neoBuilding, this);
+						// remember multiply reference matrices by the building transform matrix.***
+						//var transformMat = new Matrix4();
+						//transformMat.setByFloat32Array(neoBuilding.move_matrix);
+						//if(transformMat)
+						//{
+							//neoRefsList.multiplyReferencesMatrices(transformMat);
+						//}
+						continue;
+					}
 				}
 			}
 			
@@ -1030,14 +1033,25 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 		
 	}
 	
+	// LOD Buildings.***********************************************************************************
 	var buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
 	for(var i=0; i<buildingsCount; i++)
 	{
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-		
+		buildingFolderName = neoBuilding.buildingFileName;
 		if(neoBuilding.lod2Building == undefined)
 		{
-			
+			neoBuilding.lod2Building = new LodBuilding();
+			continue;
+		}
+		
+		if(neoBuilding.lod2Building.fileLoadState == 0) // file no requested.***
+		{
+			if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+			{
+				filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "simpleBuilding_LOD2";
+				this.readerWriter.readLodBuildingArraybufferInServer(filePathInServer, neoBuilding.lod2Building, this);
+			}
 		}
 	}
 };
@@ -1175,7 +1189,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 	//return;
 	
 	//if(this.detailed_neoBuilding) // Provisional.***
-	if(this.visibleObjControlerBuildings.currentVisibles0.length > 0) // Provisional.***
+	//if(this.visibleObjControlerBuildings.currentVisibles0.length > 0) // Provisional.***
 	{
 		// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 		Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
@@ -1190,7 +1204,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		// Normal matrix.********************************************************************
 		var mvMat = scene._context._us._modelView; // original.***
 		var mvMat_inv = new Cesium.Matrix4();
-		mvMat_inv = Cesium.Matrix4.inverse(mvMat, mvMat_inv);
+		mvMat_inv = Cesium.Matrix4.inverseTransformation(mvMat, mvMat_inv);
 		//var normalMat = new Cesium.Matrix4();
 		this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
 		//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
@@ -1214,7 +1228,6 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
 		var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
-		//var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // neo depth TEST.***
 		this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
 		GL.clearColor(0, 0, 0, 1);
 		GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -1247,7 +1260,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		var neoBuilding;
 		
 		// renderDepth for all buildings.***
-		// 1) LOD 0.***
+		// 1) LOD 0.*********************************************************************************************************************
 		var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
@@ -1260,6 +1273,38 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
 			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
 			this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+		}
+		
+		// LOD 2 & 3.*********************************************************************************************************************************
+		var currentShader = this.postFxShadersManager.pFx_shaders_array[7]; // lodBuilding depth.***
+		var shaderProgram = currentShader.program;
+		GL.useProgram(shaderProgram);
+		GL.enableVertexAttribArray(currentShader.position3_loc);
+		if(currentShader.normal3_loc != -1)
+			GL.enableVertexAttribArray(currentShader.normal3_loc);
+
+		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
+		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
+		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
+		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+		
+		
+		GL.uniform1f(currentShader.near_loc, frustum._near);	
+		//GL.uniform1f(currentShader.far_loc, frustum._far);	
+		GL.uniform1f(currentShader.far_loc, current_frustum_far); 
+		
+		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
+		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+		buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
+		for(var i=0; i<buildingsCount; i++)
+		{
+			neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
+			GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
 		}
 		
 		// now, render depth of the neoSimpleBuildings.**********************************************************************************************
@@ -2000,6 +2045,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 	return neoBuilding.currentRenderablesNeoRefLists;
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
@@ -2062,6 +2108,76 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(GL, cameraPosition,
 
 		this.renderer.renderNeoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
+ * @param scene 변수
+ * @param shader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ * @param neoRefLists_array 변수
+ */
+CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, shader, renderTexture, ssao_idx, lodBuilding) {
+	if(lodBuilding.fileLoadState == 2)// file loaded but not parsed.***
+	{
+		lodBuilding.parseArrayBuffer(gl, this.readerWriter);
+	}
+	/*
+	if(ssao_idx == -1)// picking mode.***********************************************************************************
+	{
+		// picking mode.***
+		this.selectionCandidateObjectsArray.length = 0; // init.***
+		
+		// set byteColor codes for references objects.***
+		var red = 0, green = 0, blue = 0, alfa = 255;
+		
+		// 1) Exterior objects.***
+		var neoRefListsArray = neoRefLists_array;
+		//var neoRefListsArray = this.detailed_neoBuilding._neoRefLists_Container.neoRefsLists_Array;
+		var neoRefLists_count = neoRefListsArray.length;
+		for(var i = 0; i<neoRefLists_count; i++)
+		{
+			var neoRefList = neoRefListsArray[i];
+			var neoRefs_count = neoRefList.neoRefs_Array.length;
+			for(var j=0; j<neoRefs_count; j++)
+			{
+				var neoRef = neoRefList.neoRefs_Array[j];
+				if(neoRef.selColor4 == undefined)
+					neoRef.selColor4 = new Color();
+				
+				neoRef.selColor4.set(red, green, blue, alfa);
+				this.selectionCandidateObjectsArray.push(neoRef);
+				blue++;
+				if(blue >= 254)
+				{
+					blue = 0;
+					green++;
+					if(green >= 254)
+					{
+						red++;
+					}
+				}
+			}
+		}
+	}
+	
+
+	if(ssao_idx == -1)
+	{
+		var isInterior = false; // no used.***
+
+		this.renderer.renderNeoRefListsColorSelection(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+	}
+	else{
+	
+		var isInterior = false; // no used.***
+
+		this.renderer.renderNeoRefLists(GL, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
+	}
+	*/
 };
 
 /**
@@ -2700,8 +2816,8 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*2;
-	var lod1_minSquaredDist = 100000*50;
+	var lod0_minSquaredDist = 100000*100;
+	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
 	

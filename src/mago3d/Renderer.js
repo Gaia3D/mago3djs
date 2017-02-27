@@ -158,7 +158,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 				if(block != null)
 				{
 					if(block.isSmallObj && f4d_manager.objectSelected != neoReference)
-								continue;
+						continue;
 				}
 			}
 
@@ -611,6 +611,22 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 	
 	GL.enable(GL.DEPTH_TEST);
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param neoRefList_array 변수
+ * @param neoBuilding 변수
+ * @param f4d_manager 변수
+ * @param isInterior 변수
+ * @param standardShader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ */
+Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, neoBuilding, magoManager, shader, renderTexture, ssao_idx) {
+
+	
+}
 
 /**
  * 어떤 일을 하고 있습니까?

@@ -228,7 +228,71 @@ NeoSimpleBuilding.prototype {
  var LodBuilding = function()
  {
 	// this class is for use for LOD2 and LOD3 buildings.***
-	
+	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
+	this.dataArraybuffer; // binary data.***
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.fileLoadState = 0;
+ };
+ 
+ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter)
+ {
+	if(this.fileLoadState == 2)// file loaded.***
+	{
+		this.fileLoadState = 3;// 3 = parsing started.***
+		var bytesReaded = 0;
+		
+		// 1rst, read bbox.***
+		var bbox = new BoundingBox();
+		bbox._minX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._minY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._minZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		  
+		bbox._maxX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		
+		// 1) Positions.************************************************************************************************
+		var vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var verticesFloatValues_count = vertexCount * 3;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + 4*verticesFloatValues_count;
+		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+		
+		// 2) Normals.*****************************************************************************************************
+		var hasNormals = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasNormals)
+		{
+			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var normalsByteValues_count = vertexCount * 3;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 1*normalsByteValues_count;
+			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
+		}
+		
+		// 3) Colors.*******************************************************************************************************
+		var hasColors = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasColors)
+		{
+			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var colorsByteValues_count = vertexCount * 4;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 1*colorsByteValues_count;
+			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
+		}
+		
+		// 4) TexCoord.****************************************************************************************************
+		var hasTexCoord = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasTexCoord)
+		{
+			// TODO:
+		}
+	}	
  };
 
 /**
