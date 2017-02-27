@@ -36,10 +36,10 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
 	
-	this.dateSC = new Date();
-	this.startTimeSC = this.dateSC.getTime();
-	this.currentTimeSC;
-	var secondsUsed;
+	//this.dateSC = new Date();
+	//this.startTimeSC = this.dateSC.getTime();
+	//this.currentTimeSC;
+	//var secondsUsed;
 	var timeControlCounter = 0;
 	
 	GL.enable(GL.DEPTH_TEST);
@@ -97,7 +97,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 		// New version. Use occlussion indices.***
 		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
 
-		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
+		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
 		{
 			/*
@@ -137,8 +137,8 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 					//return;
 				}
 			}
-			var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
-			//var neoReference = neoRefList.neoRefs_Array[k]; // TEST.***
+			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
+			var neoReference = neoRefList.neoRefs_Array[k]; // TEST.***
 			if(!neoReference || neoReference== undefined)
 			{
 				continue;
@@ -337,7 +337,6 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = GL.createBuffer ();
 							GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, GL.STATIC_DRAW);
-							//this.vbo_vi_cacheKey_aux.indices_count = this.vbo_vi_cacheKey_aux.idx_vboDataArray.length;
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
@@ -383,9 +382,9 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 
 					}
 				}
-			timeControlCounter++;
-			if(timeControlCounter > 20)
-				timeControlCounter = 0;
+			//timeControlCounter++;
+			//if(timeControlCounter > 20)
+			//	timeControlCounter = 0;
 		}
 	}
 	

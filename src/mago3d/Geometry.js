@@ -225,6 +225,15 @@ NeoSimpleBuilding.prototype {
 /**
  * 어떤 일을 하고 있습니까?
  */
+ var LodBuilding = function()
+ {
+	// this class is for use for LOD2 and LOD3 buildings.***
+	
+ };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -240,6 +249,8 @@ var NeoBuilding = function() {
 	this.move_matrix_inv; // Inverse of PositionMatrix.***
 	this.buildingPosMat_inv; // f4d matrix4.***
 	this.transfMat_inv; // cesium matrix4.***
+	this.f4dTransfMat; // f4d matrix4.***
+	this.f4dTransfMatInv; // f4d matrix4.***
 	
 	// create the default blocks_lists.*****************************
 	this._blocksList_Container = new BlocksListsContainer();
@@ -267,7 +278,11 @@ var NeoBuilding = function() {
 	this.isReadyToRender = false;
 	
 	// The simple building.***********************************************
-	this.neoSimpleBuilding;
+	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
+	
+	// The lodBuildings.***
+	this.lod2Building;
+	this.lod3Building;
 	
 	// SCRATCH.*********************************
 	this.point3d_scratch = new Point3D();

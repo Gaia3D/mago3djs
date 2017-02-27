@@ -218,7 +218,9 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 			var alfa = 255;
 			
 			if(dim == 4)
+			{
 				alfa = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+			}
 			
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
@@ -246,7 +248,9 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 				var b = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				
 				if(dim == 4)
+				{					
 					var alfa = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
 			}
 		}
 		

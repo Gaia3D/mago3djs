@@ -38,8 +38,10 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding)
 	// End Determine the elevation of the position.-------------------------------------------------------
 	neoBuilding.move_matrix = new Float32Array(16); // PositionMatrix.***
 	neoBuilding.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
-	
+	neoBuilding.f4dTransfMat = new Matrix4();
+	neoBuilding.f4dTransfMatInv = new Matrix4();
 	Cesium.Transforms.eastNorthUpToFixedFrame(position, undefined, neoBuilding.move_matrix);
+	neoBuilding.f4dTransfMat.setByFloat32Array(neoBuilding.move_matrix);
 	neoBuilding.transfMat_inv = new Float32Array(16);
 	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.transfMat_inv);
 	
@@ -50,6 +52,7 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding)
 	// note: "neoBuilding.move_matrix" is only rotation matrix.***
 	
 	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.move_matrix_inv);
+	neoBuilding.f4dTransfMatInv.setByFloat32Array(neoBuilding.move_matrix_inv);
 	
 	return true;
 };
