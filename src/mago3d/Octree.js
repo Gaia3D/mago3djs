@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param octreeOwner 변수
@@ -25,17 +23,19 @@ var Octree = function(octreeOwner) {
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
+	
 
     this.subOctrees_array = [];
     this._compRefsList_Array = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
 	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox.***
+	
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @returns subOctree 변수
  */
-Octree.prototype.newSubOctree = function() {
+Octree.prototype.new_subOctree = function() {
 	var subOctree = new Octree(this);
 	this.subOctrees_array.push(subOctree);
 	return subOctree;
@@ -48,7 +48,7 @@ Octree.prototype.newSubOctree = function() {
 Octree.prototype.makeTree = function(treeDepth) {
 	if(this.octree_level < treeDepth) {
 		for(var i=0; i<8; i++) {
-			var subOctree = this.newSubOctree();
+			var subOctree = this.new_subOctree();
 			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
 		}
 		  
@@ -227,13 +227,17 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 	if(result_CRefListsArray == undefined)
 		result_CRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0) {
-		var subOctrees_arrayLength = this.subOctrees_array.length;
-		for(var i=0; i<subOctrees_arrayLength; i++) {
+	if(this.subOctrees_array.length > 0)
+	{
+		for(var i=0; i<this.subOctrees_array.length; i++)
+		{
 			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
 		}
-	} else {
-		if(this._compRefsList_Array.length>0) {
+	}
+	else
+	{
+		if(this._compRefsList_Array.length>0)
+		{
 			result_CRefListsArray.push(this._compRefsList_Array[0]); // there are only 1.***
 		}
 	}
@@ -247,13 +251,17 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
 	if(result_NeoRefListsArray == undefined)
 		result_NeoRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0) {
-		var subOctreesArrayLength = this.subOctrees_array.length;
-		for(var i=0; i<subOctreesArrayLength; i++) {
+	if(this.subOctrees_array.length > 0)
+	{
+		for(var i=0; i<this.subOctrees_array.length; i++)
+		{
 			this.subOctrees_array[i].getCRefListArray(result_NeoRefListsArray);
 		}
-	} else {
-		if(this.neoRefsList_Array.length>0) {
+	}
+	else
+	{
+		if(this.neoRefsList_Array.length>0)
+		{
 			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
 		}
 	}
@@ -272,6 +280,7 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 	var visibleOctreesArray = [];
 	var excludedOctArray = [];
 	var sortedOctreesArray = [];
+	var distAux = 0.0;
 	  
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
@@ -381,6 +390,11 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
+    if(this.octree_level == 3)
+    {
+	    var hola = 0;
+    }
+  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) 
 	{
@@ -393,9 +407,10 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 		{
 			result_octreesArray.push(this);
 		}
-		else {
-			var subOctreesArrayLength = this.subOctrees_array.length;
-			for(var i=0; i<subOctreesArrayLength; i++ ) {
+		else
+		{
+			for(var i=0; i<this.subOctrees_array.length; i++ )
+			{
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -433,6 +448,11 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
+    if(this.octree_level == 3)
+    {
+	    var hola = 0;
+    }
+  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) 
 	{
@@ -444,9 +464,10 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) // original, good.***
 		{
 			result_octreesArray.push(this);
-		} else {
-			var subOctreesArrayLength = this.subOctrees_array.length;
-			for(var i=0; i<subOctreesArrayLength; i++ )
+		}
+		else
+		{
+			for(var i=0; i<this.subOctrees_array.length; i++ )
 			{
 				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
@@ -521,8 +542,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
 		result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
-		var subOctreesArrayLength = this.subOctrees_array.length;
-		for(var i=0; i<subOctreesArrayLength; i++) {
+		for(var i=0; i<this.subOctrees_array.length; i++) {
 			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
 		}
 	} else {

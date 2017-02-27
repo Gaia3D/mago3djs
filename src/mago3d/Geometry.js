@@ -33,53 +33,55 @@ var MetaData = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
- * @param readWriter 변수
+ * @param f4dReadWriter 변수
  */
-MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
+MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
+	var auxScratch;
 	//var header = BR_Project._header;
 	//var arrayBuffer = this.fileArrayBuffer;
-	//var bytesReaded = this.fileBytesReaded;
-	var bytesReaded = 0;
+	//var bytes_readed = this.fileBytesReaded;
+	var bytes_readed = 0;
 	
-	if(readWriter == undefined) readWriter = new ReaderWriter();
+	if(f4dReadWriter == undefined)
+		f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
-		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
+		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
 	
 	// 3) Global unique ID.*********************
 	if(this.guid == undefined)
 		this.guid ="";
 	
-	intAux_scratch = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
-		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
+		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
 	
 	// 4) Location.*************************
 	if(this.longitude == undefined)
 	{
-		this.longitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else
-		bytesReaded += 8;
+		bytes_readed += 8;
 		
 	if(this.latitude == undefined)
 	{
-		this.latitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else
-		bytesReaded += 8;
+		bytes_readed += 8;
 	
 	if(this.altitude == undefined)
 	{
-		this.altitude = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	}
 	else
-		bytesReaded += 4;
+		bytes_readed += 4;
 	
 	//this.altitude += 20.0; // TEST.***
 	
@@ -89,34 +91,34 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 		this.bbox = new BoundingBox();
 	
 	// 6) BoundingBox.************************
-	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.bbox.minY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.bbox.minZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.bbox.maxX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.bbox.maxY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-	this.bbox.maxZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.bbox._minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox._minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox._minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox._maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox._maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox._maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	
 	// TEST. PROVISIONAL. DELETE.***
 	//this.bbox.expand(20.0);
 	//-------------------------------
 	
-	readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+	var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	// 7) Buildings octree mother size.***
-	this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.oct_min_y = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.oct_min_z = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.oct_max_x = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.oct_max_y = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
-	this.oct_max_z = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4; 
+	this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.oct_min_y = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.oct_min_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.oct_max_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.oct_max_y = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.oct_max_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
 	
 	var isLarge = false;
-	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0)
+	if(this.bbox._maxX - this.bbox._minX > 40.0 || this.bbox._maxY - this.bbox._minY > 40.0)
 	{
 		isLarge = true;
 	}
 	
-	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0)
+	if(!isLarge && this.bbox._maxZ - this.bbox._minZ < 30.0)
 	{
 		this.isSmall = true;
 	}
@@ -133,7 +135,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 	//var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);  // Original.***
 	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height); 
 	
-	BR_Project.buildingPosition = position; 
+	BR_Project._buildingPosition = position; 
 	
 	// High and Low values of the position.****************************************************
 	var splitValue = Cesium.EncodedCartesian3.encode(position);
@@ -141,10 +143,17 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 	
-	BR_Project.buildingPositionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
-	BR_Project.buildingPositionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
+	BR_Project._buildingPositionHIGH = new Float32Array(3);
+	BR_Project._buildingPositionHIGH[0] = splitVelue_X.high;
+	BR_Project._buildingPositionHIGH[1] = splitVelue_Y.high;
+	BR_Project._buildingPositionHIGH[2] = splitVelue_Z.high;
 	
-	this.fileBytesReaded = bytesReaded;
+	BR_Project._buildingPositionLOW = new Float32Array(3);
+	BR_Project._buildingPositionLOW[0] = splitVelue_X.low;
+	BR_Project._buildingPositionLOW[1] = splitVelue_Y.low;
+	BR_Project._buildingPositionLOW[2] = splitVelue_Z.low;
+	
+	this.fileBytesReaded = bytes_readed;
 	*/
 };
 
@@ -216,6 +225,79 @@ NeoSimpleBuilding.prototype {
 /**
  * 어떤 일을 하고 있습니까?
  */
+ var LodBuilding = function()
+ {
+	// this class is for use for LOD2 and LOD3 buildings.***
+	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
+	this.dataArraybuffer; // binary data.***
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.fileLoadState = 0;
+ };
+ 
+ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter)
+ {
+	if(this.fileLoadState == 2)// file loaded.***
+	{
+		this.fileLoadState = 3;// 3 = parsing started.***
+		var bytesReaded = 0;
+		
+		// 1rst, read bbox.***
+		var bbox = new BoundingBox();
+		bbox._minX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._minY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._minZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		  
+		bbox._maxX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox._maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		
+		// 1) Positions.************************************************************************************************
+		var vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var verticesFloatValues_count = vertexCount * 3;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + 4*verticesFloatValues_count;
+		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+		
+		// 2) Normals.*****************************************************************************************************
+		var hasNormals = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasNormals)
+		{
+			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var normalsByteValues_count = vertexCount * 3;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 1*normalsByteValues_count;
+			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
+		}
+		
+		// 3) Colors.*******************************************************************************************************
+		var hasColors = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasColors)
+		{
+			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var colorsByteValues_count = vertexCount * 4;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 1*colorsByteValues_count;
+			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
+		}
+		
+		// 4) TexCoord.****************************************************************************************************
+		var hasTexCoord = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasTexCoord)
+		{
+			// TODO:
+		}
+	}	
+ };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -223,26 +305,28 @@ var NeoBuilding = function() {
 	
 	this.metaData;
 	
-	this.buildingPosition;
-	this.buildingPositionHIGH;
-	this.buildingPositionLOW;
+	this._buildingPosition;
+	this._buildingPositionHIGH;
+	this._buildingPositionLOW;
 	
 	this.move_matrix; // PositionMatrix (only rotations).***
 	this.move_matrix_inv; // Inverse of PositionMatrix.***
 	this.buildingPosMat_inv; // f4d matrix4.***
 	this.transfMat_inv; // cesium matrix4.***
+	this.f4dTransfMat; // f4d matrix4.***
+	this.f4dTransfMatInv; // f4d matrix4.***
 	
 	// create the default blocks_lists.*****************************
-	this.blocksListContainer = new BlocksListsContainer();
-	this.blocksListContainer.newBlocksList("Blocks1");
-	this.blocksListContainer.newBlocksList("Blocks2");
-	this.blocksListContainer.newBlocksList("Blocks3");
-	this.blocksListContainer.newBlocksList("BlocksBone");
-	this.blocksListContainer.newBlocksList("Blocks4");
+	this._blocksList_Container = new BlocksListsContainer();
+	this._blocksList_Container.newBlocksList("Blocks1");
+	this._blocksList_Container.newBlocksList("Blocks2");
+	this._blocksList_Container.newBlocksList("Blocks3");
+	this._blocksList_Container.newBlocksList("BlocksBone");
+	this._blocksList_Container.newBlocksList("Blocks4");
 	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************
-	this.neoRefListsContainer = new NeoReferencesListsContainer(); // Exterior and bone objects.***
+	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = [];
 	
 	// Textures loaded.***************************************************
@@ -258,7 +342,11 @@ var NeoBuilding = function() {
 	this.isReadyToRender = false;
 	
 	// The simple building.***********************************************
-	this.neoSimpleBuilding;
+	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
+	
+	// The lodBuildings.***
+	this.lod2Building;
+	this.lod3Building;
 	
 	// SCRATCH.*********************************
 	this.point3d_scratch = new Point3D();
@@ -300,14 +388,14 @@ NeoBuilding.prototype.getTextureId = function(texture) {
  * @param eye_z 변수
  */
 NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_y, eye_z) {
-	this.neoRefListsContainer.updateCurrentVisibleIndicesOfLists(eye_x, eye_y, eye_z);
+	this._neoRefLists_Container.updateCurrentVisibleIndicesOfLists(eye_x, eye_y, eye_z);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
 NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
-	this.neoRefListsContainer.updateCurrentAllIndicesOfLists();
+	this._neoRefLists_Container.updateCurrentAllIndicesOfLists();
 };
 
 /**
@@ -327,7 +415,7 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
  */
 NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this.buildingPosition;
+	var buildingPosition = this._buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
@@ -352,7 +440,7 @@ var NeoBuildingsList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.neoBuildingsArray = [];
+	this.neoBuildings_Array = [];
 };
 
 /**
@@ -361,6 +449,6 @@ var NeoBuildingsList = function() {
  */
 NeoBuildingsList.prototype.newNeoBuilding = function() {
 	var neoBuilding = new NeoBuilding();
-	this.neoBuildingsArray.push(neoBuilding);
+	this.neoBuildings_Array.push(neoBuilding);
 	return neoBuilding;
 };
