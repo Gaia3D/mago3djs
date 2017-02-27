@@ -29,10 +29,10 @@ var VBOVertexIdxCacheKey = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.indices_count = -1;
+    this.indices_count = -1;
     
-	this.MESH_VERTEX_cacheKey = null;
-	this.MESH_FACES_cacheKey = null;
+    this.MESH_VERTEX_cacheKey = null;
+    this.MESH_FACES_cacheKey = null;
 	this.MESH_NORMAL_cacheKey = null;
 	this.MESH_COLOR_cacheKey = null;
 	this.MESH_TEXCOORDS_cacheKey = null;

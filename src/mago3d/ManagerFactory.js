@@ -20,7 +20,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 			|| magoConfig.deployConfig === '' 
 			|| magoConfig.deployConfig.viewLibrary === null 
 			|| magoConfig.deployConfig.viewLibrary === '' 
-			|| magoConfig.deployConfig.viewLibrary === Constant.CESIUM) {
+			|| magoConfig.deployConfig.viewLibrary === 'cesium') {
 		// 환경 설정
 		MagoConfig.init(magoConfig);
 		
@@ -31,38 +31,55 @@ var ManagerFactory = function(containerId, magoConfig) {
 		initEntity();
 		initTerrain();
 		initCamera();
-	} else if(viewLibrary === WORLDWIND) {
+	} else if(viewLibrary === 'worldwind') {
 		viewer = null;
 	}
 	
 	function draw() {
-		if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.CESIUM) {
+		if(MagoConfig.getInformation().deployConfig.viewLibrary === 'cesium') {
 			drawCesium();
-		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === WORLDWIND) {
+		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === 'worldwind') {
 			//
 		}
 	}
 	
 	function drawCesium() {
 		
-		var gl = viewer.scene.context._gl;
-		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(gl); 
-		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); 
+		var GL = viewer.scene.context._gl;
+		viewer.scene.magoManager.selection.init(GL, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+		viewer.scene.magoManager.shadersManager.createDefaultShader(GL); 
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(GL); 
 		viewer.scene.magoManager.scene = viewer.scene;
 		
 		// Start postRender version.***********************************************
 		magoManager = viewer.scene.magoManager;
 		scene = viewer.scene;
 		//scene.copyGlobeDepth = true;
+		
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		
-		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		viewer.scene.magoManager.getObjectIndexFile();
-		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+		magoManager.selection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
+		magoManager.shadersManager.createDefaultShader(GL); 
+		magoManager.postFxShadersManager.createDefaultShaders(GL); 
+		
+		var readerWriter = new ReaderWriter();
+		
+		// 실제 빌딩을 읽어 들임
+		magoManager.loadData(MagoConfig.getInformation().geoConfig.initBuilding);
+		
+//		var bRBuildingProjectsList = magoManager.bRBuildingProjectsList;
+		var neoBuildingsList = magoManager.neoBuildingsList;
+		
+		magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
+
+		
+		//getEntity()
+		//viewer.zoomTo(viewer.entities);
+
 	}
 	
+	// handlers.**************************************************************************
 	function disableCameraMotion(state){
 		viewer.scene.screenSpaceCameraController.enableRotate = state;
 		viewer.scene.screenSpaceCameraController.enableZoom = state;
@@ -81,6 +98,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
 			
+			var hola = 0;
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 		magoManager.handler.setInputAction(function(movement) {
@@ -93,7 +111,8 @@ var ManagerFactory = function(containerId, magoConfig) {
 						
 						// 1rst, check if there are objects to move.***
 						if(magoManager.mustCheckIfDragging) {
-							if(magoManager.isDragging(scene)) {
+							var gl = scene.context._gl;
+							if(magoManager.isDragging(gl, scene)) {
 								magoManager.mouseDragging = true;
 								disableCameraMotion(false);
 							}
@@ -104,7 +123,8 @@ var ManagerFactory = function(containerId, magoConfig) {
 					}	
 						
 					if(magoManager.mouseDragging) {
-						magoManager.moveSelectedObject(scene, magoManager.currentRenderablesNeoRefListsArray);
+						var gl = scene.context._gl;
+						magoManager.moveSelectedObject(gl, scene, magoManager.currentRenderables_neoRefLists_array);
 					}
 				}
 			} else{
@@ -133,10 +153,11 @@ var ManagerFactory = function(containerId, magoConfig) {
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
+					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(gl, scene, f4d_topManager.currentRenderables_neoRefLists_array);
 				}
 			}
 			
+			var hola = 0;
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 	}
 	

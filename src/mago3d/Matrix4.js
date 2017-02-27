@@ -1,4 +1,5 @@
-'use strict';
+
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -8,15 +9,52 @@ var Matrix4 = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.floatArrays = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
-
+	this._floatArrays = [];
+	
+	this._floatArrays.push(1);
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	
+	this._floatArrays.push(0);
+	this._floatArrays.push(1);
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	this._floatArrays.push(1);
+	this._floatArrays.push(0);
+	
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	this._floatArrays.push(0);
+	this._floatArrays.push(1);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */	
 Matrix4.prototype.Identity = function() {
-	this.floatArrays = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
+	this._floatArrays[0] = 1;  // Col 0 - Row 0.***
+	this._floatArrays[1] = 0;  // Col 0 - Row 1.***
+	this._floatArrays[2] = 0;  // Col 0 - Row 2.***
+	this._floatArrays[3] = 0;  // Col 0 - Row 3.***
+	
+	this._floatArrays[4] = 0;  // Col 1 - Row 0.***
+	this._floatArrays[5] = 1;  // Col 1 - Row 1.***
+	this._floatArrays[6] = 0;  // Col 1 - Row 2.***
+	this._floatArrays[7] = 0;  // Col 1 - Row 3.***
+	
+	this._floatArrays[8] = 0;  // Col 2 - Row 0.***
+	this._floatArrays[9] = 0;  // Col 2 - Row 1.***
+	this._floatArrays[10] = 1; // Col 2 - Row 2.***
+	this._floatArrays[11] = 0; // Col 2 - Row 3.***
+	
+	this._floatArrays[12] = 0; // Col 3 - Row 0.***
+	this._floatArrays[13] = 0; // Col 3 - Row 1.***
+	this._floatArrays[14] = 0; // Col 3 - Row 2.***
+	this._floatArrays[15] = 1; // Col 3 - Row 3.***
 };
 
 /**
@@ -85,25 +123,25 @@ Matrix4.prototype.rotationByQuaternion = function(quaternion) {
 	var y = quaternion.y;
 	var z = quaternion.z;
 	
-	this.floatArrays[this.getIndexOfArray(0,0)] = 1 - 2*y*y - 2*z*z;
-	this.floatArrays[this.getIndexOfArray(0,1)] = 2*x*y + 2*z*w;
-	this.floatArrays[this.getIndexOfArray(0,2)] = 2*x*z - 2*y*w;
-	this.floatArrays[this.getIndexOfArray(0,3)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(0,0)] = 1 - 2*y*y - 2*z*z;
+	this._floatArrays[this.getIndexOfArray(0,1)] = 2*x*y + 2*z*w;
+	this._floatArrays[this.getIndexOfArray(0,2)] = 2*x*z - 2*y*w;
+	this._floatArrays[this.getIndexOfArray(0,3)] = 0.0;
 	
-	this.floatArrays[this.getIndexOfArray(1,0)] = 2*x*y - 2*z*w; 
-	this.floatArrays[this.getIndexOfArray(1,1)] = 1 - 2*x*x - 2*z*z;
-	this.floatArrays[this.getIndexOfArray(1,2)] = 2*y*z + 2*x*w;
-	this.floatArrays[this.getIndexOfArray(1,3)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(1,0)] = 2*x*y - 2*z*w; 
+	this._floatArrays[this.getIndexOfArray(1,1)] = 1 - 2*x*x - 2*z*z;
+	this._floatArrays[this.getIndexOfArray(1,2)] = 2*y*z + 2*x*w;
+	this._floatArrays[this.getIndexOfArray(1,3)] = 0.0;
 	
-	this.floatArrays[this.getIndexOfArray(2,0)] = 2*x*z + 2*y*w;
-	this.floatArrays[this.getIndexOfArray(2,1)] = 2*y*z - 2*x*w;
-	this.floatArrays[this.getIndexOfArray(2,2)] = 1 - 2*x*x - 2*y*y;
-	this.floatArrays[this.getIndexOfArray(2,3)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(2,0)] = 2*x*z + 2*y*w;
+	this._floatArrays[this.getIndexOfArray(2,1)] = 2*y*z - 2*x*w;
+	this._floatArrays[this.getIndexOfArray(2,2)] = 1 - 2*x*x - 2*y*y;
+	this._floatArrays[this.getIndexOfArray(2,3)] = 0.0;
 	
-	this.floatArrays[this.getIndexOfArray(3,0)] = 0.0;
-	this.floatArrays[this.getIndexOfArray(3,1)] = 0.0;
-	this.floatArrays[this.getIndexOfArray(3,2)] = 0.0;
-	this.floatArrays[this.getIndexOfArray(3,3)] = 1.0;
+	this._floatArrays[this.getIndexOfArray(3,0)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3,1)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3,2)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3,3)] = 1.0;
 };
 
 /**
@@ -113,7 +151,7 @@ Matrix4.prototype.rotationByQuaternion = function(quaternion) {
 Matrix4.prototype.setByFloat32Array = function(float32array) {
 	for(var i=0; i<16; i++)
 	{
-		this.floatArrays[i] = float32array[i];
+		this._floatArrays[i] = float32array[i];
 	}
 };
 
@@ -132,7 +170,7 @@ Matrix4.prototype.getIndexOfArray = function(col, row) {
  * @param row 변수
  */
 Matrix4.prototype.get = function(col, row) {
-	return this.floatArrays[this.getIndexOfArray(col, row)];
+	return this._floatArrays[this.getIndexOfArray(col, row)];
 };
 
 /**
@@ -189,10 +227,10 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
 		for(var j=0; j<4; j++)
 		{
 			var idx = this.getIndexOfArray(i, j);
-			resultMat.floatArrays[idx] = 0.0;
+			resultMat._floatArrays[idx] = 0.0;
 			for(var k=0; k<4; k++)
 			{
-				resultMat.floatArrays[idx] += matrix.get(k, j) * this.get(i, k);
+				resultMat._floatArrays[idx] += matrix.get(k, j) * this.get(i, k);
 			}
 		}
 	}
