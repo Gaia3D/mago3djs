@@ -47,8 +47,22 @@ var CesiumManager = function() {
 	this.startMovPoint = new Point3D();
 	
 	//this.ssaoFSQuad;// No use this.***
-	this.kernel = [];
-	var kernelSize = 16;
+	this.kernel = [ 0.33, 0.0, 0.85,
+					0.25, 0.3, 0.5,
+					0.1, 0.3, 0.85,
+					-0.15, 0.2, 0.85, 
+					-0.33, 0.05, 0.6,
+					-0.1, -0.15, 0.85,
+					-0.05, -0.32, 0.25,
+					0.2, -0.15, 0.85,
+					0.6, 0.0, 0.55,
+					0.5, 0.6, 0.45,
+					-0.01, 0.7, 0.35,
+					-0.33, 0.5, 0.45,
+					-0.45, 0.0, 0.55,
+					-0.65, -0.5, 0.7,
+					0.0, -0.5, 0.55,
+					0.33, 0.3, 0.35];
 	
 	// Original for hemisphere.***
 	/*
@@ -63,88 +77,7 @@ var CesiumManager = function() {
 	}
 	*/
 	
-	// 1.***
-	this.kernel.push(0.33);
-	this.kernel.push(0.0);
-	this.kernel.push(0.85);
-	
-	// 2.***
-	this.kernel.push(0.25);
-	this.kernel.push(0.3);
-	this.kernel.push(0.5);
-	
-	// 3.***
-	this.kernel.push(0.1);
-	this.kernel.push(0.3);
-	this.kernel.push(0.85);
-	
-	// 4.***
-	this.kernel.push(-0.15);
-	this.kernel.push(0.2);
-	this.kernel.push(0.85);
-	
-	// 5.***
-	this.kernel.push(-0.33);
-	this.kernel.push(0.05);
-	this.kernel.push(0.6);
-	
-	// 6.***
-	this.kernel.push(-0.1);
-	this.kernel.push(-0.15);
-	this.kernel.push(0.85);
-	
-	// 7.***
-	this.kernel.push(-0.05);
-	this.kernel.push(-0.32);
-	this.kernel.push(0.25);
-	
-	// 8.***
-	this.kernel.push(0.2);
-	this.kernel.push(-0.15);
-	this.kernel.push(0.85);
-	
-	// 9.***
-	this.kernel.push(0.6);
-	this.kernel.push(0.0);
-	this.kernel.push(0.55);
-	
-	// 10.***
-	this.kernel.push(0.5);
-	this.kernel.push(0.6);
-	this.kernel.push(0.45);
-	
-	// 11.***
-	this.kernel.push(-0.01);
-	this.kernel.push(0.7);
-	this.kernel.push(0.35);
-	
-	// 12.***
-	this.kernel.push(-0.33);
-	this.kernel.push(0.5);
-	this.kernel.push(0.45);
-	
-	// 13.***
-	this.kernel.push(-0.45);
-	this.kernel.push(0.0);
-	this.kernel.push(0.55);
-	
-	// 14.***
-	this.kernel.push(-0.65);
-	this.kernel.push(-0.5);
-	this.kernel.push(0.7);
-	
-	// 15.***
-	this.kernel.push(0.0);
-	this.kernel.push(-0.5);
-	this.kernel.push(0.55);
-	
-	// 16.***
-	this.kernel.push(0.33);
-	this.kernel.push(0.3);
-	this.kernel.push(0.35);
-	
-	/*
-	// Test for sphere.***
+	/* Test for sphere.***
 	for(var i=0; i<kernelSize; i++) {
 		this.kernel.push(2.0 * (Math.random() - 0.5));
 		this.kernel.push(2.0 * (Math.random() - 0.5));
@@ -400,6 +333,27 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
 	texture.height = h; 
 	return texture;
 }
+
+/**
+ * object 를 그리는 두가지 종류의 function을 호출
+ * @param scene 변수
+ * @param pass 변수
+ * @param frustumIdx 변수
+ * @param numFrustums 변수
+ */
+CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
+	var isLastFrustum = false;
+	if(frustumIdx == numFrustums-1) isLastFrustum = true;
+	
+	// cesium 새 버전에서 지원하지 않음
+	var picking = pass.pick;
+	if(picking) {
+		//scene.magoManager.renderNeoBuildings(scene, isLastFrustum);
+	} else {
+		scene.magoManager.renderNeoBuildings(scene, isLastFrustum);
+		scene.magoManager.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
+	}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1128,20 +1082,17 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding)
 	
 };
 
-
-// render_neobuildings
 /**
- * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param cameraPosition 변수
- * @param _modelViewProjectionRelativeToEye 변수
+ * object index 파일을 읽어서 Frustum Culling으로 화면에 rendering
  * @param scene 변수
  * @param isLastFrustum 변수
  */
-CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _modelViewProjectionRelativeToEye, scene, isLastFrustum) {
-	if(!isLastFrustum)
-		return;
+CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
+	var GL = scene.context._gl;
+	var cameraPosition = scene.context._us._cameraPosition;
+	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye
 	
+	if(!isLastFrustum) return;
 	
 	if(this.textureAux_1x1 == undefined)
 	{
@@ -2285,23 +2236,19 @@ CesiumManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param cameraPosition 변수
- * @param cullingVolume 변수
- * @param _modelViewProjectionRelativeToEye 변수
  * @param scene 변수
  * @param isLastFrustum 변수
- * @param frustum_idx 변수
  */
-CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(GL, cameraPosition, cullingVolume, _modelViewProjectionRelativeToEye, scene, isLastFrustum, frustum_idx) {
-	if(this.isCameraInsideNeoBuilding)
-		return;
+CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene, isLastFrustum) {
+	if(!isLastFrustum) return;
+	if(this.isCameraInsideNeoBuilding) return;
 	
-	GL.disable(GL.CULL_FACE); // Optional.***
+	var GL = scene.context._gl;
+	var cameraPosition = scene.context._us._cameraPosition;
+	var cullingVolume = scene._frameState.cullingVolume;
+	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
 	
-	if(!isLastFrustum)return;
-	
-	//this.isCameraMoving = this.isButtonDown(scene);
+	GL.disable(GL.CULL_FACE);
 	
 	// Check if camera was moved considerably for update the renderables objects.***
 	if(this.detailed_building)
@@ -3508,11 +3455,9 @@ CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
 
 };
 
-//# sourceURL=CesiumManager.js
-
-
-
-
-
-
-
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
+CesiumManager.prototype.getObjectIndexFile = function() {
+	this.readerWriter.getObjectIndexFile(this.scene.context._gl, this.readerWriter, this.neoBuildingsList);
+};
