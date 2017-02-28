@@ -1192,6 +1192,10 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		//scene._context._currentFramebuffer._bind();
 		
 		var ssao_idx = 0; // 0= depth. 1= ssao.***
+		var buildingsCount;
+		var renderTexture = false;
+		var cameraPosition = null;
+		var neoBuilding;
 		
 		// 1) The depth render.***************************************************************************************************
 		// 1) The depth render.***************************************************************************************************
@@ -1203,6 +1207,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);  
 	
 		var shaderProgram = currentShader.program;
+		
 		GL.useProgram(shaderProgram);
 		//GL.enableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
 		GL.enableVertexAttribArray(currentShader.position3_loc);
@@ -1224,13 +1229,12 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
 		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
 		
-		var renderTexture = false;
-		var cameraPosition = null;
-		var neoBuilding;
+		
+		
 		
 		// renderDepth for all buildings.***
 		// 1) LOD 0.*********************************************************************************************************************
-		var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
+		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
@@ -1244,9 +1248,11 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 			this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 		}
 		
+		
+		
 		// LOD 2 & 3.*********************************************************************************************************************************
-		var currentShader = this.postFxShadersManager.pFx_shaders_array[7]; // lodBuilding depth.***
-		var shaderProgram = currentShader.program;
+		currentShader = this.postFxShadersManager.pFx_shaders_array[7]; // lodBuilding depth.***
+		shaderProgram = currentShader.program;
 		GL.useProgram(shaderProgram);
 		GL.enableVertexAttribArray(currentShader.position3_loc);
 		//GL.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1315,45 +1321,49 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 					}
 					else
 					{
-						/*
-						simpBuildTexture.textureId = GL.createTexture();
+						
+						// simpBuildTexture.textureId = GL.createTexture();
 		
-						// must upload the texture to gl.***
-						GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
-						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
-						GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
-						GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-						GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-						GL.generateMipmap(GL.TEXTURE_2D);
-						GL.bindTexture(GL.TEXTURE_2D, null);
+						// // must upload the texture to gl.***
+						// GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
+						// ////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+						// GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
+						// GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+						// GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+						// GL.generateMipmap(GL.TEXTURE_2D);
+						// GL.bindTexture(GL.TEXTURE_2D, null);
 						  
-						delete simpBuildTexture.texImage;
-						*/
+						// delete simpBuildTexture.texImage;
+						
 					}
 				}
 			}
 		}
 		
+		
 		if(currentShader.normal3_loc != -1)
 			GL.disableVertexAttribArray(currentShader.normal3_loc);
 		GL.disableVertexAttribArray(currentShader.position3_loc);
 		//GL.disableVertexAttribArray(currentShader.texCoord2_loc); // No textures for depth render.***
-	
+		
 		this.depthFboNeo.unbind();
 		
 		// 2) ssao render.************************************************************************************************************
 		// 2) ssao render.************************************************************************************************************
 		// 2) ssao render.************************************************************************************************************
 		scene._context._currentFramebuffer._bind();
+		if(this.noiseTexture == undefined)
+			this.noiseTexture = genNoiseTextureRGBA(GL, 4, 4, this.pixels);
+		
+		ssao_idx = 1;
+		
+		
 		currentShader = this.postFxShadersManager.pFx_shaders_array[4];
 		
 		//GL.clearColor(0, 0, 0, 1);
 		//GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 		//GL.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
-		
-		if(this.noiseTexture == undefined)
-			this.noiseTexture = genNoiseTextureRGBA(GL, 4, 4, this.pixels);
-		
+
 		shaderProgram = currentShader.program;
 		GL.useProgram(shaderProgram);
 		GL.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -1390,7 +1400,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 			
 		renderTexture = true;
 
-		ssao_idx = 1;
+		
 		var cameraPosition = null;
 		//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.currentRenderables_neoRefLists_array);
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
@@ -1405,9 +1415,11 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		
 		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
 		
+		
+		
 		// LOD 2 & 3.*********************************************************************************************************************************
-		var currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
-		var shaderProgram = currentShader.program;
+		currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
+		shaderProgram = currentShader.program;
 		GL.useProgram(shaderProgram);
 		GL.enableVertexAttribArray(currentShader.position3_loc);
 		GL.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1429,6 +1441,14 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
 		GL.uniform1i(currentShader.hasAditionalMov_loc, true);
 		GL.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
+		
+		GL.uniform1i(currentShader.depthTex_loc, 0);	
+		GL.uniform1i(currentShader.noiseTex_loc, 1);	
+		GL.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+		GL.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
+		GL.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
+		GL.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+		GL.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
 		
 		GL.uniform1i(currentShader.depthTex_loc, 0);	
 		GL.uniform1i(currentShader.noiseTex_loc, 1);	
@@ -2837,7 +2857,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	
 	var octreesLoadRequestsCount = 0;
 	
-	var lod0_minSquaredDist = 100000*2;
+	var lod0_minSquaredDist = 100000*0.8;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
