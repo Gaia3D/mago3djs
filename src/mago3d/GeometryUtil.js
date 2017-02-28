@@ -1414,7 +1414,7 @@ var CompoundReferencesList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this._name = "";
+	this.name = "";
 	this._compoundRefsArray = [];
 	this._lodLevel = -1;
 	this._ocCulling = new OcclusionCullingOctree();
@@ -1519,7 +1519,7 @@ var CompoundReferencesListContainer = function() {
  */
 CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoundReferenceList_name, lodLevel) {
 	var compoundRefList = new CompoundReferencesList();
-	compoundRefList._name = compoundReferenceList_name;
+	compoundRefList.name = compoundReferenceList_name;
 	compoundRefList._lodLevel = lodLevel;
 	this._compRefsList_Array.push(compoundRefList);
 	return compoundRefList;
@@ -1551,7 +1551,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	var i=0;
 	while(!found && i<compRefLists_count)
 	{
-		if(this._compRefsList_Array[i]._name == compRefListsName)
+		if(this._compRefsList_Array[i].name == compRefListsName)
 		{
 			result_compRefList = this._compRefsList_Array[i];
 		}
@@ -2044,12 +2044,12 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
-			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
-			this._boundingBox._maxX = compRefList._ocCulling._ocCulling_box._maxX;
-			this._boundingBox._minY = compRefList._ocCulling._ocCulling_box._minY;
-			this._boundingBox._maxY = compRefList._ocCulling._ocCulling_box._maxY;
-			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
-			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
+			this._boundingBox.minX = compRefList._ocCulling._ocCulling_box.minX;
+			this._boundingBox.maxX = compRefList._ocCulling._ocCulling_box.maxX;
+			this._boundingBox.minY = compRefList._ocCulling._ocCulling_box.minY;
+			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
+			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
+			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
 			
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
@@ -2072,7 +2072,7 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 		  for(var i=0; i<compRefLists_count; i++)
 		  {
 			  var compRefList = this._compRefList_Container._compRefsList_Array[i];
-			  var blocksList = this._blocksList_Container._BlocksListsArray[i];
+			  var blocksList = this._blocksList_Container.blocksListsArray[i];
 			  var bb = compRefList.getBoundingBox(blocksList);
 			  if(this._boundingBox == undefined)
 			  {
@@ -2094,12 +2094,12 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if(compRefList) {
 			this._boundingBox = new BoundingBox();
-			this._boundingBox._minX = compRefList._ocCulling._ocCulling_box._minX;
-			this._boundingBox._maxX = compRefList._ocCulling._ocCulling_box._maxX;
-			this._boundingBox._minY = compRefList._ocCulling._ocCulling_box._minY;
-			this._boundingBox._maxY = compRefList._ocCulling._ocCulling_box._maxY;
-			this._boundingBox._minZ = compRefList._ocCulling._ocCulling_box._minZ;
-			this._boundingBox._maxZ = compRefList._ocCulling._ocCulling_box._maxZ;
+			this._boundingBox.minX = compRefList._ocCulling._ocCulling_box._minX;
+			this._boundingBox.maxX = compRefList._ocCulling._ocCulling_box.maxX;
+			this._boundingBox.minY = compRefList._ocCulling._ocCulling_box.minY;
+			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
+			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
+			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
 			
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
@@ -2393,23 +2393,23 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	//header._elevation += 70.0; // delete this. TEST.!!!
 	
 	// 6) BoundingBox.************************
-	header._boundingBox._minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox._maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	header._boundingBox._maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	
-	var semiHeight = (header._boundingBox._maxZ - header._boundingBox._minZ )/2.0;
+	var semiHeight = (header._boundingBox.maxZ - header._boundingBox.minZ )/2.0;
 	header._elevation = 45.0 + semiHeight-0.5;
 	
 	var isLarge = false;
-	if(header._boundingBox._maxX - header._boundingBox._minX > 40.0 || header._boundingBox._maxY - header._boundingBox._minY > 40.0)
+	if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
 	{
 		isLarge = true;
 	}
 	
-	if(!isLarge && header._boundingBox._maxZ - header._boundingBox._minZ < 30.0)
+	if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
 	{
 		header.isSmall = true;
 	}
