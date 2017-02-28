@@ -2804,7 +2804,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*2;
+	var lod0_minSquaredDist = 100000*100;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
