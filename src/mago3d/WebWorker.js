@@ -38,20 +38,20 @@ onmessage = function(e) {
  */
 function setTest(value) {
 	squareDistUmbral = value;
-};
+}
 
 /*
-function getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume)
+function getFrustumIntersectedProjectBuildings(projectsList, cullingVolume)
 {
 	var buildings_array = [];
 	var last_squared_dist = undefined;
 	var detailed_building = undefined;
-	var building_projects_count = f4d_projectsList._BR_buildingsArray.length;
+	var building_projects_count = projectsList._BR_buildingsArray.length;
 	
 	for(var p_counter = 0; p_counter<building_projects_count; p_counter++)
 	{
-		var BR_Project = f4d_projectsList._BR_buildingsArray[p_counter];
-		var squaredDistToCamera = Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
+		var BR_Project = projectsList._BR_buildingsArray[p_counter];
+		var squaredDistToCamera = Cartesian3.distanceSquared(cameraPosition, BR_Project.buildingPosition);
 		var min_squaredDist_to_see_detailed = 40000;
 		var min_squaredDist_to_see = 10000000;
 		
@@ -59,7 +59,7 @@ function getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume)
 			continue;
 		
 		var boundingSphere_Aux = new BoundingSphere();
-		boundingSphere_Aux.center = BR_Project._buildingPosition;
+		boundingSphere_Aux.center = BR_Project.buildingPosition;
 		boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
 		
 		//----------------------------------------------------------------------------------------------------------------------------
@@ -123,9 +123,9 @@ function possibleCameraPositionChanged(e) {
 	return total_visibleCompRefLists;
 	  /*
 	// 1rst, frustum culling.*******************
-	var f4d_projectsList = e.data[0];
+	var projectsList = e.data[0];
 	var cullingVolume = e.data[1];
-	//var projects_list = getFrustumIntersectedProjectBuildings(f4d_projectsList, cullingVolume);
+	//var projects_list = getFrustumIntersectedProjectBuildings(projectsList, cullingVolume);
 	
 	
 	var squaredDist = lastCamPos.squareDistTo(currentCamPos.x, currentCamPos.y, currentCamPos.z);
@@ -139,7 +139,7 @@ function possibleCameraPositionChanged(e) {
 		// Camera doesnt moved.***
 	}
 	*/
-};
+}
 
 /*
 // An example.***
@@ -164,4 +164,3 @@ search: while (true) {
   postMessage(n);
 }
 */
-//# sourceURL=sonWorker.js
