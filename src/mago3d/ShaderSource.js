@@ -810,12 +810,12 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
 		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-		if(vNormal.z < 0.0)\n\
-		{\n\
-			vNormal.x *= -1.0;\n\
-			vNormal.y *= -1.0;\n\
-			vNormal.z *= -1.0;\n\
-		}\n\
+		//if(vNormal.z < 0.0)\n\
+		//{\n\
+		//	vNormal.x *= -1.0;\n\
+		//	vNormal.y *= -1.0;\n\
+		//	vNormal.z *= -1.0;\n\
+		//}\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		vcolor4 = color4;\n\
@@ -912,9 +912,9 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		vec3 ambient = vec3(1.0);\n\
 		vec4 textureColor;\n\
 		textureColor = vcolor4;\n\
-		//gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
-		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8 * occlusion)); // test.***\n\
+		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
 		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+		//gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting); \n\
 		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
