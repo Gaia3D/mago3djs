@@ -1170,8 +1170,41 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
 	oReq.send(null);
 };	
 
-ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManager)
-{
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
+ * @param readerWriter 파일 처리를 담당
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.getObjectIndexFile = function(gl, readerWriter, neoBuildingsList) {
+	var filePathInServer = readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE;
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePathInServer, true);
+	oReq.responseType = "arraybuffer";
+	oReq.onload = function (oEvent) {
+		if(oReq.status == 200) {
+			var arrayBuffer = oReq.response; // Note: not oReq.responseText
+			if (arrayBuffer) {
+				readerWriter.parseObjectIndexFile(gl, arrayBuffer, neoBuildingsList);
+		    }
+		    arrayBuffer = null;
+		} else {
+		}
+	};
+
+	oReq.onerror = function(e) {
+	}
+	
+	oReq.send(null);
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
+ * @param arrayBuffer object index file binary data
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuildingsList) {
 	var bytesReaded = 0;
 	var buildingNameLength;
 	var buildingName = "";
@@ -1182,16 +1215,16 @@ ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManag
 	var bbLengthY;
 	var bbLengthZ;
 	
-	var neoBuildingsList = f4dManager.neoBuildingsList;
+	var neoBuildingsList = neoBuildingsList;
 	
-	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	for(var i =0; i<buildingsCount; i++)
-	{
+	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); 
+	bytesReaded += 4;
+	for(var i =0; i<buildingsCount; i++) {
 		// read the building location data.***
-		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		bytesReaded += 4;
 		buildingName = "";
-		for(var j=0; j<buildingNameLength; j++)
-		{
+		for(var j=0; j<buildingNameLength; j++) {
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
 		
@@ -1211,52 +1244,27 @@ ReaderWriter.prototype.parseObjectIndexFile = function(GL, arrayBuffer, f4dManag
 		var neoBuilding = neoBuildingsList.newNeoBuilding();
 		
 		neoBuilding.buildingFileName = buildingName;
-		if(neoBuilding.metaData == undefined)
-		{
+		if(neoBuilding.metaData == undefined) {
 			neoBuilding.metaData = new MetaData();
 		}
 		neoBuilding.metaData.latitude = latitude;
 		neoBuilding.metaData.longitude = longitude;
 		neoBuilding.metaData.altitude = altitude;
 		
-		if(neoBuilding.metaData.bbox == undefined)
-		{
+		if(neoBuilding.metaData.bbox == undefined) {
 			neoBuilding.metaData.bbox = new BoundingBox();
 		}
 		
 		var bbox = neoBuilding.metaData.bbox;
 		
-		bbox._minX = -bbLengthX/2.0; 
-		bbox._minY = -bbLengthY/2.0;
-		bbox._minZ = -bbLengthZ/2.0;
+		bbox.minX = -bbLengthX/2.0; 
+		bbox.minY = -bbLengthY/2.0;
+		bbox.minZ = -bbLengthZ/2.0;
 	  
-		bbox._maxX = bbLengthX/2.0; 
-		bbox._maxY = bbLengthY/2.0; 
-		bbox._maxZ = bbLengthZ/2.0; 
+		bbox.maxX = bbLengthX/2.0; 
+		bbox.maxY = bbLengthY/2.0; 
+		bbox.maxZ = bbLengthZ/2.0; 
 	}
-};
-
-ReaderWriter.prototype.readObjectIndexFileInServer = function(GL, filePathInServer, readerWriter, manager)
-{
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePathInServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer)
-		{
-			if(readerWriter == undefined)
-			{
-				readerWriter = new ReaderWriter();
-			}
-			readerWriter.parseObjectIndexFile(GL, arrayBuffer, manager);
-	    }
-	    arrayBuffer = null;
-	};
-
-	oReq.send(null);
 };
 
 /**

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
  */
@@ -38,7 +40,7 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
 		}
 		if(jsonConfig.deployConfig.viewLibrary === undefined
 				|| jsonConfig.deployConfig.viewLibrary === null || jsonConfig.deployConfig.viewLibrary === '') {
-			jsonConfig.deployConfig.viewLibrary = "cesium";
+			jsonConfig.deployConfig.viewLibrary = Constant.CESIUM;
 		}
 		if(jsonConfig.deployConfig.dataPath === undefined
 				|| jsonConfig.deployConfig.dataPath === null || jsonConfig.deployConfig.dataPath === '') {
@@ -57,14 +59,14 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
 MagoConfig.initRenderingConfig = function(jsonConfig) {
 	// 화면 rendering 관련 설정
 	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== '' ) {
-		if(jsonConfig.renderingConfg.glEnable === undefined
-				|| jsonConfig.renderingConfg.glEnable === null 
-				|| jsonConfig.renderingConfg.glEnable === '' 
-				|| jsonConfig.renderingConfg.glEnable === false
-				|| jsonConfig.renderingConfg.glEnable === 'false') {
-			jsonConfig.renderingConfg.glEnable = false;
+		if(jsonConfig.renderingConfg.cullFaceEnable === undefined
+				|| jsonConfig.renderingConfg.cullFaceEnable === null 
+				|| jsonConfig.renderingConfg.cullFaceEnable === '' 
+				|| jsonConfig.renderingConfg.cullFaceEnable === false
+				|| jsonConfig.renderingConfg.cullFaceEnable === 'false') {
+			jsonConfig.renderingConfg.cullFaceEnable = false;
 		} else {
-			jsonConfig.renderingConfg.glEnable = true;
+			jsonConfig.renderingConfg.cullFaceEnable = true;
 		}
 	}
 	
