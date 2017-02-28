@@ -804,7 +804,7 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		\n\
-		vec3 rotatedNormal = normal;\n\
+		vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
 		uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
 		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
@@ -850,7 +850,8 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 	\n\
 	const int kernelSize = 16;  \n\
 	//const float radius = 0.01;      \n\
-	const float radius = 0.15;      \n\
+	//const float radius = 0.15;      \n\
+	const float radius = 0.5;      \n\
 	\n\
 	float unpackDepth(const in vec4 rgba_depth) {\n\
 		//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\

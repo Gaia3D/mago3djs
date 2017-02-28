@@ -54,6 +54,8 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 	} else {
 		GL.disable(GL.CULL_FACE);
 	}
+	
+	GL.disable(GL.CULL_FACE);
 		
 	//if(ssao_idx == 0)
 	//	GL.disable(GL.CULL_FACE);
