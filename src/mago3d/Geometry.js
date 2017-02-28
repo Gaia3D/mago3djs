@@ -251,12 +251,13 @@ NeoSimpleBuilding.prototype {
 		bbox._maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox._maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		
+		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		
 		// 1) Positions.************************************************************************************************
 		var vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValues_count = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4*verticesFloatValues_count;
-		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
 		
@@ -270,7 +271,6 @@ NeoSimpleBuilding.prototype {
 			var normalsByteValues_count = vertexCount * 3;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*normalsByteValues_count;
-			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
 		}
@@ -283,8 +283,7 @@ NeoSimpleBuilding.prototype {
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*colorsByteValues_count;
-			var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
 		}
 		

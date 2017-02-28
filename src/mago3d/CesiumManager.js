@@ -1282,8 +1282,8 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		var shaderProgram = currentShader.program;
 		GL.useProgram(shaderProgram);
 		GL.enableVertexAttribArray(currentShader.position3_loc);
-		if(currentShader.normal3_loc != -1)
-			GL.enableVertexAttribArray(currentShader.normal3_loc);
+		//GL.enableVertexAttribArray(currentShader.normal3_loc);
+		//GL.enableVertexAttribArray(currentShader.color4_loc);
 
 		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
 		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
@@ -1299,11 +1299,15 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		
 		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
 		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+		
+		GL.uniform1i(currentShader.hasAditionalMov_loc, true);
+		GL.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
+		
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-			GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+			GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
 			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
 			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
 			this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
@@ -1429,15 +1433,41 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 			this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 		}
 		
-		// Now, the LOD 2 of buildings.********************************************
+		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
+		
+		// LOD 2 & 3.*********************************************************************************************************************************
+		var currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
+		var shaderProgram = currentShader.program;
+		GL.useProgram(shaderProgram);
+		GL.enableVertexAttribArray(currentShader.position3_loc);
+		GL.enableVertexAttribArray(currentShader.normal3_loc);
+		GL.enableVertexAttribArray(currentShader.color4_loc);
+
+		GL.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
+		GL.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
+		GL.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
+		GL.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
+		GL.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+		
+		
+		GL.uniform1f(currentShader.near_loc, frustum._near);	
+		//GL.uniform1f(currentShader.far_loc, frustum._far);	
+		GL.uniform1f(currentShader.far_loc, current_frustum_far); 
+		
+		GL.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
+		GL.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+		GL.uniform1i(currentShader.hasAditionalMov_loc, true);
+		GL.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
+		
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-			//GL.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-			//GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-			//GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
-			//this.renderDetailedNeoBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+			GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
 		}
 		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
@@ -1492,7 +1522,7 @@ CesiumManager.prototype.renderNeoBuildings = function(GL, cameraPosition, _model
 		if(currentShader.normal3_loc != -1)
 			GL.disableVertexAttribArray(currentShader.normal3_loc);
 		GL.disableVertexAttribArray(currentShader.position3_loc);
-		GL.disableVertexAttribArray(currentShader.texCoord2_loc);
+		
 		
 	}
 };
@@ -2827,7 +2857,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*100;
+	var lod0_minSquaredDist = 100000*2;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
