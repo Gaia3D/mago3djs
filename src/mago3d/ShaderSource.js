@@ -782,6 +782,7 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 normalMatrix4;\n\
+	uniform mat4 buildingRotMatrix;  \n\
 	uniform vec3 buildingPosHIGH;\n\
 	uniform vec3 buildingPosLOW;\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
@@ -792,9 +793,10 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
+	varying vec4 vcolor4;\n\
 	\n\
 	void main() {	\n\
-		vec4 rotatedPos = vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -816,6 +818,7 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		}\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+		vcolor4 = color4;\n\
 	}";
 	
 	
@@ -843,6 +846,7 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 	\n\
 	varying vec2 vTexCoord;   \n\
 	varying vec3 vLightWeighting;\n\
+	varying vec4 vcolor4;\n\
 	\n\
 	const int kernelSize = 16;  \n\
 	//const float radius = 0.01;      \n\
@@ -907,16 +911,11 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		vec3 diffuse = vec3(NdotL);\n\
 		vec3 ambient = vec3(1.0);\n\
 		vec4 textureColor;\n\
-		if(hasTexture)\n\
-		{\n\
-			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-		}\n\
-		else{\n\
-			textureColor = vColor4Aux;\n\
-		}\n\
+		textureColor = vcolor4;\n\
 		//gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
 		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8 * occlusion)); // test.***\n\
-		gl_FragColor.rgb = vec3((textureColor.xyz*0.2 + textureColor.xyz*0.8)*vLightWeighting * occlusion); \n\
+		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
 	
@@ -930,6 +929,7 @@ ShaderSource.lodBuildingDepthVsSource = "\n\
 	\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 buildingRotMatrix;  \n\
 	uniform vec3 buildingPosHIGH;\n\
 	uniform vec3 buildingPosLOW;\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
@@ -940,7 +940,7 @@ ShaderSource.lodBuildingDepthVsSource = "\n\
 	\n\
 	varying float depth;  \n\
 	void main() {	\n\
-		vec4 rotatedPos = vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\

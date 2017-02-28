@@ -553,7 +553,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	this.pFx_shaders_array.push(shader);
 		
 	var ssao_vs_source = ShaderSource.LodBuildingSsaoVsSource;
-	var ssao_fs_source = ShaderSource.modelRefSsaoFsSource;
+	var ssao_fs_source = ShaderSource.LodBuildingSsaoFsSource;
 
 		
 	shader.program = gl.createProgram();
@@ -575,13 +575,14 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	
 	//shader.program.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
 	//shader.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
 	//shader._lightDirection = gl.getUniformLocation(shader.program, "uLightingDirection");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
 
@@ -645,6 +646,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	//*********************************************************************************
