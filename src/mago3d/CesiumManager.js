@@ -995,6 +995,22 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 	{
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
 		buildingFolderName = neoBuilding.buildingFileName;
+		
+		buildingFolderName = neoBuilding.buildingFileName;
+			
+		// 1) The buildings metaData.*************************************************************************************
+		metaData = neoBuilding.metaData;
+		if(metaData.fileLoadState == 0)
+		{
+			if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+			{
+				// must read metadata file.***
+				neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
+				this.readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+				continue;
+			}
+		}
+			
 		if(neoBuilding.lod2Building == undefined)
 		{
 			neoBuilding.lod2Building = new LodBuilding();
@@ -1258,10 +1274,13 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		for(var i=0; i<buildingsCount; i++)
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-			GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
-			this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
+			if(neoBuilding.lod2Building)
+			{
+				GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+				GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+				GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
+			}
 		}
 		
 		// now, render depth of the neoSimpleBuildings.**********************************************************************************************
@@ -1411,14 +1430,28 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		GL.uniform1i(currentShader.hasAditionalMov_loc, true);
 		GL.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
 		
+		GL.uniform1i(currentShader.depthTex_loc, 0);	
+		GL.uniform1i(currentShader.noiseTex_loc, 1);	
+		//GL.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+		
+		GL.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);	
+		GL.uniform3fv(currentShader.kernel16_loc, this.kernel);	
+			GL.activeTexture(GL.TEXTURE0);
+			GL.bindTexture(GL.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***		
+			GL.activeTexture(GL.TEXTURE1);            
+			GL.bindTexture(GL.TEXTURE_2D, this.noiseTexture); 
+		
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-			GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-			GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-			GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
-			this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
+			if(neoBuilding.lod2Building)
+			{
+				GL.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+				GL.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+				GL.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				this.renderLodBuilding(GL, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
+			}
 		}
 		// now, render ssao of the neoSimpleBuildings.**********************************************************************************
 		var imageLod = 3;
@@ -1451,20 +1484,18 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 					}
 					else
 					{
-						/*
-						simpBuildTexture.textureId = GL.createTexture();
+						// simpBuildTexture.textureId = GL.createTexture();
 		
-						// must upload the texture to gl.***
-						GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
-						////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
-						GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
-						GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-						GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-						GL.generateMipmap(GL.TEXTURE_2D);
-						GL.bindTexture(GL.TEXTURE_2D, null);
+						// // must upload the texture to gl.***
+						// GL.bindTexture(GL.TEXTURE_2D, simpBuildTexture.textureId);
+						// ////GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+						// GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, simpBuildTexture.texImage); // Original.***
+						// GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+						// GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+						// GL.generateMipmap(GL.TEXTURE_2D);
+						// GL.bindTexture(GL.TEXTURE_2D, null);
 						  
 						delete simpBuildTexture.texImage;
-						*/
 					}
 				}
 			}
@@ -2804,10 +2835,17 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var last_squared_dist;
 	this.detailed_neoBuilding;
 	
-	var lod0_minSquaredDist = 100000*1.0;
+	var octreesLoadRequestsCount = 0;
+	
+	var lod0_minSquaredDist = 100000*2;
 	var lod1_minSquaredDist = 100000*100;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
+	
+	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles2.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles3.length = 0;
 	
 	
 	this.visibleObjControlerBuildings.initArrays(); 
@@ -2866,15 +2904,18 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 
 		// must calculate the realBuildingPosition (bbox_center_position).***
 		var realBuildingPos;
-		if(neoBuilding.octree != undefined && neoBuilding.f4dTransfMat != undefined)
+		if(neoBuilding.metaData && neoBuilding.f4dTransfMat != undefined)
 		{
-			var centerPos = neoBuilding.octree.getCenterPos(); // center pos is a point3d.***
-			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(centerPos, realBuildingPos );
+			//var centerPos = neoBuilding.octree.getCenterPos(); // center pos is a point3d.***
+			this.pointSC.set((neoBuilding.metaData.oct_max_x + neoBuilding.metaData.oct_min_x)/2.0, 
+							(neoBuilding.metaData.oct_max_y + neoBuilding.metaData.oct_min_y)/2.0, 
+							(neoBuilding.metaData.oct_max_z + neoBuilding.metaData.oct_min_z)/2.0);
+			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
 			
 		}
 		else
 		{
-			realBuildingPos = neoBuilding._buildingPosition;
+			continue;
 		}
 
 		
@@ -2884,9 +2925,9 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue;
 		
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
-		if(neoBuilding.octree)
+		if(neoBuilding.metaData)
 		{
-			this.radiusAprox_aux = neoBuilding.octree.half_dx;
+			this.radiusAprox_aux = (neoBuilding.metaData.oct_max_x + neoBuilding.metaData.oct_min_x)/2.0;
 		}
 		else
 			this.radiusAprox_aux = 50.0;
