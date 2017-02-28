@@ -155,7 +155,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 			
 			block_idx = neoReference._block_idx;
 				
-			if(block_idx >= myBlocksList._blocksArray.length)
+			if(block_idx >= myBlocksList.blocksArray.length)
 			{
 				var hola =0;
 				continue;
@@ -290,7 +290,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 					//if(f4d_manager.isCameraMoving && block.isSmallObj)
 					//	continue;
 					
-					cacheKeys_count = block._vbo_VertexIdx_CacheKeys_Container._vbo_cacheKeysArray.length;
+					cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 					// Must applicate the transformMatrix of the reference object.***
 
 					GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
@@ -309,7 +309,7 @@ Renderer.prototype.renderNeoRefLists = function(GL, neoRefList_array, neoBuildin
 					for(var n=0; n<cacheKeys_count; n++) // Original.***
 					{
 						//var mesh_array = block._vi_arrays_Container._meshArrays[n];
-						this.vbo_vi_cacheKey_aux = block._vbo_VertexIdx_CacheKeys_Container._vbo_cacheKeysArray[n];
+						this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
 						
 						//****************************************************************************************************AAA
 						if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)
@@ -468,7 +468,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 			
 			block_idx = neoReference._block_idx;
 				
-			if(block_idx >= myBlocksList._blocksArray.length)
+			if(block_idx >= myBlocksList.blocksArray.length)
 			{
 				var hola =0;
 				continue;
@@ -530,7 +530,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 				if(block != null)
 				{
 
-					cacheKeys_count = block._vbo_VertexIdx_CacheKeys_Container._vbo_cacheKeysArray.length;
+					cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 					// Must applicate the transformMatrix of the reference object.***
 					GL.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
 					
@@ -551,7 +551,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(GL, neoRefList_arr
 					for(var n=0; n<cacheKeys_count; n++) // Original.***
 					{
 						//var mesh_array = block._vi_arrays_Container._meshArrays[n];
-						this.vbo_vi_cacheKey_aux = block._vbo_VertexIdx_CacheKeys_Container._vbo_cacheKeysArray[n];
+						this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
 						
 						//****************************************************************************************************AAA
 						if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)

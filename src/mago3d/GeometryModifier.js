@@ -277,12 +277,12 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
  * @param max_z 변수
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellSetDimensions = function(ocCullOctreeCell, min_x, max_x, min_y, max_y, min_z, max_z) {
-	ocCullOctreeCell._minX = min_x;
-	ocCullOctreeCell._maxX = max_x;
-	ocCullOctreeCell._minY = min_y;
-	ocCullOctreeCell._maxY = max_y;
-	ocCullOctreeCell._minZ = min_z;
-	ocCullOctreeCell._maxZ = max_z;
+	ocCullOctreeCell.minX = min_x;
+	ocCullOctreeCell.maxX = max_x;
+	ocCullOctreeCell.minY = min_y;
+	ocCullOctreeCell.maxY = max_y;
+	ocCullOctreeCell.minZ = min_z;
+	ocCullOctreeCell.maxZ = max_z;
 };
   
 /**
@@ -305,31 +305,31 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 	
 	if(ocCullOctreeCell._subBoxesArray.length > 0)
 	{
-		var half_x= (ocCullOctreeCell._maxX + ocCullOctreeCell._minX)/2.0;
-		var half_y= (ocCullOctreeCell._maxY + ocCullOctreeCell._minY)/2.0;
-		var half_z= (ocCullOctreeCell._maxZ + ocCullOctreeCell._minZ)/2.0;
+		var half_x= (ocCullOctreeCell.maxX + ocCullOctreeCell.minX)/2.0;
+		var half_y= (ocCullOctreeCell.maxY + ocCullOctreeCell.minY)/2.0;
+		var half_z= (ocCullOctreeCell.maxZ + ocCullOctreeCell.minZ)/2.0;
 		
 		// Old.***************************************************************************************************************************************************
-		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[2].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		//ocCullOctreeCell._subBoxesArray[3].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[2].setDimensions(half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
+		//ocCullOctreeCell._subBoxesArray[3].setDimensions(ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
 
-		//ocCullOctreeCell._subBoxesArray[4].setDimensions(ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		//ocCullOctreeCell._subBoxesArray[4].setDimensions(ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
+		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		
 		// New version.*********************************************************************************************************************************************
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   ocCullOctreeCell._minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
 		
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell._minX, half_x,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell._maxX,   ocCullOctreeCell._minY, half_y,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell._maxX,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
-		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell._minX, half_x,   half_y, ocCullOctreeCell._maxY,   half_z, ocCullOctreeCell._maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
+		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 		for(var i=0; i<ocCullOctreeCell._subBoxesArray.length; i++)
@@ -353,9 +353,9 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersects = false;
 	
-	if(x>ocCullOctreeCell._minX && x<ocCullOctreeCell._maxX) {
-		if(y>ocCullOctreeCell._minY && y<ocCullOctreeCell._maxY) {
-			if(z>ocCullOctreeCell._minZ && z<ocCullOctreeCell._maxZ) {
+	if(x>ocCullOctreeCell.minX && x<ocCullOctreeCell.maxX) {
+		if(y>ocCullOctreeCell.minY && y<ocCullOctreeCell.maxY) {
+			if(z>ocCullOctreeCell.minZ && z<ocCullOctreeCell.maxZ) {
 				intersects = true;
 			}
 		}
@@ -389,9 +389,9 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 	var subBoxes_count = ocCullOctreeCell._subBoxesArray.length;
 	if(subBoxes_count > 0)
 	{
-		var center_x = (ocCullOctreeCell._minX + ocCullOctreeCell._maxX)/2.0;
-		var center_y = (ocCullOctreeCell._minY + ocCullOctreeCell._maxY)/2.0;
-		var center_z = (ocCullOctreeCell._minZ + ocCullOctreeCell._maxZ)/2.0;
+		var center_x = (ocCullOctreeCell.minX + ocCullOctreeCell.maxX)/2.0;
+		var center_y = (ocCullOctreeCell.minY + ocCullOctreeCell.maxY)/2.0;
+		var center_z = (ocCullOctreeCell.minZ + ocCullOctreeCell.maxZ)/2.0;
 		
 		var intersectedSubBox_aux = null;
 		var intersectedSubBox_idx = undefined;
@@ -471,12 +471,12 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = 
  * @param expansionDist 변수
  */	
 GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCullOctreeCell, expansionDist) {
-	ocCullOctreeCell._minX -= expansionDist;
-	ocCullOctreeCell._maxX += expansionDist;
-	ocCullOctreeCell._minY -= expansionDist;
-	ocCullOctreeCell._maxY += expansionDist;
-	ocCullOctreeCell._minZ -= expansionDist;
-	ocCullOctreeCell._maxZ += expansionDist;
+	ocCullOctreeCell.minX -= expansionDist;
+	ocCullOctreeCell.maxX += expansionDist;
+	ocCullOctreeCell.minY -= expansionDist;
+	ocCullOctreeCell.maxY += expansionDist;
+	ocCullOctreeCell.minZ -= expansionDist;
+	ocCullOctreeCell.maxZ += expansionDist;
 };
 	  
 /**
@@ -503,8 +503,8 @@ GeometryModifier.prototype.vertexTexcoordsArraysCacheKeysContainerNewVertexTexco
 GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
 	var block = null;
 	  
-	if(idx >= 0 && idx <blockList._blocksArray.length) {
-		block = blockList._blocksArray[idx];
+	if(idx >= 0 && idx <blockList.blocksArray.length) {
+		block = blockList.blocksArray[idx];
 	}
 	return block;
 };
@@ -515,13 +515,13 @@ GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
  * 
  * @param blockList_container 변수
  * @param blocksList_name 변수
- * @returns f4d_blocksList
+ * @returns blocksList
  */
 GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockList_container, blocksList_name) {
-	var f4d_blocksList = new BlocksList();
-	f4d_blocksList._name = blocksList_name;
-	blockList_container._BlocksListsArray.push(f4d_blocksList);
-	return f4d_blocksList;
+	var blocksList = new BlocksList();
+	blocksList.name = blocksList_name;
+	blockList_container.blocksListsArray.push(blocksList);
+	return blocksList;
 };
 	  
 /**
@@ -533,14 +533,14 @@ GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockLis
  * @returns blocksList
  */	  
 GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList_container, blockList_name) {
-	var blocksLists_count = blockList_container._BlocksListsArray.length;
+	var blocksLists_count = blockList_container.blocksListsArray.length;
 	var found = false;
 	var i=0;
 	var blocksList = null;
 	while(!found && i<blocksLists_count)
 	{
-		var current_blocksList = blockList_container._BlocksListsArray[i];
-		if(current_blocksList._name == blockList_name)
+		var current_blocksList = blockList_container.blocksListsArray[i];
+		if(current_blocksList.name == blockList_name)
 		{
 			found = true;
 			blocksList =current_blocksList;

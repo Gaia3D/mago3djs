@@ -918,16 +918,16 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 			
 			// 2) The block models.********************************************************************************************
 			// the InteriorBlock must load only if the camera is very cloesd.***
-			var blocksListsCount = neoBuilding._blocksList_Container._BlocksListsArray.length;
+			var blocksListsCount = neoBuilding._blocksList_Container.blocksListsArray.length;
 			for(var j=0; j<blocksListsCount-1; j++) // blocksListsCount-1 bcos interiorLOD4 only load if cam is inside of building.***
 			{
-				blocksList = neoBuilding._blocksList_Container._BlocksListsArray[j];
+				blocksList = neoBuilding._blocksList_Container.blocksListsArray[j];
 				if(blocksList.fileLoadState == 0)
 				{
 					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
 					{
 						// must read blocksList.***
-						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList._name;
+						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList.name;
 						this.readerWriter.readNeoBlocksArraybufferInServer(GL, filePathInServer, blocksList, neoBuilding, this);
 						continue;
 					}
@@ -942,7 +942,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(GL, scene)
 				// there are 4 neoReferencesLists (lodExt0, lodExt1, lodExt2, lodBone).****
 				for(var j=0; j<4; j++)
 				{
-					blocksList = neoBuilding._blocksList_Container._BlocksListsArray[j];
+					blocksList = neoBuilding._blocksList_Container.blocksListsArray[j];
 					neoReferencesList = neoBuilding._neoRefLists_Container.newNeoRefsList(blocksList);
 					if(j == 0)
 						neoReferencesListName = "Ref_Skin1";
@@ -1970,7 +1970,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(GL, scene, 
 							var geometryDataPath = this.readerWriter.geometryDataPath;
 							var buildingFolderName = neoBuilding.buildingFileName;
 		
-							var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList._name;
+							var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + blocksList.name;
 							this.readerWriter.readNeoBlocksArraybufferInServer(GL, filePathInServer, blocksList, neoBuilding, this);
 						}
 						continue;
