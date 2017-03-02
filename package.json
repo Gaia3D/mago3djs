@@ -1,13 +1,13 @@
 {
-  "name": "geomartian",
-  "version": "0.0.0",
+  "name": "mago3djs",
+  "version": "1.0.0",
   "description": "Generated with Eclipse npm Tools",
-  "main": "index.js",
+  "main": "mago3d.js",
   "scripts": {
-    "test": "mocha"
+    "test": "jasmine"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Gaia3d",
+  "license": "BSD",
   "devDependencies": {
     "browserify": "^13.3.0",
     "chai": "^3.5.0",
