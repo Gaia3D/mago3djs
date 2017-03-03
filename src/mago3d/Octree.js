@@ -18,15 +18,13 @@ var Octree = function(octreeOwner) {
 	this.octree_number_name = 0;
 	this.squareDistToEye = 10000.0;
 	  
-	if(octreeOwner)
-	{
+	if(octreeOwner) {
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
 	
-
     this.subOctrees_array = [];
-    this._compRefsList_Array = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
+    this.compRefsListArray = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
 	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox.***
 	
 };
@@ -93,11 +91,8 @@ Octree.prototype.getMotherOctree = function() {
  */
 Octree.prototype.getOctree = function(octreeNumberName, numDigits) {
 	if(numDigits == 1) {
-		if(octreeNumberName == 0)
-			return this.getMotherOctree();
-		else {
-			return this.subOctrees_array[octreeNumberName-1];
-		}
+		if(octreeNumberName == 0) return this.getMotherOctree();
+		else return this.subOctrees_array[octreeNumberName-1];
 	}
 	  
 	// determine the next level octree.***
@@ -119,15 +114,11 @@ Octree.prototype.getOctreeByNumberName = function(octreeNumberName) {
 	var numDigits = this.getNumberOfDigits(octreeNumberName);
 	  
 	if(numDigits == 1) {
-		if(octreeNumberName == 0)
-			return motherOctree;
-		else{
-			return motherOctree.subOctrees_array[octreeNumberName-1];
-		}
+		if(octreeNumberName == 0) return motherOctree;
+		else return motherOctree.subOctrees_array[octreeNumberName-1];
 	}
 	  
-	if(motherOctree.subOctrees_array.length == 0)
-		return undefined;
+	if(motherOctree.subOctrees_array.length == 0) return undefined;
 	  
 	// determine the next level octree.***
 	var exp = numDigits-1;
@@ -165,8 +156,7 @@ Octree.prototype.setSizesSubBoxes = function() {
 	var max_y = this.centerPos.y + this.half_dy;
 	var max_z = this.centerPos.z + this.half_dz;
 	
-	if(this.subOctrees_array.length > 0)
-	{
+	if(this.subOctrees_array.length > 0) {
 		this.subOctrees_array[0].setBoxSize(min_x, half_x, min_y, half_y, min_z, half_z);
 		this.subOctrees_array[1].setBoxSize(half_x, max_x, min_y, half_y, min_z, half_z);
 		this.subOctrees_array[2].setBoxSize(half_x, max_x, half_y, max_y, min_z, half_z);
@@ -177,8 +167,7 @@ Octree.prototype.setSizesSubBoxes = function() {
 		this.subOctrees_array[6].setBoxSize(half_x, max_x, half_y, max_y, half_z, max_z);
 		this.subOctrees_array[7].setBoxSize(min_x, half_x, half_y, max_y, half_z, max_z);
 		
-		for(var i=0; i<8; i++)
-		{
+		for(var i=0; i<8; i++) {
 			this.subOctrees_array[i].setSizesSubBoxes();
 		}
 	}
@@ -227,18 +216,13 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 	if(result_CRefListsArray == undefined)
 		result_CRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0)
-	{
-		for(var i=0; i<this.subOctrees_array.length; i++)
-		{
+	if(this.subOctrees_array.length > 0) {
+		for(var i=0; i<this.subOctrees_array.length; i++) {
 			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
 		}
-	}
-	else
-	{
-		if(this._compRefsList_Array.length>0)
-		{
-			result_CRefListsArray.push(this._compRefsList_Array[0]); // there are only 1.***
+	} else {
+		if(this.compRefsListArray.length>0) {
+			result_CRefListsArray.push(this.compRefsListArray[0]); // there are only 1.***
 		}
 	}
 };
@@ -251,17 +235,12 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
 	if(result_NeoRefListsArray == undefined)
 		result_NeoRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0)
-	{
-		for(var i=0; i<this.subOctrees_array.length; i++)
-		{
+	if(this.subOctrees_array.length > 0) {
+		for(var i=0; i<this.subOctrees_array.length; i++) {
 			this.subOctrees_array[i].getCRefListArray(result_NeoRefListsArray);
 		}
-	}
-	else
-	{
-		if(this.neoRefsList_Array.length>0)
-		{
+	} else {
+		if(this.neoRefsList_Array.length>0) {
 			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
 		}
 	}
@@ -307,14 +286,12 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 	  // Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
 	  
-	for(var i=0; i<visibleOctrees_count; i++)
-	{
+	for(var i=0; i<visibleOctrees_count; i++) {
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
 		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 	
-	for(var i=0; i<visibleOctrees_count; i++)
-	{
+	for(var i=0; i<visibleOctrees_count; i++) {
 		sortedOctreesArray[i].getCRefListArray(result_CRefListsArray);
 		//visibleOctreesArray[i].getCRefListArray(result_CRefListsArray);
 	}
@@ -367,50 +344,38 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
 	if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0)
-	//if(this.subOctrees_array.length == 0 && this._compRefsList_Array.length == 0) // For use with ifc buildings.***
+	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
 		return;
 	
     // this function has Cesium dependence.***
-    if(result_octreesArray == undefined)
-	    result_octreesArray = [];
+    if(result_octreesArray == undefined) result_octreesArray = [];
   
-    if(cesium_boundingSphere_scratch == undefined)
-	    cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); // Cesium dependency.***
+    if(cesium_boundingSphere_scratch == undefined) cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); // Cesium dependency.***
   
     cesium_boundingSphere_scratch.center.x = this.centerPos.x;
     cesium_boundingSphere_scratch.center.y = this.centerPos.y;
     cesium_boundingSphere_scratch.center.z = this.centerPos.z;
   
-    if(this.subOctrees_array.length == 0)
-    {
+    if(this.subOctrees_array.length == 0) {
 	    //cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
 		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-    }
-    else{
+    } else {
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-    if(this.octree_level == 3)
-    {
+    if(this.octree_level == 3) {
 	    var hola = 0;
     }
   
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if(frustumCull == Cesium.Intersect.INSIDE ) 
-	{
+	if(frustumCull == Cesium.Intersect.INSIDE ) {
 		//result_octreesArray.push(this);
 		this.getAllSubOctrees(result_octreesArray);
-	}
-	else if(frustumCull == Cesium.Intersect.INTERSECTING  ) 
-	{
-		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) // original, good.***
-		{
+	} else if(frustumCull == Cesium.Intersect.INTERSECTING  ) {
+		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) {
 			result_octreesArray.push(this);
-		}
-		else
-		{
-			for(var i=0; i<this.subOctrees_array.length; i++ )
-			{
+		} else {
+			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -425,50 +390,34 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
  * @param cesium_boundingSphere_scratch 변수
  */
 Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
-	if(this.subOctrees_array.length == 0 && this._compRefsList_Array.length == 0) // For use with ifc buildings.***
+	if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
 		return;
 	
     // this function has Cesium dependence.***
-    if(result_octreesArray == undefined)
-	    result_octreesArray = [];
+    if(result_octreesArray == undefined) result_octreesArray = [];
   
-    if(cesium_boundingSphere_scratch == undefined)
-	    cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); // Cesium dependency.***
+    if(cesium_boundingSphere_scratch == undefined) cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); // Cesium dependency.***
   
     cesium_boundingSphere_scratch.center.x = this.centerPos.x;
     cesium_boundingSphere_scratch.center.y = this.centerPos.y;
     cesium_boundingSphere_scratch.center.z = this.centerPos.z;
   
-    if(this.subOctrees_array.length == 0)
-    {
+    if(this.subOctrees_array.length == 0) {
 	    //cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
 		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-    }
-    else{
+    } else {
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-    if(this.octree_level == 3)
-    {
-	    var hola = 0;
-    }
-  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if(frustumCull == Cesium.Intersect.INSIDE ) 
-	{
+	if(frustumCull == Cesium.Intersect.INSIDE ) {
 		//result_octreesArray.push(this);
 		this.getAllSubOctrees(result_octreesArray);
-	}
-	else if(frustumCull == Cesium.Intersect.INTERSECTING  ) 
-	{
-		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) // original, good.***
-		{
+	} else if(frustumCull == Cesium.Intersect.INTERSECTING ) {
+		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) {
 			result_octreesArray.push(this);
-		}
-		else
-		{
-			for(var i=0; i<this.subOctrees_array.length; i++ )
-			{
+		} else {
+			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -546,9 +495,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
 			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
 		}
 	} else {
-		if(this._compRefsList_Array.length > 0)
-			result_octreesArray.push(this); // there are only 1.***
-		else if(this.neoRefsList_Array.length > 0)
-			result_octreesArray.push(this); // there are only 1.***
+		if(this.compRefsListArray.length > 0) result_octreesArray.push(this); // there are only 1.***
+		else if(this.neoRefsList_Array.length > 0) result_octreesArray.push(this); // there are only 1.***
 	}
 };

@@ -230,10 +230,10 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 GeometryModifier.prototype.compoundReferencesListContainerGetVisibleCompRefObjectsList = function(compRefList_container, eye_x, eye_y, eye_z) {
 	var visibleCompRefObjectsArray_Total = [];
 	var compRefList = undefined;
-	var compRefLists_count = compRefList_container._compRefsList_Array.length;
+	var compRefLists_count = compRefList_container.compRefsListArray.length;
 	for(var i=0; i<compRefLists_count; i++)
 	{
-		compRefList = compRefList_container._compRefsList_Array[i];
+		compRefList = compRefList_container.compRefsListArray[i];
 		var visibleCompRefObjectsArray = this.compoundReferencesListGetVisibleCompRefObjectsList(compRefList, eye_x, eye_y, eye_z);
 		if(visibleCompRefObjectsArray != null)
 			visibleCompRefObjectsArray_Total.push(visibleCompRefObjectsArray);

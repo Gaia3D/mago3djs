@@ -3186,7 +3186,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(GL, f
 			{
 				
 				// Activate this in the future, when all f4d_projects unified.***
-				if(BR_Project._compRefList_Container._compRefsList_Array.length > 0)
+				if(BR_Project._compRefList_Container.compRefsListArray.length > 0)
 				{
 					if(BR_Project._header._f4d_version == 1)
 					{

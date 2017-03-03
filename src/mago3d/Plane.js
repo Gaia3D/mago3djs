@@ -48,16 +48,12 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint) {
 	
 	var den = this.a*u + this.b*v + this.c*w;
 	
-	if(Math.abs(den) > 10E-8)
-	{
+	if(Math.abs(den) > 10E-8) {
 		var alfa = -((this.a*r + this.b*s + this.c*t + this.d)/(den));
 		
-		if(intersectionPoint == undefined)
-			intersectionPoint = new Point3D();
+		if(intersectionPoint == undefined) intersectionPoint = new Point3D();
 		
 		intersectionPoint.set(r+alfa*u, s+alfa*v, t+alfa*w);
 		return intersectionPoint;
-	}
-	else
-		return undefined;
+	} else return undefined;
 };
