@@ -1508,7 +1508,7 @@ var CompoundReferencesListContainer = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this._compRefsList_Array = [];
+	this.compRefsListArray = [];
 };
 
 /**
@@ -1521,7 +1521,7 @@ CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoun
 	var compoundRefList = new CompoundReferencesList();
 	compoundRefList.name = compoundReferenceList_name;
 	compoundRefList._lodLevel = lodLevel;
-	this._compRefsList_Array.push(compoundRefList);
+	this.compRefsListArray.push(compoundRefList);
 	return compoundRefList;
 };
 
@@ -1532,10 +1532,10 @@ CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoun
  * @param eye_z 변수
  */
 CompoundReferencesListContainer.prototype.updateCurrentVisibleIndicesOfLists = function(eye_x, eye_y, eye_z) {
-	var compRefLists_count = this._compRefsList_Array.length;
+	var compRefLists_count = this.compRefsListArray.length;
 	for(var i=0; i<compRefLists_count; i++)
 	{
-		this._compRefsList_Array[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
+		this.compRefsListArray[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
 	}
 };
 
@@ -1547,13 +1547,13 @@ CompoundReferencesListContainer.prototype.updateCurrentVisibleIndicesOfLists = f
 CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRefListsName) {
 	var result_compRefList;
 	var found = false;
-	var compRefLists_count = this._compRefsList_Array.length;
+	var compRefLists_count = this.compRefsListArray.length;
 	var i=0;
 	while(!found && i<compRefLists_count)
 	{
-		if(this._compRefsList_Array[i].name == compRefListsName)
+		if(this.compRefsListArray[i].name == compRefListsName)
 		{
-			result_compRefList = this._compRefsList_Array[i];
+			result_compRefList = this.compRefsListArray[i];
 		}
 		i++;
 	}
@@ -1944,9 +1944,9 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
 	// This is temp function for debugging.***
 	var compRefList;
 	var compRefs_count = 0;
-	var interior_compRefLists_count = _interiorCompRefList_Container._compRefsList_Array.length;
+	var interior_compRefLists_count = _interiorCompRefList_Container.compRefsListArray.length;
 	for(var i=0; i<interior_compRefLists_count; i++) {
-		compRefList = _interiorCompRefList_Container._compRefsList_Array[i];
+		compRefList = _interiorCompRefList_Container.compRefsListArray[i];
 		compRefs_count = compRefList._compoundRefsArray.length;
 		for(var j=0; j<compRefs_count; j++) {
 			
@@ -2031,7 +2031,7 @@ BRBuildingProject.prototype.getVisibleEXTCompRefLists = function(eye_x, eye_y, e
  * @returns allCompRefLists
  */
 BRBuildingProject.prototype.getAllCompRefLists = function() {
-	var allCompRefLists = this._compRefList_Container._compRefsList_Array.concat(this._interiorCompRefList_Container._compRefsList_Array);
+	var allCompRefLists = this._compRefList_Container.compRefsListArray.concat(this._interiorCompRefList_Container.compRefsListArray);
 	return allCompRefLists;
 };
 
@@ -2068,10 +2068,10 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 	  {
 		  var boundingBox = null;
 		  
-		  var compRefLists_count = this._compRefList_Container._compRefsList_Array.length;
+		  var compRefLists_count = this._compRefList_Container.compRefsListArray.length;
 		  for(var i=0; i<compRefLists_count; i++)
 		  {
-			  var compRefList = this._compRefList_Container._compRefsList_Array[i];
+			  var compRefList = this._compRefList_Container.compRefsListArray[i];
 			  var blocksList = this._blocksList_Container.blocksListsArray[i];
 			  var bb = compRefList.getBoundingBox(blocksList);
 			  if(this._boundingBox == undefined)
