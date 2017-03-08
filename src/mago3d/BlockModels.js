@@ -55,7 +55,7 @@ BlocksList.prototype.getBlock = function(idx) {
 	
 	var block = null;
 	if(idx >= 0 && idx <this.blocksArray.length) {
-		block = this.blocksArray[idx];
+		return this.blocksArray[idx];
 	}
 	return block;
 };

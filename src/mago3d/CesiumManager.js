@@ -1233,83 +1233,6 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding)
 	
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param neoBuilding 변수
- */
- /*
-CesiumManager.prototype.loadBuildingOctreeAsimetricVersion = function(neoBuilding)
-{
-	// this function loads the references of the lowestOctrees.***
-	// The references (Octree).*************************************************************************
-	if(neoBuilding.octree != undefined && !neoBuilding.octreeLoadedAllFiles)
-	{
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		var buildingFolderName = neoBuilding.buildingFileName;
-		var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-		var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
-		var areAllSubOctreesLoadedFile = true; // init on true.***
-		var blocksList = neoBuilding._blocksList_Container.blocksListsArray[0]; // in asimetric version use the 1rst blocksList.***
-		var subOctree;
-		var neoReferencesList;
-		
-		var octree = neoBuilding.octree;
-		var lowestOctreesArray = [];
-		octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray); // Maximum call stack size exceeded!!!.***
-		
-		var lowestOctreesCount = lowestOctreesArray.length;
-		for(var i=0; i<lowestOctreesCount; i++)
-		{
-			var lowestOctree = lowestOctreesArray[i];
-			//if(lowestOctree.triPolyhedronsCount > 0)
-			{
-				if(lowestOctree.neoRefsList_Array.length == 0)
-				{
-					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-					{
-						neoReferencesList = new NeoReferencesList();
-						//if(transformMat)
-						//{
-						//	neoReferencesList.multiplyReferencesMatrices(transformMat); // after parse, multiply transfMat by the buildings mat.***
-						//}
-						neoReferencesList.blocksList = blocksList;
-						lowestOctree.neoRefsList_Array.push(neoReferencesList);
-						
-						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-						
-						var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-						this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
-					}
-					areAllSubOctreesLoadedFile = false;
-				}
-				else{
-					neoReferencesList = lowestOctree.neoRefsList_Array[0];
-					if(neoReferencesList != undefined && neoReferencesList.fileLoadState == 0)
-						areAllSubOctreesLoadedFile = false;
-				}
-				
-				// must load the legoStructure of the lowestOctree.***
-				if(lowestOctree.fileLoadState == 0)
-				{
-					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-					{
-						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-						
-						var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
-					}
-				}
-			}
-		}
-		
-		if(areAllSubOctreesLoadedFile)
-		{
-			neoBuilding.octreeLoadedAllFiles = true;
-		}
-	}
-	
-};
-*/
 
 /**
  * object index 파일을 읽어서 Frustum Culling으로 화면에 rendering
@@ -2820,6 +2743,94 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				}
 			}
 			
+			// LOD 1.*******************************************************************************
+			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+			for(var i=lastLOD0LowestOctreesCount; i<lowestOctreesCount; i++)
+			{
+				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+				
+				if(lowestOctree.triPolyhedronsCount == 0)
+					continue;
+				
+				
+				//if(lowestOctree.neoRefsList_Array.length == 0)
+				//	continue;
+				
+				if(lowestOctree.neoRefsList_Array.length == 0)
+				{
+					lowestOctree.neoBuildingOwner = neoBuilding; // New.***
+					
+					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+					{
+						var neoReferencesList = new NeoReferencesList();
+						neoReferencesList.neoBuildingOwner = neoBuilding; // New.***
+						//if(transformMat)
+						//{
+						//	neoReferencesList.multiplyReferencesMatrices(transformMat); // after parse, multiply transfMat by the buildings mat.***
+						//}
+						neoReferencesList.blocksList = neoBuilding._blocksList_Container.blocksListsArray[0]; //blocksList;
+						lowestOctree.neoRefsList_Array.push(neoReferencesList);
+						
+						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+						
+						var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+						this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+					}
+					continue;
+				}
+				/*
+				if(lowestOctree.lego.fileLoadState == 0)// && lowestOctree.neoRefsList_Array.length == 0)
+				{
+					// must load the legoStructure of the lowestOctree.***
+					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+					{
+						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+						
+						var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
+						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
+					}
+					continue;
+				}
+				*/
+				//---------------------------------------------------------------------------------------------------------------
+				
+				refList = lowestOctree.neoRefsList_Array[0];
+				
+				if(refList.fileLoadState == 2 ) // 2 = file loading finished.***
+				{
+					if(refListsParsingCount < maxRefListParsingCount)
+					{
+						// must parse the arraybuffer data.***
+						refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
+						refList.dataArraybuffer = null;
+						if(buildingRotationMatrix)
+						{
+							refList.multiplyReferencesMatrices(buildingRotationMatrix);
+						}
+			  
+						refListsParsingCount += 1;
+					}
+				}
+				else if(refList.fileLoadState == 4 ) // 4 = parsed.***
+				{
+					// now, check if the blocksList is loaded & parsed.***
+					var blocksList = refList.blocksList;
+					if(blocksList.fileLoadState == 0) // 0 = file loading NO started.***
+					{
+						if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
+						{
+							// must read blocksList.***
+							var geometryDataPath = this.readerWriter.geometryDataPath;
+							var buildingFolderName = neoBuilding.buildingFileName;
+		
+							var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
+							this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
+						}
+						continue;
+					}
+				}
+			}
+			
 			// LOD 2.**************************************************************************************************************************************
 			/*
 			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles2.length;
@@ -3254,7 +3265,30 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				
 			}
 			
-			// 2) LOD 1 & 2.************************************************************************************************************************************
+			// 2) LOD 1.*********************************************************************************************************************
+			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+			for(var i=0; i<lowestOctreesCount; i++)
+			{
+				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+				
+				if(lowestOctree.neoRefsList_Array.length == 0)
+					continue;
+				
+				refList = lowestOctree.neoRefsList_Array[0];
+				
+				
+				
+				neoBuilding = refList.neoBuildingOwner;
+				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+
+				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, 0.8);
+				
+			}
+			
+			// 2) LOD 2 & 3.************************************************************************************************************************************
 			currentShader = this.postFxShadersManager.pFx_shaders_array[7]; // lodBuilding depth.***
 			shaderProgram = currentShader.program;
 			gl.useProgram(shaderProgram);
@@ -3401,7 +3435,31 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx);
 				
 			}
-			// 2) LOD 1.************************************************************************************************************************************
+			
+			// 2) LOD 1.*********************************************************************************************************************
+			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+			for(var i=0; i<lowestOctreesCount; i++)
+			{
+				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+				
+				if(lowestOctree.neoRefsList_Array.length == 0)
+					continue;
+				
+				refList = lowestOctree.neoRefsList_Array[0];
+				
+				
+				
+				neoBuilding = refList.neoBuildingOwner;
+				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
+				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+
+				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, 0.8);
+				
+			}
+			
+			// 2) LOD 2 & 3.************************************************************************************************************************************
 			
 			currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
 			shaderProgram = currentShader.program;

@@ -420,7 +420,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender) {
 	// render_neoRef
 	var gl = gl;
 	var neoRefLists_count = neoRefList_array.length;
@@ -552,6 +552,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				continue;
 			}
 			block = myBlocksList.getBlock(block_idx);
+			
+			if(maxSizeToRender && block != null)
+			{
+				if(block.radius < maxSizeToRender)
+					continue;
+			}
 			
 			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
 			{
@@ -870,6 +876,7 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 		if(myBlocksList.fileLoadState == 2)
 		{
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
 		
