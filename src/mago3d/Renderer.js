@@ -483,6 +483,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		if(myBlocksList.fileLoadState == 2)
 		{
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
 		

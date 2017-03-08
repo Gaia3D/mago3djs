@@ -2645,6 +2645,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			
 			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
 			var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+			var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
 			neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 			
 			// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
@@ -2744,8 +2745,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			}
 			
 			// LOD 1.*******************************************************************************
+			
 			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
-			for(var i=lastLOD0LowestOctreesCount; i<lowestOctreesCount; i++)
+			for(var i=lastLOD1LowestOctreesCount; i<lowestOctreesCount; i++)
 			{
 				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
 				
@@ -2778,20 +2780,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					}
 					continue;
 				}
-				/*
-				if(lowestOctree.lego.fileLoadState == 0)// && lowestOctree.neoRefsList_Array.length == 0)
-				{
-					// must load the legoStructure of the lowestOctree.***
-					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-					{
-						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-						
-						var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
-					}
-					continue;
-				}
-				*/
 				//---------------------------------------------------------------------------------------------------------------
 				
 				refList = lowestOctree.neoRefsList_Array[0];

@@ -263,6 +263,9 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		
 		block.lego.fileLoadState = 2; // data is loaded with the blockModel.***
 		bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
+		
+		// test.
+		block.lego = null;
 	}
 	this.fileLoadState = 4; // 4 = parsing finished.***
 };
