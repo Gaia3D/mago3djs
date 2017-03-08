@@ -30,6 +30,7 @@ var MetaData = function() {
 	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading.***
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
@@ -123,38 +124,105 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 		this.isSmall = true;
 	}
 	
-	/*
-	// Now, must calculate some params of the project.**********************************************
-	// 0) PositionMatrix.************************************************************************
-	// Determine the elevation of the position.***********************************************************
-	var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);
-	var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-    var height = cartographic.height;
-	// End Determine the elevation of the position.-------------------------------------------------------
+	return bytes_readed;
 	
-	//var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);  // Original.***
-	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height); 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param arrayBuffer 변수
+ * @param f4dReadWriter 변수
+ */
+MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dReadWriter) {
+	var version_string_length = 5;
+	var intAux_scratch = 0;
+	var auxScratch;
+	//var header = BR_Project._header;
+	//var arrayBuffer = this.fileArrayBuffer;
+	//var bytes_readed = this.fileBytesReaded;
+	var bytes_readed = 0;
 	
-	BR_Project._buildingPosition = position; 
+	if(f4dReadWriter == undefined)
+		f4dReadWriter = new ReaderWriter();
 	
-	// High and Low values of the position.****************************************************
-	var splitValue = Cesium.EncodedCartesian3.encode(position);
-	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
+	// 1) Version(5 chars).***********
+	for(var j=0; j<version_string_length; j++){
+		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	}
 	
-	BR_Project._buildingPositionHIGH = new Float32Array(3);
-	BR_Project._buildingPositionHIGH[0] = splitVelue_X.high;
-	BR_Project._buildingPositionHIGH[1] = splitVelue_Y.high;
-	BR_Project._buildingPositionHIGH[2] = splitVelue_Z.high;
+	// 3) Global unique ID.*********************
+	if(this.guid == undefined)
+		this.guid ="";
 	
-	BR_Project._buildingPositionLOW = new Float32Array(3);
-	BR_Project._buildingPositionLOW[0] = splitVelue_X.low;
-	BR_Project._buildingPositionLOW[1] = splitVelue_Y.low;
-	BR_Project._buildingPositionLOW[2] = splitVelue_Z.low;
+	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for(var j=0; j<intAux_scratch; j++){
+		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	}
 	
-	this.fileBytesReaded = bytes_readed;
-	*/
+	// 4) Location.*************************
+	if(this.longitude == undefined)
+	{
+		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+	}
+	else
+		bytes_readed += 8;
+		
+	if(this.latitude == undefined)
+	{
+		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+	}
+	else
+		bytes_readed += 8;
+	
+	if(this.altitude == undefined)
+	{
+		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	}
+	else
+		bytes_readed += 4;
+	
+	//this.altitude += 20.0; // TEST.***
+	
+	
+	//header._elevation += 70.0; // delete this. TEST.!!!
+	if(this.bbox == undefined)
+		this.bbox = new BoundingBox();
+	
+	// 6) BoundingBox.************************
+	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	this.bbox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	
+	// TEST. PROVISIONAL. DELETE.***
+	//this.bbox.expand(20.0);
+	//-------------------------------
+	
+	//var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	
+	//// 7) Buildings octree mother size.***
+	//this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	//this.oct_min_y = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	//this.oct_min_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	//this.oct_max_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	//this.oct_max_y = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	//this.oct_max_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	
+	var isLarge = false;
+	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0)
+	{
+		isLarge = true;
+	}
+	
+	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0)
+	{
+		this.isSmall = true;
+	}
+	
+	return bytes_readed;
+	
 };
 
 // F4D ReferenceObject.************************************************************************************************************************* // 
@@ -332,6 +400,7 @@ var NeoBuilding = function() {
 	// create the references lists.*********************************
 	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = [];
+	this.preExtractedLowestOctreesArray = [];
 	
 	// Textures loaded.***************************************************
 	this.textures_loaded = [];

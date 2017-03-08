@@ -82,6 +82,18 @@ var ManagerFactory = function(containerId, magoConfig) {
 			magoManager.mouseLeftDown = true;
 			
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+		
+		magoManager.handler.setInputAction(function(click) {
+			magoManager.dateSC = new Date();
+			magoManager.startTimeSC = magoManager.dateSC.getTime();
+			//secondsUsed = this.currentTimeSC - this.startTimeSC;
+					
+			magoManager.mouse_x = click.position.x;
+			magoManager.mouse_y = click.position.y;
+			magoManager.mouseLeftDown = true;
+			
+		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
+
 
 		magoManager.handler.setInputAction(function(movement) {
 			if(magoManager.mouseLeftDown) {
@@ -138,6 +150,31 @@ var ManagerFactory = function(containerId, magoConfig) {
 			}
 			
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
+		
+		magoManager.handler.setInputAction(function(movement) {
+			// if picked
+			//vm.pickedPolygon = false;
+			//disableCameraMotion(true)
+			magoManager.isCameraMoving = false;
+			magoManager.mouseLeftDown = false;
+			magoManager.mouseDragging = false;
+			magoManager.selObjMovePlane = undefined;
+			magoManager.mustCheckIfDragging = true;
+			magoManager.thereAreStartMovePoint = false;
+			disableCameraMotion(true);
+			
+			magoManager.dateSC = new Date();
+			magoManager.currentTimeSC = magoManager.dateSC.getTime();
+			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
+			if(miliSecondsUsed < 500) {
+				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
+					magoManager.bPicking = true;
+					//var gl = scene.context._gl;
+					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
+				}
+			}
+			
+	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
 	}
 	
 	function drawWorldWind() {

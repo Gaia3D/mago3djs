@@ -709,6 +709,48 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, neoBuilding, magoManager) {
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
+	
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	lowestOctree.lego.fileLoadState = 1;	
+
+	oReq.onload = function (oEvent) {
+		if(oReq.status == 200) {
+			lowestOctree.legoDataArrayBuffer = oReq.response; // Note: not oReq.responseText
+			if(lowestOctree.legoDataArrayBuffer) {
+				lowestOctree.lego.fileLoadState = 2;	
+				if(magoManager != undefined) {
+					magoManager.fileRequestControler.filesRequestedCount -= 1;
+					if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+				}
+			} else {
+				lowestOctree.fileLoadState = 0;	
+			}
+		} else {
+			lowestOctree.fileLoadState = oReq.status;
+		}
+	};
+	
+	oReq.onerror = function(e) {
+		lowestOctree.fileLoadState = 500;
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	}
+
+	oReq.send(null);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param filePathInServer 변수
  * @param lodBuilding 변수
  * @param magoManager 변수
@@ -1295,6 +1337,79 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
 										
 			neoBuilding.octree.makeTree(3);
 			neoBuilding.octree.setSizesSubBoxes();
+			
+			neoBuilding.metaData.fileLoadState = 2; // 2 = loading finished.***
+			
+			// finally decrement of files requested count.***
+			if(f4d_manager.fileRequestControler.filesRequestedCount > 0 )
+			{
+				f4d_manager.fileRequestControler.filesRequestedCount -= 1;
+			}
+			else{
+				f4d_manager.fileRequestControler.filesRequestedCount = 0;
+			}
+			
+		  
+		    //if(f4d_manager.backGround_fileReadings_count > 0 )
+			//    f4d_manager.backGround_fileReadings_count -= 1; // old.***
+		  
+		    //BR_Project._f4d_header_readed_finished = true;
+	    }
+	    arrayBuffer = null;
+	};
+
+	oReq.send(null);
+
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param GL 변수
+ * @param filePath_inServer 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ * @param f4d_manager 변수
+ */
+ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, f4d_manager) {
+	//BR_Project._f4d_header_readed = true;
+	
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", filePath_inServer, true);
+	oReq.responseType = "arraybuffer";
+	
+	f4d_manager.fileRequestControler.filesRequestedCount += 1; // increment of files requested count.***
+	neoBuilding.metaData.fileLoadState = 1; // 1 = load strated.***
+
+	oReq.onload = function (oEvent)
+	{
+	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+	    if (arrayBuffer)
+	    {
+		    if(readerWriter == undefined)
+		    {
+			    readerWriter = new ReaderWriter();
+		    }
+		    //------------------------------------------------------
+		    if(neoBuilding.metaData == undefined)
+		    {
+			    neoBuilding.metaData = new MetaData();
+		    }
+		    var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
+		  
+			// Now, make the neoBuilding's octree.***
+			if(neoBuilding.octree == undefined)
+				neoBuilding.octree = new Octree(undefined);
+			
+			// now, parse octreeAsimetric.***
+			neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+			
+			neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
+			neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;  
+			neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
+			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
+			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
+			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 			
 			neoBuilding.metaData.fileLoadState = 2; // 2 = loading finished.***
 			
