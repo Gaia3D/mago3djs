@@ -5930,7 +5930,6 @@ define('Core/Matrix4',[
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './freezeObject',
         './Math',
         './Matrix3',
@@ -5942,7 +5941,6 @@ define('Core/Matrix4',[
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         freezeObject,
         CesiumMath,
         Matrix3,
@@ -8453,7 +8451,6 @@ define('Core/Rectangle',[
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './Ellipsoid',
         './freezeObject',
         './Math'
@@ -8463,7 +8460,6 @@ define('Core/Rectangle',[
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         Ellipsoid,
         freezeObject,
         CesiumMath) {
@@ -11378,6 +11374,21 @@ define('Core/WebGLConstants',[
         UNPACK_COLORSPACE_CONVERSION_WEBGL : 0x9243,
         BROWSER_DEFAULT_WEBGL : 0x9244,
 
+        // WEBGL_compressed_texture_s3tc
+        COMPRESSED_RGB_S3TC_DXT1_EXT : 0x83F0,
+        COMPRESSED_RGBA_S3TC_DXT1_EXT : 0x83F1,
+        COMPRESSED_RGBA_S3TC_DXT3_EXT : 0x83F2,
+        COMPRESSED_RGBA_S3TC_DXT5_EXT : 0x83F3,
+
+        // WEBGL_compressed_texture_pvrtc
+        COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0x8C00,
+        COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0x8C01,
+        COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0x8C02,
+        COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0x8C03,
+
+        // WEBGL_compressed_texture_etc1
+        COMPRESSED_RGB_ETC1_WEBGL : 0x8D64,
+
         // Desktop OpenGL
         DOUBLE : 0x140A,
 
@@ -11989,14 +12000,314 @@ define('Core/ComponentDatatype',[
 });
 
 /*global define*/
+define('Core/oneTimeWarning',[
+        './defaultValue',
+        './defined',
+        './DeveloperError'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError) {
+    "use strict";
+
+    var warnings = {};
+
+    /**
+     * Logs a one time message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports oneTimeWarning
+     *
+     * @param {String} identifier The unique identifier for this warning.
+     * @param {String} [message=identifier] The message to log to the console.
+     *
+     * @example
+     * for(var i=0;i<foo.length;++i) {
+     *    if (!defined(foo[i].bar)) {
+     *       // Something that can be recovered from but may happen a lot
+     *       oneTimeWarning('foo.bar undefined', 'foo.bar is undefined. Setting to 0.');
+     *       foo[i].bar = 0;
+     *       // ...
+     *    }
+     * }
+     *
+     * @private
+     */
+    function oneTimeWarning(identifier, message) {
+                if (!defined(identifier)) {
+            throw new DeveloperError('identifier is required.');
+        }
+        
+        if (!defined(warnings[identifier])) {
+            warnings[identifier] = true;
+            console.warn(defaultValue(message, identifier));
+        }
+    }
+
+    oneTimeWarning.geometryOutlines = 'Entity geometry outlines are unsupported on terrain. Outlines will be disabled. To enable outlines, disable geometry terrain clamping by explicitly setting height to 0.';
+
+    return oneTimeWarning;
+});
+
+/*global define*/
+define('Core/deprecationWarning',[
+        './defined',
+        './DeveloperError',
+        './oneTimeWarning'
+    ], function(
+        defined,
+        DeveloperError,
+        oneTimeWarning) {
+    'use strict';
+    
+    /**
+     * Logs a deprecation message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports deprecationWarning
+     *
+     * @param {String} identifier The unique identifier for this deprecated API.
+     * @param {String} message The message to log to the console.
+     *
+     * @example
+     * // Deprecated function or class
+     * function Foo() {
+     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
+     *    // ...
+     * }
+     *
+     * // Deprecated function
+     * Bar.prototype.func = function() {
+     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
+     *    // ...
+     * };
+     *
+     * // Deprecated property
+     * defineProperties(Bar.prototype, {
+     *     prop : {
+     *         get : function() {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         },
+     *         set : function(value) {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         }
+     *     }
+     * });
+     *
+     * @private
+     */
+    function deprecationWarning(identifier, message) {
+                if (!defined(identifier) || !defined(message)) {
+            throw new DeveloperError('identifier and message are required.');
+        }
+        
+        oneTimeWarning(identifier, message);
+    }
+
+    return deprecationWarning;
+});
+
+/*global define*/
+define('Core/HeadingPitchRoll',[
+        './defaultValue',
+        './defined',
+        './DeveloperError',
+        './Math'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError,
+        CesiumMath) {
+    "use strict";
+
+    /**
+     * A rotation expressed as a heading, pitch, and roll. Heading is the rotation about the
+     * negative z axis. Pitch is the rotation about the negative y axis. Roll is the rotation about
+     * the positive x axis.
+     * @alias HeadingPitchRoll
+     * @constructor
+     *
+     * @param {Number} [heading=0.0] The heading component in radians.
+     * @param {Number} [pitch=0.0] The pitch component in radians.
+     * @param {Number} [roll=0.0] The roll component in radians.
+     */
+    function HeadingPitchRoll(heading, pitch, roll) {
+        this.heading = defaultValue(heading, 0.0);
+        this.pitch = defaultValue(pitch, 0.0);
+        this.roll = defaultValue(roll, 0.0);
+    }
+
+    /**
+     * Computes the heading, pitch and roll from a quaternion (see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles )
+     *
+     * @param {Quaternion} quaternion The quaternion from which to retrieve heading, pitch, and roll, all expressed in radians.
+     * @param {Quaternion} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.fromQuaternion = function(quaternion, result) {
+                if (!defined(quaternion)) {
+            throw new DeveloperError('quaternion is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        var test = 2 * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
+        var denominatorRoll = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+        var numeratorRoll = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
+        var denominatorHeading = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+        var numeratorHeading = 2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
+        result.heading = -Math.atan2(numeratorHeading, denominatorHeading);
+        result.roll = Math.atan2(numeratorRoll, denominatorRoll);
+        result.pitch = -Math.asin(test);
+        return result;
+    };
+
+    /**
+     * Returns a new HeadingPitchRoll instance from angles given in degrees.
+     *
+     * @param {Number} heading the heading in degrees
+     * @param {Number} pitch the pitch in degrees
+     * @param {Number} roll the heading in degrees
+     * @param {HeadingPitchRoll} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} A new HeadingPitchRoll instance
+     */
+    HeadingPitchRoll.fromDegrees = function(heading, pitch, roll, result) {
+                if (!defined(heading)) {
+            throw new DeveloperError('heading is required');
+        }
+        if (!defined(pitch)) {
+            throw new DeveloperError('pitch is required');
+        }
+        if (!defined(roll)) {
+            throw new DeveloperError('roll is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        result.heading = heading * CesiumMath.RADIANS_PER_DEGREE;
+        result.pitch = pitch * CesiumMath.RADIANS_PER_DEGREE;
+        result.roll = roll * CesiumMath.RADIANS_PER_DEGREE;
+        return result;
+    };
+
+    /**
+     * Duplicates a HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} headingPitchRoll The HeadingPitchRoll to duplicate.
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided. (Returns undefined if headingPitchRoll is undefined)
+     */
+    HeadingPitchRoll.clone = function(headingPitchRoll, result) {
+        if (!defined(headingPitchRoll)) {
+            return undefined;
+        }
+        if (!defined(result)) {
+            return new HeadingPitchRoll(headingPitchRoll.heading, headingPitchRoll.pitch, headingPitchRoll.roll);
+        }
+        result.heading = headingPitchRoll.heading;
+        result.pitch = headingPitchRoll.pitch;
+        result.roll = headingPitchRoll.roll;
+        return result;
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equals = function(left, right) {
+        return (left === right) ||
+            ((defined(left)) &&
+                (defined(right)) &&
+                (left.heading === right.heading) &&
+                (left.pitch === right.pitch) &&
+                (left.roll === right.roll));
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equalsEpsilon = function(left, right, relativeEpsilon, absoluteEpsilon) {
+        return (left === right) ||
+            (defined(left) &&
+                defined(right) &&
+                CesiumMath.equalsEpsilon(left.heading, right.heading, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.pitch, right.pitch, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.roll, right.roll, relativeEpsilon, absoluteEpsilon));
+    };
+
+    /**
+     * Duplicates this HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.prototype.clone = function(result) {
+        return HeadingPitchRoll.clone(this, result);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equals = function(right) {
+        return HeadingPitchRoll.equals(this, right);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equalsEpsilon = function(right, relativeEpsilon, absoluteEpsilon) {
+        return HeadingPitchRoll.equalsEpsilon(this, right, relativeEpsilon, absoluteEpsilon);
+    };
+
+    /**
+     * Creates a string representing this HeadingPitchRoll in the format '(heading, pitch, roll)' in radians.
+     *
+     * @returns {String} A string representing the provided HeadingPitchRoll in the format '(heading, pitch, roll)'.
+     */
+    HeadingPitchRoll.prototype.toString = function() {
+        return '(' + this.heading + ', ' + this.pitch + ', ' + this.roll + ')';
+    };
+
+    return HeadingPitchRoll;
+});
+
+/*global define*/
 define('Core/Quaternion',[
         './Cartesian3',
         './Check',
         './defaultValue',
         './defined',
-        './DeveloperError',
+        './deprecationWarning',
         './FeatureDetection',
         './freezeObject',
+        './HeadingPitchRoll',
         './Math',
         './Matrix3'
     ], function(
@@ -12004,9 +12315,10 @@ define('Core/Quaternion',[
         Check,
         defaultValue,
         defined,
-        DeveloperError,
+        deprecationWarning,
         FeatureDetection,
         freezeObject,
+        HeadingPitchRoll,
         CesiumMath,
         Matrix3) {
     'use strict';
@@ -12158,6 +12470,9 @@ define('Core/Quaternion',[
     };
 
     var scratchHPRQuaternion = new Quaternion();
+    var scratchHeadingQuaternion = new Quaternion();
+    var scratchPitchQuaternion = new Quaternion();
+    var scratchRollQuaternion = new Quaternion();
 
     /**
      * Computes a rotation from the given heading, pitch and roll angles. Heading is the rotation about the
@@ -12170,16 +12485,27 @@ define('Core/Quaternion',[
      * @param {Quaternion} [result] The object onto which to store the result.
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if none was provided.
      */
-    Quaternion.fromHeadingPitchRoll = function(heading, pitch, roll, result) {
-                Check.typeOf.number('heading', heading);
-        Check.typeOf.number('pitch', pitch);
-        Check.typeOf.number('roll', roll);
-        
-        var rollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, roll, scratchHPRQuaternion);
-        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, result);
-        result = Quaternion.multiply(pitchQuaternion, rollQuaternion, pitchQuaternion);
-        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, scratchHPRQuaternion);
-        return Quaternion.multiply(headingQuaternion, result, result);
+    Quaternion.fromHeadingPitchRoll = function(headingOrHeadingPitchRoll, pitchOrResult, roll, result) {
+                if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            Check.typeOf.object('headingPitchRoll', headingOrHeadingPitchRoll);
+        } else {
+            Check.typeOf.number(headingOrHeadingPitchRoll, 'heading');
+            Check.typeOf.number(pitchOrResult, 'pitch');
+            Check.typeOf.number(roll, 'roll');
+        }
+                var hpr;
+        if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            hpr = headingOrHeadingPitchRoll;
+            result = pitchOrResult;
+        } else {
+            deprecationWarning('Quaternion.fromHeadingPitchRoll(heading, pitch, roll,result)', 'The method was deprecated in Cesium 1.32 and will be removed in version 1.33. ' + 'Use Quaternion.fromHeadingPitchRoll(hpr,result) where hpr is a HeadingPitchRoll');
+            hpr = new HeadingPitchRoll(headingOrHeadingPitchRoll, pitchOrResult, roll);
+        }
+        scratchRollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, hpr.roll, scratchHPRQuaternion);
+        scratchPitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -hpr.pitch, result);
+        result = Quaternion.multiply(scratchPitchQuaternion, scratchRollQuaternion, scratchPitchQuaternion);
+        scratchHeadingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -hpr.heading, scratchHPRQuaternion);
+        return Quaternion.multiply(scratchHeadingQuaternion, result, result);
     };
 
     var sampledQuaternionAxis = new Cartesian3();
@@ -14302,7 +14628,6 @@ define('Core/CircleOutlineGeometry',[
         './Check',
         './defaultValue',
         './defined',
-        './DeveloperError',
         './EllipseOutlineGeometry',
         './Ellipsoid'
     ], function(
@@ -14310,7 +14635,6 @@ define('Core/CircleOutlineGeometry',[
         Check,
         defaultValue,
         defined,
-        DeveloperError,
         EllipseOutlineGeometry,
         Ellipsoid) {
     'use strict';

@@ -75,7 +75,6 @@
 <script type="text/javascript" src="../src/mago3d/VisibleObjectsControler.js"></script>
 <script type="text/javascript" src="../src/mago3d/Matrix4.js"></script>
 <script>
-	var MAGO_CONFIG = null;
 	$.ajax({
 		url: "/sample/database.json",
 		type: "GET",
@@ -89,6 +88,23 @@
 			alert(e.responseText);
 		}
 	});
+	
+/* 	
+	// blocks 정보를 db에서 읽어 오는 예제
+ 	$.ajax({
+		url: "/sample/blocks.json",
+		type: "GET",
+		dataType: "json",
+		async : true,
+		success: function(result){
+			var blockId = "block5";
+			alert(result[blockId].id);
+		},
+		error: function(e){
+			alert(e.responseText);
+		}
+	}); 
+	*/
 </script>
 </body>
 </html>

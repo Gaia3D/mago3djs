@@ -1,0 +1,12 @@
+{
+	"block1" : { "id" : "block1-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block2" : { "id" : "block2-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block3" : { "id" : "block3-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block4" : { "id" : "block4-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block5" : { "id" : "block5-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block6" : { "id" : "block6-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block7" : { "id" : "block7-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block8" : { "id" : "block8-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block9" : { "id" : "block9-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 },
+	"block10" : { "id" : "block10-test", "latitude" : 34.903696, "longitude" : 128.595724, "height" : 1500.0 }
+}

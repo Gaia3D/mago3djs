@@ -20,7 +20,7 @@ var Server = require('karma').Server;
 
 var paths = {
 	data : './data',
-	source_js : [ './src/mago3d/*.js', '!./src/engine/cesium' ],
+	source_js : [ './src/mago3d/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js' ],
 //	source_images : './images/*',
 //	source_css : './src/css/*',
 	dest_js : './build/mago3d',
@@ -67,14 +67,14 @@ gulp.task('uglify', [ 'clean' ], function () {
 		.pipe(gulp.dest( paths.dest_js));
 });
 
-//gulp.task('combine-js', [ 'clean' ], function() {
-//	return gulp.src(paths.source_js)
-////			.pipe(stripeDebug())
-//			.pipe(uglify())
-//			//.pipe(rename({ suffix: '.min'}))
-//			.pipe(concat('all.js'))
-//			.pipe(gulp.dest(paths.dest_js));
-//});
+gulp.task('combine-js', [ 'clean' ], function() {
+	return gulp.src(paths.source_js)
+//			.pipe(stripeDebug())
+			.pipe(uglify())
+			//.pipe(rename({ suffix: '.min'}))
+			.pipe(concat('mago3d.js'))
+			.pipe(gulp.dest(paths.dest_js));
+});
 
 //gulp.task('minify-css', [ 'clean' ], function() {
 //	return gulp.src(paths.source_css)
@@ -115,5 +115,5 @@ gulp.task('doc', function (cb) {
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'clean' ]);
+gulp.task('default', [ 'clean', 'combine-js' ]);
 //gulp.task('default', [ 'uglify', 'doc' ]);
