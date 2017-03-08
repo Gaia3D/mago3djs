@@ -9,52 +9,22 @@ var Matrix4 = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this._floatArrays = [];
-	
-	this._floatArrays.push(1);
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	
-	this._floatArrays.push(0);
-	this._floatArrays.push(1);
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	this._floatArrays.push(1);
-	this._floatArrays.push(0);
-	
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	this._floatArrays.push(0);
-	this._floatArrays.push(1);
+	this._floatArrays = [ 	1, 0, 0, 0,
+							0, 1, 0, 0, 
+							0, 0, 1, 0, 
+							0, 0, 0, 1 
+						];
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */	
 Matrix4.prototype.Identity = function() {
-	this._floatArrays[0] = 1;  // Col 0 - Row 0.***
-	this._floatArrays[1] = 0;  // Col 0 - Row 1.***
-	this._floatArrays[2] = 0;  // Col 0 - Row 2.***
-	this._floatArrays[3] = 0;  // Col 0 - Row 3.***
-	
-	this._floatArrays[4] = 0;  // Col 1 - Row 0.***
-	this._floatArrays[5] = 1;  // Col 1 - Row 1.***
-	this._floatArrays[6] = 0;  // Col 1 - Row 2.***
-	this._floatArrays[7] = 0;  // Col 1 - Row 3.***
-	
-	this._floatArrays[8] = 0;  // Col 2 - Row 0.***
-	this._floatArrays[9] = 0;  // Col 2 - Row 1.***
-	this._floatArrays[10] = 1; // Col 2 - Row 2.***
-	this._floatArrays[11] = 0; // Col 2 - Row 3.***
-	
-	this._floatArrays[12] = 0; // Col 3 - Row 0.***
-	this._floatArrays[13] = 0; // Col 3 - Row 1.***
-	this._floatArrays[14] = 0; // Col 3 - Row 2.***
-	this._floatArrays[15] = 1; // Col 3 - Row 3.***
+	this._floatArrays = [ 	1, 0, 0, 0,
+							0, 1, 0, 0, 
+							0, 0, 1, 0, 
+							0, 0, 0, 1 
+						];
 };
 
 /**
