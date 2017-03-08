@@ -60,6 +60,8 @@ var NeoReferencesList = function() {
 	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 	
+	this.neoBuildingOwner;
+	
 	this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); 
 	this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); 
 	
