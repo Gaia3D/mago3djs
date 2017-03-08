@@ -20,10 +20,10 @@
 	},
 	"geoConfig" : {
 		"initEntity" : {
-			"name" : "삼성중공업",
-			"latitude" : 34.903696,
-			"longitude" : 128.595724,
-			"height" : 1500.0
+			"name" : "여의도",
+			"latitude" : 37.521168,
+			"longitude" : 126.924185,
+			"height" : 3000.0
 		},
 		"initTerrain" : {
 			"enable" : true,
@@ -32,16 +32,16 @@
 			"requestVertexNormals" : true
 		},
 		"initCamera" : {
-			"latitude" : 34.903696,
-			"longitude" : 128.595724,
+			"latitude" : 37.521168,
+			"longitude" : 126.924185,
 			"height" : 3000.0,
 			"duration": 3
 		},
 		"initBuilding" : {
-			"latitude" : [ 34.902880 ],
-			"longitude" : [ 128.595717 ],
-			"height" : [ 42.9 ],
-			"buildingFileName" : [ "F4D_2089_S120T_2_old"]
+			"latitude" : [ 37.5172076, 37.5157076 ],
+			"longitude" : [ 126.929, 126.929],
+			"height" : [ 60.0, 60.0 ],
+			"buildingFileName" : [ "F4D_KICT_main_Arc_v3_with_spaces", "F4D_gangbuk_cultur_del"]
 		}
 	}
 }
