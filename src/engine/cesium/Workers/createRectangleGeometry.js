@@ -3456,7 +3456,6 @@ define('Core/Rectangle',[
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './Ellipsoid',
         './freezeObject',
         './Math'
@@ -3466,7 +3465,6 @@ define('Core/Rectangle',[
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         Ellipsoid,
         freezeObject,
         CesiumMath) {
@@ -6759,7 +6757,6 @@ define('Core/Matrix4',[
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './freezeObject',
         './Math',
         './Matrix3',
@@ -6771,7 +6768,6 @@ define('Core/Matrix4',[
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         freezeObject,
         CesiumMath,
         Matrix3,
@@ -12079,6 +12075,21 @@ define('Core/WebGLConstants',[
         UNPACK_COLORSPACE_CONVERSION_WEBGL : 0x9243,
         BROWSER_DEFAULT_WEBGL : 0x9244,
 
+        // WEBGL_compressed_texture_s3tc
+        COMPRESSED_RGB_S3TC_DXT1_EXT : 0x83F0,
+        COMPRESSED_RGBA_S3TC_DXT1_EXT : 0x83F1,
+        COMPRESSED_RGBA_S3TC_DXT3_EXT : 0x83F2,
+        COMPRESSED_RGBA_S3TC_DXT5_EXT : 0x83F3,
+
+        // WEBGL_compressed_texture_pvrtc
+        COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0x8C00,
+        COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0x8C01,
+        COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0x8C02,
+        COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0x8C03,
+
+        // WEBGL_compressed_texture_etc1
+        COMPRESSED_RGB_ETC1_WEBGL : 0x8D64,
+
         // Desktop OpenGL
         DOUBLE : 0x140A,
 
@@ -13741,118 +13752,6 @@ define('Core/barycentricCoordinates',[
     }
 
     return barycentricCoordinates;
-});
-
-/*global define*/
-define('Core/oneTimeWarning',[
-        './defaultValue',
-        './defined',
-        './DeveloperError'
-    ], function(
-        defaultValue,
-        defined,
-        DeveloperError) {
-    "use strict";
-
-    var warnings = {};
-
-    /**
-     * Logs a one time message to the console.  Use this function instead of
-     * <code>console.log</code> directly since this does not log duplicate messages
-     * unless it is called from multiple workers.
-     *
-     * @exports oneTimeWarning
-     *
-     * @param {String} identifier The unique identifier for this warning.
-     * @param {String} [message=identifier] The message to log to the console.
-     *
-     * @example
-     * for(var i=0;i<foo.length;++i) {
-     *    if (!defined(foo[i].bar)) {
-     *       // Something that can be recovered from but may happen a lot
-     *       oneTimeWarning('foo.bar undefined', 'foo.bar is undefined. Setting to 0.');
-     *       foo[i].bar = 0;
-     *       // ...
-     *    }
-     * }
-     *
-     * @private
-     */
-    function oneTimeWarning(identifier, message) {
-                if (!defined(identifier)) {
-            throw new DeveloperError('identifier is required.');
-        }
-        
-        if (!defined(warnings[identifier])) {
-            warnings[identifier] = true;
-            console.warn(defaultValue(message, identifier));
-        }
-    }
-
-    oneTimeWarning.geometryOutlines = 'Entity geometry outlines are unsupported on terrain. Outlines will be disabled. To enable outlines, disable geometry terrain clamping by explicitly setting height to 0.';
-
-    return oneTimeWarning;
-});
-
-/*global define*/
-define('Core/deprecationWarning',[
-        './defined',
-        './DeveloperError',
-        './oneTimeWarning'
-    ], function(
-        defined,
-        DeveloperError,
-        oneTimeWarning) {
-    'use strict';
-    
-    /**
-     * Logs a deprecation message to the console.  Use this function instead of
-     * <code>console.log</code> directly since this does not log duplicate messages
-     * unless it is called from multiple workers.
-     *
-     * @exports deprecationWarning
-     *
-     * @param {String} identifier The unique identifier for this deprecated API.
-     * @param {String} message The message to log to the console.
-     *
-     * @example
-     * // Deprecated function or class
-     * function Foo() {
-     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
-     *    // ...
-     * }
-     *
-     * // Deprecated function
-     * Bar.prototype.func = function() {
-     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
-     *    // ...
-     * };
-     *
-     * // Deprecated property
-     * defineProperties(Bar.prototype, {
-     *     prop : {
-     *         get : function() {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         },
-     *         set : function(value) {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         }
-     *     }
-     * });
-     *
-     * @private
-     */
-    function deprecationWarning(identifier, message) {
-                if (!defined(identifier) || !defined(message)) {
-            throw new DeveloperError('identifier and message are required.');
-        }
-        
-        oneTimeWarning(identifier, message);
-    }
-
-    return deprecationWarning;
 });
 
 /*global define*/
@@ -16324,7 +16223,6 @@ define('Core/GeometryPipeline',[
         './ComponentDatatype',
         './defaultValue',
         './defined',
-        './deprecationWarning',
         './DeveloperError',
         './EncodedCartesian3',
         './GeographicProjection',
@@ -16351,7 +16249,6 @@ define('Core/GeometryPipeline',[
         ComponentDatatype,
         defaultValue,
         defined,
-        deprecationWarning,
         DeveloperError,
         EncodedCartesian3,
         GeographicProjection,
@@ -17459,20 +17356,28 @@ define('Core/GeometryPipeline',[
         for (i = 0; i < numVertices; i++) {
             var i3 = i * 3;
             vertexNormalData = normalsPerVertex[i];
+            Cartesian3.clone(Cartesian3.ZERO, normal);
             if (vertexNormalData.count > 0) {
-                Cartesian3.clone(Cartesian3.ZERO, normal);
                 for (j = 0; j < vertexNormalData.count; j++) {
                     Cartesian3.add(normal, normalsPerTriangle[normalIndices[vertexNormalData.indexOffset + j]], normal);
                 }
-                Cartesian3.normalize(normal, normal);
-                normalValues[i3] = normal.x;
-                normalValues[i3 + 1] = normal.y;
-                normalValues[i3 + 2] = normal.z;
-            } else {
-                normalValues[i3] = 0.0;
-                normalValues[i3 + 1] = 0.0;
-                normalValues[i3 + 2] = 1.0;
+
+                // We can run into an issue where a vertex is used with 2 primitives that have opposite winding order.
+                if (Cartesian3.equalsEpsilon(Cartesian3.ZERO, normal, CesiumMath.EPSILON10)) {
+                    Cartesian3.clone(normalsPerTriangle[normalIndices[vertexNormalData.indexOffset]], normal);
+                }
             }
+
+            // We end up with a zero vector probably because of a degenerate triangle
+            if (Cartesian3.equalsEpsilon(Cartesian3.ZERO, normal, CesiumMath.EPSILON10)) {
+                // Default to (0,0,1)
+                normal.z = 1.0;
+            }
+
+            Cartesian3.normalize(normal, normal);
+            normalValues[i3] = normal.x;
+            normalValues[i3 + 1] = normal.y;
+            normalValues[i3 + 2] = normal.z;
         }
 
         geometry.attributes.normal = new GeometryAttribute({
@@ -17622,34 +17527,6 @@ define('Core/GeometryPipeline',[
             componentsPerAttribute : 3,
             values : bitangentValues
         });
-
-        return geometry;
-    };
-
-    /**
-     * Computes per-vertex binormal and tangents for a geometry containing <code>TRIANGLES</code>.
-     * The result is new <code>binormal</code> and <code>tangent</code> attributes added to the geometry.
-     * This assumes a counter-clockwise winding order.
-     * <p>
-     * Based on <a href="http://www.terathon.com/code/tangent.html">Computing Tangent Space Basis Vectors
-     * for an Arbitrary Mesh</a> by Eric Lengyel.
-     * </p>
-     *
-     * @param {Geometry} geometry The geometry to modify.
-     * @returns {Geometry} The modified <code>geometry</code> argument with the computed <code>binormal</code> and <code>tangent</code> attributes.
-     *
-     * @exception {DeveloperError} geometry.indices length must be greater than 0 and be a multiple of 3.
-     * @exception {DeveloperError} geometry.primitiveType must be {@link PrimitiveType.TRIANGLES}.
-     *
-     * @example
-     * Cesium.GeometryPipeline.computeBinormalAndTangent(geometry);
-     *
-     * @see GeometryPipeline.computeTangentAndBitangent
-     */
-    GeometryPipeline.computeBinormalAndTangent = function(geometry) {
-        deprecationWarning('computeBinormalAndTangent', 'computeBinormalAndTangent was deprecated in 1.30.  It will be removed in 1.31.  Use a computeTangentAndBitangent.');
-        GeometryPipeline.computeTangentAndBitangent(geometry);
-        geometry.attributes.binormal = geometry.attributes.bitangent;
 
         return geometry;
     };
@@ -18851,842 +18728,6 @@ define('Core/GeometryPipeline',[
 });
 
 /*global define*/
-define('Core/Matrix2',[
-        './Cartesian2',
-        './Check',
-        './defaultValue',
-        './defined',
-        './defineProperties',
-        './DeveloperError',
-        './freezeObject'
-    ], function(
-        Cartesian2,
-        Check,
-        defaultValue,
-        defined,
-        defineProperties,
-        DeveloperError,
-        freezeObject) {
-    'use strict';
-
-    /**
-     * A 2x2 matrix, indexable as a column-major order array.
-     * Constructor parameters are in row-major order for code readability.
-     * @alias Matrix2
-     * @constructor
-     *
-     * @param {Number} [column0Row0=0.0] The value for column 0, row 0.
-     * @param {Number} [column1Row0=0.0] The value for column 1, row 0.
-     * @param {Number} [column0Row1=0.0] The value for column 0, row 1.
-     * @param {Number} [column1Row1=0.0] The value for column 1, row 1.
-     *
-     * @see Matrix2.fromColumnMajorArray
-     * @see Matrix2.fromRowMajorArray
-     * @see Matrix2.fromScale
-     * @see Matrix2.fromUniformScale
-     * @see Matrix3
-     * @see Matrix4
-     */
-    function Matrix2(column0Row0, column1Row0, column0Row1, column1Row1) {
-        this[0] = defaultValue(column0Row0, 0.0);
-        this[1] = defaultValue(column0Row1, 0.0);
-        this[2] = defaultValue(column1Row0, 0.0);
-        this[3] = defaultValue(column1Row1, 0.0);
-    }
-
-    /**
-     * The number of elements used to pack the object into an array.
-     * @type {Number}
-     */
-    Matrix2.packedLength = 4;
-
-    /**
-     * Stores the provided instance into the provided array.
-     *
-     * @param {Matrix2} value The value to pack.
-     * @param {Number[]} array The array to pack into.
-     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
-     *
-     * @returns {Number[]} The array that was packed into
-     */
-    Matrix2.pack = function(value, array, startingIndex) {
-                Check.typeOf.object('value', value);
-        Check.defined('array', array);
-        
-        startingIndex = defaultValue(startingIndex, 0);
-
-        array[startingIndex++] = value[0];
-        array[startingIndex++] = value[1];
-        array[startingIndex++] = value[2];
-        array[startingIndex++] = value[3];
-
-        return array;
-    };
-
-    /**
-     * Retrieves an instance from a packed array.
-     *
-     * @param {Number[]} array The packed array.
-     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
-     * @param {Matrix2} [result] The object into which to store the result.
-     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
-     */
-    Matrix2.unpack = function(array, startingIndex, result) {
-                Check.defined('array', array);
-        
-        startingIndex = defaultValue(startingIndex, 0);
-
-        if (!defined(result)) {
-            result = new Matrix2();
-        }
-
-        result[0] = array[startingIndex++];
-        result[1] = array[startingIndex++];
-        result[2] = array[startingIndex++];
-        result[3] = array[startingIndex++];
-        return result;
-    };
-
-    /**
-     * Duplicates a Matrix2 instance.
-     *
-     * @param {Matrix2} matrix The matrix to duplicate.
-     * @param {Matrix2} [result] The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided. (Returns undefined if matrix is undefined)
-     */
-    Matrix2.clone = function(matrix, result) {
-        if (!defined(matrix)) {
-            return undefined;
-        }
-        if (!defined(result)) {
-            return new Matrix2(matrix[0], matrix[2],
-                               matrix[1], matrix[3]);
-        }
-        result[0] = matrix[0];
-        result[1] = matrix[1];
-        result[2] = matrix[2];
-        result[3] = matrix[3];
-        return result;
-    };
-
-    /**
-     * Creates a Matrix2 from 4 consecutive elements in an array.
-     *
-     * @param {Number[]} array The array whose 4 consecutive elements correspond to the positions of the matrix.  Assumes column-major order.
-     * @param {Number} [startingIndex=0] The offset into the array of the first element, which corresponds to first column first row position in the matrix.
-     * @param {Matrix2} [result] The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
-     *
-     * @example
-     * // Create the Matrix2:
-     * // [1.0, 2.0]
-     * // [1.0, 2.0]
-     *
-     * var v = [1.0, 1.0, 2.0, 2.0];
-     * var m = Cesium.Matrix2.fromArray(v);
-     *
-     * // Create same Matrix2 with using an offset into an array
-     * var v2 = [0.0, 0.0, 1.0, 1.0, 2.0, 2.0];
-     * var m2 = Cesium.Matrix2.fromArray(v2, 2);
-     */
-    Matrix2.fromArray = function(array, startingIndex, result) {
-                Check.defined('array', array);
-        
-        startingIndex = defaultValue(startingIndex, 0);
-
-        if (!defined(result)) {
-            result = new Matrix2();
-        }
-
-        result[0] = array[startingIndex];
-        result[1] = array[startingIndex + 1];
-        result[2] = array[startingIndex + 2];
-        result[3] = array[startingIndex + 3];
-        return result;
-    };
-
-    /**
-     * Creates a Matrix2 instance from a column-major order array.
-     *
-     * @param {Number[]} values The column-major order array.
-     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
-     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
-     */
-    Matrix2.fromColumnMajorArray = function(values, result) {
-                Check.defined('values', values);
-        
-        return Matrix2.clone(values, result);
-    };
-
-    /**
-     * Creates a Matrix2 instance from a row-major order array.
-     * The resulting matrix will be in column-major order.
-     *
-     * @param {Number[]} values The row-major order array.
-     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
-     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
-     */
-    Matrix2.fromRowMajorArray = function(values, result) {
-                Check.defined('values', values);
-        
-        if (!defined(result)) {
-            return new Matrix2(values[0], values[1],
-                               values[2], values[3]);
-        }
-        result[0] = values[0];
-        result[1] = values[2];
-        result[2] = values[1];
-        result[3] = values[3];
-        return result;
-    };
-
-    /**
-     * Computes a Matrix2 instance representing a non-uniform scale.
-     *
-     * @param {Cartesian2} scale The x and y scale factors.
-     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
-     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
-     *
-     * @example
-     * // Creates
-     * //   [7.0, 0.0]
-     * //   [0.0, 8.0]
-     * var m = Cesium.Matrix2.fromScale(new Cesium.Cartesian2(7.0, 8.0));
-     */
-    Matrix2.fromScale = function(scale, result) {
-                Check.typeOf.object('scale', scale);
-        
-        if (!defined(result)) {
-            return new Matrix2(
-                scale.x, 0.0,
-                0.0,     scale.y);
-        }
-
-        result[0] = scale.x;
-        result[1] = 0.0;
-        result[2] = 0.0;
-        result[3] = scale.y;
-        return result;
-    };
-
-    /**
-     * Computes a Matrix2 instance representing a uniform scale.
-     *
-     * @param {Number} scale The uniform scale factor.
-     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
-     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
-     *
-     * @example
-     * // Creates
-     * //   [2.0, 0.0]
-     * //   [0.0, 2.0]
-     * var m = Cesium.Matrix2.fromUniformScale(2.0);
-     */
-    Matrix2.fromUniformScale = function(scale, result) {
-                Check.typeOf.number('scale', scale);
-        
-        if (!defined(result)) {
-            return new Matrix2(
-                scale, 0.0,
-                0.0,   scale);
-        }
-
-        result[0] = scale;
-        result[1] = 0.0;
-        result[2] = 0.0;
-        result[3] = scale;
-        return result;
-    };
-
-    /**
-     * Creates a rotation matrix.
-     *
-     * @param {Number} angle The angle, in radians, of the rotation.  Positive angles are counterclockwise.
-     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
-     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
-     *
-     * @example
-     * // Rotate a point 45 degrees counterclockwise.
-     * var p = new Cesium.Cartesian2(5, 6);
-     * var m = Cesium.Matrix2.fromRotation(Cesium.Math.toRadians(45.0));
-     * var rotated = Cesium.Matrix2.multiplyByVector(m, p, new Cesium.Cartesian2());
-     */
-    Matrix2.fromRotation = function(angle, result) {
-                Check.typeOf.number('angle', angle);
-        
-        var cosAngle = Math.cos(angle);
-        var sinAngle = Math.sin(angle);
-
-        if (!defined(result)) {
-            return new Matrix2(
-                cosAngle, -sinAngle,
-                sinAngle, cosAngle);
-        }
-        result[0] = cosAngle;
-        result[1] = sinAngle;
-        result[2] = -sinAngle;
-        result[3] = cosAngle;
-        return result;
-    };
-
-    /**
-     * Creates an Array from the provided Matrix2 instance.
-     * The array will be in column-major order.
-     *
-     * @param {Matrix2} matrix The matrix to use..
-     * @param {Number[]} [result] The Array onto which to store the result.
-     * @returns {Number[]} The modified Array parameter or a new Array instance if one was not provided.
-     */
-    Matrix2.toArray = function(matrix, result) {
-                Check.typeOf.object('matrix', matrix);
-        
-        if (!defined(result)) {
-            return [matrix[0], matrix[1], matrix[2], matrix[3]];
-        }
-        result[0] = matrix[0];
-        result[1] = matrix[1];
-        result[2] = matrix[2];
-        result[3] = matrix[3];
-        return result;
-    };
-
-    /**
-     * Computes the array index of the element at the provided row and column.
-     *
-     * @param {Number} row The zero-based index of the row.
-     * @param {Number} column The zero-based index of the column.
-     * @returns {Number} The index of the element at the provided row and column.
-     *
-     * @exception {DeveloperError} row must be 0 or 1.
-     * @exception {DeveloperError} column must be 0 or 1.
-     *
-     * @example
-     * var myMatrix = new Cesium.Matrix2();
-     * var column1Row0Index = Cesium.Matrix2.getElementIndex(1, 0);
-     * var column1Row0 = myMatrix[column1Row0Index]
-     * myMatrix[column1Row0Index] = 10.0;
-     */
-    Matrix2.getElementIndex = function(column, row) {
-                Check.typeOf.number.greaterThanOrEquals('row', row, 0);
-        Check.typeOf.number.lessThanOrEquals('row', row, 1);
-
-        Check.typeOf.number.greaterThanOrEquals('column', column, 0);
-        Check.typeOf.number.lessThanOrEquals('column', column, 1);
-        
-        return column * 2 + row;
-    };
-
-    /**
-     * Retrieves a copy of the matrix column at the provided index as a Cartesian2 instance.
-     *
-     * @param {Matrix2} matrix The matrix to use.
-     * @param {Number} index The zero-based index of the column to retrieve.
-     * @param {Cartesian2} result The object onto which to store the result.
-     * @returns {Cartesian2} The modified result parameter.
-     *
-     * @exception {DeveloperError} index must be 0 or 1.
-     */
-    Matrix2.getColumn = function(matrix, index, result) {
-                Check.typeOf.object('matrix', matrix);
-
-        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
-        Check.typeOf.number.lessThanOrEquals('index', index, 1);
-
-        Check.typeOf.object('result', result);
-        
-        var startIndex = index * 2;
-        var x = matrix[startIndex];
-        var y = matrix[startIndex + 1];
-
-        result.x = x;
-        result.y = y;
-        return result;
-    };
-
-    /**
-     * Computes a new matrix that replaces the specified column in the provided matrix with the provided Cartesian2 instance.
-     *
-     * @param {Matrix2} matrix The matrix to use.
-     * @param {Number} index The zero-based index of the column to set.
-     * @param {Cartesian2} cartesian The Cartesian whose values will be assigned to the specified column.
-     * @param {Cartesian2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     *
-     * @exception {DeveloperError} index must be 0 or 1.
-     */
-    Matrix2.setColumn = function(matrix, index, cartesian, result) {
-                Check.typeOf.object('matrix', matrix);
-
-        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
-        Check.typeOf.number.lessThanOrEquals('index', index, 1);
-
-        Check.typeOf.object('cartesian', cartesian);
-        Check.typeOf.object('result', result);
-        
-        result = Matrix2.clone(matrix, result);
-        var startIndex = index * 2;
-        result[startIndex] = cartesian.x;
-        result[startIndex + 1] = cartesian.y;
-        return result;
-    };
-
-    /**
-     * Retrieves a copy of the matrix row at the provided index as a Cartesian2 instance.
-     *
-     * @param {Matrix2} matrix The matrix to use.
-     * @param {Number} index The zero-based index of the row to retrieve.
-     * @param {Cartesian2} result The object onto which to store the result.
-     * @returns {Cartesian2} The modified result parameter.
-     *
-     * @exception {DeveloperError} index must be 0 or 1.
-     */
-    Matrix2.getRow = function(matrix, index, result) {
-                Check.typeOf.object('matrix', matrix);
-
-        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
-        Check.typeOf.number.lessThanOrEquals('index', index, 1);
-
-        Check.typeOf.object('result', result);
-        
-        var x = matrix[index];
-        var y = matrix[index + 2];
-
-        result.x = x;
-        result.y = y;
-        return result;
-    };
-
-    /**
-     * Computes a new matrix that replaces the specified row in the provided matrix with the provided Cartesian2 instance.
-     *
-     * @param {Matrix2} matrix The matrix to use.
-     * @param {Number} index The zero-based index of the row to set.
-     * @param {Cartesian2} cartesian The Cartesian whose values will be assigned to the specified row.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     *
-     * @exception {DeveloperError} index must be 0 or 1.
-     */
-    Matrix2.setRow = function(matrix, index, cartesian, result) {
-                Check.typeOf.object('matrix', matrix);
-
-        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
-        Check.typeOf.number.lessThanOrEquals('index', index, 1);
-
-        Check.typeOf.object('cartesian', cartesian);
-        Check.typeOf.object('result', result);
-        
-        result = Matrix2.clone(matrix, result);
-        result[index] = cartesian.x;
-        result[index + 2] = cartesian.y;
-        return result;
-    };
-
-    var scratchColumn = new Cartesian2();
-
-    /**
-     * Extracts the non-uniform scale assuming the matrix is an affine transformation.
-     *
-     * @param {Matrix2} matrix The matrix.
-     * @param {Cartesian2} result The object onto which to store the result.
-     * @returns {Cartesian2} The modified result parameter.
-     */
-    Matrix2.getScale = function(matrix, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('result', result);
-        
-        result.x = Cartesian2.magnitude(Cartesian2.fromElements(matrix[0], matrix[1], scratchColumn));
-        result.y = Cartesian2.magnitude(Cartesian2.fromElements(matrix[2], matrix[3], scratchColumn));
-        return result;
-    };
-
-    var scratchScale = new Cartesian2();
-
-    /**
-     * Computes the maximum scale assuming the matrix is an affine transformation.
-     * The maximum scale is the maximum length of the column vectors.
-     *
-     * @param {Matrix2} matrix The matrix.
-     * @returns {Number} The maximum scale.
-     */
-    Matrix2.getMaximumScale = function(matrix) {
-        Matrix2.getScale(matrix, scratchScale);
-        return Cartesian2.maximumComponent(scratchScale);
-    };
-
-    /**
-     * Computes the product of two matrices.
-     *
-     * @param {Matrix2} left The first matrix.
-     * @param {Matrix2} right The second matrix.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.multiply = function(left, right, result) {
-                Check.typeOf.object('left', left);
-        Check.typeOf.object('right', right);
-        Check.typeOf.object('result', result);
-        
-        var column0Row0 = left[0] * right[0] + left[2] * right[1];
-        var column1Row0 = left[0] * right[2] + left[2] * right[3];
-        var column0Row1 = left[1] * right[0] + left[3] * right[1];
-        var column1Row1 = left[1] * right[2] + left[3] * right[3];
-
-        result[0] = column0Row0;
-        result[1] = column0Row1;
-        result[2] = column1Row0;
-        result[3] = column1Row1;
-        return result;
-    };
-
-    /**
-     * Computes the sum of two matrices.
-     *
-     * @param {Matrix2} left The first matrix.
-     * @param {Matrix2} right The second matrix.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.add = function(left, right, result) {
-                Check.typeOf.object('left', left);
-        Check.typeOf.object('right', right);
-        Check.typeOf.object('result', result);
-        
-        result[0] = left[0] + right[0];
-        result[1] = left[1] + right[1];
-        result[2] = left[2] + right[2];
-        result[3] = left[3] + right[3];
-        return result;
-    };
-
-    /**
-     * Computes the difference of two matrices.
-     *
-     * @param {Matrix2} left The first matrix.
-     * @param {Matrix2} right The second matrix.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.subtract = function(left, right, result) {
-                Check.typeOf.object('left', left);
-        Check.typeOf.object('right', right);
-        Check.typeOf.object('result', result);
-        
-        result[0] = left[0] - right[0];
-        result[1] = left[1] - right[1];
-        result[2] = left[2] - right[2];
-        result[3] = left[3] - right[3];
-        return result;
-    };
-
-    /**
-     * Computes the product of a matrix and a column vector.
-     *
-     * @param {Matrix2} matrix The matrix.
-     * @param {Cartesian2} cartesian The column.
-     * @param {Cartesian2} result The object onto which to store the result.
-     * @returns {Cartesian2} The modified result parameter.
-     */
-    Matrix2.multiplyByVector = function(matrix, cartesian, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('cartesian', cartesian);
-        Check.typeOf.object('result', result);
-        
-        var x = matrix[0] * cartesian.x + matrix[2] * cartesian.y;
-        var y = matrix[1] * cartesian.x + matrix[3] * cartesian.y;
-
-        result.x = x;
-        result.y = y;
-        return result;
-    };
-
-    /**
-     * Computes the product of a matrix and a scalar.
-     *
-     * @param {Matrix2} matrix The matrix.
-     * @param {Number} scalar The number to multiply by.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.multiplyByScalar = function(matrix, scalar, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.number('scalar', scalar);
-        Check.typeOf.object('result', result);
-        
-        result[0] = matrix[0] * scalar;
-        result[1] = matrix[1] * scalar;
-        result[2] = matrix[2] * scalar;
-        result[3] = matrix[3] * scalar;
-        return result;
-    };
-
-    /**
-     * Computes the product of a matrix times a (non-uniform) scale, as if the scale were a scale matrix.
-     *
-     * @param {Matrix2} matrix The matrix on the left-hand side.
-     * @param {Cartesian2} scale The non-uniform scale on the right-hand side.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     *
-     *
-     * @example
-     * // Instead of Cesium.Matrix2.multiply(m, Cesium.Matrix2.fromScale(scale), m);
-     * Cesium.Matrix2.multiplyByScale(m, scale, m);
-     *
-     * @see Matrix2.fromScale
-     * @see Matrix2.multiplyByUniformScale
-     */
-    Matrix2.multiplyByScale = function(matrix, scale, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('scale', scale);
-        Check.typeOf.object('result', result);
-        
-        result[0] = matrix[0] * scale.x;
-        result[1] = matrix[1] * scale.x;
-        result[2] = matrix[2] * scale.y;
-        result[3] = matrix[3] * scale.y;
-        return result;
-    };
-
-    /**
-     * Creates a negated copy of the provided matrix.
-     *
-     * @param {Matrix2} matrix The matrix to negate.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.negate = function(matrix, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('result', result);
-        
-        result[0] = -matrix[0];
-        result[1] = -matrix[1];
-        result[2] = -matrix[2];
-        result[3] = -matrix[3];
-        return result;
-    };
-
-    /**
-     * Computes the transpose of the provided matrix.
-     *
-     * @param {Matrix2} matrix The matrix to transpose.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.transpose = function(matrix, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('result', result);
-        
-        var column0Row0 = matrix[0];
-        var column0Row1 = matrix[2];
-        var column1Row0 = matrix[1];
-        var column1Row1 = matrix[3];
-
-        result[0] = column0Row0;
-        result[1] = column0Row1;
-        result[2] = column1Row0;
-        result[3] = column1Row1;
-        return result;
-    };
-
-    /**
-     * Computes a matrix, which contains the absolute (unsigned) values of the provided matrix's elements.
-     *
-     * @param {Matrix2} matrix The matrix with signed elements.
-     * @param {Matrix2} result The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter.
-     */
-    Matrix2.abs = function(matrix, result) {
-                Check.typeOf.object('matrix', matrix);
-        Check.typeOf.object('result', result);
-        
-        result[0] = Math.abs(matrix[0]);
-        result[1] = Math.abs(matrix[1]);
-        result[2] = Math.abs(matrix[2]);
-        result[3] = Math.abs(matrix[3]);
-
-        return result;
-    };
-
-    /**
-     * Compares the provided matrices componentwise and returns
-     * <code>true</code> if they are equal, <code>false</code> otherwise.
-     *
-     * @param {Matrix2} [left] The first matrix.
-     * @param {Matrix2} [right] The second matrix.
-     * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
-     */
-    Matrix2.equals = function(left, right) {
-        return (left === right) ||
-               (defined(left) &&
-                defined(right) &&
-                left[0] === right[0] &&
-                left[1] === right[1] &&
-                left[2] === right[2] &&
-                left[3] === right[3]);
-    };
-
-    /**
-     * @private
-     */
-    Matrix2.equalsArray = function(matrix, array, offset) {
-        return matrix[0] === array[offset] &&
-               matrix[1] === array[offset + 1] &&
-               matrix[2] === array[offset + 2] &&
-               matrix[3] === array[offset + 3];
-    };
-
-    /**
-     * Compares the provided matrices componentwise and returns
-     * <code>true</code> if they are within the provided epsilon,
-     * <code>false</code> otherwise.
-     *
-     * @param {Matrix2} [left] The first matrix.
-     * @param {Matrix2} [right] The second matrix.
-     * @param {Number} epsilon The epsilon to use for equality testing.
-     * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
-     */
-    Matrix2.equalsEpsilon = function(left, right, epsilon) {
-                Check.typeOf.number('epsilon', epsilon);
-        
-        return (left === right) ||
-                (defined(left) &&
-                defined(right) &&
-                Math.abs(left[0] - right[0]) <= epsilon &&
-                Math.abs(left[1] - right[1]) <= epsilon &&
-                Math.abs(left[2] - right[2]) <= epsilon &&
-                Math.abs(left[3] - right[3]) <= epsilon);
-    };
-
-    /**
-     * An immutable Matrix2 instance initialized to the identity matrix.
-     *
-     * @type {Matrix2}
-     * @constant
-     */
-    Matrix2.IDENTITY = freezeObject(new Matrix2(1.0, 0.0,
-                                                0.0, 1.0));
-
-    /**
-     * An immutable Matrix2 instance initialized to the zero matrix.
-     *
-     * @type {Matrix2}
-     * @constant
-     */
-    Matrix2.ZERO = freezeObject(new Matrix2(0.0, 0.0,
-                                            0.0, 0.0));
-
-    /**
-     * The index into Matrix2 for column 0, row 0.
-     *
-     * @type {Number}
-     * @constant
-     *
-     * @example
-     * var matrix = new Cesium.Matrix2();
-     * matrix[Cesium.Matrix2.COLUMN0ROW0] = 5.0; // set column 0, row 0 to 5.0
-     */
-    Matrix2.COLUMN0ROW0 = 0;
-
-    /**
-     * The index into Matrix2 for column 0, row 1.
-     *
-     * @type {Number}
-     * @constant
-     *
-     * @example
-     * var matrix = new Cesium.Matrix2();
-     * matrix[Cesium.Matrix2.COLUMN0ROW1] = 5.0; // set column 0, row 1 to 5.0
-     */
-    Matrix2.COLUMN0ROW1 = 1;
-
-    /**
-     * The index into Matrix2 for column 1, row 0.
-     *
-     * @type {Number}
-     * @constant
-     *
-     * @example
-     * var matrix = new Cesium.Matrix2();
-     * matrix[Cesium.Matrix2.COLUMN1ROW0] = 5.0; // set column 1, row 0 to 5.0
-     */
-    Matrix2.COLUMN1ROW0 = 2;
-
-    /**
-     * The index into Matrix2 for column 1, row 1.
-     *
-     * @type {Number}
-     * @constant
-     *
-     * @example
-     * var matrix = new Cesium.Matrix2();
-     * matrix[Cesium.Matrix2.COLUMN1ROW1] = 5.0; // set column 1, row 1 to 5.0
-     */
-    Matrix2.COLUMN1ROW1 = 3;
-
-    defineProperties(Matrix2.prototype, {
-        /**
-         * Gets the number of items in the collection.
-         * @memberof Matrix2.prototype
-         *
-         * @type {Number}
-         */
-        length : {
-            get : function() {
-                return Matrix2.packedLength;
-            }
-        }
-    });
-
-    /**
-     * Duplicates the provided Matrix2 instance.
-     *
-     * @param {Matrix2} [result] The object onto which to store the result.
-     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
-     */
-    Matrix2.prototype.clone = function(result) {
-        return Matrix2.clone(this, result);
-    };
-
-    /**
-     * Compares this matrix to the provided matrix componentwise and returns
-     * <code>true</code> if they are equal, <code>false</code> otherwise.
-     *
-     * @param {Matrix2} [right] The right hand side matrix.
-     * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
-     */
-    Matrix2.prototype.equals = function(right) {
-        return Matrix2.equals(this, right);
-    };
-
-    /**
-     * Compares this matrix to the provided matrix componentwise and returns
-     * <code>true</code> if they are within the provided epsilon,
-     * <code>false</code> otherwise.
-     *
-     * @param {Matrix2} [right] The right hand side matrix.
-     * @param {Number} epsilon The epsilon to use for equality testing.
-     * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
-     */
-    Matrix2.prototype.equalsEpsilon = function(right, epsilon) {
-        return Matrix2.equalsEpsilon(this, right, epsilon);
-    };
-
-    /**
-     * Creates a string representing this Matrix with each row being
-     * on a separate line and in the format '(column0, column1)'.
-     *
-     * @returns {String} A string representing the provided Matrix with each row being on a separate line and in the format '(column0, column1)'.
-     */
-    Matrix2.prototype.toString = function() {
-        return '(' + this[0] + ', ' + this[2] + ')\n' +
-               '(' + this[1] + ', ' + this[3] + ')';
-    };
-
-    return Matrix2;
-});
-
-/*global define*/
 define('ThirdParty/earcut-2.1.1',[], function() {
     'use strict';
 
@@ -20667,14 +19708,314 @@ define('Core/PolygonPipeline',[
 });
 
 /*global define*/
+define('Core/oneTimeWarning',[
+        './defaultValue',
+        './defined',
+        './DeveloperError'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError) {
+    "use strict";
+
+    var warnings = {};
+
+    /**
+     * Logs a one time message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports oneTimeWarning
+     *
+     * @param {String} identifier The unique identifier for this warning.
+     * @param {String} [message=identifier] The message to log to the console.
+     *
+     * @example
+     * for(var i=0;i<foo.length;++i) {
+     *    if (!defined(foo[i].bar)) {
+     *       // Something that can be recovered from but may happen a lot
+     *       oneTimeWarning('foo.bar undefined', 'foo.bar is undefined. Setting to 0.');
+     *       foo[i].bar = 0;
+     *       // ...
+     *    }
+     * }
+     *
+     * @private
+     */
+    function oneTimeWarning(identifier, message) {
+                if (!defined(identifier)) {
+            throw new DeveloperError('identifier is required.');
+        }
+        
+        if (!defined(warnings[identifier])) {
+            warnings[identifier] = true;
+            console.warn(defaultValue(message, identifier));
+        }
+    }
+
+    oneTimeWarning.geometryOutlines = 'Entity geometry outlines are unsupported on terrain. Outlines will be disabled. To enable outlines, disable geometry terrain clamping by explicitly setting height to 0.';
+
+    return oneTimeWarning;
+});
+
+/*global define*/
+define('Core/deprecationWarning',[
+        './defined',
+        './DeveloperError',
+        './oneTimeWarning'
+    ], function(
+        defined,
+        DeveloperError,
+        oneTimeWarning) {
+    'use strict';
+    
+    /**
+     * Logs a deprecation message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports deprecationWarning
+     *
+     * @param {String} identifier The unique identifier for this deprecated API.
+     * @param {String} message The message to log to the console.
+     *
+     * @example
+     * // Deprecated function or class
+     * function Foo() {
+     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
+     *    // ...
+     * }
+     *
+     * // Deprecated function
+     * Bar.prototype.func = function() {
+     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
+     *    // ...
+     * };
+     *
+     * // Deprecated property
+     * defineProperties(Bar.prototype, {
+     *     prop : {
+     *         get : function() {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         },
+     *         set : function(value) {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         }
+     *     }
+     * });
+     *
+     * @private
+     */
+    function deprecationWarning(identifier, message) {
+                if (!defined(identifier) || !defined(message)) {
+            throw new DeveloperError('identifier and message are required.');
+        }
+        
+        oneTimeWarning(identifier, message);
+    }
+
+    return deprecationWarning;
+});
+
+/*global define*/
+define('Core/HeadingPitchRoll',[
+        './defaultValue',
+        './defined',
+        './DeveloperError',
+        './Math'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError,
+        CesiumMath) {
+    "use strict";
+
+    /**
+     * A rotation expressed as a heading, pitch, and roll. Heading is the rotation about the
+     * negative z axis. Pitch is the rotation about the negative y axis. Roll is the rotation about
+     * the positive x axis.
+     * @alias HeadingPitchRoll
+     * @constructor
+     *
+     * @param {Number} [heading=0.0] The heading component in radians.
+     * @param {Number} [pitch=0.0] The pitch component in radians.
+     * @param {Number} [roll=0.0] The roll component in radians.
+     */
+    function HeadingPitchRoll(heading, pitch, roll) {
+        this.heading = defaultValue(heading, 0.0);
+        this.pitch = defaultValue(pitch, 0.0);
+        this.roll = defaultValue(roll, 0.0);
+    }
+
+    /**
+     * Computes the heading, pitch and roll from a quaternion (see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles )
+     *
+     * @param {Quaternion} quaternion The quaternion from which to retrieve heading, pitch, and roll, all expressed in radians.
+     * @param {Quaternion} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.fromQuaternion = function(quaternion, result) {
+                if (!defined(quaternion)) {
+            throw new DeveloperError('quaternion is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        var test = 2 * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
+        var denominatorRoll = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+        var numeratorRoll = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
+        var denominatorHeading = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+        var numeratorHeading = 2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
+        result.heading = -Math.atan2(numeratorHeading, denominatorHeading);
+        result.roll = Math.atan2(numeratorRoll, denominatorRoll);
+        result.pitch = -Math.asin(test);
+        return result;
+    };
+
+    /**
+     * Returns a new HeadingPitchRoll instance from angles given in degrees.
+     *
+     * @param {Number} heading the heading in degrees
+     * @param {Number} pitch the pitch in degrees
+     * @param {Number} roll the heading in degrees
+     * @param {HeadingPitchRoll} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} A new HeadingPitchRoll instance
+     */
+    HeadingPitchRoll.fromDegrees = function(heading, pitch, roll, result) {
+                if (!defined(heading)) {
+            throw new DeveloperError('heading is required');
+        }
+        if (!defined(pitch)) {
+            throw new DeveloperError('pitch is required');
+        }
+        if (!defined(roll)) {
+            throw new DeveloperError('roll is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        result.heading = heading * CesiumMath.RADIANS_PER_DEGREE;
+        result.pitch = pitch * CesiumMath.RADIANS_PER_DEGREE;
+        result.roll = roll * CesiumMath.RADIANS_PER_DEGREE;
+        return result;
+    };
+
+    /**
+     * Duplicates a HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} headingPitchRoll The HeadingPitchRoll to duplicate.
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided. (Returns undefined if headingPitchRoll is undefined)
+     */
+    HeadingPitchRoll.clone = function(headingPitchRoll, result) {
+        if (!defined(headingPitchRoll)) {
+            return undefined;
+        }
+        if (!defined(result)) {
+            return new HeadingPitchRoll(headingPitchRoll.heading, headingPitchRoll.pitch, headingPitchRoll.roll);
+        }
+        result.heading = headingPitchRoll.heading;
+        result.pitch = headingPitchRoll.pitch;
+        result.roll = headingPitchRoll.roll;
+        return result;
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equals = function(left, right) {
+        return (left === right) ||
+            ((defined(left)) &&
+                (defined(right)) &&
+                (left.heading === right.heading) &&
+                (left.pitch === right.pitch) &&
+                (left.roll === right.roll));
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equalsEpsilon = function(left, right, relativeEpsilon, absoluteEpsilon) {
+        return (left === right) ||
+            (defined(left) &&
+                defined(right) &&
+                CesiumMath.equalsEpsilon(left.heading, right.heading, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.pitch, right.pitch, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.roll, right.roll, relativeEpsilon, absoluteEpsilon));
+    };
+
+    /**
+     * Duplicates this HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.prototype.clone = function(result) {
+        return HeadingPitchRoll.clone(this, result);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equals = function(right) {
+        return HeadingPitchRoll.equals(this, right);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equalsEpsilon = function(right, relativeEpsilon, absoluteEpsilon) {
+        return HeadingPitchRoll.equalsEpsilon(this, right, relativeEpsilon, absoluteEpsilon);
+    };
+
+    /**
+     * Creates a string representing this HeadingPitchRoll in the format '(heading, pitch, roll)' in radians.
+     *
+     * @returns {String} A string representing the provided HeadingPitchRoll in the format '(heading, pitch, roll)'.
+     */
+    HeadingPitchRoll.prototype.toString = function() {
+        return '(' + this.heading + ', ' + this.pitch + ', ' + this.roll + ')';
+    };
+
+    return HeadingPitchRoll;
+});
+
+/*global define*/
 define('Core/Quaternion',[
         './Cartesian3',
         './Check',
         './defaultValue',
         './defined',
-        './DeveloperError',
+        './deprecationWarning',
         './FeatureDetection',
         './freezeObject',
+        './HeadingPitchRoll',
         './Math',
         './Matrix3'
     ], function(
@@ -20682,9 +20023,10 @@ define('Core/Quaternion',[
         Check,
         defaultValue,
         defined,
-        DeveloperError,
+        deprecationWarning,
         FeatureDetection,
         freezeObject,
+        HeadingPitchRoll,
         CesiumMath,
         Matrix3) {
     'use strict';
@@ -20836,6 +20178,9 @@ define('Core/Quaternion',[
     };
 
     var scratchHPRQuaternion = new Quaternion();
+    var scratchHeadingQuaternion = new Quaternion();
+    var scratchPitchQuaternion = new Quaternion();
+    var scratchRollQuaternion = new Quaternion();
 
     /**
      * Computes a rotation from the given heading, pitch and roll angles. Heading is the rotation about the
@@ -20848,16 +20193,27 @@ define('Core/Quaternion',[
      * @param {Quaternion} [result] The object onto which to store the result.
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if none was provided.
      */
-    Quaternion.fromHeadingPitchRoll = function(heading, pitch, roll, result) {
-                Check.typeOf.number('heading', heading);
-        Check.typeOf.number('pitch', pitch);
-        Check.typeOf.number('roll', roll);
-        
-        var rollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, roll, scratchHPRQuaternion);
-        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, result);
-        result = Quaternion.multiply(pitchQuaternion, rollQuaternion, pitchQuaternion);
-        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, scratchHPRQuaternion);
-        return Quaternion.multiply(headingQuaternion, result, result);
+    Quaternion.fromHeadingPitchRoll = function(headingOrHeadingPitchRoll, pitchOrResult, roll, result) {
+                if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            Check.typeOf.object('headingPitchRoll', headingOrHeadingPitchRoll);
+        } else {
+            Check.typeOf.number(headingOrHeadingPitchRoll, 'heading');
+            Check.typeOf.number(pitchOrResult, 'pitch');
+            Check.typeOf.number(roll, 'roll');
+        }
+                var hpr;
+        if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            hpr = headingOrHeadingPitchRoll;
+            result = pitchOrResult;
+        } else {
+            deprecationWarning('Quaternion.fromHeadingPitchRoll(heading, pitch, roll,result)', 'The method was deprecated in Cesium 1.32 and will be removed in version 1.33. ' + 'Use Quaternion.fromHeadingPitchRoll(hpr,result) where hpr is a HeadingPitchRoll');
+            hpr = new HeadingPitchRoll(headingOrHeadingPitchRoll, pitchOrResult, roll);
+        }
+        scratchRollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, hpr.roll, scratchHPRQuaternion);
+        scratchPitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -hpr.pitch, result);
+        result = Quaternion.multiply(scratchPitchQuaternion, scratchRollQuaternion, scratchPitchQuaternion);
+        scratchHeadingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -hpr.heading, scratchHPRQuaternion);
+        return Quaternion.multiply(scratchHeadingQuaternion, result, result);
     };
 
     var sampledQuaternionAxis = new Cartesian3();
@@ -21653,6 +21009,840 @@ define('Core/Quaternion',[
 });
 
 /*global define*/
+define('Core/Matrix2',[
+        './Cartesian2',
+        './Check',
+        './defaultValue',
+        './defined',
+        './defineProperties',
+        './freezeObject'
+    ], function(
+        Cartesian2,
+        Check,
+        defaultValue,
+        defined,
+        defineProperties,
+        freezeObject) {
+    'use strict';
+
+    /**
+     * A 2x2 matrix, indexable as a column-major order array.
+     * Constructor parameters are in row-major order for code readability.
+     * @alias Matrix2
+     * @constructor
+     *
+     * @param {Number} [column0Row0=0.0] The value for column 0, row 0.
+     * @param {Number} [column1Row0=0.0] The value for column 1, row 0.
+     * @param {Number} [column0Row1=0.0] The value for column 0, row 1.
+     * @param {Number} [column1Row1=0.0] The value for column 1, row 1.
+     *
+     * @see Matrix2.fromColumnMajorArray
+     * @see Matrix2.fromRowMajorArray
+     * @see Matrix2.fromScale
+     * @see Matrix2.fromUniformScale
+     * @see Matrix3
+     * @see Matrix4
+     */
+    function Matrix2(column0Row0, column1Row0, column0Row1, column1Row1) {
+        this[0] = defaultValue(column0Row0, 0.0);
+        this[1] = defaultValue(column0Row1, 0.0);
+        this[2] = defaultValue(column1Row0, 0.0);
+        this[3] = defaultValue(column1Row1, 0.0);
+    }
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    Matrix2.packedLength = 4;
+
+    /**
+     * Stores the provided instance into the provided array.
+     *
+     * @param {Matrix2} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     *
+     * @returns {Number[]} The array that was packed into
+     */
+    Matrix2.pack = function(value, array, startingIndex) {
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        array[startingIndex++] = value[0];
+        array[startingIndex++] = value[1];
+        array[startingIndex++] = value[2];
+        array[startingIndex++] = value[3];
+
+        return array;
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {Matrix2} [result] The object into which to store the result.
+     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
+     */
+    Matrix2.unpack = function(array, startingIndex, result) {
+                Check.defined('array', array);
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        if (!defined(result)) {
+            result = new Matrix2();
+        }
+
+        result[0] = array[startingIndex++];
+        result[1] = array[startingIndex++];
+        result[2] = array[startingIndex++];
+        result[3] = array[startingIndex++];
+        return result;
+    };
+
+    /**
+     * Duplicates a Matrix2 instance.
+     *
+     * @param {Matrix2} matrix The matrix to duplicate.
+     * @param {Matrix2} [result] The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided. (Returns undefined if matrix is undefined)
+     */
+    Matrix2.clone = function(matrix, result) {
+        if (!defined(matrix)) {
+            return undefined;
+        }
+        if (!defined(result)) {
+            return new Matrix2(matrix[0], matrix[2],
+                               matrix[1], matrix[3]);
+        }
+        result[0] = matrix[0];
+        result[1] = matrix[1];
+        result[2] = matrix[2];
+        result[3] = matrix[3];
+        return result;
+    };
+
+    /**
+     * Creates a Matrix2 from 4 consecutive elements in an array.
+     *
+     * @param {Number[]} array The array whose 4 consecutive elements correspond to the positions of the matrix.  Assumes column-major order.
+     * @param {Number} [startingIndex=0] The offset into the array of the first element, which corresponds to first column first row position in the matrix.
+     * @param {Matrix2} [result] The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
+     *
+     * @example
+     * // Create the Matrix2:
+     * // [1.0, 2.0]
+     * // [1.0, 2.0]
+     *
+     * var v = [1.0, 1.0, 2.0, 2.0];
+     * var m = Cesium.Matrix2.fromArray(v);
+     *
+     * // Create same Matrix2 with using an offset into an array
+     * var v2 = [0.0, 0.0, 1.0, 1.0, 2.0, 2.0];
+     * var m2 = Cesium.Matrix2.fromArray(v2, 2);
+     */
+    Matrix2.fromArray = function(array, startingIndex, result) {
+                Check.defined('array', array);
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        if (!defined(result)) {
+            result = new Matrix2();
+        }
+
+        result[0] = array[startingIndex];
+        result[1] = array[startingIndex + 1];
+        result[2] = array[startingIndex + 2];
+        result[3] = array[startingIndex + 3];
+        return result;
+    };
+
+    /**
+     * Creates a Matrix2 instance from a column-major order array.
+     *
+     * @param {Number[]} values The column-major order array.
+     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
+     */
+    Matrix2.fromColumnMajorArray = function(values, result) {
+                Check.defined('values', values);
+        
+        return Matrix2.clone(values, result);
+    };
+
+    /**
+     * Creates a Matrix2 instance from a row-major order array.
+     * The resulting matrix will be in column-major order.
+     *
+     * @param {Number[]} values The row-major order array.
+     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
+     */
+    Matrix2.fromRowMajorArray = function(values, result) {
+                Check.defined('values', values);
+        
+        if (!defined(result)) {
+            return new Matrix2(values[0], values[1],
+                               values[2], values[3]);
+        }
+        result[0] = values[0];
+        result[1] = values[2];
+        result[2] = values[1];
+        result[3] = values[3];
+        return result;
+    };
+
+    /**
+     * Computes a Matrix2 instance representing a non-uniform scale.
+     *
+     * @param {Cartesian2} scale The x and y scale factors.
+     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
+     *
+     * @example
+     * // Creates
+     * //   [7.0, 0.0]
+     * //   [0.0, 8.0]
+     * var m = Cesium.Matrix2.fromScale(new Cesium.Cartesian2(7.0, 8.0));
+     */
+    Matrix2.fromScale = function(scale, result) {
+                Check.typeOf.object('scale', scale);
+        
+        if (!defined(result)) {
+            return new Matrix2(
+                scale.x, 0.0,
+                0.0,     scale.y);
+        }
+
+        result[0] = scale.x;
+        result[1] = 0.0;
+        result[2] = 0.0;
+        result[3] = scale.y;
+        return result;
+    };
+
+    /**
+     * Computes a Matrix2 instance representing a uniform scale.
+     *
+     * @param {Number} scale The uniform scale factor.
+     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
+     *
+     * @example
+     * // Creates
+     * //   [2.0, 0.0]
+     * //   [0.0, 2.0]
+     * var m = Cesium.Matrix2.fromUniformScale(2.0);
+     */
+    Matrix2.fromUniformScale = function(scale, result) {
+                Check.typeOf.number('scale', scale);
+        
+        if (!defined(result)) {
+            return new Matrix2(
+                scale, 0.0,
+                0.0,   scale);
+        }
+
+        result[0] = scale;
+        result[1] = 0.0;
+        result[2] = 0.0;
+        result[3] = scale;
+        return result;
+    };
+
+    /**
+     * Creates a rotation matrix.
+     *
+     * @param {Number} angle The angle, in radians, of the rotation.  Positive angles are counterclockwise.
+     * @param {Matrix2} [result] The object in which the result will be stored, if undefined a new instance will be created.
+     * @returns {Matrix2} The modified result parameter, or a new Matrix2 instance if one was not provided.
+     *
+     * @example
+     * // Rotate a point 45 degrees counterclockwise.
+     * var p = new Cesium.Cartesian2(5, 6);
+     * var m = Cesium.Matrix2.fromRotation(Cesium.Math.toRadians(45.0));
+     * var rotated = Cesium.Matrix2.multiplyByVector(m, p, new Cesium.Cartesian2());
+     */
+    Matrix2.fromRotation = function(angle, result) {
+                Check.typeOf.number('angle', angle);
+        
+        var cosAngle = Math.cos(angle);
+        var sinAngle = Math.sin(angle);
+
+        if (!defined(result)) {
+            return new Matrix2(
+                cosAngle, -sinAngle,
+                sinAngle, cosAngle);
+        }
+        result[0] = cosAngle;
+        result[1] = sinAngle;
+        result[2] = -sinAngle;
+        result[3] = cosAngle;
+        return result;
+    };
+
+    /**
+     * Creates an Array from the provided Matrix2 instance.
+     * The array will be in column-major order.
+     *
+     * @param {Matrix2} matrix The matrix to use..
+     * @param {Number[]} [result] The Array onto which to store the result.
+     * @returns {Number[]} The modified Array parameter or a new Array instance if one was not provided.
+     */
+    Matrix2.toArray = function(matrix, result) {
+                Check.typeOf.object('matrix', matrix);
+        
+        if (!defined(result)) {
+            return [matrix[0], matrix[1], matrix[2], matrix[3]];
+        }
+        result[0] = matrix[0];
+        result[1] = matrix[1];
+        result[2] = matrix[2];
+        result[3] = matrix[3];
+        return result;
+    };
+
+    /**
+     * Computes the array index of the element at the provided row and column.
+     *
+     * @param {Number} row The zero-based index of the row.
+     * @param {Number} column The zero-based index of the column.
+     * @returns {Number} The index of the element at the provided row and column.
+     *
+     * @exception {DeveloperError} row must be 0 or 1.
+     * @exception {DeveloperError} column must be 0 or 1.
+     *
+     * @example
+     * var myMatrix = new Cesium.Matrix2();
+     * var column1Row0Index = Cesium.Matrix2.getElementIndex(1, 0);
+     * var column1Row0 = myMatrix[column1Row0Index]
+     * myMatrix[column1Row0Index] = 10.0;
+     */
+    Matrix2.getElementIndex = function(column, row) {
+                Check.typeOf.number.greaterThanOrEquals('row', row, 0);
+        Check.typeOf.number.lessThanOrEquals('row', row, 1);
+
+        Check.typeOf.number.greaterThanOrEquals('column', column, 0);
+        Check.typeOf.number.lessThanOrEquals('column', column, 1);
+        
+        return column * 2 + row;
+    };
+
+    /**
+     * Retrieves a copy of the matrix column at the provided index as a Cartesian2 instance.
+     *
+     * @param {Matrix2} matrix The matrix to use.
+     * @param {Number} index The zero-based index of the column to retrieve.
+     * @param {Cartesian2} result The object onto which to store the result.
+     * @returns {Cartesian2} The modified result parameter.
+     *
+     * @exception {DeveloperError} index must be 0 or 1.
+     */
+    Matrix2.getColumn = function(matrix, index, result) {
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 1);
+
+        Check.typeOf.object('result', result);
+        
+        var startIndex = index * 2;
+        var x = matrix[startIndex];
+        var y = matrix[startIndex + 1];
+
+        result.x = x;
+        result.y = y;
+        return result;
+    };
+
+    /**
+     * Computes a new matrix that replaces the specified column in the provided matrix with the provided Cartesian2 instance.
+     *
+     * @param {Matrix2} matrix The matrix to use.
+     * @param {Number} index The zero-based index of the column to set.
+     * @param {Cartesian2} cartesian The Cartesian whose values will be assigned to the specified column.
+     * @param {Cartesian2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     *
+     * @exception {DeveloperError} index must be 0 or 1.
+     */
+    Matrix2.setColumn = function(matrix, index, cartesian, result) {
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 1);
+
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
+        
+        result = Matrix2.clone(matrix, result);
+        var startIndex = index * 2;
+        result[startIndex] = cartesian.x;
+        result[startIndex + 1] = cartesian.y;
+        return result;
+    };
+
+    /**
+     * Retrieves a copy of the matrix row at the provided index as a Cartesian2 instance.
+     *
+     * @param {Matrix2} matrix The matrix to use.
+     * @param {Number} index The zero-based index of the row to retrieve.
+     * @param {Cartesian2} result The object onto which to store the result.
+     * @returns {Cartesian2} The modified result parameter.
+     *
+     * @exception {DeveloperError} index must be 0 or 1.
+     */
+    Matrix2.getRow = function(matrix, index, result) {
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 1);
+
+        Check.typeOf.object('result', result);
+        
+        var x = matrix[index];
+        var y = matrix[index + 2];
+
+        result.x = x;
+        result.y = y;
+        return result;
+    };
+
+    /**
+     * Computes a new matrix that replaces the specified row in the provided matrix with the provided Cartesian2 instance.
+     *
+     * @param {Matrix2} matrix The matrix to use.
+     * @param {Number} index The zero-based index of the row to set.
+     * @param {Cartesian2} cartesian The Cartesian whose values will be assigned to the specified row.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     *
+     * @exception {DeveloperError} index must be 0 or 1.
+     */
+    Matrix2.setRow = function(matrix, index, cartesian, result) {
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 1);
+
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
+        
+        result = Matrix2.clone(matrix, result);
+        result[index] = cartesian.x;
+        result[index + 2] = cartesian.y;
+        return result;
+    };
+
+    var scratchColumn = new Cartesian2();
+
+    /**
+     * Extracts the non-uniform scale assuming the matrix is an affine transformation.
+     *
+     * @param {Matrix2} matrix The matrix.
+     * @param {Cartesian2} result The object onto which to store the result.
+     * @returns {Cartesian2} The modified result parameter.
+     */
+    Matrix2.getScale = function(matrix, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
+        
+        result.x = Cartesian2.magnitude(Cartesian2.fromElements(matrix[0], matrix[1], scratchColumn));
+        result.y = Cartesian2.magnitude(Cartesian2.fromElements(matrix[2], matrix[3], scratchColumn));
+        return result;
+    };
+
+    var scratchScale = new Cartesian2();
+
+    /**
+     * Computes the maximum scale assuming the matrix is an affine transformation.
+     * The maximum scale is the maximum length of the column vectors.
+     *
+     * @param {Matrix2} matrix The matrix.
+     * @returns {Number} The maximum scale.
+     */
+    Matrix2.getMaximumScale = function(matrix) {
+        Matrix2.getScale(matrix, scratchScale);
+        return Cartesian2.maximumComponent(scratchScale);
+    };
+
+    /**
+     * Computes the product of two matrices.
+     *
+     * @param {Matrix2} left The first matrix.
+     * @param {Matrix2} right The second matrix.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.multiply = function(left, right, result) {
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
+        
+        var column0Row0 = left[0] * right[0] + left[2] * right[1];
+        var column1Row0 = left[0] * right[2] + left[2] * right[3];
+        var column0Row1 = left[1] * right[0] + left[3] * right[1];
+        var column1Row1 = left[1] * right[2] + left[3] * right[3];
+
+        result[0] = column0Row0;
+        result[1] = column0Row1;
+        result[2] = column1Row0;
+        result[3] = column1Row1;
+        return result;
+    };
+
+    /**
+     * Computes the sum of two matrices.
+     *
+     * @param {Matrix2} left The first matrix.
+     * @param {Matrix2} right The second matrix.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.add = function(left, right, result) {
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
+        
+        result[0] = left[0] + right[0];
+        result[1] = left[1] + right[1];
+        result[2] = left[2] + right[2];
+        result[3] = left[3] + right[3];
+        return result;
+    };
+
+    /**
+     * Computes the difference of two matrices.
+     *
+     * @param {Matrix2} left The first matrix.
+     * @param {Matrix2} right The second matrix.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.subtract = function(left, right, result) {
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
+        
+        result[0] = left[0] - right[0];
+        result[1] = left[1] - right[1];
+        result[2] = left[2] - right[2];
+        result[3] = left[3] - right[3];
+        return result;
+    };
+
+    /**
+     * Computes the product of a matrix and a column vector.
+     *
+     * @param {Matrix2} matrix The matrix.
+     * @param {Cartesian2} cartesian The column.
+     * @param {Cartesian2} result The object onto which to store the result.
+     * @returns {Cartesian2} The modified result parameter.
+     */
+    Matrix2.multiplyByVector = function(matrix, cartesian, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
+        
+        var x = matrix[0] * cartesian.x + matrix[2] * cartesian.y;
+        var y = matrix[1] * cartesian.x + matrix[3] * cartesian.y;
+
+        result.x = x;
+        result.y = y;
+        return result;
+    };
+
+    /**
+     * Computes the product of a matrix and a scalar.
+     *
+     * @param {Matrix2} matrix The matrix.
+     * @param {Number} scalar The number to multiply by.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.multiplyByScalar = function(matrix, scalar, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
+        
+        result[0] = matrix[0] * scalar;
+        result[1] = matrix[1] * scalar;
+        result[2] = matrix[2] * scalar;
+        result[3] = matrix[3] * scalar;
+        return result;
+    };
+
+    /**
+     * Computes the product of a matrix times a (non-uniform) scale, as if the scale were a scale matrix.
+     *
+     * @param {Matrix2} matrix The matrix on the left-hand side.
+     * @param {Cartesian2} scale The non-uniform scale on the right-hand side.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     *
+     *
+     * @example
+     * // Instead of Cesium.Matrix2.multiply(m, Cesium.Matrix2.fromScale(scale), m);
+     * Cesium.Matrix2.multiplyByScale(m, scale, m);
+     *
+     * @see Matrix2.fromScale
+     * @see Matrix2.multiplyByUniformScale
+     */
+    Matrix2.multiplyByScale = function(matrix, scale, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('scale', scale);
+        Check.typeOf.object('result', result);
+        
+        result[0] = matrix[0] * scale.x;
+        result[1] = matrix[1] * scale.x;
+        result[2] = matrix[2] * scale.y;
+        result[3] = matrix[3] * scale.y;
+        return result;
+    };
+
+    /**
+     * Creates a negated copy of the provided matrix.
+     *
+     * @param {Matrix2} matrix The matrix to negate.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.negate = function(matrix, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
+        
+        result[0] = -matrix[0];
+        result[1] = -matrix[1];
+        result[2] = -matrix[2];
+        result[3] = -matrix[3];
+        return result;
+    };
+
+    /**
+     * Computes the transpose of the provided matrix.
+     *
+     * @param {Matrix2} matrix The matrix to transpose.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.transpose = function(matrix, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
+        
+        var column0Row0 = matrix[0];
+        var column0Row1 = matrix[2];
+        var column1Row0 = matrix[1];
+        var column1Row1 = matrix[3];
+
+        result[0] = column0Row0;
+        result[1] = column0Row1;
+        result[2] = column1Row0;
+        result[3] = column1Row1;
+        return result;
+    };
+
+    /**
+     * Computes a matrix, which contains the absolute (unsigned) values of the provided matrix's elements.
+     *
+     * @param {Matrix2} matrix The matrix with signed elements.
+     * @param {Matrix2} result The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter.
+     */
+    Matrix2.abs = function(matrix, result) {
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
+        
+        result[0] = Math.abs(matrix[0]);
+        result[1] = Math.abs(matrix[1]);
+        result[2] = Math.abs(matrix[2]);
+        result[3] = Math.abs(matrix[3]);
+
+        return result;
+    };
+
+    /**
+     * Compares the provided matrices componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {Matrix2} [left] The first matrix.
+     * @param {Matrix2} [right] The second matrix.
+     * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
+     */
+    Matrix2.equals = function(left, right) {
+        return (left === right) ||
+               (defined(left) &&
+                defined(right) &&
+                left[0] === right[0] &&
+                left[1] === right[1] &&
+                left[2] === right[2] &&
+                left[3] === right[3]);
+    };
+
+    /**
+     * @private
+     */
+    Matrix2.equalsArray = function(matrix, array, offset) {
+        return matrix[0] === array[offset] &&
+               matrix[1] === array[offset + 1] &&
+               matrix[2] === array[offset + 2] &&
+               matrix[3] === array[offset + 3];
+    };
+
+    /**
+     * Compares the provided matrices componentwise and returns
+     * <code>true</code> if they are within the provided epsilon,
+     * <code>false</code> otherwise.
+     *
+     * @param {Matrix2} [left] The first matrix.
+     * @param {Matrix2} [right] The second matrix.
+     * @param {Number} epsilon The epsilon to use for equality testing.
+     * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
+     */
+    Matrix2.equalsEpsilon = function(left, right, epsilon) {
+                Check.typeOf.number('epsilon', epsilon);
+        
+        return (left === right) ||
+                (defined(left) &&
+                defined(right) &&
+                Math.abs(left[0] - right[0]) <= epsilon &&
+                Math.abs(left[1] - right[1]) <= epsilon &&
+                Math.abs(left[2] - right[2]) <= epsilon &&
+                Math.abs(left[3] - right[3]) <= epsilon);
+    };
+
+    /**
+     * An immutable Matrix2 instance initialized to the identity matrix.
+     *
+     * @type {Matrix2}
+     * @constant
+     */
+    Matrix2.IDENTITY = freezeObject(new Matrix2(1.0, 0.0,
+                                                0.0, 1.0));
+
+    /**
+     * An immutable Matrix2 instance initialized to the zero matrix.
+     *
+     * @type {Matrix2}
+     * @constant
+     */
+    Matrix2.ZERO = freezeObject(new Matrix2(0.0, 0.0,
+                                            0.0, 0.0));
+
+    /**
+     * The index into Matrix2 for column 0, row 0.
+     *
+     * @type {Number}
+     * @constant
+     *
+     * @example
+     * var matrix = new Cesium.Matrix2();
+     * matrix[Cesium.Matrix2.COLUMN0ROW0] = 5.0; // set column 0, row 0 to 5.0
+     */
+    Matrix2.COLUMN0ROW0 = 0;
+
+    /**
+     * The index into Matrix2 for column 0, row 1.
+     *
+     * @type {Number}
+     * @constant
+     *
+     * @example
+     * var matrix = new Cesium.Matrix2();
+     * matrix[Cesium.Matrix2.COLUMN0ROW1] = 5.0; // set column 0, row 1 to 5.0
+     */
+    Matrix2.COLUMN0ROW1 = 1;
+
+    /**
+     * The index into Matrix2 for column 1, row 0.
+     *
+     * @type {Number}
+     * @constant
+     *
+     * @example
+     * var matrix = new Cesium.Matrix2();
+     * matrix[Cesium.Matrix2.COLUMN1ROW0] = 5.0; // set column 1, row 0 to 5.0
+     */
+    Matrix2.COLUMN1ROW0 = 2;
+
+    /**
+     * The index into Matrix2 for column 1, row 1.
+     *
+     * @type {Number}
+     * @constant
+     *
+     * @example
+     * var matrix = new Cesium.Matrix2();
+     * matrix[Cesium.Matrix2.COLUMN1ROW1] = 5.0; // set column 1, row 1 to 5.0
+     */
+    Matrix2.COLUMN1ROW1 = 3;
+
+    defineProperties(Matrix2.prototype, {
+        /**
+         * Gets the number of items in the collection.
+         * @memberof Matrix2.prototype
+         *
+         * @type {Number}
+         */
+        length : {
+            get : function() {
+                return Matrix2.packedLength;
+            }
+        }
+    });
+
+    /**
+     * Duplicates the provided Matrix2 instance.
+     *
+     * @param {Matrix2} [result] The object onto which to store the result.
+     * @returns {Matrix2} The modified result parameter or a new Matrix2 instance if one was not provided.
+     */
+    Matrix2.prototype.clone = function(result) {
+        return Matrix2.clone(this, result);
+    };
+
+    /**
+     * Compares this matrix to the provided matrix componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {Matrix2} [right] The right hand side matrix.
+     * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
+     */
+    Matrix2.prototype.equals = function(right) {
+        return Matrix2.equals(this, right);
+    };
+
+    /**
+     * Compares this matrix to the provided matrix componentwise and returns
+     * <code>true</code> if they are within the provided epsilon,
+     * <code>false</code> otherwise.
+     *
+     * @param {Matrix2} [right] The right hand side matrix.
+     * @param {Number} epsilon The epsilon to use for equality testing.
+     * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
+     */
+    Matrix2.prototype.equalsEpsilon = function(right, epsilon) {
+        return Matrix2.equalsEpsilon(this, right, epsilon);
+    };
+
+    /**
+     * Creates a string representing this Matrix with each row being
+     * on a separate line and in the format '(column0, column1)'.
+     *
+     * @returns {String} A string representing the provided Matrix with each row being on a separate line and in the format '(column0, column1)'.
+     */
+    Matrix2.prototype.toString = function() {
+        return '(' + this[0] + ', ' + this[2] + ')\n' +
+               '(' + this[1] + ', ' + this[3] + ')';
+    };
+
+    return Matrix2;
+});
+
+/*global define*/
 define('Core/RectangleGeometryLibrary',[
     './Cartesian3',
     './Cartographic',
@@ -22194,59 +22384,57 @@ define('Core/VertexFormat',[
 
 /*global define*/
 define('Core/RectangleGeometry',[
-        './BoundingSphere',
-        './Cartesian2',
-        './Cartesian3',
-        './Cartographic',
-        './Check',
-        './ComponentDatatype',
-        './defaultValue',
-        './defined',
-        './defineProperties',
-        './DeveloperError',
-        './Ellipsoid',
-        './Geometry',
-        './GeometryAttribute',
-        './GeometryAttributes',
-        './GeometryInstance',
-        './GeometryPipeline',
-        './IndexDatatype',
-        './Math',
-        './Matrix2',
-        './Matrix3',
-        './PolygonPipeline',
-        './PrimitiveType',
-        './Quaternion',
-        './Rectangle',
-        './RectangleGeometryLibrary',
-        './VertexFormat'
-    ], function(
-        BoundingSphere,
-        Cartesian2,
-        Cartesian3,
-        Cartographic,
-        Check,
-        ComponentDatatype,
-        defaultValue,
-        defined,
-        defineProperties,
-        DeveloperError,
-        Ellipsoid,
-        Geometry,
-        GeometryAttribute,
-        GeometryAttributes,
-        GeometryInstance,
-        GeometryPipeline,
-        IndexDatatype,
-        CesiumMath,
-        Matrix2,
-        Matrix3,
-        PolygonPipeline,
-        PrimitiveType,
-        Quaternion,
-        Rectangle,
-        RectangleGeometryLibrary,
-        VertexFormat) {
+    './BoundingSphere',
+    './Cartesian2',
+    './Cartesian3',
+    './Cartographic',
+    './Check',
+    './ComponentDatatype',
+    './defaultValue',
+    './defined',
+    './defineProperties',
+    './DeveloperError',
+    './Ellipsoid',
+    './Geometry',
+    './GeometryAttribute',
+    './GeometryAttributes',
+    './GeometryInstance',
+    './GeometryPipeline',
+    './IndexDatatype',
+    './Math',
+    './Matrix3',
+    './PolygonPipeline',
+    './PrimitiveType',
+    './Quaternion',
+    './Rectangle',
+    './RectangleGeometryLibrary',
+    './VertexFormat'
+], function(
+    BoundingSphere,
+    Cartesian2,
+    Cartesian3,
+    Cartographic,
+    Check,
+    ComponentDatatype,
+    defaultValue,
+    defined,
+    defineProperties,
+    DeveloperError,
+    Ellipsoid,
+    Geometry,
+    GeometryAttribute,
+    GeometryAttributes,
+    GeometryInstance,
+    GeometryPipeline,
+    IndexDatatype,
+    CesiumMath,
+    Matrix3,
+    PolygonPipeline,
+    PrimitiveType,
+    Quaternion,
+    Rectangle,
+    RectangleGeometryLibrary,
+    VertexFormat) {
     'use strict';
 
     var positionScratch = new Cartesian3();
@@ -22304,12 +22492,12 @@ define('Core/RectangleGeometry',[
         var bitangent = bitangentScratch;
         var tangent = tangentScratch;
         var normal = normalScratch;
-        for (var i = 0; i < length; i += 3) {
-            var p = Cartesian3.fromArray(positions, i, positionScratch);
-            var attrIndex1 = attrIndex + 1;
-            var attrIndex2 = attrIndex + 2;
+        if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+            for (var i = 0; i < length; i += 3) {
+                var p = Cartesian3.fromArray(positions, i, positionScratch);
+                var attrIndex1 = attrIndex + 1;
+                var attrIndex2 = attrIndex + 2;
 
-            if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
                 normal = ellipsoid.geodeticSurfaceNormal(p, normal);
                 if (vertexFormat.tangent || vertexFormat.bitangent) {
                     Cartesian3.cross(Cartesian3.UNIT_Z, normal, tangent);
@@ -22336,8 +22524,8 @@ define('Core/RectangleGeometry',[
                     bitangents[attrIndex1] = bitangent.y;
                     bitangents[attrIndex2] = bitangent.z;
                 }
+                attrIndex += 3;
             }
-            attrIndex += 3;
         }
         return createAttributes(vertexFormat, {
             positions : positions,
@@ -22349,6 +22537,7 @@ define('Core/RectangleGeometry',[
 
     var v1Scratch = new Cartesian3();
     var v2Scratch = new Cartesian3();
+
     function calculateAttributesWall(positions, vertexFormat, ellipsoid) {
         var length = positions.length;
 
@@ -22364,10 +22553,9 @@ define('Core/RectangleGeometry',[
         var bitangent = bitangentScratch;
         var tangent = tangentScratch;
         var normal = normalScratch;
-        for (var i = 0; i < length; i += 6) {
-            var p = Cartesian3.fromArray(positions, i, positionScratch);
-
-            if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+        if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+            for (var i = 0; i < length; i += 6) {
+                var p = Cartesian3.fromArray(positions, i, positionScratch);
                 var p1 = Cartesian3.fromArray(positions, (i + 6) % length, v1Scratch);
                 if (recomputeNormal) {
                     var p2 = Cartesian3.fromArray(positions, (i + 3) % length, v2Scratch);
@@ -22527,6 +22715,7 @@ define('Core/RectangleGeometry',[
     }
 
     var scratchVertexFormat = new VertexFormat();
+
     function constructExtrudedRectangle(options) {
         var shadowVolume = options.shadowVolume;
         var vertexFormat = options.vertexFormat;
@@ -22552,7 +22741,7 @@ define('Core/RectangleGeometry',[
         var topPositions = PolygonPipeline.scaleToGeodeticHeight(topBottomGeo.attributes.position.values, maxHeight, ellipsoid, false);
         topPositions = new Float64Array(topPositions);
         var length = topPositions.length;
-        var newLength = length*2;
+        var newLength = length * 2;
         var positions = new Float64Array(newLength);
         positions.set(topPositions);
         var bottomPositions = PolygonPipeline.scaleToGeodeticHeight(topBottomGeo.attributes.position.values, minHeight, ellipsoid);
@@ -22562,13 +22751,13 @@ define('Core/RectangleGeometry',[
         var normals = (vertexFormat.normal) ? new Float32Array(newLength) : undefined;
         var tangents = (vertexFormat.tangent) ? new Float32Array(newLength) : undefined;
         var bitangents = (vertexFormat.bitangent) ? new Float32Array(newLength) : undefined;
-        var textures = (vertexFormat.st) ? new Float32Array(newLength/3*2) : undefined;
+        var textures = (vertexFormat.st) ? new Float32Array(newLength / 3 * 2) : undefined;
         var topSt;
         var topNormals;
         if (vertexFormat.normal) {
             topNormals = topBottomGeo.attributes.normal.values;
             normals.set(topNormals);
-            for (i = 0; i < length; i ++) {
+            for (i = 0; i < length; i++) {
                 topNormals[i] = -topNormals[i];
             }
             normals.set(topNormals, length);
@@ -22580,7 +22769,7 @@ define('Core/RectangleGeometry',[
                 topBottomGeo.attributes.normal = undefined;
             }
             var extrudeNormals = new Float32Array(newLength);
-            for (i = 0; i < length; i ++) {
+            for (i = 0; i < length; i++) {
                 topNormals[i] = -topNormals[i];
             }
             extrudeNormals.set(topNormals, length); //only get normals for bottom layer that's going to be pushed down
@@ -22594,7 +22783,7 @@ define('Core/RectangleGeometry',[
         if (vertexFormat.tangent) {
             var topTangents = topBottomGeo.attributes.tangent.values;
             tangents.set(topTangents);
-            for (i = 0; i < length; i ++) {
+            for (i = 0; i < length; i++) {
                 topTangents[i] = -topTangents[i];
             }
             tangents.set(topTangents, length);
@@ -22609,14 +22798,14 @@ define('Core/RectangleGeometry',[
         if (vertexFormat.st) {
             topSt = topBottomGeo.attributes.st.values;
             textures.set(topSt);
-            textures.set(topSt, length/3*2);
+            textures.set(topSt, length / 3 * 2);
             topBottomGeo.attributes.st.values = textures;
         }
 
         var indices = topBottomGeo.indices;
         var indicesLength = indices.length;
         var posLength = length / 3;
-        var newIndices = IndexDatatype.createTypedArray(newLength/3, indicesLength*2);
+        var newIndices = IndexDatatype.createTypedArray(newLength / 3, indicesLength * 2);
         newIndices.set(indices);
         for (i = 0; i < indicesLength; i += 3) {
             newIndices[i + indicesLength] = indices[i + 2] + posLength;
@@ -22637,12 +22826,12 @@ define('Core/RectangleGeometry',[
         var extrudeNormalIndex = 0;
         var area = width * height;
         var threeI;
-        for (i = 0; i < area; i+=width) {
+        for (i = 0; i < area; i += width) {
             threeI = i * 3;
             wallPositions = addWallPositions(wallPositions, posIndex, threeI, topPositions, bottomPositions);
             posIndex += 6;
             if (vertexFormat.st) {
-                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i*2, topSt);
+                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i * 2, topSt);
                 stIndex += 4;
             }
             if (shadowVolume) {
@@ -22653,12 +22842,12 @@ define('Core/RectangleGeometry',[
             }
         }
 
-        for (i = area-width; i < area; i++) {
+        for (i = area - width; i < area; i++) {
             threeI = i * 3;
             wallPositions = addWallPositions(wallPositions, posIndex, threeI, topPositions, bottomPositions);
             posIndex += 6;
             if (vertexFormat.st) {
-                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i*2, topSt);
+                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i * 2, topSt);
                 stIndex += 4;
             }
             if (shadowVolume) {
@@ -22669,12 +22858,12 @@ define('Core/RectangleGeometry',[
             }
         }
 
-        for (i = area-1; i > 0; i-=width) {
+        for (i = area - 1; i > 0; i -= width) {
             threeI = i * 3;
             wallPositions = addWallPositions(wallPositions, posIndex, threeI, topPositions, bottomPositions);
             posIndex += 6;
             if (vertexFormat.st) {
-                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i*2, topSt);
+                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i * 2, topSt);
                 stIndex += 4;
             }
             if (shadowVolume) {
@@ -22685,12 +22874,12 @@ define('Core/RectangleGeometry',[
             }
         }
 
-        for (i = width-1; i >= 0; i--) {
+        for (i = width - 1; i >= 0; i--) {
             threeI = i * 3;
             wallPositions = addWallPositions(wallPositions, posIndex, threeI, topPositions, bottomPositions);
             posIndex += 6;
             if (vertexFormat.st) {
-                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i*2, topSt);
+                wallTextures = addWallTextureCoordinates(wallTextures, stIndex, i * 2, topSt);
                 stIndex += 4;
             }
             if (shadowVolume) {
@@ -22726,7 +22915,7 @@ define('Core/RectangleGeometry',[
         var upperRight;
         length = wallPositions.length / 3;
         var index = 0;
-        for (i = 0; i < length - 1; i+=2) {
+        for (i = 0; i < length - 1; i += 2) {
             upperLeft = i;
             upperRight = (upperLeft + 2) % length;
             var p1 = Cartesian3.fromArray(wallPositions, upperLeft * 3, v1Scratch);
@@ -22925,7 +23114,7 @@ define('Core/RectangleGeometry',[
         extrudedHeight : undefined,
         closeTop : undefined,
         closeBottom : undefined,
-        shadowVolume: undefined
+        shadowVolume : undefined
     };
 
     /**
@@ -23089,7 +23278,7 @@ define('Core/RectangleGeometry',[
             closeTop : true,
             closeBottom : true,
             vertexFormat : VertexFormat.POSITION_ONLY,
-            shadowVolume: true
+            shadowVolume : true
         });
     };
 
