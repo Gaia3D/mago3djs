@@ -4245,7 +4245,16 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			}
 		}
 		else{
-			
+			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
+			{
+				var blocksList = neoBuilding._blocksList_Container.blocksListsArray[0];
+				if(blocksList.fileLoadState >= 2 && blocksList.fileLoadState.blocksArray)
+				{
+					blocksList.blocksArray.length =0;
+					blocksList.fileLoadState = 0;
+					blocksList.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
+				}
+			}
 		}
 		
 	}

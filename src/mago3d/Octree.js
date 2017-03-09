@@ -373,12 +373,12 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	  
 
 	for(var i=0; i<visibleOctrees_count; i++) {
-		if(visibleOctreesArray[i].squareDistToEye < 500) // 15x15 = 225
+		if(visibleOctreesArray[i].squareDistToEye < 400) // 15x15 = 225
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
 		}
-		else if(visibleOctreesArray[i].squareDistToEye < 5000) // 25x25 = 625
+		else if(visibleOctreesArray[i].squareDistToEye < 2000) // 25x25 = 625
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
