@@ -50,6 +50,22 @@ Octree.prototype.new_subOctree = function() {
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
+Octree.prototype.deleteGlObjects = function(gl) {
+	if(this.lego != undefined)
+	{
+		this.lego.vbo_vicks_container.deleteGlObjects(gl);
+	}
+	var subOctreesCount = this.subOctrees_array.length;
+	for(var i=0; i<subOctreesCount; i++)
+	{
+		this.subOctrees_array[i].deleteGlObjects(gl);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
 Octree.prototype.makeTree = function(treeDepth) {
 	if(this.octree_level < treeDepth) {
 		for(var i=0; i<8; i++) {
