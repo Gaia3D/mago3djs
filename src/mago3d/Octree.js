@@ -375,6 +375,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	var excludedOctArray = [];
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
+	var find = false;
 	  
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
@@ -392,22 +393,34 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		if(visibleOctreesArray[i].squareDistToEye < 400) // 15x15 = 225
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
+			{
 				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				find = true;
+			}
 		}
 		else if(visibleOctreesArray[i].squareDistToEye < 2000) // 25x25 = 625
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
+			{
 				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				find = true;
+			}
 		}
 		else if(visibleOctreesArray[i].squareDistToEye < 1000000) // 50x50 = 2500
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
+			{
 				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				find = true;
+			}
 		}
 		else
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
+			{
 				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				find = true;
+			}
 		}
 	}
 	
@@ -415,6 +428,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	visibleOctreesArray.length = 0;
 	sortedOctreesArray.length = 0;
 	excludedOctArray.length = 0;
+	
+	return find;
 };
 
 /**

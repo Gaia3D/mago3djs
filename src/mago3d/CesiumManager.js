@@ -2430,8 +2430,13 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
 			var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 			var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
-			neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+			var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 			
+			if(!find)
+			{
+				this.deleteNeoBuilding(gl, neoBuilding);
+				return;
+			}
 			// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
 			var geometryDataPath = this.readerWriter.geometryDataPath;
 			var buildingFolderName = neoBuilding.buildingFileName;
@@ -4076,6 +4081,76 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
  * @param cameraPosition 변수
  * @returns neoVisibleBuildings_array
  */
+CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
+	neoBuilding.metaData.fileLoadState = 0;
+			//neoBuilding._buildingPosition = undefined;
+			//neoBuilding._buildingPositionHIGH = undefined;
+			//neoBuilding._buildingPositionLOW = undefined;
+			
+			//neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
+			//neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
+			//neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
+			//neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
+			//neoBuilding.f4dTransfMat = undefined; // f4d matrix4.***
+			//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
+			
+			// create the default blocks_lists.*****************************
+			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
+				neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
+			neoBuilding._blocksList_Container = new BlocksListsContainer();
+			neoBuilding._blocksList_Container.newBlocksList("Blocks1");
+			//this._blocksList_Container.newBlocksList("Blocks2");
+			//this._blocksList_Container.newBlocksList("Blocks3");
+			//this._blocksList_Container.newBlocksList("BlocksBone");
+			//this._blocksList_Container.newBlocksList("Blocks4");
+			//--------------------------------------------------------------
+			
+			// create the references lists.*********************************
+			neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
+			neoBuilding.currentRenderablesNeoRefLists = [];
+			neoBuilding.preExtractedLowestOctreesArray = [];
+			
+			// Textures loaded.***************************************************
+			neoBuilding.textures_loaded = [];
+			
+			// The octree.********************************************************
+			if(neoBuilding.octree != undefined)
+				neoBuilding.octree.deleteGlObjects(gl);
+			neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
+			neoBuilding.octreeLoadedAllFiles = false;
+			
+			//neoBuilding.buildingFileName = "";
+			
+			neoBuilding.allFilesLoaded = false;
+			neoBuilding.isReadyToRender = false;
+			
+			// The simple building.***********************************************
+			neoBuilding.neoSimpleBuilding = undefined; // this is a simpleBuilding for Buildings with texture.***
+			
+			// The lodBuildings.***
+			neoBuilding.lod2Building = undefined;
+			neoBuilding.lod3Building = undefined;
+			/*
+			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
+			{
+				var blocksList = neoBuilding._blocksList_Container.blocksListsArray[0];
+				if(blocksList.fileLoadState >= 2 && blocksList.fileLoadState.blocksArray)
+				{
+					blocksList.blocksArray.length =0;
+					blocksList.fileLoadState = 0;
+					blocksList.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
+				}
+			}
+			*/
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume 변수
+ * @param neoVisibleBuildings_array 변수
+ * @param cameraPosition 변수
+ * @returns neoVisibleBuildings_array
+ */
 CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, neoVisibleBuildings_array, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
@@ -4224,67 +4299,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 		else{
 			var gl = this.scene._context._gl;
-			
-			neoBuilding.metaData.fileLoadState = 0;
-			//neoBuilding._buildingPosition = undefined;
-			//neoBuilding._buildingPositionHIGH = undefined;
-			//neoBuilding._buildingPositionLOW = undefined;
-			
-			//neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
-			//neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
-			//neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
-			//neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
-			//neoBuilding.f4dTransfMat = undefined; // f4d matrix4.***
-			//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
-			
-			// create the default blocks_lists.*****************************
-			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
-				neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
-			neoBuilding._blocksList_Container = new BlocksListsContainer();
-			neoBuilding._blocksList_Container.newBlocksList("Blocks1");
-			//this._blocksList_Container.newBlocksList("Blocks2");
-			//this._blocksList_Container.newBlocksList("Blocks3");
-			//this._blocksList_Container.newBlocksList("BlocksBone");
-			//this._blocksList_Container.newBlocksList("Blocks4");
-			//--------------------------------------------------------------
-			
-			// create the references lists.*********************************
-			neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
-			neoBuilding.currentRenderablesNeoRefLists = [];
-			neoBuilding.preExtractedLowestOctreesArray = [];
-			
-			// Textures loaded.***************************************************
-			neoBuilding.textures_loaded = [];
-			
-			// The octree.********************************************************
-			if(neoBuilding.octree != undefined)
-				neoBuilding.octree.deleteGlObjects(gl);
-			neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
-			neoBuilding.octreeLoadedAllFiles = false;
-			
-			//neoBuilding.buildingFileName = "";
-			
-			neoBuilding.allFilesLoaded = false;
-			neoBuilding.isReadyToRender = false;
-			
-			// The simple building.***********************************************
-			neoBuilding.neoSimpleBuilding = undefined; // this is a simpleBuilding for Buildings with texture.***
-			
-			// The lodBuildings.***
-			neoBuilding.lod2Building = undefined;
-			neoBuilding.lod3Building = undefined;
-			/*
-			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
-			{
-				var blocksList = neoBuilding._blocksList_Container.blocksListsArray[0];
-				if(blocksList.fileLoadState >= 2 && blocksList.fileLoadState.blocksArray)
-				{
-					blocksList.blocksArray.length =0;
-					blocksList.fileLoadState = 0;
-					blocksList.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
-				}
-			}
-			*/
+			this.deleteNeoBuilding(gl, neoBuilding);
 		}
 		
 	}
