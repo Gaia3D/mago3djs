@@ -391,10 +391,10 @@ var NeoBuilding = function() {
 	// create the default blocks_lists.*****************************
 	this._blocksList_Container = new BlocksListsContainer();
 	this._blocksList_Container.newBlocksList("Blocks1");
-	this._blocksList_Container.newBlocksList("Blocks2");
-	this._blocksList_Container.newBlocksList("Blocks3");
-	this._blocksList_Container.newBlocksList("BlocksBone");
-	this._blocksList_Container.newBlocksList("Blocks4");
+	//this._blocksList_Container.newBlocksList("Blocks2");
+	//this._blocksList_Container.newBlocksList("Blocks3");
+	//this._blocksList_Container.newBlocksList("BlocksBone");
+	//this._blocksList_Container.newBlocksList("Blocks4");
 	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************

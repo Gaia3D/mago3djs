@@ -718,8 +718,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
 							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
+							//this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
+							
 								continue;
 						}
 						
@@ -731,8 +732,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
 							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
+							//this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
+
 								continue;
 						}
 						
@@ -744,8 +746,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
+							//this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
 							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
+
 								continue;
 						}
 						
@@ -1470,6 +1473,11 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.pos_vboDataArray, gl.STATIC_DRAW);
 				
 				vbo_vicky.pos_vboDataArray = undefined;
+				
+				if(gl.getError() != gl.NO_ERROR)
+							{
+								alert('WebGL ERROR!!! *** XXXXXXXX***');
+							}
 			}
 			
 			return;
@@ -1507,6 +1515,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.pos_vboDataArray, gl.STATIC_DRAW);
 				
 				vbo_vicky.pos_vboDataArray = undefined;
+				
 			}
 			
 			return;
@@ -1522,6 +1531,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.nor_vboDataArray, gl.STATIC_DRAW);
 				
 				vbo_vicky.nor_vboDataArray = undefined;
+				
 			}
 			return;
 		}
@@ -1536,6 +1546,8 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.col_vboDataArray, gl.STATIC_DRAW);
 				
 				vbo_vicky.col_vboDataArray = undefined;
+				
+				
 			}
 			
 			return;
