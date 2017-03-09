@@ -70,6 +70,34 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns vbo_VIcacheKey
+ */
+VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
+	var vboDatasCount = this._vbo_cacheKeysArray.length;
+	for(var j=0; j<vboDatasCount; j++) {
+	
+		var vbo_vi_cacheKey = this._vbo_cacheKeysArray[j];
+
+		if(vbo_vi_cacheKey.MESH_VERTEX_cacheKey)
+			gl.deleteBuffer(vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+		
+		if(vbo_vi_cacheKey.MESH_NORMAL_cacheKey)
+			gl.deleteBuffer(vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+		
+		if(vbo_vi_cacheKey.MESH_COLOR_cacheKey)
+			gl.deleteBuffer(vbo_vi_cacheKey.MESH_COLOR_cacheKey);
+		
+		if(vbo_vi_cacheKey.MESH_TEXCOORDS_cacheKey)
+			gl.deleteBuffer(vbo_vi_cacheKey.MESH_TEXCOORDS_cacheKey);
+		
+		if(vbo_vi_cacheKey.MESH_FACES_cacheKey)
+			gl.deleteBuffer(vbo_vi_cacheKey.MESH_FACES_cacheKey);
+
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 var VBOByteColorCacheKey = function() {
 	if(!(this instanceof VBOByteColorCacheKey)) {

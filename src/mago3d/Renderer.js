@@ -324,8 +324,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
 							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
+							this.vbo_vi_cacheKey_aux.pos_vboDataArray = undefined;
+							//this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
 								continue;
 						}
 						
@@ -337,8 +337,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
 							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
+							this.vbo_vi_cacheKey_aux.nor_vboDataArray = undefined;
+							//this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
 								continue;
 						}
 						
@@ -350,8 +350,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
 							gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
 							gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
+							this.vbo_vi_cacheKey_aux.idx_vboDataArray = undefined;
+							//this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
 								continue;
 						}
 						
