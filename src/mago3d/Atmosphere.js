@@ -322,7 +322,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 	var position = Cesium.Cartesian3.fromDegrees(this.longitude, this.latitude, this.altitude); 
 	this.position = position; 
 	
-	var splitValue = Cesium.EncodedCartesian3.encode(position);
+//	var splitValue = Cesium.EncodedCartesian3.encode(position);
 	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
@@ -355,7 +355,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat, shado
 	var x = 0.0;
 	var y = 0.0;
 	var randomValue = 0;
-	var cloudWhite = 0.98;
+//	var cloudWhite = 0.98;
 	
 	// 1) Top ring. radius zero.***
 	var vertex_list = vtxMat.newVertexList();
