@@ -65,6 +65,24 @@ BlocksList.prototype.getBlock = function(idx) {
  * @param idx 변수
  * @returns block
  */
+BlocksList.prototype.deleteGlObjects = function(gl) {
+	if(this.blocksArray == undefined)
+		return;
+	
+	var blocksCount = this.blocksArray.length;
+	
+	for(var i=0; i<blocksCount; i++) {
+		var block = this.blocksArray[i];
+		  
+		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns block
+ */
 BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 	this.fileLoadState = 3;// 3 = parsing started.***
 	var bytesReaded = 0;
@@ -155,6 +173,41 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			 */ 
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
 			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
+			
+			// TEST.***
+			//****************************************************************************************************AAA
+			/*
+			this.vbo_vi_cacheKey_aux = vbo_vi_cacheKey;
+			if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)
+			{
+				this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
+				//this.vbo_vi_cacheKey_aux.pos_vboDataArray = undefined;
+				this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
+				
+			}
+			
+			if(this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey == undefined)
+			{
+				this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
+				//this.vbo_vi_cacheKey_aux.nor_vboDataArray = undefined;
+				this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
+					
+			}
+			
+			if(this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey == undefined)
+			{
+				this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
+				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
+				//this.vbo_vi_cacheKey_aux.idx_vboDataArray = undefined;
+				this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
+					
+			}
+			*/
 		}
 	}
 	this.fileLoadState = 4; // 4 = parsing finished.***
