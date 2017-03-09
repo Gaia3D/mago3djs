@@ -4226,16 +4226,16 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			var gl = this.scene._context._gl;
 			
 			neoBuilding.metaData.fileLoadState = 0;
-			neoBuilding._buildingPosition = undefined;
-			neoBuilding._buildingPositionHIGH = undefined;
-			neoBuilding._buildingPositionLOW = undefined;
+			//neoBuilding._buildingPosition = undefined;
+			//neoBuilding._buildingPositionHIGH = undefined;
+			//neoBuilding._buildingPositionLOW = undefined;
 			
-			neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
-			neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
-			neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
-			neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
-			neoBuilding.f4dTransfMat = undefined; // f4d matrix4.***
-			neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
+			//neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
+			//neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
+			//neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
+			//neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
+			//neoBuilding.f4dTransfMat = undefined; // f4d matrix4.***
+			//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
 			
 			// create the default blocks_lists.*****************************
 			if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
