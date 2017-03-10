@@ -53,3 +53,4 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	
 	return true;
 };
+
