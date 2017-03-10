@@ -2247,7 +2247,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 		
 		if(!find) {
-			this.deleteNeoBuilding(gl, neoBuilding);
+			//this.deleteNeoBuilding(gl, neoBuilding);
 			return;
 		}
 		// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
@@ -2646,7 +2646,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 
-				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx);
+				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, 0.1);
 			}
 			
 			// 2) LOD 1.*********************************************************************************************************************
@@ -2792,7 +2792,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 
-				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx);
+				this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoRefsList_Array, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, 0.1);
 			}
 			
 			// 2) LOD 1.*********************************************************************************************************************
@@ -3717,6 +3717,7 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	
 	// create the default blocks_lists.*****************************
 	if(neoBuilding._blocksList_Container.blocksListsArray.length > 0) neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
+	neoBuilding._blocksList_Container = undefined;
 	neoBuilding._blocksList_Container = new BlocksListsContainer();
 	neoBuilding._blocksList_Container.newBlocksList("Blocks1");
 	//this._blocksList_Container.newBlocksList("Blocks2");
@@ -3726,7 +3727,7 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************
-	neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
+	//neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // in asimetric version there are no references in exterior.***
 	neoBuilding.currentRenderablesNeoRefLists = [];
 	neoBuilding.preExtractedLowestOctreesArray = [];
 	
@@ -3749,18 +3750,6 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	// The lodBuildings.***
 	neoBuilding.lod2Building = undefined;
 	neoBuilding.lod3Building = undefined;
-	/*
-	if(neoBuilding._blocksList_Container.blocksListsArray.length > 0)
-	{
-		var blocksList = neoBuilding._blocksList_Container.blocksListsArray[0];
-		if(blocksList.fileLoadState >= 2 && blocksList.fileLoadState.blocksArray)
-		{
-			blocksList.blocksArray.length =0;
-			blocksList.fileLoadState = 0;
-			blocksList.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
-		}
-	}
-	*/
 };
 
 /**
