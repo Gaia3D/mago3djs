@@ -1290,6 +1290,8 @@ ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuild
 		bbox.maxY = bbLengthY/2.0; 
 		bbox.maxZ = bbLengthZ/2.0; 
 	}
+	
+	neoBuildingsList.neoBuildings_Array.reverse();
 };
 
 /**

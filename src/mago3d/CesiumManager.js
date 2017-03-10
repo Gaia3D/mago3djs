@@ -1626,11 +1626,12 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	// 1) LOD 0.*********************************************************************************************************************
 	if(!this.isCameraMoving) {
 		this.visibleObjControlerOctrees.initArrays(); // init.******
+		this.visibleObjControlerOctreesAux.initArrays(); // init.******
 		
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for(var i=0; i<buildingsCount; i++) {
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding ,this.visibleObjControlerOctrees);
+			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding ,this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux);
 		}
 	}
 	this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
@@ -2183,7 +2184,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
  * @param result_neoRefLists_array 변수
  * @returns result_neoRefLists_array
  */
-CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees) {
+CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux) {
 	//result_neoRefLists_array.length = 0; // Init.***
 	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
 	
@@ -2201,7 +2202,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 //	{
 	//result_neoRefLists_array.length = 0; // init.***
 	var refList;
-	var maxRefListParsingCount = 5;
+	var maxRefListParsingCount = 50;
 	var refListsParsingCount = 0;
 	//var buildingRotationMatrix;
 	
@@ -2245,7 +2246,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		// get frustumCulled lowestOctrees classified by distances.************************************************************************************
 		var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 		var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
-		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 		
 		if(!find) {
 			this.deleteNeoBuilding(gl, neoBuilding);
@@ -2260,9 +2261,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var lowestOctree;
 		//buildingRotationMatrix = new Matrix4();
 		this.f4dMatrix4SC.setByFloat32Array(neoBuilding.move_matrix);
-		var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+		var lowestOctreesCount = visibleObjControlerOctreesAux.currentVisibles0.length;
 		for(var i=lastLOD0LowestOctreesCount; i<lowestOctreesCount; i++) {
-			lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+			lowestOctree = visibleObjControlerOctreesAux.currentVisibles0[i];
 			if(lowestOctree.triPolyhedronsCount == 0) continue;
 			
 			//if(lowestOctree.neoRefsList_Array.length == 0)
@@ -2335,9 +2336,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		}
 		
 		// LOD 1.*******************************************************************************
-		lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+		lowestOctreesCount = visibleObjControlerOctreesAux.currentVisibles1.length;
 		for(var i=lastLOD1LowestOctreesCount; i<lowestOctreesCount; i++) {
-			lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+			lowestOctree = visibleObjControlerOctreesAux.currentVisibles1[i];
 			
 			if(lowestOctree.triPolyhedronsCount == 0) continue;
 			

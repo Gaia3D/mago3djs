@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  */
 var FileRequestControler = function() {
-	this.maxFilesRequestedCount = 10;
+	this.maxFilesRequestedCount = 50;
 	this.filesRequestedCount = 0;
 	
 	//this.maxNeoBuildingHeaderRequestedCount = 50;
