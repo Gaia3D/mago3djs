@@ -592,27 +592,25 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(gl, arrayBuffer, neoSimp
  */
 ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) {
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			blocksList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			blocksList.fileLoadState = 2; // 2 = file loading finished.***
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response; // Note: not oReq.responseText
+			if(arrayBuffer) {
+				blocksList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
+				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+			}
+			arrayBuffer = null;
 		} else {
 			blocksList.fileLoadState = oReq.status;
 		}
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
-	oReq.onerror = function(e) {
-		blocksList.fileLoadState = 500;
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
+	});
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
