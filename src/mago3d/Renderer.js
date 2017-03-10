@@ -444,6 +444,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		gl.disable(gl.CULL_FACE);
 	}
 	
+	//gl.enable(gl.CULL_FACE);
 	gl.disable(gl.CULL_FACE);
 		
 	//if(ssao_idx == 0)
@@ -480,7 +481,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		if(myBlocksList == undefined)
 			continue;
 		
-		if(myBlocksList.fileLoadState == 2)
+		if(myBlocksList.fileLoadState == 2 && !f4d_manager.isCameraMoving)
 		{
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
