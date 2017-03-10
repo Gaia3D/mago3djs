@@ -591,24 +591,28 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(gl, arrayBuffer, neoSimp
  * @param readerWriter 변수
  */
 ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) {
-	var oReq = new XMLHttpRequest();
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
+	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
 		if(oReq.status === 200) {
-			var arrayBuffer = oReq.response; // Note: not oReq.responseText
+			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
-				blocksList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
 				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				blocksList.dataArraybuffer = arrayBuffer;
+				arrayBuffer = null;
+			} else {
+				blocksList.fileLoadState = 500;
 			}
-			arrayBuffer = null;
 		} else {
 			blocksList.fileLoadState = oReq.status;
 		}
+		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
 	});
+	
 	oReq.open("GET", fileName, true);
 	oReq.responseType = "arraybuffer";
 	oReq.send(null);
@@ -623,41 +627,30 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
  * @param readerWriter 변수
  */
 ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuilding, readerWriter, magoManager) {
-	// this is old function, but is in use.***
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
-	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		    if (arrayBuffer) {
-		    	readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList, neoBuilding);
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
 				blocksList.fileLoadState = 2; // 2 = file loading finished.***
-				
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
-					if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) {
-						magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
-					}
-				}
-		    }
-		  
-		    arrayBuffer = null;
+				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList, neoBuilding);
+				arrayBuffer = null;
+			} else {
+				blocksList.fileLoadState = 500;
+			}
 		} else {
 			blocksList.fileLoadState = oReq.status;
 		}
-	};
-	
-	oReq.onerror = function(e) {
-		blocksList.fileLoadState = 500;
+		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -669,37 +662,29 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuil
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, neoBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoRefsList.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			neoRefsList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			if(neoRefsList.dataArraybuffer) {
-				neoRefsList.fileLoadState = 2;	
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.filesRequestedCount -= 1;
-					if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-				}
+	neoRefsList.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				neoRefsList.fileLoadState = 2; // 2 = file loading finished.***
+				neoRefsList.dataArraybuffer = arrayBuffer;
+				arrayBuffer = null;
 			} else {
-				neoRefsList.fileLoadState = 0;	
+				neoRefsList.fileLoadState = 500;
 			}
 		} else {
 			neoRefsList.fileLoadState = oReq.status;
 		}
-	};
-	
-	oReq.onerror = function(e) {
-		neoRefsList.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -711,37 +696,29 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, neoBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lowestOctree.lego.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			lowestOctree.legoDataArrayBuffer = oReq.response; // Note: not oReq.responseText
-			if(lowestOctree.legoDataArrayBuffer) {
-				lowestOctree.lego.fileLoadState = 2;	
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.filesRequestedCount -= 1;
-					if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-				}
+	lowestOctree.lego.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				lowestOctree.lego.fileLoadState = 2; // 2 = file loading finished.***
+				lowestOctree.legoDataArrayBuffer = arrayBuffer;
+				arrayBuffer = null;
 			} else {
-				lowestOctree.fileLoadState = 0;	
+				lowestOctree.lego.fileLoadState = 500;
 			}
 		} else {
-			lowestOctree.fileLoadState = oReq.status;
+			lowestOctree.lego.fileLoadState = oReq.status;
 		}
-	};
-	
-	oReq.onerror = function(e) {
-		lowestOctree.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -752,35 +729,29 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lodBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePathInServer, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lodBuilding.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-		    lodBuilding.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			if(lodBuilding.dataArraybuffer) {
-				lodBuilding.fileLoadState = 2;	
-				magoManager.fileRequestControler.filesRequestedCount -= 1;
-				if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	lodBuilding.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				lodBuilding.fileLoadState = 2; // 2 = file loading finished.***
+				lodBuilding.dataArraybuffer = arrayBuffer;
+				arrayBuffer = null;
 			} else {
-				lodBuilding.fileLoadState = 0;	
+				lodBuilding.fileLoadState = 500;
 			}
 		} else {
-			lodBuilding.fileLoadState = 0;	
+			lodBuilding.fileLoadState = oReq.status;
 		}
-	};
-
-	oReq.onerror = function(e) {
-		lodBuilding.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
+	});
 	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -797,83 +768,90 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lo
  * @param readerWriter 변수
  * @param subOctreeNumberName 변수
  */
-ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, readerWriter, subOctreeNumberName, manager) {
-
+ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRefList_container, neoReferenceList_name, lodLevel, blocksList, 
+															transformMat, neoBuilding, readerWriter, subOctreeNumberName, magoManager) {
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				if(subOctreeNumberName != undefined) {
+					// we are reading interior comRefs.***
+				    if(neoBuilding.octree == undefined) {
+				    	neoBuilding.octree = new Octree(undefined);
+				    }
+				  
+				    var octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
+				    var neoRefsList = new NeoReferencesList();
+				    neoRefsList.lod_level = lodLevel;
+				    neoRefsList.blocksList = blocksList;
+				    neoRefsList.name = neoReferenceList_name;
+				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    if(transformMat) {
+				    	neoRefsList.multiplyReferencesMatrices(transformMat);
+				    }
+				    octree.neoRefsList_Array.push(neoRefsList);
+			    } else {
+				    var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
+				    neoRefsList.lod_level = lodLevel;
+				    neoRefsList.name = neoReferenceList_name;
+				    neoRefsList.blocksList = blocksList; // no necessary.***
+				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    if(transformMat) {
+				    	neoRefsList.multiplyReferencesMatrices(transformMat);
+				    }
+			    }
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
 	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent) {
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer) {
-		    if(readerWriter == undefined) {
-			    readerWriter = new ReaderWriter();
-		    }
-		  
-		    var octree;
-		    if(subOctreeNumberName != undefined) {
-		    	// we are reading interior comRefs.***
-			    if(neoBuilding.octree == undefined) {
-		  		    neoBuilding.octree = new Octree(undefined);
-			    }
-			  
-			    octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
-			    var neoRefsList = new NeoReferencesList();
-			    neoRefsList.lod_level = lodLevel;
-			    neoRefsList.blocksList = blocksList;
-			    neoRefsList.name = neoReferenceList_name;
-			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			    if(transformMat) {
-			  	    neoRefsList.multiplyReferencesMatrices(transformMat);
-			    }
-			    octree.neoRefsList_Array.push(neoRefsList);
-
-		    } else {
-			    var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
-			    neoRefsList.lod_level = lodLevel;
-			    neoRefsList.name = neoReferenceList_name;
-			    neoRefsList.blocksList = blocksList; // no necessary.***
-			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			    if(transformMat) {
-				    neoRefsList.multiplyReferencesMatrices(transformMat);
-			    }
-		    }
-		 
-	    }
-	    //arrayBuffer = null;
-	};
-
 	oReq.send(null);
 };	
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param filePath_inServer 변수
+ * @param gl 변수
+ * @param fileName 변수
  * @param neoSimpleBuilding 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inServer, neoSimpleBuilding, readerWriter) {
+ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, neoSimpleBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent) {
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer) {
-			if(readerWriter == undefined) {
-				readerWriter = new ReaderWriter();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				readerWriter.readNeoSimpleBuilding(gl, arrayBuffer, neoSimpleBuilding );
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
 			}
-			readerWriter.readNeoSimpleBuilding(GL, arrayBuffer, neoSimpleBuilding );
+		} else {
+//			blocksList.fileLoadState = oReq.status;
 		}
-		arrayBuffer = null;
-	};
-
-	oReq.send(null);
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
 };
 
 /**
@@ -947,34 +925,43 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param filePath_inServer 변수
+ * @param gl 변수
+ * @param fileName 변수
  * @param terranTile 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServer, terranTile, readerWriter) {
+ReaderWriter.prototype.readTerranTileFileInServer = function(gl, fileName, terranTile, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent) {
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer) {
-			if(readerWriter == undefined) {
-				readerWriter = new ReaderWriter();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				var bytes_readed = 0;
+				readerWriter.readTerranTileFile(gl, arrayBuffer, fileName, terranTile, readerWriter, bytes_readed);
+				
+				// Once readed the terranTilesFile, must make all the quadtree.***
+				terranTile.setDimensionsSubTiles();
+				terranTile.calculatePositionByLonLatSubTiles();
+				terranTile.terranIndexFile_readed = true;
+				
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
 			}
-			var bytes_readed = 0;
-			readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed);
-			
-			// Once readed the terranTilesFile, must make all the quadtree.***
-			terranTile.setDimensionsSubTiles();
-			terranTile.calculatePositionByLonLatSubTiles();
-			terranTile.terranIndexFile_readed = true;
+		} else {
+//			blocksList.fileLoadState = oReq.status;
 		}
-		arrayBuffer = null;
-	};
-
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
