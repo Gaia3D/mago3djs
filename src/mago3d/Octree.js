@@ -54,6 +54,7 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	if(this.lego != undefined)
 	{
 		this.lego.vbo_vicks_container.deleteGlObjects(gl);
+		this.legoDataArrayBuffer = undefined;
 	}
 	var subOctreesCount = this.subOctrees_array.length;
 	for(var i=0; i<subOctreesCount; i++)
@@ -229,7 +230,7 @@ Octree.prototype.getCenterPos = function() {
  */
 Octree.prototype.getRadiusAprox = function() {
 	//return Math.abs(this.half_dx*1.2);
-	return Math.abs(this.half_dx*2.0);
+	return Math.abs(this.half_dx*3.0);
 };
 
 /**
@@ -371,7 +372,7 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  * @param eye_y 변수
  * @param eye_z 변수
  */
-Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVolume, visibleObjControlerOctrees, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
+Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
 	var visibleOctreesArray = [];
 	var excludedOctArray = [];
 	var sortedOctreesArray = [];
@@ -386,32 +387,35 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	  
 	for(var i=0; i<visibleOctrees_count; i++) {
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
-	//	this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 	  
 
 	for(var i=0; i<visibleOctrees_count; i++) {
-		if(visibleOctreesArray[i].squareDistToEye < 400) // 15x15 = 225
+		if(visibleOctreesArray[i].squareDistToEye < 300) // 15x15 = 225
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 			{
-				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if(visibleOctreesArray[i].squareDistToEye < 2000) // 25x25 = 625
+		else if(visibleOctreesArray[i].squareDistToEye < 2200) // 25x25 = 625
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 			{
-				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if(visibleOctreesArray[i].squareDistToEye < 1000000) // 50x50 = 2500
+		else if(visibleOctreesArray[i].squareDistToEye < 500000) // 50x50 = 2500
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 			{
-				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
@@ -419,7 +423,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
 			{
-				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
