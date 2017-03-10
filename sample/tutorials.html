@@ -83,7 +83,7 @@
 		async : true,
 		success: function(result){
 			// TODO DB 에서 고객사별 환경 설정을 읽어서 초기화
-			var managerFactory = new ManagerFactory("magoContainer", result);
+			var managerFactory = new ManagerFactory(null, "magoContainer", result);
 		},
 		error: function(e){
 			alert(e.responseText);

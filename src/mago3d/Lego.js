@@ -1,6 +1,3 @@
-
-
-
 'use strict';
 
 /**
@@ -16,10 +13,9 @@ var Lego = function() {
 	this.fileLoadState = 0;
 };
 
- Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded)
- {
-	if(this.fileLoadState == 2)// file loaded.***
-	{
+Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded) {
+	if(this.fileLoadState == 2) {
+		// file loaded.***
 		this.fileLoadState = 3;// 3 = parsing started.***
 		
 		// 1rst, read bbox.***
@@ -44,27 +40,20 @@ var Lego = function() {
 		
 		vbo_vi_cacheKey.vertexCount = vertexCount;
 		
-		if(vbo_vi_cacheKey.vertexCount == 0)
-		{
-			var hola = 0;
-		}
-		
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasNormals)
-		{
+		if(hasNormals) {
 			vertexCount = f4dReadWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var normalsByteValues_count = vertexCount * 3;
-			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 1*normalsByteValues_count;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 1*normalsByteValues_count;
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
 		}
 		
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasColors)
-		{
+		if(hasColors) {
 			vertexCount = f4dReadWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
@@ -75,17 +64,12 @@ var Lego = function() {
 		
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoord = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasTexCoord)
-		{
-			// TODO:
-		}
+		// TODO:
+//		if(hasTexCoord) {
+//		}
 		
 		this.fileLoadState = 4; // 4 = parsing finished.***
-
-	}	
-	else{
-		var hola = 0;
 	}
 	
 	return bytesReaded;
- };
+};
