@@ -188,6 +188,8 @@ var CesiumManager = function() {
 	this.terranTileSC;
 	
 	this.textureAux_1x1;
+	this.resultRaySC = new Float32Array(3);
+	this.f4dMatrix4SC = new Matrix4();
 	
 	// Workers.****************************************************************************
 	/*
@@ -1860,13 +1862,12 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(gl, cameraPosition, 
 	var realZDepth = zDepth*current_frustum_far;
 	
 	// now, find the 3d position of the pixel in camCoord.****
-	var ray = new Float32Array(3);
-	ray = this.getRayCamSpace(gl, scene, ray);
+	this.resultRaySC = this.getRayCamSpace(gl, scene, this.resultRaySC);
 	
 	var pixelPosCamCoord = new Float32Array(3);
-	pixelPosCamCoord[0] = ray[0] * realZDepth;
-	pixelPosCamCoord[1] = ray[1] * realZDepth;
-	pixelPosCamCoord[2] = ray[2] * realZDepth;
+	pixelPosCamCoord[0] = this.resultRaySC[0] * realZDepth;
+	pixelPosCamCoord[1] = this.resultRaySC[1] * realZDepth;
+	pixelPosCamCoord[2] = this.resultRaySC[2] * realZDepth;
 	
 	// now, must transform this pixelCamCoord to world coord.***
 	var mv_inv = new Cesium.Matrix4();
@@ -2050,7 +2051,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 	var refList;
 	var maxRefListParsingCount = 10;
 	var refListsParsingCount = 0;
-	var buildingRotationMatrix;
+	//var buildingRotationMatrix;
 	
 	// Determine if the camera is inside of the building.***
 	if(this.isCameraInsideNeoBuilding && neoBuilding.octree != undefined) {
@@ -2091,8 +2092,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		// then do frustum culling for interior octree.***
 		this.intNeoRefList_array.length = 0;
 		neoBuilding.octree.getFrustumVisibleNeoRefListArray(myCullingVolume, this.intNeoRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
-		buildingRotationMatrix = new Matrix4();
-		buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
+		//buildingRotationMatrix = new Matrix4();
+		this.f4dMatrix4SC.setByFloat32Array(neoBuilding.move_matrix);
 		
 		for(var i=0; i<this.intNeoRefList_array.length; i++) {
 			// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
@@ -2103,8 +2104,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
 					refList.dataArraybuffer = null;
-					if(buildingRotationMatrix) {
-						refList.multiplyReferencesMatrices(buildingRotationMatrix);
+					if(this.f4dMatrix4SC) {
+						refList.multiplyReferencesMatrices(this.f4dMatrix4SC);
 					}
 		  
 					refListsParsingCount += 1;
@@ -2134,8 +2135,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 	
 	// Exterior and "bone" neoReferences.***************************
 	// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
-	buildingRotationMatrix = new Matrix4();
-	buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
+	//buildingRotationMatrix = new Matrix4();
+	this.f4dMatrix4SC.setByFloat32Array(neoBuilding.move_matrix);
 		
 	var extNeoRefsCount = neoBuilding._neoRefLists_Container.neoRefsLists_Array.length;
 	for(var i=0; i<extNeoRefsCount; i++) {
@@ -2146,8 +2147,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 				// must parse the arraybuffer data.***
 				refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
 				refList.dataArraybuffer = null;
-				if(buildingRotationMatrix) {
-					refList.multiplyReferencesMatrices(buildingRotationMatrix);
+				if(this.f4dMatrix4SC) {
+					refList.multiplyReferencesMatrices(this.f4dMatrix4SC);
 				}
 	  
 				refListsParsingCount += 1;
@@ -2202,7 +2203,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	var refList;
 	var maxRefListParsingCount = 5;
 	var refListsParsingCount = 0;
-	var buildingRotationMatrix;
+	//var buildingRotationMatrix;
 	
 	// Determine if the camera is inside of the building.***
 	
@@ -2257,8 +2258,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 //			var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
 	
 		var lowestOctree;
-		buildingRotationMatrix = new Matrix4();
-		buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
+		//buildingRotationMatrix = new Matrix4();
+		this.f4dMatrix4SC.setByFloat32Array(neoBuilding.move_matrix);
 		var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 		for(var i=lastLOD0LowestOctreesCount; i<lowestOctreesCount; i++) {
 			lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
@@ -2308,8 +2309,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
 					refList.dataArraybuffer = null;
-					if(buildingRotationMatrix) {
-						refList.multiplyReferencesMatrices(buildingRotationMatrix);
+					if(this.f4dMatrix4SC) {
+						refList.multiplyReferencesMatrices(this.f4dMatrix4SC);
 					}
 		  
 					refListsParsingCount += 1;
@@ -2370,9 +2371,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
 					refList.dataArraybuffer = null;
-					if(buildingRotationMatrix)
+					if(this.f4dMatrix4SC)
 					{
-						refList.multiplyReferencesMatrices(buildingRotationMatrix);
+						refList.multiplyReferencesMatrices(this.f4dMatrix4SC);
 					}
 		  
 					refListsParsingCount += 1;
@@ -2703,7 +2704,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
 				// && lowestOctree.neoRefsList_Array.length == 0)
-				if(lowestOctree.lego.fileLoadState == 0) {
+				if(lowestOctree.lego.fileLoadState == 0 && !this.isCameraMoving) {
 					// must load the legoStructure of the lowestOctree.***
 					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 						var subOctreeNumberName = lowestOctree.octree_number_name.toString();
@@ -2715,7 +2716,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					continue;
 				}
 				
-				if(lowestOctree.lego.fileLoadState == 2) {
+				if(lowestOctree.lego.fileLoadState == 2 && !this.isCameraMoving) {
 					if(lowestOctreeLegosParsingCount < 100) {
 						var bytesReaded = 0;
 						lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
