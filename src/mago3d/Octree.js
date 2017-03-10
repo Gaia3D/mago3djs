@@ -228,7 +228,8 @@ Octree.prototype.getCenterPos = function() {
  * @returns Math.abs(this.half_dx*1.2);
  */
 Octree.prototype.getRadiusAprox = function() {
-	return Math.abs(this.half_dx*1.2);
+	//return Math.abs(this.half_dx*1.2);
+	return Math.abs(this.half_dx*2.0);
 };
 
 /**

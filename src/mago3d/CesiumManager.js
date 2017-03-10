@@ -1566,7 +1566,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	//}
 
 	if(this.bPicking == true) {
-		this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
+		//this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
 	}
 	
 	//return;
@@ -2248,7 +2248,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 		
 		if(!find) {
-			//this.deleteNeoBuilding(gl, neoBuilding);
+			this.deleteNeoBuilding(gl, neoBuilding);
 			return;
 		}
 		// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
