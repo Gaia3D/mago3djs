@@ -115,5 +115,5 @@ gulp.task('doc', function (cb) {
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', [ 'clean', 'combine-js' ]);
+gulp.task('default', [ 'clean', 'combine-js', 'lint' ]);
 //gulp.task('default', [ 'uglify', 'doc' ]);
