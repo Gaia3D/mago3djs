@@ -972,50 +972,57 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(gl, fileName, terra
  * @param BR_ProjectsList 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inServer, BR_ProjectsList, readerWriter) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent) {
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer) {
-		    if(readerWriter == undefined) {
-		    	readerWriter = new ReaderWriter();
-		    }
-		    // write code here.***
-		    var pCloudProject;
-		  
-		    var bytes_readed = 0;
+ReaderWriter.prototype.readPCloudIndexFileInServer = function(gl, fileName, BR_ProjectsList, readerWriter) {
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
-			var f4d_rawPathName_length = 0;
-//			var f4d_simpleBuildingPathName_length = 0;
-//			var f4d_nailImagePathName_length = 0;
-			
-			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			
-			for(var i=0; i<pCloudProjects_count; i++) {
-				pCloudProject = new PCloudMesh();
-				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
-				pCloudProject._header._f4d_version = 2;
-				// 1rst, read the files path names.************************************************************************************************************
-				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<f4d_rawPathName_length; j++) {
-					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				// write code here.***
+			    var pCloudProject;
+			  
+			    var bytes_readed = 0;
+		
+				var f4d_rawPathName_length = 0;
+//				var f4d_simpleBuildingPathName_length = 0;
+//				var f4d_nailImagePathName_length = 0;
+				
+				var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				for(var i=0; i<pCloudProjects_count; i++) {
+					pCloudProject = new PCloudMesh();
+					BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
+					pCloudProject._header._f4d_version = 2;
+					// 1rst, read the files path names.************************************************************************************************************
+					f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+					for(var j=0; j<f4d_rawPathName_length; j++) {
+						pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+					}
+					
+					pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
+					pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
+					
+					//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
+					//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
+					//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
 				}
-				
-				pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
-				pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
-				
-				//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
-				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
-				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
 			}
-	    }
-	    arrayBuffer = null;
-	};
-
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
