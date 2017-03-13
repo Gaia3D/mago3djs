@@ -13,7 +13,7 @@ var ReaderWriter = function() {
 	this.geometryDataPath = MagoConfig.getInformation().deployConfig.dataPath;
 	this.viArraysContainer = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
-		//var simpleBuildingImage = new Image();
+	//var simpleBuildingImage = new Image();
 		
 	this.j_counter;
 	this.k_counter;
@@ -25,8 +25,8 @@ var ReaderWriter = function() {
 	this.GAIA3D__offset_longitude = -0.001;
 	this.GAIA3D__counter = 0;
 		
-		// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
-		// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
+	// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
+	// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
 	this.uint32;
 	this.uint16;
 	this.int16;
@@ -170,11 +170,9 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end) {
 	var int8 = new Int8Array(buffer.slice(start, end));
 	var int8_value = int8[0];
 
-	if(int8_value > max_color_value)
-	   int8_value = max_color_value;
+	if(int8_value > max_color_value) int8_value = max_color_value;
 
-	 if(int8_value < 0)
-	   int8_value += 256;
+	 if(int8_value < 0) int8_value += 256;
 
 	 return int8_value;
 };
@@ -567,7 +565,7 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(gl, arrayBuffer, neoSimp
 	}
 	
 	// now, read the buffer.***
-	var buffer_id = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	var buffer_length = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
@@ -593,28 +591,30 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(gl, arrayBuffer, neoSimp
  * @param readerWriter 변수
  */
 ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) {
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			blocksList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			blocksList.fileLoadState = 2; // 2 = file loading finished.***
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				blocksList.dataArraybuffer = arrayBuffer;
+				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+				blocksList.fileLoadState = 500;
+			}
 		} else {
 			blocksList.fileLoadState = oReq.status;
 		}
+		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	};
-	oReq.onerror = function(e) {
-		blocksList.fileLoadState = 500;
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	}
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -627,41 +627,30 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
  * @param readerWriter 변수
  */
 ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuilding, readerWriter, magoManager) {
-	// this is old function, but is in use.***
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
-	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
+//	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		    if (arrayBuffer) {
-		    	readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList, neoBuilding);
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList, neoBuilding);
 				blocksList.fileLoadState = 2; // 2 = file loading finished.***
-				
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
-					if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) {
-						magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
-					}
-				}
-		    }
-		  
-		    arrayBuffer = null;
+				arrayBuffer = null;
+			} else {
+				blocksList.fileLoadState = 500;
+			}
 		} else {
 			blocksList.fileLoadState = oReq.status;
 		}
-	};
+		
+//		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
+	});
 	
-	oReq.onerror = function(e) {
-		blocksList.fileLoadState = 500;
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	}
-
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -673,37 +662,29 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuil
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, neoBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoRefsList.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			neoRefsList.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			if(neoRefsList.dataArraybuffer) {
-				neoRefsList.fileLoadState = 2;	
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.filesRequestedCount -= 1;
-					if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-				}
+	neoRefsList.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				neoRefsList.dataArraybuffer = arrayBuffer;
+				neoRefsList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
 			} else {
-				neoRefsList.fileLoadState = 0;	
+				neoRefsList.fileLoadState = 500;
 			}
 		} else {
 			neoRefsList.fileLoadState = oReq.status;
 		}
-	};
-	
-	oReq.onerror = function(e) {
-		neoRefsList.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	}
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -715,37 +696,29 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, neoBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", fileName, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lowestOctree.lego.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			lowestOctree.legoDataArrayBuffer = oReq.response; // Note: not oReq.responseText
-			if(lowestOctree.legoDataArrayBuffer) {
-				lowestOctree.lego.fileLoadState = 2;	
-				if(magoManager != undefined) {
-					magoManager.fileRequestControler.filesRequestedCount -= 1;
-					if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-				}
+	lowestOctree.lego.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				lowestOctree.legoDataArrayBuffer = arrayBuffer;
+				lowestOctree.lego.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
 			} else {
-				lowestOctree.fileLoadState = 0;	
+				lowestOctree.lego.fileLoadState = 500;
 			}
 		} else {
-			lowestOctree.fileLoadState = oReq.status;
+			lowestOctree.lego.fileLoadState = oReq.status;
 		}
-	};
-	
-	oReq.onerror = function(e) {
-		lowestOctree.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	}
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -756,35 +729,29 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
  * @param magoManager 변수
  */
 ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lodBuilding, magoManager) {
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePathInServer, true);
-	oReq.responseType = "arraybuffer";
-	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lodBuilding.fileLoadState = 1;	
-
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-		    lodBuilding.dataArraybuffer = oReq.response; // Note: not oReq.responseText
-			if(lodBuilding.dataArraybuffer) {
-				lodBuilding.fileLoadState = 2;	
-				magoManager.fileRequestControler.filesRequestedCount -= 1;
-				if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	lodBuilding.fileLoadState = 1; // 1 = file loading strated.***
+	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				lodBuilding.dataArraybuffer = arrayBuffer;
+				lodBuilding.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
 			} else {
-				lodBuilding.fileLoadState = 0;	
+				lodBuilding.fileLoadState = 500;
 			}
 		} else {
-			lodBuilding.fileLoadState = 0;	
+			lodBuilding.fileLoadState = oReq.status;
 		}
-	};
-
-	oReq.onerror = function(e) {
-		lodBuilding.fileLoadState = 500;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	}
+	});
 	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -801,98 +768,90 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lo
  * @param readerWriter 변수
  * @param subOctreeNumberName 변수
  */
-ReaderWriter.prototype.readNeoReferencesInServer = function(GL, filePath_inServer, neoRefList_container, neoReferenceList_name, 
-																		  lodLevel, blocksList, transformMat, neoBuilding, readerWriter, subOctreeNumberName, manager) {
-
+ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRefList_container, neoReferenceList_name, lodLevel, blocksList, 
+															transformMat, neoBuilding, readerWriter, subOctreeNumberName, magoManager) {
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				if(subOctreeNumberName != undefined) {
+					// we are reading interior comRefs.***
+				    if(neoBuilding.octree == undefined) {
+				    	neoBuilding.octree = new Octree(undefined);
+				    }
+				  
+				    var octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
+				    var neoRefsList = new NeoReferencesList();
+				    neoRefsList.lod_level = lodLevel;
+				    neoRefsList.blocksList = blocksList;
+				    neoRefsList.name = neoReferenceList_name;
+				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    if(transformMat) {
+				    	neoRefsList.multiplyReferencesMatrices(transformMat);
+				    }
+				    octree.neoRefsList_Array.push(neoRefsList);
+			    } else {
+				    var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
+				    neoRefsList.lod_level = lodLevel;
+				    neoRefsList.name = neoReferenceList_name;
+				    neoRefsList.blocksList = blocksList; // no necessary.***
+				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    if(transformMat) {
+				    	neoRefsList.multiplyReferencesMatrices(transformMat);
+				    }
+			    }
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
 	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	    {
-		    if(readerWriter == undefined)
-		    {
-			    readerWriter = new ReaderWriter();
-		    }
-		    //------------------------------------------------------
-		  
-		    var octree;
-		    if(subOctreeNumberName != undefined)
-		    {
-		    	// we are reading interior comRefs.***
-			    if(neoBuilding.octree == undefined)
-			    {
-		  		    neoBuilding.octree = new Octree(undefined);
-			    }
-			  
-			    octree = neoBuilding.octree.getOctreeByNumberName(subOctreeNumberName);
-			    var neoRefsList = new NeoReferencesList();
-			    neoRefsList.lod_level = lodLevel;
-			    neoRefsList.blocksList = blocksList;
-			    neoRefsList.name = neoReferenceList_name;
-			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			    if(transformMat)
-			    {
-			  	    neoRefsList.multiplyReferencesMatrices(transformMat);
-			    }
-			    octree.neoRefsList_Array.push(neoRefsList);
-
-		    }
-		    else
-		    {
-			  
-			    var neoRefsList = neoRefList_container.newNeoRefsList(blocksList);
-			    neoRefsList.lod_level = lodLevel;
-			    neoRefsList.name = neoReferenceList_name;
-			    neoRefsList.blocksList = blocksList; // no necessary.***
-			    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
-			    readerWriter.readNeoReferences(GL, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
-			    if(transformMat)
-			    {
-				    neoRefsList.multiplyReferencesMatrices(transformMat);
-			    }
-		    }
-		 
-	    }
-	    //arrayBuffer = null;
-	};
-
 	oReq.send(null);
 };	
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param filePath_inServer 변수
+ * @param gl 변수
+ * @param fileName 변수
  * @param neoSimpleBuilding 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inServer, neoSimpleBuilding, readerWriter) {
+ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, neoSimpleBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	  if (arrayBuffer)
-	  {
-		   if(readerWriter == undefined)
-		  {
-			   readerWriter = new ReaderWriter();
-		  }
-		  //------------------------------------------------------
-		   readerWriter.readNeoSimpleBuilding(GL, arrayBuffer, neoSimpleBuilding );
-	  }
-	  arrayBuffer = null;
-	};
-
-	oReq.send(null);
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				readerWriter.readNeoSimpleBuilding(gl, arrayBuffer, neoSimpleBuilding );
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
 };
 
 /**
@@ -907,14 +866,13 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(GL, filePath_inS
  */
 ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) {
 	//var bytes_readed = 0;
-	var f4d_headerPathName_length = 0;
-	var BP_Project;
-	var idxFile;
-	var subTile;
+//	var f4d_headerPathName_length = 0;
+//	var BP_Project;
+//	var idxFile;
+//	var subTile;
 	
 	terranTile._depth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	if(terranTile._depth == 0)
-	{
+	if(terranTile._depth == 0) {
 		// Read dimensions.***
 		terranTile.longitude_min = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
 		terranTile.longitude_max = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
@@ -931,16 +889,13 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 	// Old.***
 	/*
 	var subTiles_count = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	if(subTiles_count == 0)
-	{
+	if(subTiles_count == 0) {
 		// this is the smallest tile.***
 		var idxFiles_count = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		if(idxFiles_count > 1)
-		{
+		if(idxFiles_count > 1) {
 			var h=0;
-		}
-		for(var i=0; i<idxFiles_count; i++)
-		{
+		} 
+		for(var i=0; i<idxFiles_count; i++) {
 			
 			BP_Project = terranTile.newBRProject();
 			BP_Project._header._f4d_version = 2;
@@ -958,11 +913,8 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 		// provisionally, delete all the BP_Projects created.***
 		// provisionally, delete all the BP_Projects created.***
 		terranTile._BR_buildingsArray.length = 0;
-	}
-	else
-	{
-		for(var i=0; i<4; i++)
-		{
+	} else {
+		for(var i=0; i<4; i++) {
 			subTile = terranTile.newSubTerranTile();
 			bytes_readed = this.readTerranTileFile(GL, arrayBuffer, filePath_inServer, subTile, readerWriter, bytes_readed);
 		}
@@ -973,38 +925,43 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param filePath_inServer 변수
+ * @param gl 변수
+ * @param fileName 변수
  * @param terranTile 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServer, terranTile, readerWriter) {
+ReaderWriter.prototype.readTerranTileFileInServer = function(gl, fileName, terranTile, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				var bytes_readed = 0;
+				readerWriter.readTerranTileFile(gl, arrayBuffer, fileName, terranTile, readerWriter, bytes_readed);
+				
+				// Once readed the terranTilesFile, must make all the quadtree.***
+				terranTile.setDimensionsSubTiles();
+				terranTile.calculatePositionByLonLatSubTiles();
+				terranTile.terranIndexFile_readed = true;
 
-	oReq.onload = function (oEvent)
-	{
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer)
-		{
-			if(readerWriter == undefined)
-			{
-				readerWriter = new ReaderWriter();
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
 			}
-			//------------------------------------------------------
-			var bytes_readed = 0;
-			readerWriter.readTerranTileFile(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed);
-			
-			// Once readed the terranTilesFile, must make all the quadtree.***
-			terranTile.setDimensionsSubTiles();
-			terranTile.calculatePositionByLonLatSubTiles();
-			terranTile.terranIndexFile_readed = true;
-	  }
-	  arrayBuffer = null;
-	};
-
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -1015,183 +972,184 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(GL, filePath_inServ
  * @param BR_ProjectsList 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readPCloudIndexFileInServer = function(GL, filePath_inServer, BR_ProjectsList, readerWriter) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	   {
-		    if(readerWriter == undefined)
-		    {
-		    	readerWriter = new ReaderWriter();
-		    }
-		    //---------------------------------------------------------------------------------------------------
-		    // write code here.***
-		    var pCloudProject;
-		  
-		    var bytes_readed = 0;
+ReaderWriter.prototype.readPCloudIndexFileInServer = function(gl, fileName, BR_ProjectsList, readerWriter) {
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
-			var f4d_rawPathName_length = 0;
-			var f4d_simpleBuildingPathName_length = 0;
-			var f4d_nailImagePathName_length = 0;
-			
-			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			
-			for(var i=0; i<pCloudProjects_count; i++)
-			{
-				pCloudProject = new PCloudMesh();
-				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
-				pCloudProject._header._f4d_version = 2;
-				// ********************************************************************************************************************************************
-				// 1rst, read the files path names.************************************************************************************************************
-				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<f4d_rawPathName_length; j++){
-					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				// write code here.***
+			    var pCloudProject;
+			  
+			    var bytes_readed = 0;
+		
+				var f4d_rawPathName_length = 0;
+//				var f4d_simpleBuildingPathName_length = 0;
+//				var f4d_nailImagePathName_length = 0;
+				
+				var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				for(var i=0; i<pCloudProjects_count; i++) {
+					pCloudProject = new PCloudMesh();
+					BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
+					pCloudProject._header._f4d_version = 2;
+					// 1rst, read the files path names.************************************************************************************************************
+					f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+					for(var j=0; j<f4d_rawPathName_length; j++) {
+						pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+					}
+					
+					pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
+					pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
+					
+					//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
+					//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
+					//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
 				}
-				
-				pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
-				pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
-				
-				//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
-				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
-				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
 			}
-	    }
-	    arrayBuffer = null;
-	};
-
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param filePath_inServer 변수
+ * @param gl 변수
+ * @param fileName 변수
  * @param pCloud 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer, pCloud, readerWriter, f4d_manager) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	pCloud._f4d_header_readed = true;
+ReaderWriter.prototype.readPCloudHeaderInServer = function(gl, fileName, pCloud, readerWriter, magoManager) {
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
+	pCloud._f4d_header_readed = true;
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				// write code here.***
+				  
+			    var bytes_readed = 0;
+				var version_string_length = 5;
+				var intAux_scratch = 0;
+				var auxScratch;
+				var header = pCloud._header;
+				
+				// 1) Version(5 chars).***********
+				for(var j=0; j<version_string_length; j++){
+					header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+				
+				// 2) Type (1 byte).**************
+				header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				
+				// 3) Global unique ID.*********************
+				intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for(var j=0; j<intAux_scratch; j++){
+					header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+				
+				// 4) Location.*************************
+				header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+				header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+				header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+				
+				header._elevation += 60.0; // delete this. TEST.!!!
+				
+				// 5) Orientation.*********************
+				auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // yaw.***
+				auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // pitch.***
+				auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // roll.***
+				
+				// 6) BoundingBox.************************
+				header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+				header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+				
+				var isLarge = false;
+				if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0) {
+					isLarge = true;
+				}
+				
+				if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0) {
+					header.isSmall = true;
+				}
+				
+				// 7) octZerothBox.***********************
+				header._octZerothBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._octZerothBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._octZerothBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._octZerothBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+				header._octZerothBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+				header._octZerothBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+				
+				// 8) Data file name.********************
+				intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for(var j=0; j<intAux_scratch; j++) {
+					header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+				
+				// Now, must calculate some params of the project.**********************************************
+				// 0) PositionMatrix.************************************************************************
+				//var height = elevation;
+				
+				var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation); // Old.***
+				pCloud._pCloudPosition = position; 
+				
+				// High and Low values of the position.****************************************************
+				var splitValue = Cesium.EncodedCartesian3.encode(position);
+				var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
+				var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
+				var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
+				
+				pCloud._pCloudPositionHIGH = new Float32Array(3);
+				pCloud._pCloudPositionHIGH[0] = splitVelue_X.high;
+				pCloud._pCloudPositionHIGH[1] = splitVelue_Y.high;
+				pCloud._pCloudPositionHIGH[2] = splitVelue_Z.high;
+				
+				pCloud._pCloudPositionLOW = new Float32Array(3);
+				pCloud._pCloudPositionLOW[0] = splitVelue_X.low;
+				pCloud._pCloudPositionLOW[1] = splitVelue_Y.low;
+				pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
+				
+				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
+			  
+				pCloud._f4d_header_readed_finished = true;
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+		
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
 	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	    {
-		    if(readerWriter == undefined)
-		    {
-		    	readerWriter = new ReaderWriter();
-		    }
-		    //--------------------------------------------------------------
-		    // write code here.***
-		  
-		    var bytes_readed = 0;
-			var version_string_length = 5;
-			var intAux_scratch = 0;
-			var auxScratch;
-			var header = pCloud._header;
-			
-			// 1) Version(5 chars).***********
-			for(var j=0; j<version_string_length; j++){
-				header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-			
-			// 2) Type (1 byte).**************
-			header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			
-			// 3) Global unique ID.*********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j=0; j<intAux_scratch; j++){
-				header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-			
-			// 4) Location.*************************
-			header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			
-			header._elevation += 60.0; // delete this. TEST.!!!
-			
-			// 5) Orientation.*********************
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // yaw.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // pitch.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // roll.***
-			
-			// 6) BoundingBox.************************
-			header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			
-			var isLarge = false;
-			if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
-			{
-				isLarge = true;
-			}
-			
-			if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
-			{
-				header.isSmall = true;
-			}
-			
-			// 7) octZerothBox.***********************
-			header._octZerothBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._octZerothBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._octZerothBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._octZerothBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-			header._octZerothBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			
-			// 8) Data file name.********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j=0; j<intAux_scratch; j++){
-				header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-			
-			// Now, must calculate some params of the project.**********************************************
-			// 0) PositionMatrix.************************************************************************
-			//var height = elevation;
-			
-			var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation); // Old.***
-			pCloud._pCloudPosition = position; 
-			
-			// High and Low values of the position.****************************************************
-			var splitValue = Cesium.EncodedCartesian3.encode(position);
-			var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-			var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-			var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-			
-			pCloud._pCloudPositionHIGH = new Float32Array(3);
-			pCloud._pCloudPositionHIGH[0] = splitVelue_X.high;
-			pCloud._pCloudPositionHIGH[1] = splitVelue_Y.high;
-			pCloud._pCloudPositionHIGH[2] = splitVelue_Z.high;
-			
-			pCloud._pCloudPositionLOW = new Float32Array(3);
-			pCloud._pCloudPositionLOW[0] = splitVelue_X.low;
-			pCloud._pCloudPositionLOW[1] = splitVelue_Y.low;
-			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
-			
-		  if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		  pCloud._f4d_header_readed_finished = true;
-	  }
-	  arrayBuffer = null;
-	};
-
 	oReq.send(null);
 };	
 
@@ -1202,37 +1160,42 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(GL, filePath_inServer
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
 ReaderWriter.prototype.getObjectIndexFile = function(gl, readerWriter, neoBuildingsList) {
-	var filePathInServer = readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE;
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePathInServer, true);
-	oReq.responseType = "arraybuffer";
-	oReq.onload = function (oEvent) {
-		if(oReq.status == 200) {
-			var arrayBuffer = oReq.response; // Note: not oReq.responseText
-			if (arrayBuffer) {
-				readerWriter.parseObjectIndexFile(gl, arrayBuffer, neoBuildingsList);
-		    }
-		    arrayBuffer = null;
-		} else {
-		}
-	};
-
-	oReq.onerror = function(e) {
-	};
+	var fileName = readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE;
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+		
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- * @param gl gl context
  * @param arrayBuffer object index file binary data
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuildingsList) {
+ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildingsList) {
 	var bytesReaded = 0;
 	var buildingNameLength;
-	var buildingName = "";
 	var longitude;
 	var latitude;
 	var altitude;
@@ -1240,15 +1203,13 @@ ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuild
 	var bbLengthY;
 	var bbLengthZ;
 	
-	var neoBuildingsList = neoBuildingsList;
-	
 	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); 
 	bytesReaded += 4;
 	for(var i =0; i<buildingsCount; i++) {
 		// read the building location data.***
 		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		buildingName = "";
+		var buildingName = "";
 		for(var j=0; j<buildingNameLength; j++) {
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
@@ -1300,141 +1261,110 @@ ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuild
  * @param filePath_inServer 변수
  * @param neoBuilding 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, f4d_manager) {
+ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	neoBuilding.metaData.fileLoadState = 1; // 1 = file loading strated.***
 	
-
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				if(neoBuilding.metaData == undefined) {
+				    neoBuilding.metaData = new MetaData();
+			    }
+			    neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
+			  
+				// Now, make the neoBuilding's octree.***
+				if(neoBuilding.octree == undefined) neoBuilding.octree = new Octree(undefined);
+				
+				neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
+											  neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
+											  neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
+											
+				neoBuilding.octree.makeTree(3);
+				neoBuilding.octree.setSizesSubBoxes();
+
+				neoBuilding.metaData.fileLoadState = 2; // 2 = file loading finished.***
+				//if(magoManager.backGround_fileReadings_count > 0 )
+				//    magoManager.backGround_fileReadings_count -= 1; // old.***
+				//BR_Project._f4d_header_readed_finished = true;
+				arrayBuffer = null;
+			} else {
+				neoBuilding.metaData.fileLoadState = 500;
+			}
+		} else {
+			neoBuilding.metaData.fileLoadState = oReq.status;
+		}
+		
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
 	
-	f4d_manager.fileRequestControler.filesRequestedCount += 1; // increment of files requested count.***
-	neoBuilding.metaData.fileLoadState = 1; // 1 = load strated.***
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	    {
-		    if(readerWriter == undefined)
-		    {
-			    readerWriter = new ReaderWriter();
-		    }
-		    //------------------------------------------------------
-		    if(neoBuilding.metaData == undefined)
-		    {
-			    neoBuilding.metaData = new MetaData();
-		    }
-		    neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
-		  
-			// Now, make the neoBuilding's octree.***
-			if(neoBuilding.octree == undefined)
-				neoBuilding.octree = new Octree(undefined);
-			
-			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,  
-										  neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,  
-										  neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-										
-			neoBuilding.octree.makeTree(3);
-			neoBuilding.octree.setSizesSubBoxes();
-			
-			neoBuilding.metaData.fileLoadState = 2; // 2 = loading finished.***
-			
-			// finally decrement of files requested count.***
-			if(f4d_manager.fileRequestControler.filesRequestedCount > 0 )
-			{
-				f4d_manager.fileRequestControler.filesRequestedCount -= 1;
-			}
-			else{
-				f4d_manager.fileRequestControler.filesRequestedCount = 0;
-			}
-			
-		  
-		    //if(f4d_manager.backGround_fileReadings_count > 0 )
-			//    f4d_manager.backGround_fileReadings_count -= 1; // old.***
-		  
-		    //BR_Project._f4d_header_readed_finished = true;
-	    }
-	    arrayBuffer = null;
-	};
-
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
-
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
- * @param filePath_inServer 변수
+ * @param fileName 변수
  * @param neoBuilding 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, f4d_manager) {
+ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	neoBuilding.metaData.fileLoadState = 1; // 1 = file loading strated.***
 	
-
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				if(neoBuilding.metaData == undefined) {
+				    neoBuilding.metaData = new MetaData();
+			    }
+			    var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
+			  
+				// Now, make the neoBuilding's octree.***
+				if(neoBuilding.octree == undefined) neoBuilding.octree = new Octree(undefined);
+				
+				// now, parse octreeAsimetric.***
+				neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+				
+				neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
+				neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;  
+				neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
+				neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
+				neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
+				neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
+				
+				neoBuilding.metaData.fileLoadState = 2; // 2 = file loading finished.***
+				//if(magoManager.backGround_fileReadings_count > 0 )
+				//    magoManager.backGround_fileReadings_count -= 1; // old.***
+			  
+			    //BR_Project._f4d_header_readed_finished = true;
+				arrayBuffer = null;
+			} else {
+				neoBuilding.metaData.fileLoadState = 500;
+			}
+		} else {
+			neoBuilding.metaData.fileLoadState = oReq.status;
+		}
+		
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
 	
-	f4d_manager.fileRequestControler.filesRequestedCount += 1; // increment of files requested count.***
-	neoBuilding.metaData.fileLoadState = 1; // 1 = load strated.***
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	    {
-		    if(readerWriter == undefined)
-		    {
-			    readerWriter = new ReaderWriter();
-		    }
-		    //------------------------------------------------------
-		    if(neoBuilding.metaData == undefined)
-		    {
-			    neoBuilding.metaData = new MetaData();
-		    }
-		    var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
-		  
-			// Now, make the neoBuilding's octree.***
-			if(neoBuilding.octree == undefined)
-				neoBuilding.octree = new Octree(undefined);
-			
-			// now, parse octreeAsimetric.***
-			neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
-			
-			neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
-			neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;  
-			neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
-			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
-			
-			neoBuilding.metaData.fileLoadState = 2; // 2 = loading finished.***
-			
-			// finally decrement of files requested count.***
-			if(f4d_manager.fileRequestControler.filesRequestedCount > 0 )
-			{
-				f4d_manager.fileRequestControler.filesRequestedCount -= 1;
-			}
-			else{
-				f4d_manager.fileRequestControler.filesRequestedCount = 0;
-			}
-			
-		  
-		    //if(f4d_manager.backGround_fileReadings_count > 0 )
-			//    f4d_manager.backGround_fileReadings_count -= 1; // old.***
-		  
-		    //BR_Project._f4d_header_readed_finished = true;
-	    }
-	    arrayBuffer = null;
-	};
-
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
-
 };
 
 /**
@@ -1462,8 +1392,7 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
 		imageArrayBuffer = null;
 		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
 		
-		if(f4d_manager.backGround_imageReadings_count > 0)
-		{
+		if(f4d_manager.backGround_imageReadings_count > 0) {
 			f4d_manager.backGround_imageReadings_count--;
 		}
 	};
@@ -1492,8 +1421,7 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
  * @param imageLod 변수
  */
 ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, BR_Project, readerWriter, f4d_manager, imageLod) {
-	function handleTextureLoaded(gl, image, texture) 
-	{
+	function handleTextureLoaded(gl, image, texture) {
 	  gl.bindTexture(gl.TEXTURE_2D, texture);
 	  //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
 	  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
@@ -1503,22 +1431,17 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 	  gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	
-	if(imageLod == undefined)
-		imageLod = 3; // The lowest lod.***
+	if(imageLod == undefined) imageLod = 3; // The lowest lod.***
 	
-	if(imageLod == 3)
-		BR_Project._f4d_nailImage_readed = true;
-	else if(imageLod == 0)
-		BR_Project._f4d_lod0Image_readed  = true;
+	if(imageLod == 3) BR_Project._f4d_nailImage_readed = true;
+	else if(imageLod == 0) BR_Project._f4d_lod0Image_readed  = true;
 	
-	if(BR_Project._simpleBuilding_v1 == undefined)
-		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
+	if(BR_Project._simpleBuilding_v1 == undefined) BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
 	var simpleBuildingImage = new Image();
-	simpleBuildingImage.onload = function() 
-	{ 
+	simpleBuildingImage.onload = function() { 
 	/*
 		if(f4d_manager.render_time > 20)// for the moment is a test.***
 		{
@@ -1534,35 +1457,29 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 		}
 		*/
 		
-		if(imageLod == 3)
-		{
+		if(imageLod == 3) {
 			handleTextureLoaded(GL, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture); 
 		    BR_Project._f4d_nailImage_readed_finished = true;
-		}
-	    else if(imageLod == 0)
-		{
-			if(simpBuildingV1._texture_0 == undefined)
-				simpBuildingV1._texture_0 = GL.createTexture();
+		} else if(imageLod == 0) {
+			if(simpBuildingV1._texture_0 == undefined) simpBuildingV1._texture_0 = GL.createTexture();
 			
 			handleTextureLoaded(GL, simpleBuildingImage, simpBuildingV1._texture_0);
 			BR_Project._f4d_lod0Image_readed_finished = true;
 		}
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
 	};
 	
 	simpleBuildingImage.onerror = function() {
 		// doesn't exist or error loading
 		BR_Project._f4d_lod0Image_readed_finished = false;
 		BR_Project._f4d_lod0Image_exists = false;
-		if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
 		return;
     };
 	
-		var filePath_inServer_SimpleBuildingImage = filePath_inServer;
-		simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
+	var filePath_inServer_SimpleBuildingImage = filePath_inServer;
+	simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
 };
 
 /**
@@ -1575,19 +1492,16 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 ReaderWriter.prototype.readTextureInServer = function(GL, filePath_inServer, f4dTex, f4d_manager) {
 	f4dTex.loadStarted = true;
 	f4dTex.texImage = new Image();
-	f4dTex.texImage.onload = function() 
-	{ 
+	f4dTex.texImage.onload = function() { 
 		f4dTex.loadFinished = true;
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
 	};
 	
 	f4dTex.texImage.onerror = function() {
 		// doesn't exist or error loading
 		f4dTex.loadStarted = false;
-		if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
 		return;
     };
 
@@ -1604,8 +1518,7 @@ ReaderWriter.prototype.readTextureInServer = function(GL, filePath_inServer, f4d
  */
 ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_inServer, texture, neoBuilding, f4d_manager) {
 	// load neoTextures
-	function handleTextureLoaded(gl, image, texture) 
-	{
+	function handleTextureLoaded(gl, image, texture) {
 		// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 		//var gl = viewer.scene.context._gl;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1623,24 +1536,19 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
 	}
 	
 	var neoRefImage = new Image();
-	neoRefImage.onload = function() 
-	{ 
-		
-		if(texture.tex_id == undefined)
-			texture.tex_id = GL.createTexture();
+	neoRefImage.onload = function() { 
+		if(texture.tex_id == undefined) texture.tex_id = GL.createTexture();
 		
 		handleTextureLoaded(GL, neoRefImage, texture.tex_id);
 		//BR_Project._f4d_lod0Image_readed_finished = true;
 
 		neoBuilding.textures_loaded.push(texture);
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
 	};
 	
 	neoRefImage.onerror = function() {
 		// doesn't exist or error loading
-
 		return;
     };
 	
@@ -1661,37 +1569,40 @@ ReaderWriter.prototype.openTerranTile = function(GL, terranTile, readerWriter ) 
 /**
  * 어떤 일을 하고 있습니까?
  * @param GL 변수
- * @param filePath_inServer 변수
+ * @param fileName 변수
  * @param terranTile 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inServer, terranTile, readerWriter, f4d_manager) {
+ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, fileName, terranTile, readerWriter, magoManager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	terranTile.fileReading_started = true;
+//	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
+	
 	var oReq = new XMLHttpRequest();
-
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-		var arrayBuffer = oReq.response; // Note: not oReq.responseText
-		if (arrayBuffer)
-		{
-			//var BR_Project = new BRBuildingProject(); // Test.***
-			//readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
-			terranTile.fileArrayBuffer = arrayBuffer;
-			terranTile.fileReading_finished = true;
-			
-			if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		  arrayBuffer = null;
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				//var BR_Project = new BRBuildingProject(); // Test.***
+				//readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
+				terranTile.fileArrayBuffer = arrayBuffer;
+				terranTile.fileReading_finished = true;
+				
+				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
 		}
-		
-	};
-
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -1701,95 +1612,95 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, filePath_inSer
  * @param filePath_inServer 변수
  * @param pCloud 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, filePath_inServer, pCloud, readerWriter, f4d_manager) {
+ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pCloud, readerWriter, magoManager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_geometry_readed = true;
-	var oReq = new XMLHttpRequest();
-
-	oReq.open("GET", filePath_inServer, true);
-	oReq.responseType = "arraybuffer";
-
-	oReq.onload = function (oEvent)
-	{
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer)
-	    {
-		    if(readerWriter == undefined)
-		    {
-		    	readerWriter = new ReaderWriter();
-		    }
-		    //------------------------------------------------------
-		    // write code here.***
-		    var bytes_readed = 0;
-			var startBuff;
-			var endBuff;
-			
-			var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-			for(var a=0; a<meshes_count; a++)
-			{
-				var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-				
-				// single interleaved buffer mode.*********************************************************************************
-				for(var i=0; i<vbo_objects_count; i++) 
-				{
-					var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
-					//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
-					
-					var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertex_count.***
-					startBuff = bytes_readed;
-					//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
-					endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
-					
-					//vt_cacheKey._verticesArray_cacheKey = GL.createBuffer ();
-					vbo_vertexIdx_data.MESH_VERTEX_cacheKey = GL.createBuffer ();
-					GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vertexIdx_data.MESH_VERTEX_cacheKey);
-					GL.bufferData(GL.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), GL.STATIC_DRAW);
-					
-					//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
-					bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
-					
-					//vt_cacheKey._vertices_count = iDatas_count;
-					// Now, read short indices.***
-					var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-					
-					vbo_vertexIdx_data.indices_count = shortIndices_count;
-
-					// Indices.***********************
-					startBuff = bytes_readed;
-					endBuff = bytes_readed + 2*shortIndices_count;
-					/*
-					// Test.***************************************************************************************
-					for(var counter = 0; counter<shortIndices_count; counter++)
-					{
-						var shortIdx = new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2));bytes_readed += 2; 
-						if(shortIdx[0] >= iDatas_count)
-						{
-							var h=0;
-						}
-					}
-					bytes_readed -= 2*shortIndices_count;
-					// End test.------------------------------------------------------------------------------------
-					*/
-				  
-					vbo_vertexIdx_data.MESH_FACES_cacheKey= GL.createBuffer ();
-					GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.MESH_FACES_cacheKey);
-					GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
-				  
-					bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
-				}
-			}
-			////////////////////////////////////////////////////////////////////////////////////////////////
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
-		  if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
-		  
-		  pCloud._f4d_geometry_readed_finished = true;
-	  }
-	  arrayBuffer = null;
-	};
+	var oReq = new XMLHttpRequest();
+	oReq.addEventListener('loadend', function(){
+		if(oReq.status === 200) {
+			var arrayBuffer = oReq.response;
+			if(arrayBuffer) {
+				// write code here.***
+			    var bytes_readed = 0;
+				var startBuff;
+				var endBuff;
+				
+				var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+				for(var a=0; a<meshes_count; a++) {
+					var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+					
+					// single interleaved buffer mode.*********************************************************************************
+					for(var i=0; i<vbo_objects_count; i++) {
+						var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
+						//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
+						
+						var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertex_count.***
+						startBuff = bytes_readed;
+						//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
+						endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
+						
+						//vt_cacheKey._verticesArray_cacheKey = GL.createBuffer ();
+						vbo_vertexIdx_data.MESH_VERTEX_cacheKey = GL.createBuffer ();
+						GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vertexIdx_data.MESH_VERTEX_cacheKey);
+						GL.bufferData(GL.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), GL.STATIC_DRAW);
+						
+						//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
+						bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
+						
+						//vt_cacheKey._vertices_count = iDatas_count;
+						// Now, read short indices.***
+						var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+						
+						vbo_vertexIdx_data.indices_count = shortIndices_count;
 
+						// Indices.***********************
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + 2*shortIndices_count;
+						/*
+						// Test.***************************************************************************************
+						for(var counter = 0; counter<shortIndices_count; counter++)
+						{
+							var shortIdx = new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2));bytes_readed += 2; 
+							if(shortIdx[0] >= iDatas_count)
+							{
+								var h=0;
+							}
+						}
+						bytes_readed -= 2*shortIndices_count;
+						// End test.------------------------------------------------------------------------------------
+						*/
+					  
+						vbo_vertexIdx_data.MESH_FACES_cacheKey= GL.createBuffer ();
+						GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.MESH_FACES_cacheKey);
+						GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+					  
+						bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
+					}
+				}
+			
+//				blocksList.fileLoadState = 2; // 2 = file loading finished.***
+				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
+			  
+				pCloud._f4d_geometry_readed_finished = true;
+				arrayBuffer = null;
+			} else {
+//				blocksList.fileLoadState = 500;
+			}
+		} else {
+//			blocksList.fileLoadState = oReq.status;
+		}
+		
+//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
 	oReq.send(null);
 };
 
@@ -1810,13 +1721,11 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	// Read the header.***
 	var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
-	
 	var neoBuilding = NeoBuildingsList.newNeoBuilding();
 	
 	neoBuilding.buildingFileName = buildingFileName;
 	
-	if(neoBuilding.octree == undefined)
-		neoBuilding.octree = new Octree(undefined);
+	if(neoBuilding.octree == undefined) neoBuilding.octree = new Octree(undefined);
 	
 	readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, readerWriter, f4d_manager); // Here makes the tree of octree.***
 	
@@ -1915,12 +1824,9 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	//var interior_base_name = "Ref_NodeData";
 	var subOctreeName_counter = -1;
 	
-	for(var i=1; i<9; i++)
-	{
-		for(var j=1; j<9; j++)
-		{
-			for(var k=1; k<9; k++)
-			{
+	for(var i=1; i<9; i++) {
+		for(var j=1; j<9; j++) {
+			for(var k=1; k<9; k++) {
 				subOctreeName_counter = i*100 + j*10 + k;
 				var interiorCRef_fileName = subOctreeName_counter.toString();
 

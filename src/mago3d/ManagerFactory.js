@@ -7,12 +7,11 @@
  * @param magoConfig mago3d 설정값 json object
  * @return api
  */
-var ManagerFactory = function(containerId, magoConfig) {
+var ManagerFactory = function(viewer, containerId, magoConfig) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	var viewer = null;
 	var magoManager = null;
 	var scene = null;
 	
@@ -24,7 +23,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 		// 환경 설정
 		MagoConfig.init(magoConfig);
 		
-		viewer = new Cesium.Viewer(containerId);
+		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
 		
 		draw();
@@ -124,7 +123,7 @@ var ManagerFactory = function(containerId, magoConfig) {
 				disableCameraMotion(true);
 			}
 			
-			}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) {
 			// if picked
