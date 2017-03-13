@@ -987,18 +987,11 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl, scene) {
 CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, scene) {
 	
 	// for all renderables, prepare data.***
-	// LOD_0.***
 	var neoBuilding;
 	var metaData;
 	var neoBuilding_header_path = "";
 	var buildingFolderName = "";
-//	var filePathInServer = "";
 	var geometryDataPath = this.readerWriter.geometryDataPath;
-//	var blocksList;
-//	var neoReferencesList;
-//	var neoReferencesListName;
-//	var subOctree;
-//	var buildingRotationMatrix;
 	
 	var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 	for(var i=0; i<buildingsCount; i++) {
@@ -1019,65 +1012,8 @@ CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, scene
 				}
 			}
 			
-			// 2) The block models.********************************************************************************************
-			// in the asimetricVersion there are only 1 block.***
-			/*
-			blocksList = neoBuilding._blocksList_Container.blocksListsArray[0]; // we use the 1rst blocksList.***
-			if(blocksList.fileLoadState == 0)
-			{
-				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-				{
-					// must read blocksList.***
-					filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
-					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-					continue;
-				}
-			}
-			*/
-			//else if(blocksList.fileLoadState == 2)
-			//{
-			//	// this is a test.***
-			//	blocksList.parseArrayBufferAsimetricVersion(gl, blocksList.dataArraybuffer, this.readerWriter);
-			//	blocksList.dataArraybuffer = undefined;
-			//}
-			
-			// 3) The references.*********************************************************************************************************
-			// in the asimetricVersion there are no exterior-interior separated references. All references is inside of octree.***
 		}
 	}
-	/*
-	// LOD Buildings.***********************************************************************************
-	buildingsCount = this.visibleObjControlerBuildings.currentVisibles1.length;
-	for(var i=0; i<buildingsCount; i++) {
-		neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
-		buildingFolderName = neoBuilding.buildingFileName;
-		
-		buildingFolderName = neoBuilding.buildingFileName;
-			
-		// 1) The buildings metaData.*************************************************************************************
-		metaData = neoBuilding.metaData;
-		if(metaData.fileLoadState == 0) {
-			if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
-				// must read metadata file.***
-				neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
-				this.readerWriter.readNeoHeaderInServer(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
-				continue;
-			}
-		}
-			
-		if(neoBuilding.lod2Building == undefined) {
-			neoBuilding.lod2Building = new LodBuilding();
-			continue;
-		}
-		
-		if(neoBuilding.lod2Building.fileLoadState == 0) {
-			if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
-				filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "simpleBuilding_LOD2";
-				this.readerWriter.getLodBuildingArraybuffer(filePathInServer, neoBuilding.lod2Building, this);
-			}
-		}
-	}
-	*/
 };
 
 /**
@@ -1559,21 +1495,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.detailed_neoBuilding = undefined;
 	}
 	
-	//if(!this.isCameraMoving)
-	//{
-	//	this.currentRenderables_neoRefLists_array.length = 0;
-	//	this.getRenderablesDetailedNeoBuilding(gl, scene, this.detailed_neoBuilding , this.currentRenderables_neoRefLists_array);
-	//}
 
 	if(this.bPicking == true) {
 		//this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
 	}
 	
-	//return;
-	
-	//if(this.detailed_neoBuilding) // Provisional.***
-	//if(this.visibleObjControlerBuildings.currentVisibles0.length > 0) // Provisional.***
-//	{
 	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
 	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.*** 
@@ -2732,7 +2658,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
 				
 				this.renderer.renderLodBuilding(gl, lowestOctree.lego, this, currentShader, ssao_idx);
-
+				
 			}
 			//this.renderer.renderNeoRefListsLegoAsimetricVersion(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx);
 		}
@@ -3718,7 +3644,8 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
 	
 	// create the default blocks_lists.*****************************
-	if(neoBuilding._blocksList_Container.blocksListsArray.length > 0) neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
+	if(neoBuilding._blocksList_Container.blocksListsArray.length > 0) 
+		neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
 	neoBuilding._blocksList_Container = undefined;
 	neoBuilding._blocksList_Container = new BlocksListsContainer();
 	neoBuilding._blocksList_Container.newBlocksList("Blocks1");
@@ -3730,14 +3657,15 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	
 	// create the references lists.*********************************
 	//neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // in asimetric version there are no references in exterior.***
-	neoBuilding.currentRenderablesNeoRefLists = [];
-	neoBuilding.preExtractedLowestOctreesArray = [];
+	//neoBuilding.currentRenderablesNeoRefLists = [];
+	//neoBuilding.preExtractedLowestOctreesArray = [];
 	
 	// Textures loaded.***************************************************
-	neoBuilding.textures_loaded = [];
+	//neoBuilding.textures_loaded = [];
 	
 	// The octree.********************************************************
-	if(neoBuilding.octree != undefined) neoBuilding.octree.deleteGlObjects(gl);
+	if(neoBuilding.octree != undefined) 
+		neoBuilding.octree.deleteGlObjects(gl);
 	neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
 	neoBuilding.octreeLoadedAllFiles = false;
 	
@@ -3784,7 +3712,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 //	var octreesLoadRequestsCount = 0;
 	
 	var lod0_minSquaredDist = 100000*100;
-	var lod1_minSquaredDist = 100000*100;
+	var lod1_minSquaredDist = 100000*2;
 	var lod2_minSquaredDist = 100000*6;
 	var lod3_minSquaredDist = 100000*9;
 	

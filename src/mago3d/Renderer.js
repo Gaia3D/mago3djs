@@ -711,6 +711,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 						this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
 						
 						//****************************************************************************************************AAA
+						
 						if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)
 						{
 							if(this.vbo_vi_cacheKey_aux.pos_vboDataArray == undefined)
@@ -752,6 +753,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 
 								continue;
 						}
+						
 						
 						//if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined || this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey == undefined || this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey == undefined)
 						//	continue;
@@ -1456,6 +1458,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 	{
 		return;
 	}
+	
 	
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
