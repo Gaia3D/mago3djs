@@ -1488,12 +1488,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.prepareNeoBuildingsAsimetricVersion(gl, scene);
 	}
 	
-	if(this.visibleObjControlerBuildings.currentVisibles0.length > 0)  {
-		// PROVISIONAL.***
-		this.detailed_neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[0]; // provisionally take the 1rst.***
-	} else {
-		this.detailed_neoBuilding = undefined;
-	}
+
 	
 
 	if(this.bPicking == true) {
@@ -2111,7 +2106,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
  * @returns result_neoRefLists_array
  */
 CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux) {
-	//result_neoRefLists_array.length = 0; // Init.***
 	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
 	
 	if(neoBuilding == undefined) return;
@@ -2324,71 +2318,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			}
 		}
 		
-		// LOD 2.**************************************************************************************************************************************
-		/*
-		lowestOctreesCount = visibleObjControlerOctrees.currentVisibles2.length;
-		for(var i=0; i<lowestOctreesCount; i++) {
-			lowestOctree = visibleObjControlerOctrees.currentVisibles2[i];
-			
-			if(lowestOctree.triPolyhedronsCount == 0) continue;
-			
-			if(lowestOctree.lego.fileLoadState == 0)// && lowestOctree.neoRefsList_Array.length == 0) {
-				// must load the legoStructure of the lowestOctree.***
-				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
-					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-					
-					var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-					this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
-				}
-				continue;
-			}
-		}
-		*/
-		
-		/*
-		// then do frustum culling for interior octree.***
-		this.intNeoRefList_array.length = 0;
-		neoBuilding.octree.getFrustumVisibleNeoRefListArray(myCullingVolume, this.intNeoRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
-		buildingRotationMatrix = new Matrix4();
-		buildingRotationMatrix.setByFloat32Array(neoBuilding.move_matrix);
-		
-		for(var i=0; i<this.intNeoRefList_array.length; i++) {
-			// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
-			refList = this.intNeoRefList_array[i];
-			// 2 = file loading finished.***
-			if(refList.fileLoadState == 2 ) {
-				if(refListsParsingCount < maxRefListParsingCount) {
-					// must parse the arraybuffer data.***
-					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
-					refList.dataArraybuffer = null;
-					if(buildingRotationMatrix) {
-						refList.multiplyReferencesMatrices(buildingRotationMatrix);
-					}
-		  
-					refListsParsingCount += 1;
-				}
-			} else if(refList.fileLoadState == 4 ) {
-				// 4 = parsed.***
-				// now, check if the blocksList is loaded & parsed.***
-				var blocksList = refList.blocksList;
-				if(blocksList.fileLoadState == 0) {
-				// 0 = file loading NO started.***
-					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
-						// must read blocksList.***
-						var geometryDataPath = this.readerWriter.geometryDataPath;
-						var buildingFolderName = neoBuilding.buildingFileName;
-	
-						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
-						//this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-					}
-					continue;
-				}
-				
-				//refList.updateCurrentVisibleIndicesInterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
-				neoBuilding.currentRenderablesNeoRefLists.push(refList);
-			}
-		}
-		*/
+
 	}
 //}
 };

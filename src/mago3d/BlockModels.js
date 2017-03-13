@@ -81,7 +81,8 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 		block.isSmallObj = undefined;
 		block.radius = undefined;  
 		block.vertex_count = undefined; // only for test.*** delete this.***
-		
+		if(block.lego)
+			block.lego.vbo_vicks_container.deleteGlObjects(gl);
 		block.lego = undefined; // legoBlock.***
 		this.blocksArray[i] = undefined;
 	}
