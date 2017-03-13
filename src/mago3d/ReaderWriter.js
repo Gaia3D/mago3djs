@@ -704,8 +704,11 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 		if(oReq.status === 200) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
-				lowestOctree.legoDataArrayBuffer = arrayBuffer;
-				lowestOctree.lego.fileLoadState = 2; // 2 = file loading finished.***
+				if(lowestOctree.lego)
+				{
+					lowestOctree.legoDataArrayBuffer = arrayBuffer;
+					lowestOctree.lego.fileLoadState = 2; // 2 = file loading finished.***
+				}
 				arrayBuffer = null;
 			} else {
 				lowestOctree.lego.fileLoadState = 500;
