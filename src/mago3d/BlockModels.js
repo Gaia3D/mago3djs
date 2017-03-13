@@ -75,7 +75,21 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 		var block = this.blocksArray[i];
 		  
 		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
+		
+		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+		block.mIFCEntityType = undefined;
+		block.isSmallObj = undefined;
+		block.radius = undefined;  
+		block.vertex_count = undefined; // only for test.*** delete this.***
+		
+		block.lego = undefined; // legoBlock.***
+		this.blocksArray[i] = undefined;
 	}
+	this.blocksArray = undefined;
+	
+	this.name = undefined;
+	this.fileLoadState = undefined;
+	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
 };
 
 /**

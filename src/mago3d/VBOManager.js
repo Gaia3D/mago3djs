@@ -79,20 +79,41 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
 		var vbo_vi_cacheKey = this._vbo_cacheKeysArray[j];
 
 		if(vbo_vi_cacheKey.MESH_VERTEX_cacheKey)
+		{
 			gl.deleteBuffer(vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = undefined;
+			this.pos_vboDataArray = undefined;
+		}
 		
 		if(vbo_vi_cacheKey.MESH_NORMAL_cacheKey)
+		{
 			gl.deleteBuffer(vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = undefined;
+			this.nor_vboDataArray = undefined;
+		}
 		
 		if(vbo_vi_cacheKey.MESH_COLOR_cacheKey)
+		{
 			gl.deleteBuffer(vbo_vi_cacheKey.MESH_COLOR_cacheKey);
+			vbo_vi_cacheKey.MESH_COLOR_cacheKey = undefined;
+			this.col_vboDataArray = undefined;
+		}
 		
 		if(vbo_vi_cacheKey.MESH_TEXCOORDS_cacheKey)
+		{
 			gl.deleteBuffer(vbo_vi_cacheKey.MESH_TEXCOORDS_cacheKey);
+			vbo_vi_cacheKey.MESH_TEXCOORDS_cacheKey = undefined;
+			this.tcoord_vboDataArray = undefined;
+		}
 		
 		if(vbo_vi_cacheKey.MESH_FACES_cacheKey)
+		{
 			gl.deleteBuffer(vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			vbo_vi_cacheKey.MESH_FACES_cacheKey = undefined;
+			this.idx_vboDataArray = undefined;
+		}
 
+		this.buffer = undefined;
 	}
 };
 

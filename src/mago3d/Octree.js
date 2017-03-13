@@ -56,11 +56,41 @@ Octree.prototype.deleteGlObjects = function(gl) {
 		this.lego.vbo_vicks_container.deleteGlObjects(gl);
 		this.legoDataArrayBuffer = undefined;
 	}
+	
+	this.centerPos = undefined;
+	this.half_dx = undefined; // half width.***
+	this.half_dy = undefined; // half length.***
+	this.half_dz = undefined; // half height.***
+	
+	this.octree_owner = undefined;
+	this.octree_level = undefined;
+	this.octree_number_name = undefined;
+	this.squareDistToEye = undefined;
+	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.***
+	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	  
+	this.neoBuildingOwner = undefined;
+
+	// now, for legoStructure.***
+	this.legoDataArrayBuffer = undefined;
+	this.lego = undefined;
+	
+	// delete the blocksList.***
+	var neoRefListsCount = this.neoRefsList_Array.length;
+	for(var i=0; i<neoRefListsCount; i++)
+	{
+		this.neoRefsList_Array[i].blocksList = undefined;
+	}
+	
 	var subOctreesCount = this.subOctrees_array.length;
 	for(var i=0; i<subOctreesCount; i++)
 	{
 		this.subOctrees_array[i].deleteGlObjects(gl);
+		this.subOctrees_array[i] = undefined;
 	}
+	
+	this.subOctrees_array = undefined;
+	this.neoRefsList_Array = undefined; 
 };
 
 /**

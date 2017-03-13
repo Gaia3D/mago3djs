@@ -357,6 +357,7 @@ NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
 	return neoRefList;
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param eye_x 변수
