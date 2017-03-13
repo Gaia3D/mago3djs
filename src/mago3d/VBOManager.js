@@ -114,6 +114,7 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
 		}
 
 		this.buffer = undefined;
+		this._vbo_cacheKeysArray[j] = undefined;
 	}
 };
 
