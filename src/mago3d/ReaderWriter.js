@@ -708,6 +708,9 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 					lowestOctree.legoDataArrayBuffer = arrayBuffer;
 					lowestOctree.lego.fileLoadState = 2; // 2 = file loading finished.***
 				}
+				else{
+					lowestOctree = undefined;
+				}
 				arrayBuffer = null;
 			} else {
 				lowestOctree.lego.fileLoadState = 500;
@@ -1355,10 +1358,12 @@ ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, file
 				arrayBuffer = null;
 			} else {
 				neoBuilding.metaData.fileLoadState = 500;
+				arrayBuffer = undefined;
 			}
 		} else {
 			neoBuilding.metaData.fileLoadState = oReq.status;
 		}
+		arrayBuffer = undefined;
 		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
