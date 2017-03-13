@@ -1169,7 +1169,7 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, readerWriter, neoBuildi
 		if(oReq.status === 200) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
-				readerWriter.parseObjectIndexFile(gl, arrayBuffer, neoBuildingsList);
+				readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
 //				blocksList.fileLoadState = 2; // 2 = file loading finished.***
 				arrayBuffer = null;
 			} else {
@@ -1190,14 +1190,12 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, readerWriter, neoBuildi
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- * @param gl gl context
  * @param arrayBuffer object index file binary data
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuildingsList) {
+ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildingsList) {
 	var bytesReaded = 0;
 	var buildingNameLength;
-	var buildingName = "";
 	var longitude;
 	var latitude;
 	var altitude;
@@ -1205,15 +1203,13 @@ ReaderWriter.prototype.parseObjectIndexFile = function(gl, arrayBuffer, neoBuild
 	var bbLengthY;
 	var bbLengthZ;
 	
-	var neoBuildingsList = neoBuildingsList;
-	
 	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); 
 	bytesReaded += 4;
 	for(var i =0; i<buildingsCount; i++) {
 		// read the building location data.***
 		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		buildingName = "";
+		var buildingName = "";
 		for(var j=0; j<buildingNameLength; j++) {
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
