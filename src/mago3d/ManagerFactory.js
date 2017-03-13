@@ -123,7 +123,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 				disableCameraMotion(true);
 			}
 			
-			}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) {
 			// if picked
