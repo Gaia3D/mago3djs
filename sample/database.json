@@ -16,7 +16,7 @@
 		"dataPath" : "/data"
 	},
 	"renderingConfg" : {
-		"glEnable" : "false"
+		"cullFaceEnable" : false
 	},
 	"geoConfig" : {
 		"initEntity" : {
