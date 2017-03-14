@@ -285,7 +285,7 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList, neo
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
-			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
+			vbo_vi_cacheKey.indicesCount = shortIndicesValues_count;  
 		}
 	}
 };
@@ -574,7 +574,7 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(arrayBuffer, neoSimpleBu
 	
 	vbo_vicky.buffer = new Buffer();
 	vbo_vicky.buffer.dataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
-	vbo_vicky.buffer.dataArray_byteLength = buffer_length;
+	vbo_vicky.buffer.dataArrayByteLength = buffer_length;
 	
 	//vbo_vicky.pos_vboDataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
 	
@@ -1634,7 +1634,7 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 						// Now, read short indices.***
 						var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
 						
-						vbo_vertexIdx_data.indices_count = shortIndices_count;
+						vbo_vertexIdx_data.indicesCount = shortIndices_count;
 
 						// Indices.***********************
 						startBuff = bytes_readed;

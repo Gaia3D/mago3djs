@@ -521,8 +521,8 @@ CesiumManager.prototype.renderAtmosphere = function(gl, cameraPosition, cullingV
 		gl.vertexAttribPointer(standardShader._color, 3, gl.FLOAT, false,24,12);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_indexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	
 	gl.disableVertexAttribArray(standardShader._color);
@@ -627,8 +627,8 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 		gl.vertexAttribPointer(standardShader._position, 3, gl.FLOAT, false,0,0);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_shadowIndexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	
 	// Second pass.****************************************************************************************************
@@ -660,8 +660,8 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 		gl.vertexAttribPointer(standardShader._position, 3, gl.FLOAT, false,0,0);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_shadowIndexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	//gl.disableVertexAttribArray(standardShader._color);
 	gl.disableVertexAttribArray(standardShader._position);
@@ -712,7 +712,7 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 	gl.vertexAttribPointer(standardShader._color, 4, gl.FLOAT, false,28,12);
 	
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shadowBC.vbo_indexCacheKey);
-	gl.drawElements(gl.TRIANGLES, shadowBC.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
+	gl.drawElements(gl.TRIANGLES, shadowBC.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 	
 	gl.disableVertexAttribArray(standardShader._position);
 	gl.disableVertexAttribArray(standardShader._color);

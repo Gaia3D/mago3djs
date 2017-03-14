@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param occlusionCullingOctree_Cell_Owner 변수
