@@ -3,6 +3,7 @@
 /**
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
  * 
+ * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
  * @param magoConfig mago3d 설정값 json object
  * @return api
@@ -34,6 +35,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		viewer = null;
 	}
 	
+	// 실제 화면에 object를 rendering 하는 메인 메서드
 	function draw() {
 		if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.CESIUM) {
 			drawCesium();
@@ -42,6 +44,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		}
 	}
 	
+	// cesium을 구현체로서 이용
 	function drawCesium() {
 		
 		var gl = viewer.scene.context._gl;
@@ -62,6 +65,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		addMouseAction();
 	}
 	
+	// 뭐하는 메서드 인가?
 	function disableCameraMotion(state){
 		viewer.scene.screenSpaceCameraController.enableRotate = state;
 		viewer.scene.screenSpaceCameraController.enableZoom = state;
@@ -70,6 +74,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		viewer.scene.screenSpaceCameraController.enableTranslate = state;
 	}
 	
+	// 이벤트 확장
 	function addMouseAction() {
 		magoManager.handler.setInputAction(function(click) {
 			magoManager.dateSC = new Date();
@@ -176,6 +181,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
 	}
 	
+	// world wind 구현체를 이용
 	function drawWorldWind() {
 	}
 	
@@ -201,6 +207,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		});
 	}
 	
+	// terrain 적용 유무를 설정
 	function initTerrain() {
 		if(MagoConfig.getInformation().geoConfig.initTerrain.enable) {
 			var terrainProvider = new Cesium.CesiumTerrainProvider({
@@ -212,6 +219,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		}
 	}
 	
+	// 최초 로딩시 이동할 카메라 위치
 	function initCamera() {
 		viewer.camera.flyTo({
 		    destination : Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initCamera.longitude, 
@@ -221,11 +229,34 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 		});
 	}
 	
+	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
-		drawAPI : function() {
+		// 초기화 api
+		init : function() {
+			
+		},
+		// 블락 및 부재 검색 api
+		search : function() {
+			
+		},
+		// 선택 블락 highlighting
+		highlighting : function(blockId) {
+			
+		},
+		// 선택 블락 color 변경
+		setColor : function() {
+			
+		},
+		// 선택 블락 표시
+		show : function() {
 			draw();
 		},
-		highlightAPI : function(type) {
+		// 선택 블락 숨기기
+		hide : function() {
+			
+		},
+		// 선택 블락 이동
+		move : function() {
 			
 		}
 	};

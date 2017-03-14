@@ -1,5 +1,4 @@
-
-
+'use strict';
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -119,8 +118,7 @@ Matrix4.prototype.rotationByQuaternion = function(quaternion) {
  * @param float32array 변수
  */	
 Matrix4.prototype.setByFloat32Array = function(float32array) {
-	for(var i=0; i<16; i++)
-	{
+	for(var i=0; i<16; i++) {
 		this._floatArrays[i] = float32array[i];
 	}
 };
@@ -131,7 +129,7 @@ Matrix4.prototype.setByFloat32Array = function(float32array) {
  * @param row 변수
  */
 Matrix4.prototype.getIndexOfArray = function(col, row) {
-	return 4*col+row;
+	return 4 * col + row;
 };
 
 /**
@@ -150,10 +148,7 @@ Matrix4.prototype.get = function(col, row) {
  * @returns result_point3d
  */
 Matrix4.prototype.transformPoint3D = function(point3d, result_point3d) {
-	if(result_point3d == undefined)
-	{
-		result_point3d = new Point3D();
-	}
+	if(result_point3d == undefined) result_point3d = new Point3D();
 
 	var x = point3d.x;
 	var y = point3d.y;
@@ -189,17 +184,13 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
 		return c;
 	}
 	*/
-	if(resultMat == undefined)
-	 resultMat = new Matrix4();
+	if(resultMat == undefined) resultMat = new Matrix4();
  
-	for(var i=0; i<4; i++)
-	{
-		for(var j=0; j<4; j++)
-		{
+	for(var i=0; i<4; i++) {
+		for(var j=0; j<4; j++) {
 			var idx = this.getIndexOfArray(i, j);
 			resultMat._floatArrays[idx] = 0.0;
-			for(var k=0; k<4; k++)
-			{
+			for(var k=0; k<4; k++) {
 				resultMat._floatArrays[idx] += matrix.get(k, j) * this.get(i, k);
 			}
 		}
