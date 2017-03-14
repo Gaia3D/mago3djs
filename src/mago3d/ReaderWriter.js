@@ -17,7 +17,7 @@ var ReaderWriter = function() {
 	this.j_counter;
 	this.k_counter;
 		
-	this.GL;
+	this.gl;
 	this.incre_latAng = 0.001;
 	this.incre_longAng = 0.001;
 	this.GAIA3D__offset_latitude = -0.001;
@@ -525,11 +525,10 @@ ReaderWriter.prototype.readOcclusionCullingOctreeCell = function(arrayBuffer, by
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl 변수
  * @param arrayBuffer 변수
  * @param neoSimpleBuilding 변수
  */
-ReaderWriter.prototype.readNeoSimpleBuilding = function(gl, arrayBuffer, neoSimpleBuilding) {
+ReaderWriter.prototype.readNeoSimpleBuilding = function(arrayBuffer, neoSimpleBuilding) {
 	var bytesReaded = 0;
 	var accessors_count = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
@@ -762,7 +761,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lo
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param neoRefList_container 변수
  * @param neoReferenceList_name 변수
@@ -773,7 +772,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lo
  * @param readerWriter 변수
  * @param subOctreeNumberName 변수
  */
-ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRefList_container, neoReferenceList_name, lodLevel, blocksList, 
+ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_container, neoReferenceList_name, lodLevel, blocksList, 
 															transformMat, neoBuilding, readerWriter, subOctreeNumberName, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
@@ -794,7 +793,7 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRef
 				    neoRefsList.lod_level = lodLevel;
 				    neoRefsList.blocksList = blocksList;
 				    neoRefsList.name = neoReferenceList_name;
-				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    //neoRefsList.parseArrayBuffer(gl, arrayBuffer, neoBuilding, readerWriter);
 				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
 				    if(transformMat) {
 				    	neoRefsList.multiplyReferencesMatrices(transformMat);
@@ -805,7 +804,7 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRef
 				    neoRefsList.lod_level = lodLevel;
 				    neoRefsList.name = neoReferenceList_name;
 				    neoRefsList.blocksList = blocksList; // no necessary.***
-				    //neoRefsList.parseArrayBuffer(GL, arrayBuffer, neoBuilding, readerWriter);
+				    //neoRefsList.parseArrayBuffer(gl, arrayBuffer, neoBuilding, readerWriter);
 				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
 				    if(transformMat) {
 				    	neoRefsList.multiplyReferencesMatrices(transformMat);
@@ -835,7 +834,7 @@ ReaderWriter.prototype.readNeoReferencesInServer = function(gl, fileName, neoRef
  * @param neoSimpleBuilding 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, neoSimpleBuilding, readerWriter) {
+ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
@@ -845,7 +844,7 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, ne
 		if(oReq.status === 200) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
-				readerWriter.readNeoSimpleBuilding(gl, arrayBuffer, neoSimpleBuilding );
+				readerWriter.readNeoSimpleBuilding(arrayBuffer, neoSimpleBuilding );
 //				blocksList.fileLoadState = 2; // 2 = file loading finished.***
 				arrayBuffer = null;
 			} else {
@@ -861,7 +860,7 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, ne
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param arrayBuffer 변수
  * @param filePath_inServer 변수
  * @param terranTile 변수
@@ -869,7 +868,7 @@ ReaderWriter.prototype.readNeoSimpleBuildingInServer = function(gl, fileName, ne
  * @param bytes_readed 변수
  * @returns bytes_readed
  */
-ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) {
+ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) {
 	//var bytes_readed = 0;
 //	var f4d_headerPathName_length = 0;
 //	var BP_Project;
@@ -921,7 +920,7 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
 	} else {
 		for(var i=0; i<4; i++) {
 			subTile = terranTile.newSubTerranTile();
-			bytes_readed = this.readTerranTileFile(GL, arrayBuffer, filePath_inServer, subTile, readerWriter, bytes_readed);
+			bytes_readed = this.readTerranTileFile(gl, arrayBuffer, filePath_inServer, subTile, readerWriter, bytes_readed);
 		}
 	}
 	*/
@@ -935,7 +934,7 @@ ReaderWriter.prototype.readTerranTileFile = function(GL, arrayBuffer, filePath_i
  * @param terranTile 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readTerranTileFileInServer = function(gl, fileName, terranTile, readerWriter) {
+ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
@@ -972,12 +971,12 @@ ReaderWriter.prototype.readTerranTileFileInServer = function(gl, fileName, terra
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param BR_ProjectsList 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.readPCloudIndexFileInServer = function(gl, fileName, BR_ProjectsList, readerWriter) {
+ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsList, readerWriter) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -1039,7 +1038,7 @@ ReaderWriter.prototype.readPCloudIndexFileInServer = function(gl, fileName, BR_P
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.readPCloudHeaderInServer = function(gl, fileName, pCloud, readerWriter, magoManager) {
+ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWriter, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -1161,11 +1160,11 @@ ReaderWriter.prototype.readPCloudHeaderInServer = function(gl, fileName, pCloud,
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param gl gl context
+ * @param fileName 파일명
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.getObjectIndexFile = function(gl, readerWriter, neoBuildingsList) {
-	var fileName = readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE;
+ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter, neoBuildingsList) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -1262,13 +1261,13 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param neoBuilding 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, neoBuilding, readerWriter, magoManager) {
+ReaderWriter.prototype.getNeoHeader = function(gl, filePath_inServer, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = 1; // 1 = file loading strated.***
@@ -1316,13 +1315,13 @@ ReaderWriter.prototype.readNeoHeaderInServer = function(GL, filePath_inServer, n
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param fileName 변수
  * @param neoBuilding 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, fileName, neoBuilding, readerWriter, magoManager) {
+ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = 1; // 1 = file loading strated.***
@@ -1376,14 +1375,14 @@ ReaderWriter.prototype.readNeoHeaderAsimetricVersionInServer = function(GL, file
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param imageArrayBuffer 변수
  * @param BR_Project 변수
  * @param readerWriter 변수
  * @param f4d_manager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffer, BR_Project, readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, f4d_manager, imageLod) {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
 	var urlCreator = window.URL || window.webkitURL;
@@ -1393,8 +1392,8 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
 	simpleBuildingImage.onload = function () {
 		//console.log("Image Onload");
 		if(simpBuildingV1._simpleBuildingTexture == undefined)
-		simpBuildingV1._simpleBuildingTexture = GL.createTexture();
-		handleTextureLoaded(GL, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture); 
+		simpBuildingV1._simpleBuildingTexture = gl.createTexture();
+		handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture); 
 		BR_Project._f4d_nailImage_readed_finished = true;
 		imageArrayBuffer = null;
 		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
@@ -1420,14 +1419,14 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(GL, imageArrayBuffe
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param BR_Project 변수
  * @param readerWriter 변수
  * @param f4d_manager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, BR_Project, readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, f4d_manager, imageLod) {
 	if(imageLod == undefined) imageLod = 3; // The lowest lod.***
 	
 	if(imageLod == 3) BR_Project._f4d_nailImage_readed = true;
@@ -1455,12 +1454,12 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 		*/
 		
 		if(imageLod == 3) {
-			handleTextureLoaded(GL, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture); 
+			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture); 
 		    BR_Project._f4d_nailImage_readed_finished = true;
 		} else if(imageLod == 0) {
-			if(simpBuildingV1._texture_0 == undefined) simpBuildingV1._texture_0 = GL.createTexture();
+			if(simpBuildingV1._texture_0 == undefined) simpBuildingV1._texture_0 = gl.createTexture();
 			
-			handleTextureLoaded(GL, simpleBuildingImage, simpBuildingV1._texture_0);
+			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._texture_0);
 			BR_Project._f4d_lod0Image_readed_finished = true;
 		}
 		
@@ -1481,12 +1480,12 @@ ReaderWriter.prototype.readNailImageInServer = function(GL, filePath_inServer, B
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param f4dTex 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readTextureInServer = function(GL, filePath_inServer, f4dTex, f4d_manager) {
+ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, f4d_manager) {
 	f4dTex.loadStarted = true;
 	f4dTex.texImage = new Image();
 	f4dTex.texImage.onload = function() { 
@@ -1507,18 +1506,18 @@ ReaderWriter.prototype.readTextureInServer = function(GL, filePath_inServer, f4d
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param texture 변수
  * @param neoBuilding 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_inServer, texture, neoBuilding, f4d_manager) {
+ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, f4d_manager) {
 	var neoRefImage = new Image();
 	neoRefImage.onload = function() { 
-		if(texture.tex_id == undefined) texture.tex_id = GL.createTexture();
+		if(texture.tex_id == undefined) texture.tex_id = gl.createTexture();
 		
-		handleTextureLoaded(GL, neoRefImage, texture.tex_id);
+		handleTextureLoaded(gl, neoRefImage, texture.tex_id);
 		//BR_Project._f4d_lod0Image_readed_finished = true;
 
 		neoBuilding.textures_loaded.push(texture);
@@ -1536,24 +1535,24 @@ ReaderWriter.prototype.readNeoReferenceTextureInServer = function(GL, filePath_i
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param terranTile 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.openTerranTile = function(GL, terranTile, readerWriter ) {
+ReaderWriter.prototype.openTerranTile = function(gl, terranTile, readerWriter ) {
 	var filePath_inServer = this.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILEFILE_TXT;
-	readerWriter.readTerranTileFileInServer(GL, filePath_inServer, terranTile, readerWriter);
+	readerWriter.getTerranTileFile(gl, filePath_inServer, terranTile, readerWriter);
 };	
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param fileName 변수
  * @param terranTile 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, fileName, terranTile, readerWriter, magoManager) {
+ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, readerWriter, magoManager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	terranTile.fileReading_started = true;
 //	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
@@ -1565,7 +1564,7 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, fileName, terr
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				//var BR_Project = new BRBuildingProject(); // Test.***
-				//readerWriter.readF4D_Header(GL, arrayBuffer, BR_Project ); // Test.***
+				//readerWriter.readF4D_Header(gl, arrayBuffer, BR_Project ); // Test.***
 				terranTile.fileArrayBuffer = arrayBuffer;
 				terranTile.fileReading_finished = true;
 				
@@ -1587,13 +1586,13 @@ ReaderWriter.prototype.readTileArrayBufferInServer = function(GL, fileName, terr
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pCloud, readerWriter, magoManager) {
+ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, readerWriter, magoManager) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_geometry_readed = true;
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
@@ -1623,10 +1622,10 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pClou
 						//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
 						endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
 						
-						//vt_cacheKey._verticesArray_cacheKey = GL.createBuffer ();
-						vbo_vertexIdx_data.MESH_VERTEX_cacheKey = GL.createBuffer ();
-						GL.bindBuffer(GL.ARRAY_BUFFER, vbo_vertexIdx_data.MESH_VERTEX_cacheKey);
-						GL.bufferData(GL.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), GL.STATIC_DRAW);
+						//vt_cacheKey._verticesArray_cacheKey = gl.createBuffer ();
+						vbo_vertexIdx_data.MESH_VERTEX_cacheKey = gl.createBuffer ();
+						gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.MESH_VERTEX_cacheKey);
+						gl.bufferData(gl.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), gl.STATIC_DRAW);
 						
 						//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
 						bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
@@ -1654,9 +1653,9 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pClou
 						// End test.------------------------------------------------------------------------------------
 						*/
 					  
-						vbo_vertexIdx_data.MESH_FACES_cacheKey= GL.createBuffer ();
-						GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.MESH_FACES_cacheKey);
-						GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), GL.STATIC_DRAW);
+						vbo_vertexIdx_data.MESH_FACES_cacheKey= gl.createBuffer ();
+						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.MESH_FACES_cacheKey);
+						gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 					  
 						bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
 					}
@@ -1685,7 +1684,7 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pClou
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param buildingFileName 변수
  * @param latitude 변수
  * @param longitude 변수
@@ -1694,7 +1693,7 @@ ReaderWriter.prototype.readPCloudGeometryInServer = function(GL, fileName, pClou
  * @param NeoBuildingsList 변수
  * @param f4d_manager 변수
  */
-ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, f4d_manager) {
+ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, f4d_manager) {
 	// This is a test function to read the new f4d format.***
 	// The location(latitude, longitude, height) is provisional.***
 	
@@ -1706,7 +1705,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	if(neoBuilding.octree == undefined) neoBuilding.octree = new Octree(undefined);
 	
-	readerWriter.readNeoHeaderInServer(GL, neoBuilding_header_path, neoBuilding, readerWriter, f4d_manager); // Here makes the tree of octree.***
+	readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, readerWriter, f4d_manager); // Here makes the tree of octree.***
 	
 	// 0) PositionMatrix.************************************************************************
 	//var height = elevation;
@@ -1756,23 +1755,23 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.getBlockList("Blocks1");
-	readerWriter.getNeoBlocks(GL, filePath_inServer, blocksList, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer, blocksList, neoBuilding, readerWriter);
 	
 	var filePath_inServer_2 = this.geometryDataPath + "/"+buildingFileName+"/Blocks2";
 	var blocksList_2 = blocksListContainer.getBlockList("Blocks2");
-	readerWriter.getNeoBlocks(GL, filePath_inServer_2, blocksList_2, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_2, blocksList_2, neoBuilding, readerWriter);
 	
 	var filePath_inServer_3 = this.geometryDataPath + "/"+buildingFileName+"/Blocks3";
 	var blocksList_3 = blocksListContainer.getBlockList("Blocks3");
-	readerWriter.getNeoBlocks(GL, filePath_inServer_3, blocksList_3, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_3, blocksList_3, neoBuilding, readerWriter);
 	
 	var filePath_inServer_bone = this.geometryDataPath + "/"+buildingFileName+"/BlocksBone";
 	var blocksList_bone = blocksListContainer.getBlockList("BlocksBone");
-	readerWriter.getNeoBlocks(GL, filePath_inServer_bone, blocksList_bone, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_bone, blocksList_bone, neoBuilding, readerWriter);
 	
 	var filePath_inServer_4 = this.geometryDataPath + "/"+buildingFileName+"/Blocks4"; // Interior Objects.***
 	var blocksList_4 = blocksListContainer.getBlockList("Blocks4");
-	readerWriter.getNeoBlocks(GL, filePath_inServer_4, blocksList_4, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_4, blocksList_4, neoBuilding, readerWriter);
 	
 	// 2) References.****************************************************************************************************************************
 	var moveMatrix = new Matrix4();
@@ -1783,19 +1782,19 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	
 	lod_level = 0;
 	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin1";
-	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, readerWriter, undefined);
+	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 1;
 	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin2";
-	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, readerWriter, undefined);
+	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 2;
 	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin3";
-	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, readerWriter, undefined);
+	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	lod_level = 3;
 	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Bone";
-	readerWriter.readNeoReferencesInServer(GL, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, readerWriter, undefined);
+	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, readerWriter, undefined);
 	
 	// Now, read the interior objects in octree format.**********************************************************************************************
 	var interiorCRef_folderPath = this.geometryDataPath + "/" + buildingFileName + "/inLOD4";
@@ -1811,8 +1810,8 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 
 				// Create a "compoundRefList".************************************************
 				var intCompRef_filePath = interiorCRef_folderPath + "/" + interiorCRef_fileName;
-				//readerWriter.readF4D_CompoundReferences_inServer(GL, intCompRef_filePath, null, interiorCRef_fileName, 4, blocksList_4, moveMatrix, BR_buildingProject, readerWriter, subOctreeName_counter);
-				readerWriter.readNeoReferencesInServer(GL, intCompRef_filePath, null, interiorCRef_fileName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
+				//readerWriter.readF4D_CompoundReferences_inServer(gl, intCompRef_filePath, null, interiorCRef_fileName, 4, blocksList_4, moveMatrix, BR_buildingProject, readerWriter, subOctreeName_counter);
+				readerWriter.getNeoReferences(gl, intCompRef_filePath, null, interiorCRef_fileName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
 			}
 		}
 	}
@@ -1820,7 +1819,7 @@ ReaderWriter.prototype.openNeoBuilding = function(GL, buildingFileName, latitude
 	// Now, read the simple building.************************
 	neoBuilding.neoSimpleBuilding = new NeoSimpleBuilding();
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
-	readerWriter.readNeoSimpleBuildingInServer(GL, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
+	readerWriter.getNeoSimpleBuilding(gl, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
 };
 
 //load neoTextures
