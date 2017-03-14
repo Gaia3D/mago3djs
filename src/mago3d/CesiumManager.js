@@ -2229,6 +2229,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			*/
 			
 			refList = lowestOctree.neoRefsList_Array[0];
+			if(refList == undefined)
+				continue;
+			
 			// 2 = file loading finished.***
 			if(refList.fileLoadState == 2 ) {
 				if(refListsParsingCount < maxRefListParsingCount) {
@@ -2296,6 +2299,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			}
 			
 			refList = lowestOctree.neoRefsList_Array[0];
+			if(refList == undefined)
+				continue;
+			
 			// 2 = file loading finished.***
 			if(refList.fileLoadState == 2 ) {
 				if(refListsParsingCount < maxRefListParsingCount) {
@@ -2326,6 +2332,18 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					continue;
 				}
 			}
+		}
+		
+		// LOD 2.*******************************************************************************
+		lowestOctreesCount = visibleObjControlerOctreesAux.currentVisibles2.length;
+		for(var i=0; i<lowestOctreesCount; i++) {
+			lowestOctree = visibleObjControlerOctreesAux.currentVisibles2[i];
+			
+			if(lowestOctree.triPolyhedronsCount == 0) continue;
+			
+			lowestOctree.deleteLod0GlObjects(gl);
+			
+
 		}
 		
 
@@ -2507,6 +2525,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.neoRefsList_Array.length == 0) continue;
 				
 				refList = lowestOctree.neoRefsList_Array[0];
+				if(refList == undefined)
+					continue;
 				
 				neoBuilding = refList.neoBuildingOwner;
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
@@ -2525,6 +2545,9 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.neoRefsList_Array.length == 0) continue;
 				
 				refList = lowestOctree.neoRefsList_Array[0];
+				
+				if(refList == undefined)
+					continue;
 				
 				neoBuilding = refList.neoBuildingOwner;
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
@@ -2653,6 +2676,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.neoRefsList_Array.length == 0) continue;
 				
 				refList = lowestOctree.neoRefsList_Array[0];
+				if(refList == undefined)
+					continue;
 				
 				neoBuilding = refList.neoBuildingOwner;
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
@@ -2671,6 +2696,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.neoRefsList_Array.length == 0) continue;
 				
 				refList = lowestOctree.neoRefsList_Array[0];
+				if(refList == undefined)
+					continue;
 				
 				neoBuilding = refList.neoBuildingOwner;
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);

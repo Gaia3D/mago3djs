@@ -141,12 +141,13 @@ NeoReferencesList.prototype.deleteGlObjects = function(gl) {
 		this.neoRefs_Array[i].deleteGlObjects(gl);
 		this.neoRefs_Array[i] = undefined;
 	}
+	this.neoRefs_Array.length = 0;
 	
-	this.name = undefined;
-	this.neoRefs_Array = undefined;
+	//this.name = undefined;
+	//this.neoRefs_Array = undefined;
 	this.blocksList = undefined;
 	this.lod_level = undefined;
-	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
 	
 	this.neoBuildingOwner = undefined;
