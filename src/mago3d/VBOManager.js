@@ -89,7 +89,7 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 		}
 
 		this.buffer = undefined;
-	}
+
 };
 
 /**
