@@ -44,6 +44,43 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 	this._matrix4 = multipliedMat;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.deleteGlObjects = function(gl) {
+	// 1) Object ID.***
+	this._id = undefined;
+	
+	// 2) Block Idx.***
+	this._block_idx = undefined;
+	
+	// 3) Transformation Matrix.***
+	this._matrix4 = undefined;
+	this._originalMatrix4 = undefined; // 
+	
+	// 4) Tex coords cache_key.***
+	if(this.MESH_TEXCOORD_cacheKey)
+	{
+		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey);
+		this.MESH_TEXCOORD_cacheKey = undefined;
+	}
+	
+	// 5) The texture image.***
+	this.hasTexture = undefined;
+	this.texture = undefined; // Texture
+	
+	// 6) 1 color.***
+	this.color4 = undefined; //new Color();
+	
+	// 7) selection color.***
+	this.selColor4 = undefined; //new Color(); // use for selection only.***
+	
+	this.vertex_count = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
+	
+	// 8) movement of the object.***
+	this.moveVector = undefined; // Point3D.***
+};
+
 // F4D References list.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
@@ -91,6 +128,35 @@ NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 		var neoRef = this.neoRefs_Array[i];
 		neoRef.multiplyTransformMatrix(matrix);
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix 변수
+ */
+NeoReferencesList.prototype.deleteGlObjects = function(gl) {
+	var neoRefs_count = this.neoRefs_Array.length;
+	for(var i=0; i<neoRefs_count; i++)
+	{
+		this.neoRefs_Array[i].deleteGlObjects(gl);
+		this.neoRefs_Array[i] = undefined;
+	}
+	
+	this.name = undefined;
+	this.neoRefs_Array = undefined;
+	this.blocksList = undefined;
+	this.lod_level = undefined;
+	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
+	
+	this.neoBuildingOwner = undefined;
+	
+	this.exterior_ocCullOctree = undefined; 
+	this.interior_ocCullOctree = undefined; 
+	
+	this._currentVisibleIndices = undefined; // Determined by occlusion culling.***
+	this._currentVisibleIndicesSC = undefined; // Determined by occlusion culling.***
+	this._currentVisibleIndicesSC_2 = undefined; // Determined by occlusion culling.***
 };
 
 /**

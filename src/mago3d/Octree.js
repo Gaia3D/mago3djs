@@ -79,7 +79,8 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	var neoRefListsCount = this.neoRefsList_Array.length;
 	for(var i=0; i<neoRefListsCount; i++)
 	{
-		this.neoRefsList_Array[i].blocksList = undefined;
+		this.neoRefsList_Array[i].deleteGlObjects(gl);
+		this.neoRefsList_Array[i] = undefined;
 	}
 	
 	var subOctreesCount = this.subOctrees_array.length;
