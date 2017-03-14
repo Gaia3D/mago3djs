@@ -29,7 +29,7 @@ var ShadowBlendingCube = function() {
 	
 	this.vbo_vertexCacheKey;
 	this.vbo_indexCacheKey;
-	this.indices_count = 0;
+	this.indicesCount = 0;
 };
 
 /**
@@ -140,7 +140,7 @@ ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
 ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
 	this.vertexMatrix.setVertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
-	this.indices_count = shortArray.length;
+	this.indicesCount = shortArray.length;
 	
 	return shortArray;
 };
@@ -201,7 +201,7 @@ var CircularCloud = function() {
 	this.vbo_indexCacheKey;
 	this.vbo_shadowVertexCacheKey;
 	this.vbo_shadowIndexCacheKey;
-	this.indices_count = 0;
+	this.indicesCount = 0;
 	
 	this.rendered = false; // Test.***
 	
@@ -226,7 +226,7 @@ CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
 CircularCloud.prototype.getVBOIndicesShortArray = function() {
 	this.vertexMatrix.setVertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
-	this.indices_count = shortArray.length;
+	this.indicesCount = shortArray.length;
 	
 	return shortArray;
 };
@@ -247,7 +247,7 @@ CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
 CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
 	this.shadowVertexMatrix.setVertexIdxInList();
 	var shortArray = this.shadowTTrianglesMatrix.getVBOIndicesShortArray();
-	this.indices_count = shortArray.length;
+	this.indicesCount = shortArray.length;
 	
 	return shortArray;
 };

@@ -190,7 +190,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
-			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
+			vbo_vi_cacheKey.indicesCount = shortIndicesValues_count;  
 			
 			// TEST.***
 			//****************************************************************************************************AAA
@@ -328,7 +328,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
-			vbo_vi_cacheKey.indices_count = shortIndicesValues_count;  
+			vbo_vi_cacheKey.indicesCount = shortIndicesValues_count;  
 		}
 		
 		// in asimetricVersion must load the block's lego.***
