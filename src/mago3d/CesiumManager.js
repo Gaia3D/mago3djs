@@ -2198,6 +2198,11 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					//{
 					//	neoReferencesList.multiplyReferencesMatrices(transformMat); // after parse, multiply transfMat by the buildings mat.***
 					//}
+					if(neoBuilding._blocksList_Container == undefined)
+					{
+						neoBuilding._blocksList_Container = new BlocksListsContainer();
+						neoBuilding._blocksList_Container.newBlocksList("Blocks1");
+					}
 					neoReferencesList.blocksList = neoBuilding._blocksList_Container.blocksListsArray[0]; //blocksList;
 					lowestOctree.neoRefsList_Array.push(neoReferencesList);
 					
@@ -2274,6 +2279,11 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					//{
 					//	neoReferencesList.multiplyReferencesMatrices(transformMat); // after parse, multiply transfMat by the buildings mat.***
 					//}
+					if(neoBuilding._blocksList_Container == undefined)
+					{
+						neoBuilding._blocksList_Container = new BlocksListsContainer();
+						neoBuilding._blocksList_Container.newBlocksList("Blocks1");
+					}
 					neoReferencesList.blocksList = neoBuilding._blocksList_Container.blocksListsArray[0]; //blocksList;
 					lowestOctree.neoRefsList_Array.push(neoReferencesList);
 					
@@ -3574,15 +3584,19 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
 	
 	// create the default blocks_lists.*****************************
-	if(neoBuilding._blocksList_Container.blocksListsArray.length > 0) 
+	if(neoBuilding._blocksList_Container && neoBuilding._blocksList_Container.blocksListsArray.length > 0) 
+	{
 		neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
+		neoBuilding._blocksList_Container.blocksListsArray[0] = undefined;
+		neoBuilding._blocksList_Container.blocksListsArray = undefined;
+	}
 	neoBuilding._blocksList_Container = undefined;
-	neoBuilding._blocksList_Container = new BlocksListsContainer();
-	neoBuilding._blocksList_Container.newBlocksList("Blocks1");
-	//this._blocksList_Container.newBlocksList("Blocks2");
-	//this._blocksList_Container.newBlocksList("Blocks3");
-	//this._blocksList_Container.newBlocksList("BlocksBone");
-	//this._blocksList_Container.newBlocksList("Blocks4");
+	//neoBuilding._blocksList_Container = new BlocksListsContainer();
+	//neoBuilding._blocksList_Container.newBlocksList("Blocks1");
+	////this._blocksList_Container.newBlocksList("Blocks2");
+	////this._blocksList_Container.newBlocksList("Blocks3");
+	////this._blocksList_Container.newBlocksList("BlocksBone");
+	////this._blocksList_Container.newBlocksList("Blocks4");
 	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************
