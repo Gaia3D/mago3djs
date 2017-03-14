@@ -210,8 +210,8 @@ var CesiumManager = function() {
 	*/
 	// End workers.------------------------------------------------------------------------
 	
-	this.createCloudsTEST();
-	this.loadObjectIndexFile = false;
+//	this.createCloudsTEST();
+//	this.loadObjectIndexFile = false;
 };
 
 // real time radiosity shader http://madebyevan.com/webgl-path-tracing/
@@ -363,50 +363,50 @@ CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
 	}
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
-CesiumManager.prototype.createCloudsTEST = function() {
-//	var increLong = 0.004;
-//	var increLat = 0.004;
-	
-	var randomLongitude = 0;
-	var randomLatitude = 0;
-	var randomAltitude = 0;
-	var randomRadius = 0;
-	var randomDepth = 0;
-	
-	var cloud;
-	for(var i =0; i<10; i++) {
-		randomLongitude = 126.91+(0.05*Math.random());
-		randomLatitude = 37.51+(0.05*Math.random());
-		randomAltitude = 350+Math.random()*50;
-		randomRadius = 10+Math.random()*150;
-		randomDepth = 10+Math.random()*50;
-		cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
-		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
-	}
-	
-	for(var i =0; i<10; i++) {
-		randomLongitude = 127.0+(0.05*Math.random());
-		randomLatitude = 37.45+(0.05*Math.random());
-		randomAltitude = 350+Math.random()*50;
-		randomRadius = 10+Math.random()*150;
-		randomDepth = 10+Math.random()*50;
-		cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
-		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
-	}
-	/*
-	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
-	cloud.createCloud(126.929, 37.5172076, 300.0, 100.0, 40.0, 16);
-
-	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
-	cloud.createCloud(126.929+increLong, 37.5172076, 340.0, 50.0, 40.0, 16);
-	
-	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
-	cloud.createCloud(126.929+increLong, 37.5172076+increLat, 340.0, 80.0, 90.0, 16);
-	*/
-};
+///**
+// * 어떤 일을 하고 있습니까?
+// */
+//CesiumManager.prototype.createCloudsTEST = function() {
+////	var increLong = 0.004;
+////	var increLat = 0.004;
+//	
+//	var randomLongitude = 0;
+//	var randomLatitude = 0;
+//	var randomAltitude = 0;
+//	var randomRadius = 0;
+//	var randomDepth = 0;
+//	
+//	var cloud;
+//	for(var i =0; i<10; i++) {
+//		randomLongitude = 126.91+(0.05*Math.random());
+//		randomLatitude = 37.51+(0.05*Math.random());
+//		randomAltitude = 350+Math.random()*50;
+//		randomRadius = 10+Math.random()*150;
+//		randomDepth = 10+Math.random()*50;
+//		cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
+//		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
+//	}
+//	
+//	for(var i =0; i<10; i++) {
+//		randomLongitude = 127.0+(0.05*Math.random());
+//		randomLatitude = 37.45+(0.05*Math.random());
+//		randomAltitude = 350+Math.random()*50;
+//		randomRadius = 10+Math.random()*150;
+//		randomDepth = 10+Math.random()*50;
+//		cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
+//		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
+//	}
+//	/*
+//	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
+//	cloud.createCloud(126.929, 37.5172076, 300.0, 100.0, 40.0, 16);
+//
+//	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
+//	cloud.createCloud(126.929+increLong, 37.5172076, 340.0, 50.0, 40.0, 16);
+//	
+//	cloud = this.f4d_atmos.cloudsManager.newCircularCloud();
+//	cloud.createCloud(126.929+increLong, 37.5172076+increLat, 340.0, 80.0, 90.0, 16);
+//	*/
+//};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -808,7 +808,7 @@ CesiumManager.prototype.renderPCloudProjects = function(gl, cameraPosition, cull
 			if(this.backGround_fileReadings_count < 20) {
 				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject._f4d_headerPathName;
 				
-				this.readerWriter.readPCloudHeaderInServer(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
+				this.readerWriter.getPCloudHeader(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -816,7 +816,7 @@ CesiumManager.prototype.renderPCloudProjects = function(gl, cameraPosition, cull
 			if(this.backGround_fileReadings_count < 20) {
 				filePath_scratch = this.readerWriter.geometryDataPath +"/" + pCloudProject._f4d_geometryPathName;
 				
-				this.readerWriter.readPCloudGeometryInServer(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
+				this.readerWriter.getPCloudGeometry(gl, filePath_scratch, pCloudProject, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -888,7 +888,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl, scene) {
 				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
 					neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
-					this.readerWriter.readNeoHeaderInServer(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+					this.readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 					continue;
 				}
 			}
@@ -958,7 +958,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl, scene) {
 			if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 				// must read metadata file.***
 				neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
-				this.readerWriter.readNeoHeaderInServer(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+				this.readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 				continue;
 			}
 		}
@@ -1007,7 +1007,7 @@ CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, scene
 				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
 					neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/HeaderAsimetric.hed";
-					this.readerWriter.readNeoHeaderAsimetricVersionInServer(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+					this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 					continue;
 				}
 			}
@@ -1065,7 +1065,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
 						neoReferencesList = subOctree.neoRefsList_Array[0];
 						if(neoReferencesList != undefined && neoReferencesList.fileLoadState == 0) areAllSubOctreesLoadedFile = false;
 					}
-					////readerWriter.readNeoReferencesInServer(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
+					////readerWriter.getNeoReferences(gl, intCompRef_filePath, null, subOctreeNumberName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
 				}
 			}
 		}
@@ -1262,7 +1262,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 				var simpBuild_tex = neoSkin.newTexture();
 				
 				var filePath_inServer = this.readerWriter.geometryDataPath + "/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-				this.readerWriter.readTextureInServer(gl, filePath_inServer, simpBuild_tex, this);
+				this.readerWriter.readTexture(gl, filePath_inServer, simpBuild_tex, this);
 			}
 		} else {
 			var simpBuildTexture = neoSkin.texturesArray[0]; 
@@ -1423,7 +1423,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 				var simpBuild_tex = neoSkin.newTexture();
 				
 				var filePath_inServer = this.readerWriter.geometryDataPath +"/" + neoBuilding.buildingFileName + Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP;
-				this.readerWriter.readTextureInServer(gl, filePath_inServer, simpBuild_tex, this);
+				this.readerWriter.readTexture(gl, filePath_inServer, simpBuild_tex, this);
 			}
 		} else {
 			var simpBuildTexture = neoSkin.texturesArray[0]; 
@@ -3246,7 +3246,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
 					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
 					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 					
-					this.readerWriter.readNailImageInServer(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
+					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 					this.backGround_fileReadings_count ++;
 					
 				}
@@ -3398,7 +3398,7 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
 					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
 					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 					
-					this.readerWriter.readNailImageInServer(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
+					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0); 
 					this.backGround_fileReadings_count ++;
 				}
 				//continue;
@@ -3878,7 +3878,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			
@@ -3951,7 +3951,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -4000,7 +4000,7 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading) {
 				tileNumberNameString = this.terranTileSC._numberName.toString();
 				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";	
-				this.readerWriter.readTileArrayBufferInServer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
+				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
 			continue;
@@ -4116,57 +4116,11 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- */
-CesiumManager.prototype.loadData = function(jsonBuildingInformation) {
-//	// Now, load sejong.***
-//	var project_number = 7500; // House with car and mini park to children.***
-//	var GAIA3D__counter =1;
-//	//GAIA3D__offset_latitude += 0.0021;
-//	//GAIA3D__offset_longitude += 0.0021;
-//	
-//	var incre_latAng = 0.0005;
-//	var incre_longAng = 0.0005;
-//	
-//	// Test modularitzing.*******************************************************
-//	var BR_ProjectsList = this.bRBuildingProjectsList;
-//	var neoBuildingsList = this.neoBuildingsList;
-//
-//	var height = 1635.0;
-	var gl = this.scene.context._gl;
-	//viewer.readerWriter.openBuildingProject(gl, 100,  latitude, longitude, height, viewer.readerWriter, BR_ProjectsList);
-	// End test modularitzing.---------------------------------------------------
-	
-	/*
-	var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
-	url : '//assets.agi.com/stk-terrain/world',
-	requestWaterMask : false,
-	requestVertexNormals : true
-	});
-	this.terrainProvider = cesiumTerrainProviderMeshes;
-	*/
-
-	//this.readerWriter.openTerranTile(gl, this.terranTile, this.readerWriter);
-	
-//	var buildingCount = jsonBuildingInformation.latitude.length;
-//	for(var i=0; i<buildingCount; i++) {
-////		var deltaLat = -0.0015;
-////		var deltaLon = 0.0015;
-//		var latitude = jsonBuildingInformation.latitude;
-//		var longitude = jsonBuildingInformation.longitude;
-//		var height = jsonBuildingInformation.height;
-//		var buildingFileName = jsonBuildingInformation.buildingFileName;
-//		//this.readerWriter.openNeoBuilding(gl, buildingFileName[i], latitude[i], longitude[i], height[i], this.readerWriter, neoBuildingsList, this);
-//	}
-//	
-	var filePathInServer = this.readerWriter.geometryDataPath + "/objectIndexFile.ihe";
-	this.readerWriter.readObjectIndexFileInServer(gl, filePathInServer, this.readerWriter, this);
-
-};
-
-/**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 CesiumManager.prototype.getObjectIndexFile = function() {
-	this.readerWriter.getObjectIndexFile(this.scene.context._gl, this.readerWriter, this.neoBuildingsList);
+	this.readerWriter.getObjectIndexFile(	this.scene.context._gl, 
+											this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, 
+											this.readerWriter, 
+											this.neoBuildingsList);
 };
