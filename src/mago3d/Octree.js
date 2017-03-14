@@ -76,22 +76,64 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	this.lego = undefined;
 	
 	// delete the blocksList.***
-	var neoRefListsCount = this.neoRefsList_Array.length;
-	for(var i=0; i<neoRefListsCount; i++)
+	if(this.neoRefsList_Array != undefined)
 	{
-		this.neoRefsList_Array[i].deleteGlObjects(gl);
-		this.neoRefsList_Array[i] = undefined;
+		var neoRefListsCount = this.neoRefsList_Array.length;
+		for(var i=0; i<neoRefListsCount; i++)
+		{
+			if(this.neoRefsList_Array[i])
+			{
+				this.neoRefsList_Array[i].deleteGlObjects(gl);
+			}
+			this.neoRefsList_Array[i] = undefined;
+		}
+		this.neoRefsList_Array.length = 0;
+	}
+	
+	if(this.subOctrees_array != undefined)
+	{
+		var subOctreesCount = this.subOctrees_array.length;
+		for(var i=0; i<subOctreesCount; i++)
+		{
+			this.subOctrees_array[i].deleteGlObjects(gl);
+			this.subOctrees_array[i] = undefined;
+		}
+	}
+	
+	this.subOctrees_array = undefined;
+	this.neoRefsList_Array = undefined; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.deleteLod0GlObjects = function(gl) {
+
+	
+	// delete the blocksList.***
+	if(this.neoRefsList_Array)
+	{
+		var neoRefListsCount = this.neoRefsList_Array.length;
+		for(var i=0; i<neoRefListsCount; i++)
+		{
+			if(this.neoRefsList_Array[i])
+			{
+				this.neoRefsList_Array[i].deleteGlObjects(gl);
+			}
+			this.neoRefsList_Array[i] = undefined;
+		}
+		this.neoRefsList_Array.legnth = 0;
 	}
 	
 	var subOctreesCount = this.subOctrees_array.length;
 	for(var i=0; i<subOctreesCount; i++)
 	{
-		this.subOctrees_array[i].deleteGlObjects(gl);
-		this.subOctrees_array[i] = undefined;
+		this.subOctrees_array[i].deleteLod0GlObjects(gl);
 	}
 	
-	this.subOctrees_array = undefined;
-	this.neoRefsList_Array = undefined; 
+	//this.subOctrees_array = undefined;
+	//this.neoRefsList_Array = undefined; 
 };
 
 /**
@@ -530,6 +572,9 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
 	//if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
+	if(this.subOctrees_array == undefined)
+		return;
+	
 	if(this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
 	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
 		return;
@@ -679,6 +724,9 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
  * @param result_octreesArray 변수
  */
 Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) {
+	if(this.subOctrees_array == undefined)
+		return;
+	
 	if(result_octreesArray == undefined)
 		result_octreesArray = [];
 	  
