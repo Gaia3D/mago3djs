@@ -174,7 +174,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 				if(tex_id == undefined) {
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				} else {
@@ -524,7 +524,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				{
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				}
@@ -909,7 +909,7 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 				{
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				}
@@ -1244,7 +1244,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 				{
 					// Load the texture.***
 					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTextureInServer(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
+					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 					f4d_manager.backGround_fileReadings_count ++;
 					continue;
 				}
