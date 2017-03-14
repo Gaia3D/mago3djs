@@ -53,6 +53,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 	} else {
 		gl.disable(gl.CULL_FACE);
 	}
+	
+	gl.enable(gl.CULL_FACE);
 		
 	//if(ssao_idx == 0)
 	//	gl.disable(gl.CULL_FACE);
@@ -388,6 +390,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 	} else {
 		gl.disable(gl.CULL_FACE);
 	}
+	
+	gl.enable(gl.CULL_FACE);
 		
 	//if(ssao_idx == 0)
 	//	gl.disable(gl.CULL_FACE);

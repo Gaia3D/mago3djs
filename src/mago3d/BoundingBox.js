@@ -36,6 +36,20 @@ BoundingBox.prototype.setInit = function(point3d) {
  * 어떤 일을 하고 있습니까?
  * @param point3d 변수
  */
+BoundingBox.prototype.deleteObjects = function() {
+	this.minX = undefined;
+	this.minY = undefined;
+	this.minZ = undefined;
+  
+	this.maxX = undefined; 
+	this.maxY = undefined;
+	this.maxZ = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param point3d 변수
+ */
 BoundingBox.prototype.expand = function(dist) {
 	this.minX -= dist;
 	this.minY -= dist;

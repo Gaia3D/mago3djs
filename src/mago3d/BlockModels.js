@@ -82,7 +82,10 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 		block.radius = undefined;  
 		block.vertex_count = undefined; // only for test.*** delete this.***
 		if(block.lego)
+		{
 			block.lego.vbo_vicks_container.deleteGlObjects(gl);
+			block.lego.vbo_vicks_container = undefined;
+		}
 		block.lego = undefined; // legoBlock.***
 		this.blocksArray[i] = undefined;
 	}
@@ -259,10 +262,13 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		bytesReaded += 4;
 		
 		var maxLength = bbox.getMaxLength();
-		if(maxLength < 1.0) block.isSmallObj = true;
+		if(maxLength < 0.9) block.isSmallObj = true;
 		else block.isSmallObj = false;
 		
 		block.radius = maxLength/2.0;
+		
+		bbox.deleteObjects();
+		bbox = undefined;
 		
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
 		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
@@ -332,8 +338,10 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		block.lego.fileLoadState = 2; // data is loaded with the blockModel.***
 		bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
 		
-		// test.
-		block.lego = null;
+		// provisionally delete lego.***
+		block.lego.vbo_vicks_container.deleteGlObjects(gl);
+		block.lego.vbo_vicks_container = undefined;
+		block.lego = undefined;
 	}
 	this.fileLoadState = 4; // 4 = parsing finished.***
 };
