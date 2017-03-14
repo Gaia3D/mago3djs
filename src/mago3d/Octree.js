@@ -126,11 +126,13 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
 		this.neoRefsList_Array.legnth = 0;
 	}
 	
+	
 	var subOctreesCount = this.subOctrees_array.length;
 	for(var i=0; i<subOctreesCount; i++)
 	{
 		this.subOctrees_array[i].deleteLod0GlObjects(gl);
 	}
+	
 	
 	//this.subOctrees_array = undefined;
 	//this.neoRefsList_Array = undefined; 
@@ -357,32 +359,12 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
  */
 Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume, result_CRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
 	var visibleOctreesArray = [];
-	var excludedOctArray = [];
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
 	  
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
-	/*
-	// Test. Exclude octrees with little frustum intersection.************************************************
-	// Test: exclude octrees that the center is rear of the near_plane of culling volume.***
-	var octrees_count = visibleOctreesArray.length;
-	for(var i=0; i<octrees_count; i++)
-	{
-		  distAux = Cesium.Plane.getPointDistance(cesium_cullingVolume.planes[5], new Cesium.Cartesian3(visibleOctreesArray[i].centerPos.x, visibleOctreesArray[i].centerPos.y, visibleOctreesArray[i].centerPos.z));
-		  cesium_boundingSphere_scratch.center.x = visibleOctreesArray[i].centerPos.x;
-		  cesium_boundingSphere_scratch.center.y = visibleOctreesArray[i].centerPos.y;
-		  cesium_boundingSphere_scratch.center.z = visibleOctreesArray[i].centerPos.z;
-		  cesium_boundingSphere_scratch.radius = visibleOctreesArray[i].getRadiusAprox()*0.7;
-		  
-		  frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-		  if(frustumCull == Cesium.Intersect.INSIDE || frustumCull == Cesium.Intersect.INTERSECTING) 
-		  {
-			  excludedOctArray.push(visibleOctreesArray[i]);
-		  }
-	  }
-	  // End test.---------------------------------------------------------------------------------------------
-	  */
+
 	  // Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
 	  
@@ -397,8 +379,10 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 	}
 	  
 	visibleOctreesArray.length = 0;
-	sortedOctreesArray.length = 0;
 	excludedOctArray.length = 0;
+	
+	visibleOctreesArray = undefined;
+	excludedOctArray = undefined;
 };
 
 /**
@@ -412,7 +396,6 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
  */
 Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolume, result_NeoRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
 	var visibleOctreesArray = [];
-	var excludedOctArray = [];
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
 	  
@@ -433,7 +416,9 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 	  
 	visibleOctreesArray.length = 0;
 	sortedOctreesArray.length = 0;
-	excludedOctArray.length = 0;
+	
+	visibleOctreesArray = undefined;
+	sortedOctreesArray = undefined;
 };
 
 /**
@@ -447,7 +432,6 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  */
 Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
 	var visibleOctreesArray = [];
-	var excludedOctArray = [];
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
 	var find = false;
@@ -506,7 +490,9 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	  
 	visibleOctreesArray.length = 0;
 	sortedOctreesArray.length = 0;
-	excludedOctArray.length = 0;
+	
+	visibleOctreesArray = undefined;
+	sortedOctreesArray = undefined;
 	
 	return find;
 };

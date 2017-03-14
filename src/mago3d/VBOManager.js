@@ -57,7 +57,6 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 	{
 		gl.deleteBuffer(this.MESH_VERTEX_cacheKey);
 		this.MESH_VERTEX_cacheKey = undefined;
-		
 	}
 	this.pos_vboDataArray = undefined;
 	
@@ -65,7 +64,6 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 	{
 		gl.deleteBuffer(this.MESH_NORMAL_cacheKey);
 		this.MESH_NORMAL_cacheKey = undefined;
-		
 	}
 	this.nor_vboDataArray = undefined;
 	
@@ -73,7 +71,6 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 	{
 		gl.deleteBuffer(this.MESH_COLOR_cacheKey);
 		this.MESH_COLOR_cacheKey = undefined;
-		
 	}
 	this.col_vboDataArray = undefined;
 	
@@ -81,7 +78,6 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 	{
 		gl.deleteBuffer(this.MESH_TEXCOORDS_cacheKey);
 		this.MESH_TEXCOORDS_cacheKey = undefined;
-		
 	}
 	this.tcoord_vboDataArray = undefined;
 	
@@ -89,7 +85,6 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 	{
 		gl.deleteBuffer(this.MESH_FACES_cacheKey);
 		this.MESH_FACES_cacheKey = undefined;
-		
 	}
 	this.idx_vboDataArray = undefined;
 
