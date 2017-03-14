@@ -931,7 +931,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl, scene) {
 				if(neoReferencesList.fileLoadState == 0) {
 					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
-						this.readerWriter.getNeoReferencesArraybuffer(filePathInServer, neoReferencesList, neoBuilding, this);
+						this.readerWriter.getNeoReferencesArraybuffer(filePathInServer, neoReferencesList, this);
 						// remember multiply reference matrices by the building transform matrix.***
 						//var transformMat = new Matrix4();
 						//transformMat.setByFloat32Array(neoBuilding.move_matrix);
@@ -1058,7 +1058,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
 							subOctree.neoRefsList_Array.push(neoReferencesList);
 							
 							var intRef_filePath = interiorCRef_folderPath + "/" + subOctreeNumberName;
-							this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+							this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 						}
 						areAllSubOctreesLoadedFile = false;
 					} else {
@@ -2197,7 +2197,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 				}
 				continue;
 			}
@@ -2210,7 +2210,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-					this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
+					this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, this);
 				}
 				continue;
 			}
@@ -2281,7 +2281,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 				}
 				continue;
 			}
@@ -2591,7 +2591,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						var buildingFolderName = neoBuilding.buildingFileName;
 						var bricks_folderPath = this.readerWriter.geometryDataPath + "/" + buildingFolderName + "/Bricks";
 						var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
+						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, this);
 					}
 					continue;
 				}

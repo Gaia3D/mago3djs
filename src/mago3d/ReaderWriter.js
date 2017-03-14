@@ -206,9 +206,8 @@ ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, r
  * @param gl 변수
  * @param arrayBuffer 변수
  * @param blocksList 변수
- * @param neoBuilding 변수
  */
-ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList, neoBuilding) {
+ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList) {
 	var bytesReaded = 0;
 	var blocksCount = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
@@ -295,10 +294,9 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList, neo
  * @param gl 변수
  * @param neoRefsList 변수
  * @param arrayBuffer 변수
- * @param neoBuilding 변수
  * @param readWriter 변수
  */
-ReaderWriter.prototype.readNeoReferences = function(gl, neoRefsList, arrayBuffer, neoBuilding, readWriter) {
+ReaderWriter.prototype.readNeoReferences = function(gl, neoRefsList, arrayBuffer, readWriter) {
 	var startBuff;
 	var endBuff;
 	var bytesReaded = 0;
@@ -624,7 +622,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
  * @param neoBuilding 변수
  * @param readerWriter 변수
  */
-ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuilding, readerWriter, magoManager) {
+ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) {
 //	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
 	blocksList.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -633,7 +631,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuil
 		if(oReq.status === 200) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
-				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList, neoBuilding);
+				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
 				blocksList.fileLoadState = 2; // 2 = file loading finished.***
 				arrayBuffer = null;
 			} else {
@@ -656,10 +654,9 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, neoBuil
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param fileName 파일명
- * @param neoBuilding 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, neoBuilding, magoManager) {
+ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	neoRefsList.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -690,10 +687,9 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param fileName 파일명
- * @param neoBuilding 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, neoBuilding, magoManager) {
+ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -728,11 +724,11 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param filePathInServer 변수
+ * @param fileName 변수
  * @param lodBuilding 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getLodBuildingArraybuffer = function(filePathInServer, lodBuilding, magoManager) {
+ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuilding, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lodBuilding.fileLoadState = 1; // 1 = file loading strated.***
 	
@@ -794,7 +790,7 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 				    neoRefsList.blocksList = blocksList;
 				    neoRefsList.name = neoReferenceList_name;
 				    //neoRefsList.parseArrayBuffer(gl, arrayBuffer, neoBuilding, readerWriter);
-				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, readerWriter);
 				    if(transformMat) {
 				    	neoRefsList.multiplyReferencesMatrices(transformMat);
 				    }
@@ -805,7 +801,7 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 				    neoRefsList.name = neoReferenceList_name;
 				    neoRefsList.blocksList = blocksList; // no necessary.***
 				    //neoRefsList.parseArrayBuffer(gl, arrayBuffer, neoBuilding, readerWriter);
-				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, neoBuilding, readerWriter);
+				    readerWriter.readNeoReferences(gl, neoRefsList, arrayBuffer, readerWriter);
 				    if(transformMat) {
 				    	neoRefsList.multiplyReferencesMatrices(transformMat);
 				    }
@@ -856,6 +852,10 @@ ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBu
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
 //		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
 	});
+	
+	oReq.open("GET", fileName, true);
+	oReq.responseType = "arraybuffer";
+	oReq.send(null);
 };
 
 /**
@@ -1755,23 +1755,23 @@ ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude
 	
 	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
 	var blocksList = blocksListContainer.getBlockList("Blocks1");
-	readerWriter.getNeoBlocks(gl, filePath_inServer, blocksList, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer, blocksList, readerWriter);
 	
 	var filePath_inServer_2 = this.geometryDataPath + "/"+buildingFileName+"/Blocks2";
 	var blocksList_2 = blocksListContainer.getBlockList("Blocks2");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_2, blocksList_2, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_2, blocksList_2, readerWriter);
 	
 	var filePath_inServer_3 = this.geometryDataPath + "/"+buildingFileName+"/Blocks3";
 	var blocksList_3 = blocksListContainer.getBlockList("Blocks3");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_3, blocksList_3, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_3, blocksList_3, readerWriter);
 	
 	var filePath_inServer_bone = this.geometryDataPath + "/"+buildingFileName+"/BlocksBone";
 	var blocksList_bone = blocksListContainer.getBlockList("BlocksBone");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_bone, blocksList_bone, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_bone, blocksList_bone, readerWriter);
 	
 	var filePath_inServer_4 = this.geometryDataPath + "/"+buildingFileName+"/Blocks4"; // Interior Objects.***
 	var blocksList_4 = blocksListContainer.getBlockList("Blocks4");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_4, blocksList_4, neoBuilding, readerWriter);
+	readerWriter.getNeoBlocks(gl, filePath_inServer_4, blocksList_4, readerWriter);
 	
 	// 2) References.****************************************************************************************************************************
 	var moveMatrix = new Matrix4();
