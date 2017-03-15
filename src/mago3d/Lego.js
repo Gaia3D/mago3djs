@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Lego
  */
 var Lego = function() {
 	if(!(this instanceof Lego)) {

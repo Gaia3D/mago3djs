@@ -5,6 +5,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Atmosphere
  */
 var Atmosphere = function() {
 	if(!(this instanceof Atmosphere)) {
@@ -17,6 +18,7 @@ var Atmosphere = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ShadowBlendingCube
  */
 var ShadowBlendingCube = function() {
 	if(!(this instanceof ShadowBlendingCube)) {
@@ -147,6 +149,7 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CloudsManager
  */
 var CloudsManager = function() {
 	if(!(this instanceof CloudsManager)) {
@@ -167,6 +170,7 @@ CloudsManager.prototype.newCircularCloud = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CircularCloud
  */
 var CircularCloud = function() {
 	if(!(this instanceof CircularCloud)) {

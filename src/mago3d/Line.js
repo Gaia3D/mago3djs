@@ -2,6 +2,7 @@
 
 /**
  * 선
+ * @class Line
  */
 var Line = function() {
 	if(!(this instanceof Line)) {

@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Block
  */
 var Block = function() {
 	if(!(this instanceof Block)) {
@@ -20,6 +21,7 @@ var Block = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BlocksList
  */
 var BlocksList = function() {
 	if(!(this instanceof BlocksList)) {
@@ -348,6 +350,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BlocksListsContainer
  */
 var BlocksListsContainer = function() {
 	if(!(this instanceof BlocksListsContainer)) {

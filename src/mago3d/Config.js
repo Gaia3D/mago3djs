@@ -2,6 +2,7 @@
 
 /**
  * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
+ * @class MagoConfig
  */
 var MagoConfig = MagoConfig || {};
 

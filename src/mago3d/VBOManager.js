@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOManager
  */
 var VBOManager = function() {
 	if(!(this instanceof VBOManager)) {
@@ -11,6 +12,7 @@ var VBOManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Buffer
  */
 var Buffer = function() {
 	if(!(this instanceof Buffer)) {
@@ -23,6 +25,7 @@ var Buffer = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOVertexIdxCacheKey
  */
 var VBOVertexIdxCacheKey = function() {
 	if(!(this instanceof VBOVertexIdxCacheKey)) {
@@ -88,6 +91,7 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOVertexIdxCacheKeysContainer
  */
 var VBOVertexIdxCacheKeysContainer = function() {
 	if(!(this instanceof VBOVertexIdxCacheKeysContainer)) {
@@ -124,6 +128,7 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOByteColorCacheKey
  */
 var VBOByteColorCacheKey = function() {
 	if(!(this instanceof VBOByteColorCacheKey)) {
@@ -136,6 +141,7 @@ var VBOByteColorCacheKey = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOByteColorCacheKeysContainer
  */
 var VBOByteColorCacheKeysContainer = function() {
 	if(!(this instanceof VBOByteColorCacheKeysContainer)) {

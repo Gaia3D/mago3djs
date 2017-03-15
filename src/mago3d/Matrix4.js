@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Matrix4
  */
 var Matrix4 = function() {
 	if(!(this instanceof Matrix4)) {

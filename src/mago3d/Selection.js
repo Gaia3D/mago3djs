@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Selection
  */
 var Selection = function() {
 	if(!(this instanceof Selection)) {

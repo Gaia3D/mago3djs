@@ -2,6 +2,7 @@
 
 /**
  * 상수 설정
+ * @class Constant
  */
 var Constant = {};
 
