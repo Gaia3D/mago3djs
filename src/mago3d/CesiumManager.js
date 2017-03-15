@@ -1975,6 +1975,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		}
 		
 		var camera = scene.frameState.camera;
+		
 		var cameraDir = camera.direction;
 		var transformedCamDir;
 		var transformedCamUp;
@@ -1995,6 +1996,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		this.myCameraSC.up.x = transformedCamUp.x;
 		this.myCameraSC.up.y = transformedCamUp.y;
 		this.myCameraSC.up.z = transformedCamUp.z;
+		
+		
+		
 		
 		var myCullingVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
 	
@@ -2102,24 +2106,13 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		return;
 	}
 	
-	var cameraPosition = scene.context._us._cameraPosition;
-	var transformedCamPos = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-	//this.isCameraInsideNeoBuilding = neoBuilding.isCameraInsideOfBuilding(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
-	//if(!this.isCameraMoving)
-//	{
-	//result_neoRefLists_array.length = 0; // init.***
 	var refList;
 	var maxRefListParsingCount = 50;
 	var refListsParsingCount = 0;
-	//var buildingRotationMatrix;
-	
-	// Determine if the camera is inside of the building.***
 	
 	//if(this.isCameraInsideNeoBuilding && neoBuilding.octree != undefined) // original.***
 	if(neoBuilding.octree != undefined) {
-		// check if must load the octree.***
-		//this.loadBuildingOctreeAsimetricVersion(neoBuilding); // here loads octree interior references.***
-		
+
 		if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 		if(neoBuilding.buildingPosMat_inv == undefined) {
 		    neoBuilding.buildingPosMat_inv = new Matrix4();
@@ -2127,33 +2120,14 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		}
 		
 		var camera = scene.frameState.camera;
-		var cameraDir = camera.direction;
-		var transformedCamDir;
-		var transformedCamUp;
-		
-		this.pointSC.set(cameraDir.x, cameraDir.y, cameraDir.z);
-		transformedCamDir = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
-		this.pointSC.set(camera.up.x, camera.up.y, camera.up.z);
-		transformedCamUp = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
-		
-		this.myCameraSC.position.x = transformedCamPos.x; 
-		this.myCameraSC.position.y = transformedCamPos.y;
-		this.myCameraSC.position.z = transformedCamPos.z;
-		
-		this.myCameraSC.direction.x = transformedCamDir.x;
-		this.myCameraSC.direction.y = transformedCamDir.y;
-		this.myCameraSC.direction.z = transformedCamDir.z;
-		
-		this.myCameraSC.up.x = transformedCamUp.x;
-		this.myCameraSC.up.y = transformedCamUp.y;
-		this.myCameraSC.up.z = transformedCamUp.z;
+		this.myCameraSC = neoBuilding.getTransformedRelativeCameraToBuilding(camera, this.myCameraSC);
 		
 		var myCullingVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
 		
 		// get frustumCulled lowestOctrees classified by distances.************************************************************************************
 		var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 		var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
-		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, this.boundingSphere_Aux, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 		
 		if(!find) {
 			//this.deleteNeoBuilding(gl, neoBuilding);
@@ -2323,6 +2297,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		}
 		
 		// LOD 1.*******************************************************************************
+		/*
 		lowestOctreesCount = visibleObjControlerOctreesAux.currentVisibles2.length;
 		for(var i=0; i<lowestOctreesCount; i++) {
 			lowestOctree = visibleObjControlerOctreesAux.currentVisibles2[i];
@@ -2331,7 +2306,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			
 			//lowestOctree.deleteLod0GlObjects(gl);
 		}
-		
+		*/
 	}
 //}
 };

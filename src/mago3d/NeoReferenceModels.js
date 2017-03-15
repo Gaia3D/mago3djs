@@ -56,7 +56,9 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 	this._block_idx = undefined;
 	
 	// 3) Transformation Matrix.***
+	this._matrix4._floatArrays = undefined;
 	this._matrix4 = undefined;
+	this._originalMatrix4._floatArrays = undefined;
 	this._originalMatrix4 = undefined; // 
 	
 	// 4) Tex coords cache_key.***
