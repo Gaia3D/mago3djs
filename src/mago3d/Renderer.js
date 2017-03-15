@@ -376,7 +376,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		gl.disable(gl.CULL_FACE);
 	}
 	
-	gl.enable(gl.CULL_FACE);
+	//gl.enable(gl.CULL_FACE);
+	gl.disable(gl.CULL_FACE);
 		
 	//if(ssao_idx == 0)
 	//	gl.disable(gl.CULL_FACE);
@@ -482,7 +483,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 			
 			if(block == undefined)
 				continue;
-			
+					/*
 					for(var n=0; n<cacheKeys_count; n++) // Original.***
 					{
 						this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
@@ -534,6 +535,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 						}
 						//------------------------------------------------------------------------------------------------------------
 					}
+					*/
 			
 			if(maxSizeToRender && block != null)
 			{

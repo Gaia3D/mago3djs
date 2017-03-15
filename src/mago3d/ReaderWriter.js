@@ -1218,6 +1218,10 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
 		
+		var buildingNameDivided = buildingName.split("-");
+		var tempBuildingId = buildingNameDivided[2].split("_");
+		var buildingId = tempBuildingId[0];
+		
 		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
