@@ -1350,8 +1350,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 				
 				neoBuilding.metaData.fileLoadState = 2; // 2 = file loading finished.***
-				//if(magoManager.backGround_fileReadings_count > 0 )
-				//    magoManager.backGround_fileReadings_count -= 1; // old.***
 			  
 			    //BR_Project._f4d_header_readed_finished = true;
 				arrayBuffer = undefined;

@@ -507,6 +507,35 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param absolute_eye_x 변수
+ * @param absolute_eye_y 변수
+ * @param absolute_eye_z 변수
+ * @returns point3d_scrath_2
+ */
+NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absoluteCamera, resultCamera) {
+	// 1rst, calculate the relative eye position.***
+	var buildingPosition = this._buildingPosition;
+	
+	if(this.buildingPosMat_inv == undefined)
+	{
+		this.buildingPosMat_inv = new Matrix4();
+		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
+	}
+
+	this.point3d_scratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);
+	resultCamera.position = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.position);
+	
+	this.point3d_scratch.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
+	resultCamera.direction = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.direction);
+	
+	this.point3d_scratch.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
+	resultCamera.up = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.up);
+  
+	return resultCamera;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 var NeoBuildingsList = function() {
 	if(!(this instanceof NeoBuildingsList)) {
