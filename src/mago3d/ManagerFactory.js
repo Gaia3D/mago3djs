@@ -6,9 +6,10 @@
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
  * @param magoConfig mago3d 설정값 json object
+ * @param blocksConfig block list 설정값 json object
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, magoConfig) {
+var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -22,7 +23,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig) {
 			|| magoConfig.deployConfig.viewLibrary === '' 
 			|| magoConfig.deployConfig.viewLibrary === Constant.CESIUM) {
 		// 환경 설정
-		MagoConfig.init(magoConfig);
+		MagoConfig.init(magoConfig, blocksConfig);
 		
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
