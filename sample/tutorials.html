@@ -84,29 +84,40 @@
 		async : true,
 		success: function(result){
 			// TODO DB 에서 고객사별 환경 설정을 읽어서 초기화
-			var managerFactory = new ManagerFactory(null, "magoContainer", result);
+			getBlocksConfig(result);
 		},
 		error: function(e){
 			alert(e.responseText);
 		}
 	});
 	
-/* 	
-	// blocks 정보를 db에서 읽어 오는 예제
- 	$.ajax({
-		url: "/sample/blocks.json",
-		type: "GET",
-		dataType: "json",
-		async : true,
-		success: function(result){
-			var blockId = "block5";
-			alert(result[blockId].id);
-		},
-		error: function(e){
-			alert(e.responseText);
-		}
-	}); 
-	*/
+	function getBlocksConfig(magoConfig) {
+		// blocks 정보를 db에서 읽어 오는 예제
+		$.ajax({
+			url: "/sample/blocks.json",
+			type: "GET",
+			dataType: "json",
+			async : true,
+			success: function(result){
+				var managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, result);
+				
+				// 사용하는 예제
+				/* 
+				var blocks = result.blocks;
+				var blockId = "F110T";
+				var block = blocks[blockId];
+				console.log("map 처럼 key 로 뽑을 경우" + block.LATITUDE);
+				for(var key in blocks) {
+					block = blocks[key];
+					console.log(key + "---------------" + block.LATITUDE);
+				} 
+				*/
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
 </script>
 </body>
 </html>

@@ -521,8 +521,8 @@ CesiumManager.prototype.renderAtmosphere = function(gl, cameraPosition, cullingV
 		gl.vertexAttribPointer(standardShader._color, 3, gl.FLOAT, false,24,12);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_indexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	
 	gl.disableVertexAttribArray(standardShader._color);
@@ -627,8 +627,8 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 		gl.vertexAttribPointer(standardShader._position, 3, gl.FLOAT, false,0,0);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_shadowIndexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	
 	// Second pass.****************************************************************************************************
@@ -660,8 +660,8 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 		gl.vertexAttribPointer(standardShader._position, 3, gl.FLOAT, false,0,0);
 		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cloud.vbo_shadowIndexCacheKey);
-		gl.drawElements(gl.TRIANGLES, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINE_LOOP, cloud.indices_count, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINE_LOOP, cloud.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 	}
 	//gl.disableVertexAttribArray(standardShader._color);
 	gl.disableVertexAttribArray(standardShader._position);
@@ -712,7 +712,7 @@ CesiumManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullin
 	gl.vertexAttribPointer(standardShader._color, 4, gl.FLOAT, false,28,12);
 	
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shadowBC.vbo_indexCacheKey);
-	gl.drawElements(gl.TRIANGLES, shadowBC.indices_count, gl.UNSIGNED_SHORT, 0); // Fill.***
+	gl.drawElements(gl.TRIANGLES, shadowBC.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 	
 	gl.disableVertexAttribArray(standardShader._position);
 	gl.disableVertexAttribArray(standardShader._color);
@@ -931,7 +931,7 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl, scene) {
 				if(neoReferencesList.fileLoadState == 0) {
 					if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 						filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
-						this.readerWriter.getNeoReferencesArraybuffer(filePathInServer, neoReferencesList, neoBuilding, this);
+						this.readerWriter.getNeoReferencesArraybuffer(filePathInServer, neoReferencesList, this);
 						// remember multiply reference matrices by the building transform matrix.***
 						//var transformMat = new Matrix4();
 						//transformMat.setByFloat32Array(neoBuilding.move_matrix);
@@ -1058,7 +1058,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
 							subOctree.neoRefsList_Array.push(neoReferencesList);
 							
 							var intRef_filePath = interiorCRef_folderPath + "/" + subOctreeNumberName;
-							this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+							this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 						}
 						areAllSubOctreesLoadedFile = false;
 					} else {
@@ -2171,7 +2171,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 				}
 				continue;
 			}
@@ -2184,7 +2184,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-					this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
+					this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, this);
 				}
 				continue;
 			}
@@ -2255,7 +2255,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, neoBuilding, this);
+					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
 				}
 				continue;
 			}
@@ -2566,7 +2566,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						var buildingFolderName = neoBuilding.buildingFileName;
 						var bricks_folderPath = this.readerWriter.geometryDataPath + "/" + buildingFolderName + "/Bricks";
 						var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, neoBuilding, this);
+						this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, this);
 					}
 					continue;
 				}

@@ -13,8 +13,9 @@ MagoConfig.getInformation = function() {
  * 환경설정 세팅
  * 
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
+ * @param blocksConfig block list 설정값 json object
  */
-MagoConfig.init = function(jsonConfig) {
+MagoConfig.init = function(jsonConfig, blocksConfig) {
 	this.jsonConfig = jsonConfig;
 	
 	// 배포 관련 설정
@@ -23,6 +24,9 @@ MagoConfig.init = function(jsonConfig) {
 	MagoConfig.initRenderingConfig(jsonConfig);
 	// 초기화 할 공간 정보 설정
 	MagoConfig.initGeoConfig(jsonConfig);
+	
+	// block 정보 설정
+	MagoConfig.initBlocksConfig(blocksConfig);
 };
 
 /**
@@ -193,4 +197,14 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 	}
 	
 	this.jsonConfig.geoConfig = jsonConfig.geoConfig;
+};
+
+/**
+ * block 정보 설정
+ * 
+ * @param blocksConfig 블락 정보 설정 설정
+ */
+MagoConfig.initBlocksConfig = function(blocksConfig) {
+	if(blocksConfig === null || blocksConfig.blocks === null || blocksConfig.blocks === undefined) return;
+	this.jsonConfig.blockConfig = blocksConfig;
 };

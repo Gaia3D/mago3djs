@@ -1599,7 +1599,7 @@ var VertexIdxArrays = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.indices_count = -1;
+	this.indicesCount = -1;
 	  
 	this.MESH_VERTEX_cacheKey= null;
 	this.MESH_FACES_cacheKey= null;
@@ -1683,7 +1683,7 @@ var VNTInterleavedCacheKeys = function() {
 	this.VNT_cacheKey = null;
 	this.indices_cacheKey = null;
 	this._vertices_count = 0;
-	this._indices_count = 0;
+	this.indicesCount = 0;
 };
   
 /**

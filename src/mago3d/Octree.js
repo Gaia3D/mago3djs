@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param octreeOwner 변수
@@ -51,8 +53,7 @@ Octree.prototype.new_subOctree = function() {
  * @param treeDepth 변수
  */
 Octree.prototype.deleteGlObjects = function(gl) {
-	if(this.lego != undefined)
-	{
+	if(this.lego != undefined) {
 		this.lego.vbo_vicks_container.deleteGlObjects(gl);
 		this.legoDataArrayBuffer = undefined;
 	}
@@ -76,13 +77,10 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	this.lego = undefined;
 	
 	// delete the blocksList.***
-	if(this.neoRefsList_Array != undefined)
-	{
+	if(this.neoRefsList_Array != undefined) {
 		var neoRefListsCount = this.neoRefsList_Array.length;
-		for(var i=0; i<neoRefListsCount; i++)
-		{
-			if(this.neoRefsList_Array[i])
-			{
+		for(var i=0; i<neoRefListsCount; i++) {
+			if(this.neoRefsList_Array[i]) {
 				this.neoRefsList_Array[i].deleteGlObjects(gl);
 			}
 			this.neoRefsList_Array[i] = undefined;
@@ -90,11 +88,9 @@ Octree.prototype.deleteGlObjects = function(gl) {
 		this.neoRefsList_Array.length = 0;
 	}
 	
-	if(this.subOctrees_array != undefined)
-	{
+	if(this.subOctrees_array != undefined) {
 		var subOctreesCount = this.subOctrees_array.length;
-		for(var i=0; i<subOctreesCount; i++)
-		{
+		for(var i=0; i<subOctreesCount; i++) {
 			this.subOctrees_array[i].deleteGlObjects(gl);
 			this.subOctrees_array[i] = undefined;
 		}
@@ -110,15 +106,11 @@ Octree.prototype.deleteGlObjects = function(gl) {
  */
 Octree.prototype.deleteLod0GlObjects = function(gl) {
 
-	
 	// delete the blocksList.***
-	if(this.neoRefsList_Array)
-	{
+	if(this.neoRefsList_Array) {
 		var neoRefListsCount = this.neoRefsList_Array.length;
-		for(var i=0; i<neoRefListsCount; i++)
-		{
-			if(this.neoRefsList_Array[i])
-			{
+		for(var i=0; i<neoRefListsCount; i++) {
+			if(this.neoRefsList_Array[i]) {
 				this.neoRefsList_Array[i].deleteGlObjects(gl);
 			}
 			this.neoRefsList_Array[i] = undefined;
@@ -126,13 +118,10 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
 		this.neoRefsList_Array.legnth = 0;
 	}
 	
-	
 	var subOctreesCount = this.subOctrees_array.length;
-	for(var i=0; i<subOctreesCount; i++)
-	{
+	for(var i=0; i<subOctreesCount; i++) {
 		this.subOctrees_array[i].deleteLod0GlObjects(gl);
 	}
-	
 	
 	//this.subOctrees_array = undefined;
 	//this.neoRefsList_Array = undefined; 
@@ -313,8 +302,7 @@ Octree.prototype.getRadiusAprox = function() {
  * @param result_CRefListsArray 변수
  */  
 Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
-	if(result_CRefListsArray == undefined)
-		result_CRefListsArray = [];
+	if(result_CRefListsArray == undefined) result_CRefListsArray = [];
   
 	if(this.subOctrees_array.length > 0) {
 		for(var i=0; i<this.subOctrees_array.length; i++) {
@@ -332,8 +320,7 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
  * @param result_NeoRefListsArray 변수
  */
 Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
-	if(result_NeoRefListsArray == undefined)
-		result_NeoRefListsArray = [];
+	if(result_NeoRefListsArray == undefined) result_NeoRefListsArray = [];
   
 	if(this.subOctrees_array.length > 0) {
 		for(var i=0; i<this.subOctrees_array.length; i++) {
@@ -447,39 +434,30 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 	  
-
 	for(var i=0; i<visibleOctrees_count; i++) {
 		if(visibleOctreesArray[i].squareDistToEye < 300) // 15x15 = 225
 		{
-			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
-			{
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		}
-		else if(visibleOctreesArray[i].squareDistToEye < 2200) // 25x25 = 625
+		} else if(visibleOctreesArray[i].squareDistToEye < 2200) // 25x25 = 625
 		{
-			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
-			{
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		}
-		else if(visibleOctreesArray[i].squareDistToEye < 500000) // 50x50 = 2500
+		} else if(visibleOctreesArray[i].squareDistToEye < 500000) // 50x50 = 2500
 		{
-			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
-			{
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		}
-		else
-		{
-			if(visibleOctreesArray[i].triPolyhedronsCount > 0)
-			{
+		} else {
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
 				find = true;
@@ -487,7 +465,6 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		}
 	}
 	
-	  
 	visibleOctreesArray.length = 0;
 	sortedOctreesArray.length = 0;
 	
@@ -534,14 +511,11 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 		//result_octreesArray.push(this);
 		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
 	} else if(frustumCull == Cesium.Intersect.INTERSECTING  ) {
-		if(this.subOctrees_array.length == 0) 
-		{
+		if(this.subOctrees_array.length == 0) {
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
 				result_octreesArray.push(this);
-		} 
-		else 
-		{
+		}  else {
 			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
@@ -558,8 +532,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
 	//if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
-	if(this.subOctrees_array == undefined)
-		return;
+	if(this.subOctrees_array == undefined) return;
 	
 	if(this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
 	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
@@ -581,23 +554,20 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-    if(this.octree_level == 3) {
-	    var hola = 0;
-    }
+//    if(this.octree_level == 3) {
+//	    var hola = 0;
+//    }
   
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) {
 		//result_octreesArray.push(this);
 		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
 	} else if(frustumCull == Cesium.Intersect.INTERSECTING  ) {
-		if(this.subOctrees_array.length == 0) 
-		{
+		if(this.subOctrees_array.length == 0) {
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
 				result_octreesArray.push(this);
-		} 
-		else 
-		{
+		} else {
 			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
@@ -710,11 +680,9 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
  * @param result_octreesArray 변수
  */
 Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) {
-	if(this.subOctrees_array == undefined)
-		return;
+	if(this.subOctrees_array == undefined) return;
 	
-	if(result_octreesArray == undefined)
-		result_octreesArray = [];
+	if(result_octreesArray == undefined) result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
 		for(var i=0; i<this.subOctrees_array.length; i++) {
@@ -722,8 +690,7 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) {
 		}
 	} else {
 		//if(this.neoRefsList_Array.length > 0) 
-		if(this.triPolyhedronsCount > 0) 
-			result_octreesArray.push(this); // there are only 1.***
+		if(this.triPolyhedronsCount > 0) result_octreesArray.push(this); // there are only 1.***
 	}
 };
 
@@ -732,8 +699,7 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) {
  * @param result_octreesArray 변수
  */
 Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
-	if(result_octreesArray == undefined)
-		result_octreesArray = [];
+	if(result_octreesArray == undefined) result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
 		for(var i=0; i<this.subOctrees_array.length; i++) {
@@ -748,18 +714,13 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
-Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray)
-{
+Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray) {
 	var subOctreesCount = this.subOctrees_array.length;
 	
-	
-	if(subOctreesCount == 0 && this.triPolyhedronsCount > 0)
-	{
+	if(subOctreesCount == 0 && this.triPolyhedronsCount > 0) {
 		lowestOctreesArray.push(this);
-	}
-	else{
-		for(var i=0; i<subOctreesCount; i++)
-		{
+	} else {
+		for(var i=0; i<subOctreesCount; i++) {
 			this.subOctrees_array[i].extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
 		}
 	}
@@ -769,12 +730,10 @@ Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctree
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
-Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner)
-{
+Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) {
 	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	
-	if(octreeLevel == 0)
-	{
+	if(octreeLevel == 0) {
 		// this is the mother octree, so read the mother octree's size.***
 		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -793,8 +752,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 		this.neoBuildingOwner = neoBuildingOwner;
 			
 	// 1rst, create the 8 subOctrees.***
-	for(var i=0; i<subOctreesCount; i++)
-	{
+	for(var i=0; i<subOctreesCount; i++) {
 		var subOctree = this.new_subOctree();
 		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
 	}
@@ -802,32 +760,10 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	// now, set size of subOctrees.***
 	this.setSizesSubBoxes();
 	
-	for(var i=0; i<subOctreesCount; i++)
-	{
+	for(var i=0; i<subOctreesCount; i++) {
 		var subOctree = this.subOctrees_array[i];
 		bytesReaded = subOctree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner);
 	}
 	
 	return bytesReaded;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
