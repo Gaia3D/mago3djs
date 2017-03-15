@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BoundingBox
  */
 var BoundingBox = function() {
 	if(!(this instanceof BoundingBox)) {

@@ -2,6 +2,7 @@
 
 /**
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
+ * @class ManagerFactory
  * 
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id

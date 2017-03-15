@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PostFxShader
  * @param gl 변수
  */
 var PostFxShader = function(gl) {
@@ -63,6 +64,7 @@ var PostFxShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PostFxShadersManager
  */
 var PostFxShadersManager = function() {
 	if(!(this instanceof PostFxShadersManager)) {

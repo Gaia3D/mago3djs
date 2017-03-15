@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Color
  */
 var Color = function() {
 	if(!(this instanceof Color)) {
@@ -48,6 +49,7 @@ Color.prototype.setRGBA = function(_r, _g, _b, _alpha) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ByteColor
  */
 var ByteColor = function() {
 	if(!(this instanceof ByteColor)) {
@@ -84,6 +86,7 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue) {
   
 /**
 * 어떤 일을 하고 있습니까?
+* @class Point2D
 */
 var Point2D = function() {
 	if(!(this instanceof Point2D)) {
@@ -97,6 +100,7 @@ var Point2D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Point3DAux
  */
 var Point3DAux = function() {
 	if(!(this instanceof Point3DAux)) {
@@ -111,6 +115,7 @@ var Point3DAux = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTriangle
  */
 var TTriangle = function() {
 	if(!(this instanceof TTriangle)) {
@@ -145,6 +150,7 @@ TTriangle.prototype.invert = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTrianglesList
  */
 var TTrianglesList = function() {
 	if(!(this instanceof TTrianglesList)) {
@@ -189,6 +195,7 @@ TTrianglesList.prototype.getTTriangle = function(idx) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TTrianglesMatrix
  */
 var TTrianglesMatrix = function() {
 	if(!(this instanceof TTrianglesMatrix)) {
@@ -267,6 +274,7 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Vertex
  */
 var Vertex = function() {
 	if(!(this instanceof Vertex)) {
@@ -330,6 +338,7 @@ Vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexList
  */
 var VertexList = function() {
 	if(!(this instanceof VertexList)) {
@@ -429,6 +438,7 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexMatrix
  */
 var VertexMatrix = function() {
 	if(!(this instanceof VertexMatrix)) {
@@ -701,10 +711,9 @@ VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 	}
 };
 
-
-
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Triangle
  */
 var Triangle= function() {
 	if(!(this instanceof Triangle)) {
@@ -792,6 +801,7 @@ Triangle.prototype.setColors = function(color_1, color_2, color_3) {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Polygon
  */
 var Polygon = function() {
 	if(!(this instanceof Polygon)) {
@@ -821,6 +831,7 @@ Polygon.prototype.newPoint3D = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TrianglesSurface
  */
 var TrianglesSurface= function() {
 	if(!(this instanceof TrianglesSurface)) {
@@ -1082,6 +1093,7 @@ TrianglesSurface.prototype.getBoundingBox = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Fpolyhedron
  */
 var Fpolyhedron= function() {
 	if(!(this instanceof Fpolyhedron)) {
@@ -1184,6 +1196,7 @@ Fpolyhedron.prototype.getBoundingBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class FpolyhedronsList
  */
 var FpolyhedronsList= function() {
 	if(!(this instanceof FpolyhedronsList)) {
@@ -1224,6 +1237,7 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 
 /**
 * 어떤 일을 하고 있습니까?
+* @class Quaternion
 */
 var Quaternion = function() {
 	if(!(this instanceof Quaternion)) {
@@ -1296,11 +1310,9 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
 	}
 };
 
-
-	
-
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Reference
  */
 var Reference = function() {
 	if(!(this instanceof Reference)) {
@@ -1360,6 +1372,7 @@ Reference.prototype.newByteColorsSurface = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReference
  */
 var CompoundReference = function() {
 	if(!(this instanceof CompoundReference)) {
@@ -1408,6 +1421,7 @@ CompoundReference.prototype.newReference = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReferencesList
  */
 var CompoundReferencesList = function() {
 	if(!(this instanceof CompoundReferencesList)) {
@@ -1502,6 +1516,7 @@ CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class CompoundReferencesListContainer
  */
 var CompoundReferencesListContainer = function() {
 	if(!(this instanceof CompoundReferencesListContainer)) {
@@ -1593,6 +1608,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexIdxArrays
  */
 var VertexIdxArrays = function() {
 	if(!(this instanceof VertexIdxArrays)) {
@@ -1607,6 +1623,7 @@ var VertexIdxArrays = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexIdxVBOArraysContainer
  */
 var VertexIdxVBOArraysContainer = function() {
 	if(!(this instanceof VertexIdxVBOArraysContainer)) {
@@ -1628,6 +1645,7 @@ VertexIdxVBOArraysContainer.prototype.newVertexIdxArray = function() {
 
 /**
 * 어떤 일을 하고 있습니까?
+* @class ByteColorsVBOArrays
 */
 var ByteColorsVBOArrays = function() {
 	if(!(this instanceof ByteColorsVBOArrays)) {
@@ -1639,6 +1657,7 @@ var ByteColorsVBOArrays = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ByteColorsVBOArraysContainer
  */
 var ByteColorsVBOArraysContainer = function() {
 	if(!(this instanceof ByteColorsVBOArraysContainer)) {
@@ -1657,11 +1676,10 @@ ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
 	this._meshArrays.push(byteColors_array);
 	return byteColors_array;
 };
-
-
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArrays
  */
 var VertexTexcoordsArrays = function() {
 	if(!(this instanceof VertexTexcoordsArrays)) {
@@ -1674,6 +1692,7 @@ var VertexTexcoordsArrays = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VNTInterleavedCacheKeys
  */
 var VNTInterleavedCacheKeys = function() {
 	if(!(this instanceof VNTInterleavedCacheKeys)) {
@@ -1688,6 +1707,7 @@ var VNTInterleavedCacheKeys = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArraysCacheKeys
  */
 var VertexTexcoordsArraysCacheKeys = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeys)) {
@@ -1707,6 +1727,7 @@ var VertexTexcoordsArraysCacheKeys = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VertexTexcoordsArraysCacheKeysContainer
  */
 var VertexTexcoordsArraysCacheKeysContainer = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeysContainer)) {
@@ -1728,6 +1749,7 @@ VertexTexcoordsArraysCacheKeysContainer.prototype.newVertexTexcoordsArraysCacheK
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleObject
  */
 var SimpleObject = function() {
 	if(!(this instanceof SimpleObject)) {
@@ -1739,6 +1761,7 @@ var SimpleObject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleStorey
  */
 var SimpleStorey = function() {
 	if(!(this instanceof SimpleStorey)) {
@@ -1760,6 +1783,7 @@ SimpleStorey.prototype.newSimpleObject = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleBuilding
  */
 var SimpleBuilding = function() {
 	if(!(this instanceof SimpleBuilding)) {
@@ -1784,6 +1808,7 @@ SimpleBuilding.prototype.newSimpleStorey = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class SimpleBuildingV1
  */
 var SimpleBuildingV1 = function() {
 	if(!(this instanceof SimpleBuildingV1)) {
@@ -1816,11 +1841,10 @@ SimpleBuildingV1.prototype.newSimpleObject = function() {
 	this._simpleObjects_array.push(simpleObject);
 	return simpleObject;
 };
-
-
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Header
  */
 var Header = function() {
 	if(!(this instanceof Header)) {
@@ -1853,6 +1877,7 @@ var Header = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BRBuildingProject
  */
 var BRBuildingProject = function() {
 	if(!(this instanceof BRBuildingProject)) {
@@ -2123,6 +2148,7 @@ BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
+ * @class PCloudMesh
  */
 var PCloudMesh = function() {
 	if(!(this instanceof PCloudMesh)) {
@@ -2153,6 +2179,7 @@ var PCloudMesh = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class BRBuildingProjectsList
  */
 var BRBuildingProjectsList = function() {
 	if(!(this instanceof BRBuildingProjectsList)) {
@@ -2204,6 +2231,7 @@ BRBuildingProjectsList.prototype.getBoundingBox = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class TerranTile
  */
 var TerranTile = function() {
 	if(!(this instanceof TerranTile)) {
