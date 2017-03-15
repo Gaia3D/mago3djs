@@ -43,5 +43,10 @@
 			"height" : [ 60.0, 60.0 ],
 			"buildingFileName" : [ "F4D_KICT_main_Arc_v3_with_spaces", "F4D_gangbuk_cultur_del"]
 		}
+	},
+	"blockConfig" : {
+		"time" : "yyyy-MM-dd hh:mi:ss",
+		"blocks" : { 
+		}
 	}
 }

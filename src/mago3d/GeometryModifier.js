@@ -193,8 +193,8 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 	var indicesVisiblesArray_interior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_interior)
 	{
-		var indices_count = indicesVisiblesArray_interior.length;
-		for(var i=0; i<indices_count; i++)
+		var indicesCount = indicesVisiblesArray_interior.length;
+		for(var i=0; i<indicesCount; i++)
 		{
 			visibleCompRefObjectsArray._compoundRefsArray.push(compRefList._compoundRefsArray[indicesVisiblesArray_interior[i]]);
 		}
@@ -205,8 +205,8 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 	var indicesVisiblesArray_exterior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(infinite_ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_exterior)
 	{
-		var indices_count = indicesVisiblesArray_exterior.length;
-		for(var i=0; i<indices_count; i++)
+		var indicesCount = indicesVisiblesArray_exterior.length;
+		for(var i=0; i<indicesCount; i++)
 		{
 			visibleCompRefObjectsArray._compoundRefsArray.push(compRefList._compoundRefsArray[indicesVisiblesArray_exterior[i]]);
 		}

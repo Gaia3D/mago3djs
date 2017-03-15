@@ -30,7 +30,6 @@ var MetaData = function() {
 	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading.***
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
@@ -45,8 +44,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
-	if(f4dReadWriter == undefined)
-		f4dReadWriter = new ReaderWriter();
+	if(f4dReadWriter == undefined) f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -54,8 +52,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	}
 	
 	// 3) Global unique ID.*********************
-	if(this.guid == undefined)
-		this.guid ="";
+	if(this.guid == undefined) this.guid ="";
 	
 	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
@@ -63,33 +60,22 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	}
 	
 	// 4) Location.*************************
-	if(this.longitude == undefined)
-	{
+	if(this.longitude == undefined) {
 		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else
-		bytes_readed += 8;
+	} else bytes_readed += 8;
 		
-	if(this.latitude == undefined)
-	{
+	if(this.latitude == undefined) {
 		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else
-		bytes_readed += 8;
+	} else bytes_readed += 8;
 	
-	if(this.altitude == undefined)
-	{
+	if(this.altitude == undefined) {
 		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	}
-	else
-		bytes_readed += 4;
+	} else bytes_readed += 4;
 	
 	//this.altitude += 20.0; // TEST.***
 	
-	
 	//header._elevation += 70.0; // delete this. TEST.!!!
-	if(this.bbox == undefined)
-		this.bbox = new BoundingBox();
+	if(this.bbox == undefined) this.bbox = new BoundingBox();
 	
 	// 6) BoundingBox.************************
 	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
@@ -101,8 +87,6 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	
 	// TEST. PROVISIONAL. DELETE.***
 	//this.bbox.expand(20.0);
-	//-------------------------------
-	
 	var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	// 7) Buildings octree mother size.***
@@ -114,18 +98,15 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	this.oct_max_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
 	
 	var isLarge = false;
-	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0)
-	{
+	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0) {
 		isLarge = true;
 	}
 	
-	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0)
-	{
+	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0) {
 		this.isSmall = true;
 	}
 	
 	return bytes_readed;
-	
 };
 
 /**
@@ -142,8 +123,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
-	if(f4dReadWriter == undefined)
-		f4dReadWriter = new ReaderWriter();
+	if(f4dReadWriter == undefined) f4dReadWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -151,8 +131,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	}
 	
 	// 3) Global unique ID.*********************
-	if(this.guid == undefined)
-		this.guid ="";
+	if(this.guid == undefined) this.guid ="";
 	
 	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
@@ -160,33 +139,22 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	}
 	
 	// 4) Location.*************************
-	if(this.longitude == undefined)
-	{
+	if(this.longitude == undefined) {
 		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else
-		bytes_readed += 8;
+	} else bytes_readed += 8;
 		
-	if(this.latitude == undefined)
-	{
+	if(this.latitude == undefined) {
 		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else
-		bytes_readed += 8;
+	} else bytes_readed += 8;
 	
-	if(this.altitude == undefined)
-	{
+	if(this.altitude == undefined) {
 		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	}
-	else
-		bytes_readed += 4;
+	} else bytes_readed += 4;
 	
 	//this.altitude += 20.0; // TEST.***
 	
-	
 	//header._elevation += 70.0; // delete this. TEST.!!!
-	if(this.bbox == undefined)
-		this.bbox = new BoundingBox();
+	if(this.bbox == undefined) this.bbox = new BoundingBox();
 	
 	// 6) BoundingBox.************************
 	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
@@ -198,7 +166,6 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	
 	// TEST. PROVISIONAL. DELETE.***
 	//this.bbox.expand(20.0);
-	//-------------------------------
 	
 	//var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
@@ -211,18 +178,15 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	//this.oct_max_z = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
 	
 	var isLarge = false;
-	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0)
-	{
+	if(this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0) {
 		isLarge = true;
 	}
 	
-	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0)
-	{
+	if(!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0) {
 		this.isSmall = true;
 	}
 	
 	return bytes_readed;
-	
 };
 
 // F4D ReferenceObject.************************************************************************************************************************* // 
@@ -237,10 +201,7 @@ var Texture = function() {
 	this.texture_type_name = "";
 	this.texture_image_fileName = "";
 	this.tex_id;
-
 };
-
-
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -279,8 +240,7 @@ NeoSimpleBuilding.prototype.newTexture = function() {
 NeoSimpleBuilding.prototype {
 	neoRefsLists_Array: [],
 	new_accesor: function() {},
-	updateCurrentAllIndicesOfLists:  function()
-		{
+	updateCurrentAllIndicesOfLists:  function() {
 			var neoRefLists_count = this.neoRefsLists_Array.length;
 			for(var i=0; i<neoRefLists_count; i++)
 			{
@@ -293,17 +253,15 @@ NeoSimpleBuilding.prototype {
 /**
  * 어떤 일을 하고 있습니까?
  */
- var LodBuilding = function()
- {
+var LodBuilding = function() {
 	// this class is for use for LOD2 and LOD3 buildings.***
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = 0;
- };
+};
  
- LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter)
- {
+LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 	if(this.fileLoadState == 2)// file loaded.***
 	{
 		this.fileLoadState = 3;// 3 = parsing started.***
@@ -333,8 +291,7 @@ NeoSimpleBuilding.prototype {
 		
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasNormals)
-		{
+		if(hasNormals) {
 			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var normalsByteValues_count = vertexCount * 3;
 			var startBuff = bytesReaded;
@@ -345,8 +302,7 @@ NeoSimpleBuilding.prototype {
 		
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasColors)
-		{
+		if(hasColors) {
 			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
@@ -357,13 +313,11 @@ NeoSimpleBuilding.prototype {
 		
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoord = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasTexCoord)
-		{
-			// TODO:
-		}
+//		if(hasTexCoord) {
+//			// TODO:
+//		}
 		
 		this.fileLoadState = 4; // 4 = parsing finished.***
-
 	}	
  };
 
@@ -395,7 +349,6 @@ var NeoBuilding = function() {
 	//this._blocksList_Container.newBlocksList("Blocks3");
 	//this._blocksList_Container.newBlocksList("BlocksBone");
 	//this._blocksList_Container.newBlocksList("Blocks4");
-	//--------------------------------------------------------------
 	
 	// create the references lists.*********************************
 	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
@@ -441,10 +394,8 @@ NeoBuilding.prototype.getTextureId = function(texture) {
 	var textures_loaded_count = this.textures_loaded.length;
 	var find = false;
 	var i=0;
-	while(!find && i<textures_loaded_count)
-	{
-		if(this.textures_loaded[i].texture_image_fileName == texture.texture_image_fileName)
-		{
+	while(!find && i<textures_loaded_count) {
+		if(this.textures_loaded[i].texture_image_fileName == texture.texture_image_fileName) {
 			find = true;
 			tex_id = this.textures_loaded[i].tex_id;
 		}
@@ -493,8 +444,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
 	
-	if(this.buildingPosMat_inv == undefined)
-	{
+	if(this.buildingPosMat_inv == undefined) {
 		this.buildingPosMat_inv = new Matrix4();
 		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
 	}

@@ -4,10 +4,10 @@ function ManagerUtils() {};
 
 ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	var metaData = neoBuilding.metaData;
-	
-	if(metaData == undefined) return false;
-	
-	if(metaData.longitude == undefined || metaData.latitude == undefined || metaData.altitude == undefined ) return false;
+	if( metaData == undefined
+			|| metaData.longitude == undefined 
+			|| metaData.latitude == undefined 
+			|| metaData.altitude == undefined ) return false;
 	
 	// 0) PositionMatrix.************************************************************************
 	var position = Cesium.Cartesian3.fromDegrees(metaData.longitude, metaData.latitude, metaData.altitude);
