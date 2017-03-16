@@ -42,7 +42,6 @@ var ShadowBlendingCube = function() {
 ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	// create a blending cube, with faces inverted.***
 	var cubeSideSemiLength = 150.5;
-	var vertex;
 	
 	var r = 0.1;
 	var g = 0.1;
@@ -51,7 +50,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	
 	// Center Bottom of the cube.***
 	var vertex_list = vtxMat.newVertexList();
-	vertex = vertex_list.newVertex();
+	var vertex = vertex_list.newVertex();
 	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 	

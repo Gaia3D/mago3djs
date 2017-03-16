@@ -11,13 +11,13 @@ var Lego = function() {
 	
 	//this.dataArraybuffer; // binary data.***
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
-	this.fileLoadState = 0;
+	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
 Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded) {
 	if(this.fileLoadState == 2) {
 		// file loaded.***
-		this.fileLoadState = 3;// 3 = parsing started.***
+		this.fileLoadState = CODE.fileLoadState.PARSE;
 		
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
@@ -69,7 +69,7 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 //		if(hasTexCoord) {
 //		}
 		
-		this.fileLoadState = 4; // 4 = parsing finished.***
+		this.fileLoadState = CODE.fileLoadState.FINISH;
 	}
 	
 	return bytesReaded;

@@ -17,10 +17,8 @@ var Renderer = function() {
 	this.currentTimeSC;
 	this.dateSC;
 	this.startTimeSC;
-			
 	this.simpObj_scratch;
 };
-
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -49,11 +47,11 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL); 
 	gl.depthRange(0, 1);
-	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
-		gl.enable(gl.CULL_FACE);
-	} else {
-		gl.disable(gl.CULL_FACE);
-	}
+//	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
+//		gl.enable(gl.CULL_FACE);
+//	} else {
+//		gl.disable(gl.CULL_FACE);
+//	}
 	
 	gl.enable(gl.CULL_FACE);
 		
@@ -103,7 +101,6 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 
 		// New version. Use occlussion indices.***
 		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
-
 
 		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
@@ -304,7 +301,6 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 					
 					//if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined || this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey == undefined || this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey == undefined)
 					//	continue;
-					//----------------------------------------------------------------------------------------------------AAA
 					
 					// Positions.***
 
@@ -358,7 +354,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
-	
 
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
@@ -371,11 +366,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL); 
 	gl.depthRange(0, 1);
-	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
-		gl.enable(gl.CULL_FACE);
-	} else {
-		gl.disable(gl.CULL_FACE);
-	}
+//	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
+//		gl.enable(gl.CULL_FACE);
+//	} else {
+//		gl.disable(gl.CULL_FACE);
+//	}
 	
 	//gl.enable(gl.CULL_FACE);
 	gl.disable(gl.CULL_FACE);
@@ -451,8 +446,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 //			*/
 //		}
 
-		for(var k=0; k<visibleIndices_count; k++)
-		{
+		for(var k=0; k<visibleIndices_count; k++) {
 			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
 //			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
 //			{
@@ -538,10 +532,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 					}
 					*/
 			
-			if(maxSizeToRender && block != null)
-			{
-				if(block.radius < maxSizeToRender)
-					continue;
+			if(maxSizeToRender && block != null) {
+				if(block.radius < maxSizeToRender) continue;
 			}
 			
 			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
@@ -568,7 +560,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				}
 			}
 				
-			// **************************************************************************************************************************
 			if(f4d_manager.objectSelected == neoReference) {
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
 				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -750,7 +741,6 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
-	
 
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
@@ -1327,7 +1317,6 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 					alert('WebGL ERROR!!! *** XXXXXXXX***');
 				}
 			}
-			
 			return;
 		}
 		
@@ -1384,7 +1373,6 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				
 				vbo_vicky.col_vboDataArray = undefined;
 			}
-			
 			return;
 		}
 		
@@ -1434,7 +1422,6 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 				
 				vbo_vicky.pos_vboDataArray = undefined;
 			}
-			
 			return;
 		}
 		
@@ -1465,7 +1452,6 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 				
 				vbo_vicky.pos_vboDataArray = undefined;
 			}
-			
 			return;
 		}
 		
@@ -1492,7 +1478,6 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 				
 				vbo_vicky.col_vboDataArray = undefined;
 			}
-			
 			return;
 		}
 		

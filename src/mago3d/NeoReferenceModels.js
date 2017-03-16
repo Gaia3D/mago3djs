@@ -99,7 +99,7 @@ var NeoReferencesList = function() {
 	this.neoRefs_Array = [];
 	this.blocksList;
 	this.lod_level = -1;
-	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 	
 	this.neoBuildingOwner;
@@ -152,7 +152,7 @@ NeoReferencesList.prototype.deleteGlObjects = function(gl) {
 	//this.neoRefs_Array = undefined;
 	this.blocksList = undefined;
 	this.lod_level = undefined;
-	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
 	
 	this.neoBuildingOwner = undefined;
@@ -217,7 +217,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y,
  * @param f4dReadWriter 변수
  */
 NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dReadWriter) {
-	this.fileLoadState = 3; // parsing started.***
+	this.fileLoadState = CODE.fileLoadState.PARSE;
 	
 	var startBuff;
 	var endBuff;
@@ -403,7 +403,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
 	ocCullBox.setSizesSubBoxes();
 	
-	this.fileLoadState = 4; // file data parsed.***
+	this.fileLoadState = CODE.fileLoadState.FINISH;
 };
 
 // F4D References list container ********************************************************************************************************** // 
@@ -430,7 +430,6 @@ NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
 	return neoRefList;
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param eye_x 변수
@@ -439,8 +438,7 @@ NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
  */
 NeoReferencesListsContainer.prototype.updateCurrentVisibleIndicesOfLists = function(eye_x, eye_y, eye_z) {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
-	for(var i=0; i<neoRefLists_count; i++)
-	{
+	for(var i=0; i<neoRefLists_count; i++) {
 		this.neoRefsLists_Array[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
 	}
 };
@@ -450,30 +448,7 @@ NeoReferencesListsContainer.prototype.updateCurrentVisibleIndicesOfLists = funct
  */
 NeoReferencesListsContainer.prototype.updateCurrentAllIndicesOfLists = function() {
 	var neoRefLists_count = this.neoRefsLists_Array.length;
-	for(var i=0; i<neoRefLists_count; i++)
-	{
+	for(var i=0; i<neoRefLists_count; i++) {
 		this.neoRefsLists_Array[i].updateCurrentAllIndicesInterior();
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

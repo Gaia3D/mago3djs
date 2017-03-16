@@ -22,7 +22,7 @@ var Octree = function(octreeOwner) {
 	this.octree_number_name = 0;
 	this.squareDistToEye = 10000.0;
 	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
-	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = CODE.fileLoadState.READY;
 	  
 	if(octreeOwner) {
 		this.octree_owner = octreeOwner;
@@ -324,8 +324,9 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) {
 	if(result_NeoRefListsArray == undefined) result_NeoRefListsArray = [];
   
-	if(this.subOctrees_array.length > 0) {
-		for(var i=0; i<this.subOctrees_array.length; i++) {
+	var subOctreesArrayLength = this.subOctrees_array.length;
+	if(subOctreesArrayLength > 0) {
+		for(var i=0; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getNeoRefListArray(result_NeoRefListsArray);
 		}
 	} else {
@@ -354,9 +355,8 @@ Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume,
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
 	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
 
-	  // Now, we must sort the subOctrees near->far from eye.***
+	// Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
-	  
 	for(var i=0; i<visibleOctrees_count; i++) {
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
 		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
@@ -403,11 +403,8 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 		sortedOctreesArray[i].getNeoRefListArray(result_NeoRefListsArray);
 	}
 	  
-	visibleOctreesArray.length = 0;
-	sortedOctreesArray.length = 0;
-	
-	visibleOctreesArray = undefined;
-	sortedOctreesArray = undefined;
+	visibleOctreesArray = null;
+	sortedOctreesArray = null;
 };
 
 /**
@@ -477,12 +474,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		}
 	}
 	
-	visibleOctreesArray.length = 0;
-	sortedOctreesArray.length = 0;
-	
-	visibleOctreesArray = undefined;
-	sortedOctreesArray = undefined;
-	
+	visibleOctreesArray = null;
+	sortedOctreesArray = null;
 	return find;
 };
 
@@ -526,14 +519,14 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 		if(this.subOctrees_array.length == 0) {
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
-				result_octreesArray.push(this);
+			result_octreesArray.push(this);
 		}  else {
 			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
 	}
-  // else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
+	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
 
 /**
@@ -578,14 +571,14 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 		if(this.subOctrees_array.length == 0) {
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
-				result_octreesArray.push(this);
+			result_octreesArray.push(this);
 		} else {
 			for(var i=0; i<this.subOctrees_array.length; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
 	}
-  // else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
+	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
 
 /**
@@ -627,7 +620,7 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 			}
 		}
 	}
-  // else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
+	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
   
 
