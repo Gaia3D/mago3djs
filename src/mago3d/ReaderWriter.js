@@ -1212,6 +1212,8 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 	bytesReaded += 4;
 	for(var i =0; i<buildingsCount; i++) {
 		// read the building location data.***
+		var neoBuilding = neoBuildingsList.newNeoBuilding();
+		
 		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		var buildingName = "";
@@ -1219,9 +1221,7 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
 		
-		var buildingNameDivided = buildingName.split("-");
-		var tempBuildingId = buildingNameDivided[2].split("_");
-		var buildingId = tempBuildingId[0];
+		
 		
 		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
@@ -1229,14 +1229,28 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		
 		// TEST.*********
 		altitude = 50.0;
-		
+		neoBuilding.bbox = new BoundingBox();
+		neoBuilding.bbox.minX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.minY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.minZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		/*
+		// Old.***
 		bbLengthX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		bbLengthY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		bbLengthZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		*/
 		
 		// create a building and set the location.***
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
-		var neoBuilding = neoBuildingsList.newNeoBuilding();
+		
+		
+		var buildingNameDivided = buildingName.split("-");
+		var tempBuildingId = buildingNameDivided[2].split("_");
+		neoBuilding.buildingId = tempBuildingId[0];
+		neoBuilding.buildingType = buildingNameDivided[1];
 		
 		neoBuilding.buildingFileName = buildingName;
 		if(neoBuilding.metaData == undefined) {
@@ -1252,13 +1266,13 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		
 		var bbox = neoBuilding.metaData.bbox;
 		
-		bbox.minX = -bbLengthX/2.0; 
-		bbox.minY = -bbLengthY/2.0;
-		bbox.minZ = -bbLengthZ/2.0;
+		bbox.minX = neoBuilding.bbox.minX; 
+		bbox.minY = neoBuilding.bbox.minY;
+		bbox.minZ = neoBuilding.bbox.minZ;
 	  
-		bbox.maxX = bbLengthX/2.0; 
-		bbox.maxY = bbLengthY/2.0; 
-		bbox.maxZ = bbLengthZ/2.0; 
+		bbox.maxX = neoBuilding.bbox.maxX; 
+		bbox.maxY = neoBuilding.bbox.maxY; 
+		bbox.maxZ = neoBuilding.bbox.maxZ; 
 	}
 	
 	neoBuildingsList.neoBuildings_Array.reverse();
