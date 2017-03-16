@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class OcclusionCullingOctreeCell
  * @param occlusionCullingOctree_Cell_Owner 변수
  */
 var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) {
@@ -283,6 +284,7 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 	
 /**
  * 어떤 일을 하고 있습니까?
+ * @class OcclusionCullingOctree
  */
 var OcclusionCullingOctree = function() {
 	if(!(this instanceof OcclusionCullingOctree)) {

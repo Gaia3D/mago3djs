@@ -67,6 +67,7 @@
 		
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Shader
  */
 var Shader = function() {
 	if(!(this instanceof Shader)) {
@@ -102,6 +103,7 @@ var Shader = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class ShadersManager
  */
 var ShadersManager = function() {
 	if(!(this instanceof ShadersManager)) {

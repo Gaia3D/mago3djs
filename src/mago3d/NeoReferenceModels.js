@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReference
  */
 var NeoReference = function() {
 	if(!(this instanceof NeoReference)) {
@@ -87,6 +88,7 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 // F4D References list.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReferencesList
  */
 var NeoReferencesList = function() {
 	if(!(this instanceof NeoReferencesList)) {
@@ -407,6 +409,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(GL, arrayBuffer, f4dRead
 // F4D References list container ********************************************************************************************************** // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoReferencesListsContainer
  */
 var NeoReferencesListsContainer = function() {
 	if(!(this instanceof NeoReferencesListsContainer)) {

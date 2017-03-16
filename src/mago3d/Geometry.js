@@ -2,6 +2,7 @@
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class MetaData
  */
 var MetaData = function() {
 	if(!(this instanceof MetaData)) {
@@ -192,6 +193,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 // F4D ReferenceObject.************************************************************************************************************************* // 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class Texture
  */
 var Texture = function() {
 	if(!(this instanceof Texture)) {
@@ -205,6 +207,7 @@ var Texture = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoSimpleBuilding
  */
 var NeoSimpleBuilding = function() {
 	if(!(this instanceof NeoSimpleBuilding)) {
@@ -252,8 +255,12 @@ NeoSimpleBuilding.prototype {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class LodBuilding
  */
 var LodBuilding = function() {
+	if(!(this instanceof LodBuilding)) {
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
 	// this class is for use for LOD2 and LOD3 buildings.***
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
@@ -323,6 +330,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoBuilding
  */
 var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
@@ -488,6 +496,7 @@ NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absolute
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class NeoBuildingsList
  */
 var NeoBuildingsList = function() {
 	if(!(this instanceof NeoBuildingsList)) {

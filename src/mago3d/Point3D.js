@@ -2,6 +2,7 @@
 
 /**
  * 3차원 정보
+ * @class Point3D
  */
 var Point3D = function() {
 	if(!(this instanceof Point3D)) {

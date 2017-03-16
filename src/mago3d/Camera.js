@@ -1,6 +1,7 @@
 
 /**
  * 3차원 정보
+ * @class Camera
  */
 var Camera = function() {
 	if(!(this instanceof Camera)) {
