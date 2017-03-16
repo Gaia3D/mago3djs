@@ -21,7 +21,6 @@ Point3D.prototype.destroy = function() {
     this.x = null;
     this.y = null;
     this.z = null;
-
 };
 
 /**

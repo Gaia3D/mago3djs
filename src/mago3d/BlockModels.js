@@ -31,7 +31,7 @@ var BlocksList = function() {
 	this.name = "";
 	this.blocksArray;
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
-	this.fileLoadState = 0;
+	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 };
 
@@ -55,11 +55,10 @@ BlocksList.prototype.newBlock = function() {
 BlocksList.prototype.getBlock = function(idx) {
 	if(this.blocksArray == undefined) return null;
 	
-	var block = null;
 	if(idx >= 0 && idx <this.blocksArray.length) {
 		return this.blocksArray[idx];
 	}
-	return block;
+	return null;
 };
 
 /**
@@ -68,23 +67,18 @@ BlocksList.prototype.getBlock = function(idx) {
  * @returns block
  */
 BlocksList.prototype.deleteGlObjects = function(gl) {
-	if(this.blocksArray == undefined)
-		return;
+	if(this.blocksArray == undefined) return;
 	
 	var blocksCount = this.blocksArray.length;
-	
 	for(var i=0; i<blocksCount; i++) {
 		var block = this.blocksArray[i];
-		  
 		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
-		
 		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
 		block.mIFCEntityType = undefined;
 		block.isSmallObj = undefined;
 		block.radius = undefined;  
 		block.vertex_count = undefined; // only for test.*** delete this.***
-		if(block.lego)
-		{
+		if(block.lego) {
 			block.lego.vbo_vicks_container.deleteGlObjects(gl);
 			block.lego.vbo_vicks_container = undefined;
 		}
@@ -92,7 +86,6 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 		this.blocksArray[i] = undefined;
 	}
 	this.blocksArray = undefined;
-	
 	this.name = undefined;
 	this.fileLoadState = undefined;
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
@@ -104,7 +97,7 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
  * @returns block
  */
 BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
-	this.fileLoadState = 3;// 3 = parsing started.***
+	this.fileLoadState = CODE.fileLoadState.PARSE;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
@@ -230,7 +223,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			*/
 		}
 	}
-	this.fileLoadState = 4; // 4 = parsing finished.***
+	this.fileLoadState = CODE.fileLoadState.FINISH;
 };
 
 /**
@@ -239,7 +232,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
  * @returns block
  */
 BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer, readWriter) {
-	this.fileLoadState = 3;// 3 = parsing started.***
+	this.fileLoadState = CODE.fileLoadState.PARSE;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
@@ -334,10 +327,9 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		}
 		
 		// in asimetricVersion must load the block's lego.***
-		if(block.lego == undefined)
-			block.lego = new Lego();
+		if(block.lego == undefined) block.lego = new Lego();
 		
-		block.lego.fileLoadState = 2; // data is loaded with the blockModel.***
+		block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
 		bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
 		
 		// provisionally delete lego.***
@@ -345,7 +337,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		block.lego.vbo_vicks_container = undefined;
 		block.lego = undefined;
 	}
-	this.fileLoadState = 4; // 4 = parsing finished.***
+	this.fileLoadState = CODE.fileLoadState.FINISH;
 };
 
 /**
@@ -391,8 +383,3 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
   	}
   	return blocksList;
 };
-
-
-
-
-

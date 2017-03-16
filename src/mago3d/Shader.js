@@ -124,8 +124,7 @@ var ShadersManager = function() {
 ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
 	
-	if(idx >= 0 && idx < this.shaders_array.length)
-	{
+	if(idx >= 0 && idx < this.shaders_array.length) {
 		shader = this.shaders_array[idx];
 	}
 	
@@ -169,7 +168,7 @@ ShadersManager.prototype.createColorSelectionShader = function(GL) {
 	this.shaders_array.push(shader);
 	
 	shader.shader_vertex_source = ShaderSource.colorShaderVertexSource;
-		//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
+	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
 		
 	shader.shader_fragment_source = ShaderSource.colorShaderFragmentSource;
 		

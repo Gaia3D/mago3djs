@@ -27,8 +27,13 @@
 	
 	<div style="min-height: 500px;">
 		<div style="float: left; min-width: 200px;">
+			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
 			<ul>
-				<li>Tutorials</li>
+				<!-- <li><a href="/sample/tutorials.html">FullShip 모드</a></li>
+				<li><a href="/sample/tutorials.html?viewType=deploy">Deploy 모드</a></li> -->
+				
+				<li><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
+				<li><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
 			</ul>
 		</div>
 		<div style="float: left; padding-top: 30px; padding-left: 20px;">
@@ -43,6 +48,7 @@
 
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../thirdparty/jquery/jquery.js"></script>
+<script type="text/javascript" src="../src/mago3d/Code.js"></script>
 <script type="text/javascript" src="../src/mago3d/Config.js"></script>
 <script type="text/javascript" src="../src/mago3d/Constant.js"></script>
 <script type="text/javascript" src="../src/mago3d/Message.js"></script>
@@ -78,6 +84,8 @@
 <script type="text/javascript" src="../src/mago3d/Camera.js"></script>
 <script type="text/javascript" src="../src/mago3d/GeoLocationData.js"></script>
 <script>
+	var managerFactory = null;
+	
 	$.ajax({
 		url: "/sample/database.json",
 		type: "GET",
@@ -100,7 +108,15 @@
 			dataType: "json",
 			async : true,
 			success: function(result){
-				var managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, result);
+				/* var queryString = window.location.search;
+				var viewType = "0";
+				if(queryString == undefined || queryString == null || queryString.length == 0) {
+					// TODO 나중에는 문자나 조건을 좀 달리 해야할거 같음
+					viewType = "0";
+				} else {
+					viewType = "1";
+				} */
+				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, result);
 				
 				// 사용하는 예제
 				/* 
@@ -118,6 +134,12 @@
 				alert(e.responseText);
 			}
 		});
+	}
+	
+	function changeRenderMode(renderMode) {
+		if(managerFactory != null) {
+			managerFactory.renderMode(renderMode);
+		}
 	}
 </script>
 </body>
