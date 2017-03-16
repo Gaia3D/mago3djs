@@ -338,10 +338,12 @@ var NeoBuilding = function() {
 	}
 	
 	this.metaData;
-	
+	this.buildingId;
+	this.buildingType; // use this for classify a building.***
 	this._buildingPosition;
 	this._buildingPositionHIGH;
 	this._buildingPositionLOW;
+	this.bbox;
 	
 	this.move_matrix; // PositionMatrix (only rotations).***
 	this.move_matrix_inv; // Inverse of PositionMatrix.***
