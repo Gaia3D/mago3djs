@@ -133,10 +133,7 @@ var CesiumManager = function() {
 	this.intNeoRefList_array = [];
 	
 	this.lowestOctreeArray = [];
-	
-	this.currentSelectedObj_idx = -1;
-	this.currentByteColorPicked = new Uint8Array(4);
-	
+
 	this.backGround_fileReadings_count = 0; // this can be as max = 9.***
 	this.backGround_imageReadings_count = 0;
 	this.isCameraMoving = false;
@@ -154,10 +151,14 @@ var CesiumManager = function() {
 	
 	this.scene;
 	
+	this.renderingModeTemp = 0; // 0 = assembled mode. 1 = dispersed mode.***
+	
 	// CURRENTS.********************************************************************
+	this.currentSelectedObj_idx = -1;
+	this.currentByteColorPicked = new Uint8Array(4);
 	this.currentShader;
 	
-	// SPEED TEST.********************************************************
+	// SPEED TEST.******************************************************************
 	this.f4d_rendering_time = 0;
 	this.xdo_rendering_time = 0;
 	this.xdo_rendering_time_arrays = 0;
@@ -1481,7 +1482,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 //	var neoVisibleBuildings_array = [];
 	
 	// do frustum culling.***
+	
 	if(!this.isCameraMoving) {
+		
+		var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
+		
 		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
@@ -3673,6 +3678,8 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var maxNumberOfCalculatingPositions = 40;
 	var currentCalculatingPositionsCount = 0;
 	
+	//this.renderingModeTemp = 0; // 0 = assembled mode. 1 = dispersed mode.***
+	
 	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++) {
 		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
@@ -3717,6 +3724,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		
 		// must calculate the realBuildingPosition (bbox_center_position).***
 		var realBuildingPos;
+		/*
 		if(neoBuilding.metaData && neoBuilding.f4dTransfMat != undefined) {
 			//var centerPos = neoBuilding.octree.getCenterPos(); // center pos is a point3d.***
 			this.pointSC.set((neoBuilding.metaData.oct_max_x + neoBuilding.metaData.oct_min_x)/2.0, 
@@ -3726,6 +3734,10 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		} else {
 			continue;
 		}
+		*/
+		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
+		
 		
 		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
@@ -3738,7 +3750,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
 		if(neoBuilding.metaData) {
-			this.radiusAprox_aux = (neoBuilding.metaData.oct_max_x - neoBuilding.metaData.oct_min_x)/2.0;
+			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX)/2.0;
 		} else this.radiusAprox_aux = 50.0;
 		
 		if(this.radiusAprox_aux) {
