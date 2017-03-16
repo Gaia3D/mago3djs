@@ -340,17 +340,19 @@ var NeoBuilding = function() {
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
-	this._buildingPosition;
-	this._buildingPositionHIGH;
-	this._buildingPositionLOW;
+	this._buildingPosition; // TODO: put this inside of a geoLocationData.***
+	this._buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
+	this._buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.bbox;
 	
-	this.move_matrix; // PositionMatrix (only rotations).***
-	this.move_matrix_inv; // Inverse of PositionMatrix.***
-	this.buildingPosMat_inv; // f4d matrix4.***
-	this.transfMat_inv; // cesium matrix4.***
-	this.f4dTransfMat; // f4d matrix4.***
-	this.f4dTransfMatInv; // f4d matrix4.***
+	this.move_matrix; // PositionMatrix (only rotations).*** // TODO: put this inside of a geoLocationData.***
+	this.move_matrix_inv; // Inverse of PositionMatrix.***   // TODO: put this inside of a geoLocationData.***
+	this.buildingPosMat_inv; // f4d matrix4.***              // TODO: put this inside of a geoLocationData.***
+	this.transfMat_inv; // cesium matrix4.***                // TODO: put this inside of a geoLocationData.***
+	this.f4dTransfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
+	this.f4dTransfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
+	
+	this.geoLocationDataAux; // there are positions and matrices.***
 	
 	// create the default blocks_lists.*****************************
 	this._blocksList_Container = new BlocksListsContainer();
@@ -479,7 +481,7 @@ NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absolute
 	if(this.buildingPosMat_inv == undefined)
 	{
 		this.buildingPosMat_inv = new Matrix4();
-		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
+		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv); // this is rotationMatrixInverse.***
 	}
 
 	this.point3d_scratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);

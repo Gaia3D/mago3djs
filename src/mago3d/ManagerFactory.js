@@ -8,10 +8,9 @@
  * @param containerId 뷰에서 표시할 위치 id
  * @param magoConfig mago3d 설정값 json object
  * @param blocksConfig block list 설정값 json object
- * @param viewType 0 = FullShip 모드, 1 = Deploy 모드
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig, viewType) {
+var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -241,6 +240,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig, vie
 		// 블락 및 부재 검색 api
 		search : function() {
 			
+		},
+		// 블락 및 부재 검색 api
+		renderMode : function(renderMode) {
+			magoManager.renderingModeTemp = renderMode;
 		},
 		// 선택 블락 highlighting
 		highlighting : function(blockId) {
