@@ -198,3 +198,20 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
 	}
 	return resultMat;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix 변수
+ * @param resultMat 변수
+ * @returns resultMat
+ */	
+Matrix4.prototype.copyFromMatrix4 = function(matrix) {
+	for(var i=0; i<16; i++)
+	{
+		this._floatArrays[i] = matrix._floatArrays[i];
+	}
+};
+
+
+
+

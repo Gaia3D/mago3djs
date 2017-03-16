@@ -419,7 +419,8 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  * @param eye_y 변수
  * @param eye_z 변수
  */
-Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) {
+Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, 
+																	cesium_boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) {
 	var visibleOctreesArray = [];
 	var sortedOctreesArray = [];
 	var distAux = 0.0;
@@ -435,23 +436,32 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
+	
+	if(squaredDistLod0 == undefined)
+		squaredDistLod0 = 300;
+	
+	if(squaredDistLod1 == undefined)
+		squaredDistLod1 = 2200;
+	
+	if(squaredDistLod2 == undefined)
+		squaredDistLod2 = 500000*1000;
 	  
 	for(var i=0; i<visibleOctrees_count; i++) {
-		if(visibleOctreesArray[i].squareDistToEye < 300) // 15x15 = 225
+		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) // 15x15 = 225
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		} else if(visibleOctreesArray[i].squareDistToEye < 2200) // 25x25 = 625
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod1) // 25x25 = 625
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		} else if(visibleOctreesArray[i].squareDistToEye < 500000) // 50x50 = 2500
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod2) // 50x50 = 2500
 		{
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
