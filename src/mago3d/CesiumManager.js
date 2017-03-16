@@ -358,7 +358,7 @@ CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
 	if(picking) {
 		//scene.magoManager.renderNeoBuildings(scene, isLastFrustum);
 	} else {
-		scene.magoManager.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum);
+		this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum);
 		//scene.magoManager.renderNeoBuildings(scene, isLastFrustum); // original.****
 		//scene.magoManager.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
