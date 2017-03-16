@@ -25,13 +25,13 @@ var Renderer = function() {
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -75,10 +75,10 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 		if(ssao_idx == 1)
 			gl.uniform1i(standardShader.hasTexture_loc, true); //.***	
 	} else{
-		gl.bindTexture(gl.TEXTURE_2D, f4d_manager.textureAux_1x1);
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	}
 	 
-	var geometryDataPath = f4d_manager.readerWriter.geometryDataPath;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	  
 	for(var j=0; j<neoRefLists_count; j++) {
 		var neoRefList = neoRefList_array[j];
@@ -89,7 +89,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 		if(myBlocksList == undefined) continue;
 		
 		if(myBlocksList.fileLoadState == 2) {
-			myBlocksList.parseArrayBuffer(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			myBlocksList.parseArrayBuffer(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -104,7 +104,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 
 		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+		if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 		{
 			/*
 			if(neoRefList._lodLevel == 1 || neoRefList._lodLevel == 2)
@@ -126,8 +126,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 		}
 
 		for(var k=0; k<visibleIndices_count; k++) {
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-//			if(f4d_manager.isCameraMoving && timeControlCounter == 0) {
+			//if(magoManager.isCameraMoving && isInterior && timeControlCounter == 0)
+//			if(magoManager.isCameraMoving && timeControlCounter == 0) {
 //				//if(j==4)return;
 //				
 //				//this.dateSC = new Date();
@@ -154,31 +154,31 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 			}
 			block = myBlocksList.getBlock(block_idx);
 			
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+			if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 			{
 				if(block != null) {
-					if(block.isSmallObj && f4d_manager.objectSelected != neoReference) continue;
+					if(block.isSmallObj && magoManager.objectSelected != neoReference) continue;
 				}
 			}
 
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
-				if(f4d_manager.backGround_fileReadings_count > 10) continue;
+				if(magoManager.backGround_fileReadings_count > 10) continue;
 				
 				// 1rst, check if the texture is loaded.***
 				var tex_id = neoBuilding.getTextureId(neoReference.texture);
 				if(tex_id == undefined) {
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
+					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
 					neoReference.texture.tex_id = tex_id;
 				}
 			}
 				
-			if(f4d_manager.objectSelected == neoReference) {
+			if(magoManager.objectSelected == neoReference) {
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
 				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			} else {
@@ -244,7 +244,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 				//if( ifc_entity==26 || ifc_entity==27 || ifc_entity==14)
 				//	continue;
 				
-				//if(f4d_manager.isCameraMoving && block.isSmallObj)
+				//if(magoManager.isCameraMoving && block.isSmallObj)
 				//	continue;
 				
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
@@ -344,13 +344,13 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender) {
+Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_array, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -394,10 +394,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 	if(renderTexture) {
 		if(ssao_idx == 1) gl.uniform1i(standardShader.hasTexture_loc, true); //.***	
 	} else {
-		gl.bindTexture(gl.TEXTURE_2D, f4d_manager.textureAux_1x1);
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	}
 	 
-	var geometryDataPath = f4d_manager.readerWriter.geometryDataPath;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	  
 	for(var j=0; j<neoRefLists_count; j++) {
 		var neoRefList = neoRefList_array[j];
@@ -408,8 +408,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		if(myBlocksList == undefined)
 			continue;
 		
-		if(myBlocksList.fileLoadState == 2 && !f4d_manager.isCameraMoving) {
-			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+		if(myBlocksList.fileLoadState == 2 && !magoManager.isCameraMoving) {
+			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -425,7 +425,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 
 		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-//		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+//		if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 //		{
 //			/*
 //			if(neoRefList._lodLevel == 1 || neoRefList._lodLevel == 2)
@@ -447,8 +447,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 //		}
 
 		for(var k=0; k<visibleIndices_count; k++) {
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-//			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
+			//if(magoManager.isCameraMoving && isInterior && timeControlCounter == 0)
+//			if(magoManager.isCameraMoving && timeControlCounter == 0)
 //			{
 //				//if(j==4)return;
 //				
@@ -536,31 +536,31 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				if(block.radius < maxSizeToRender) continue;
 			}
 			
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+			if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 			{
 				if(block != null) {
-					if(block.isSmallObj && f4d_manager.objectSelected != neoReference) continue;
+					if(block.isSmallObj && magoManager.objectSelected != neoReference) continue;
 				}
 			}
 
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
-				if(f4d_manager.backGround_fileReadings_count > 10) continue;
+				if(magoManager.backGround_fileReadings_count > 10) continue;
 				
 				// 1rst, check if the texture is loaded.***
 				var tex_id = neoBuilding.getTextureId(neoReference.texture);
 				if(tex_id == undefined) {
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
+					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
 					neoReference.texture.tex_id = tex_id;
 				}
 			}
 				
-			if(f4d_manager.objectSelected == neoReference) {
+			if(magoManager.objectSelected == neoReference) {
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
 				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			} else {
@@ -627,7 +627,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				//if( ifc_entity==26 || ifc_entity==27 || ifc_entity==14)
 				//	continue;
 				
-				//if(f4d_manager.isCameraMoving && block.isSmallObj)
+				//if(magoManager.isCameraMoving && block.isSmallObj)
 				//	continue;
 				
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
@@ -731,13 +731,13 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefList_array, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -779,10 +779,10 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 		if(ssao_idx == 1)
 			gl.uniform1i(standardShader.hasTexture_loc, true); //.***	
 	} else{
-		gl.bindTexture(gl.TEXTURE_2D, f4d_manager.textureAux_1x1);
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	}
 	 
-	var geometryDataPath = f4d_manager.readerWriter.geometryDataPath;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	  
 	for(var j=0; j<neoRefLists_count; j++) {
 		var neoRefList = neoRefList_array[j];
@@ -793,7 +793,7 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 		if(myBlocksList == undefined) continue;
 		
 		if(myBlocksList.fileLoadState == 2) {
-			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, f4d_manager.readerWriter);
+			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -808,7 +808,7 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 
 		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-//		if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+//		if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 //		{
 //			/*
 //			if(neoRefList._lodLevel == 1 || neoRefList._lodLevel == 2)
@@ -830,8 +830,8 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 //		}
 
 		for(var k=0; k<visibleIndices_count; k++) {
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-//			if(f4d_manager.isCameraMoving && timeControlCounter == 0)
+			//if(magoManager.isCameraMoving && isInterior && timeControlCounter == 0)
+//			if(magoManager.isCameraMoving && timeControlCounter == 0)
 //			{
 //				//if(j==4)return;
 //				
@@ -861,31 +861,31 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 			
 			if(block.radius < 0.3) continue;
 			
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding)
+			if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 			{
 				if(block != null) {
-					if(block.isSmallObj && f4d_manager.objectSelected != neoReference) continue;
+					if(block.isSmallObj && magoManager.objectSelected != neoReference) continue;
 				}
 			}
 
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
-				if(f4d_manager.backGround_fileReadings_count > 10) continue;
+				if(magoManager.backGround_fileReadings_count > 10) continue;
 				
 				// 1rst, check if the texture is loaded.***
 				var tex_id = neoBuilding.getTextureId(neoReference.texture);
 				if(tex_id == undefined) {
 					// Load the texture.***
 					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
+					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
 					neoReference.texture.tex_id = tex_id;
 				}
 			}
 				
-			if(f4d_manager.objectSelected == neoReference) {
+			if(magoManager.objectSelected == neoReference) {
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
 				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			} else {
@@ -951,7 +951,7 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 
 			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
 			if(block != null && block.lego != undefined) {
-				//if(f4d_manager.isCameraMoving && block.isSmallObj)
+				//if(magoManager.isCameraMoving && block.isSmallObj)
 				//	continue;
 				
 				//cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
@@ -1087,13 +1087,13 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_array, neoBuilding, f4d_manager, isInterior, standardShader, renderTexture, ssao_idx) {
+Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_array, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx) {
 	// render_neoRef
 	var neoRefLists_count = neoRefList_array.length;
 	if(neoRefLists_count == 0) return;
@@ -1132,8 +1132,8 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 		for(var k=0; k<visibleIndices_count; k++) {
-			//if(f4d_manager.isCameraMoving && isInterior && timeControlCounter == 0)
-//			if(f4d_manager.isCameraMoving && timeControlCounter == 0){
+			//if(magoManager.isCameraMoving && isInterior && timeControlCounter == 0)
+//			if(magoManager.isCameraMoving && timeControlCounter == 0){
 //			}
 			var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
 			//var neoReference = neoRefList.neoRefs_Array[k]; // TEST.***
@@ -1149,7 +1149,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 			block = myBlocksList.getBlock(block_idx);
 			
 			/*
-			if(f4d_manager.isCameraMoving)// && !isInterior && f4d_manager.isCameraInsideBuilding) {
+			if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding) {
 				if(block != null)
 				{
 					
@@ -1163,15 +1163,15 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 			// Check if the texture is loaded.********************************************************************************
 			/*
 			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
-				if(f4d_manager.backGround_fileReadings_count > 10) continue;
+				if(magoManager.backGround_fileReadings_count > 10) continue;
 				
 				// 1rst, check if the texture is loaded.***
 				var tex_id = neoBuilding.getTextureId(neoReference.texture);
 				if(tex_id == undefined) {
 					// Load the texture.***
 					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
-					f4d_manager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
-					f4d_manager.backGround_fileReadings_count ++;
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
+					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
 					neoReference.texture.tex_id = tex_id;
@@ -1285,7 +1285,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
@@ -1394,7 +1394,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
  * @param gl 변수
  * @param neoRefList_array 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param isInterior 변수
  * @param standardShader 변수
  * @param renderTexture 변수
@@ -1498,14 +1498,14 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param imageLod 변수
  * @param shader 변수
  */
-Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuilding, f4d_manager, imageLod, shader) {
+Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuilding, magoManager, imageLod, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var shadersManager = f4d_manager.shadersManager;
+	var shadersManager = magoManager.shadersManager;
 	
 	// check if has vbos.***
 	if(simpBuild.vbo_vicks_container._vbo_cacheKeysArray.length == 0) {
@@ -1514,7 +1514,7 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuildin
 	
 	if(imageLod == undefined) imageLod = 3; // The lowest lod.***
 	
-	//if(f4d_manager.isCameraMoving)
+	//if(magoManager.isCameraMoving)
 	//	imageLod = 3; // The lowest lod.***
 	var shaderProgram = shader.program;
 
@@ -1614,13 +1614,13 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuildin
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param shader 변수
  */
-Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(gl, neoBuilding, f4d_manager, shader) {
+Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(gl, neoBuilding, magoManager, shader) {
 	var simpBuild = neoBuilding.neoSimpleBuilding;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var shadersManager = f4d_manager.shadersManager;
+	var shadersManager = magoManager.shadersManager;
 	
 	// check if has vbos.***
 	if(simpBuild.vbo_vicks_container._vbo_cacheKeysArray.length == 0) {
@@ -1701,14 +1701,14 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(gl, neoBuilding
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param BR_Project 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param imageLod 변수
  * @param shader 변수
  */
-Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(gl, BR_Project, f4d_manager, imageLod, shader) {
+Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(gl, BR_Project, magoManager, imageLod, shader) {
 	var simpBuildV1 = BR_Project._simpleBuilding_v1;
 	//var simpObjs_count = simpBuildV1._simpleObjects_array.length;
-	var shadersManager = f4d_manager.shadersManager;
+	var shadersManager = magoManager.shadersManager;
 	
 	if(simpBuildV1._simpleObjects_array.length == 0) {
 		return;
@@ -1716,7 +1716,7 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(gl, BR_Project,
 	
 	if(imageLod == undefined) imageLod = 3; // The lowest lod.***
 	
-	//if(f4d_manager.isCameraMoving)
+	//if(magoManager.isCameraMoving)
 	//	imageLod = 3; // The lowest lod.***
 	var shaderProgram = shader.program;
 
@@ -1763,10 +1763,10 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(gl, BR_Project,
  * @param modelViewProjRelToEye_matrix 변수
  * @param encodedCamPosMC_High 변수
  * @param encodedCamPosMC_Low 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-Renderer.prototype.renderPCloudProject = function(gl, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, f4d_manager) {
-	var shadersManager = f4d_manager.shadersManager;
+Renderer.prototype.renderPCloudProject = function(gl, pCloudProject, modelViewProjRelToEye_matrix, encodedCamPosMC_High, encodedCamPosMC_Low, magoManager) {
+	var shadersManager = magoManager.shadersManager;
 	
 	//if(simpBuildV1._simpleObjects_array.length == 0)
 	//{
@@ -1799,7 +1799,7 @@ Renderer.prototype.renderPCloudProject = function(gl, pCloudProject, modelViewPr
 		
 		//this.dateSC = new Date();
 		//this.currentTimeSC = this.dateSC.getTime();
-		//f4d_manager.f4d_rendering_time += this.currentTimeSC - this.startTimeSC;
+		//magoManager.renderingTime += this.currentTimeSC - this.startTimeSC;
 //		}
 	}
 };
