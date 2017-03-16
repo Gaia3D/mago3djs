@@ -76,19 +76,19 @@ var PostFxShadersManager = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param source 변수
  * @param type 변수
  * @param typeString 변수
  * @returns shader
  */
-PostFxShadersManager.prototype.getShader = function(GL, source, type, typeString) {
+PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString) {
 	// Source from internet.***
-	var shader = GL.createShader(type);
-	GL.shaderSource(shader, source);
-	GL.compileShader(shader);
-	if (!GL.getShaderParameter(shader, GL.COMPILE_STATUS)) {
-		alert("ERROR IN "+typeString+ " SHADER : " + GL.getShaderInfoLog(shader));
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
 		return false;
 	}
 	return shader;
@@ -96,33 +96,33 @@ PostFxShadersManager.prototype.getShader = function(GL, source, type, typeString
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  */
-PostFxShadersManager.prototype.createDefaultShaders = function(GL) {
-	this.createRenderDepthShader(GL); // 0.***
-	this.createSsaoShader(GL); // 1.***
-	this.createBlurShader(GL); // 2.***
+PostFxShadersManager.prototype.createDefaultShaders = function(gl) {
+	this.createRenderDepthShader(gl); // 0.***
+	this.createSsaoShader(gl); // 1.***
+	this.createBlurShader(gl); // 2.***
 	
 	// Now, create shaders for modelReference geometries.****
-	this.createRenderDepthShaderModelRef(GL); // 3.***
-	this.createSsaoShaderModelRef(GL); // 4.***
-	//this.createBlurShader_ModelRef(GL); // 5.***
+	this.createRenderDepthShaderModelRef(gl); // 3.***
+	this.createSsaoShaderModelRef(gl); // 4.***
+	//this.createBlurShader_ModelRef(gl); // 5.***
 	
-	this.createColorSelectionShaderModelRef(GL);// 5.***
-	this.createSimpleDepthShaderModelRef(GL);// 6.***
+	this.createColorSelectionShaderModelRef(gl);// 5.***
+	this.createSimpleDepthShaderModelRef(gl);// 6.***
 	
-	this.createRenderDepthShaderLODBuilding(GL);// 7.***
-	this.createSsaoShaderLODBuilding(GL);// 8.***
+	this.createRenderDepthShaderLODBuilding(gl);// 7.***
+	this.createSsaoShaderLODBuilding(gl);// 8.***
 	
-	this.createRenderDepthShaderLego(GL);// 9.***
-	this.createSsaoShaderLego(GL);// 10.***
+	this.createRenderDepthShaderLego(gl);// 9.***
+	this.createSsaoShaderLego(gl);// 10.***
 	
-	//this.create_renderDepthShader_TEST_ModelRef(GL); // 5
+	//this.create_renderDepthShader_TEST_ModelRef(gl); // 5
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  */
 PostFxShadersManager.prototype.createBlurShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
@@ -218,7 +218,7 @@ PostFxShadersManager.prototype.createSsaoShader = function(gl) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  */
 PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
 	var shader = new PostFxShader(this.gl);

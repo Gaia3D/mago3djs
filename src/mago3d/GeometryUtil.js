@@ -2531,9 +2531,9 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 /**
  * 어떤 일을 하고 있습니까?
  * @param BR_Project 변수
- * @param f4dManager 변수
+ * @param magoManager 변수
  */
-TerranTile.prototype.parseFileNailImage = function(BR_Project, f4dManager) {
+TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
 	//BR_Project._f4d_nailImage_readed = true;
 
 	if(BR_Project._simpleBuilding_v1 == undefined)
@@ -2560,9 +2560,9 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param f4dManager 변수
+ * @param magoManager 변수
  */
-TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
+TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 	{
@@ -2598,7 +2598,7 @@ TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 		
 		this.parseFileHeader(this.current_BRProject_parsing);
 		this.parseFileSimpleBuilding(this.current_BRProject_parsing);
-		this.parseFileNailImage(this.current_BRProject_parsing, f4dManager);
+		this.parseFileNailImage(this.current_BRProject_parsing, magoManager);
 	}
 	this.fileParsingFinished = true;
 	this.fileArrayBuffer = null;
@@ -2606,10 +2606,10 @@ TerranTile.prototype.parseFileAllBuildings = function(f4dManager) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
- * @param f4dManager 변수
+ * @param gl 변수
+ * @param magoManager 변수
  */
-TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
+TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 	{
@@ -2640,27 +2640,20 @@ TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 	var BR_Project = this.current_BRProject_parsing;
 
 	// Read header, simpleBuilding, and the nailImage.***
-	if(this.current_BRProject_parsing_state == 0)
-	{
+	if(this.current_BRProject_parsing_state == 0) {
 		this.parseFileHeader(BR_Project);
 		this.current_BRProject_parsing_state=1;
-	}
-	else if(this.current_BRProject_parsing_state == 1)
-	{
-		if(f4dManager.backGround_imageReadings_count < 1)
-		{
-			this.parseFile_simpleBuilding_old(GL, BR_Project);
+	} else if(this.current_BRProject_parsing_state == 1) {
+		if(magoManager.backGround_imageReadings_count < 1) {
+			this.parseFile_simpleBuilding_old(gl, BR_Project);
 			this.current_BRProject_parsing_state=2;
 		}
-	}
-	else if(this.current_BRProject_parsing_state == 2)
-	{
-		if(f4dManager.backGround_imageReadings_count < 1)
-		{
-			this.parseFile_nailImage_old(GL, BR_Project, f4dManager);
+	} else if(this.current_BRProject_parsing_state == 2) {
+		if(magoManager.backGround_imageReadings_count < 1) {
+			this.parseFile_nailImage_old(gl, BR_Project, magoManager);
 			this.current_BRProject_parsing_state=0;
 			this.projectsParsed_count++;
-			f4dManager.backGround_imageReadings_count ++;
+			magoManager.backGround_imageReadings_count ++;
 		}
 	}
 };
@@ -2671,8 +2664,7 @@ TerranTile.prototype.parseFileOneBuilding = function(GL, f4dManager) {
 TerranTile.prototype.setDimensionsSubTiles = function() {
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
-	if(subTiles_count == 4)
-	{
+	if(subTiles_count == 4) {
 		var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
 		var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
 		
@@ -2688,8 +2680,7 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
 		subTile = this.subTiles_array[3];
 		subTile.setDimensions(this.longitude_min, lon_mid, lat_mid, this.latitude_max);
 		
-		for(var i=0; i<subTiles_count; i++)
-		{
+		for(var i=0; i<subTiles_count; i++) {
 			this.subTiles_array[i].setDimensionsSubTiles();
 		}
 	}
@@ -2701,17 +2692,13 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
  */
 TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
-	if(this.subTiles_array.length > 0)
-	{
-		for(var i=0; i<this.subTiles_array.length; i++)
-		{
+	if(this.subTiles_array.length > 0) {
+		for(var i=0; i<this.subTiles_array.length; i++) {
 			this.subTiles_array[i].visibilityType = this.visibilityType;
 			this.subTiles_array[i].getSmallestTiles(smallestTiles_array);
 		}
-	}
-	else{
-		if(!this.empty_tile.length)
-			smallestTiles_array.push(this);
+	} else {
+		if(!this.empty_tile.length) smallestTiles_array.push(this);
 	}
 };
 
@@ -2726,8 +2713,7 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
 	this.getIntersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
 	
 	var intersectedTiles_count = intersectedTiles_array.length;
-	for(var i=0; i<intersectedTiles_count; i++)
-	{
+	for(var i=0; i<intersectedTiles_count; i++) {
 		intersectedTiles_array[i].getSmallestTiles(intersectedSmallestTiles_array);
 	}
 	intersectedTiles_array.length = 0;
@@ -2741,11 +2727,9 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
  */
 TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
 	// Cesium dependency.***
-	if(this.position == undefined)
-		return;
+	if(this.position == undefined) return;
 	
-	if(boundingSphere_Aux == undefined)
-		boundingSphere_Aux = new Cesium.BoundingSphere();
+	if(boundingSphere_Aux == undefined) boundingSphere_Aux = new Cesium.BoundingSphere();
 	
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
@@ -2771,26 +2755,19 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 		intersectedPoints_count++;
 	*/
 	
-	if(this.visibilityType == Cesium.Intersect.OUTSIDE)
-	{
+	if(this.visibilityType == Cesium.Intersect.OUTSIDE) {
 		// OUTSIDE.***
 		// do nothing.***
-	}
-	else if(this.visibilityType == Cesium.Intersect.INSIDE)
-	{
+	} else if(this.visibilityType == Cesium.Intersect.INSIDE) {
 		// INSIDE.***
 		intersectedTiles_array.push(this);
-	}
-	else{
+	} else {
 		// INTERSECTED.***
-		if(this.subTiles_array.length > 0)
-		{
-			for(var i=0; i<this.subTiles_array.length; i++)
-			{
+		if(this.subTiles_array.length > 0) {
+			for(var i=0; i<this.subTiles_array.length; i++) {
 				this.subTiles_array[i].getIntersectedTiles(frustumVolume, intersectedTiles_array);
 			}
-		}
-		else{
+		} else {
 			intersectedTiles_array.push(this);
 		}
 	}

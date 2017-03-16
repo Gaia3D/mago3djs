@@ -1281,12 +1281,12 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
- * @param filePath_inServer 변수
+ * @param fileName 변수
  * @param neoBuilding 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getNeoHeader = function(gl, filePath_inServer, neoBuilding, readerWriter, magoManager) {
+ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING;
@@ -1396,10 +1396,10 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
  * @param imageArrayBuffer 변수
  * @param BR_Project 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, magoManager, imageLod) {
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
 	var urlCreator = window.URL || window.webkitURL;
@@ -1415,8 +1415,8 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffe
 		imageArrayBuffer = null;
 		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
 		
-		if(f4d_manager.backGround_imageReadings_count > 0) {
-			f4d_manager.backGround_imageReadings_count--;
+		if(magoManager.backGround_imageReadings_count > 0) {
+			magoManager.backGround_imageReadings_count--;
 		}
 	};
 	
@@ -1425,8 +1425,8 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffe
 		
 		//BR_Project._f4d_lod0Image_readed_finished = false;
 		//BR_Project._f4d_lod0Image_exists = false;
-		//if(f4d_manager.backGround_fileReadings_count > 0 )
-		//	  f4d_manager.backGround_fileReadings_count -=1;
+		//if(magoManager.backGround_fileReadings_count > 0 )
+		//	  magoManager.backGround_fileReadings_count -=1;
 		  
 		return;
 	};
@@ -1440,10 +1440,10 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffe
  * @param filePath_inServer 변수
  * @param BR_Project 변수
  * @param readerWriter 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  * @param imageLod 변수
  */
-ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, f4d_manager, imageLod) {
+ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, magoManager, imageLod) {
 	if(imageLod == undefined) imageLod = 3; // The lowest lod.***
 	
 	if(imageLod == 3) BR_Project._f4d_nailImage_readed = true;
@@ -1456,15 +1456,15 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
 	var simpleBuildingImage = new Image();
 	simpleBuildingImage.onload = function() { 
 	/*
-		if(f4d_manager.render_time > 20)// for the moment is a test.***
+		if(magoManager.render_time > 20)// for the moment is a test.***
 		{
 			if(imageLod == 3)
 				BR_Project._f4d_nailImage_readed = false;
 			else if(imageLod == 0)
 				BR_Project._f4d_lod0Image_readed  = false;
 			
-			if(f4d_manager.backGround_fileReadings_count > 0 )
-			  f4d_manager.backGround_fileReadings_count -=1;
+			if(magoManager.backGround_fileReadings_count > 0 )
+			  magoManager.backGround_fileReadings_count -=1;
 		  
 			return;
 		}
@@ -1480,14 +1480,14 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
 			BR_Project._f4d_lod0Image_readed_finished = true;
 		}
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};
 	
 	simpleBuildingImage.onerror = function() {
 		// doesn't exist or error loading
 		BR_Project._f4d_lod0Image_readed_finished = false;
 		BR_Project._f4d_lod0Image_exists = false;
-		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 		return;
     };
 	
@@ -1500,21 +1500,21 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
  * @param gl 변수
  * @param filePath_inServer 변수
  * @param f4dTex 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, f4d_manager) {
+ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, magoManager) {
 	f4dTex.loadStarted = true;
 	f4dTex.texImage = new Image();
 	f4dTex.texImage.onload = function() { 
 		f4dTex.loadFinished = true;
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};
 	
 	f4dTex.texImage.onerror = function() {
 		// doesn't exist or error loading
 		f4dTex.loadStarted = false;
-		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 		return;
     };
 
@@ -1527,9 +1527,9 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, f4d
  * @param filePath_inServer 변수
  * @param texture 변수
  * @param neoBuilding 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, f4d_manager) {
+ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) {
 	var neoRefImage = new Image();
 	neoRefImage.onload = function() { 
 		if(texture.tex_id == undefined) texture.tex_id = gl.createTexture();
@@ -1539,7 +1539,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 
 		neoBuilding.textures_loaded.push(texture);
 		
-		if(f4d_manager.backGround_fileReadings_count > 0 ) f4d_manager.backGround_fileReadings_count -=1;
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};
 	
 	neoRefImage.onerror = function() {
@@ -1708,9 +1708,9 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
  * @param height 변수
  * @param readerWriter 변수
  * @param NeoBuildingsList 변수
- * @param f4d_manager 변수
+ * @param magoManager 변수
  */
-ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, f4d_manager) {
+ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, magoManager) {
 	// This is a test function to read the new f4d format.***
 	// The location(latitude, longitude, height) is provisional.***
 	
@@ -1722,7 +1722,7 @@ ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude
 	
 	if(neoBuilding.octree == undefined) neoBuilding.octree = new Octree(undefined);
 	
-	readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, readerWriter, f4d_manager); // Here makes the tree of octree.***
+	readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, readerWriter, magoManager); // Here makes the tree of octree.***
 	
 	// 0) PositionMatrix.************************************************************************
 	//var height = elevation;
