@@ -8,5 +8,5 @@ CODE.fileLoadState = {
 	"LOADING" : 1,
 	"LOADING_FINISH" : 2,
 	"PARSE" : 3,
-	"FINISHED" : 4
+	"FINISH" : 4
 };

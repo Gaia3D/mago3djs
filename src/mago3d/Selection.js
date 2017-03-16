@@ -21,33 +21,33 @@ var Selection = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param GL 변수
+ * @param gl 변수
  * @param drawingBufferWidth 변수
  * @param drawingBufferHeight 변수
  */
-Selection.prototype.init = function(GL, drawingBufferWidth, drawingBufferHeight) {
+Selection.prototype.init = function(gl, drawingBufferWidth, drawingBufferHeight) {
 	// http://www.webglacademy.com/courses.php?courses=0|1|20|2|3|4|23|5|6|7|10#10
 	this.drawing_height = drawingBufferHeight;
 	this.drawing_width = drawingBufferWidth;
 	//this.lastCapturedColourMap = new Uint8Array(this.drawing_width * this.drawing_height * 4);
-	this.GAIA_selectFrameBuffer = GL.createFramebuffer();
-	GL.bindFramebuffer(GL.FRAMEBUFFER, this.GAIA_selectFrameBuffer);
+	this.GAIA_selectFrameBuffer = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, this.GAIA_selectFrameBuffer);
 	
-	this.GAIA_selectRenderBuffer = GL.createRenderbuffer();
-	GL.bindRenderbuffer(GL.RENDERBUFFER, this.GAIA_selectRenderBuffer);
-	GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16 , this.drawing_width, this.drawing_height);
+	this.GAIA_selectRenderBuffer = gl.createRenderbuffer();
+	gl.bindRenderbuffer(gl.RENDERBUFFER, this.GAIA_selectRenderBuffer);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16 , this.drawing_width, this.drawing_height);
 
-	this.GAIA_selectRttTexture = GL.createTexture();
-	GL.bindTexture(GL.TEXTURE_2D, this.GAIA_selectRttTexture);
-	GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-	GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-	GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, this.drawing_width, this.drawing_height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
+	this.GAIA_selectRttTexture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, this.GAIA_selectRttTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.drawing_width, this.drawing_height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 
-	GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, this.GAIA_selectRttTexture, 0);
-	GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, this.GAIA_selectRenderBuffer);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.GAIA_selectRttTexture, 0);
+	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.GAIA_selectRenderBuffer);
 	
 	// Finally...
-	GL.bindTexture(GL.TEXTURE_2D, null);
-	GL.bindRenderbuffer(GL.RENDERBUFFER, null);
-	GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };

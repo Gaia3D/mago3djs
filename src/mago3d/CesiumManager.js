@@ -357,11 +357,11 @@ CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
 	// cesium 새 버전에서 지원하지 않음
 	var picking = pass.pick;
 	if(picking) {
-		//scene.magoManager.renderNeoBuildings(scene, isLastFrustum);
+		//this.renderNeoBuildings(scene, isLastFrustum);
 	} else {
 		this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum);
-		//scene.magoManager.renderNeoBuildings(scene, isLastFrustum); // original.****
-		//scene.magoManager.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
+		//this.renderNeoBuildings(scene, isLastFrustum); // original.****
+		//this.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
 };
 
@@ -1102,7 +1102,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 	if(this.depthFboNeo == undefined) this.depthFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
 	
-//	var neoVisibleBuildings_array = [];
+//	var neoVisibleBuildingsArray = [];
 	
 	// do frustum culling.***
 	if(!this.isCameraMoving) {
@@ -1480,7 +1480,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(this.depthFboNeo == undefined) this.depthFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
 	
-//	var neoVisibleBuildings_array = [];
+//	var neoVisibleBuildingsArray = [];
 	
 	// do frustum culling.***
 	
@@ -1494,9 +1494,9 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.prepareNeoBuildingsAsimetricVersion(gl, scene);
 	}
 
-	if(this.bPicking == true) {
-		//this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
-	}
+//	if(this.bPicking == true) {
+//		//this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
+//	}
 	
 	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
 	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
@@ -1518,7 +1518,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	//Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array); 
 	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 
-	
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var buildingsCount;
 	var renderTexture = false;
@@ -1567,8 +1566,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(currentShader.normal3_loc != -1) gl.disableVertexAttribArray(currentShader.normal3_loc);
 	gl.disableVertexAttribArray(currentShader.position3_loc);
 	*/
-		
-
 //}
 };
 
@@ -2557,7 +2554,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				
 				if(lowestOctree.lego == undefined) {
 					lowestOctree.lego = new Lego();
-					lowestOctree.lego.fileLoadState = 0;
+					lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
 				}
 				
 				if(lowestOctree.legoDataArrayBuffer == undefined && lowestOctree.lego == undefined) continue;
@@ -2877,7 +2874,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 					if(lowestOctree.lego == undefined) {
 						if(lowestOctreeLegosParsingCount < 2000) {
 							lowestOctree.lego = new Lego();
-							lowestOctree.lego.fileLoadState = 2;
+							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
 							var bytesReaded = 0;
 							lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
 							lowestOctree.legoDataArrayBuffer = undefined;
@@ -2953,7 +2950,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 					if(lowestOctree.lego == undefined) {
 						if(lowestOctreeLegosParsingCount < 2000) {
 							lowestOctree.lego = new Lego();
-							lowestOctree.lego.fileLoadState = 2;
+							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
 							var bytesReaded = 0;
 							lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
 							lowestOctree.legoDataArrayBuffer = undefined;
@@ -3575,12 +3572,12 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
 /**
  * 어떤 일을 하고 있습니까?
  * @param frustumVolume 변수
- * @param neoVisibleBuildings_array 변수
+ * @param neoVisibleBuildingsArray 변수
  * @param cameraPosition 변수
- * @returns neoVisibleBuildings_array
+ * @returns neoVisibleBuildingsArray
  */
 CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
-	neoBuilding.metaData.fileLoadState = 0;
+	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
 	//neoBuilding._buildingPosition = undefined;
 	//neoBuilding._buildingPositionHIGH = undefined;
 	//neoBuilding._buildingPositionLOW = undefined;
@@ -3638,18 +3635,18 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 /**
  * 어떤 일을 하고 있습니까?
  * @param frustumVolume 변수
- * @param neoVisibleBuildings_array 변수
+ * @param neoVisibleBuildingsArray 변수
  * @param cameraPosition 변수
- * @returns neoVisibleBuildings_array
+ * @returns neoVisibleBuildingsArray
  */
-CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, neoVisibleBuildings_array, cameraPosition) {
+CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, neoVisibleBuildingsArray, cameraPosition) {
 	// This makes the visible buildings array.***
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
 	// Note: in this function, we do frustum culling and determine the detailedBuilding in same time.***
 	
 	// Init the visible buildings array.***
-	neoVisibleBuildings_array.length = 0;
+	neoVisibleBuildingsArray.length = 0;
 	
 	//this.min_squaredDist_to_see_detailed = 40000; // 200m.***
 	//this.min_squaredDist_to_see_LOD0 = 250000; // 600m.***
@@ -3678,8 +3675,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	
 	var maxNumberOfCalculatingPositions = 40;
 	var currentCalculatingPositionsCount = 0;
-	
-	
 	
 	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++) {
@@ -3739,17 +3734,13 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		
 		//this.renderingModeTemp = 0; // 0 = assembled mode. 1 = dispersed mode.***
 		
-		
 		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
-		
+		realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
 		
 		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
-		if(squaredDistToCamera > this.min_squaredDist_to_see) 
-		{
-			var gl = this.scene._context._gl;
-			this.deleteNeoBuilding(gl, neoBuilding);
+		if(squaredDistToCamera > this.min_squaredDist_to_see) {
+			this.deleteNeoBuilding(this.scene._context._gl, neoBuilding);
 			continue;
 		}
 		
@@ -3778,8 +3769,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
 			}
 		} else {
-			var gl = this.scene._context._gl;
-			this.deleteNeoBuilding(gl, neoBuilding);
+			this.deleteNeoBuilding(this.scene._context._gl, neoBuilding);
 		}
 	}
 	/*
@@ -3814,32 +3804,32 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 						if(last_squared_dist) {
 							if(squaredDistToCamera < last_squared_dist) {
 								last_squared_dist = squaredDistToCamera;
-								neoVisibleBuildings_array.push(this.detailed_neoBuilding);
+								neoVisibleBuildingsArray.push(this.detailed_neoBuilding);
 								this.detailed_neoBuilding = neoBuilding;
 							} else {
-									neoVisibleBuildings_array.push(neoBuilding);
+									neoVisibleBuildingsArray.push(neoBuilding);
 							}
 						} else {
 							last_squared_dist = squaredDistToCamera;
 							this.detailed_neoBuilding = neoBuilding;
-							//neoVisibleBuildings_array.push(neoBuilding);
+							//neoVisibleBuildingsArray.push(neoBuilding);
 						}
 					}
 				} else {
-					if(neoBuilding._header && neoBuilding._header.isSmall) neoVisibleBuildings_array.push(neoBuilding);
+					if(neoBuilding._header && neoBuilding._header.isSmall) neoVisibleBuildingsArray.push(neoBuilding);
 					else {
-						neoVisibleBuildings_array.push(neoBuilding);
+						neoVisibleBuildingsArray.push(neoBuilding);
 						//this.currentVisibleBuildings_LOD0_array.push(neoBuilding);
 					}
 				}
 				
 			} else {
-				neoVisibleBuildings_array.push(neoBuilding);
+				neoVisibleBuildingsArray.push(neoBuilding);
 			}
 		}
 	}
 	*/
-	return neoVisibleBuildings_array;
+	return neoVisibleBuildingsArray;
 };
 
 /**
