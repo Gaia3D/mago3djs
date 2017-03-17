@@ -2069,18 +2069,19 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 	return neoBuilding.currentRenderablesNeoRefLists;
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param scene 변수
- * @param result_neoRefLists_array 변수
+ * @param neoBuilding 변수
+ * @param visibleObjControlerOctrees 변수
+ * @param visibleObjControlerOctreesAux 변수
  * @returns result_neoRefLists_array
  */
 CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux) {
-	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
-	
 	if(neoBuilding == undefined) return;
+	
+	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
 	
 	if(neoBuilding.move_matrix == undefined) {
 		ManagerUtils.calculateBuildingPositionMatrix(neoBuilding);
@@ -2101,16 +2102,12 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		}
 		
 		var camera = scene.frameState.camera;
-		if(this.renderingModeTemp == 0)
-		{
+		if(this.renderingModeTemp == 0) {
 			this.myCameraSC = neoBuilding.getTransformedRelativeCameraToBuilding(camera, this.myCameraSC);
-		}
-		else{
-			if(neoBuilding.geoLocationDataAux)
-			{
+		} else {
+			if(neoBuilding.geoLocationDataAux) {
 				this.myCameraSC = neoBuilding.geoLocationDataAux.getTransformedRelativeCamera(camera, this.myCameraSC);
-			}
-			else{
+			} else {
 				this.myCameraSC = neoBuilding.getTransformedRelativeCameraToBuilding(camera, this.myCameraSC);
 			}
 		}
@@ -2125,15 +2122,15 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var squaredDistLod0 = 300;
 		var squaredDistLod1 = 2200;
 		var squaredDistLod2 = 500000*1000;
-		if(this.renderingModeTemp == 1)
-		{
+		if(this.renderingModeTemp == 1) {
 			squaredDistLod0 = 1000;
 			squaredDistLod1 = 6000;
 			squaredDistLod2 = 500000*1000;
 		}
-		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, 
-		this.boundingSphere_Aux, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z, squaredDistLod0, squaredDistLod1, squaredDistLod2);
 		
+		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, 
+																			this.boundingSphere_Aux, this.myCameraSC.position.x, this.myCameraSC.position.y, 
+																			this.myCameraSC.position.z, squaredDistLod0, squaredDistLod1, squaredDistLod2);
 		if(!find) {
 			//this.deleteNeoBuilding(gl, neoBuilding);
 			//neoBuilding.octree.deleteLod0GlObjects(gl);
@@ -2177,8 +2174,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
-					
-					
 				}
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2232,8 +2227,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
 						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-						
-						
 					}
 					// test
 					//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2273,8 +2266,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
-					
-					
 				}
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2285,7 +2276,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			if(refList == undefined)
 				continue;
 			
-			// 2 = file loading finished.***
 			if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED ) {
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
@@ -2314,8 +2304,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
 						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-						
-						
 					}
 					// test
 					//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2397,7 +2385,6 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition,
 		this.renderer.renderNeoRefLists(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 };
-
 
 /**
  * 어떤 일을 하고 있습니까?
