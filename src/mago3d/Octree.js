@@ -32,10 +32,10 @@ var Octree = function(octreeOwner) {
 	
     this.subOctrees_array = [];
     //this.compRefsListArray = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
-	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox.***
+	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox. normal mode.***
+	this.neoReferencesMotherAndIndices; // Asimetric mode.***
 	
 	// now, for legoStructure.***
-	this.legoDataArrayBuffer;
 	this.lego;
 };
 
@@ -788,3 +788,21 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	
 	return bytesReaded;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2140,7 +2140,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var geometryDataPath = this.readerWriter.geometryDataPath;
 		var buildingFolderName = neoBuilding.buildingFileName;
 		var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-//			var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
+		//  var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
 	
 		var lowestOctree;
 		//buildingRotationMatrix = new Matrix4();
@@ -2174,6 +2174,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
+
 				}
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2204,7 +2205,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
-					refList.dataArraybuffer = null;
+					refList.dataArraybuffer = undefined;
 					if(this.matrix4SC) {
 						refList.multiplyReferencesMatrices(this.matrix4SC);
 					}
@@ -2227,6 +2228,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
 						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
+
 					}
 					// test
 					//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2621,7 +2623,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
 				}
 				
-				if(lowestOctree.legoDataArrayBuffer == undefined && lowestOctree.lego == undefined) continue;
+				if(lowestOctree.lego == undefined && lowestOctree.lego.dataArrayBuffer == undefined) continue;
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
@@ -2641,8 +2643,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.lego.fileLoadState == 2 && !this.isCameraMoving) {
 					if(lowestOctreeLegosParsingCount < 100) {
 						var bytesReaded = 0;
-						lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
-						lowestOctree.legoDataArrayBuffer = undefined;
+						lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.lego.dataArrayBuffer, bytesReaded);
+						lowestOctree.lego.dataArrayBuffer = undefined;
 						lowestOctreeLegosParsingCount++;
 					} 
 					continue;

@@ -12,6 +12,7 @@ var Lego = function() {
 	//this.dataArraybuffer; // binary data.***
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
+	this.dataArrayBuffer;
 };
 
 Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded) {
