@@ -362,6 +362,7 @@ CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
 		isLastFrustum = true;
 		this.isLastFrustum = true;
 	}
+	
 	// cesium 새 버전에서 지원하지 않음
 	var picking = pass.pick;
 	if(picking) {
@@ -1199,8 +1200,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 			this.getRenderablesDetailedNeoBuilding(gl, scene, neoBuilding , this.currentRenderables_neoRefLists_array);
 		}
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 		this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 	}
 	
@@ -1234,8 +1235,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
 		if(neoBuilding.lod2Building) {
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 			this.renderLodBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
 		}
 	}
@@ -1341,8 +1342,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 	for(var i=0; i<buildingsCount; i++) {
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 		this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 	}
 	
@@ -1396,8 +1397,8 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles1[i];
 		if(neoBuilding.lod2Building) {
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 			this.renderLodBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.lod2Building);
 		}
 	}
@@ -1510,8 +1511,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	//cameraPosition = null;
 	
 	// 1) The depth render.***************************************************************************************************
-	// 1) The depth render.***************************************************************************************************
-	// 1) The depth render.***************************************************************************************************
 	this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1528,15 +1527,13 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for(var i=0; i<buildingsCount; i++) {
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding ,this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux);
+			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux);
 		}
 	}
 	
 	this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
 	this.depthFboNeo.unbind();
 	
-	// 2) ssao render.************************************************************************************************************
-	// 2) ssao render.************************************************************************************************************
 	// 2) ssao render.************************************************************************************************************
 	scene._context._currentFramebuffer._bind();
 	if(this.noiseTexture == undefined) this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels);
@@ -1639,8 +1636,8 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
 		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 		
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding.buildingPositionHIGH);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding.buildingPositionLOW);
 
 		var ssao_idx = -1; // selection code.***
 		//ssao_idx = 1; // test.***
@@ -1736,8 +1733,8 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(gl, cameraPosition, 
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 	
-	gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding._buildingPositionHIGH);
-	gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding._buildingPositionLOW);
+	gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding.buildingPositionHIGH);
+	gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding.buildingPositionLOW);
 	  
 	gl.uniform1f(currentShader.far_loc, current_frustum_far); 
 
@@ -2072,18 +2069,19 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 	return neoBuilding.currentRenderablesNeoRefLists;
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param scene 변수
- * @param result_neoRefLists_array 변수
+ * @param neoBuilding 변수
+ * @param visibleObjControlerOctrees 변수
+ * @param visibleObjControlerOctreesAux 변수
  * @returns result_neoRefLists_array
  */
 CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux) {
-	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
-	
 	if(neoBuilding == undefined) return;
+	
+	neoBuilding.currentRenderablesNeoRefLists.length = 0; // Init.***
 	
 	if(neoBuilding.move_matrix == undefined) {
 		ManagerUtils.calculateBuildingPositionMatrix(neoBuilding);
@@ -2104,16 +2102,12 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		}
 		
 		var camera = scene.frameState.camera;
-		if(this.renderingModeTemp == 0)
-		{
+		if(this.renderingModeTemp == 0) {
 			this.myCameraSC = neoBuilding.getTransformedRelativeCameraToBuilding(camera, this.myCameraSC);
-		}
-		else{
-			if(neoBuilding.geoLocationDataAux)
-			{
+		} else {
+			if(neoBuilding.geoLocationDataAux) {
 				this.myCameraSC = neoBuilding.geoLocationDataAux.getTransformedRelativeCamera(camera, this.myCameraSC);
-			}
-			else{
+			} else {
 				this.myCameraSC = neoBuilding.getTransformedRelativeCameraToBuilding(camera, this.myCameraSC);
 			}
 		}
@@ -2128,15 +2122,15 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var squaredDistLod0 = 300;
 		var squaredDistLod1 = 2200;
 		var squaredDistLod2 = 500000*1000;
-		if(this.renderingModeTemp == 1)
-		{
+		if(this.renderingModeTemp == 1) {
 			squaredDistLod0 = 1000;
 			squaredDistLod1 = 6000;
 			squaredDistLod2 = 500000*1000;
 		}
-		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, 
-		this.boundingSphere_Aux, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z, squaredDistLod0, squaredDistLod1, squaredDistLod2);
 		
+		var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	myCullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux, 
+																			this.boundingSphere_Aux, this.myCameraSC.position.x, this.myCameraSC.position.y, 
+																			this.myCameraSC.position.z, squaredDistLod0, squaredDistLod1, squaredDistLod2);
 		if(!find) {
 			//this.deleteNeoBuilding(gl, neoBuilding);
 			//neoBuilding.octree.deleteLod0GlObjects(gl);
@@ -2180,8 +2174,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
-					
-					
 				}
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2235,8 +2227,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
 						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-						
-						
 					}
 					// test
 					//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2276,8 +2266,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					
 					var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 					this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, neoReferencesList, this);
-					
-					
 				}
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2288,7 +2276,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			if(refList == undefined)
 				continue;
 			
-			// 2 = file loading finished.***
 			if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED ) {
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
@@ -2317,8 +2304,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 	
 						var filePathInServer = geometryDataPath + "/" + buildingFolderName + "/" + "Blocks";
 						this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-						
-						
 					}
 					// test
 					//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -2400,7 +2385,6 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition,
 		this.renderer.renderNeoRefLists(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 };
-
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -2538,8 +2522,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				}
 				else{
 					if(neoBuilding.geoLocationDataAux)
@@ -2550,13 +2534,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					else{
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 				if(i == 0)
 					minSize = 0.0;
@@ -2580,8 +2564,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				}
 				else{
 					if(neoBuilding.geoLocationDataAux)
@@ -2592,13 +2576,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					else{
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 				if(i == 0)
 					minSize = 1.0;
@@ -2665,8 +2649,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				}
 				if(this.renderingModeTemp == 0) {
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				} else {
 					if(neoBuilding.geoLocationDataAux) {
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
@@ -2674,13 +2658,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
 					} else {
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				
 				this.renderer.renderLodBuilding(gl, lowestOctree.lego, this, currentShader, ssao_idx);
 				
@@ -2759,8 +2743,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				}
 				else{
 					if(neoBuilding.geoLocationDataAux)
@@ -2771,13 +2755,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					else{
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 				if(i == 0)
 					minSize = 0.0;
@@ -2800,8 +2784,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				}
 				else{
 					if(neoBuilding.geoLocationDataAux)
@@ -2812,13 +2796,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					else{
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
 				if(i == 0)
 					minSize = 1.0;
@@ -2876,8 +2860,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				}
 				else{
 					if(neoBuilding.geoLocationDataAux)
@@ -2888,13 +2872,13 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					else{
 						gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 				if(lowestOctree.lego == undefined) {
 					continue;
@@ -3018,8 +3002,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 				if(neoBuilding.octree == undefined) continue;
 	
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				
 				this.lowestOctreeArray.length = 0;
 				if(neoBuilding.preExtractedLowestOctreesArray.length == 0)
@@ -3096,8 +3080,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 				if(neoBuilding.octree == undefined) continue;
 			
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				
 				this.lowestOctreeArray.length = 0;
 				if(neoBuilding.preExtractedLowestOctreesArray.length == 0) neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(neoBuilding.preExtractedLowestOctreesArray);
@@ -3740,20 +3724,19 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
  */
 CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
-	//neoBuilding._buildingPosition = undefined;
-	//neoBuilding._buildingPositionHIGH = undefined;
-	//neoBuilding._buildingPositionLOW = undefined;
+	//neoBuilding.buildingPosition = undefined;
+	//neoBuilding.buildingPositionHIGH = undefined;
+	//neoBuilding.buildingPositionLOW = undefined;
 	
 	//neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
 	//neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
 	//neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
 	//neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
-	//neoBuilding.f4dTransfMat = undefined; // f4d matrix4.***
-	//neoBuilding.f4dTransfMatInv = undefined; // f4d matrix4.***
+	//neoBuilding.transfMat = undefined; // f4d matrix4.***
+	//neoBuilding.transfMatInv = undefined; // f4d matrix4.***
 	
 	// create the default blocks_lists.*****************************
-	if(neoBuilding._blocksList_Container && neoBuilding._blocksList_Container.blocksListsArray.length > 0) 
-	{
+	if(neoBuilding._blocksList_Container && neoBuilding._blocksList_Container.blocksListsArray.length > 0) {
 		neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
 		neoBuilding._blocksList_Container.blocksListsArray[0] = undefined;
 		neoBuilding._blocksList_Container.blocksListsArray = undefined;
@@ -3795,7 +3778,7 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
  * @param frustumVolume 변수
  * @param neoVisibleBuildingsArray 변수
  * @param cameraPosition 변수
@@ -3837,13 +3820,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	
 	var maxNumberOfCalculatingPositions = 40;
 	var currentCalculatingPositionsCount = 0;
-	
 	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++) {
 		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		
 		// 1) check if there are cartesian position.***
-		if(neoBuilding._buildingPosition == undefined) {
+		if(neoBuilding.buildingPosition == undefined) {
 			// check if there are the metadata. if exist metadata try to calculate the position.***
 			// we must fix the max number of this calculation to preserve smoothing rendering.***
 			if(currentCalculatingPositionsCount < maxNumberOfCalculatingPositions) {
@@ -3857,7 +3839,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					if(longitude != undefined && latitude != undefined && altitude != undefined ) {
 						var position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude); 
 						//var position = absolutePosition;
-						neoBuilding._buildingPosition = position; 
+						neoBuilding.buildingPosition = position; 
 						
 						// High and Low values of the position.****************************************************
 						var splitValue = Cesium.EncodedCartesian3.encode(position); // no works!.***
@@ -3865,8 +3847,8 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 						var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 						var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 						
-						neoBuilding._buildingPositionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
-						neoBuilding._buildingPositionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
+						neoBuilding.buildingPositionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
+						neoBuilding.buildingPositionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
 						
 						currentCalculatingPositionsCount += 1;
 					}
@@ -3881,19 +3863,17 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 		
 		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-		var realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
+		var realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
 		
 		// calculate realPosition of the building.****************************************************************************
 		if(this.renderingModeTemp == 1) // 0 = assembled mode. 1 = dispersed mode.***
 		{
-			if(neoBuilding.geoLocationDataAux == undefined)
-			{
+			if(neoBuilding.geoLocationDataAux == undefined) {
 				var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
 				var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 				// must calculate the realBuildingPosition (bbox_center_position).***
 				
-				if(newLocation)
-				{
+				if(newLocation) {
 					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, neoBuilding.geoLocationDataAux);
 					
 					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
@@ -3905,32 +3885,26 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					//Cesium.Matrix4.inverse(neoBuilding.geoLocationDataAux.rotMatrix._floatArrays, neoBuilding.geoLocationDataAux.rotMatrixInv._floatArrays);
 					
 					realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-				}
-				else{
+				} else {
 					// use the normal data.***
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
+					realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
 				}
-			}
-			else
-			{
+			} else {
 				//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				//this.pointSC.set(0.0, 0.0, 50.0);
 				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 			}
-		}
-		else
-		{
+		} else {
 			this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
+			realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
 		}
 		// end calculating realPosition of the building.------------------------------------------------------------------------
 		
-		if(realBuildingPos == undefined)
-			continue;
+		if(realBuildingPos == undefined) continue;
 		
-		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition); // original.****
+		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding.buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
 		if(squaredDistToCamera > this.min_squaredDist_to_see) {
 			this.deleteNeoBuilding(this.scene._context._gl, neoBuilding);
@@ -3965,17 +3939,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
 			}
 		} else {
-
-			var gl = this.scene._context._gl;
-			if(this.renderingModeTemp == 0)
-			{
-				this.deleteNeoBuilding(gl, neoBuilding);
-			}
-			else{
-				if(this.frustumIdx == 0)
-				{
-					//this.deleteNeoBuilding(gl, neoBuilding);
-				}
+			if(this.renderingModeTemp == 0) {
+				this.deleteNeoBuilding(this.scene._context._gl, neoBuilding);
+			} else {
+//				if(this.frustumIdx == 0) {
+//					//this.deleteNeoBuilding(gl, neoBuilding);
+//				}
 			}
 		}
 	}
@@ -3984,14 +3953,14 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	for(var i=0; i<neoBuildings_count; i++) {
 		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		
-		if(neoBuilding._buildingPosition == undefined) {
+		if(neoBuilding.buildingPosition == undefined) {
 			continue;
 		}
 		
-		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition);
+		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding.buildingPosition);
 		if(squaredDistToCamera > this.min_squaredDist_to_see) continue;
 		
-		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding._buildingPosition);
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(neoBuilding.buildingPosition);
 		this.radiusAprox_aux = 1000.0;
 		
 		if(this.radiusAprox_aux) {
@@ -4134,12 +4103,12 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 		buildings_count = this.terranTileSC._BR_buildingsArray.length;
 		for(var j=0; j<buildings_count; j++) {
 			BR_Project = this.detailedVisibleTiles_array[i]._BR_buildingsArray[j];
-			if(BR_Project._buildingPosition == undefined) {
+			if(BR_Project.buildingPosition == undefined) {
 				this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 				continue;
 			}
 			
-			squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
+			squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project.buildingPosition);
 			if(squaredDistToCamera < this.min_squaredDist_to_see_detailed) {
 				
 				// Activate this in the future, when all f4d_projects unified.***
@@ -4164,14 +4133,14 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 				}
 			} else if(squaredDistToCamera < this.min_squaredDist_to_see_LOD0) {
 				if(need_frustumCulling) {
-					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 					if(need_frustumCulling && frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE) {
 						this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 					}
 				} else this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 			} else {
 				if(need_frustumCulling) {
-					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 					if(need_frustumCulling && frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE) {
 						visibleBuildings_array.push(BR_Project);
 					}
@@ -4206,22 +4175,22 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 		buildings_count = this.terranTileSC._BR_buildingsArray.length;
 		for(var j=0; j<buildings_count; j++) {
 			BR_Project = this.LOD0VisibleTiles_array[i]._BR_buildingsArray[j];
-			if(BR_Project._buildingPosition == undefined) {
+			if(BR_Project.buildingPosition == undefined) {
 				visibleBuildings_array.push(BR_Project);
 				continue;
 			}
 			
-			squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
+			squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project.buildingPosition);
 			if(squaredDistToCamera < this.min_squaredDist_to_see_LOD0) {
 				if(need_frustumCulling) {
-					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 					if(frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE) {
 						this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 					}
 				} else this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 			} else {
 				if(need_frustumCulling) {
-					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+					this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 					if(frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE) {
 						visibleBuildings_array.push(BR_Project);
 					}
@@ -4255,15 +4224,15 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 		buildings_count = this.terranTileSC._BR_buildingsArray.length;
 		for(var j=0; j<buildings_count; j++) {
 			BR_Project = this.filteredVisibleTiles_array[i]._BR_buildingsArray[j];
-			if(BR_Project._buildingPosition == undefined) {
+			if(BR_Project.buildingPosition == undefined) {
 				visibleBuildings_array.push(BR_Project);
 				continue;
 			} else {
-				squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project._buildingPosition);
+				squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, BR_Project.buildingPosition);
 				if(BR_Project._header.isSmall) {
 					if(squaredDistToCamera < this.min_squaredDist_to_see_smallBuildings) {
 						if(need_frustumCulling) {
-							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 							if(frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 							visibleBuildings_array.push(BR_Project);
 						} else visibleBuildings_array.push(BR_Project);
@@ -4272,14 +4241,14 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 					// Provisionally check for LODzero distance.***
 					if(squaredDistToCamera < this.min_squaredDist_to_see_LOD0) {
 						if(need_frustumCulling) {
-							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 							if(frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE) {
 								this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 							}
 						} else this.currentVisibleBuildings_LOD0_array.push(BR_Project);
 					} else {
 						if(need_frustumCulling) {
-							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project._buildingPosition);
+							this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(BR_Project.buildingPosition);
 							if(frustumVolume.computeVisibility(this.boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 								visibleBuildings_array.push(BR_Project);
 						} else visibleBuildings_array.push(BR_Project);

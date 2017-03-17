@@ -1890,9 +1890,9 @@ var BRBuildingProject = function() {
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
 	this.buildingPosMat_inv;
-	this._buildingPosition;
-	this._buildingPositionHIGH;
-	this._buildingPositionLOW;
+	this.buildingPosition;
+	this.buildingPositionHIGH;
+	this.buildingPositionLOW;
 	  
 	// Blocks data.***************************************************************
 	this._blocksList_Container = new BlocksListsContainer();
@@ -1988,7 +1988,7 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
  */ 
 BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this._buildingPosition;
+	var buildingPosition = this.buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
@@ -2455,7 +2455,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	//var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);  // Original.***
 	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height); 
 	
-	BR_Project._buildingPosition = position; 
+	BR_Project.buildingPosition = position; 
 	
 	// High and Low values of the position.****************************************************
 	var splitValue = Cesium.EncodedCartesian3.encode(position);
@@ -2463,15 +2463,15 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
 	
-	BR_Project._buildingPositionHIGH = new Float32Array(3);
-	BR_Project._buildingPositionHIGH[0] = splitVelue_X.high;
-	BR_Project._buildingPositionHIGH[1] = splitVelue_Y.high;
-	BR_Project._buildingPositionHIGH[2] = splitVelue_Z.high;
+	BR_Project.buildingPositionHIGH = new Float32Array(3);
+	BR_Project.buildingPositionHIGH[0] = splitVelue_X.high;
+	BR_Project.buildingPositionHIGH[1] = splitVelue_Y.high;
+	BR_Project.buildingPositionHIGH[2] = splitVelue_Z.high;
 	
-	BR_Project._buildingPositionLOW = new Float32Array(3);
-	BR_Project._buildingPositionLOW[0] = splitVelue_X.low;
-	BR_Project._buildingPositionLOW[1] = splitVelue_Y.low;
-	BR_Project._buildingPositionLOW[2] = splitVelue_Z.low;
+	BR_Project.buildingPositionLOW = new Float32Array(3);
+	BR_Project.buildingPositionLOW[0] = splitVelue_X.low;
+	BR_Project.buildingPositionLOW[1] = splitVelue_Y.low;
+	BR_Project.buildingPositionLOW[2] = splitVelue_Z.low;
 	
 	this.fileBytesReaded = bytes_readed;
 };
