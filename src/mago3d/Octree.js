@@ -115,12 +115,11 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
 		this.neoRefsList_Array.legnth = 0;
 	}
 	
-	for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
-		this.subOctrees_array[i].deleteLod0GlObjects(gl);
+	if(this.subOctrees_array != undefined) {
+		for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
+			this.subOctrees_array[i].deleteLod0GlObjects(gl);
+		}
 	}
-	
-	//this.subOctrees_array = undefined;
-	//this.neoRefsList_Array = undefined; 
 };
 
 /**
@@ -128,21 +127,19 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
  * @param treeDepth 변수
  */
 Octree.prototype.setRenderedFalseToAllReferences = function() {
-
 	if(this.neoRefsList_Array) {
-		var neoRefListsCount = this.neoRefsList_Array.length;
-		for(var i=0; i<neoRefListsCount; i++) {
+		for(var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) {
 			if(this.neoRefsList_Array[i]) {
 				this.neoRefsList_Array[i].setRenderedFalseToAllReferences();
 			}
 		}
 	}
 	
-	var subOctreesCount = this.subOctrees_array.length;
-	for(var i=0; i<subOctreesCount; i++) {
-		this.subOctrees_array[i].setRenderedFalseToAllReferences();
+	if(this.subOctrees_array != undefined) {
+		for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
+			this.subOctrees_array[i].setRenderedFalseToAllReferences();
+		}
 	}
-
 };
 
 /**
@@ -182,11 +179,9 @@ Octree.prototype.getNumberOfDigits = function(intNumber) {
  * 어떤 일을 하고 있습니까?
  */
 Octree.prototype.getMotherOctree = function() {
-	if(this.octree_owner == undefined) {
-		return this;
-	} else {
-		return this.octree_owner.getMotherOctree();
-	}
+	if(this.octree_owner == undefined) return this;
+	
+	return this.octree_owner.getMotherOctree();
 };
 
 /**
@@ -216,9 +211,7 @@ Octree.prototype.getOctree = function(octreeNumberName, numDigits) {
  */
 Octree.prototype.getOctreeByNumberName = function(octreeNumberName) {
 	var motherOctree = this.getMotherOctree();
-	  
 	var numDigits = this.getNumberOfDigits(octreeNumberName);
-	  
 	if(numDigits == 1) {
 		if(octreeNumberName == 0) return motherOctree;
 		else return motherOctree.subOctrees_array[octreeNumberName-1];
@@ -323,7 +316,7 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray) {
 	if(result_CRefListsArray == undefined) result_CRefListsArray = [];
   
 	if(this.subOctrees_array.length > 0) {
-		for(var i=0; i<this.subOctrees_array.length; i++) {
+		for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
 		}
 	} else {
@@ -409,7 +402,6 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 	
 	// Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
-	  
 	for(var i=0; i<visibleOctrees_count; i++) {
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
 		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
@@ -444,38 +436,32 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 	
 	// Now, we must sort the subOctrees near->far from eye.***
 	var visibleOctrees_count = visibleOctreesArray.length;
-	  
 	for(var i=0; i<visibleOctrees_count; i++) {
 		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);	
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 	
-	if(squaredDistLod0 == undefined)
-		squaredDistLod0 = 300;
+	if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
+	if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
+	if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
 	
-	if(squaredDistLod1 == undefined)
-		squaredDistLod1 = 2200;
-	
-	if(squaredDistLod2 == undefined)
-		squaredDistLod2 = 500000*1000;
-	  
 	for(var i=0; i<visibleOctrees_count; i++) {
-		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) // 15x15 = 225
-		{
+		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) {
+			// 15x15 = 225
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod1) // 25x25 = 625
-		{
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod1) {
+			// 25x25 = 625
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
-		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod2) // 50x50 = 2500
-		{
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod2) {
+			// 50x50 = 2500
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
 				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
@@ -523,10 +509,6 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-    if(this.octree_level == 3) {
-	    var hola = 0;
-    }
-  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) {
 		//result_octreesArray.push(this);
@@ -537,7 +519,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 			//if(this.triPolyhedronsCount > 0)
 			result_octreesArray.push(this);
 		}  else {
-			for(var i=0; i<this.subOctrees_array.length; i++ ) {
+			for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -575,10 +557,6 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 	    cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
     }
   
-//    if(this.octree_level == 3) {
-//	    var hola = 0;
-//    }
-  
     var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
 	if(frustumCull == Cesium.Intersect.INSIDE ) {
 		//result_octreesArray.push(this);
@@ -589,7 +567,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 			//if(this.triPolyhedronsCount > 0)
 			result_octreesArray.push(this);
 		} else {
-			for(var i=0; i<this.subOctrees_array.length; i++ ) {
+			for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
@@ -631,14 +609,13 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 		if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) {
 			result_octreesArray.push(this);
 		} else {
-			for(var i=0; i<this.subOctrees_array.length; i++ ) {
+			for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) {
 				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
 			}
 		}
 	}
 	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
 };
-  
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -706,7 +683,7 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) {
 	if(result_octreesArray == undefined) result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
-		for(var i=0; i<this.subOctrees_array.length; i++) {
+		for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getAllSubOctreesIfHasRefLists(result_octreesArray);
 		}
 	} else {
@@ -723,7 +700,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray) {
 	if(result_octreesArray == undefined) result_octreesArray = [];
 	  
 	if(this.subOctrees_array.length > 0) {
-		for(var i=0; i<this.subOctrees_array.length; i++) {
+		for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) {
 			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
 		}
 	} else {
