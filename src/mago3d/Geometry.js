@@ -192,7 +192,8 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 
 // F4D ReferenceObject.************************************************************************************************************************* // 
 /**
- * 어떤 일을 하고 있습니까?
+ * 맵 이미지. 머티리얼에는 텍스처에 대한 참조가 포함될 수 있으므로 머티리얼의 셰이더는 객체의 표면색을 계산하는 동안 텍스처를 사용할 수 있습니다. 
+ * 오브제의 표면의 기본 색상 (알베도) 외에도 텍스쳐는 반사율이나 거칠기와 같은 재질 표면의 많은 다른면을 나타낼 수 있습니다.
  * @class Texture
  */
 var Texture = function() {
@@ -340,17 +341,17 @@ var NeoBuilding = function() {
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
-	this._buildingPosition;     // TODO: put this inside of a geoLocationData.***
-	this._buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
-	this._buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
+	this.buildingPosition;     // TODO: put this inside of a geoLocationData.***
+	this.buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
+	this.buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.bbox;
 	
 	this.move_matrix; // PositionMatrix (only rotations).*** // TODO: put this inside of a geoLocationData.***
 	this.move_matrix_inv; // Inverse of PositionMatrix.***   // TODO: put this inside of a geoLocationData.***
 	this.buildingPosMat_inv; // f4d matrix4.***              // TODO: put this inside of a geoLocationData.***
 	this.transfMat_inv; // cesium matrix4.***                // TODO: put this inside of a geoLocationData.***
-	this.f4dTransfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
-	this.f4dTransfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
+	this.transfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
+	this.transfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
 	
 	this.geoLocationDataAux; // there are positions and matrices.***
 	
@@ -452,7 +453,7 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
  */
 NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this._buildingPosition;
+	var buildingPosition = this.buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
@@ -477,10 +478,9 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  */
 NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absoluteCamera, resultCamera) {
 	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this._buildingPosition;
+	var buildingPosition = this.buildingPosition;
 	
-	if(this.buildingPosMat_inv == undefined)
-	{
+	if(this.buildingPosMat_inv == undefined) {
 		this.buildingPosMat_inv = new Matrix4();
 		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv); // this is rotationMatrixInverse.***
 	}

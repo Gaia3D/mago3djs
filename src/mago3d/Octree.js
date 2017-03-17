@@ -80,26 +80,22 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	
 	// delete the blocksList.***
 	if(this.neoRefsList_Array != undefined) {
-		var neoRefListsCount = this.neoRefsList_Array.length;
-		for(var i=0; i<neoRefListsCount; i++) {
+		for(var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) {
 			if(this.neoRefsList_Array[i]) {
 				this.neoRefsList_Array[i].deleteGlObjects(gl);
 			}
 			this.neoRefsList_Array[i] = undefined;
 		}
-		this.neoRefsList_Array.length = 0;
+		this.neoRefsList_Array = undefined; 
 	}
 	
 	if(this.subOctrees_array != undefined) {
-		var subOctreesCount = this.subOctrees_array.length;
-		for(var i=0; i<subOctreesCount; i++) {
+		for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
 			this.subOctrees_array[i].deleteGlObjects(gl);
 			this.subOctrees_array[i] = undefined;
 		}
+		this.subOctrees_array = undefined;
 	}
-	
-	this.subOctrees_array = undefined;
-	this.neoRefsList_Array = undefined; 
 };
 
 /**
@@ -110,8 +106,7 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
 
 	// delete the blocksList.***
 	if(this.neoRefsList_Array) {
-		var neoRefListsCount = this.neoRefsList_Array.length;
-		for(var i=0; i<neoRefListsCount; i++) {
+		for(var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) {
 			if(this.neoRefsList_Array[i]) {
 				this.neoRefsList_Array[i].deleteGlObjects(gl);
 			}
@@ -120,8 +115,7 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
 		this.neoRefsList_Array.legnth = 0;
 	}
 	
-	var subOctreesCount = this.subOctrees_array.length;
-	for(var i=0; i<subOctreesCount; i++) {
+	for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
 		this.subOctrees_array[i].deleteLod0GlObjects(gl);
 	}
 	
