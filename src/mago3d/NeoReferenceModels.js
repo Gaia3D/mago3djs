@@ -252,7 +252,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y,
  * @param f4dReadWriter 변수
  */
 NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, f4dReadWriter) {
-	this.fileLoadState = CODE.fileLoadState.PARSE;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	
 	var startBuff;
 	var endBuff;
@@ -438,7 +438,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, f4dRead
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
 	ocCullBox.setSizesSubBoxes();
 	
-	this.fileLoadState = CODE.fileLoadState.FINISH;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 // F4D References list container ********************************************************************************************************** // 

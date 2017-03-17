@@ -980,33 +980,25 @@ CesiumManager.prototype.prepareNeoBuildings = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
- * @param image 변수
- * @param texture
  */
-CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, scene) {
+CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl) {
 	
 	// for all renderables, prepare data.***
 	var neoBuilding;
-	var metaData;
-	var neoBuilding_header_path = "";
-	var buildingFolderName = "";
 	var geometryDataPath = this.readerWriter.geometryDataPath;
-	
 	var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 	for(var i=0; i<buildingsCount; i++) {
 		neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 		
 		// check if this building is ready to render.***
 		if(!neoBuilding.allFilesLoaded) {
-			buildingFolderName = neoBuilding.buildingFileName;
-			
 			// 1) The buildings metaData.*************************************************************************************
-			metaData = neoBuilding.metaData;
+			var metaData = neoBuilding.metaData;
 			if(metaData.fileLoadState == CODE.fileLoadState.READY) {
 				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
-					neoBuilding_header_path = geometryDataPath + "/" + buildingFolderName + "/HeaderAsimetric.hed";
-					this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuilding_header_path, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+					var neoBuildingHeaderPath = geometryDataPath + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+					this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 					continue;
 				}
 			}
@@ -1459,14 +1451,13 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
  * @param isLastFrustum 변수
  */
 CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLastFrustum) {
-	var gl = scene.context._gl;
-	var cameraPosition = scene.context._us._cameraPosition;
-//	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
-	if(this.renderingModeTemp == 0)
-	{
+	if(this.renderingModeTemp == 0) {
 		if(!isLastFrustum) return;
 	}
 	
+	var gl = scene.context._gl;
+	var cameraPosition = scene.context._us._cameraPosition;
+//	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
 	if(this.textureAux_1x1 == undefined) {
 		this.textureAux_1x1 = gl.createTexture();
 		// Test wait for texture to load.********************************************
@@ -1482,15 +1473,12 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 //	var neoVisibleBuildingsArray = [];
 	
 	// do frustum culling.***
-	
 	if(!this.isCameraMoving) {
-		
 		var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
-		
 		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
-		this.prepareNeoBuildingsAsimetricVersion(gl, scene);
+		this.prepareNeoBuildingsAsimetricVersion(gl);
 	}
 
 //	if(this.bPicking == true) {
@@ -1518,10 +1506,8 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
-	var buildingsCount;
 	var renderTexture = false;
 	//cameraPosition = null;
-	var neoBuilding;
 	
 	// 1) The depth render.***************************************************************************************************
 	// 1) The depth render.***************************************************************************************************
@@ -1539,14 +1525,14 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.visibleObjControlerOctrees.initArrays(); // init.******
 		this.visibleObjControlerOctreesAux.initArrays(); // init.******
 		
-		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
+		var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for(var i=0; i<buildingsCount; i++) {
-			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
+			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding ,this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux);
 		}
 	}
-	this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
 	
+	this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
 	this.depthFboNeo.unbind();
 	
 	// 2) ssao render.************************************************************************************************************
@@ -2011,7 +1997,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 			// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
 			refList = this.intNeoRefList_array[i];
 			// 2 = file loading finished.***
-			if(refList.fileLoadState == 2 ) {
+			if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
@@ -2022,7 +2008,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		  
 					refListsParsingCount += 1;
 				}
-			} else if(refList.fileLoadState == 4 ) {
+			} else if(refList.fileLoadState == CODE.fileLoadState.PARSE_FINISHED) {
 				// 4 = parsed.***
 				// now, check if the blocksList is loaded & parsed.***
 				var blocksList = refList.blocksList;
@@ -2044,7 +2030,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		}
 	}
 	
-	
 	// Exterior and "bone" neoReferences.***************************
 	// Before "updateCurrentVisibleIndicesInterior", must check if the refList has parsed the arrayBuffer data.***
 	//buildingRotationMatrix = new Matrix4();
@@ -2053,7 +2038,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 	var extNeoRefsCount = neoBuilding._neoRefLists_Container.neoRefsLists_Array.length;
 	for(var i=0; i<extNeoRefsCount; i++) {
 		refList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[i];
-		if(refList.fileLoadState == 2 ) {
+		if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 			// 2 = file loading finished.***
 			if(refListsParsingCount < maxRefListParsingCount) {
 				// must parse the arraybuffer data.***
@@ -2066,7 +2051,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 				refListsParsingCount += 1;
 			}
 		}
-		//else if(refList.fileLoadState == 4 )
+		//else if(refList.fileLoadState == CODE.fileLoadState.PARSE_FINISHED)
 		//{
 		//	refList.updateCurrentVisibleIndicesInterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 		//	result_neoRefLists_array.push(refList); // GET INTERIORS.****
@@ -2223,7 +2208,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				continue;
 			
 			// 2 = file loading finished.***
-			if(refList.fileLoadState == 2 ) {
+			if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
@@ -2237,7 +2222,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 						
-			} else if(refList.fileLoadState == 4 ) {
+			} else if(refList.fileLoadState == CODE.fileLoadState.PARSE_FINISHED ) {
 				// 4 = parsed.***
 				// now, check if the blocksList is loaded & parsed.***
 				var blocksList = refList.blocksList;
@@ -2304,7 +2289,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				continue;
 			
 			// 2 = file loading finished.***
-			if(refList.fileLoadState == 2 ) {
+			if(refList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED ) {
 				if(refListsParsingCount < maxRefListParsingCount) {
 					// must parse the arraybuffer data.***
 					refList.parseArrayBuffer(gl, refList.dataArraybuffer, this.readerWriter);
@@ -2319,7 +2304,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 						
-			} else if(refList.fileLoadState == 4 ) {
+			} else if(refList.fileLoadState == CODE.fileLoadState.PARSE_FINISHED) {
 				// 4 = parsed.***
 				// now, check if the blocksList is loaded & parsed.***
 				var blocksList = refList.blocksList;
@@ -3051,7 +3036,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 					if(lowestOctree.lego == undefined) {
 						if(lowestOctreeLegosParsingCount < 2000) {
 							lowestOctree.lego = new Lego();
-							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 							var bytesReaded = 0;
 							lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
 							lowestOctree.legoDataArrayBuffer = undefined;
@@ -3127,7 +3112,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
 					if(lowestOctree.lego == undefined) {
 						if(lowestOctreeLegosParsingCount < 2000) {
 							lowestOctree.lego = new Lego();
-							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+							lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 							var bytesReaded = 0;
 							lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.legoDataArrayBuffer, bytesReaded);
 							lowestOctree.legoDataArrayBuffer = undefined;
@@ -3156,7 +3141,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion_OLD = function(gl
  */
 CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, shader, renderTexture, ssao_idx, lodBuilding) {
 	// file loaded but not parsed.***
-	if(lodBuilding.fileLoadState == 2) {
+	if(lodBuilding.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 		lodBuilding.parseArrayBuffer(gl, this.readerWriter);
 	}
 	

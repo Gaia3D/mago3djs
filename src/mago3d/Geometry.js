@@ -269,9 +269,9 @@ var LodBuilding = function() {
 };
  
 LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
-	if(this.fileLoadState == 2)// file loaded.***
+	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
 	{
-		this.fileLoadState = CODE.fileLoadState.PARSE;
+		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 		var bytesReaded = 0;
 		
 		// 1rst, read bbox.***
@@ -324,7 +324,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 //			// TODO:
 //		}
 		
-		this.fileLoadState = CODE.fileLoadState.FINISH;
+		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}	
  };
 

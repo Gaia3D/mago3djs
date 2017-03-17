@@ -15,9 +15,9 @@ var Lego = function() {
 };
 
 Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded) {
-	if(this.fileLoadState == 2) {
+	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 		// file loaded.***
-		this.fileLoadState = CODE.fileLoadState.PARSE;
+		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 		
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
@@ -69,7 +69,7 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 //		if(hasTexCoord) {
 //		}
 		
-		this.fileLoadState = CODE.fileLoadState.FINISH;
+		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}
 	
 	return bytesReaded;

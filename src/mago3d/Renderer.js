@@ -88,13 +88,13 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 		
 		if(myBlocksList == undefined) continue;
 		
-		if(myBlocksList.fileLoadState == 2) {
+		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 			myBlocksList.parseArrayBuffer(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
 		
-		if(myBlocksList.fileLoadState != 4) continue;
+		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 		
 		//if(!isInterior && neoRefList.name == "Ref_Bone")
 		//	continue;
@@ -408,13 +408,13 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 		if(myBlocksList == undefined)
 			continue;
 		
-		if(myBlocksList.fileLoadState == 2 && !magoManager.isCameraMoving) {
+		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) {
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
 		
-		if(myBlocksList.fileLoadState != 4) continue;
+		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 		
 		//if(!isInterior && neoRefList.name == "Ref_Bone")
 		//	continue;
@@ -799,13 +799,13 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 		
 		if(myBlocksList == undefined) continue;
 		
-		if(myBlocksList.fileLoadState == 2) {
+		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
 		
-		if(myBlocksList.fileLoadState != 4) continue;
+		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 		
 		//if(!isInterior && neoRefList.name == "Ref_Bone")
 		//	continue;
