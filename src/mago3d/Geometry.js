@@ -28,7 +28,7 @@ var MetaData = function() {
 	this.oct_max_z = 0.0;
 	
 	this.isSmall = false;
-	this.fileLoadState = 0; // 0 = no started to load. 1 = started loading. 2 = finished loading.***
+	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
 /**
@@ -265,13 +265,13 @@ var LodBuilding = function() {
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
-	this.fileLoadState = 0;
+	this.fileLoadState = CODE.fileLoadState.READY;
 };
  
 LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 	if(this.fileLoadState == 2)// file loaded.***
 	{
-		this.fileLoadState = 3;// 3 = parsing started.***
+		this.fileLoadState = CODE.fileLoadState.PARSE;
 		var bytesReaded = 0;
 		
 		// 1rst, read bbox.***
@@ -324,7 +324,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 //			// TODO:
 //		}
 		
-		this.fileLoadState = 4; // 4 = parsing finished.***
+		this.fileLoadState = CODE.fileLoadState.FINISH;
 	}	
  };
 

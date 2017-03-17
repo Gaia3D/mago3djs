@@ -37,10 +37,8 @@ OcclusionCullingOctreeCell.prototype.newSubBox = function() {
  * 어떤 일을 하고 있습니까?
  */
 OcclusionCullingOctreeCell.prototype.create8SubBoxes = function() {
-	this._subBoxesArray.length = 0; // reset the array.***
-	
-	for(var i=0; i<8; i++)
-	{
+	this._subBoxesArray.length = 0;	
+	for(var i=0; i<8; i++) {
 		this.newSubBox();
 	}
 };
@@ -78,8 +76,7 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 	// |          |          |     |          |          |       -----------------> X
 	// |----------|----------|     |----------|----------|  
 	
-	if(this._subBoxesArray.length > 0)
-	{
+	if(this._subBoxesArray.length > 0) {
 		var half_x= (this.maxX + this.minX)/2.0;
 		var half_y= (this.maxY + this.minY)/2.0;
 		var half_z= (this.maxZ + this.minZ)/2.0;
@@ -94,8 +91,7 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
 		this._subBoxesArray[6].setDimensions(half_x, this.maxX,   half_y, this.maxY,   half_z, this.maxZ);
 		this._subBoxesArray[7].setDimensions(this.minX, half_x,   half_y, this.maxY,   half_z, this.maxZ);
 		
-		for(var i=0; i<this._subBoxesArray.length; i++)
-		{
+		for(var i=0; i<this._subBoxesArray.length; i++) {
 			this._subBoxesArray[i].setSizesSubBoxes();
 		}
 	}
@@ -110,13 +106,9 @@ OcclusionCullingOctreeCell.prototype.setSizesSubBoxes = function() {
  */
 OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z) {
 	var intersects = false;
-	
-	if(x>this.minX && x<this.maxX)
-	{
-		if(y>this.minY && y<this.maxY)
-		{
-			if(z>this.minZ && z<this.maxZ)
-			{
+	if(x>this.minX && x<this.maxX) {
+		if(y>this.minY && y<this.maxY) {
+			if(z>this.minZ && z<this.maxZ) {
 				intersects = true;
 			}
 		}
@@ -133,54 +125,40 @@ OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z) {
  * @returns intersectedSubBox
  */
 OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z) {
-	var intersectedSubBox = null;
-	
-	if(this._ocCulling_Cell_owner == null)
-	{
+	if(this._ocCulling_Cell_owner == null) {
 		// This is the mother_cell.***
-		if(!this.intersectsWithPoint3D(x, y, z))
-		{
+		if(!this.intersectsWithPoint3D(x, y, z)) {
 			return null;
 		}
 	}
 	
+	var intersectedSubBox = null;
 	var subBoxes_count = this._subBoxesArray.length;
-	if(subBoxes_count > 0)
-	{
+	if(subBoxes_count > 0) {
 		var center_x = (this.minX + this.maxX)/2.0;
 		var center_y = (this.minY + this.maxY)/2.0;
 		var center_z = (this.minZ + this.maxZ)/2.0;
 		
 		var intersectedSubBox_aux = null;
 		var intersectedSubBox_idx;
-		
-		if(x<center_x)
-		{
+		if(x<center_x) {
 			// Here are the boxes number 0, 3, 4, 7.***
-			if(y<center_y)
-			{
+			if(y<center_y) {
 				// Here are 0, 4.***
 				if(z<center_z) intersectedSubBox_idx = 0;
 				else intersectedSubBox_idx = 4;
-			}
-			else
-			{
+			} else {
 				// Here are 3, 7.***
 				if(z<center_z) intersectedSubBox_idx = 3;
 				else intersectedSubBox_idx = 7;
 			}
-		}
-		else 
-		{
+		} else {
 			// Here are the boxes number 1, 2, 5, 6.***
-			if(y<center_y)
-			{
+			if(y<center_y) {
 				// Here are 1, 5.***
 				if(z<center_z) intersectedSubBox_idx = 1;
 				else intersectedSubBox_idx = 5;
-			}
-			else
-			{
+			} else {
 				// Here are 2, 6.***
 				if(z<center_z) intersectedSubBox_idx = 2;
 				else intersectedSubBox_idx = 6;
@@ -190,9 +168,7 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 		intersectedSubBox_aux = this._subBoxesArray[intersectedSubBox_idx];
 		intersectedSubBox = intersectedSubBox_aux.getIntersectedSubBoxByPoint3D(x, y, z);
 		
-	}
-	else
-	{
+	} else {
 		intersectedSubBox = this;
 	}
 	
@@ -210,8 +186,7 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray) {
 	var intersectedSubBox = this.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
 	
-	if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
-	{
+	if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0) {
 		result_visibleIndicesArray = intersectedSubBox._indicesArray;
 	}
 	
@@ -243,8 +218,7 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 	// Important note: this is the version of neoGeometry.***
 	// Important note: this is the version of neoGeometry.***
 	var is_mother_cell = f4dReaderWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-	if(is_mother_cell)
-	{
+	if(is_mother_cell) {
 		// read the mother dimensions.***
 		var minX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var maxX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -255,31 +229,23 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		
 		this.setDimensions(minX, maxX, minY, maxY, minZ, maxZ);
 	}
-	else{
-		// do nothing.***
-	}
 	
 	var subBoxes_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
-	if(subBoxes_count == 0)
-	{
+	if(subBoxes_count == 0) {
 		var objects_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		for(var i=0; i<objects_count; i++)
-		{
+		for(var i=0; i<objects_count; i++) {
 			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			this._indicesArray.push(objects_idxInList);
 		}
-	}
-	else{
-		for(var i=0; i<subBoxes_count; i++)
-		{
+	} else {
+		for(var i=0; i<subBoxes_count; i++) {
 			var subOcclusionBox = this.newSubBox();
 			bytes_readed = subOcclusionBox.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReaderWriter);
 		}
 	}
 	
 	return bytes_readed;
-	
 };
 	
 /**
@@ -293,5 +259,4 @@ var OcclusionCullingOctree = function() {
 	
 	this._ocCulling_box = new OcclusionCullingOctreeCell(null);
 	this._infinite_ocCulling_box = new OcclusionCullingOctreeCell(null);
-	
 };

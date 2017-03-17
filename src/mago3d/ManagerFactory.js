@@ -241,6 +241,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		search : function() {
 			
 		},
+		// 블락 및 부재 검색 api
+		renderMode : function(renderMode) {
+			magoManager.renderingModeTemp = renderMode;
+		},
 		// 선택 블락 highlighting
 		highlighting : function(blockId) {
 			

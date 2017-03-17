@@ -16,7 +16,6 @@ var BoundingBox = function() {
 	this.maxX = -1000000.0; 
 	this.maxY = -1000000.0;
 	this.maxZ = -1000000.0;
-  
 };
 
 /**
