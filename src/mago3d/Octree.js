@@ -133,6 +133,28 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
+Octree.prototype.setRenderedFalseToAllReferences = function() {
+
+	if(this.neoRefsList_Array) {
+		var neoRefListsCount = this.neoRefsList_Array.length;
+		for(var i=0; i<neoRefListsCount; i++) {
+			if(this.neoRefsList_Array[i]) {
+				this.neoRefsList_Array[i].setRenderedFalseToAllReferences();
+			}
+		}
+	}
+	
+	var subOctreesCount = this.subOctrees_array.length;
+	for(var i=0; i<subOctreesCount; i++) {
+		this.subOctrees_array[i].setRenderedFalseToAllReferences();
+	}
+
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
 Octree.prototype.makeTree = function(treeDepth) {
 	if(this.octree_level < treeDepth) {
 		for(var i=0; i<8; i++) {

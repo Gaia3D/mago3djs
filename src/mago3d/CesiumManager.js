@@ -2133,6 +2133,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			}
 		}
 		
+		//this.myCameraSC.near = 0.1;
+		//this.myCameraSC.far = 500000;
 		var myCullingVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
 		
 		// get frustumCulled lowestOctrees classified by distances.************************************************************************************
@@ -2521,7 +2523,18 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
 
 			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-
+			/*
+			var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+			for(var i=0; i<lowestOctreesCount; i++) {
+				lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+				lowestOctree.setRenderedFalseToAllReferences();
+			}
+			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+			for(var i=0; i<lowestOctreesCount; i++) {
+				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+				lowestOctree.setRenderedFalseToAllReferences();
+			}
+			*/
 			// renderDepth for all buildings.***
 			// 1) LOD 0.*********************************************************************************************************************
 			var minSize = 0.0;
@@ -2732,7 +2745,19 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***		
 			gl.activeTexture(gl.TEXTURE1);            
 			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture); 
-				
+			/*
+			var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+			for(var i=0; i<lowestOctreesCount; i++) {
+				lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+				lowestOctree.setRenderedFalseToAllReferences();
+			}
+			
+			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
+			for(var i=0; i<lowestOctreesCount; i++) {
+				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
+				lowestOctree.setRenderedFalseToAllReferences();
+			}
+			*/
 			//renderTexture = true;
 			// 1) LOD 0.*********************************************************************************************************************
 			var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;

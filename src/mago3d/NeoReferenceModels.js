@@ -36,6 +36,9 @@ var NeoReference = function() {
 	
 	// 8) movement of the object.***
 	this.moveVector; // Point3D.***
+	
+	// 9) check for render.***
+	this.bRendered = false;
 };
 
 /**
@@ -83,6 +86,8 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 	
 	// 8) movement of the object.***
 	this.moveVector = undefined; // Point3D.***
+	
+	this.bRendered = undefined;
 };
 
 // F4D References list.************************************************************************************************************************* // 
@@ -120,6 +125,36 @@ NeoReferencesList.prototype.newNeoReference = function() {
 	var neoRef = new NeoReference();
 	this.neoRefs_Array.push(neoRef);
 	return neoRef;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns neoRef
+ */
+NeoReferencesList.prototype.setRenderedFalseToAllReferences = function() {
+	var neoRefs_count = this.neoRefs_Array.length;
+	for(var i=0; i<neoRefs_count; i++)
+	{
+		var neoRef = this.neoRefs_Array[i];
+		neoRef.bRendered = false;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns neoRef
+ */
+NeoReferencesList.prototype.setRenderedTrueToReferencesWithId = function(id) {
+	var neoRefs_count = this.neoRefs_Array.length;
+	for(var i=0; i<neoRefs_count; i++)
+	{
+		var neoRef = this.neoRefs_Array[i];
+		if(neoRef._id == id)
+		{
+			neoRef.bRendered = true;
+			return;
+		}
+	}
 };
 
 /**

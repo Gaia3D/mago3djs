@@ -340,7 +340,7 @@ var NeoBuilding = function() {
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
-	this._buildingPosition; // TODO: put this inside of a geoLocationData.***
+	this._buildingPosition;     // TODO: put this inside of a geoLocationData.***
 	this._buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
 	this._buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.bbox;
