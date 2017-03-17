@@ -469,6 +469,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 				continue;
 			}
 			
+			//if(neoReference.bRendered)
+			//	continue;
+			
+			
+			
 			block_idx = neoReference._block_idx;
 				
 			if(block_idx >= myBlocksList.blocksArray.length) {
@@ -715,6 +720,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoRefList_a
 					gl.drawElements(gl.TRIANGLES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 					//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 				}
+				
+				//neoReference.bRendered = true;
 			}
 			//timeControlCounter++;
 			//if(timeControlCounter > 20)
