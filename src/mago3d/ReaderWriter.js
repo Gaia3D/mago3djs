@@ -589,7 +589,7 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(arrayBuffer, neoSimpleBu
  */
 ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -597,7 +597,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				blocksList.dataArraybuffer = arrayBuffer;
-				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 				blocksList.fileLoadState = 500;
@@ -625,7 +625,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
  */
 ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) {
 //	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -633,7 +633,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
-				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 				blocksList.fileLoadState = 500;
@@ -659,7 +659,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
  */
 ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoRefsList.fileLoadState = CODE.fileLoadState.LOADING;
+	neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -667,7 +667,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				neoRefsList.dataArraybuffer = arrayBuffer;
-				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 				neoRefsList.fileLoadState = 500;
@@ -692,7 +692,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
  */
 ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING;
+	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -702,7 +702,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 				if(lowestOctree.lego)
 				{
 					lowestOctree.legoDataArrayBuffer = arrayBuffer;
-					lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+					lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				}
 				else{
 					lowestOctree = undefined;
@@ -731,7 +731,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
  */
 ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuilding, magoManager) {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lodBuilding.fileLoadState = CODE.fileLoadState.LOADING;
+	lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -739,7 +739,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuildin
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				lodBuilding.dataArraybuffer = arrayBuffer;
-				lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 				lodBuilding.fileLoadState = 500;
@@ -772,7 +772,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuildin
 ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_container, neoReferenceList_name, lodLevel, blocksList, 
 															transformMat, neoBuilding, readerWriter, subOctreeNumberName, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -807,7 +807,7 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 				    	neoRefsList.multiplyReferencesMatrices(transformMat);
 				    }
 			    }
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -834,7 +834,7 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBuilding, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -842,7 +842,7 @@ ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBu
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.readNeoSimpleBuilding(arrayBuffer, neoSimpleBuilding );
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -938,7 +938,7 @@ ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_i
 ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, readerWriter) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -953,7 +953,7 @@ ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, re
 				terranTile.calculatePositionByLonLatSubTiles();
 				terranTile.terranIndexFile_readed = true;
 
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -979,7 +979,7 @@ ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, re
  */
 ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsList, readerWriter) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1014,7 +1014,7 @@ ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsLi
 					//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
 					//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
 				}
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -1041,7 +1041,7 @@ ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsLi
  */
 ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWriter, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	pCloud._f4d_header_readed = true;
 	var oReq = new XMLHttpRequest();
@@ -1140,7 +1140,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
 				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 			  
 				pCloud._f4d_header_readed_finished = true;
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -1167,7 +1167,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  */
 ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter, neoBuildingsList) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1175,7 +1175,7 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter,
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -1289,7 +1289,7 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING;
+	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1311,7 +1311,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 				neoBuilding.octree.makeTree(3);
 				neoBuilding.octree.setSizesSubBoxes();
 
-				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				//if(magoManager.backGround_fileReadings_count > 0 )
 				//    magoManager.backGround_fileReadings_count -= 1; // old.***
 				//BR_Project._f4d_header_readed_finished = true;
@@ -1343,7 +1343,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING;
+	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1368,7 +1368,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
 				neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 				
-				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			  
 			    //BR_Project._f4d_header_readed_finished = true;
 				arrayBuffer = undefined;
@@ -1573,7 +1573,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	terranTile.fileReading_started = true;
 //	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1586,7 +1586,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 				terranTile.fileReading_finished = true;
 				
 				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				arrayBuffer = null;
 			} else {
 //				blocksList.fileLoadState = 500;
@@ -1613,7 +1613,7 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 	pCloud._f4d_geometry_readed = true;
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
@@ -1678,7 +1678,7 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 					}
 				}
 			
-//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+//				blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 			  
 				pCloud._f4d_geometry_readed_finished = true;
