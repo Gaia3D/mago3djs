@@ -69,8 +69,7 @@ BlocksList.prototype.getBlock = function(idx) {
 BlocksList.prototype.deleteGlObjects = function(gl) {
 	if(this.blocksArray == undefined) return;
 	
-	var blocksCount = this.blocksArray.length;
-	for(var i=0; i<blocksCount; i++) {
+	for(var i=0, blocksCount = this.blocksArray.length; i<blocksCount; i++) {
 		var block = this.blocksArray[i];
 		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
 		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
@@ -97,7 +96,7 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
  * @returns block
  */
 BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
-	this.fileLoadState = CODE.fileLoadState.PARSE;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
@@ -223,7 +222,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			*/
 		}
 	}
-	this.fileLoadState = CODE.fileLoadState.FINISH;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 /**
@@ -232,7 +231,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
  * @returns block
  */
 BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer, readWriter) {
-	this.fileLoadState = CODE.fileLoadState.PARSE;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
@@ -329,7 +328,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		// in asimetricVersion must load the block's lego.***
 		if(block.lego == undefined) block.lego = new Lego();
 		
-		block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISH;
+		block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
 		
 		// provisionally delete lego.***
@@ -337,7 +336,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		block.lego.vbo_vicks_container = undefined;
 		block.lego = undefined;
 	}
-	this.fileLoadState = CODE.fileLoadState.FINISH;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 /**
