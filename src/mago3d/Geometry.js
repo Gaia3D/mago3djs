@@ -367,6 +367,7 @@ var NeoBuilding = function() {
 	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = [];
 	this.preExtractedLowestOctreesArray = [];
+	this.motherNeoReferencesArray = []; // asimetric mode.***
 	
 	// Textures loaded.***************************************************
 	this.textures_loaded = [];
