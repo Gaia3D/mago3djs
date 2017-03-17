@@ -3770,7 +3770,7 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
  * @param frustumVolume 변수
  * @param neoVisibleBuildingsArray 변수
  * @param cameraPosition 변수
@@ -3812,7 +3812,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	
 	var maxNumberOfCalculatingPositions = 40;
 	var currentCalculatingPositionsCount = 0;
-	
 	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<neoBuildings_count; i++) {
 		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
@@ -3861,14 +3860,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		// calculate realPosition of the building.****************************************************************************
 		if(this.renderingModeTemp == 1) // 0 = assembled mode. 1 = dispersed mode.***
 		{
-			if(neoBuilding.geoLocationDataAux == undefined)
-			{
+			if(neoBuilding.geoLocationDataAux == undefined) {
 				var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
 				var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 				// must calculate the realBuildingPosition (bbox_center_position).***
 				
-				if(newLocation)
-				{
+				if(newLocation) {
 					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, neoBuilding.geoLocationDataAux);
 					
 					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
@@ -3880,30 +3877,24 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					//Cesium.Matrix4.inverse(neoBuilding.geoLocationDataAux.rotMatrix._floatArrays, neoBuilding.geoLocationDataAux.rotMatrixInv._floatArrays);
 					
 					realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-				}
-				else{
+				} else {
 					// use the normal data.***
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 					realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
 				}
-			}
-			else
-			{
+			} else {
 				//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				//this.pointSC.set(0.0, 0.0, 50.0);
 				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 			}
-		}
-		else
-		{
+		} else {
 			this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 			realBuildingPos = neoBuilding.f4dTransfMat.transformPoint3D(this.pointSC, realBuildingPos );
 		}
 		// end calculating realPosition of the building.------------------------------------------------------------------------
 		
-		if(realBuildingPos == undefined)
-			continue;
+		if(realBuildingPos == undefined) continue;
 		
 		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding._buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
@@ -3941,16 +3932,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			}
 		} else {
 
-			var gl = this.scene._context._gl;
-			if(this.renderingModeTemp == 0)
-			{
-				this.deleteNeoBuilding(gl, neoBuilding);
-			}
-			else{
-				if(this.frustumIdx == 0)
-				{
-					//this.deleteNeoBuilding(gl, neoBuilding);
-				}
+			if(this.renderingModeTemp == 0) {
+				this.deleteNeoBuilding(this.scene._context._gl, neoBuilding);
+			} else {
+//				if(this.frustumIdx == 0) {
+//					//this.deleteNeoBuilding(gl, neoBuilding);
+//				}
 			}
 		}
 	}
