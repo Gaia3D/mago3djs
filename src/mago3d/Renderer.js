@@ -1525,8 +1525,8 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuildin
 	//	imageLod = 3; // The lowest lod.***
 	var shaderProgram = shader.program;
 
-	gl.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-	gl.uniform3fv(shader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 	//gl.activeTexture(gl.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
@@ -1636,8 +1636,8 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(gl, neoBuilding
 
 	var shaderProgram = shader.program;
 
-	gl.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding._buildingPositionHIGH);
-	gl.uniform3fv(shader.buildingPosLOW_loc, neoBuilding._buildingPositionLOW);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 	//gl.activeTexture(gl.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
@@ -1727,8 +1727,8 @@ Renderer.prototype.renderSimpleBuildingV1PostFxShader = function(gl, BR_Project,
 	//	imageLod = 3; // The lowest lod.***
 	var shaderProgram = shader.program;
 
-	gl.uniform3fv(shader.buildingPosHIGH_loc, BR_Project._buildingPositionHIGH);
-	gl.uniform3fv(shader.buildingPosLOW_loc, BR_Project._buildingPositionLOW);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, BR_Project.buildingPositionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, BR_Project.buildingPositionLOW);
 
 	//gl.activeTexture(gl.TEXTURE0);
 	// if we are rendering in depth buffer, then no bind texture.***
