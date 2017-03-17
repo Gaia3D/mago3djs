@@ -174,8 +174,7 @@ TTrianglesList.prototype.newTTriangle = function() {
  * 어떤 일을 하고 있습니까?
  */
 TTrianglesList.prototype.invertTrianglesSense= function() {
-	var tri_count = this.tTrianglesArray.length;
-	for(var i=0; i<tri_count; i++) {
+	for(var i=0, tri_count = this.tTrianglesArray.length; i<tri_count; i++) {
 		this.tTrianglesArray[i].invert();
 	}
 };
@@ -221,9 +220,7 @@ TTrianglesMatrix.prototype.newTTrianglesList = function() {
  * 어떤 일을 하고 있습니까?
  */
 TTrianglesMatrix.prototype.invertTrianglesSense = function() {
-	var tTriLists_count = this.tTrianglesListsArray.length;
-	for(var i=0; i<tTriLists_count; i++)
-	{
+	for(var i=0, tTriLists_count = this.tTrianglesListsArray.length; i<tTriLists_count; i++) {
 		this.tTrianglesListsArray[i].invertTrianglesSense();
 	}
 };
@@ -234,15 +231,9 @@ TTrianglesMatrix.prototype.invertTrianglesSense = function() {
  * @returns resultTotalTTrianglesArray
  */
 TTrianglesMatrix.prototype.getTotalTTrianglesArray = function(resultTotalTTrianglesArray) {
-	var tTriangles_count;
-	var tTriangle;
-	var tTriLists_count = this.tTrianglesListsArray.length;
-	for(var i=0; i<tTriLists_count; i++)
-	{
-		tTriangles_count = this.tTrianglesListsArray[i].tTrianglesArray.length;
-		for(var j=0; j<tTriangles_count; j++)
-		{
-			tTriangle = this.tTrianglesListsArray[i].getTTriangle(j);
+	for(var i=0, tTriLists_count = this.tTrianglesListsArray.length; i<tTriLists_count; i++) {
+		for(var j=0, tTriangles_count = this.tTrianglesListsArray[i].tTrianglesArray.length; j<tTriangles_count; j++) {
+			var tTriangle = this.tTrianglesListsArray[i].getTTriangle(j);
 			resultTotalTTrianglesArray.push(tTriangle);
 		}
 	}
@@ -259,10 +250,8 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
 	this.totalTTrianglesArraySC = this.getTotalTTrianglesArray(this.totalTTrianglesArraySC);
 	
 	var tTriangle;
-	var tTriangles_count = this.totalTTrianglesArraySC.length;
 	var shortArray = new Uint16Array(tTriangles_count*3);
-	for(var i=0; i<tTriangles_count; i++)
-	{
+	for(var i=0, tTriangles_count = this.totalTTrianglesArraySC.length; i<tTriangles_count; i++) {
 		tTriangle = this.totalTTrianglesArraySC[i];
 		shortArray[i*3] = tTriangle.m_vertex_1.m_idx_inList;
 		shortArray[i*3+1] = tTriangle.m_vertex_2.m_idx_inList;
@@ -305,8 +294,7 @@ Vertex.prototype.setPosition = function(x, y, z) {
  * @param b 변수
  */
 Vertex.prototype.setColorRGB = function(r, g, b) {
-	if(this.color4 == undefined)
-		this.color4 = new Color();
+	if(this.color4 == undefined) this.color4 = new Color();
 	
 	this.color4.setRGB(r, g, b);
 };
@@ -319,8 +307,7 @@ Vertex.prototype.setColorRGB = function(r, g, b) {
  * @param alpha 변수
  */
 Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
-	if(this.color4 == undefined)
-		this.color4 = new Color();
+	if(this.color4 == undefined) this.color4 = new Color();
 	
 	this.color4.setRGBA(r, g, b, alpha);
 };
@@ -380,8 +367,7 @@ VertexList.prototype.getVertexCount = function() {
  * @param vertexCount 변수
  */
 VertexList.prototype.createNVertex = function(vertexCount) {
-	for(var i=0; i<vertexCount; i++)
-	{
+	for(var i=0; i<vertexCount; i++) {
 		this.newVertex();
 	}
 };
@@ -394,9 +380,7 @@ VertexList.prototype.createNVertex = function(vertexCount) {
  * @param distance 변수
  */
 VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
-	var vertex_count = this.vertexArray.length;
-	for(var i=0; i<vertex_count; i++)
-	{
+	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
 		this.vertexArray[i].translate(dir_x, dir_y, dir_z, distance);
 	}
 };
@@ -407,16 +391,11 @@ VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance)
  * @returns resultBox
  */
 VertexList.prototype.getBoundingBox = function(resultBox) {
-	if(resultBox == undefined)
-		resultBox = new BoundingBox();
+	if(resultBox == undefined) resultBox = new BoundingBox();
 	
-	var vertex_count = this.vertexArray.length;
-	for(var i=0; i<vertex_count; i++)
-	{
-		if(i==0)
-		resultBox.setInit (this.vertexArray[i].point3d);
-		else
-			resultBox.addPoint3D(this.vertexArray[i].point3d);
+	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
+		if(i==0) resultBox.setInit (this.vertexArray[i].point3d);
+		else resultBox.addPoint3D(this.vertexArray[i].point3d);
 	}
 	return resultBox;
 };
@@ -426,12 +405,8 @@ VertexList.prototype.getBoundingBox = function(resultBox) {
  * @param transformMatrix 변수
  */
 VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
-	var vertex;
-	
-	var vertex_count = this.vertexArray.length;
-	for(var i=0; i<vertex_count; i++)
-	{
-		vertex = this.vertexArray[i];
+	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
+		var vertex = this.vertexArray[i];
 		transformMatrix.transformPoint3D(vertex.point3d, vertex.point3d);
 	}
 };
@@ -446,7 +421,6 @@ var VertexMatrix = function() {
 	}
 	
 	this.vertexListsArray = [];
-	
 	// SCTRATXH.******************
 	this.totalVertexArraySC = [];
 };
@@ -467,11 +441,9 @@ VertexMatrix.prototype.newVertexList = function() {
  * @returns vertexListArray[idx]
  */
 VertexMatrix.prototype.getVertexList = function(idx) {
-	if(idx >= 0 && idx < this.vertexListsArray.length)
-	{
+	if(idx >= 0 && idx < this.vertexListsArray.length) {
 		return this.vertexListsArray[idx];
-	}
-	else{
+	} else {
 		return undefined;
 	}
 };
@@ -482,20 +454,13 @@ VertexMatrix.prototype.getVertexList = function(idx) {
  * @returns resultBox
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) {
-	if(resultBox == undefined)
-		resultBox = new BoundingBox();
+	if(resultBox == undefined) resultBox = new BoundingBox();
 	
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	var total_vertex_count = this.totalVertexArraySC.length;
-	
-	for(var i=0; i<total_vertex_count; i++)
-	{
-		if(i==0)
-		resultBox.setInit (this.totalVertexArraySC[i].point3d);
-		else
-			resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
-		
+	for(var i=0, total_vertex_count = this.totalVertexArraySC.length; i<total_vertex_count; i++) {
+		if(i==0) resultBox.setInit (this.totalVertexArraySC[i].point3d);
+		else resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
 	}
 	return resultBox;
 };
@@ -505,16 +470,10 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox) {
  */
 VertexMatrix.prototype.setVertexIdxInList = function() {
 	var idx_in_list = 0;
-	var vertex;
-	var vtxList;
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count; i++)
-	{
-		vtxList = this.vertexListsArray[i];
-		vertex_count = vtxList.vertexArray.length;
-		for(var j=0; j<vertex_count; j++)
-		{
-			vertex = vtxList.getVertex(j);
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+		var vtxList = this.vertexListsArray[i];
+		for(var j=0, vertex_count = vtxList.vertexArray.length; j<vertex_count; j++) {
+			var vertex = vtxList.getVertex(j);
 			vertex.m_idx_inList = idx_in_list;
 			idx_in_list++;
 		}
@@ -527,9 +486,7 @@ VertexMatrix.prototype.setVertexIdxInList = function() {
  */
 VertexMatrix.prototype.getVertexCount = function() {
 	var vertexCount = 0;
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count; i++)
-	{
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
 		vertexCount += this.vertexListsArray[i].getVertexCount();
 	}
 	
@@ -542,13 +499,9 @@ VertexMatrix.prototype.getVertexCount = function() {
  * @returns resultTotalVertexArray
  */
 VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count; i++)
-	{
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
 		var vtxList = this.vertexListsArray[i];
-		var vertex_count = vtxList.vertexArray.length;
-		for(var j=0; j<vertex_count; j++)
-		{
+		for(var j=0, vertex_count = vtxList.vertexArray.length; j<vertex_count; j++) {
 			var vertex = vtxList.getVertex(j);
 			resultTotalVertexArray.push(vertex);
 		}
@@ -567,13 +520,10 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined)
-		resultFloatArray = new Float32Array(total_vertex_count*6);
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*6);
 	
-	var vertex;
-	for(var i=0; i<total_vertex_count; i++)
-	{
-		vertex = this.totalVertexArraySC[i];
+	for(var i=0; i<total_vertex_count; i++) {
+		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*6] = vertex.point3d.x;
 		resultFloatArray[i*6+1] = vertex.point3d.y;
 		resultFloatArray[i*6+2] = vertex.point3d.z;
@@ -596,13 +546,10 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined)
-		resultFloatArray = new Float32Array(total_vertex_count*7);
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*7);
 	
-	var vertex;
-	for(var i=0; i<total_vertex_count; i++)
-	{
-		vertex = this.totalVertexArraySC[i];
+	for(var i=0; i<total_vertex_count; i++) {
+		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*7] = vertex.point3d.x;
 		resultFloatArray[i*7+1] = vertex.point3d.y;
 		resultFloatArray[i*7+2] = vertex.point3d.z;
@@ -626,13 +573,10 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined)
-		resultFloatArray = new Float32Array(total_vertex_count*3);
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*3);
 	
-	var vertex;
-	for(var i=0; i<total_vertex_count; i++)
-	{
-		vertex = this.totalVertexArraySC[i];
+	for(var i=0; i<total_vertex_count; i++) {
+		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*3] = vertex.point3d.x;
 		resultFloatArray[i*3+1] = vertex.point3d.y;
 		resultFloatArray[i*3+2] = vertex.point3d.z;
@@ -649,9 +593,7 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
  * @param distance 변수
  */
 VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count; i++)
-	{
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
 		this.vertexListsArray[i].translateVertices(dir_x, dir_y, dir_z, distance);
 	}
 };
@@ -662,34 +604,26 @@ VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distanc
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) {
 	// condition: all the vertex lists must have the same number of vertex.***
-	//--------------------------------------------------------------------------
 	var vtxList_1;
 	var vtxList_2;
 	var tTrianglesList;
 	var tTriangle_1;
 	var tTriangle_2;
 	var vertex_count = 0;
-	
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count-1; i++)
-	{
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count-1; i++) {
 		vtxList_1 = this.vertexListsArray[i];
 		vtxList_2 = this.vertexListsArray[i+1];
 		tTrianglesList = tTrianglesMatrix.newTTrianglesList();
 		
 		vertex_count = vtxList_1.vertexArray.length;
-		for(var j=0; j<vertex_count; j++)
-		{
+		for(var j=0; j<vertex_count; j++) {
 			tTriangle_1 = tTrianglesList.newTTriangle();
 			tTriangle_2 = tTrianglesList.newTTriangle();
 			
-			if(j == vertex_count-1)
-			{
+			if(j == vertex_count-1) {
 				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(0)); 
 				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(0), vtxList_1.getVertex(0)); 
-			}
-			else
-			{
+			} else {
 				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(j+1)); 
 				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j+1), vtxList_1.getVertex(j+1)); 
 			}
@@ -702,11 +636,8 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
  * @param transformMatrix
  */
 VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
-	var vtxList;
-	var vertexLists_count = this.vertexListsArray.length;
-	for(var i=0; i<vertexLists_count; i++)
-	{
-		vtxList = this.vertexListsArray[i];
+	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+		var vtxList = this.vertexListsArray[i];
 		vtxList.transformPointsByMatrix4(transformMatrix);
 	}
 };
@@ -747,7 +678,6 @@ Triangle.prototype.destroy = function() {
   	if(this.m_color_1!=null)this.m_color_1.destroy();
   	if(this.m_color_2!=null)this.m_color_2.destroy();
   	if(this.m_color_3!=null)this.m_color_3.destroy();
-	//--------------------------
 	
 	this.m_point_1 = null;
   	this.m_point_2 = null;
@@ -847,8 +777,7 @@ var TrianglesSurface= function() {
  */
 TrianglesSurface.prototype.destroy = function() {
 	// 1rst, destroy ftriangles.**********************************
-	var ftriangles_count = this.mTrianglesArray.length;
-	for(var i=0; i<ftriangles_count; i++) {
+	for(var i=0, ftriangles_count = this.mTrianglesArray.length; i<ftriangles_count; i++) {
 		var ftriangle = this.mTrianglesArray[i];
 		if(ftriangle!=null)ftriangle.destroy();
 		ftriangle = null;
@@ -856,10 +785,9 @@ TrianglesSurface.prototype.destroy = function() {
 	this.mTrianglesArray = null;
 	  
 	// 2nd, destroy points3d.*************************************
-	var points_count = this.mPoint3DArray.length;
-	for(var i=0; i<points_count; i++) {
+	for(var i=0, points_count = this.mPoint3DArray.length; i<points_count; i++) {
 		var point = this.mPoint3DArray[i];
-		if(point!=null)point.destroy();
+		if(point!=null) point.destroy();
 		point = null;
 	}
 	this.mPoint3DArray = null;
@@ -881,8 +809,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 	// max unsigned short =  65,535
 	var max_indices = 65000;
 	  
-	var ftriangles_count = this.mTrianglesArray.length;
-	for(var i=0; i<ftriangles_count; i++) {
+	for(var i=0, ftriangles_count = this.mTrianglesArray.length; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
 			current_meshArrays = generalVBOArraysContainer.newVertexColorIdx_Array();
 		}
@@ -947,8 +874,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 	  
 	var ftriangles_count = this.mTrianglesArray.length;
 	var curr_vtx_count = current_meshArrays.mesh_vertices.length/3;
-	var vtx_count = this.mPoint3DArray.length;
-	for(var i=0; i<vtx_count; i++) {
+	for(var i=0, vtx_count = this.mPoint3DArray.length; i<vtx_count; i++) {
 		var point = this.mPoint3DArray[i];
 		current_meshArrays.mesh_vertices.push(point.x);
 		current_meshArrays.mesh_vertices.push(point.y);
@@ -988,8 +914,7 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_Ver
 	// max unsigned short =  65,535
 	var max_indices = 65000;
 	  
-	var ftriangles_count = this.mTrianglesArray.length;
-	for(var i=0; i<ftriangles_count; i++) {
+	for(var i=0, ftriangles_count = this.mTrianglesArray.length; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
 			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 		}
@@ -1002,7 +927,6 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_Ver
 		var p1 = this.mPoint3DArray[idx_p1];
 		var p2 = this.mPoint3DArray[idx_p2];
 		var p3 = this.mPoint3DArray[idx_p3];
-		  
 		  
 		// Point 1.***
 		current_meshArrays.mesh_vertices.push(p1.x);
@@ -1053,16 +977,14 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
 	var transformedTrianglesSurface = new TrianglesSurface();
 	  
 	// 1) copy and transform the points3d.***
-	var points_count = this.mPoint3DArray.length;
-	for(var i=0; i<points_count; i++) {
+	for(var i=0, points_count = this.mPoint3DArray.length; i<points_count; i++) {
 		var point3d = this.mPoint3DArray[i];
 		var transformed_point = matrix4.transformPoint3D(point3d);
 		transformedTrianglesSurface.mPoint3DArray.push(transformed_point);
 	}
 	  
 	// 2) copy the triangles.***
-	var tri_count = this.mTrianglesArray.length;
-	for(var i=0; i<tri_count; i++) {
+	for(var i=0, tri_count = this.mTrianglesArray.length; i<tri_count; i++) {
 		var tri = this.mTrianglesArray[i];
 		var transformed_tri = transformedTrianglesSurface.newTriangle();
 		transformed_tri.setPoints3DIndices(tri.m_point_1_idx, tri.m_point_2_idx, tri.m_point_3_idx);
@@ -1076,8 +998,7 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
  */
 TrianglesSurface.prototype.getBoundingBox = function() {
 	var points_count = this.mPoint3DArray.length;
-	if(points_count == 0)
-		return null;
+	if(points_count == 0) return null;
 	  
 	var bb = new BoundingBox();
 	var first_point3d = this.mPoint3DArray[0];
@@ -1108,14 +1029,12 @@ var Fpolyhedron= function() {
  * 어떤 일을 하고 있습니까?
  */
 Fpolyhedron.prototype.destroy = function() {
-	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
-	for(var i=0; i<ftriSurfaces_count; i++) {
+	for(var i=0, ftriSurfaces_count = this.mFTrianglesSurfacesArray.length; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
 		if(ftriangles_surface!=null)ftriangles_surface.destroy();
 		ftriangles_surface = null;
 	}
 	this.mFTrianglesSurfacesArray = null;
-	  
 	this.mIFCEntityType = null;
 };
 
@@ -1124,8 +1043,7 @@ Fpolyhedron.prototype.destroy = function() {
  * @param generalVBOArraysContainer 변수
  */
 Fpolyhedron.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer) {
-	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
-	for(var i=0; i<ftriSurfaces_count; i++) {
+	for(var i=0, ftriSurfaces_count = this.mFTrianglesSurfacesArray.length; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
 		ftriangles_surface.getVertexColorsIndicesArrays(generalVBOArraysContainer);
 	}
@@ -1136,8 +1054,7 @@ Fpolyhedron.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysCo
  * @param general_VertexIdxVBO_ArraysContainer 변수
  */
 Fpolyhedron.prototype.getVertexIndicesArrays = function(general_VertexIdxVBO_ArraysContainer) {
-	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
-	for(var i=0; i<ftriSurfaces_count; i++) {
+	for(var i=0, ftriSurfaces_count = this.mFTrianglesSurfacesArray.length; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
 		ftriangles_surface.getVertexIndicesArrays(general_VertexIdxVBO_ArraysContainer);
 	}
@@ -1160,9 +1077,7 @@ Fpolyhedron.prototype.newFTrianglesSurface = function() {
  */
 Fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4) {
 	var transformedFPolyhedron = new Fpolyhedron();
-	  
-	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
-	for(var i=0; i<ftriSurfaces_count; i++) {
+	for(var i=0, ftriSurfaces_count = this.mFTrianglesSurfacesArray.length; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
 		var transformed_ftriangles_surface = ftriangles_surface.getTransformedTrianglesSurface(matrix4);
 		transformedFPolyhedron.mFTrianglesSurfacesArray.push(transformed_ftriangles_surface);
@@ -1180,7 +1095,6 @@ Fpolyhedron.prototype.getBoundingBox = function() {
 	if(ftriSurfaces_count == 0) return null;
 	  
 	var bb = null;
-	  
 	for(var i=0; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
 		var current_bb = ftriangles_surface.getBoundingBox();
@@ -1211,8 +1125,7 @@ var FpolyhedronsList= function() {
  * @param generalVBOArraysContainer 변수
  */
 FpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArraysContainer) {
-	var fpolyhedrons_count = this.mFPolyhedronsArray.length;
-	for(var i=0; i<fpolyhedrons_count; i++) {
+	for(var i=0, fpolyhedrons_count = this.mFPolyhedronsArray.length; i<fpolyhedrons_count; i++) {
 		var fpolyhedron = this.mFPolyhedronsArray[i];
 		if(fpolyhedron.mIFCEntityType != 27 && fpolyhedron.mIFCEntityType != 26) // 27 = ifc_space, 26 = ifc_windows.***
 			fpolyhedron.getVertexColorsIndicesArrays(generalVBOArraysContainer);
@@ -1228,12 +1141,6 @@ FpolyhedronsList.prototype.newFPolyhedron = function() {
 	this.mFPolyhedronsArray.push(fpolyhedron);
 	return fpolyhedron;
 };
-
-  // F4D Fitted Box.************************************************************************************************************* //
-//	var f4d_FittedBox = function()
-//	{
-//
-//	};
 
 /**
 * 어떤 일을 하고 있습니까?
@@ -1291,8 +1198,7 @@ Quaternion.prototype.rotationAngDeg = function(angDeg, axis_x, axis_y, axis_z) {
 Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
 	var s = Math.sqrt(axis_x*axis_x + axis_y*axis_y + axis_z*axis_z);
 	var error = 10E-13;
-	if(!s < error)
-	{
+	if(!s < error) {
 		var c = 1.0/s;
 		var omega = -0.5 * angRad;
 		s = Math.sin(omega);
@@ -1301,8 +1207,7 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z) {
 		this.z = axis_z * c * s;
 		this.w = Math.cos(omega);
 		this.Unitary();
-	}
-	else{
+	} else {
 		this.x = 0.0;
 		this.y = 0.0;
 		this.z = 0.0;
@@ -1389,20 +1294,13 @@ var CompoundReference = function() {
  */
 CompoundReference.prototype.getBoundingBox = function(blocksList) {
 	var bb = null;
-	var references_count = this._referencesList.length;
-	for(var i=0; i<references_count; i++)
-	{
+	for(var i=0, references_count = this._referencesList.length; i<references_count; i++) {
 		var reference = this._referencesList[i];
 		var current_bb = reference.getBoundingBox(blocksList);
-		if(bb == null)
-		{
-			if(current_bb != null)
-				bb = current_bb;
-		}
-		else
-		{
-			if(current_bb != null)
-				bb.addBox(current_bb);
+		if(bb == null) {
+			if(current_bb != null) bb = current_bb;
+		} else {
+			if(current_bb != null) bb.addBox(current_bb);
 		}
 	}
 	
@@ -1466,20 +1364,13 @@ CompoundReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(
  */
 CompoundReferencesList.prototype.getBoundingBox = function(blocksList) {
 	var bb = null;
-	var compRefs_count = this._compoundRefsArray.length;
-	for(var i=0; i<compRefs_count; i++)
-	{
+	for(var i=0, compRefs_count = this._compoundRefsArray.length; i<compRefs_count; i++) {
 		var compRef = this._compoundRefsArray[i];
 		var current_bb = compRef.getBoundingBox(blocksList);
-		if(bb == null)
-		{
-			if(current_bb != null)
-				bb = current_bb;
-		}
-		else
-		{
-			if(current_bb != null)
-				bb.addBox(current_bb);
+		if(bb == null) {
+			if(current_bb != null) bb = current_bb;
+		} else {
+			if(current_bb != null) bb.addBox(current_bb);
 		}
 	}
 	return bb;
@@ -1501,13 +1392,9 @@ CompoundReferencesList.prototype.newCompoundReference = function() {
  * @param matrix 변수
  */
 CompoundReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
-	var compRefs_count = this._compoundRefsArray.length;
-	for(var i=0; i<compRefs_count; i++)
-	{
+	for(var i=0, compRefs_count = this._compoundRefsArray.length; i<compRefs_count; i++) {
 		var compRef = this._compoundRefsArray[i];
-		var refs_count = compRef._referencesList.length;
-		for(var j=0; j<refs_count; j++)
-		{
+		for(var j=0, refs_count = compRef._referencesList.length; j<refs_count; j++) {
 			var reference = compRef._referencesList[j];
 			reference.multiplyTransformMatrix(matrix);
 		}
@@ -1547,9 +1434,7 @@ CompoundReferencesListContainer.prototype.newCompoundRefsList = function(compoun
  * @param eye_z 변수
  */
 CompoundReferencesListContainer.prototype.updateCurrentVisibleIndicesOfLists = function(eye_x, eye_y, eye_z) {
-	var compRefLists_count = this.compRefsListArray.length;
-	for(var i=0; i<compRefLists_count; i++)
-	{
+	for(var i=0, compRefLists_count = this.compRefsListArray.length; i<compRefLists_count; i++) {
 		this.compRefsListArray[i].updateCurrentVisibleIndices(eye_x, eye_y, eye_z);
 	}
 };
@@ -1564,10 +1449,8 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	var found = false;
 	var compRefLists_count = this.compRefsListArray.length;
 	var i=0;
-	while(!found && i<compRefLists_count)
-	{
-		if(this.compRefsListArray[i].name == compRefListsName)
-		{
+	while(!found && i<compRefLists_count) {
+		if(this.compRefsListArray[i].name == compRefListsName) {
 			result_compRefList = this.compRefsListArray[i];
 		}
 		i++;
@@ -1576,7 +1459,6 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	return result_compRefList;
 };
   
-  //----------------------------------------------------------------------------------------------------
   //VBO container.**************************************************************************************************************** //
   /*
   var VertexColorIdx_Arrays = function()
