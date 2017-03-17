@@ -41,6 +41,9 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 	pointAux.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
 	resultCamera.up = this.rotMatrixInv.transformPoint3D(pointAux, resultCamera.up);
   
+	pointAux.x = undefined;
+	pointAux.y = undefined;
+	pointAux.z = undefined;
 	pointAux = undefined;
 	
 	return resultCamera;
