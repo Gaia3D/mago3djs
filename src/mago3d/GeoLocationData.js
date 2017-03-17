@@ -9,7 +9,7 @@ var GeoLocationData = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.longitude;
+	this.longitude; 
 	this.latitude;
 	this.elevation;
 	
@@ -17,6 +17,7 @@ var GeoLocationData = function() {
 	this.positionHIGH;
 	this.positionLOW;
 	
+	// F4D Matrix4.****
 	this.tMatrix;
 	this.tMatrixInv;
 	this.rotMatrix; // this contains only rotation.***
