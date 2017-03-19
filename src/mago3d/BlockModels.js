@@ -21,6 +21,25 @@ var Block = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns block
+ */
+Block.prototype.deleteObjects = function(gl) {
+
+	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
+	this.vBOVertexIdxCacheKeysContainer = undefined;
+	this.mIFCEntityType = undefined;
+	this.isSmallObj = undefined;
+	this.radius = undefined;  
+	this.vertex_count = undefined; // only for test.*** delete this.***
+	
+	if(this.lego)
+		this.lego.deleteGlObjects(gl);
+	
+	this.lego = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class BlocksList
  */
 var BlocksList = function() {
@@ -230,15 +249,20 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
  * @param idx 변수
  * @returns block
  */
-BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer, readWriter) {
+BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer, readWriter, motherBlocksArray) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
 	
 	for(var i=0; i<blocksCount; i++) {
-		var block = this.newBlock();
-		  
+		//var block = this.newBlock(); // old.***
+		var block = new Block();
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		bytesReaded += 4;
+		block.idx = blockIdx;
+		motherBlocksArray[blockIdx] = block;
+		 
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
 		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
@@ -265,7 +289,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		bbox = undefined;
 		
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		for(var j=0; j<vboDatasCount; j++) {
 		

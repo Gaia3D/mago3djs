@@ -73,6 +73,11 @@ Octree.prototype.deleteGlObjects = function(gl) {
 	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	  
 	this.neoBuildingOwner = undefined;
+	
+	if(this.neoReferencesMotherAndIndices)
+		this.neoReferencesMotherAndIndices.deleteObjects(gl);
+	
+	this.neoReferencesMotherAndIndices = undefined;
 
 	// now, for legoStructure.***
 	this.legoDataArrayBuffer = undefined;
@@ -127,19 +132,18 @@ Octree.prototype.deleteLod0GlObjects = function(gl) {
  * @param treeDepth 변수
  */
 Octree.prototype.setRenderedFalseToAllReferences = function() {
-	if(this.neoRefsList_Array) {
-		for(var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) {
-			if(this.neoRefsList_Array[i]) {
-				this.neoRefsList_Array[i].setRenderedFalseToAllReferences();
-			}
-		}
-	}
-	
-	if(this.subOctrees_array != undefined) {
-		for(var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) {
+
+
+	if(this.neoReferencesMotherAndIndices)
+	{
+		this.neoReferencesMotherAndIndices.setRenderedFalseToAllReferences();
+		var subOctreesCount = this.subOctrees_array.length;
+		for(var i=0; i<subOctreesCount; i++) {
 			this.subOctrees_array[i].setRenderedFalseToAllReferences();
 		}
 	}
+
+
 };
 
 /**
