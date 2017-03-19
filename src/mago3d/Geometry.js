@@ -368,6 +368,7 @@ var NeoBuilding = function() {
 	this.currentRenderablesNeoRefLists = [];
 	this.preExtractedLowestOctreesArray = [];
 	this.motherNeoReferencesArray = []; // asimetric mode.***
+	this.motherBlocksArray = []; // asimetric mode.***
 	
 	// Textures loaded.***************************************************
 	this.textures_loaded = [];
@@ -391,6 +392,19 @@ var NeoBuilding = function() {
 	// SCRATCH.*********************************
 	this.point3d_scratch = new Point3D();
 	this.point3d_scratch_2 = new Point3D();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns neoRef
+ */
+NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
+	var neoRefs_count = this.motherNeoReferencesArray.length;
+	for(var i=0; i<neoRefs_count; i++)
+	{
+		var neoRef = this.motherNeoReferencesArray[i];
+		neoRef.bRendered = false;
+	}
 };
 
 /**

@@ -455,13 +455,47 @@ var NeoReferencesMotherAndIndices = function() {
 	}
 	// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
+	this.blocksList;
 	this.neoRefsIndices = [];
 	
 	this.fileLoadState = 0;
-	this.dataArrayBuffer;
+	this.dataArraybuffer;
 	
 	this.exterior_ocCullOctree;
 	this.interior_ocCullOctree; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) {
+
+	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
+	if(this.blocksList)
+		this.blocksList.deleteGlObjects(gl);
+	
+	this.blocksList = undefined;
+	this.neoRefsIndices = undefined;
+	
+	this.fileLoadState = 0;
+	this.dataArraybuffer = undefined;
+	
+	this.exterior_ocCullOctree = undefined;
+	this.interior_ocCullOctree = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() {
+
+	var refIndicesCount = this.neoRefsIndices.length;
+	for(var i=0; i<refIndicesCount; i++)
+	{
+		this.motherNeoRefsList[this.neoRefsIndices[i]].bRendered = false;
+	}
 };
 
 /**
@@ -471,7 +505,7 @@ var NeoReferencesMotherAndIndices = function() {
  * @param neoBuilding 변수
  * @param f4dReadWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, f4dReadWriter, motherNeoReferencesArray) {
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, f4dReadWriter, motherNeoReferencesArray, tMatrix4) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	
 	var startBuff;
@@ -486,8 +520,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		// 1) Id.***
 		var ref_ID =  f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
-	
+		
+		this.motherNeoRefsList = motherNeoReferencesArray;
+		if(motherNeoReferencesArray[neoRef._id] != undefined)
+		{
+			var hola = 0;
+		}
+		
 		motherNeoReferencesArray[neoRef._id] = neoRef;
+		this.neoRefsIndices.push(neoRef._id);
 		
 		// 2) Block's Idx.***
 		var blockIdx =   f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -642,17 +683,28 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		else{
 			neoRef.hasTexture = false;
 		}
+		
+		if(tMatrix4)
+		{
+			neoRef.multiplyTransformMatrix(tMatrix4);
+		}
 
 	}
 	
 	// Now occlusion cullings.***
 	
 	// Occlusion culling octree data.*****
+	if(this.exterior_ocCullOctree == undefined)
+		this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); 
+	
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, f4dReadWriter);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
+	
+	if(this.interior_ocCullOctree == undefined)
+		this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); 
 	
 	var ocCullBox = this.interior_ocCullOctree; 
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
