@@ -28,7 +28,6 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	neoBuilding.buildingPositionLOW[0] = splitVelue_X.low;
 	neoBuilding.buildingPositionLOW[1] = splitVelue_Y.low;
 	neoBuilding.buildingPositionLOW[2] = splitVelue_Z.low;
-	// End.-----------------------------------------------------------------------------------
 	
 	// Determine the elevation of the position.***********************************************************
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
@@ -74,7 +73,6 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	
 	resultGeoLocationData.positionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
 	resultGeoLocationData.positionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
-	// End.-----------------------------------------------------------------------------------
 	
 	// Determine the elevation of the position.***********************************************************
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
@@ -102,53 +100,37 @@ ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) {
 	// renderingMode = 0 => assembled.***
 	// renderingMode = 1 => dispersed.***
 	
-	if(neoBuilding == undefined)
-		return undefined;
+	if(neoBuilding == undefined) return undefined;
 	
 	var realBuildingPos;
 	
-	if(renderingMode == 1) // 0 = assembled mode. 1 = dispersed mode.***
-	{
-		if(neoBuilding.geoLocationDataAux == undefined)
-		{
+	// 0 = assembled mode. 1 = dispersed mode.***
+	if(renderingMode == 1) {
+		if(neoBuilding.geoLocationDataAux == undefined) {
 			var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
 			var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 			// must calculate the realBuildingPosition (bbox_center_position).***
 			
-			if(newLocation)
-			{
+			if(newLocation) {
 				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, neoBuilding.geoLocationDataAux);
 				
 				//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				neoBuilding.point3d_scratch.set(0.0, 0.0, 50.0);
 				realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(neoBuilding.point3d_scratch, realBuildingPos );
-			}
-			else{
+			} else {
 				// use the normal data.***
 				neoBuilding.point3d_scratch = neoBuilding.bbox.getCenterPoint3d(neoBuilding.point3d_scratch);
 				realBuildingPos = neoBuilding.transfMat.transformPoint3D(neoBuilding.point3d_scratch, realBuildingPos );
 			}
-		}
-		else
-		{
+		} else {
 			//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 			neoBuilding.point3d_scratch.set(0.0, 0.0, 50.0);
 			realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(neoBuilding.point3d_scratch, realBuildingPos );
 		}
-	}
-	else
-	{
+	} else {
 		neoBuilding.point3d_scratch = neoBuilding.bbox.getCenterPoint3d(neoBuilding.point3d_scratch);
 		realBuildingPos = neoBuilding.transfMat.transformPoint3D(neoBuilding.point3d_scratch, realBuildingPos );
 	}
 	
 	return realBuildingPos;
 };
-
-
-
-
-
-
-
-

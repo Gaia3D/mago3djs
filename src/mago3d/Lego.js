@@ -65,10 +65,7 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 		}
 		
 		// 4) TexCoord.****************************************************************************************************
-		var hasTexCoord = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		// TODO:
-//		if(hasTexCoord) {
-//		}
+		f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}
