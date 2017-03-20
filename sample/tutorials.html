@@ -25,7 +25,7 @@
 		</div>
 	</header>
 	
-	<div style="min-height: 500px;">
+	<div style="width:100% ;min-height: 500px;">
 		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
 			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
@@ -43,13 +43,17 @@
 					</select><br/>
 					
 					<label for="blockId">블록 ID</label><br/>
-					<input type="text" id="blockId" name="blockId" size="15"/>
+					<input type="text" id="blockId" name="blockId" size="15"/><br/>
 					<a href="#" onclick="searchBlock(); return false;">검색</a>
+					<a href="#" onclick="searchBlock(); return false;">HighLighting</a><br/>
+					<a href="#" onclick="searchBlock(); return false;">색변경</a>
+					<a href="#" onclick="searchBlock(); return false;">숨기기</a>
+					<a href="#" onclick="searchBlock(); return false;">표시</a>
 				</li>
 			</ul>
 		</div>
 		</form>
-		<div style="float: left; padding-top: 30px; padding-left: 20px;">
+		<div style="padding-top: 30px; padding-left: 20px; width: 97%;">
 			<div id="magoContainer"></div>
 		</div>
 	</div>
