@@ -261,6 +261,52 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		block.idx = blockIdx;
+		
+		// check if block exist.***
+		if(motherBlocksArray[blockIdx])
+		{
+			bytesReaded += 4*6; // boundingBox.***
+			// New for read multiple vbo datas (indices cannot superate 65535 value).***
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+			for(var j=0; j<vboDatasCount; j++) {
+			
+				// 1) Positions array.***************************************************************************************
+				var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				bytesReaded += 4;
+				var verticesFloatValues_count = vertex_count * 3;
+				
+				block.vertex_count = vertex_count;
+
+				var startBuff = bytesReaded;
+				var endBuff = bytesReaded + 4*verticesFloatValues_count;
+				bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+				 
+				// 2) Normals.************************************************************************************************
+				vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				bytesReaded += 4;
+				var normalByteValues_count = vertex_count * 3;
+				bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
+				
+				// 3) Indices.*************************************************************************************************
+				var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				bytesReaded += 4;
+				bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.*** 
+			}
+			
+			// in asimetricVersion must load the block's lego.***
+			if(block.lego == undefined) block.lego = new Lego();
+			
+			block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
+			
+			// provisionally delete lego.***
+			block.lego.vbo_vicks_container.deleteGlObjects(gl);
+			block.lego.vbo_vicks_container = undefined;
+			block.lego = undefined;
+			
+			continue;
+		}
 		motherBlocksArray[blockIdx] = block;
 		 
 		// 1rst, read bbox.***
