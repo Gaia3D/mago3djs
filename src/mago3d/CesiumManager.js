@@ -5179,9 +5179,7 @@ CesiumManager.prototype.callAPI = function(api) {
 	if(apiName === "renderMode") {
 		this.renderingModeTemp = api.getRenderMode();
 	} else if(apiName === "search") {
-		var blockType = api.getBlockType();
-		var blockId = api.getBlockId();
-		this.flyToBuilding(blockType, blockId);
+		this.flyToBuilding(api.getBlockType(), api.getBlockId());
 	} else if(apiName === "highlighting") {
 		
 	} else if(apiName === "setColor") {
