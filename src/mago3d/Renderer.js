@@ -442,59 +442,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			
 			if(block == undefined)
 				continue;
-					/*
-					for(var n=0; n<cacheKeys_count; n++) // Original.***
-					{
-						this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
-						
-						//****************************************************************************************************AAA
-						if(this.vbo_vi_cacheKey_aux == undefined)
-							continue;
-						
-						if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)
-						{
-							if(this.vbo_vi_cacheKey_aux.pos_vboDataArray == undefined)
-								continue;
-						
-							this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
-							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
-							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
-							//this.vbo_vi_cacheKey_aux.pos_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
-							
-								continue;
-						}
-						
-						if(this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey == undefined)
-						{
-							if(this.vbo_vi_cacheKey_aux.nor_vboDataArray == undefined)
-								continue;
-						
-							this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
-							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
-							gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
-							//this.vbo_vi_cacheKey_aux.nor_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
 
-								continue;
-						}
-						
-						if(this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey == undefined)
-						{
-							if(this.vbo_vi_cacheKey_aux.idx_vboDataArray == undefined)
-								continue;
-						
-							this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
-							gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
-							gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
-							//this.vbo_vi_cacheKey_aux.idx_vboDataArray = [];
-							this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
-
-								continue;
-						}
-						//------------------------------------------------------------------------------------------------------------
-					}
-					*/
 			
 			if(maxSizeToRender && block != null) {
 				if(block.radius < maxSizeToRender) continue;
@@ -588,12 +536,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			if(block != null) {
 				
 				//ifc_entity = block.mIFCEntityType;
-				//if( ifc_entity==26 || ifc_entity==27 || ifc_entity==14)
-				//	continue;
-				
-				//if(magoManager.isCameraMoving && block.isSmallObj)
-				//	continue;
-				
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
 
