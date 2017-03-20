@@ -26,16 +26,29 @@
 	</header>
 	
 	<div style="min-height: 500px;">
+		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
 			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
 			<ul>
 				<!-- <li><a href="/sample/tutorials.html">FullShip 모드</a></li>
 				<li><a href="/sample/tutorials.html?viewType=deploy">Deploy 모드</a></li> -->
 				
-				<li><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
-				<li><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
+				<li style="height: 30px;">
+					<label for="blockType">블록 타입</label>
+					<select id="blockType" name="blockType">
+						<option value="0" selected="selected">Struts</option>
+						<option value="1">OutFitting</option>
+					</select><br/>
+					
+					<label for="blockId">블록 ID</label><br/>
+					<input type="text" id="blockId" name="blockId" size="15"/>
+					<a href="#" onclick="search(); return false;">검색</a>
+				</li>
 			</ul>
 		</div>
+		</form>
 		<div style="float: left; padding-top: 30px; padding-left: 20px;">
 			<div id="magoContainer"></div>
 		</div>
@@ -107,7 +120,7 @@
 			type: "GET",
 			dataType: "json",
 			async : true,
-			success: function(result){
+			success: function(blocksConfig){
 				/* var queryString = window.location.search;
 				var viewType = "0";
 				if(queryString == undefined || queryString == null || queryString.length == 0) {
@@ -116,7 +129,7 @@
 				} else {
 					viewType = "1";
 				} */
-				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, result);
+				//managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, blocksConfig);
 				
 				// 사용하는 예제
 				/* 
@@ -136,9 +149,22 @@
 		});
 	}
 	
+	// render mode 
 	function changeRenderMode(renderMode) {
 		if(managerFactory != null) {
 			managerFactory.renderMode(renderMode);
+		}
+	}
+	
+	// 블록 검색 
+	function search() {
+		var api = new API("search");
+		var blockType = $("#blockType").val();
+		var blockId = $("#blockId").val();
+		api.setBlockType(blockType);
+		api.setBlockId(blockId);
+		if(managerFactory != null) {
+			managerFactory.callAPI(api);
 		}
 	}
 </script>
