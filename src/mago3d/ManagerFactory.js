@@ -235,21 +235,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	return {
 		// api를 객체로 받아서 내부 분기
 		callAPI : function(api) {
-			var apiName = api.getAPIName();
-			if(apiName === "search") {
-				var blockType = api.getBlockType();
-				var blockId = api.getBlockId();
-			} else if(apiName === "highlighting") {
-				
-			} else if(apiName === "setColor") {
-							
-			} else if(apiName === "show") {
-				
-			} else if(apiName === "hide") {
-				
-			} else if(apiName === "move") {
-				
-			}
+			magoManager.callAPI(api);
 		},
 		// 초기화 api
 		init : function() {
