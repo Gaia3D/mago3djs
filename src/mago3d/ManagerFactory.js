@@ -233,12 +233,16 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
+		// api를 객체로 받아서 내부 분기
+		callAPI : function(api) {
+			magoManager.callAPI(api);
+		},
 		// 초기화 api
 		init : function() {
 			
 		},
 		// 블락 및 부재 검색 api
-		search : function() {
+		search : function(blockId) {
 			
 		},
 		// 블락 및 부재 검색 api

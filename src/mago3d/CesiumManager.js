@@ -4770,10 +4770,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * blockId를 이용해서 block 검색
+ * @param buildingType 0 struts, 1 outfitting
+ * @param buildingId blockId
  */
-CesiumManager.prototype.flyToBuilding = function(buildingId, buildingType) {
-	var neoBuilding = this.getNeoBuildingById(buildingId, buildingType);
+CesiumManager.prototype.flyToBuilding = function(buildingType, buildingId) {
+	var neoBuilding = this.getNeoBuildingById(buildingType, buildingId);
 	
 	if(neoBuilding == undefined)
 		return;
@@ -4822,23 +4824,23 @@ CesiumManager.prototype.flyToBuilding = function(buildingId, buildingType) {
 	
 	var viewer = this.scene.viewer;
 	var seconds = 3;
-	viewer.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
+	this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
 }
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-CesiumManager.prototype.getNeoBuildingById = function(buildingId, buildingType) {
-	var buildingCount = this.neoBuildingsList.length;
+CesiumManager.prototype.getNeoBuildingById = function(buildingType, buildingId) {
+	var buildingCount = this.neoBuildingsList.neoBuildings_Array.length;
 	var find = false;
 	var i=0; 
 	var resultNeoBuilding;
 	while(!find && i<buildingCount)
 	{
-		if(this.neoBuildingsList[i].buildingId == buildingId && this.neoBuildingsList[i].buildingType)
+		if(this.neoBuildingsList.neoBuildings_Array[i].buildingId == buildingId && this.neoBuildingsList.neoBuildings_Array[i].buildingType)
 		{
 			find = true;
-			resultNeoBuilding = this.neoBuildingsList[i];
+			resultNeoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		}
 		i++;
 	}
@@ -5167,4 +5169,28 @@ CesiumManager.prototype.getObjectIndexFile = function() {
 											this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, 
 											this.readerWriter, 
 											this.neoBuildingsList);
+};
+
+/**
+ * api gateway
+ */
+CesiumManager.prototype.callAPI = function(api) {
+	var apiName = api.getAPIName();
+	if(apiName === "renderMode") {
+		this.renderingModeTemp = api.getRenderMode();
+	} else if(apiName === "search") {
+		var blockType = api.getBlockType();
+		var blockId = api.getBlockId();
+		this.flyToBuilding(blockType, blockId);
+	} else if(apiName === "highlighting") {
+		
+	} else if(apiName === "setColor") {
+					
+	} else if(apiName === "show") {
+		
+	} else if(apiName === "hide") {
+		
+	} else if(apiName === "move") {
+		
+	}
 };
