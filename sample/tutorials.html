@@ -25,18 +25,35 @@
 		</div>
 	</header>
 	
-	<div style="min-height: 500px;">
+	<div style="width:100% ;min-height: 500px;">
+		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
 			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
 			<ul>
 				<!-- <li><a href="/sample/tutorials.html">FullShip 모드</a></li>
 				<li><a href="/sample/tutorials.html?viewType=deploy">Deploy 모드</a></li> -->
 				
-				<li><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
-				<li><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
+				<li style="height: 30px;">
+					<label for="blockType">블록 타입</label>
+					<select id="blockType" name="blockType">
+						<option value="MSP" selected="selected">Struts</option>
+						<option value="MOP">OutFitting</option>
+					</select><br/>
+					
+					<label for="blockId">블록 ID</label><br/>
+					<input type="text" id="blockId" name="blockId" size="15"/><br/>
+					<a href="#" onclick="searchBlock(); return false;">검색</a>
+					<a href="#" onclick="searchBlock(); return false;">HighLighting</a><br/>
+					<a href="#" onclick="searchBlock(); return false;">색변경</a>
+					<a href="#" onclick="searchBlock(); return false;">숨기기</a>
+					<a href="#" onclick="searchBlock(); return false;">표시</a>
+				</li>
 			</ul>
 		</div>
-		<div style="float: left; padding-top: 30px; padding-left: 20px;">
+		</form>
+		<div style="padding-top: 30px; padding-left: 20px; width: 97%;">
 			<div id="magoContainer"></div>
 		</div>
 	</div>
@@ -49,6 +66,7 @@
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../thirdparty/jquery/jquery.js"></script>
 <script type="text/javascript" src="../src/mago3d/Code.js"></script>
+<script type="text/javascript" src="../src/mago3d/API.js"></script>
 <script type="text/javascript" src="../src/mago3d/Config.js"></script>
 <script type="text/javascript" src="../src/mago3d/Constant.js"></script>
 <script type="text/javascript" src="../src/mago3d/Message.js"></script>
@@ -107,7 +125,7 @@
 			type: "GET",
 			dataType: "json",
 			async : true,
-			success: function(result){
+			success: function(blocksConfig){
 				/* var queryString = window.location.search;
 				var viewType = "0";
 				if(queryString == undefined || queryString == null || queryString.length == 0) {
@@ -116,7 +134,7 @@
 				} else {
 					viewType = "1";
 				} */
-				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, result);
+				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, blocksConfig);
 				
 				// 사용하는 예제
 				/* 
@@ -136,9 +154,24 @@
 		});
 	}
 	
+	// render mode 
 	function changeRenderMode(renderMode) {
+		var api = new API("renderMode");
+		api.setRenderMode(renderMode);
 		if(managerFactory != null) {
-			managerFactory.renderMode(renderMode);
+			managerFactory.callAPI(api);
+		}
+	}
+	
+	// 블록 검색 
+	function searchBlock() {
+		var api = new API("search");
+		var blockType = $("#blockType").val();
+		var blockId = $("#blockId").val();
+		api.setBlockType(blockType);
+		api.setBlockId(blockId);
+		if(managerFactory != null) {
+			managerFactory.callAPI(api);
 		}
 	}
 </script>
