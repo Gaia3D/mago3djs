@@ -4959,6 +4959,15 @@ CesiumManager.prototype.renderTerranTileServiceFormatPostFxShader = function(sce
  * @returns neoVisibleBuildingsArray
  */
 CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
+	// check if the neoBuilding id the selected building.***
+	if(neoBuilding == this.buildingSelected)
+	{
+		this.buildingSelected = undefined;
+		this.octreeSelected = undefined;
+		this.objectSelected = undefined;
+	}
+	
+	
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
 	//neoBuilding.buildingPosition = undefined;
 	//neoBuilding.buildingPositionHIGH = undefined;
@@ -5029,6 +5038,8 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	// The lodBuildings.***
 	neoBuilding.lod2Building = undefined;
 	neoBuilding.lod3Building = undefined;
+	
+	
 };
 
 /**
