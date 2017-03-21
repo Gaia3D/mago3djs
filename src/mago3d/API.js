@@ -12,10 +12,10 @@ var API = function(apiName) {
 	// api 이름
 	this.apiName = apiName;
 	// block id
-	this.blockId = blockId;
+	this.blockId = null;
 	
-	// 0 fullship, 1 : deploy
-	this.renderMode = null;
+	// fullship = 0, deploy = 1
+	this.renderMode = 0;
 	// 위도
 	this.latitude = 0;
 	// 경도
@@ -24,16 +24,14 @@ var API = function(apiName) {
 	this.height = 0;
 	// 색깔
 	this.color = 0;
-	// structs, outfitting
-	this.blockType = 0;
+	// structs = MSP, outfitting = MOP
+	this.blockType = null;
 };
 
-// api 이름
 API.prototype.getAPIName = function() {
 	return this.apiName;
 };
 
-// blockId
 API.prototype.getBlockId = function() {
 	return this.blockId;
 };
