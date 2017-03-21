@@ -444,8 +444,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			if(block == undefined)
 				continue;
 			
-
-			
 			if(maxSizeToRender && block != null) {
 				if(block.radius < maxSizeToRender) continue;
 			}

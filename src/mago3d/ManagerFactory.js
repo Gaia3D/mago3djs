@@ -120,9 +120,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 					} else {
 						magoManager.isCameraMoving = true; // if no object is selected.***
 					}	
-						
+					magoManager.isCameraMoving = true; // test.***
 					if(magoManager.mouseDragging) {
-						magoManager.moveSelectedObject(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray);
+						//magoManager.moveSelectedObject(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray); // original.***
+						magoManager.moveSelectedObjectAsimetricMode(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray);
 					}
 				}
 			} else{
