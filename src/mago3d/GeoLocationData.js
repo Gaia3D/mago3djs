@@ -1,4 +1,4 @@
-
+'use strict';
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -28,9 +28,7 @@ var GeoLocationData = function() {
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  */
- 
-GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera)
-{
+GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera) {
 	var pointAux = new Point3D();
 	
 	pointAux.set(absoluteCamera.position.x - this.position.x, absoluteCamera.position.y - this.position.y, absoluteCamera.position.z - this.position.z);
