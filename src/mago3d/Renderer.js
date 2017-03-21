@@ -409,7 +409,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		if(myBlocksList == undefined)
 			continue;
 		
-		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) {
+		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) 
+		{
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
@@ -707,7 +708,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		if(myBlocksList == undefined)
 			continue;
 		
-		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) {
+		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) 
+		{
 			//myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			//myBlocksList.dataArraybuffer = undefined;
 			continue;

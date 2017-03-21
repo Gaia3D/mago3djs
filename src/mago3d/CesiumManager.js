@@ -1474,14 +1474,14 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 //	var neoVisibleBuildingsArray = [];
 	
 	// do frustum culling.***
-	if(!this.isCameraMoving) {
+	if(!this.isCameraMoving && !this.mouseLeftDown) 
+	{
 		var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
 		var frustumVolume = scene._frameState.cullingVolume;
 		this.currentVisibleNeoBuildings_array.length = 0;
 		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
 		this.prepareNeoBuildingsAsimetricVersion(gl);
 	}
-
 	
 	
 	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
@@ -1798,13 +1798,15 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
 	
-
+	
+	
 	//gl.uniform1f(currentShader.near_loc, frustum._near);	
 	//gl.uniform1f(currentShader.far_loc, current_frustum_far); 
 	
 	// 1) LOD 0.*********************************************************************************************************************
 	// 1) LOD 0.*********************************************************************************************************************
 	// 1) LOD 0.*********************************************************************************************************************
+	
 	var neoBuilding;
 	var isInterior = false;
 	var renderTexture = false;
@@ -1849,6 +1851,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	// 2) LOD 1.*********************************************************************************************************************
 	// 2) LOD 1.*********************************************************************************************************************
 	// 2) LOD 1.*********************************************************************************************************************
+	
 	lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
 	for(var i=0; i<lowestOctreesCount; i++) {
 		lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
@@ -1972,7 +1975,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
-
+	
 	gl.disableVertexAttribArray(currentShader.position3_loc);
 	//gl.disableVertexAttribArray(currentShader.normal3_loc);
 	
@@ -3648,6 +3651,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.lego == undefined && lowestOctree.lego.dataArrayBuffer == undefined) continue;
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
+				if(neoBuilding == undefined)
+					continue;
 				
 				// && lowestOctree.neoRefsList_Array.length == 0)
 				if(lowestOctree.lego.fileLoadState == CODE.fileLoadState.READY && !this.isCameraMoving) {
@@ -3892,6 +3897,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(lowestOctree.legoDataArrayBuffer == undefined && lowestOctree.lego == undefined) continue;
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
+				if(neoBuilding == undefined)
+					continue;
 				if(this.renderingModeTemp == 0)
 				{
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);

@@ -147,7 +147,9 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.dateSC = new Date();
 			magoManager.currentTimeSC = magoManager.dateSC.getTime();
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
-			if(miliSecondsUsed < 500) {
+			//if(miliSecondsUsed < 500) // original.***
+			if(miliSecondsUsed < 1000) 
+			{
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
