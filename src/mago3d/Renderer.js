@@ -727,8 +727,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 				continue;
 			}
 			
-			if(neoReference.bRendered)
-				continue;
+			//if(neoReference.bRendered)
+			//	continue;
 
 			block_idx = neoReference._block_idx;
 				
@@ -824,7 +824,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 					//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 				}
 				
-				neoReference.bRendered = true;
+				//neoReference.bRendered = true;
 			}
 			//timeControlCounter++;
 			//if(timeControlCounter > 20)

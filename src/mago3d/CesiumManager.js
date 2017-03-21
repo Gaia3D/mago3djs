@@ -1530,7 +1530,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(this.bPicking == true)
 	{
 		this.objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees);
-		
 	}
 	
 	// 1) The depth render.***************************************************************************************************
@@ -1763,7 +1762,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 	}
-		
+		/*
 		var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 			for(var i=0; i<lowestOctreesCount; i++) {
 				lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
@@ -1774,7 +1773,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
 				lowestOctree.setRenderedFalseToAllReferences();
 			}
-			
+			*/
 	// colorSelection render.************************************************************************************************************
 	// colorSelection render.************************************************************************************************************
 	// colorSelection render.************************************************************************************************************
@@ -1986,8 +1985,9 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	// now, select the object.***
 	var idx = 64516*pixels[0] + 254*pixels[1] + pixels[2];
 	//this.objectSelected = this.selectionCandidateObjectsArray[idx];
-	
-	return this.selectionCandidateObjectsArray[idx];
+	var selectedObject = this.selectionCandidateObjectsArray[idx];
+	this.selectionCandidateObjectsArray.length = 0;
+	return selectedObject;
 
 };
 
