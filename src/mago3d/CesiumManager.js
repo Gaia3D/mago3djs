@@ -42,6 +42,8 @@ var CesiumManager = function() {
 	
 	this.selectionCandidateObjectsArray = [];
 	this.objectSelected;
+	this.buildingSelected;
+	this.octreeSelected;
 	this.objMovState = 0; // 0 = no started. 1 = mov started. 
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
@@ -1698,8 +1700,8 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	
 	// set byteColor codes for references objects.***
 	var red = 0, green = 0, blue = 0, alfa = 255;
-	
-	// LOD 0.********************************************************************************************************
+	var selectionCandidateLowestOctreesArray = [];
+	// LOD 0.******************************************************************************************************************************
 	var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 	var refsCount;
 	var neoRef;
@@ -1720,6 +1722,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			
 			neoRef.selColor4.set(red, green, blue, alfa);
 			this.selectionCandidateObjectsArray.push(neoRef);
+			selectionCandidateLowestOctreesArray.push(lowestOctree);
 			blue++;
 			if(blue >= 254)
 			{
@@ -1750,6 +1753,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			
 			neoRef.selColor4.set(red, green, blue, alfa);
 			this.selectionCandidateObjectsArray.push(neoRef);
+			selectionCandidateLowestOctreesArray.push(lowestOctree);
 			blue++;
 			if(blue >= 254)
 			{
@@ -1990,6 +1994,14 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	//this.objectSelected = this.selectionCandidateObjectsArray[idx];
 	var selectedObject = this.selectionCandidateObjectsArray[idx];
 	this.selectionCandidateObjectsArray.length = 0;
+	
+	this.octreeSelected = selectionCandidateLowestOctreesArray[idx];
+	
+	if(this.octreeSelected == undefined)
+		return undefined;
+	
+	this.buildingSelected = selectionCandidateLowestOctreesArray[idx].neoBuildingOwner;
+	selectionCandidateLowestOctreesArray = undefined;
 	return selectedObject;
 
 };
@@ -2122,6 +2134,115 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(gl, cameraPosition, 
 	
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param cameraPosition 변수
+ * @param scene 변수
+ * @param renderables_neoRefLists_array 변수
+ */
+CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cameraPosition, scene, renderables_neoRefLists_array) {
+	
+	// depth render.************************************************************************************************************
+	// depth render.************************************************************************************************************
+	// depth render.************************************************************************************************************
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL); 
+	gl.depthRange(0, 1);
+  
+	var camera = scene._camera;
+//	var frustum = camera.frustum;
+//	var current_frustum_near = scene._context._us._currentFrustum.x;
+	var current_frustum_far = scene._context._us._currentFrustum.y;
+	var frustumsCount = scene._frustumCommandsList.length;
+	current_frustum_far = scene._frustumCommandsList[frustumsCount-1].far;
+	
+	this.selectionFbo.bind(); // framebuffer for color selection.***
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.selectionFbo.colorBuffer, 0);
+	
+	
+	//var currentShader = this.postFxShadersManager.pFx_shaders_array[6]; // depth shader.***
+	var currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // ssao_depth shader.***
+	
+	gl.clearColor(1, 1, 1, 1); // white background.***
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
+	//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
+	
+	var shaderProgram = currentShader.program;
+	gl.useProgram(shaderProgram);
+	gl.enableVertexAttribArray(currentShader.position3_loc);
+	//gl.enableVertexAttribArray(currentShader.normal3_loc);
+
+	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
+	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
+	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
+	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+	
+	gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.buildingSelected.buildingPositionHIGH);
+	gl.uniform3fv(currentShader.buildingPosLOW_loc, this.buildingSelected.buildingPositionLOW);
+	  
+	gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+
+	var ssao_idx = -1; // selection code.***
+	//ssao_idx = 1; // test.***
+	var renderTexture = false;
+	//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array); // old.***
+	var isInterior = false;
+	var renderTexture = false;
+	var minSize = 0.0;
+	var refsCount = this.octreeSelected.setRenderedFalseToAllReferences();
+	this.renderer.renderNeoRefListsAsimetricVersion(gl, this.octreeSelected.neoReferencesMotherAndIndices, this.buildingSelected, this, isInterior, currentShader, renderTexture, ssao_idx, minSize);
+	
+	gl.disableVertexAttribArray(currentShader.position3_loc);
+	//gl.disableVertexAttribArray(currentShader.normal3_loc);
+	
+	// Now, read the picked pixel and find the pixel position.*********************************************************
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
+	gl.readPixels(this.mouse_x, scene.drawingBufferHeight - this.mouse_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+
+	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
+	zDepth /= 256.0; // convert to 0 to 1.0 range depth.***
+
+	var realZDepth = zDepth*current_frustum_far;
+	
+	// now, find the 3d position of the pixel in camCoord.****
+	this.resultRaySC = this.getRayCamSpace(gl, scene, this.resultRaySC);
+	
+	var pixelPosCamCoord = new Float32Array(3);
+	pixelPosCamCoord[0] = this.resultRaySC[0] * realZDepth;
+	pixelPosCamCoord[1] = this.resultRaySC[1] * realZDepth;
+	pixelPosCamCoord[2] = this.resultRaySC[2] * realZDepth;
+	
+	// now, must transform this pixelCamCoord to world coord.***
+	var mv_inv = new Cesium.Matrix4();
+	mv_inv = Cesium.Matrix4.inverse(scene._context._us._modelView, mv_inv);
+	var pixelPosCamCoordCartesian = new Cesium.Cartesian3(pixelPosCamCoord[0], pixelPosCamCoord[1], pixelPosCamCoord[2]);
+	var pixelPos = new Cesium.Cartesian3();
+	pixelPos = Cesium.Matrix4.multiplyByPoint(mv_inv, pixelPosCamCoordCartesian, pixelPos);
+	
+	var pixelPosBuilding = new Cesium.Cartesian3();
+	pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, pixelPos, pixelPosBuilding);
+	
+	this.selObjMovePlane = new Plane();
+	// provisionally make an XY plane.***
+	// the plane is in world coord.***
+	this.selObjMovePlane.setPointAndNormal(pixelPosBuilding.x, pixelPosBuilding.y, pixelPosBuilding.z, 0.0, 0.0, 1.0);
+	
+	/*
+	// a check. calculate the ray direction and compare with the cesium camera direction.***
+	var rayDirX = pixelPos.x - camera._position.x;
+	var rayDirY = pixelPos.y - camera._position.y;
+	var rayDirZ = pixelPos.z - camera._position.z;
+	var module = Math.sqrt(rayDirX*rayDirX + rayDirY*rayDirY + rayDirZ*rayDirZ);
+	
+	rayDirX /= module;
+	rayDirY /= module;
+	rayDirZ /= module;
+	*/
+	
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+};
 	/*
 	// camera function.***
 	function getPickRayPerspective(camera, windowPosition, result) {
@@ -2173,7 +2294,8 @@ CesiumManager.prototype.enableCameraMotion = function(state, scene) {
 CesiumManager.prototype.isDragging = function(scene) {
 	// test function.***
 	var gl = scene._context._gl;
-	var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
+	//var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array); // original.***
+	var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees);
 	
 	if(current_objectSelected == this.objectSelected) {
 		return true;
@@ -2188,8 +2310,10 @@ CesiumManager.prototype.isDragging = function(scene) {
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
  */
-CesiumManager.prototype.moveSelectedObject = function(gl, scene, renderables_neoRefLists_array) {
+CesiumManager.prototype.moveSelectedObject = function(scene, renderables_neoRefLists_array) {
 	if(this.objectSelected == undefined) return;
+	
+	var gl = scene._context._gl;
 	
 	// 1rst, check if the clicked point is the selected object.***
 	//var current_selectedObject = this.getSelectedObjectPicking(gl, scene, renderables_neoRefLists_array);
@@ -2221,6 +2345,75 @@ CesiumManager.prototype.moveSelectedObject = function(gl, scene, renderables_neo
 	
 	var camDirBuilding = new Cesium.Cartesian3();
 	camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.detailed_neoBuilding.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
+	
+	// now, intersect building_ray with the selObjMovePlane.***
+	var line = new Line();
+	line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
+	
+	var intersectionPoint = new Point3D();
+	intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
+	
+	// register the movement.***
+	if(this.objectSelected.moveVector == undefined)
+		this.objectSelected.moveVector = new Point3D();
+	
+	//this.thereAreStartMovePoint;
+	//this.startMovPoint;
+	
+	if(!this.thereAreStartMovePoint) {
+		this.startMovPoint = intersectionPoint;
+		this.startMovPoint.add(-this.objectSelected.moveVector.x, -this.objectSelected.moveVector.y, -this.objectSelected.moveVector.z);
+		this.thereAreStartMovePoint = true;
+	} else {
+		var difX = intersectionPoint.x - this.startMovPoint.x;
+		var difY = intersectionPoint.y - this.startMovPoint.y;
+		var difZ = intersectionPoint.z - this.startMovPoint.z;
+		
+		this.objectSelected.moveVector.set(difX, difY, difZ);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param scene 변수
+ * @param renderables_neoRefLists_array 변수
+ */
+CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, renderables_neoRefLists_array) {
+	if(this.objectSelected == undefined) return;
+	
+	var gl = scene._context._gl;
+	
+	// 1rst, check if the clicked point is the selected object.***
+	//var current_selectedObject = this.getSelectedObjectPicking(gl, scene, renderables_neoRefLists_array);
+	//if(current_selectedObject != this.objectSelected)
+	//	return;
+	
+	//this.objMovState
+	
+	var cameraPosition = scene.context._us._cameraPosition;
+	//this.enableCameraMotion(false, scene);
+	
+	// create a XY_plane in the selected_pixel_position.***
+	if(this.selObjMovePlane == undefined) {
+		this.calculateSelObjMovePlaneAsimetricMode(gl, cameraPosition, scene, renderables_neoRefLists_array);
+	}
+	
+	// world ray = camPos + lambda*camDir.***
+	var camera = scene._camera;
+	var camPos = camera._position;
+	
+	var windowPosition = new Cesium.Cartesian2(this.mouse_x, this.mouse_y);
+	var camRay = new Cesium.Ray();
+	camRay = camera.getPickRay(windowPosition, camRay);
+	var rayWorldSpace = new Cesium.Cartesian3(camRay.direction.x, camRay.direction.y, camRay.direction.z);
+	
+	// transform world_ray to building_ray.***
+	var camPosBuilding = new Cesium.Cartesian3();
+	camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
+	
+	var camDirBuilding = new Cesium.Cartesian3();
+	camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
 	
 	// now, intersect building_ray with the selObjMovePlane.***
 	var line = new Line();
