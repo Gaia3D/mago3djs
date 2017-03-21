@@ -262,6 +262,7 @@ ShaderSource.texNormalShaderFragmentSource = "\n\
 		gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
 	}";
 
+	//****************************************************************************************************************************************
 //어떤 용도
 ShaderSource.blurVsSource = "\n\
 	attribute vec4 position;\n\
@@ -299,6 +300,7 @@ ShaderSource.blurFsSource = "\n\
 		gl_FragColor.a = 1.0;\n\
 	}";
 
+	//****************************************************************************************************************************************
 //어떤 용도
 ShaderSource.ssaoVsSource = "\n\
 	attribute vec3 position;\n\
@@ -421,6 +423,7 @@ ShaderSource.ssaoFsSource = "\n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
 
+	//****************************************************************************************************************************************
 //어떤 용도
 ShaderSource.showDepthVsSource = "\n\
 	attribute vec3 position;\n\
@@ -486,7 +489,9 @@ ShaderSource.showDepthFsSource = "\n\
 		//gl_FragData[0].b = 1.0; // test\n\
 	}";
 
+	//****************************************************************************************************************************************
 //어떤 용도
+// idx = 4.***
 ShaderSource.modelRefSsaoVsSource = "\n\
 	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
@@ -636,6 +641,8 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
 
+	//****************************************************************************************************************************************
+	
 //어떤 용도
 ShaderSource.renderShowDepthVsSource = "\n\
 	attribute vec3 position;\n\
@@ -696,6 +703,7 @@ ShaderSource.renderShowDepthFsSource = "\n\
 		//gl_FragData[0].b = -depth; // test\n\
 	}";
 
+	//*************************************************************************************************************************
 //어떤 용도
 ShaderSource.colorSelectionSsaoVsSource = "\n\
 	attribute vec3 position;\n\
@@ -725,7 +733,8 @@ ShaderSource.colorSelectionSsaoFsSource = "\n\
 	void main() {          \n\
 		gl_FragColor = vColor4Aux;\n\
 	}";
-
+	
+	//*************************************************************************************************************************
 //어떤 용도
 ShaderSource.simpleDepthSsaoVsSource = "\n\
 	attribute vec3 position;\n\
