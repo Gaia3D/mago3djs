@@ -416,7 +416,7 @@ var NeoReferencesMotherAndIndices = function() {
 	}
 	// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
-	this.blocksList;
+	this.blocksList; // local blocks list. used only for parse data.***
 	this.neoRefsIndices = [];
 	
 	this.fileLoadState = 0;
