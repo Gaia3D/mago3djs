@@ -15,7 +15,7 @@ var Lego = function() {
 	this.dataArrayBuffer;
 };
 
-Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, bytesReaded) {
+Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, bytesReaded) {
 	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
 		// file loaded.***
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
@@ -33,7 +33,7 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 		
 		// 1) Positions.************************************************************************************************
-		var vertexCount = f4dReadWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValues_count = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4*verticesFloatValues_count;
@@ -43,9 +43,9 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 		vbo_vi_cacheKey.vertexCount = vertexCount;
 		
 		// 2) Normals.*****************************************************************************************************
-		var hasNormals = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasNormals = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasNormals) {
-			vertexCount = f4dReadWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var normalsByteValues_count = vertexCount * 3;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1*normalsByteValues_count;
@@ -54,9 +54,9 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 		}
 		
 		// 3) Colors.*******************************************************************************************************
-		var hasColors = f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasColors = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasColors) {
-			vertexCount = f4dReadWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*colorsByteValues_count;
@@ -65,7 +65,7 @@ Lego.prototype.parseArrayBuffer = function(gl, f4dReadWriter, dataArraybuffer, b
 		}
 		
 		// 4) TexCoord.****************************************************************************************************
-		f4dReadWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}

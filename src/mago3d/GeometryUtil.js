@@ -2166,7 +2166,7 @@ var TerranTile = function() {
 	this.current_BRProject_parsing;
 	this.current_BRProject_parsing_state = 0;
 	
-	this.f4dReadWriter;
+	this.readWriter;
 };
 
 /**
@@ -2279,8 +2279,8 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var arrayBuffer = this.fileArrayBuffer;
 	var bytes_readed = this.fileBytesReaded;
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.readWriter == undefined)
+		this.readWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -2290,7 +2290,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	header._f4d_version = 2;
 	
 	// 3) Global unique ID.*********************
-	intAux_scratch = this.f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
 		header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
@@ -2324,7 +2324,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 		header.isSmall = true;
 	}
 	
-	var imageLODs_count = this.f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	var imageLODs_count = this.readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	// Now, must calculate some params of the project.**********************************************
 	// 0) PositionMatrix.************************************************************************
@@ -2368,8 +2368,8 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	if(this.fileBytesReaded >= fileLegth)
 		return;
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.readWriter == undefined)
+		this.readWriter = new ReaderWriter();
 	
 	var bytes_readed = this.fileBytesReaded;
 	var startBuff;
@@ -2380,7 +2380,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	var vbo_objects_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+	var vbo_objects_count = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
 	
 	// single interleaved buffer mode.*********************************************************************************
 	for(var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
@@ -2388,7 +2388,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 		var simpObj = simpBuildingV1.newSimpleObject();
 		var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
 		
-		var iDatas_count = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var iDatas_count = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + (4*3+2*2+1*4)*iDatas_count; // fPos_usTex_bNor.****
 		vt_cacheKey.verticesArrayBuffer = arrayBuffer.slice(startBuff, endBuff);
@@ -2400,7 +2400,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	}
 	
 	// Finally read the 4byte color.***
-	var color_4byte_temp = this.f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var color_4byte_temp = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
 	//var b = color_4byte_temp & 0xFF;
     //var g = (color_4byte_temp & 0xFF00) >>> 8;
@@ -2421,8 +2421,8 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
 	if(BR_Project._simpleBuilding_v1 == undefined)
 		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.readWriter == undefined)
+		this.readWriter = new ReaderWriter();
 	
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	
@@ -2430,7 +2430,7 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
 	var bytes_readed = this.fileBytesReaded;
 	var arrayBuffer = this.fileArrayBuffer;
 	
-	var nailImageSize = this.f4dReadWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var nailImageSize = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	var startBuff = bytes_readed;
 	var endBuff = bytes_readed + nailImageSize;
 	simpBuildingV1.textureArrayBuffer = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
@@ -2452,11 +2452,11 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
 		return;
 	}
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.readWriter == undefined)
+		this.readWriter = new ReaderWriter();
 	
 	var arrayBuffer = this.fileArrayBuffer;
-	var projects_count = this.f4dReadWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
+	var projects_count = this.readWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
 	
 	if(projects_count == 0)
 		this.empty_tile = true;
@@ -2465,7 +2465,7 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
 	{
 		/*
 		// 1rst, read the relative rawFile_path.***
-		var rawFileNamePath_length = this.f4dReadWriter.readInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;// only debug test.***
+		var rawFileNamePath_length = this.readWriter.readInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;// only debug test.***
 		var rawFileNamePath = "";
 		
 		for(var j=0; j<rawFileNamePath_length; j++){
@@ -2499,10 +2499,10 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
 		return;
 	}
 	
-	if(this.f4dReadWriter == undefined)
-		this.f4dReadWriter = new ReaderWriter();
+	if(this.readWriter == undefined)
+		this.readWriter = new ReaderWriter();
 	
-	var projects_count = this.f4dReadWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
+	var projects_count = this.readWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
 	
 	if(this.projectsParsed_count >= projects_count)
 	{
