@@ -32,8 +32,7 @@ Block.prototype.deleteObjects = function(gl) {
 	this.radius = undefined;  
 	this.vertex_count = undefined; // only for test.*** delete this.***
 	
-	if(this.lego)
-		this.lego.deleteGlObjects(gl);
+	if(this.lego) this.lego.deleteGlObjects(gl);
 	
 	this.lego = undefined;
 };
@@ -263,14 +262,12 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		block.idx = blockIdx;
 		
 		// check if block exist.***
-		if(motherBlocksArray[blockIdx])
-		{
+		if(motherBlocksArray[blockIdx]) {
 			bytesReaded += 4*6; // boundingBox.***
 			// New for read multiple vbo datas (indices cannot superate 65535 value).***
 			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			for(var j=0; j<vboDatasCount; j++) {
-			
 				// 1) Positions array.***************************************************************************************
 				var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
@@ -338,7 +335,6 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		for(var j=0; j<vboDatasCount; j++) {
-		
 			// 1) Positions array.***************************************************************************************
 			var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;

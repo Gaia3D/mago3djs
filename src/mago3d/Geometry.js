@@ -34,9 +34,9 @@ var MetaData = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
- * @param f4dReadWriter 변수
+ * @param readWriter 변수
  */
-MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
+MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 	var auxScratch;
@@ -45,7 +45,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
-	if(f4dReadWriter == undefined) f4dReadWriter = new ReaderWriter();
+	if(readWriter == undefined) readWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -55,7 +55,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	// 3) Global unique ID.*********************
 	if(this.guid == undefined) this.guid ="";
 	
-	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
 		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
@@ -88,7 +88,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 	
 	// TEST. PROVISIONAL. DELETE.***
 	//this.bbox.expand(20.0);
-	var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	var imageLODs_count = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	// 7) Buildings octree mother size.***
 	this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
@@ -113,9 +113,9 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, f4dReadWriter) {
 /**
  * 어떤 일을 하고 있습니까?
  * @param arrayBuffer 변수
- * @param f4dReadWriter 변수
+ * @param readWriter 변수
  */
-MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dReadWriter) {
+MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter) {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 	var auxScratch;
@@ -124,7 +124,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 	
-	if(f4dReadWriter == undefined) f4dReadWriter = new ReaderWriter();
+	if(readWriter == undefined) readWriter = new ReaderWriter();
 	
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
@@ -134,7 +134,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	// 3) Global unique ID.*********************
 	if(this.guid == undefined) this.guid ="";
 	
-	intAux_scratch = f4dReadWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
 		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
@@ -168,7 +168,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, f4dRe
 	// TEST. PROVISIONAL. DELETE.***
 	//this.bbox.expand(20.0);
 	
-	//var imageLODs_count = f4dReadWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+	//var imageLODs_count = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	
 	//// 7) Buildings octree mother size.***
 	//this.oct_min_x = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
@@ -269,7 +269,7 @@ var LodBuilding = function() {
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
  
-LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
+LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
 	{
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
@@ -288,7 +288,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 		
 		// 1) Positions.************************************************************************************************
-		var vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValues_count = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4*verticesFloatValues_count;
@@ -298,9 +298,9 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 		vbo_vi_cacheKey.vertexCount = vertexCount;
 		
 		// 2) Normals.*****************************************************************************************************
-		var hasNormals = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasNormals) {
-			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var normalsByteValues_count = vertexCount * 3;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*normalsByteValues_count;
@@ -309,9 +309,9 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 		}
 		
 		// 3) Colors.*******************************************************************************************************
-		var hasColors = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasColors = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasColors) {
-			vertexCount = f4dReadWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*colorsByteValues_count;
@@ -320,7 +320,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, f4dReadWriter) {
 		}
 		
 		// 4) TexCoord.****************************************************************************************************
-		var hasTexCoord = f4dReadWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasTexCoord = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 //		if(hasTexCoord) {
 //			// TODO:
 //		}
