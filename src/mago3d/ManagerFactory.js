@@ -111,7 +111,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 						
 						// 1rst, check if there are objects to move.***
 						if(magoManager.mustCheckIfDragging) {
-							if(magoManager.isDragging(scene)) {
+							if(magoManager.isDragging(magoManager.scene)) {
 								magoManager.mouseDragging = true;
 								disableCameraMotion(false);
 							}
@@ -122,7 +122,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 					}	
 						
 					if(magoManager.mouseDragging) {
-						magoManager.moveSelectedObject(scene, magoManager.currentRenderablesNeoRefListsArray);
+						magoManager.moveSelectedObject(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray);
 					}
 				}
 			} else{
