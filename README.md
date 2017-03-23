@@ -24,7 +24,7 @@ sample 폴더안에 <b>database.json</b>에서 원하는 데이터로 설정해�
 ## Step 3. Setting up a web server
 server를 실행하기 전에 <b>Dependencies</b>를 설치해줍니다. <br>
 #### 1. node Setup <br>
-&emsp;<code>node install --save-dev yargs express url compression request</code>
+&emsp;<code>npm install --save-dev yargs express url compression request</code>
 
 #### 2. Server Execution <br>
 &emsp;<code>C:\git\repository\mago3djs>node server.js</code><br>
