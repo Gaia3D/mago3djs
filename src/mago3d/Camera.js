@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 3차원 정보
+ * 카메라
  * @class Camera
  */
 var Camera = function() {

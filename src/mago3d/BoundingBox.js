@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스
  * @class BoundingBox
  */
 var BoundingBox = function() {
@@ -19,7 +19,7 @@ var BoundingBox = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스 초기화
  * @param point3d 변수
  */
 BoundingBox.prototype.setInit = function(point3d) {
@@ -33,7 +33,7 @@ BoundingBox.prototype.setInit = function(point3d) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스 삭제
  * @param point3d 변수
  */
 BoundingBox.prototype.deleteObjects = function() {
@@ -47,7 +47,7 @@ BoundingBox.prototype.deleteObjects = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스 확대
  * @param point3d 변수
  */
 BoundingBox.prototype.expand = function(dist) {
@@ -61,7 +61,7 @@ BoundingBox.prototype.expand = function(dist) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스에 포인트를 추가하면서 영역을 변경
  * @param point3d
  */
 BoundingBox.prototype.addPoint3D = function(point3d) {
@@ -76,7 +76,7 @@ BoundingBox.prototype.addPoint3D = function(point3d) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스에 새로운 박스를 포함해서 새로 그림
  * @param boundingBox 변수
  */  
 BoundingBox.prototype.addBox = function(boundingBox) {
@@ -91,7 +91,7 @@ BoundingBox.prototype.addBox = function(boundingBox) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스 가로, 세로, 높이 중에서 최대값
  * @returns result
  */
 BoundingBox.prototype.getMaxLength = function() {
@@ -106,6 +106,14 @@ BoundingBox.prototype.getMaxLength = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns result
+ */
+BoundingBox.prototype.getXLength = function() {
+	return this.maxX - this.minX;
+};
+
+/**
+ * 영역 박스의 중심을 획득
  * @param resultPoint3d
  * @returns resultPoint3d
  */
@@ -117,7 +125,7 @@ BoundingBox.prototype.getCenterPoint3d = function(resultPoint3d) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 영역 박스내에 존재 유무를 판단
  * @param x 변수
  * @param y 변수
  * @param z 변수

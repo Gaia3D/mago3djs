@@ -26,6 +26,17 @@ var API = function(apiName) {
 	this.color = 0;
 	// structs = MSP, outfitting = MOP
 	this.blockType = null;
+	// outfitting 표시/비표시
+	this.showOutFitting = false;
+	// frustum culling 가시 거리(M단위)
+	this.frustumFarDistance = 0;
+	// highlighting
+	this.highLightedBuildings = [];
+	// color
+	this.colorBuildings = [];
+	// show/hide
+	this.hideBuildings = [];
+	
 };
 
 API.prototype.getAPIName = function() {
@@ -80,3 +91,39 @@ API.prototype.getBlockType = function() {
 API.prototype.setBlockType = function(blockType) {
 	this.blockType = blockType;
 };
+
+API.prototype.getShowOutFitting = function() {
+	return this.showOutFitting;
+};
+API.prototype.setShowOutFitting = function(showOutFitting) {
+	this.showOutFitting = showOutFitting;
+};
+
+API.prototype.getFrustumFarDistance = function() {
+	return this.frustumFarDistance;
+};
+API.prototype.setFrustumFarDistance = function(frustumFarDistance) {
+	this.frustumFarDistance = frustumFarDistance;
+};
+
+API.prototype.getHighLightedBuildings = function() {
+	return this.highLightedBuildings;
+};
+API.prototype.setHighLightedBuildings = function(highLightedBuildings) {
+	this.highLightedBuildings = highLightedBuildings;
+};
+
+API.prototype.getColorBuildings = function() {
+	return this.colorBuildings;
+};
+API.prototype.setColorBuildings = function(colorBuildings) {
+	this.colorBuildings = colorBuildings;
+};
+
+API.prototype.getHideBuildings = function() {
+	return this.hideBuildings;
+};
+API.prototype.setHideBuildings = function(hideBuildings) {
+	this.hideBuildings = hideBuildings;
+};
+

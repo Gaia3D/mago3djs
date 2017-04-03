@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블럭 모델
  * @class Block
  */
 var Block = function() {
@@ -20,7 +20,7 @@ var Block = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블럭이 가지는 데이터 삭제
  * @returns block
  */
 Block.prototype.deleteObjects = function(gl) {
@@ -38,7 +38,7 @@ Block.prototype.deleteObjects = function(gl) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록 목록
  * @class BlocksList
  */
 var BlocksList = function() {
@@ -54,7 +54,7 @@ var BlocksList = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 새 블록 생성
  * @returns block
  */
 BlocksList.prototype.newBlock = function() {
@@ -66,7 +66,7 @@ BlocksList.prototype.newBlock = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록 획득
  * @param idx 변수
  * @returns block
  */
@@ -80,7 +80,7 @@ BlocksList.prototype.getBlock = function(idx) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록을 삭제
  * @param idx 변수
  * @returns block
  */
@@ -109,7 +109,7 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록리스트 버퍼를 파싱
  * @param idx 변수
  * @returns block
  */
@@ -244,7 +244,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록리스트 버퍼를 파싱(비대칭적)
  * @param idx 변수
  * @returns block
  */
@@ -287,6 +287,8 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 				
 				// 3) Indices.*************************************************************************************************
 				var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				bytesReaded += 4;
+				var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.*** 
 			}
@@ -378,6 +380,9 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			// 3) Indices.*************************************************************************************************
 			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
+			var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+			vbo_vi_cacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2*shortIndicesValues_count;
 			  
@@ -406,7 +411,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록 컨테이너
  * @class BlocksListsContainer
  */
 var BlocksListsContainer = function() {
@@ -417,7 +422,7 @@ var BlocksListsContainer = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 새 블록 리스트를 생성
  * @param blocksList_name 변수
  * @returns blocksList
  */
@@ -429,7 +434,7 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 블록 리스트 획득
  * @param blockList_name 변수
  * @returns blocksList
  */

@@ -152,7 +152,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	} else bytes_readed += 4;
 	
-	//this.altitude += 20.0; // TEST.***
+	//this.altitude -= 140.0; // TEST.***
 	
 	//header._elevation += 70.0; // delete this. TEST.!!!
 	if(this.bbox == undefined) this.bbox = new BoundingBox();
@@ -345,6 +345,8 @@ var NeoBuilding = function() {
 	this.buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
 	this.buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.bbox;
+	this.bboxAbsoluteCenterPos;
+	this.frustumCulled = false;
 	
 	this.move_matrix; // PositionMatrix (only rotations).*** // TODO: put this inside of a geoLocationData.***
 	this.move_matrix_inv; // Inverse of PositionMatrix.***   // TODO: put this inside of a geoLocationData.***
@@ -354,6 +356,8 @@ var NeoBuilding = function() {
 	this.transfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
 	
 	this.geoLocationDataAux; // there are positions and matrices.***
+	this.isDemoBlock = false;
+	//this.isHighLighted;
 	
 	// create the default blocks_lists.*****************************
 	this._blocksList_Container = new BlocksListsContainer();
@@ -532,3 +536,58 @@ NeoBuildingsList.prototype.newNeoBuilding = function() {
 	this.neoBuildings_Array.push(neoBuilding);
 	return neoBuilding;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns neoBuilding
+ */
+NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId) {
+	var resultBuilding;
+	var buildingsCount = this.neoBuildings_Array.length;
+	var found = false;
+	var i=0;
+	while(!found && i<buildingsCount)
+	{
+		if(this.neoBuildings_Array[i].buildingType == buildingType && this.neoBuildings_Array[i].buildingId == buildingId)
+		{
+			found = true;
+			resultBuilding = this.neoBuildings_Array[i];
+		}
+		i++;
+	}
+	
+	return resultBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns neoBuilding
+ */
+NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulled) {
+	var buildingsCount = this.neoBuildings_Array.length;
+
+	for(var i=0; i<buildingsCount; i++)
+	{
+		this.neoBuildings_Array[i].frustumCulled = bFrustumCulled;
+	}
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

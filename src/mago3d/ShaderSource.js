@@ -799,6 +799,8 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
+	uniform vec4 oneColor4;\n\
+	uniform bool bUse1Color;\n\
 	\n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
@@ -829,7 +831,14 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		//}\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-		vcolor4 = color4;\n\
+		if(bUse1Color)\n\
+		{\n\
+			vcolor4 = oneColor4;\n\
+		}\n\
+		else\n\
+		{\n\
+			vcolor4 = color4;\n\
+		}\n\
 	}";
 	
 	

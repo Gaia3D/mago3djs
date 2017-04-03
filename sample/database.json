@@ -10,12 +10,25 @@
 			"url" : "http://www.gaia3d.com/ko/"
 		}
 	},
+	"backgroundProvider" : {
+		"enable" : false,
+		"url" : "http://localhost:8081/geoserver/gaia3d/wms",
+		"layers" : "gaia3d:backgroundForSHI",
+		"parameters" : {
+			"service" : "WMS",
+			"version" : "1.1.1",
+			"request" : "GetMap",
+			"transparent" : "true",
+			"format" : "image/png"
+		}
+	},
 	"deployConfig" : {
-		"deployType" : "github",
+		"customer" : "github",
 		"viewLibrary" : "cesium",
 		"dataPath" : "/data"
 	},
 	"renderingConfg" : {
+		"renderMode" : "1",
 		"cullFaceEnable" : false
 	},
 	"geoConfig" : {
@@ -26,22 +39,23 @@
 			"height" : 3000.0
 		},
 		"initTerrain" : {
-			"enable" : true,
+			"enable" : false,
 			"url" : "https://assets.agi.com/stk-terrain/world",
 			"requestWaterMask" : true,
 			"requestVertexNormals" : true
 		},
 		"initCamera" : {
+			"enable" : false,
 			"latitude" : 37.521168,
 			"longitude" : 126.924185,
 			"height" : 3000.0,
 			"duration": 3
 		},
 		"initBuilding" : {
-			"latitude" : [ 37.5172076, 37.5157076 ],
-			"longitude" : [ 126.929, 126.929],
-			"height" : [ 60.0, 60.0 ],
-			"buildingFileName" : [ "F4D_KICT_main_Arc_v3_with_spaces", "F4D_gangbuk_cultur_del"]
+			"latitude" : [ 34.902880 ],
+			"longitude" : [ 128.595717 ],
+			"height" : [ 42.9 ],
+			"buildingFileName" : [ "F4D_2089_S120T_2_old"]
 		}
 	},
 	"blockConfig" : {

@@ -19,6 +19,8 @@ MagoConfig.getInformation = function() {
 MagoConfig.init = function(jsonConfig, blocksConfig) {
 	this.jsonConfig = jsonConfig;
 	
+	// backgroundProvider
+	MagoConfig.backgroundProvider(jsonConfig);
 	// 배포 관련 설정
 	MagoConfig.initDeployConfig(jsonConfig);
 	// 화면 rendering 관련 설정
@@ -31,24 +33,61 @@ MagoConfig.init = function(jsonConfig, blocksConfig) {
 };
 
 /**
+ * background provider
+ * 
+ * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
+ */
+MagoConfig.backgroundProvider = function(jsonConfig) {
+	// 배포 관련 설정
+	if(jsonConfig.backgroundProvider !== null && jsonConfig.backgroundProvider !== "" ) {
+		if(jsonConfig.backgroundProvider.enable === undefined 
+				|| jsonConfig.backgroundProvider.enable === null 
+				|| jsonConfig.backgroundProvider.enable === false
+				|| jsonConfig.backgroundProvider.enable === "false") {
+			jsonConfig.backgroundProvider.enable = false;
+		} else {
+			jsonConfig.backgroundProvider.enable = true;
+		}
+		if(jsonConfig.backgroundProvider.url === undefined
+				|| jsonConfig.backgroundProvider.url === null || jsonConfig.deployConfig.url === "") {
+			jsonConfig.backgroundProvider.url = "";
+		}
+		if(jsonConfig.backgroundProvider.layers === undefined
+				|| jsonConfig.backgroundProvider.layers === null || jsonConfig.deployConfig.layers === "") {
+			jsonConfig.backgroundProvider.layers = "uos:uos_upload_image";
+		}
+		if(jsonConfig.backgroundProvider.parameters === undefined
+				|| jsonConfig.backgroundProvider.parameters === null || jsonConfig.deployConfig.parameters === "") {
+			jsonConfig.backgroundProvider.parameters = "";
+		}
+		if(jsonConfig.backgroundProvider.proxy === undefined
+				|| jsonConfig.backgroundProvider.proxy === null || jsonConfig.deployConfig.proxy === "") {
+			jsonConfig.backgroundProvider.proxy = "/proxy/";
+		}
+	}
+	
+	this.jsonConfig.backgroundProvider = jsonConfig.backgroundProvider;
+};
+
+/**
  * 배포관련 환경 설정
  * 
  * @param jsonConfig DB에서 가져온 json 포맷 환경 설정
  */
 MagoConfig.initDeployConfig = function(jsonConfig) {
 	// 배포 관련 설정
-	if(jsonConfig.deployConfig !== null && jsonConfig.deployConfig !== '' ) {
-		if(jsonConfig.deployConfig.deployType === undefined 
-				|| jsonConfig.deployConfig.deployType === null 
-				|| jsonConfig.deployConfig.deployType === '') {
-			jsonConfig.deployConfig.deployType = "github";
+	if(jsonConfig.deployConfig !== null && jsonConfig.deployConfig !== "" ) {
+		if(jsonConfig.deployConfig.customer === undefined 
+				|| jsonConfig.deployConfig.customer === null 
+				|| jsonConfig.deployConfig.customer === "") {
+			jsonConfig.deployConfig.customer = "github";
 		}
 		if(jsonConfig.deployConfig.viewLibrary === undefined
-				|| jsonConfig.deployConfig.viewLibrary === null || jsonConfig.deployConfig.viewLibrary === '') {
+				|| jsonConfig.deployConfig.viewLibrary === null || jsonConfig.deployConfig.viewLibrary === "") {
 			jsonConfig.deployConfig.viewLibrary = Constant.CESIUM;
 		}
 		if(jsonConfig.deployConfig.dataPath === undefined
-				|| jsonConfig.deployConfig.dataPath === null || jsonConfig.deployConfig.dataPath === '') {
+				|| jsonConfig.deployConfig.dataPath === null || jsonConfig.deployConfig.dataPath === "") {
 			jsonConfig.deployConfig.dataPath = "/data";
 		}
 	}
@@ -63,12 +102,22 @@ MagoConfig.initDeployConfig = function(jsonConfig) {
  */
 MagoConfig.initRenderingConfig = function(jsonConfig) {
 	// 화면 rendering 관련 설정
-	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== '' ) {
+	if(jsonConfig.renderingConfg !== null && jsonConfig.renderingConfg !== "" ) {
+		// 0 = fullship, 1 = deploy
+		if(jsonConfig.renderingConfg.renderMode === undefined
+				|| jsonConfig.renderingConfg.renderMode === null 
+				|| jsonConfig.renderingConfg.renderMode === "" 
+				|| jsonConfig.renderingConfg.renderMode === "1") {
+			jsonConfig.renderingConfg.renderMode = 1;
+		} else {
+			jsonConfig.renderingConfg.renderMode = 0;
+		}
+		
 		if(jsonConfig.renderingConfg.cullFaceEnable === undefined
 				|| jsonConfig.renderingConfg.cullFaceEnable === null 
-				|| jsonConfig.renderingConfg.cullFaceEnable === '' 
+				|| jsonConfig.renderingConfg.cullFaceEnable === "" 
 				|| jsonConfig.renderingConfg.cullFaceEnable === false
-				|| jsonConfig.renderingConfg.cullFaceEnable === 'false') {
+				|| jsonConfig.renderingConfg.cullFaceEnable === "false") {
 			jsonConfig.renderingConfg.cullFaceEnable = false;
 		} else {
 			jsonConfig.renderingConfg.cullFaceEnable = true;
@@ -85,25 +134,25 @@ MagoConfig.initRenderingConfig = function(jsonConfig) {
  */
 MagoConfig.initGeoConfig = function(jsonConfig) {
 	// 초기화 할 공간 정보. github에 공개되어 있는 여의도 sample 자료
-	if(jsonConfig.geoConfig !== null && jsonConfig.geoConfig !== '' ) {
+	if(jsonConfig.geoConfig !== null && jsonConfig.geoConfig !== "" ) {
 		// 최초 로딩시 지도가 표시할 공간 enitity 정보
-		if(jsonConfig.geoConfig.initEntity === undefined 
-				|| jsonConfig.geoConfig.initEntity === null 
-				|| jsonConfig.geoConfig.initEntity === '') {
+		if(jsonConfig.geoConfig.initEntity !== undefined 
+				&& jsonConfig.geoConfig.initEntity !== null 
+				&& jsonConfig.geoConfig.initEntity !== "") {
 			
 			if(jsonConfig.geoConfig.initEntity.name === undefined 
 					|| jsonConfig.geoConfig.initEntity.name === null 
-					|| jsonConfig.geoConfig.initEntity.name === '') {
+					|| jsonConfig.geoConfig.initEntity.name === "") {
 				jsonConfig.geoConfig.initEntity.name = ["여의도"];
 			}
 			if(jsonConfig.geoConfig.initEntity.longitude === undefined 
 					|| jsonConfig.geoConfig.initEntity.longitude === null 
-					|| jsonConfig.geoConfig.initEntity.longitude === '') {
+					|| jsonConfig.geoConfig.initEntity.longitude === "") {
 				jsonConfig.geoConfig.initEntity.longitude = 126.924185;
 			}
 			if(jsonConfig.geoConfig.initEntity.latitude === undefined 
 					|| jsonConfig.geoConfig.initEntity.latitude === null 
-					|| jsonConfig.geoConfig.initEntity.latitude === '') {
+					|| jsonConfig.geoConfig.initEntity.latitude === "") {
 				jsonConfig.geoConfig.initEntity.latitude = 37.521168;
 			}
 			if(jsonConfig.geoConfig.initEntity.height === undefined 
@@ -113,9 +162,9 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 		}
 		
 		// 최초 로딩시 rendering 할 building 정보
-		if(jsonConfig.geoConfig.initBuilding === undefined 
-				|| jsonConfig.geoConfig.initBuilding === null 
-				|| jsonConfig.geoConfig.initBuilding === '') {
+		if(jsonConfig.geoConfig.initBuilding !== undefined 
+				&& jsonConfig.geoConfig.initBuilding !== null 
+				&& jsonConfig.geoConfig.initBuilding !== "") {
 			
 			if(jsonConfig.geoConfig.initBuilding.latitude === undefined 
 					|| jsonConfig.geoConfig.initBuilding.latitude === null 
@@ -139,51 +188,62 @@ MagoConfig.initGeoConfig = function(jsonConfig) {
 			}
 		}
 		
-		// 화면 rendering 관련 설정
-		if(jsonConfig.geoConfig.initTerrain !== null && jsonConfig.geoConfig.initTerrain !== '' ) {
+		// 화면 terrain 관련 설정
+		if(jsonConfig.geoConfig.initTerrain !== undefined 
+				&& jsonConfig.geoConfig.initTerrain !== null 
+				&& jsonConfig.geoConfig.initTerrain !== "" ) {
+			
 			if(jsonConfig.geoConfig.initTerrain.enable === undefined
 					|| jsonConfig.geoConfig.initTerrain.enable === null 
-					|| jsonConfig.geoConfig.initTerrain.enable === ''
+					|| jsonConfig.geoConfig.initTerrain.enable === ""
 					|| jsonConfig.geoConfig.initTerrain.enable === true	
-					|| jsonConfig.geoConfig.initTerrain.enable === 'true') {
+					|| jsonConfig.geoConfig.initTerrain.enable === "true") {
 				jsonConfig.geoConfig.initTerrain.enable = true;
 			} else {
 				jsonConfig.geoConfig.initTerrain.enable = false;
 			}
 			if(jsonConfig.geoConfig.initTerrain.url === undefined
 					|| jsonConfig.geoConfig.initTerrain.url === null 
-					|| jsonConfig.geoConfig.initTerrain.url === '') {
-				jsonConfig.geoConfig.initTerrain.url = 'https://assets.agi.com/stk-terrain/world';
+					|| jsonConfig.geoConfig.initTerrain.url === "") {
+				jsonConfig.geoConfig.initTerrain.url = "https://assets.agi.com/stk-terrain/world";
 			}
 			if(jsonConfig.geoConfig.initTerrain.requestWaterMask === undefined
 					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === null 
-					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === ''
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === ""
 					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === true		
-					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === 'true') {
+					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === "true") {
 				jsonConfig.geoConfig.initTerrain.requestWaterMask = true;
 			}
 			if(jsonConfig.geoConfig.initTerrain.requestVertexNormals === undefined
 					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === null 
-					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === ''
+					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === ""
 					|| jsonConfig.geoConfig.initTerrain.requestWaterMask === true		
-					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === 'true') {
+					|| jsonConfig.geoConfig.initTerrain.requestVertexNormals === "true") {
 				jsonConfig.geoConfig.initTerrain.requestVertexNormals = true;
 			}
 		}
 		
 		// 최초 로딩시 camera가 이동할 공간 정보
-		if(jsonConfig.geoConfig.initCamera === undefined 
-				|| jsonConfig.geoConfig.initCamera === null 
-				|| jsonConfig.geoConfig.initCamera === '') {
-			
+		if(jsonConfig.geoConfig.initCamera !== undefined 
+				&& jsonConfig.geoConfig.initCamera !== null 
+				&& jsonConfig.geoConfig.initCamera !== '') {
+			if(jsonConfig.geoConfig.initCamera.enable === undefined
+					|| jsonConfig.geoConfig.initCamera.enable === null 
+					|| jsonConfig.geoConfig.initCamera.enable === ""
+					|| jsonConfig.geoConfig.initCamera.enable === true		
+					|| jsonConfig.geoConfig.initCamera.enable === "true") {
+				jsonConfig.geoConfig.initCamera.enable = true;
+			} else {
+				jsonConfig.geoConfig.initCamera.enable = false;
+			}
 			if(jsonConfig.geoConfig.initCamera.longitude === undefined 
 					|| jsonConfig.geoConfig.initCamera.longitude === null 
-					|| jsonConfig.geoConfig.initCamera.longitude === '') {
+					|| jsonConfig.geoConfig.initCamera.longitude === "") {
 				jsonConfig.geoConfig.initCamera.longitude = 126.924185;
 			}
 			if(jsonConfig.geoConfig.initCamera.latitude === undefined 
 					|| jsonConfig.geoConfig.initCamera.latitude === null 
-					|| jsonConfig.geoConfig.initCamera.latitude === '') {
+					|| jsonConfig.geoConfig.initCamera.latitude === "") {
 				jsonConfig.geoConfig.initCamera.latitude = 37.521168;
 			}
 			if(jsonConfig.geoConfig.initCamera.height === undefined 

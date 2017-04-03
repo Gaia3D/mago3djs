@@ -1,10 +1,7 @@
 'use strict';
 
-// tornado : https://www.html5rocks.com/en/tutorials/casestudies/oz/
-// https://www.html5rocks.com/static/demos/oz/tutorials/tornado/index.html
-
 /**
- * 어떤 일을 하고 있습니까?
+ * 하늘에 구름을 관리하는 매니저
  * @class Atmosphere
  */
 var Atmosphere = function() {
@@ -17,7 +14,7 @@ var Atmosphere = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 구름이 땅에 그림자를 그릴때 사용함
  * @class ShadowBlendingCube
  */
 var ShadowBlendingCube = function() {
@@ -35,7 +32,7 @@ var ShadowBlendingCube = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 구름이 땅에 그림자를 그릴때 초기화
  * @param vtxMat 변수
  * @param tTriMat 변수
  */
@@ -126,7 +123,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 데이터를 올릴때 요청
  * @returns floatArray
  */
 ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
@@ -135,7 +132,7 @@ ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 데이터를 올릴때 사용(삼각형을 이루어 주는 순서)
  * @returns shortArray
  */
 ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
@@ -147,7 +144,7 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 구름 매니저
  * @class CloudsManager
  */
 var CloudsManager = function() {
@@ -158,7 +155,7 @@ var CloudsManager = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 원형 구름 생성
  * @returns circularCloud
  */
 CloudsManager.prototype.newCircularCloud = function() {
@@ -168,7 +165,7 @@ CloudsManager.prototype.newCircularCloud = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 원형 구름
  * @class CircularCloud
  */
 var CircularCloud = function() {
@@ -214,7 +211,7 @@ var CircularCloud = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 올릴 데이터를 요청
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
@@ -223,7 +220,7 @@ CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 올릴 데이터를 요청(삼각형)
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOIndicesShortArray = function() {
@@ -235,7 +232,7 @@ CircularCloud.prototype.getVBOIndicesShortArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 올릴 데이터를 요청(Vertex)
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
@@ -244,7 +241,7 @@ CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 그래픽 카드에 올릴 데이터를 요청(삼삭형 순서)
  * @returns shortArray
  */
 CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
@@ -256,7 +253,7 @@ CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 로케이션을 따라서 회전
  * @param vtxMat 변수
  */
 CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
@@ -284,7 +281,7 @@ CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 햇빛 방향으로 시작
  */
 CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 	var distance = 3000.0;
@@ -299,12 +296,12 @@ CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 구름 생성
  * @param logitude 경도
  * @param latitude 위도
  * @param radius 반지름
  * @param depth 깊이
- * @param numPointsForCircle 변수
+ * @param numPointsForCircle 동그라미 하나당 점의 갯수
  */
 CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, radius, depth, numPointsForCircle) {
 	this.longitude = longitude;
@@ -340,7 +337,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude, ra
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * mesh 생성
  * @param vtxMat 변수
  * @param tTriMat 변수
  * @param shadowVtxMat 변수

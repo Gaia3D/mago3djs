@@ -603,7 +603,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
 				blocksList.fileLoadState = 500;
 			}
 		} else {
-			blocksList.fileLoadState = oReq.status;
+			if(oReq.status == 0) blocksList.fileLoadState = 500;
+			else blocksList.fileLoadState = oReq.status;
 		}
 		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -639,7 +640,8 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
 				blocksList.fileLoadState = 500;
 			}
 		} else {
-			blocksList.fileLoadState = oReq.status;
+			if(oReq.status == 0) blocksList.fileLoadState = 500;
+			else blocksList.fileLoadState = oReq.status;
 		}
 		
 //		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
@@ -673,7 +675,8 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
 				neoRefsList.fileLoadState = 500;
 			}
 		} else {
-			neoRefsList.fileLoadState = oReq.status;
+			if(oReq.status == 0) neoRefsList.fileLoadState = 500;
+			else neoRefsList.fileLoadState = oReq.status;
 		}
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -712,7 +715,8 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 				lowestOctree.lego.fileLoadState = 500;
 			}
 		} else {
-			lowestOctree.lego.fileLoadState = oReq.status;
+			if(oReq.status == 0) lowestOctree.lego.fileLoadState = 500;
+			else lowestOctree.lego.fileLoadState = oReq.status;
 		}
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -745,7 +749,8 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuildin
 				lodBuilding.fileLoadState = 500;
 			}
 		} else {
-			lodBuilding.fileLoadState = oReq.status;
+			if(oReq.status == 0) lodBuilding.fileLoadState = 500;
+			else lodBuilding.fileLoadState = oReq.status;
 		}
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -813,7 +818,8 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
 //		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -848,7 +854,8 @@ ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBu
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
 //		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -959,7 +966,8 @@ ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, re
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
 //		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -1020,7 +1028,8 @@ ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsLi
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
 //		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -1146,7 +1155,8 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 		
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -1181,7 +1191,8 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter,
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 		
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -1320,7 +1331,8 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 				neoBuilding.metaData.fileLoadState = 500;
 			}
 		} else {
-			neoBuilding.metaData.fileLoadState = oReq.status;
+			if(oReq.status == 0) neoBuilding.metaData.fileLoadState = 500;
+			else neoBuilding.metaData.fileLoadState = oReq.status;
 		}
 		
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -1369,6 +1381,17 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 				
 				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				
+				// test for 1500 blocks.***
+				if(neoBuilding.bbox == undefined)
+					neoBuilding.bbox = new BoundingBox();
+				neoBuilding.bbox.minX = neoBuilding.metaData.oct_min_x;
+				neoBuilding.bbox.minY = neoBuilding.metaData.oct_min_y;
+				neoBuilding.bbox.minZ = neoBuilding.metaData.oct_min_z;
+				neoBuilding.bbox.maxX = neoBuilding.metaData.oct_max_x;
+				neoBuilding.bbox.maxY = neoBuilding.metaData.oct_max_y;
+				neoBuilding.bbox.maxZ = neoBuilding.metaData.oct_max_z;
+				// end // test for 1500 blocks.***
 			  
 			    //BR_Project._f4d_header_readed_finished = true;
 				arrayBuffer = undefined;
@@ -1377,7 +1400,8 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				arrayBuffer = undefined;
 			}
 		} else {
-			neoBuilding.metaData.fileLoadState = oReq.status;
+			if(oReq.status == 0) neoBuilding.metaData.fileLoadState = 500;
+			else neoBuilding.metaData.fileLoadState = oReq.status;
 		}
 		arrayBuffer = undefined;
 		
@@ -1592,7 +1616,8 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 	});
 	
@@ -1687,7 +1712,8 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 //				blocksList.fileLoadState = 500;
 			}
 		} else {
-//			blocksList.fileLoadState = oReq.status;
+//			if(oReq.status == 0) blocksList.fileLoadState = 500;
+//			else blocksList.fileLoadState = oReq.status;
 		}
 		
 //		magoManager.fileRequestControler.filesRequestedCount -= 1;

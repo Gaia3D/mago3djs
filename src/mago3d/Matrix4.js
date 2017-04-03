@@ -164,6 +164,26 @@ Matrix4.prototype.transformPoint3D = function(point3d, result_point3d) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param point3d 변수
+ * @param result_point3d 변수
+ * @returns result_point3d
+ */
+Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d) {
+	if(result_point3d == undefined) result_point3d = new Point3D();
+
+	var x = point3d.x;
+	var y = point3d.y;
+	var z = point3d.z;
+	
+	result_point3d.x = x*this.get(0,0) + y*this.get(1,0) + z*this.get(2,0);
+	result_point3d.y = x*this.get(0,1) + y*this.get(1,1) + z*this.get(2,1);
+	result_point3d.z = x*this.get(0,2) + y*this.get(1,2) + z*this.get(2,2);
+	
+	return result_point3d;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param matrix 변수
  * @param resultMat 변수
  * @returns resultMat

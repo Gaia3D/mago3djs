@@ -10,7 +10,15 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 			|| metaData.altitude == undefined ) return false;
 	
 	// 0) PositionMatrix.************************************************************************
-	var position = Cesium.Cartesian3.fromDegrees(metaData.longitude, metaData.latitude, metaData.altitude);
+	var position;
+	if(neoBuilding.buildingPosition != undefined)
+	{
+		position = neoBuilding.buildingPosition;
+	}
+	else
+	{
+		position = Cesium.Cartesian3.fromDegrees(metaData.longitude, metaData.latitude, metaData.altitude);
+	}
 	neoBuilding.buildingPosition = position; 
 	
 	// High and Low values of the position.****************************************************

@@ -445,9 +445,13 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 	
-	if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
-	if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
-	if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
+	//if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
+	//if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
+	//if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
+	
+	//squaredDistLod0 = 400;
+	//squaredDistLod1 = 2000;
+	//squaredDistLod2 = 500000*1000;
 	
 	for(var i=0; i<visibleOctrees_count; i++) {
 		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) {

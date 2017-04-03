@@ -28,29 +28,58 @@
 	<div style="width:100% ;min-height: 500px;">
 		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
-			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
-			<ul>
-				<!-- <li><a href="/sample/tutorials.html">FullShip 모드</a></li>
-				<li><a href="/sample/tutorials.html?viewType=deploy">Deploy 모드</a></li> -->
-				
-				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
-				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
-				<li style="height: 30px;">
-					<label for="blockType">블록 타입</label>
-					<select id="blockType" name="blockType">
-						<option value="MSP" selected="selected">Struts</option>
-						<option value="MOP">OutFitting</option>
-					</select><br/>
+			<div style="padding-left: 10px; padding-top: 20px;">Tutorials</div>
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<input type="radio" id="fullshipRender" name="renderMode" value="0" onclick="changeRender('0');" />
+				<label for="fullshipRender"> 호선 </label><br/>
+				<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" />
+				<label for="deployRender"> 지번 전개 </label><br/>
+				<input type="radio" id="demoDeployRender" name="renderMode" value="2" onclick="changeRender('2');" />
+				<label for="demoDeployRender"> 지번 전개 데모 </label>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<input type="radio" id="showOutFitting" name="outFitting" onclick="changeOutFitting(true);" />
+				<label for="showOutFitting"> OutFitting 표시 </label><br/>
+				<input type="radio" id="hideOutFitting" name="outFitting" onclick="changeOutFitting(false);" />
+				<label for="hideOutFitting"> OutFitting 비표시 </label>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<label for="frustumFarDistance"> 가시거리(M) </label>
+				<input type="text" id="frustumFarDistance" name="frustumFarDistance" size="2" /> 
+				<button type="button" id="changeFrustumFarDistanceAPI" class="btn btn-default btn-sm">적용</button>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<label for="blockType">블록 타입</label>
+				<select id="blockType" name="blockType">
+					<option value="MSP" selected="selected">Structure</option>
+					<option value="MOP">OutFitting</option>
+				</select><br/>
 					
-					<label for="blockId">블록 ID</label><br/>
-					<input type="text" id="blockId" name="blockId" size="15"/><br/>
-					<a href="#" onclick="searchBlock(); return false;">검색</a>
-					<a href="#" onclick="searchBlock(); return false;">HighLighting</a><br/>
-					<a href="#" onclick="searchBlock(); return false;">색변경</a>
-					<a href="#" onclick="searchBlock(); return false;">숨기기</a>
-					<a href="#" onclick="searchBlock(); return false;">표시</a>
-				</li>
-			</ul>
+				<label for="blockId">블록 ID</label>
+				<select id="blockId" name="blockId">
+				</select>
+				<button type="button" id="searchBlockAPI" class="btn btn-default btn-sm">이동</button>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<label for="blockIds">블록 ID(복수 ,연결 )</label><br/>
+				<input type="text" id="blockIds" name="blockIds" size="17" /><br/>
+				<label for="colorBlock">Color(16진수)</label>
+				<select id="colorBlock" name="colorBlock" style="margin-top: 5px;">
+					<option value="">없음</option>
+					<option value="255,0,0">빨강</option>
+					<option value="255,255,0">노랑</option>
+					<option value="0,255,0">녹색</option>
+					<option value="0,0,255">파랑</option>
+					<option value="255,0,255">분홍</option>
+					<option value="0,0,0">검정</option>
+				</select><br/>
+				<button type="button" id="changeHighLightingAPI" class="btn btn-default btn-sm">HighLighting</button>
+                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">색변경</button>
+			</div>
 		</div>
 		</form>
 		<div style="padding-top: 30px; padding-left: 20px; width: 97%;">
@@ -101,52 +130,71 @@
 <script type="text/javascript" src="../src/mago3d/Lego.js"></script>
 <script type="text/javascript" src="../src/mago3d/Camera.js"></script>
 <script type="text/javascript" src="../src/mago3d/GeoLocationData.js"></script>
+<script type="text/javascript" src="../src/mago3d/MagoFacade.js"></script>
+<script type="text/javascript" src="../src/mago3d/Policy.js"></script>
 <script>
 	var managerFactory = null;
+	magoStart(null, "magoContainer");
 	
-	$.ajax({
-		url: "/sample/database.json",
-		type: "GET",
-		dataType: "json",
-		async : true,
-		success: function(result){
-			// TODO DB 에서 고객사별 환경 설정을 읽어서 초기화
-			getBlocksConfig(result);
-		},
-		error: function(e){
-			alert(e.responseText);
+	var intervalCount = 0;
+	var timerId = setInterval("startMogoUI()", 1000); 
+	function startMogoUI() {
+		intervalCount++;
+		if(managerFactory != null) {
+			// 지번 전개
+			changeRender("1");
+			// outfitting  비표시
+			changeOutFitting(false);
+			clearInterval(timerId);
+			console.log(" managerFactory != null, intervalCount = " + intervalCount);
+			return;
 		}
-	});
+		console.log("--------- intervalCount = " + intervalCount);
+	}
 	
-	function getBlocksConfig(magoConfig) {
-		// blocks 정보를 db에서 읽어 오는 예제
+	$( document ).ready(function() {
 		$.ajax({
 			url: "/sample/blocks.json",
 			type: "GET",
 			dataType: "json",
-			async : true,
 			success: function(blocksConfig){
-				/* var queryString = window.location.search;
-				var viewType = "0";
-				if(queryString == undefined || queryString == null || queryString.length == 0) {
-					// TODO 나중에는 문자나 조건을 좀 달리 해야할거 같음
-					viewType = "0";
-				} else {
-					viewType = "1";
-				} */
-				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, blocksConfig);
-				
-				// 사용하는 예제
-				/* 
-				var blocks = result.blocks;
-				var blockId = "F110T";
-				var block = blocks[blockId];
-				console.log("map 처럼 key 로 뽑을 경우" + block.LATITUDE);
-				for(var key in blocks) {
-					block = blocks[key];
-					console.log(key + "---------------" + block.LATITUDE);
-				} 
-				*/
+				var blocks = blocksConfig.blocks;
+				for (var blockId in blocks) {
+					$('#blockId').append($('<option>',
+					{
+						value: blockId,
+						text : blockId 
+					}));
+				}
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	});
+	
+	function changeRender(renderMode) {
+		if(renderMode === "0") {
+			document.getElementById("fullshipRender").checked = true;
+			changeRenderAPI(renderMode);
+		} else if(renderMode === "1") {
+			document.getElementById("deployRender").checked = true;
+			changeRenderAPI(renderMode);
+		} else if(renderMode === "2") {
+			document.getElementById("demoDeployRender").checked = true;
+			demoRenderMode(renderMode);
+		}
+	}
+	
+	function demoRenderMode(renderMode) {
+		$.ajax({
+			url: "/sample/blocks_demo.json",
+			type: "GET",
+			dataType: "json",
+			success: function(blocksConfig){
+				if(managerFactory != null) {
+					managerFactory.demo(renderMode, blocksConfig);
+				}
 			},
 			error: function(e){
 				alert(e.responseText);
@@ -154,24 +202,80 @@
 		});
 	}
 	
-	// render mode 
-	function changeRenderMode(renderMode) {
-		var api = new API("renderMode");
-		api.setRenderMode(renderMode);
-		if(managerFactory != null) {
-			managerFactory.callAPI(api);
+	// outfitting 표시/비표시
+	function changeOutFitting(mode) {
+		if(mode) document.getElementById("showOutFitting").checked = true;
+		else document.getElementById("hideOutFitting").checked = true;
+		changeOutFittingAPI(mode);
+	}
+	
+	// 가시 거리
+	$("#changeFrustumFarDistanceAPI").click(function() {
+		changeFrustumFarDistanceCheck();
+		changeFrustumFarDistanceAPI($("#frustumFarDistance").val());
+	});
+	$("#searchBlockAPI").click(function() {
+		var blockType = $("#blockType").val();
+		var blockId = $("#blockId").val();
+		searchBlockAPI(blockType, blockId);
+	});
+	$("#changeHighLightingAPI").click(function(e) {
+		changeHighLightingCheck(e);
+		changeHighLightingAPI($("#blockIds").val());
+	});
+	$("#changeColorAPI").click(function(e) {
+		changeColorCheck(e);
+		changeColorAPI($("#blockIds").val(), $("#colorBlock").val());
+	});
+	$("#frustumFarDistance").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			changeFrustumFarDistanceCheck(e);			
+		}
+	});
+	
+	function changeFrustumFarDistanceCheck(e) {
+		if ($.trim($("#frustumFarDistance").val()) === ""){
+			alert("가시 거리를 입력해 주세요.");
+			$("#frustumFarDistance").focus();
+			return false;
 		}
 	}
 	
-	// 블록 검색 
-	function searchBlock() {
-		var api = new API("search");
-		var blockType = $("#blockType").val();
-		var blockId = $("#blockId").val();
-		api.setBlockType(blockType);
-		api.setBlockId(blockId);
-		if(managerFactory != null) {
-			managerFactory.callAPI(api);
+	$("#blockIds").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	
+	function changeHighLightingCheck(e) {
+		if ($.trim($("#blockIds").val()) === ""){
+			alert("블록 ID를 입력해 주세요.");
+			$("#blockIds").focus();
+			e.preventDefault();
+			return false;
+		}
+		if ($.trim($("#colorBlock").val()) !== ""){
+			alert("Color 를 선택하실 수 없습니다.");
+			$("#colorBlock").focus();
+			e.preventDefault();
+			return false;
+		}
+	}
+	
+	function changeColorCheck(e) {
+		if ($.trim($("#blockIds").val()) === ""){
+			alert("블록 ID를 입력해 주세요.");
+			$("#blockIds").focus();
+			e.preventDefault();
+			return false;
+		}
+		if ($.trim($("#colorBlock").val()) === ""){
+			alert("Color 를 선택하여 주세요.");
+			$("#colorBlock").focus();
+			e.preventDefault();
+			return false;
 		}
 	}
 </script>

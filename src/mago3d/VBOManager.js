@@ -34,6 +34,7 @@ var VBOVertexIdxCacheKey = function() {
 	
     this.indicesCount = -1;
 	this.vertexCount = -1;
+	this.bigTrianglesIndicesCount = -1;
     
     this.MESH_VERTEX_cacheKey = null;
     this.MESH_FACES_cacheKey = null;

@@ -577,6 +577,8 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	
 	//shader.program.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
 	//shader.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");

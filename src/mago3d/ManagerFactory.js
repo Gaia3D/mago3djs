@@ -29,10 +29,23 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
 		
+		// background provider 적용
+		if(magoConfig.backgroundProvider.enable) {
+			backgroundProvider();
+		}
 		draw();
+		// build을 rendering 할 위치
 		initEntity();
-		initTerrain();
-		initCamera();
+		// terrain 적용 여부
+		if(magoConfig.geoConfig.initTerrain.enable) {
+			initTerrain();
+		}
+		// 최초 로딩시 카메라 이동 여부
+		if(magoConfig.geoConfig.initCamera.enable) {
+			initCamera();
+		}
+		// render Mode 적용
+		initRenderMode();
 	} else if(magoConfig.deployConfig.viewLibrary === Constant.WORLDWIND) {
 		viewer = null;
 	}
@@ -48,7 +61,6 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	
 	// cesium을 구현체로서 이용
 	function drawCesium() {
-		
 		var gl = viewer.scene.context._gl;
 		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
 		viewer.scene.magoManager.shadersManager.createDefaultShader(gl); 
@@ -86,7 +98,6 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
-			
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 		
 		magoManager.handler.setInputAction(function(click) {
@@ -97,9 +108,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
-			
 		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
-
 
 		magoManager.handler.setInputAction(function(movement) {
 			if(magoManager.mouseLeftDown) {
@@ -130,7 +139,6 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				magoManager.mouseDragging = false;
 				disableCameraMotion(true);
 			}
-			
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) {
@@ -149,15 +157,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.currentTimeSC = magoManager.dateSC.getTime();
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
 			//if(miliSecondsUsed < 500) // original.***
-			if(miliSecondsUsed < 1000) 
-			{
+			if(miliSecondsUsed < 1000) {
 				if(magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) {
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
 					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
-			
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 		
 		magoManager.handler.setInputAction(function(movement) {
@@ -182,12 +188,36 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
-			
 	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
 	}
 	
 	// world wind 구현체를 이용
 	function drawWorldWind() {
+	}
+	
+	/**
+	 * background provider
+	 */
+	function backgroundProvider() {
+		var provider = new Cesium.WebMapServiceImageryProvider({
+			url : MagoConfig.getInformation().backgroundProvider.url,
+			layers : MagoConfig.getInformation().backgroundProvider.layers,
+			parameters : {
+				service : MagoConfig.getInformation().backgroundProvider.parameters.service, 
+				version : MagoConfig.getInformation().backgroundProvider.parameters.version, 
+				request : MagoConfig.getInformation().backgroundProvider.parameters.request, 
+				transparent : MagoConfig.getInformation().backgroundProvider.parameters.transparent, 
+				//tiled : MagoConfig.getInformation().backgroundProvider.parameters.tiled, 
+				format : MagoConfig.getInformation().backgroundProvider.parameters.format 
+//				time : MagoConfig.getInformation().backgroundProvider.parameters.time, 
+//		    	rand : MagoConfig.getInformation().backgroundProvider.parameters.rand, 
+//		    	asdf : MagoConfig.getInformation().backgroundProvider.parameters.asdf
+			}
+			//,proxy: new Cesium.DefaultProxy('/proxy/')
+		});
+
+//		if(index) viewer.imageryLayers.addImageryProvider(provider, index);
+		viewer.imageryLayers.addImageryProvider(provider);
 	}
 	
 	/**
@@ -234,6 +264,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		});
 	}
 	
+	// deploy 타입 적용
+	function initRenderMode() {
+		var api = new API("renderMode");
+		api.setRenderMode(MagoConfig.getInformation().renderingConfg.renderMode);
+		magoManager.callAPI(api);
+	}
+	
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
 		// api gateway 역할
@@ -264,6 +301,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		},
 		// 선택 블락 이동
 		move : function() {
+		},
+		// demo 용
+		demo : function(renderMode, json) {
+			MagoConfig.getInformation().demoBlockConfig = json;
+			var api = new API("demo");
+			api.setRenderMode(renderMode);
+			magoManager.callAPI(api);
 		}
 	};
 };
