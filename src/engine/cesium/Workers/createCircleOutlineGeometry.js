@@ -1,7 +1,7 @@
 /**
  * Cesium - https://github.com/AnalyticalGraphicsInc/cesium
  *
- * Copyright 2011-2016 Cesium Contributors
+ * Copyright 2011-2017 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,68 +43,6 @@ define('Core/defined',[],function() {
     }
 
     return defined;
-});
-
-/*global define*/
-define('Core/freezeObject',[
-        './defined'
-    ], function(
-        defined) {
-    'use strict';
-
-    /**
-     * Freezes an object, using Object.freeze if available, otherwise returns
-     * the object unchanged.  This function should be used in setup code to prevent
-     * errors from completely halting JavaScript execution in legacy browsers.
-     *
-     * @private
-     *
-     * @exports freezeObject
-     */
-    var freezeObject = Object.freeze;
-    if (!defined(freezeObject)) {
-        freezeObject = function(o) {
-            return o;
-        };
-    }
-
-    return freezeObject;
-});
-
-/*global define*/
-define('Core/defaultValue',[
-        './freezeObject'
-    ], function(
-        freezeObject) {
-    'use strict';
-
-    /**
-     * Returns the first parameter if not undefined, otherwise the second parameter.
-     * Useful for setting a default value for a parameter.
-     *
-     * @exports defaultValue
-     *
-     * @param {*} a
-     * @param {*} b
-     * @returns {*} Returns the first parameter if not undefined, otherwise the second parameter.
-     *
-     * @example
-     * param = Cesium.defaultValue(param, 'default');
-     */
-    function defaultValue(a, b) {
-        if (a !== undefined) {
-            return a;
-        }
-        return b;
-    }
-
-    /**
-     * A frozen empty object that can be used as the default value for options passed as
-     * an object literal.
-     */
-    defaultValue.EMPTY_OBJECT = freezeObject({});
-
-    return defaultValue;
 });
 
 /*global define*/
@@ -189,40 +127,12 @@ define('Core/DeveloperError',[
 });
 
 /*global define*/
-define('Core/isArray',[
-        './defined'
-    ], function(
-        defined) {
-    'use strict';
-
-    /**
-     * Tests an object to see if it is an array.
-     * @exports isArray
-     *
-     * @param {Object} value The value to test.
-     * @returns {Boolean} true if the value is an array, false otherwise.
-     */
-    var isArray = Array.isArray;
-    if (!defined(isArray)) {
-        isArray = function(value) {
-            return Object.prototype.toString.call(value) === '[object Array]';
-        };
-    }
-
-    return isArray;
-});
-
-/*global define*/
 define('Core/Check',[
-    './defaultValue',
-    './defined',
-    './DeveloperError',
-    './isArray'
+        './defined',
+        './DeveloperError'
     ], function(
-        defaultValue,
         defined,
-        DeveloperError,
-        isArray) {
+        DeveloperError) {
     'use strict';
 
     /**
@@ -237,72 +147,35 @@ define('Core/Check',[
      */
     Check.typeOf = {};
 
-    /**
-     * Contains functions for checking numeric conditions such as minimum and maximum values
-     */
-    Check.numeric = {};
-
     function getUndefinedErrorMessage(name) {
-        return name + ' was required but undefined.';
+        return name + ' is required, actual value was undefined';
     }
 
     function getFailedTypeErrorMessage(actual, expected, name) {
-        return 'Expected ' + name + ' to be typeof ' + expected + ', got ' + actual;
+        return 'Expected ' + name + ' to be typeof ' + expected + ', actual typeof was ' + actual;
     }
 
     /**
      * Throws if test is not defined
      *
-     * @param {*} test The value that is to be checked
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value that is to be checked
      * @exception {DeveloperError} test must be defined
      */
-    Check.defined = function (test, name) {
+    Check.defined = function (name, test) {
         if (!defined(test)) {
             throw new DeveloperError(getUndefinedErrorMessage(name));
         }
     };
 
     /**
-     * Throws if test is greater than maximum
-     *
-     * @param {Number} test The value to test
-     * @param {Number} maximum The maximum allowed value
-     * @exception {DeveloperError} test must not be greater than maximum
-     * @exception {DeveloperError} Both test and maximum must be typeof 'number'
-     */
-    Check.numeric.maximum = function (test, maximum) {
-        Check.typeOf.number(test);
-        Check.typeOf.number(maximum);
-        if (test > maximum) {
-            throw new DeveloperError('Expected ' + test + ' to be at most ' + maximum);
-        }
-    };
-
-    /**
-     * Throws if test is less than minimum
-     *
-     * @param {Number} test The value to test
-     * @param {Number} minimum The minimum allowed value
-     * @exception {DeveloperError} test must not be less than mininum
-     * @exception {DeveloperError} Both test and maximum must be typeof 'number'
-     */
-    Check.numeric.minimum = function (test, minimum) {
-        Check.typeOf.number(test);
-        Check.typeOf.number(minimum);
-        if (test < minimum) {
-            throw new DeveloperError('Expected ' + test + ' to be at least ' + minimum);
-        }
-    };
-
-    /**
      * Throws if test is not typeof 'function'
      *
-     * @param {*} test The value to test
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
      * @exception {DeveloperError} test must be typeof 'function'
      */
-    Check.typeOf.function = function (test, name) {
+    Check.typeOf.func = function (name, test) {
         if (typeof test !== 'function') {
             throw new DeveloperError(getFailedTypeErrorMessage(typeof test, 'function', name));
         }
@@ -311,11 +184,11 @@ define('Core/Check',[
     /**
      * Throws if test is not typeof 'string'
      *
-     * @param {*} test The value to test
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
      * @exception {DeveloperError} test must be typeof 'string'
      */
-    Check.typeOf.string = function (test, name) {
+    Check.typeOf.string = function (name, test) {
         if (typeof test !== 'string') {
             throw new DeveloperError(getFailedTypeErrorMessage(typeof test, 'string', name));
         }
@@ -324,24 +197,84 @@ define('Core/Check',[
     /**
      * Throws if test is not typeof 'number'
      *
-     * @param {*} test The value to test
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
      * @exception {DeveloperError} test must be typeof 'number'
      */
-    Check.typeOf.number = function (test, name) {
+    Check.typeOf.number = function (name, test) {
         if (typeof test !== 'number') {
             throw new DeveloperError(getFailedTypeErrorMessage(typeof test, 'number', name));
         }
     };
 
     /**
+     * Throws if test is not typeof 'number' and less than limit
+     *
+     * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
+     * @param {Number} limit The limit value to compare against
+     * @exception {DeveloperError} test must be typeof 'number' and less than limit
+     */
+    Check.typeOf.number.lessThan = function (name, test, limit) {
+        Check.typeOf.number(name, test);
+        if (test >= limit) {
+            throw new DeveloperError('Expected ' + name + ' to be less than ' + limit + ', actual value was ' + test);
+        }
+    };
+
+    /**
+     * Throws if test is not typeof 'number' and less than or equal to limit
+     *
+     * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
+     * @param {Number} limit The limit value to compare against
+     * @exception {DeveloperError} test must be typeof 'number' and less than or equal to limit
+     */
+    Check.typeOf.number.lessThanOrEquals = function (name, test, limit) {
+        Check.typeOf.number(name, test);
+        if (test > limit) {
+            throw new DeveloperError('Expected ' + name + ' to be less than or equal to ' + limit + ', actual value was ' + test);
+        }
+    };
+
+    /**
+     * Throws if test is not typeof 'number' and greater than limit
+     *
+     * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
+     * @param {Number} limit The limit value to compare against
+     * @exception {DeveloperError} test must be typeof 'number' and greater than limit
+     */
+    Check.typeOf.number.greaterThan = function (name, test, limit) {
+        Check.typeOf.number(name, test);
+        if (test <= limit) {
+            throw new DeveloperError('Expected ' + name + ' to be greater than ' + limit + ', actual value was ' + test);
+        }
+    };
+
+    /**
+     * Throws if test is not typeof 'number' and greater than or equal to limit
+     *
+     * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
+     * @param {Number} limit The limit value to compare against
+     * @exception {DeveloperError} test must be typeof 'number' and greater than or equal to limit
+     */
+    Check.typeOf.number.greaterThanOrEquals = function (name, test, limit) {
+        Check.typeOf.number(name, test);
+        if (test < limit) {
+            throw new DeveloperError('Expected ' + name + ' to be greater than or equal to' + limit + ', actual value was ' + test);
+        }
+    };
+
+    /**
      * Throws if test is not typeof 'object'
      *
-     * @param {*} test The value to test
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
      * @exception {DeveloperError} test must be typeof 'object'
      */
-    Check.typeOf.object = function (test, name) {
+    Check.typeOf.object = function (name, test) {
         if (typeof test !== 'object') {
             throw new DeveloperError(getFailedTypeErrorMessage(typeof test, 'object', name));
         }
@@ -350,17 +283,79 @@ define('Core/Check',[
     /**
      * Throws if test is not typeof 'boolean'
      *
-     * @param {*} test The value to test
      * @param {String} name The name of the variable being tested
+     * @param {*} test The value to test
      * @exception {DeveloperError} test must be typeof 'boolean'
      */
-    Check.typeOf.boolean = function (test, name) {
+    Check.typeOf.bool = function (name, test) {
         if (typeof test !== 'boolean') {
             throw new DeveloperError(getFailedTypeErrorMessage(typeof test, 'boolean', name));
         }
     };
 
     return Check;
+});
+
+/*global define*/
+define('Core/freezeObject',[
+        './defined'
+    ], function(
+        defined) {
+    'use strict';
+
+    /**
+     * Freezes an object, using Object.freeze if available, otherwise returns
+     * the object unchanged.  This function should be used in setup code to prevent
+     * errors from completely halting JavaScript execution in legacy browsers.
+     *
+     * @private
+     *
+     * @exports freezeObject
+     */
+    var freezeObject = Object.freeze;
+    if (!defined(freezeObject)) {
+        freezeObject = function(o) {
+            return o;
+        };
+    }
+
+    return freezeObject;
+});
+
+/*global define*/
+define('Core/defaultValue',[
+        './freezeObject'
+    ], function(
+        freezeObject) {
+    'use strict';
+
+    /**
+     * Returns the first parameter if not undefined, otherwise the second parameter.
+     * Useful for setting a default value for a parameter.
+     *
+     * @exports defaultValue
+     *
+     * @param {*} a
+     * @param {*} b
+     * @returns {*} Returns the first parameter if not undefined, otherwise the second parameter.
+     *
+     * @example
+     * param = Cesium.defaultValue(param, 'default');
+     */
+    function defaultValue(a, b) {
+        if (a !== undefined) {
+            return a;
+        }
+        return b;
+    }
+
+    /**
+     * A frozen empty object that can be used as the default value for options passed as
+     * an object literal.
+     */
+    defaultValue.EMPTY_OBJECT = freezeObject({});
+
+    return defaultValue;
 });
 
 /*
@@ -1047,7 +1042,7 @@ define('Core/Math',[
                 if (!defined(angle)) {
             throw new DeveloperError('angle is required.');
         }
-                
+        
         return CesiumMath.clamp(angle, -1*CesiumMath.PI_OVER_TWO, CesiumMath.PI_OVER_TWO);
     };
 
@@ -1057,11 +1052,11 @@ define('Core/Math',[
      * @param {Number} angle in radians
      * @returns {Number} The angle in the range [<code>-CesiumMath.PI</code>, <code>CesiumMath.PI</code>].
      */
-    CesiumMath.negativePiToPi = function(x) {
-                if (!defined(x)) {
-            throw new DeveloperError('x is required.');
+    CesiumMath.negativePiToPi = function(angle) {
+                if (!defined(angle)) {
+            throw new DeveloperError('angle is required.');
         }
-                return CesiumMath.zeroToTwoPi(x + CesiumMath.PI) - CesiumMath.PI;
+                return CesiumMath.zeroToTwoPi(angle + CesiumMath.PI) - CesiumMath.PI;
     };
 
     /**
@@ -1070,12 +1065,12 @@ define('Core/Math',[
      * @param {Number} angle in radians
      * @returns {Number} The angle in the range [0, <code>CesiumMath.TWO_PI</code>].
      */
-    CesiumMath.zeroToTwoPi = function(x) {
-                if (!defined(x)) {
-            throw new DeveloperError('x is required.');
+    CesiumMath.zeroToTwoPi = function(angle) {
+                if (!defined(angle)) {
+            throw new DeveloperError('angle is required.');
         }
-                var mod = CesiumMath.mod(x, CesiumMath.TWO_PI);
-        if (Math.abs(mod) < CesiumMath.EPSILON14 && Math.abs(x) > CesiumMath.EPSILON14) {
+                var mod = CesiumMath.mod(angle, CesiumMath.TWO_PI);
+        if (Math.abs(mod) < CesiumMath.EPSILON14 && Math.abs(angle) > CesiumMath.EPSILON14) {
             return CesiumMath.TWO_PI;
         }
         return mod;
@@ -1145,7 +1140,7 @@ define('Core/Math',[
      * @example
      * //Compute 7!, which is equal to 5040
      * var computedFactorial = Cesium.Math.factorial(7);
-     * 
+     *
      * @see {@link http://en.wikipedia.org/wiki/Factorial|Factorial on Wikipedia}
      */
     CesiumMath.factorial = function(n) {
@@ -1429,7 +1424,7 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
     Cartesian3.fromSpherical = function(spherical, result) {
-                Check.typeOf.object(spherical, 'spherical');
+                Check.typeOf.object('spherical', spherical);
         
         if (!defined(result)) {
             result = new Cartesian3();
@@ -1513,8 +1508,8 @@ define('Core/Cartesian3',[
      * @returns {Number[]} The array that was packed into
      */
     Cartesian3.pack = function(value, array, startingIndex) {
-                Check.typeOf.object(value, 'value');
-        Check.defined(array, 'array');
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -1534,7 +1529,7 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
     Cartesian3.unpack = function(array, startingIndex, result) {
-                Check.defined(array, 'array');
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -1555,7 +1550,7 @@ define('Core/Cartesian3',[
      * @returns {Number[]} The packed array.
      */
     Cartesian3.packArray = function(array, result) {
-                Check.defined(array, 'array');
+                Check.defined('array', array);
         
         var length = array.length;
         if (!defined(result)) {
@@ -1578,8 +1573,8 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3[]} The unpacked array.
      */
     Cartesian3.unpackArray = function(array, result) {
-                Check.defined(array, 'array');
-        Check.numeric.minimum(array.length, 3);
+                Check.defined('array', array);
+        Check.typeOf.number.greaterThanOrEquals('array.length', array.length, 3);
         if (array.length % 3 !== 0) {
             throw new DeveloperError('array length must be a multiple of 3.');
         }
@@ -1625,7 +1620,7 @@ define('Core/Cartesian3',[
      * @returns {Number} The value of the maximum component.
      */
     Cartesian3.maximumComponent = function(cartesian) {
-                Check.typeOf.object(cartesian, 'cartesian');
+                Check.typeOf.object('cartesian', cartesian);
         
         return Math.max(cartesian.x, cartesian.y, cartesian.z);
     };
@@ -1637,7 +1632,7 @@ define('Core/Cartesian3',[
      * @returns {Number} The value of the minimum component.
      */
     Cartesian3.minimumComponent = function(cartesian) {
-                Check.typeOf.object(cartesian, 'cartesian');
+                Check.typeOf.object('cartesian', cartesian);
         
         return Math.min(cartesian.x, cartesian.y, cartesian.z);
     };
@@ -1651,9 +1646,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} A cartesian with the minimum components.
      */
     Cartesian3.minimumByComponent = function(first, second, result) {
-                Check.typeOf.object(first, 'first');
-        Check.typeOf.object(second, 'second');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('first', first);
+        Check.typeOf.object('second', second);
+        Check.typeOf.object('result', result);
         
         result.x = Math.min(first.x, second.x);
         result.y = Math.min(first.y, second.y);
@@ -1671,9 +1666,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} A cartesian with the maximum components.
      */
     Cartesian3.maximumByComponent = function(first, second, result) {
-                Check.typeOf.object(first, 'first');
-        Check.typeOf.object(second, 'second');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('first', first);
+        Check.typeOf.object('second', second);
+        Check.typeOf.object('result', result);
         
         result.x = Math.max(first.x, second.x);
         result.y = Math.max(first.y, second.y);
@@ -1688,7 +1683,7 @@ define('Core/Cartesian3',[
      * @returns {Number} The squared magnitude.
      */
     Cartesian3.magnitudeSquared = function(cartesian) {
-                Check.typeOf.object(cartesian, 'cartesian');
+                Check.typeOf.object('cartesian', cartesian);
         
         return cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z;
     };
@@ -1717,8 +1712,8 @@ define('Core/Cartesian3',[
      * var d = Cesium.Cartesian3.distance(new Cesium.Cartesian3(1.0, 0.0, 0.0), new Cesium.Cartesian3(2.0, 0.0, 0.0));
      */
     Cartesian3.distance = function(left, right) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         Cartesian3.subtract(left, right, distanceScratch);
         return Cartesian3.magnitude(distanceScratch);
@@ -1737,8 +1732,8 @@ define('Core/Cartesian3',[
      * var d = Cesium.Cartesian3.distanceSquared(new Cesium.Cartesian3(1.0, 0.0, 0.0), new Cesium.Cartesian3(3.0, 0.0, 0.0));
      */
     Cartesian3.distanceSquared = function(left, right) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         Cartesian3.subtract(left, right, distanceScratch);
         return Cartesian3.magnitudeSquared(distanceScratch);
@@ -1752,8 +1747,8 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.normalize = function(cartesian, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var magnitude = Cartesian3.magnitude(cartesian);
 
@@ -1776,8 +1771,8 @@ define('Core/Cartesian3',[
      * @returns {Number} The dot product.
      */
     Cartesian3.dot = function(left, right) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         return left.x * right.x + left.y * right.y + left.z * right.z;
     };
@@ -1791,9 +1786,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.multiplyComponents = function(left, right, result) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x * right.x;
         result.y = left.y * right.y;
@@ -1835,9 +1830,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.add = function(left, right, result) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x + right.x;
         result.y = left.y + right.y;
@@ -1854,9 +1849,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.subtract = function(left, right, result) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x - right.x;
         result.y = left.y - right.y;
@@ -1873,9 +1868,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.multiplyByScalar = function(cartesian, scalar, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.number(scalar, 'scalar');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = cartesian.x * scalar;
         result.y = cartesian.y * scalar;
@@ -1892,9 +1887,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.divideByScalar = function(cartesian, scalar, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.number(scalar, 'scalar');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = cartesian.x / scalar;
         result.y = cartesian.y / scalar;
@@ -1910,8 +1905,8 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.negate = function(cartesian, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result.x = -cartesian.x;
         result.y = -cartesian.y;
@@ -1927,8 +1922,8 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.abs = function(cartesian, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result.x = Math.abs(cartesian.x);
         result.y = Math.abs(cartesian.y);
@@ -1947,10 +1942,10 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Cartesian3.lerp = function(start, end, t, result) {
-                Check.typeOf.object(start, 'start');
-        Check.typeOf.object(end, 'end');
-        Check.typeOf.number(t, 't');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('start', start);
+        Check.typeOf.object('end', end);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         Cartesian3.multiplyByScalar(end, t, lerpScratch);
         result = Cartesian3.multiplyByScalar(start, 1.0 - t, result);
@@ -1967,8 +1962,8 @@ define('Core/Cartesian3',[
      * @returns {Number} The angle between the Cartesians.
      */
     Cartesian3.angleBetween = function(left, right) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         Cartesian3.normalize(left, angleBetweenScratch);
         Cartesian3.normalize(right, angleBetweenScratch2);
@@ -1986,8 +1981,8 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The most orthogonal axis.
      */
     Cartesian3.mostOrthogonalAxis = function(cartesian, result) {
-                Check.typeOf.object(cartesian, 'cartesian');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var f = Cartesian3.normalize(cartesian, mostOrthogonalAxisScratch);
         Cartesian3.abs(f, f);
@@ -2064,9 +2059,9 @@ define('Core/Cartesian3',[
      * @returns {Cartesian3} The cross product.
      */
     Cartesian3.cross = function(left, right, result) {
-                Check.typeOf.object(left, 'left');
-        Check.typeOf.object(right, 'right');
-        Check.typeOf.object(result, 'result');
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         var leftX = left.x;
         var leftY = left.y;
@@ -2099,8 +2094,8 @@ define('Core/Cartesian3',[
      * var position = Cesium.Cartesian3.fromDegrees(-115.0, 37.0);
      */
     Cartesian3.fromDegrees = function(longitude, latitude, height, ellipsoid, result) {
-                Check.typeOf.number(longitude, 'longitude');
-        Check.typeOf.number(latitude, 'latitude');
+                Check.typeOf.number('longitude', longitude);
+        Check.typeOf.number('latitude', latitude);
         
         longitude = CesiumMath.toRadians(longitude);
         latitude = CesiumMath.toRadians(latitude);
@@ -2125,8 +2120,8 @@ define('Core/Cartesian3',[
      * var position = Cesium.Cartesian3.fromRadians(-2.007, 0.645);
      */
     Cartesian3.fromRadians = function(longitude, latitude, height, ellipsoid, result) {
-                Check.typeOf.number(longitude, 'longitude');
-        Check.typeOf.number(latitude, 'latitude');
+                Check.typeOf.number('longitude', longitude);
+        Check.typeOf.number('latitude', latitude);
         
         height = defaultValue(height, 0.0);
         var radiiSquared = defined(ellipsoid) ? ellipsoid.radiiSquared : wgs84RadiiSquared;
@@ -2160,7 +2155,7 @@ define('Core/Cartesian3',[
      * var positions = Cesium.Cartesian3.fromDegreesArray([-115.0, 37.0, -107.0, 33.0]);
      */
     Cartesian3.fromDegreesArray = function(coordinates, ellipsoid, result) {
-                Check.defined(coordinates, 'coordinates');
+                Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
             throw new DeveloperError('the number of coordinates must be a multiple of 2 and at least 2');
         }
@@ -2194,7 +2189,7 @@ define('Core/Cartesian3',[
      * var positions = Cesium.Cartesian3.fromRadiansArray([-2.007, 0.645, -1.867, .575]);
      */
     Cartesian3.fromRadiansArray = function(coordinates, ellipsoid, result) {
-                Check.defined(coordinates, 'coordinates');
+                Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
             throw new DeveloperError('the number of coordinates must be a multiple of 2 and at least 2');
         }
@@ -2228,7 +2223,7 @@ define('Core/Cartesian3',[
      * var positions = Cesium.Cartesian3.fromDegreesArrayHeights([-115.0, 37.0, 100000.0, -107.0, 33.0, 150000.0]);
      */
     Cartesian3.fromDegreesArrayHeights = function(coordinates, ellipsoid, result) {
-                Check.defined(coordinates, 'coordinates');
+                Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
             throw new DeveloperError('the number of coordinates must be a multiple of 3 and at least 3');
         }
@@ -2263,7 +2258,7 @@ define('Core/Cartesian3',[
      * var positions = Cesium.Cartesian3.fromRadiansArrayHeights([-2.007, 0.645, 100000.0, -1.867, .575, 150000.0]);
      */
     Cartesian3.fromRadiansArrayHeights = function(coordinates, ellipsoid, result) {
-                Check.defined(coordinates, 'coordinates');
+                Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
             throw new DeveloperError('the number of coordinates must be a multiple of 3 and at least 3');
         }
@@ -3010,7 +3005,9 @@ define('Core/Ellipsoid',[
     /**
      * Computes an Ellipsoid from a Cartesian specifying the radii in x, y, and z directions.
      *
-     * @param {Cartesian3} [radii=Cartesian3.ZERO] The ellipsoid's radius in the x, y, and z directions.
+     * @param {Cartesian3} [cartesian=Cartesian3.ZERO] The ellipsoid's radius in the x, y, and z directions.
+     * @param {Ellipsoid} [result] The object onto which to store the result, or undefined if a new
+     *                    instance should be created.
      * @returns {Ellipsoid} A new Ellipsoid instance.
      *
      * @exception {DeveloperError} All radii components must be greater than or equal to zero.
@@ -3650,6 +3647,7 @@ define('Core/Interval',[
 /*global define*/
 define('Core/Matrix3',[
         './Cartesian3',
+        './Check',
         './defaultValue',
         './defined',
         './defineProperties',
@@ -3658,6 +3656,7 @@ define('Core/Matrix3',[
         './Math'
     ], function(
         Cartesian3,
+        Check,
         defaultValue,
         defined,
         defineProperties,
@@ -3720,13 +3719,8 @@ define('Core/Matrix3',[
      * @returns {Number[]} The array that was packed into
      */
     Matrix3.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -3752,9 +3746,7 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter or a new Matrix3 instance if one was not provided.
      */
     Matrix3.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -3781,24 +3773,24 @@ define('Core/Matrix3',[
      * @param {Matrix3} [result] The object onto which to store the result.
      * @returns {Matrix3} The modified result parameter or a new Matrix3 instance if one was not provided. (Returns undefined if matrix is undefined)
      */
-    Matrix3.clone = function(values, result) {
-        if (!defined(values)) {
+    Matrix3.clone = function(matrix, result) {
+        if (!defined(matrix)) {
             return undefined;
         }
         if (!defined(result)) {
-            return new Matrix3(values[0], values[3], values[6],
-                               values[1], values[4], values[7],
-                               values[2], values[5], values[8]);
+            return new Matrix3(matrix[0], matrix[3], matrix[6],
+                               matrix[1], matrix[4], matrix[7],
+                               matrix[2], matrix[5], matrix[8]);
         }
-        result[0] = values[0];
-        result[1] = values[1];
-        result[2] = values[2];
-        result[3] = values[3];
-        result[4] = values[4];
-        result[5] = values[5];
-        result[6] = values[6];
-        result[7] = values[7];
-        result[8] = values[8];
+        result[0] = matrix[0];
+        result[1] = matrix[1];
+        result[2] = matrix[2];
+        result[3] = matrix[3];
+        result[4] = matrix[4];
+        result[5] = matrix[5];
+        result[6] = matrix[6];
+        result[7] = matrix[7];
+        result[8] = matrix[8];
         return result;
     };
 
@@ -3824,9 +3816,7 @@ define('Core/Matrix3',[
      * var m2 = Cesium.Matrix3.fromArray(v2, 2);
      */
     Matrix3.fromArray = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -3854,9 +3844,7 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter, or a new Matrix3 instance if one was not provided.
      */
     Matrix3.fromColumnMajorArray = function(values, result) {
-                if (!defined(values)) {
-            throw new DeveloperError('values parameter is required');
-        }
+                Check.defined('values', values);
         
         return Matrix3.clone(values, result);
     };
@@ -3870,9 +3858,7 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter, or a new Matrix3 instance if one was not provided.
      */
     Matrix3.fromRowMajorArray = function(values, result) {
-                if (!defined(values)) {
-            throw new DeveloperError('values is required.');
-        }
+                Check.defined('values', values);
         
         if (!defined(result)) {
             return new Matrix3(values[0], values[1], values[2],
@@ -3899,9 +3885,7 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The 3x3 rotation matrix from this quaternion.
      */
     Matrix3.fromQuaternion = function(quaternion, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
         
         var x2 = quaternion.x * quaternion.x;
         var xy = quaternion.x * quaternion.y;
@@ -3951,10 +3935,9 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The 3x3 rotation matrix from this headingPitchRoll.
      */
     Matrix3.fromHeadingPitchRoll = function(headingPitchRoll, result) {
-                if (!defined(headingPitchRoll)) {
-            throw new DeveloperError('headingPitchRoll is required');
-        }
-                var cosTheta = Math.cos(-headingPitchRoll.pitch);
+                Check.typeOf.object('headingPitchRoll', headingPitchRoll);
+        
+        var cosTheta = Math.cos(-headingPitchRoll.pitch);
         var cosPsi = Math.cos(-headingPitchRoll.heading);
         var cosPhi = Math.cos(headingPitchRoll.roll);
         var sinTheta = Math.sin(-headingPitchRoll.pitch);
@@ -4005,9 +3988,7 @@ define('Core/Matrix3',[
      * var m = Cesium.Matrix3.fromScale(new Cesium.Cartesian3(7.0, 8.0, 9.0));
      */
     Matrix3.fromScale = function(scale, result) {
-                if (!defined(scale)) {
-            throw new DeveloperError('scale is required.');
-        }
+                Check.typeOf.object('scale', scale);
         
         if (!defined(result)) {
             return new Matrix3(
@@ -4043,9 +4024,7 @@ define('Core/Matrix3',[
      * var m = Cesium.Matrix3.fromUniformScale(2.0);
      */
     Matrix3.fromUniformScale = function(scale, result) {
-                if (typeof scale !== 'number') {
-            throw new DeveloperError('scale is required.');
-        }
+                Check.typeOf.number('scale', scale);
         
         if (!defined(result)) {
             return new Matrix3(
@@ -4069,7 +4048,7 @@ define('Core/Matrix3',[
     /**
      * Computes a Matrix3 instance representing the cross product equivalent matrix of a Cartesian3 vector.
      *
-     * @param {Cartesian3} the vector on the left hand side of the cross product operation.
+     * @param {Cartesian3} vector the vector on the left hand side of the cross product operation.
      * @param {Matrix3} [result] The object in which the result will be stored, if undefined a new instance will be created.
      * @returns {Matrix3} The modified result parameter, or a new Matrix3 instance if one was not provided.
      *
@@ -4081,9 +4060,7 @@ define('Core/Matrix3',[
      * var m = Cesium.Matrix3.fromCrossProduct(new Cesium.Cartesian3(7.0, 8.0, 9.0));
      */
     Matrix3.fromCrossProduct = function(vector, result) {
-                if (!defined(vector)) {
-            throw new DeveloperError('vector is required.');
-        }
+                Check.typeOf.object('vector', vector);
         
         if (!defined(result)) {
             return new Matrix3(
@@ -4118,9 +4095,7 @@ define('Core/Matrix3',[
      * var rotated = Cesium.Matrix3.multiplyByVector(m, p, new Cesium.Cartesian3());
      */
     Matrix3.fromRotationX = function(angle, result) {
-                if (!defined(angle)) {
-            throw new DeveloperError('angle is required.');
-        }
+                Check.typeOf.number('angle', angle);
         
         var cosAngle = Math.cos(angle);
         var sinAngle = Math.sin(angle);
@@ -4159,9 +4134,7 @@ define('Core/Matrix3',[
      * var rotated = Cesium.Matrix3.multiplyByVector(m, p, new Cesium.Cartesian3());
      */
     Matrix3.fromRotationY = function(angle, result) {
-                if (!defined(angle)) {
-            throw new DeveloperError('angle is required.');
-        }
+                Check.typeOf.number('angle', angle);
         
         var cosAngle = Math.cos(angle);
         var sinAngle = Math.sin(angle);
@@ -4200,9 +4173,7 @@ define('Core/Matrix3',[
      * var rotated = Cesium.Matrix3.multiplyByVector(m, p, new Cesium.Cartesian3());
      */
     Matrix3.fromRotationZ = function(angle, result) {
-                if (!defined(angle)) {
-            throw new DeveloperError('angle is required.');
-        }
+                Check.typeOf.number('angle', angle);
         
         var cosAngle = Math.cos(angle);
         var sinAngle = Math.sin(angle);
@@ -4236,9 +4207,7 @@ define('Core/Matrix3',[
      * @returns {Number[]} The modified Array parameter or a new Array instance if one was not provided.
      */
     Matrix3.toArray = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
+                Check.typeOf.object('matrix', matrix);
         
         if (!defined(result)) {
             return [matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5], matrix[6], matrix[7], matrix[8]];
@@ -4272,12 +4241,10 @@ define('Core/Matrix3',[
      * myMatrix[column1Row0Index] = 10.0;
      */
     Matrix3.getElementIndex = function(column, row) {
-                if (typeof row !== 'number' || row < 0 || row > 2) {
-            throw new DeveloperError('row must be 0, 1, or 2.');
-        }
-        if (typeof column !== 'number' || column < 0 || column > 2) {
-            throw new DeveloperError('column must be 0, 1, or 2.');
-        }
+                Check.typeOf.number.greaterThanOrEquals('row', row, 0);
+        Check.typeOf.number.lessThanOrEquals('row', row, 2);
+        Check.typeOf.number.greaterThanOrEquals('column', column, 0);
+        Check.typeOf.number.lessThanOrEquals('column', column, 2);
         
         return column * 3 + row;
     };
@@ -4293,16 +4260,10 @@ define('Core/Matrix3',[
      * @exception {DeveloperError} index must be 0, 1, or 2.
      */
     Matrix3.getColumn = function(matrix, index, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
-
-        if (typeof index !== 'number' || index < 0 || index > 2) {
-            throw new DeveloperError('index must be 0, 1, or 2.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 2);
+        Check.typeOf.object('result', result);
         
         var startIndex = index * 3;
         var x = matrix[startIndex];
@@ -4327,18 +4288,11 @@ define('Core/Matrix3',[
      * @exception {DeveloperError} index must be 0, 1, or 2.
      */
     Matrix3.setColumn = function(matrix, index, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof index !== 'number' || index < 0 || index > 2) {
-            throw new DeveloperError('index must be 0, 1, or 2.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 2);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result = Matrix3.clone(matrix, result);
         var startIndex = index * 3;
@@ -4359,15 +4313,10 @@ define('Core/Matrix3',[
      * @exception {DeveloperError} index must be 0, 1, or 2.
      */
     Matrix3.getRow = function(matrix, index, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
-        if (typeof index !== 'number' || index < 0 || index > 2) {
-            throw new DeveloperError('index must be 0, 1, or 2.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 2);
+        Check.typeOf.object('result', result);
         
         var x = matrix[index];
         var y = matrix[index + 3];
@@ -4391,18 +4340,11 @@ define('Core/Matrix3',[
      * @exception {DeveloperError} index must be 0, 1, or 2.
      */
     Matrix3.setRow = function(matrix, index, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof index !== 'number' || index < 0 || index > 2) {
-            throw new DeveloperError('index must be 0, 1, or 2.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 2);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result = Matrix3.clone(matrix, result);
         result[index] = cartesian.x;
@@ -4421,12 +4363,8 @@ define('Core/Matrix3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Matrix3.getScale = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result.x = Cartesian3.magnitude(Cartesian3.fromElements(matrix[0], matrix[1], matrix[2], scratchColumn));
         result.y = Cartesian3.magnitude(Cartesian3.fromElements(matrix[3], matrix[4], matrix[5], scratchColumn));
@@ -4457,15 +4395,9 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.multiply = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         var column0Row0 = left[0] * right[0] + left[3] * right[1] + left[6] * right[2];
         var column0Row1 = left[1] * right[0] + left[4] * right[1] + left[7] * right[2];
@@ -4500,15 +4432,9 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.add = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result[0] = left[0] + right[0];
         result[1] = left[1] + right[1];
@@ -4531,15 +4457,9 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.subtract = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result[0] = left[0] - right[0];
         result[1] = left[1] - right[1];
@@ -4562,15 +4482,9 @@ define('Core/Matrix3',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Matrix3.multiplyByVector = function(matrix, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var vX = cartesian.x;
         var vY = cartesian.y;
@@ -4595,15 +4509,9 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.multiplyByScalar = function(matrix, scalar, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar must be a number');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result[0] = matrix[0] * scalar;
         result[1] = matrix[1] * scalar;
@@ -4634,15 +4542,9 @@ define('Core/Matrix3',[
      * @see Matrix3.multiplyByUniformScale
      */
     Matrix3.multiplyByScale = function(matrix, scale, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(scale)) {
-            throw new DeveloperError('scale is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('scale', scale);
+        Check.typeOf.object('result', result);
         
         result[0] = matrix[0] * scale.x;
         result[1] = matrix[1] * scale.x;
@@ -4664,12 +4566,8 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.negate = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result[0] = -matrix[0];
         result[1] = -matrix[1];
@@ -4691,12 +4589,8 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.transpose = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         var column0Row0 = matrix[0];
         var column0Row1 = matrix[3];
@@ -4836,9 +4730,7 @@ define('Core/Matrix3',[
      * var c = Cesium.Cartesian3.multiplyByScalar(v, lambda, new Cesium.Cartesian3());        // equal to Cesium.Matrix3.multiplyByVector(a, v)
      */
     Matrix3.computeEigenDecomposition = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
+                Check.typeOf.object('matrix', matrix);
         
         // This routine was created based upon Matrix Computations, 3rd ed., by Golub and Van Loan,
         // section 8.4.3 The Classical Jacobi Algorithm
@@ -4882,12 +4774,8 @@ define('Core/Matrix3',[
      * @returns {Matrix3} The modified result parameter.
      */
     Matrix3.abs = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result[0] = Math.abs(matrix[0]);
         result[1] = Math.abs(matrix[1]);
@@ -4909,9 +4797,7 @@ define('Core/Matrix3',[
      * @returns {Number} The value of the determinant of the matrix.
      */
     Matrix3.determinant = function(matrix) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
+                Check.typeOf.object('matrix', matrix);
         
         var m11 = matrix[0];
         var m21 = matrix[3];
@@ -4936,12 +4822,8 @@ define('Core/Matrix3',[
      * @exception {DeveloperError} matrix is not invertible.
      */
     Matrix3.inverse = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         var m11 = matrix[0];
         var m21 = matrix[1];
@@ -5007,9 +4889,7 @@ define('Core/Matrix3',[
      * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
      */
     Matrix3.equalsEpsilon = function(left, right, epsilon) {
-                if (typeof epsilon !== 'number') {
-            throw new DeveloperError('epsilon must be a number');
-        }
+                Check.typeOf.number('epsilon', epsilon);
         
         return (left === right) ||
                 (defined(left) &&
@@ -5197,12 +5077,14 @@ define('Core/Matrix3',[
 
 /*global define*/
 define('Core/Cartesian4',[
+        './Check',
         './defaultValue',
         './defined',
         './DeveloperError',
         './freezeObject',
         './Math'
     ], function(
+        Check,
         defaultValue,
         defined,
         DeveloperError,
@@ -5285,9 +5167,7 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter or a new Cartesian4 instance if one was not provided.
      */
     Cartesian4.fromColor = function(color, result) {
-                if (!defined(color)) {
-            throw new DeveloperError('color is required');
-        }
+                Check.typeOf.object('color', color);
                 if (!defined(result)) {
             return new Cartesian4(color.red, color.green, color.blue, color.alpha);
         }
@@ -5339,12 +5219,8 @@ define('Core/Cartesian4',[
      * @returns {Number[]} The array that was packed into
      */
     Cartesian4.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -5365,9 +5241,7 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4}  The modified result parameter or a new Cartesian4 instance if one was not provided.
      */
     Cartesian4.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -5389,9 +5263,7 @@ define('Core/Cartesian4',[
      * @returns {Number[]} The packed array.
      */
     Cartesian4.packArray = function(array, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         var length = array.length;
         if (!defined(result)) {
@@ -5414,9 +5286,7 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4[]} The unpacked array.
      */
     Cartesian4.unpackArray = function(array, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         var length = array.length;
         if (!defined(result)) {
@@ -5459,9 +5329,7 @@ define('Core/Cartesian4',[
      * @returns {Number} The value of the maximum component.
      */
     Cartesian4.maximumComponent = function(cartesian) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
         
         return Math.max(cartesian.x, cartesian.y, cartesian.z, cartesian.w);
     };
@@ -5473,9 +5341,7 @@ define('Core/Cartesian4',[
      * @returns {Number} The value of the minimum component.
      */
     Cartesian4.minimumComponent = function(cartesian) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
         
         return Math.min(cartesian.x, cartesian.y, cartesian.z, cartesian.w);
     };
@@ -5489,15 +5355,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} A cartesian with the minimum components.
      */
     Cartesian4.minimumByComponent = function(first, second, result) {
-                if (!defined(first)) {
-            throw new DeveloperError('first is required.');
-        }
-        if (!defined(second)) {
-            throw new DeveloperError('second is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required.');
-        }
+                Check.typeOf.object('first', first);
+        Check.typeOf.object('second', second);
+        Check.typeOf.object('result', result);
         
         result.x = Math.min(first.x, second.x);
         result.y = Math.min(first.y, second.y);
@@ -5516,15 +5376,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} A cartesian with the maximum components.
      */
     Cartesian4.maximumByComponent = function(first, second, result) {
-                if (!defined(first)) {
-            throw new DeveloperError('first is required.');
-        }
-        if (!defined(second)) {
-            throw new DeveloperError('second is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required.');
-        }
+                Check.typeOf.object('first', first);
+        Check.typeOf.object('second', second);
+        Check.typeOf.object('result', result);
         
         result.x = Math.max(first.x, second.x);
         result.y = Math.max(first.y, second.y);
@@ -5541,9 +5395,7 @@ define('Core/Cartesian4',[
      * @returns {Number} The squared magnitude.
      */
     Cartesian4.magnitudeSquared = function(cartesian) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
         
         return cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z + cartesian.w * cartesian.w;
     };
@@ -5574,9 +5426,8 @@ define('Core/Cartesian4',[
      *   new Cesium.Cartesian4(2.0, 0.0, 0.0, 0.0));
      */
     Cartesian4.distance = function(left, right) {
-                if (!defined(left) || !defined(right)) {
-            throw new DeveloperError('left and right are required.');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         Cartesian4.subtract(left, right, distanceScratch);
         return Cartesian4.magnitude(distanceScratch);
@@ -5597,9 +5448,8 @@ define('Core/Cartesian4',[
      *   new Cesium.Cartesian4(3.0, 0.0, 0.0, 0.0));
      */
     Cartesian4.distanceSquared = function(left, right) {
-                if (!defined(left) || !defined(right)) {
-            throw new DeveloperError('left and right are required.');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         Cartesian4.subtract(left, right, distanceScratch);
         return Cartesian4.magnitudeSquared(distanceScratch);
@@ -5613,12 +5463,8 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.normalize = function(cartesian, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var magnitude = Cartesian4.magnitude(cartesian);
 
@@ -5642,12 +5488,8 @@ define('Core/Cartesian4',[
      * @returns {Number} The dot product.
      */
     Cartesian4.dot = function(left, right) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
     };
@@ -5661,15 +5503,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.multiplyComponents = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x * right.x;
         result.y = left.y * right.y;
@@ -5687,15 +5523,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.divideComponents = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x / right.x;
         result.y = left.y / right.y;
@@ -5713,15 +5543,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.add = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x + right.x;
         result.y = left.y + right.y;
@@ -5739,15 +5563,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.subtract = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x - right.x;
         result.y = left.y - right.y;
@@ -5765,15 +5583,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.multiplyByScalar = function(cartesian, scalar, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = cartesian.x * scalar;
         result.y = cartesian.y * scalar;
@@ -5791,15 +5603,9 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.divideByScalar = function(cartesian, scalar, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = cartesian.x / scalar;
         result.y = cartesian.y / scalar;
@@ -5816,12 +5622,8 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.negate = function(cartesian, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result.x = -cartesian.x;
         result.y = -cartesian.y;
@@ -5838,12 +5640,8 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.abs = function(cartesian, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result.x = Math.abs(cartesian.x);
         result.y = Math.abs(cartesian.y);
@@ -5863,18 +5661,10 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Cartesian4.lerp = function(start, end, t, result) {
-                if (!defined(start)) {
-            throw new DeveloperError('start is required.');
-        }
-        if (!defined(end)) {
-            throw new DeveloperError('end is required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required.');
-        }
+                Check.typeOf.object('start', start);
+        Check.typeOf.object('end', end);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         Cartesian4.multiplyByScalar(end, t, lerpScratch);
         result = Cartesian4.multiplyByScalar(start, 1.0 - t, result);
@@ -5890,12 +5680,8 @@ define('Core/Cartesian4',[
      * @returns {Cartesian4} The most orthogonal axis.
      */
     Cartesian4.mostOrthogonalAxis = function(cartesian, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required.');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var f = Cartesian4.normalize(cartesian, mostOrthogonalAxisScratch);
         Cartesian4.abs(f, f);
@@ -6140,10 +5926,10 @@ define('Core/RuntimeError',[
 define('Core/Matrix4',[
         './Cartesian3',
         './Cartesian4',
+        './Check',
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './freezeObject',
         './Math',
         './Matrix3',
@@ -6151,10 +5937,10 @@ define('Core/Matrix4',[
     ], function(
         Cartesian3,
         Cartesian4,
+        Check,
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         freezeObject,
         CesiumMath,
         Matrix3,
@@ -6241,13 +6027,8 @@ define('Core/Matrix4',[
      * @returns {Number[]} The array that was packed into
      */
     Matrix4.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -6280,9 +6061,7 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter or a new Matrix4 instance if one was not provided.
      */
     Matrix4.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -6378,9 +6157,7 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
      */
     Matrix4.fromColumnMajorArray = function(values, result) {
-                if (!defined(values)) {
-            throw new DeveloperError('values is required');
-        }
+                Check.defined('values', values);
         
         return Matrix4.clone(values, result);
     };
@@ -6394,9 +6171,7 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
      */
     Matrix4.fromRowMajorArray = function(values, result) {
-                if (!defined(values)) {
-            throw new DeveloperError('values is required.');
-        }
+                Check.defined('values', values);
         
         if (!defined(result)) {
             return new Matrix4(values[0], values[1], values[2], values[3],
@@ -6433,9 +6208,7 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
      */
     Matrix4.fromRotationTranslation = function(rotation, translation, result) {
-                if (!defined(rotation)) {
-            throw new DeveloperError('rotation is required.');
-        }
+                Check.typeOf.object('rotation', rotation);
         
         translation = defaultValue(translation, Cartesian3.ZERO);
 
@@ -6483,15 +6256,9 @@ define('Core/Matrix4',[
      *   result);
      */
     Matrix4.fromTranslationQuaternionRotationScale = function(translation, rotation, scale, result) {
-                if (!defined(translation)) {
-            throw new DeveloperError('translation is required.');
-        }
-        if (!defined(rotation)) {
-            throw new DeveloperError('rotation is required.');
-        }
-        if (!defined(scale)) {
-            throw new DeveloperError('scale is required.');
-        }
+                Check.typeOf.object('translation', translation);
+        Check.typeOf.object('rotation', rotation);
+        Check.typeOf.object('scale', scale);
         
         if (!defined(result)) {
             result = new Matrix4();
@@ -6552,9 +6319,7 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
      */
     Matrix4.fromTranslationRotationScale = function(translationRotationScale, result) {
-                if (!defined(translationRotationScale)) {
-            throw new DeveloperError('translationRotationScale is required.');
-        }
+                Check.typeOf.object('translationRotationScale', translationRotationScale);
         
         return Matrix4.fromTranslationQuaternionRotationScale(translationRotationScale.translation, translationRotationScale.rotation, translationRotationScale.scale, result);
     };
@@ -6569,9 +6334,7 @@ define('Core/Matrix4',[
      * @see Matrix4.multiplyByTranslation
      */
     Matrix4.fromTranslation = function(translation, result) {
-                if (!defined(translation)) {
-            throw new DeveloperError('translation is required.');
-        }
+                Check.typeOf.object('translation', translation);
         
         return Matrix4.fromRotationTranslation(Matrix3.IDENTITY, translation, result);
     };
@@ -6592,9 +6355,7 @@ define('Core/Matrix4',[
      * var m = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(7.0, 8.0, 9.0));
      */
     Matrix4.fromScale = function(scale, result) {
-                if (!defined(scale)) {
-            throw new DeveloperError('scale is required.');
-        }
+                Check.typeOf.object('scale', scale);
         
         if (!defined(result)) {
             return new Matrix4(
@@ -6639,9 +6400,7 @@ define('Core/Matrix4',[
      * var m = Cesium.Matrix4.fromUniformScale(2.0);
      */
     Matrix4.fromUniformScale = function(scale, result) {
-                if (typeof scale !== 'number') {
-            throw new DeveloperError('scale is required.');
-        }
+                Check.typeOf.number('scale', scale);
         
         if (!defined(result)) {
             return new Matrix4(scale, 0.0,   0.0,   0.0,
@@ -6681,23 +6440,15 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter, or a new Matrix4 instance if one was not provided.
      */
     Matrix4.fromCamera = function(camera, result) {
-                if (!defined(camera)) {
-            throw new DeveloperError('camera is required.');
-        }
+                Check.typeOf.object('camera', camera);
         
         var position = camera.position;
         var direction = camera.direction;
         var up = camera.up;
 
-                if (!defined(position)) {
-            throw new DeveloperError('camera.position is required.');
-        }
-        if (!defined(direction)) {
-            throw new DeveloperError('camera.direction is required.');
-        }
-        if (!defined(up)) {
-            throw new DeveloperError('camera.up is required.');
-        }
+                Check.typeOf.object('camera.position', position);
+        Check.typeOf.object('camera.direction', direction);
+        Check.typeOf.object('camera.up', up);
         
         Cartesian3.normalize(direction, fromCameraF);
         Cartesian3.normalize(Cartesian3.cross(fromCameraF, up, fromCameraR), fromCameraR);
@@ -6776,21 +6527,11 @@ define('Core/Matrix4',[
       * @exception {DeveloperError} far must be greater than zero.
       */
     Matrix4.computePerspectiveFieldOfView = function(fovY, aspectRatio, near, far, result) {
-                if (fovY <= 0.0 || fovY > Math.PI) {
-            throw new DeveloperError('fovY must be in (0, PI].');
-        }
-        if (aspectRatio <= 0.0) {
-            throw new DeveloperError('aspectRatio must be greater than zero.');
-        }
-        if (near <= 0.0) {
-            throw new DeveloperError('near must be greater than zero.');
-        }
-        if (far <= 0.0) {
-            throw new DeveloperError('far must be greater than zero.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.number.greaterThan('fovY', fovY, 0.0);
+        Check.typeOf.number.lessThan('fovY', fovY, Math.PI);
+        Check.typeOf.number.greaterThan('near', near, 0.0);
+        Check.typeOf.number.greaterThan('far', far, 0.0);
+        Check.typeOf.object('result', result);
         
         var bottom = Math.tan(fovY * 0.5);
 
@@ -6831,27 +6572,13 @@ define('Core/Matrix4',[
     * @returns {Matrix4} The modified result parameter.
     */
     Matrix4.computeOrthographicOffCenter = function(left, right, bottom, top, near, far, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required.');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required.');
-        }
-        if (!defined(bottom)) {
-            throw new DeveloperError('bottom is required.');
-        }
-        if (!defined(top)) {
-            throw new DeveloperError('top is required.');
-        }
-        if (!defined(near)) {
-            throw new DeveloperError('near is required.');
-        }
-        if (!defined(far)) {
-            throw new DeveloperError('far is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.number('left', left);
+        Check.typeOf.number('right', right);
+        Check.typeOf.number('bottom', bottom);
+        Check.typeOf.number('top', top);
+        Check.typeOf.number('near', near);
+        Check.typeOf.number('far', far);
+        Check.typeOf.object('result', result);
         
         var a = 1.0 / (right - left);
         var b = 1.0 / (top - bottom);
@@ -6896,27 +6623,13 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.computePerspectiveOffCenter = function(left, right, bottom, top, near, far, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required.');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required.');
-        }
-        if (!defined(bottom)) {
-            throw new DeveloperError('bottom is required.');
-        }
-        if (!defined(top)) {
-            throw new DeveloperError('top is required.');
-        }
-        if (!defined(near)) {
-            throw new DeveloperError('near is required.');
-        }
-        if (!defined(far)) {
-            throw new DeveloperError('far is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.number('left', left);
+        Check.typeOf.number('right', right);
+        Check.typeOf.number('bottom', bottom);
+        Check.typeOf.number('top', top);
+        Check.typeOf.number('near', near);
+        Check.typeOf.number('far', far);
+        Check.typeOf.object('result', result);
         
         var column0Row0 = 2.0 * near / (right - left);
         var column1Row1 = 2.0 * near / (top - bottom);
@@ -6957,24 +6670,12 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.computeInfinitePerspectiveOffCenter = function(left, right, bottom, top, near, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required.');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required.');
-        }
-        if (!defined(bottom)) {
-            throw new DeveloperError('bottom is required.');
-        }
-        if (!defined(top)) {
-            throw new DeveloperError('top is required.');
-        }
-        if (!defined(near)) {
-            throw new DeveloperError('near is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.number('left', left);
+        Check.typeOf.number('right', right);
+        Check.typeOf.number('bottom', bottom);
+        Check.typeOf.number('top', top);
+        Check.typeOf.number('near', near);
+        Check.typeOf.object('result', result);
         
         var column0Row0 = 2.0 * near / (right - left);
         var column1Row1 = 2.0 * near / (top - bottom);
@@ -7022,9 +6723,7 @@ define('Core/Matrix4',[
      * }, 0.0, 1.0, new Cesium.Matrix4());
      */
     Matrix4.computeViewportTransformation = function(viewport, nearDepthRange, farDepthRange, result) {
-                if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('result', result);
         
         viewport = defaultValue(viewport, defaultValue.EMPTY_OBJECT);
         var x = defaultValue(viewport.x, 0.0);
@@ -7076,21 +6775,11 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.computeView = function(position, direction, up, right, result) {
-                if (!defined(position)) {
-            throw new DeveloperError('position is required');
-        }
-        if (!defined(direction)) {
-            throw new DeveloperError('direction is required');
-        }
-        if (!defined(up)) {
-            throw new DeveloperError('up is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('position', position);
+        Check.typeOf.object('direction', direction);
+        Check.typeOf.object('up', up);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result[0] = right.x;
         result[1] = up.x;
@@ -7131,9 +6820,7 @@ define('Core/Matrix4',[
      * //creates a = [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0]
      */
     Matrix4.toArray = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
+                Check.typeOf.object('matrix', matrix);
         
         if (!defined(result)) {
             return [matrix[0], matrix[1], matrix[2], matrix[3],
@@ -7177,12 +6864,11 @@ define('Core/Matrix4',[
      * myMatrix[column1Row0Index] = 10.0;
      */
     Matrix4.getElementIndex = function(column, row) {
-                if (typeof row !== 'number' || row < 0 || row > 3) {
-            throw new DeveloperError('row must be 0, 1, 2, or 3.');
-        }
-        if (typeof column !== 'number' || column < 0 || column > 3) {
-            throw new DeveloperError('column must be 0, 1, 2, or 3.');
-        }
+                Check.typeOf.number.greaterThanOrEquals('row', row, 0);
+        Check.typeOf.number.lessThanOrEquals('row', row, 3);
+
+        Check.typeOf.number.greaterThanOrEquals('column', column, 0);
+        Check.typeOf.number.lessThanOrEquals('column', column, 3);
         
         return column * 4 + row;
     };
@@ -7215,16 +6901,12 @@ define('Core/Matrix4',[
      * // a.x = 12.0; a.y = 16.0; a.z = 20.0; a.w = 24.0;
      */
     Matrix4.getColumn = function(matrix, index, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
+                Check.typeOf.object('matrix', matrix);
 
-        if (typeof index !== 'number' || index < 0 || index > 3) {
-            throw new DeveloperError('index must be 0, 1, 2, or 3.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 3);
+
+        Check.typeOf.object('result', result);
         
         var startIndex = index * 4;
         var x = matrix[startIndex];
@@ -7266,18 +6948,13 @@ define('Core/Matrix4',[
      * //     [22.0, 23.0, 96.0, 25.0]
      */
     Matrix4.setColumn = function(matrix, index, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof index !== 'number' || index < 0 || index > 3) {
-            throw new DeveloperError('index must be 0, 1, 2, or 3.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 3);
+
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result = Matrix4.clone(matrix, result);
         var startIndex = index * 4;
@@ -7298,15 +6975,9 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.setTranslation = function(matrix, translation, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(translation)) {
-            throw new DeveloperError('translation is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('translation', translation);
+        Check.typeOf.object('result', result);
         
         result[0] = matrix[0];
         result[1] = matrix[1];
@@ -7359,16 +7030,12 @@ define('Core/Matrix4',[
      * // a.x = 18.0; a.y = 19.0; a.z = 20.0; a.w = 21.0;
      */
     Matrix4.getRow = function(matrix, index, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
+                Check.typeOf.object('matrix', matrix);
 
-        if (typeof index !== 'number' || index < 0 || index > 3) {
-            throw new DeveloperError('index must be 0, 1, 2, or 3.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 3);
+
+        Check.typeOf.object('result', result);
         
         var x = matrix[index];
         var y = matrix[index + 4];
@@ -7409,18 +7076,13 @@ define('Core/Matrix4',[
      * //     [22.0, 23.0, 24.0, 25.0]
      */
     Matrix4.setRow = function(matrix, index, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (typeof index !== 'number' || index < 0 || index > 3) {
-            throw new DeveloperError('index must be 0, 1, 2, or 3.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+
+        Check.typeOf.number.greaterThanOrEquals('index', index, 0);
+        Check.typeOf.number.lessThanOrEquals('index', index, 3);
+
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         result = Matrix4.clone(matrix, result);
         result[index] = cartesian.x;
@@ -7440,12 +7102,8 @@ define('Core/Matrix4',[
      * @returns {Cartesian3} The modified result parameter
      */
     Matrix4.getScale = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result.x = Cartesian3.magnitude(Cartesian3.fromElements(matrix[0], matrix[1], matrix[2], scratchColumn));
         result.y = Cartesian3.magnitude(Cartesian3.fromElements(matrix[4], matrix[5], matrix[6], scratchColumn));
@@ -7477,15 +7135,9 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.multiply = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         var left0 = left[0];
         var left1 = left[1];
@@ -7569,15 +7221,9 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.add = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result[0] = left[0] + right[0];
         result[1] = left[1] + right[1];
@@ -7607,15 +7253,9 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.subtract = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result[0] = left[0] - right[0];
         result[1] = left[1] - right[1];
@@ -7656,15 +7296,9 @@ define('Core/Matrix4',[
      * var m3 = Cesium.Matrix4.multiplyTransformation(m1, m2, new Cesium.Matrix4());
      */
     Matrix4.multiplyTransformation = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         var left0 = left[0];
         var left1 = left[1];
@@ -7742,15 +7376,9 @@ define('Core/Matrix4',[
      * Cesium.Matrix4.multiplyByMatrix3(m, rotation, m);
      */
     Matrix4.multiplyByMatrix3 = function(matrix, rotation, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(rotation)) {
-            throw new DeveloperError('rotation is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('rotation', rotation);
+        Check.typeOf.object('result', result);
         
         var left0 = matrix[0];
         var left1 = matrix[1];
@@ -7818,15 +7446,9 @@ define('Core/Matrix4',[
      * Cesium.Matrix4.multiplyByTranslation(m, position, m);
      */
     Matrix4.multiplyByTranslation = function(matrix, translation, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(translation)) {
-            throw new DeveloperError('translation is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('translation', translation);
+        Check.typeOf.object('result', result);
         
         var x = translation.x;
         var y = translation.y;
@@ -7878,15 +7500,9 @@ define('Core/Matrix4',[
      * @see Matrix4.multiplyByScale
      */
     Matrix4.multiplyByUniformScale = function(matrix, scale, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (typeof scale !== 'number') {
-            throw new DeveloperError('scale is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number('scale', scale);
+        Check.typeOf.object('result', result);
         
         uniformScaleScratch.x = scale;
         uniformScaleScratch.y = scale;
@@ -7915,15 +7531,9 @@ define('Core/Matrix4',[
      * @see Matrix4.multiplyByUniformScale
      */
     Matrix4.multiplyByScale = function(matrix, scale, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(scale)) {
-            throw new DeveloperError('scale is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('scale', scale);
+        Check.typeOf.object('result', result);
         
         var scaleX = scale.x;
         var scaleY = scale.y;
@@ -7962,15 +7572,9 @@ define('Core/Matrix4',[
      * @returns {Cartesian4} The modified result parameter.
      */
     Matrix4.multiplyByVector = function(matrix, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var vX = cartesian.x;
         var vY = cartesian.y;
@@ -8006,15 +7610,9 @@ define('Core/Matrix4',[
      * //   Cesium.Matrix4.multiplyByVector(matrix, new Cesium.Cartesian4(p.x, p.y, p.z, 0.0), result);
      */
     Matrix4.multiplyByPointAsVector = function(matrix, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var vX = cartesian.x;
         var vY = cartesian.y;
@@ -8044,16 +7642,9 @@ define('Core/Matrix4',[
      * var result = Cesium.Matrix4.multiplyByPoint(matrix, p, new Cesium.Cartesian3());
      */
     Matrix4.multiplyByPoint = function(matrix, cartesian, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var vX = cartesian.x;
         var vY = cartesian.y;
@@ -8093,15 +7684,9 @@ define('Core/Matrix4',[
      * //     [-44.0, -46.0, -48.0, -50.0]
      */
     Matrix4.multiplyByScalar = function(matrix, scalar, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar must be a number');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result[0] = matrix[0] * scalar;
         result[1] = matrix[1] * scalar;
@@ -8145,12 +7730,8 @@ define('Core/Matrix4',[
      * //     [-22.0, -23.0, -24.0, -25.0]
      */
     Matrix4.negate = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result[0] = -matrix[0];
         result[1] = -matrix[1];
@@ -8194,12 +7775,8 @@ define('Core/Matrix4',[
      * //     [13.0, 17.0, 21.0, 25.0]
      */
     Matrix4.transpose = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         var matrix1 = matrix[1];
         var matrix2 = matrix[2];
@@ -8235,12 +7812,8 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.abs = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result[0] = Math.abs(matrix[0]);
         result[1] = Math.abs(matrix[1]);
@@ -8354,9 +7927,7 @@ define('Core/Matrix4',[
      * //Prints "Difference between both the matrices is not less than 0.1" on the console
      */
     Matrix4.equalsEpsilon = function(left, right, epsilon) {
-                if (typeof epsilon !== 'number') {
-            throw new DeveloperError('epsilon must be a number');
-        }
+                Check.typeOf.number('epsilon', epsilon);
         
         return (left === right) ||
                 (defined(left) &&
@@ -8387,12 +7958,8 @@ define('Core/Matrix4',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Matrix4.getTranslation = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result.x = matrix[12];
         result.y = matrix[13];
@@ -8423,12 +7990,8 @@ define('Core/Matrix4',[
      * //     [12.0, 16.0, 20.0]
      */
     Matrix4.getRotation = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         result[0] = matrix[0];
         result[1] = matrix[1];
@@ -8460,12 +8023,8 @@ define('Core/Matrix4',[
       * @exception {RuntimeError} matrix is not invertible because its determinate is zero.
       */
     Matrix4.inverse = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         // Special case for a zero scale matrix that can occur, for example,
         // when a model's node has a [0, 0, 0] scale.
@@ -8603,12 +8162,8 @@ define('Core/Matrix4',[
      * @returns {Matrix4} The modified result parameter.
      */
     Matrix4.inverseTransformation = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('matrix', matrix);
+        Check.typeOf.object('result', result);
         
         //This function is an optimized version of the below 4 lines.
         //var rT = Matrix3.transpose(Matrix4.getRotation(matrix));
@@ -8892,19 +8447,19 @@ define('Core/Matrix4',[
 /*global define*/
 define('Core/Rectangle',[
         './Cartographic',
+        './Check',
         './defaultValue',
         './defined',
         './defineProperties',
-        './DeveloperError',
         './Ellipsoid',
         './freezeObject',
         './Math'
     ], function(
         Cartographic,
+        Check,
         defaultValue,
         defined,
         defineProperties,
-        DeveloperError,
         Ellipsoid,
         freezeObject,
         CesiumMath) {
@@ -8997,13 +8552,8 @@ define('Core/Rectangle',[
      * @returns {Number[]} The array that was packed into
      */
     Rectangle.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -9024,9 +8574,7 @@ define('Core/Rectangle',[
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if one was not provided.
      */
     Rectangle.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -9047,9 +8595,7 @@ define('Core/Rectangle',[
      * @returns {Number} The width.
      */
     Rectangle.computeWidth = function(rectangle) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
                 var east = rectangle.east;
         var west = rectangle.west;
         if (east < west) {
@@ -9064,9 +8610,7 @@ define('Core/Rectangle',[
      * @returns {Number} The height.
      */
     Rectangle.computeHeight = function(rectangle) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
                 return rectangle.north - rectangle.south;
     };
 
@@ -9102,6 +8646,32 @@ define('Core/Rectangle',[
     };
 
     /**
+     * Creates an rectangle given the boundary longitude and latitude in radians.
+     *
+     * @param {Number} [west=0.0] The westernmost longitude in radians in the range [-Math.PI, Math.PI].
+     * @param {Number} [south=0.0] The southernmost latitude in radians in the range [-Math.PI/2, Math.PI/2].
+     * @param {Number} [east=0.0] The easternmost longitude in radians in the range [-Math.PI, Math.PI].
+     * @param {Number} [north=0.0] The northernmost latitude in radians in the range [-Math.PI/2, Math.PI/2].
+     * @param {Rectangle} [result] The object onto which to store the result, or undefined if a new instance should be created.
+     * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
+     *
+     * @example
+     * var rectangle = Cesium.Rectangle.fromRadians(0.0, Math.PI/4, Math.PI/8, 3*Math.PI/4);
+     */
+    Rectangle.fromRadians = function(west, south, east, north, result) {
+        if (!defined(result)) {
+            return new Rectangle(west, south, east, north);
+        }
+
+        result.west = defaultValue(west, 0.0);
+        result.south = defaultValue(south, 0.0);
+        result.east = defaultValue(east, 0.0);
+        result.north = defaultValue(north, 0.0);
+
+        return result;
+    };
+
+    /**
      * Creates the smallest possible Rectangle that encloses all positions in the provided array.
      *
      * @param {Cartographic[]} cartographics The list of Cartographic instances.
@@ -9109,9 +8679,7 @@ define('Core/Rectangle',[
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
      */
     Rectangle.fromCartographicArray = function(cartographics, result) {
-                if (!defined(cartographics)) {
-            throw new DeveloperError('cartographics is required.');
-        }
+                Check.defined('cartographics', cartographics);
         
         var west = Number.MAX_VALUE;
         var east = -Number.MAX_VALUE;
@@ -9164,9 +8732,7 @@ define('Core/Rectangle',[
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
      */
     Rectangle.fromCartesianArray = function(cartesians, ellipsoid, result) {
-                if (!defined(cartesians)) {
-            throw new DeveloperError('cartesians is required.');
-        }
+                Check.defined('cartesians', cartesians);
         
         var west = Number.MAX_VALUE;
         var east = -Number.MAX_VALUE;
@@ -9282,9 +8848,7 @@ define('Core/Rectangle',[
      * @returns {Boolean} <code>true</code> if the Rectangles are within the provided epsilon, <code>false</code> otherwise.
      */
     Rectangle.prototype.equalsEpsilon = function(other, epsilon) {
-                if (typeof epsilon !== 'number') {
-            throw new DeveloperError('epsilon is required and must be a number.');
-        }
+                Check.typeOf.number('epsilon', epsilon);
         
         return defined(other) &&
                (Math.abs(this.west - other.west) <= epsilon) &&
@@ -9304,45 +8868,23 @@ define('Core/Rectangle',[
      * @exception {DeveloperError} <code>west</code> must be in the interval [<code>-Pi</code>, <code>Pi</code>].
      */
     Rectangle.validate = function(rectangle) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
 
         var north = rectangle.north;
-        if (typeof north !== 'number') {
-            throw new DeveloperError('north is required to be a number.');
-        }
-
-        if (north < -CesiumMath.PI_OVER_TWO || north > CesiumMath.PI_OVER_TWO) {
-            throw new DeveloperError('north must be in the interval [-Pi/2, Pi/2].');
-        }
+        Check.typeOf.number.greaterThanOrEquals('north', north, -CesiumMath.PI_OVER_TWO);
+        Check.typeOf.number.lessThanOrEquals('north', north, CesiumMath.PI_OVER_TWO);
 
         var south = rectangle.south;
-        if (typeof south !== 'number') {
-            throw new DeveloperError('south is required to be a number.');
-        }
-
-        if (south < -CesiumMath.PI_OVER_TWO || south > CesiumMath.PI_OVER_TWO) {
-            throw new DeveloperError('south must be in the interval [-Pi/2, Pi/2].');
-        }
+        Check.typeOf.number.greaterThanOrEquals('south', south, -CesiumMath.PI_OVER_TWO);
+        Check.typeOf.number.lessThanOrEquals('south', south, CesiumMath.PI_OVER_TWO);
 
         var west = rectangle.west;
-        if (typeof west !== 'number') {
-            throw new DeveloperError('west is required to be a number.');
-        }
-
-        if (west < -Math.PI || west > Math.PI) {
-            throw new DeveloperError('west must be in the interval [-Pi, Pi].');
-        }
+        Check.typeOf.number.greaterThanOrEquals('west', west, -Math.PI);
+        Check.typeOf.number.lessThanOrEquals('west', west, Math.PI);
 
         var east = rectangle.east;
-        if (typeof east !== 'number') {
-            throw new DeveloperError('east is required to be a number.');
-        }
-
-        if (east < -Math.PI || east > Math.PI) {
-            throw new DeveloperError('east must be in the interval [-Pi, Pi].');
-        }
+        Check.typeOf.number.greaterThanOrEquals('east', east, -Math.PI);
+        Check.typeOf.number.lessThanOrEquals('east', east, Math.PI);
             };
 
     /**
@@ -9353,9 +8895,7 @@ define('Core/Rectangle',[
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if none was provided.
      */
     Rectangle.southwest = function(rectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         if (!defined(result)) {
             return new Cartographic(rectangle.west, rectangle.south);
@@ -9374,9 +8914,7 @@ define('Core/Rectangle',[
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if none was provided.
      */
     Rectangle.northwest = function(rectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         if (!defined(result)) {
             return new Cartographic(rectangle.west, rectangle.north);
@@ -9395,9 +8933,7 @@ define('Core/Rectangle',[
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if none was provided.
      */
     Rectangle.northeast = function(rectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         if (!defined(result)) {
             return new Cartographic(rectangle.east, rectangle.north);
@@ -9416,9 +8952,7 @@ define('Core/Rectangle',[
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if none was provided.
      */
     Rectangle.southeast = function(rectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         if (!defined(result)) {
             return new Cartographic(rectangle.east, rectangle.south);
@@ -9437,9 +8971,7 @@ define('Core/Rectangle',[
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if none was provided.
      */
     Rectangle.center = function(rectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         var east = rectangle.east;
         var west = rectangle.west;
@@ -9474,12 +9006,8 @@ define('Core/Rectangle',[
      * @returns {Rectangle|undefined} The modified result parameter, a new Rectangle instance if none was provided or undefined if there is no intersection.
      */
     Rectangle.intersection = function(rectangle, otherRectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(otherRectangle)) {
-            throw new DeveloperError('otherRectangle is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
+        Check.typeOf.object('otherRectangle', otherRectangle);
         
         var rectangleEast = rectangle.east;
         var rectangleWest = rectangle.west;
@@ -9535,12 +9063,8 @@ define('Core/Rectangle',[
      * @returns {Rectangle|undefined} The modified result parameter, a new Rectangle instance if none was provided or undefined if there is no intersection.
      */
     Rectangle.simpleIntersection = function(rectangle, otherRectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(otherRectangle)) {
-            throw new DeveloperError('otherRectangle is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
+        Check.typeOf.object('otherRectangle', otherRectangle);
         
         var west = Math.max(rectangle.west, otherRectangle.west);
         var south = Math.max(rectangle.south, otherRectangle.south);
@@ -9571,12 +9095,8 @@ define('Core/Rectangle',[
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
      */
     Rectangle.union = function(rectangle, otherRectangle, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(otherRectangle)) {
-            throw new DeveloperError('otherRectangle is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
+        Check.typeOf.object('otherRectangle', otherRectangle);
         
         if (!defined(result)) {
             result = new Rectangle();
@@ -9620,12 +9140,8 @@ define('Core/Rectangle',[
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if one was not provided.
      */
     Rectangle.expand = function(rectangle, cartographic, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required.');
-        }
-        if (!defined(cartographic)) {
-            throw new DeveloperError('cartographic is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
+        Check.typeOf.object('cartographic', cartographic);
         
         if (!defined(result)) {
             result = new Rectangle();
@@ -9647,12 +9163,8 @@ define('Core/Rectangle',[
      * @returns {Boolean} true if the provided cartographic is inside the rectangle, false otherwise.
      */
     Rectangle.contains = function(rectangle, cartographic) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(cartographic)) {
-            throw new DeveloperError('cartographic is required.');
-        }
+                Check.typeOf.object('rectangle', rectangle);
+        Check.typeOf.object('cartographic', cartographic);
         
         var longitude = cartographic.longitude;
         var latitude = cartographic.latitude;
@@ -9685,9 +9197,7 @@ define('Core/Rectangle',[
      * @returns {Cartesian3[]} The modified result parameter or a new Array of Cartesians instances if none was provided.
      */
     Rectangle.subsample = function(rectangle, ellipsoid, surfaceHeight, result) {
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
+                Check.typeOf.object('rectangle', rectangle);
         
         ellipsoid = defaultValue(ellipsoid, Ellipsoid.WGS84);
         surfaceHeight = defaultValue(surfaceHeight, 0.0);
@@ -9765,9 +9275,9 @@ define('Core/Rectangle',[
 define('Core/BoundingSphere',[
         './Cartesian3',
         './Cartographic',
+        './Check',
         './defaultValue',
         './defined',
-        './DeveloperError',
         './Ellipsoid',
         './GeographicProjection',
         './Intersect',
@@ -9778,9 +9288,9 @@ define('Core/BoundingSphere',[
     ], function(
         Cartesian3,
         Cartographic,
+        Check,
         defaultValue,
         defined,
-        DeveloperError,
         Ellipsoid,
         GeographicProjection,
         Intersect,
@@ -10110,9 +9620,7 @@ define('Core/BoundingSphere',[
 
         stride = defaultValue(stride, 3);
 
-                if (stride < 3) {
-            throw new DeveloperError('stride must be 3 or greater.');
-        }
+                Check.typeOf.number.greaterThanOrEquals('stride', stride, 3);
         
         var currentPos = fromPointsCurrentPos;
         currentPos.x = positions[0] + center.x;
@@ -10416,9 +9924,8 @@ define('Core/BoundingSphere',[
      * var sphere = Cesium.BoundingSphere.fromCornerPoints(new Cesium.Cartesian3(-0.5, -0.5, -0.5), new Cesium.Cartesian3(0.5, 0.5, 0.5));
      */
     BoundingSphere.fromCornerPoints = function(corner, oppositeCorner, result) {
-                if (!defined(corner) || !defined(oppositeCorner)) {
-            throw new DeveloperError('corner and oppositeCorner are required.');
-        }
+                Check.typeOf.object('corner', corner);
+        Check.typeOf.object('oppositeCorner', oppositeCorner);
         
         if (!defined(result)) {
             result = new BoundingSphere();
@@ -10442,9 +9949,7 @@ define('Core/BoundingSphere',[
      * var boundingSphere = Cesium.BoundingSphere.fromEllipsoid(ellipsoid);
      */
     BoundingSphere.fromEllipsoid = function(ellipsoid, result) {
-                if (!defined(ellipsoid)) {
-            throw new DeveloperError('ellipsoid is required.');
-        }
+                Check.typeOf.object('ellipsoid', ellipsoid);
         
         if (!defined(result)) {
             result = new BoundingSphere();
@@ -10570,13 +10075,8 @@ define('Core/BoundingSphere',[
      * @returns {Number[]} The array that was packed into
      */
     BoundingSphere.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -10598,9 +10098,7 @@ define('Core/BoundingSphere',[
      * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if one was not provided.
      */
     BoundingSphere.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -10627,13 +10125,8 @@ define('Core/BoundingSphere',[
      * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
      */
     BoundingSphere.union = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required.');
-        }
-
-        if (!defined(right)) {
-            throw new DeveloperError('right is required.');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         if (!defined(result)) {
             result = new BoundingSphere();
@@ -10682,13 +10175,8 @@ define('Core/BoundingSphere',[
      * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
      */
     BoundingSphere.expand = function(sphere, point, result) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-
-        if (!defined(point)) {
-            throw new DeveloperError('point is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('point', point);
         
         result = BoundingSphere.clone(sphere, result);
 
@@ -10711,13 +10199,8 @@ define('Core/BoundingSphere',[
      *                      intersects the plane.
      */
     BoundingSphere.intersectPlane = function(sphere, plane) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-
-        if (!defined(plane)) {
-            throw new DeveloperError('plane is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('plane', plane);
         
         var center = sphere.center;
         var radius = sphere.radius;
@@ -10743,13 +10226,8 @@ define('Core/BoundingSphere',[
      * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
      */
     BoundingSphere.transform = function(sphere, transform, result) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-
-        if (!defined(transform)) {
-            throw new DeveloperError('transform is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('transform', transform);
         
         if (!defined(result)) {
             result = new BoundingSphere();
@@ -10777,12 +10255,8 @@ define('Core/BoundingSphere',[
      * });
      */
     BoundingSphere.distanceSquaredTo = function(sphere, cartesian) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-        if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('cartesian', cartesian);
         
         var diff = Cartesian3.subtract(sphere.center, cartesian, distanceSquaredToScratch);
         return Cartesian3.magnitudeSquared(diff) - sphere.radius * sphere.radius;
@@ -10804,13 +10278,8 @@ define('Core/BoundingSphere',[
      * var newBoundingSphere = Cesium.BoundingSphere.transformWithoutScale(boundingSphere, modelMatrix);
      */
     BoundingSphere.transformWithoutScale = function(sphere, transform, result) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-
-        if (!defined(transform)) {
-            throw new DeveloperError('transform is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('transform', transform);
         
         if (!defined(result)) {
             result = new BoundingSphere();
@@ -10837,17 +10306,9 @@ define('Core/BoundingSphere',[
      * @returns {Interval} The nearest and farthest distances on the bounding sphere from position in direction.
      */
     BoundingSphere.computePlaneDistances = function(sphere, position, direction, result) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-
-        if (!defined(position)) {
-            throw new DeveloperError('position is required.');
-        }
-
-        if (!defined(direction)) {
-            throw new DeveloperError('direction is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('position', position);
+        Check.typeOf.object('direction', direction);
         
         if (!defined(result)) {
             result = new Interval();
@@ -10882,9 +10343,7 @@ define('Core/BoundingSphere',[
      * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
      */
     BoundingSphere.projectTo2D = function(sphere, projection, result) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
         
         projection = defaultValue(projection, projectTo2DProjection);
 
@@ -10979,12 +10438,8 @@ define('Core/BoundingSphere',[
      * @returns {Boolean} <code>true</code> if the sphere is not visible; otherwise <code>false</code>.
      */
     BoundingSphere.isOccluded = function(sphere, occluder) {
-                if (!defined(sphere)) {
-            throw new DeveloperError('sphere is required.');
-        }
-        if (!defined(occluder)) {
-            throw new DeveloperError('occluder is required.');
-        }
+                Check.typeOf.object('sphere', sphere);
+        Check.typeOf.object('occluder', occluder);
                 return !occluder.isBoundingSphereVisible(sphere);
     };
 
@@ -11919,6 +11374,21 @@ define('Core/WebGLConstants',[
         UNPACK_COLORSPACE_CONVERSION_WEBGL : 0x9243,
         BROWSER_DEFAULT_WEBGL : 0x9244,
 
+        // WEBGL_compressed_texture_s3tc
+        COMPRESSED_RGB_S3TC_DXT1_EXT : 0x83F0,
+        COMPRESSED_RGBA_S3TC_DXT1_EXT : 0x83F1,
+        COMPRESSED_RGBA_S3TC_DXT3_EXT : 0x83F2,
+        COMPRESSED_RGBA_S3TC_DXT5_EXT : 0x83F3,
+
+        // WEBGL_compressed_texture_pvrtc
+        COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0x8C00,
+        COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0x8C01,
+        COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0x8C02,
+        COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0x8C03,
+
+        // WEBGL_compressed_texture_etc1
+        COMPRESSED_RGB_ETC1_WEBGL : 0x8D64,
+
         // Desktop OpenGL
         DOUBLE : 0x140A,
 
@@ -12193,7 +11663,10 @@ define('Core/WebGLConstants',[
         COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : 0x9279,
         TEXTURE_IMMUTABLE_FORMAT : 0x912F,
         MAX_ELEMENT_INDEX : 0x8D6B,
-        TEXTURE_IMMUTABLE_LEVELS : 0x82DF
+        TEXTURE_IMMUTABLE_LEVELS : 0x82DF,
+
+        // Extensions
+        MAX_TEXTURE_MAX_ANISOTROPY_EXT : 0x84FF
     };
 
     return freezeObject(WebGLConstants);
@@ -12527,22 +12000,325 @@ define('Core/ComponentDatatype',[
 });
 
 /*global define*/
-define('Core/Quaternion',[
-        './Cartesian3',
+define('Core/oneTimeWarning',[
+        './defaultValue',
+        './defined',
+        './DeveloperError'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError) {
+    "use strict";
+
+    var warnings = {};
+
+    /**
+     * Logs a one time message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports oneTimeWarning
+     *
+     * @param {String} identifier The unique identifier for this warning.
+     * @param {String} [message=identifier] The message to log to the console.
+     *
+     * @example
+     * for(var i=0;i<foo.length;++i) {
+     *    if (!defined(foo[i].bar)) {
+     *       // Something that can be recovered from but may happen a lot
+     *       oneTimeWarning('foo.bar undefined', 'foo.bar is undefined. Setting to 0.');
+     *       foo[i].bar = 0;
+     *       // ...
+     *    }
+     * }
+     *
+     * @private
+     */
+    function oneTimeWarning(identifier, message) {
+                if (!defined(identifier)) {
+            throw new DeveloperError('identifier is required.');
+        }
+        
+        if (!defined(warnings[identifier])) {
+            warnings[identifier] = true;
+            console.warn(defaultValue(message, identifier));
+        }
+    }
+
+    oneTimeWarning.geometryOutlines = 'Entity geometry outlines are unsupported on terrain. Outlines will be disabled. To enable outlines, disable geometry terrain clamping by explicitly setting height to 0.';
+
+    return oneTimeWarning;
+});
+
+/*global define*/
+define('Core/deprecationWarning',[
+        './defined',
+        './DeveloperError',
+        './oneTimeWarning'
+    ], function(
+        defined,
+        DeveloperError,
+        oneTimeWarning) {
+    'use strict';
+    
+    /**
+     * Logs a deprecation message to the console.  Use this function instead of
+     * <code>console.log</code> directly since this does not log duplicate messages
+     * unless it is called from multiple workers.
+     *
+     * @exports deprecationWarning
+     *
+     * @param {String} identifier The unique identifier for this deprecated API.
+     * @param {String} message The message to log to the console.
+     *
+     * @example
+     * // Deprecated function or class
+     * function Foo() {
+     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
+     *    // ...
+     * }
+     *
+     * // Deprecated function
+     * Bar.prototype.func = function() {
+     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
+     *    // ...
+     * };
+     *
+     * // Deprecated property
+     * defineProperties(Bar.prototype, {
+     *     prop : {
+     *         get : function() {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         },
+     *         set : function(value) {
+     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
+     *             // ...
+     *         }
+     *     }
+     * });
+     *
+     * @private
+     */
+    function deprecationWarning(identifier, message) {
+                if (!defined(identifier) || !defined(message)) {
+            throw new DeveloperError('identifier and message are required.');
+        }
+        
+        oneTimeWarning(identifier, message);
+    }
+
+    return deprecationWarning;
+});
+
+/*global define*/
+define('Core/HeadingPitchRoll',[
         './defaultValue',
         './defined',
         './DeveloperError',
+        './Math'
+    ], function(
+        defaultValue,
+        defined,
+        DeveloperError,
+        CesiumMath) {
+    "use strict";
+
+    /**
+     * A rotation expressed as a heading, pitch, and roll. Heading is the rotation about the
+     * negative z axis. Pitch is the rotation about the negative y axis. Roll is the rotation about
+     * the positive x axis.
+     * @alias HeadingPitchRoll
+     * @constructor
+     *
+     * @param {Number} [heading=0.0] The heading component in radians.
+     * @param {Number} [pitch=0.0] The pitch component in radians.
+     * @param {Number} [roll=0.0] The roll component in radians.
+     */
+    function HeadingPitchRoll(heading, pitch, roll) {
+        this.heading = defaultValue(heading, 0.0);
+        this.pitch = defaultValue(pitch, 0.0);
+        this.roll = defaultValue(roll, 0.0);
+    }
+
+    /**
+     * Computes the heading, pitch and roll from a quaternion (see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles )
+     *
+     * @param {Quaternion} quaternion The quaternion from which to retrieve heading, pitch, and roll, all expressed in radians.
+     * @param {Quaternion} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.fromQuaternion = function(quaternion, result) {
+                if (!defined(quaternion)) {
+            throw new DeveloperError('quaternion is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        var test = 2 * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
+        var denominatorRoll = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+        var numeratorRoll = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
+        var denominatorHeading = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+        var numeratorHeading = 2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
+        result.heading = -Math.atan2(numeratorHeading, denominatorHeading);
+        result.roll = Math.atan2(numeratorRoll, denominatorRoll);
+        result.pitch = -Math.asin(test);
+        return result;
+    };
+
+    /**
+     * Returns a new HeadingPitchRoll instance from angles given in degrees.
+     *
+     * @param {Number} heading the heading in degrees
+     * @param {Number} pitch the pitch in degrees
+     * @param {Number} roll the heading in degrees
+     * @param {HeadingPitchRoll} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @returns {HeadingPitchRoll} A new HeadingPitchRoll instance
+     */
+    HeadingPitchRoll.fromDegrees = function(heading, pitch, roll, result) {
+                if (!defined(heading)) {
+            throw new DeveloperError('heading is required');
+        }
+        if (!defined(pitch)) {
+            throw new DeveloperError('pitch is required');
+        }
+        if (!defined(roll)) {
+            throw new DeveloperError('roll is required');
+        }
+                if (!defined(result)) {
+            result = new HeadingPitchRoll();
+        }
+        result.heading = heading * CesiumMath.RADIANS_PER_DEGREE;
+        result.pitch = pitch * CesiumMath.RADIANS_PER_DEGREE;
+        result.roll = roll * CesiumMath.RADIANS_PER_DEGREE;
+        return result;
+    };
+
+    /**
+     * Duplicates a HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} headingPitchRoll The HeadingPitchRoll to duplicate.
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided. (Returns undefined if headingPitchRoll is undefined)
+     */
+    HeadingPitchRoll.clone = function(headingPitchRoll, result) {
+        if (!defined(headingPitchRoll)) {
+            return undefined;
+        }
+        if (!defined(result)) {
+            return new HeadingPitchRoll(headingPitchRoll.heading, headingPitchRoll.pitch, headingPitchRoll.roll);
+        }
+        result.heading = headingPitchRoll.heading;
+        result.pitch = headingPitchRoll.pitch;
+        result.roll = headingPitchRoll.roll;
+        return result;
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equals = function(left, right) {
+        return (left === right) ||
+            ((defined(left)) &&
+                (defined(right)) &&
+                (left.heading === right.heading) &&
+                (left.pitch === right.pitch) &&
+                (left.roll === right.roll));
+    };
+
+    /**
+     * Compares the provided HeadingPitchRolls componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [left] The first HeadingPitchRoll.
+     * @param {HeadingPitchRoll} [right] The second HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.equalsEpsilon = function(left, right, relativeEpsilon, absoluteEpsilon) {
+        return (left === right) ||
+            (defined(left) &&
+                defined(right) &&
+                CesiumMath.equalsEpsilon(left.heading, right.heading, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.pitch, right.pitch, relativeEpsilon, absoluteEpsilon) &&
+                CesiumMath.equalsEpsilon(left.roll, right.roll, relativeEpsilon, absoluteEpsilon));
+    };
+
+    /**
+     * Duplicates this HeadingPitchRoll instance.
+     *
+     * @param {HeadingPitchRoll} [result] The object onto which to store the result.
+     * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
+     */
+    HeadingPitchRoll.prototype.clone = function(result) {
+        return HeadingPitchRoll.clone(this, result);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they are equal, <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equals = function(right) {
+        return HeadingPitchRoll.equals(this, right);
+    };
+
+    /**
+     * Compares this HeadingPitchRoll against the provided HeadingPitchRoll componentwise and returns
+     * <code>true</code> if they pass an absolute or relative tolerance test,
+     * <code>false</code> otherwise.
+     *
+     * @param {HeadingPitchRoll} [right] The right hand side HeadingPitchRoll.
+     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
+     * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
+     */
+    HeadingPitchRoll.prototype.equalsEpsilon = function(right, relativeEpsilon, absoluteEpsilon) {
+        return HeadingPitchRoll.equalsEpsilon(this, right, relativeEpsilon, absoluteEpsilon);
+    };
+
+    /**
+     * Creates a string representing this HeadingPitchRoll in the format '(heading, pitch, roll)' in radians.
+     *
+     * @returns {String} A string representing the provided HeadingPitchRoll in the format '(heading, pitch, roll)'.
+     */
+    HeadingPitchRoll.prototype.toString = function() {
+        return '(' + this.heading + ', ' + this.pitch + ', ' + this.roll + ')';
+    };
+
+    return HeadingPitchRoll;
+});
+
+/*global define*/
+define('Core/Quaternion',[
+        './Cartesian3',
+        './Check',
+        './defaultValue',
+        './defined',
+        './deprecationWarning',
         './FeatureDetection',
         './freezeObject',
+        './HeadingPitchRoll',
         './Math',
         './Matrix3'
     ], function(
         Cartesian3,
+        Check,
         defaultValue,
         defined,
-        DeveloperError,
+        deprecationWarning,
         FeatureDetection,
         freezeObject,
+        HeadingPitchRoll,
         CesiumMath,
         Matrix3) {
     'use strict';
@@ -12600,12 +12376,8 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if one was not provided.
      */
     Quaternion.fromAxisAngle = function(axis, angle, result) {
-                if (!defined(axis)) {
-            throw new DeveloperError('axis is required.');
-        }
-        if (typeof angle !== 'number') {
-            throw new DeveloperError('angle is required and must be a number.');
-        }
+                Check.typeOf.object('axis', axis);
+        Check.typeOf.number('angle', angle);
         
         var halfAngle = angle / 2.0;
         var s = Math.sin(halfAngle);
@@ -12637,9 +12409,7 @@ define('Core/Quaternion',[
      * @see Matrix3.fromQuaternion
      */
     Quaternion.fromRotationMatrix = function(matrix, result) {
-                if (!defined(matrix)) {
-            throw new DeveloperError('matrix is required.');
-        }
+                Check.typeOf.object('matrix', matrix);
         
         var root;
         var x;
@@ -12700,6 +12470,9 @@ define('Core/Quaternion',[
     };
 
     var scratchHPRQuaternion = new Quaternion();
+    var scratchHeadingQuaternion = new Quaternion();
+    var scratchPitchQuaternion = new Quaternion();
+    var scratchRollQuaternion = new Quaternion();
 
     /**
      * Computes a rotation from the given heading, pitch and roll angles. Heading is the rotation about the
@@ -12712,22 +12485,27 @@ define('Core/Quaternion',[
      * @param {Quaternion} [result] The object onto which to store the result.
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if none was provided.
      */
-    Quaternion.fromHeadingPitchRoll = function(heading, pitch, roll, result) {
-                if (!defined(heading)) {
-            throw new DeveloperError('heading is required.');
+    Quaternion.fromHeadingPitchRoll = function(headingOrHeadingPitchRoll, pitchOrResult, roll, result) {
+                if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            Check.typeOf.object('headingPitchRoll', headingOrHeadingPitchRoll);
+        } else {
+            Check.typeOf.number(headingOrHeadingPitchRoll, 'heading');
+            Check.typeOf.number(pitchOrResult, 'pitch');
+            Check.typeOf.number(roll, 'roll');
         }
-        if (!defined(pitch)) {
-            throw new DeveloperError('pitch is required.');
+                var hpr;
+        if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
+            hpr = headingOrHeadingPitchRoll;
+            result = pitchOrResult;
+        } else {
+            deprecationWarning('Quaternion.fromHeadingPitchRoll(heading, pitch, roll,result)', 'The method was deprecated in Cesium 1.32 and will be removed in version 1.33. ' + 'Use Quaternion.fromHeadingPitchRoll(hpr,result) where hpr is a HeadingPitchRoll');
+            hpr = new HeadingPitchRoll(headingOrHeadingPitchRoll, pitchOrResult, roll);
         }
-        if (!defined(roll)) {
-            throw new DeveloperError('roll is required.');
-        }
-        
-        var rollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, roll, scratchHPRQuaternion);
-        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, result);
-        result = Quaternion.multiply(pitchQuaternion, rollQuaternion, pitchQuaternion);
-        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, scratchHPRQuaternion);
-        return Quaternion.multiply(headingQuaternion, result, result);
+        scratchRollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, hpr.roll, scratchHPRQuaternion);
+        scratchPitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -hpr.pitch, result);
+        result = Quaternion.multiply(scratchPitchQuaternion, scratchRollQuaternion, scratchPitchQuaternion);
+        scratchHeadingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -hpr.heading, scratchHPRQuaternion);
+        return Quaternion.multiply(scratchHeadingQuaternion, result, result);
     };
 
     var sampledQuaternionAxis = new Cartesian3();
@@ -12752,13 +12530,8 @@ define('Core/Quaternion',[
      * @returns {Number[]} The array that was packed into
      */
     Quaternion.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
-
-        if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.typeOf.object('value', value);
+        Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -12779,9 +12552,7 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if one was not provided.
      */
     Quaternion.unpack = function(array, startingIndex, result) {
-                if (!defined(array)) {
-            throw new DeveloperError('array is required');
-        }
+                Check.defined('array', array);
         
         startingIndex = defaultValue(startingIndex, 0);
 
@@ -12836,7 +12607,7 @@ define('Core/Quaternion',[
      *
      * @param {Number[]} array The array previously packed for interpolation.
      * @param {Number[]} sourceArray The original packed array.
-     * @param {Number} [startingIndex=0] The startingIndex used to convert the array.
+     * @param {Number} [firstIndex=0] The firstIndex used to convert the array.
      * @param {Number} [lastIndex=packedArray.length] The lastIndex used to convert the array.
      * @param {Quaternion} [result] The object into which to store the result.
      * @returns {Quaternion} The modified result parameter or a new Quaternion instance if one was not provided.
@@ -12890,12 +12661,8 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.conjugate = function(quaternion, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.object('result', result);
         
         result.x = -quaternion.x;
         result.y = -quaternion.y;
@@ -12911,9 +12678,7 @@ define('Core/Quaternion',[
      * @returns {Number} The magnitude squared.
      */
     Quaternion.magnitudeSquared = function(quaternion) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
         
         return quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w;
     };
@@ -12936,9 +12701,7 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.normalize = function(quaternion, result) {
-                if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('result', result);
         
         var inverseMagnitude = 1.0 / Quaternion.magnitude(quaternion);
         var x = quaternion.x * inverseMagnitude;
@@ -12961,9 +12724,7 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.inverse = function(quaternion, result) {
-                if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('result', result);
         
         var magnitudeSquared = Quaternion.magnitudeSquared(quaternion);
         result = Quaternion.conjugate(quaternion, result);
@@ -12979,15 +12740,9 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.add = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x + right.x;
         result.y = left.y + right.y;
@@ -13005,15 +12760,9 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.subtract = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         result.x = left.x - right.x;
         result.y = left.y - right.y;
@@ -13030,12 +12779,8 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.negate = function(quaternion, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.object('result', result);
         
         result.x = -quaternion.x;
         result.y = -quaternion.y;
@@ -13052,12 +12797,8 @@ define('Core/Quaternion',[
      * @returns {Number} The dot product.
      */
     Quaternion.dot = function(left, right) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
         
         return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
     };
@@ -13071,15 +12812,9 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.multiply = function(left, right, result) {
-                if (!defined(left)) {
-            throw new DeveloperError('left is required');
-        }
-        if (!defined(right)) {
-            throw new DeveloperError('right is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('left', left);
+        Check.typeOf.object('right', right);
+        Check.typeOf.object('result', result);
         
         var leftX = left.x;
         var leftY = left.y;
@@ -13112,15 +12847,9 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.multiplyByScalar = function(quaternion, scalar, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = quaternion.x * scalar;
         result.y = quaternion.y * scalar;
@@ -13138,15 +12867,9 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.divideByScalar = function(quaternion, scalar, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
-        if (typeof scalar !== 'number') {
-            throw new DeveloperError('scalar is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.number('scalar', scalar);
+        Check.typeOf.object('result', result);
         
         result.x = quaternion.x / scalar;
         result.y = quaternion.y / scalar;
@@ -13163,12 +12886,8 @@ define('Core/Quaternion',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Quaternion.computeAxis = function(quaternion, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.object('result', result);
         
         var w = quaternion.w;
         if (Math.abs(w - 1.0) < CesiumMath.EPSILON6) {
@@ -13191,9 +12910,7 @@ define('Core/Quaternion',[
      * @returns {Number} The angle of rotation.
      */
     Quaternion.computeAngle = function(quaternion) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
         
         if (Math.abs(quaternion.w - 1.0) < CesiumMath.EPSILON6) {
             return 0.0;
@@ -13212,18 +12929,10 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.lerp = function(start, end, t, result) {
-                if (!defined(start)) {
-            throw new DeveloperError('start is required.');
-        }
-        if (!defined(end)) {
-            throw new DeveloperError('end is required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('start', start);
+        Check.typeOf.object('end', end);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         lerpScratch = Quaternion.multiplyByScalar(end, t, lerpScratch);
         result = Quaternion.multiplyByScalar(start, 1.0 - t, result);
@@ -13245,18 +12954,10 @@ define('Core/Quaternion',[
      * @see Quaternion#fastSlerp
      */
     Quaternion.slerp = function(start, end, t, result) {
-                if (!defined(start)) {
-            throw new DeveloperError('start is required.');
-        }
-        if (!defined(end)) {
-            throw new DeveloperError('end is required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('start', start);
+        Check.typeOf.object('end', end);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         var dot = Quaternion.dot(start, end);
 
@@ -13289,12 +12990,8 @@ define('Core/Quaternion',[
      * @returns {Cartesian3} The modified result parameter.
      */
     Quaternion.log = function(quaternion, result) {
-                if (!defined(quaternion)) {
-            throw new DeveloperError('quaternion is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('quaternion', quaternion);
+        Check.typeOf.object('result', result);
         
         var theta = CesiumMath.acosClamped(quaternion.w);
         var thetaOverSinTheta = 0.0;
@@ -13314,12 +13011,8 @@ define('Core/Quaternion',[
      * @returns {Quaternion} The modified result parameter.
      */
     Quaternion.exp = function(cartesian, result) {
-                if (!defined(cartesian)) {
-            throw new DeveloperError('cartesian is required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('cartesian', cartesian);
+        Check.typeOf.object('result', result);
         
         var theta = Cartesian3.magnitude(cartesian);
         var sinThetaOverTheta = 0.0;
@@ -13354,12 +13047,10 @@ define('Core/Quaternion',[
      * @see Quaternion#squad
      */
     Quaternion.computeInnerQuadrangle = function(q0, q1, q2, result) {
-                if (!defined(q0) || !defined(q1) || !defined(q2)) {
-            throw new DeveloperError('q0, q1, and q2 are required.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('q0', q0);
+        Check.typeOf.object('q1', q1);
+        Check.typeOf.object('q2', q2);
+        Check.typeOf.object('result', result);
         
         var qInv = Quaternion.conjugate(q1, squadScratchQuaternion0);
         Quaternion.multiply(qInv, q2, squadScratchQuaternion1);
@@ -13401,15 +13092,12 @@ define('Core/Quaternion',[
      * @see Quaternion#computeInnerQuadrangle
      */
     Quaternion.squad = function(q0, q1, s0, s1, t, result) {
-                if (!defined(q0) || !defined(q1) || !defined(s0) || !defined(s1)) {
-            throw new DeveloperError('q0, q1, s0, and s1 are required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('q0', q0);
+        Check.typeOf.object('q1', q1);
+        Check.typeOf.object('s0', s0);
+        Check.typeOf.object('s1', s1);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         var slerp0 = Quaternion.slerp(q0, q1, t, squadScratchQuaternion0);
         var slerp1 = Quaternion.slerp(s0, s1, t, squadScratchQuaternion1);
@@ -13446,18 +13134,10 @@ define('Core/Quaternion',[
      * @see Quaternion#slerp
      */
     Quaternion.fastSlerp = function(start, end, t, result) {
-                if (!defined(start)) {
-            throw new DeveloperError('start is required.');
-        }
-        if (!defined(end)) {
-            throw new DeveloperError('end is required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('start', start);
+        Check.typeOf.object('end', end);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         var x = Quaternion.dot(start, end);
 
@@ -13506,15 +13186,12 @@ define('Core/Quaternion',[
      * @see Quaternion#squad
      */
     Quaternion.fastSquad = function(q0, q1, s0, s1, t, result) {
-                if (!defined(q0) || !defined(q1) || !defined(s0) || !defined(s1)) {
-            throw new DeveloperError('q0, q1, s0, and s1 are required.');
-        }
-        if (typeof t !== 'number') {
-            throw new DeveloperError('t is required and must be a number.');
-        }
-        if (!defined(result)) {
-            throw new DeveloperError('result is required');
-        }
+                Check.typeOf.object('q0', q0);
+        Check.typeOf.object('q1', q1);
+        Check.typeOf.object('s0', s0);
+        Check.typeOf.object('s1', s1);
+        Check.typeOf.number('t', t);
+        Check.typeOf.object('result', result);
         
         var slerp0 = Quaternion.fastSlerp(q0, q1, t, squadScratchQuaternion0);
         var slerp1 = Quaternion.fastSlerp(s0, s1, t, squadScratchQuaternion1);
@@ -13550,9 +13227,7 @@ define('Core/Quaternion',[
      * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
      */
     Quaternion.equalsEpsilon = function(left, right, epsilon) {
-                if (typeof epsilon !== 'number') {
-            throw new DeveloperError('epsilon is required and must be a number.');
-        }
+                Check.typeOf.number('epsilon', epsilon);
         
         return (left === right) ||
                ((defined(left)) &&
@@ -14096,7 +13771,7 @@ define('Core/Geometry',[
          *    <li><code>position</code> - 3D vertex position.  64-bit floating-point (for precision).  3 components per attribute.  See {@link VertexFormat#position}.</li>
          *    <li><code>normal</code> - Normal (normalized), commonly used for lighting.  32-bit floating-point.  3 components per attribute.  See {@link VertexFormat#normal}.</li>
          *    <li><code>st</code> - 2D texture coordinate.  32-bit floating-point.  2 components per attribute.  See {@link VertexFormat#st}.</li>
-         *    <li><code>binormal</code> - Binormal (normalized), used for tangent-space effects like bump mapping.  32-bit floating-point.  3 components per attribute.  See {@link VertexFormat#binormal}.</li>
+         *    <li><code>bitangent</code> - Bitangent (normalized), used for tangent-space effects like bump mapping.  32-bit floating-point.  3 components per attribute.  See {@link VertexFormat#bitangent}.</li>
          *    <li><code>tangent</code> - Tangent (normalized), used for tangent-space effects like bump mapping.  32-bit floating-point.  3 components per attribute.  See {@link VertexFormat#tangent}.</li>
          * </ul>
          * </p>
@@ -14125,7 +13800,7 @@ define('Core/Geometry',[
          *   componentsPerAttribute : 3,
          *   values : new Float32Array(0)
          * });
-         * 
+         *
          * @see GeometryAttribute
          * @see VertexFormat
          */
@@ -14406,7 +14081,7 @@ define('Core/GeometryAttributes',[
         this.st = options.st;
 
         /**
-         * The binormal attribute (normalized), which is used for tangent-space effects like bump mapping.
+         * The bitangent attribute (normalized), which is used for tangent-space effects like bump mapping.
          * <p>
          * 32-bit floating-point.  3 components per attribute.
          * </p>
@@ -14415,7 +14090,7 @@ define('Core/GeometryAttributes',[
          *
          * @default undefined
          */
-        this.binormal = options.binormal;
+        this.bitangent = options.bitangent;
 
         /**
          * The tangent attribute (normalized), which is used for tangent-space effects like bump mapping.
@@ -14950,16 +14625,16 @@ define('Core/EllipseOutlineGeometry',[
 /*global define*/
 define('Core/CircleOutlineGeometry',[
         './Cartesian3',
+        './Check',
         './defaultValue',
         './defined',
-        './DeveloperError',
         './EllipseOutlineGeometry',
         './Ellipsoid'
     ], function(
         Cartesian3,
+        Check,
         defaultValue,
         defined,
-        DeveloperError,
         EllipseOutlineGeometry,
         Ellipsoid) {
     'use strict';
@@ -14997,9 +14672,7 @@ define('Core/CircleOutlineGeometry',[
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
         var radius = options.radius;
 
-                if (!defined(radius)) {
-            throw new DeveloperError('radius is required.');
-        }
+                Check.typeOf.number('radius', radius);
         
         var ellipseGeometryOptions = {
             center : options.center,
@@ -15031,9 +14704,7 @@ define('Core/CircleOutlineGeometry',[
      * @returns {Number[]} The array that was packed into
      */
     CircleOutlineGeometry.pack = function(value, array, startingIndex) {
-                if (!defined(value)) {
-            throw new DeveloperError('value is required');
-        }
+                Check.typeOf.object('value', value);
                 return EllipseOutlineGeometry.pack(value._ellipseGeometry, array, startingIndex);
     };
 

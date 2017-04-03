@@ -19,7 +19,7 @@ module.exports = function(config) {
 			'external/jasmine-2.5.2/boot.js',
 			
 			// application code
-			'src/js/*.js',
+			'src/mago3d/*.js',
 			
 			// test dependencies
 			
@@ -29,7 +29,7 @@ module.exports = function(config) {
 	
 		// list of files to exclude
 		exclude: [
-			'src/js/cesium'
+			'src/engine/cesium'
 		],
 		
 		reporters:['progress'],

@@ -1,21 +1,19 @@
- * 해야 할 목록
+﻿ * 해야 할 목록
 
 1 디랙토리 구조
  1) 3d_data
   - f4d 데이터를 저장. 용량이 커서 git에 올리는 sample data는 작은걸로 만들고 운영환경에서는 실데이터로 교체해야 함
  2) build
   - gulp minify javascript 저장. git 관리하지 않음
- 3) example
+ 3) sample
   - 예제 파일
  4) external
   - jasmine 과 같은 javascript library를 저장
- 5) images
-  - 이미지 저장
  6) node_modules
   - node 의존 library 관리. git 관리 하지 않음
  7) src
-  - cesium custmizing source
-  - cesium plugin source
+  - engine custmizing source
+  - mago3d plugin source
  8) test
   - jasmine test 소스
 
@@ -29,15 +27,15 @@
  - 우선은 apache lounge
  
 4 javascript doc
- - jsdoc
+ - jsdoc 
  - https://github.com/jsdoc3/jsdoc
  - http://usejsdoc.org/
 
 5 docker
  
- 
- 
- 
- 
- 
- 
+6 api 는 기본 세개 정도는 만들어야 함
+ - load
+ - 하이라이팅
+ - 움직이는거
+
+7 web workers

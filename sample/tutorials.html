@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<!-- <meta http-equiv="Cache-Control" content="no-cache"/>
+		<meta http-equiv="Expires" content="0"/>
+		<meta http-equiv="Pragma" content="no-cache"/> -->
+		<title>Tutorials</title>
+		<link rel="stylesheet" href="/sample/style.css" />
+		<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	</head>
+<body>
+
+	<header>
+		<div class="navbar navbar-green">
+			<div style="float: left; padding-left: 50px; padding-top: 15px;">Mago3D</div>
+			<div style="float: right">
+				<ul class="navbar-ul">
+					<li class="navbar-li">&nbsp;&nbsp;&nbsp;Download&nbsp;&nbsp;&nbsp;</li>
+					<li class="navbar-li">&nbsp;&nbsp;&nbsp;demo&nbsp;&nbsp;&nbsp;</li>
+					<li class="navbar-li">&nbsp;&nbsp;&nbsp;developers&nbsp;&nbsp;&nbsp;</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	
+	<div style="width:100% ;min-height: 500px;">
+		<form id="searchForm" name="searchForm" action="">
+		<div style="float: left; min-width: 200px;">
+			<div style="padding-left: 20px; padding-top: 20px;">Tutorials</div>
+			<ul>
+				<!-- <li><a href="/sample/tutorials.html">FullShip 모드</a></li>
+				<li><a href="/sample/tutorials.html?viewType=deploy">Deploy 모드</a></li> -->
+				
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('0'); return false;">FullShip 모드</a></li>
+				<li style="height: 30px;"><a href="#" onclick="changeRenderMode('1'); return false;">Deploy 모드</a></li>
+				<li style="height: 30px;">
+					<label for="blockType">블록 타입</label>
+					<select id="blockType" name="blockType">
+						<option value="MSP" selected="selected">Struts</option>
+						<option value="MOP">OutFitting</option>
+					</select><br/>
+					
+					<label for="blockId">블록 ID</label><br/>
+					<input type="text" id="blockId" name="blockId" size="15"/><br/>
+					<a href="#" onclick="searchBlock(); return false;">검색</a>
+					<a href="#" onclick="searchBlock(); return false;">HighLighting</a><br/>
+					<a href="#" onclick="searchBlock(); return false;">색변경</a>
+					<a href="#" onclick="searchBlock(); return false;">숨기기</a>
+					<a href="#" onclick="searchBlock(); return false;">표시</a>
+				</li>
+			</ul>
+		</div>
+		</form>
+		<div style="padding-top: 30px; padding-left: 20px; width: 97%;">
+			<div id="magoContainer"></div>
+		</div>
+	</div>
+	
+	<footer style="clear:both; padding-top:30px; text-align: center;">
+		<address>Gaia3D 팀에서 만들었습니다.</address>
+		<small>Copyright &copy; 2017 Gaia3D</small>
+	</footer>
+
+<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../thirdparty/jquery/jquery.js"></script>
+<script type="text/javascript" src="../src/mago3d/Code.js"></script>
+<script type="text/javascript" src="../src/mago3d/API.js"></script>
+<script type="text/javascript" src="../src/mago3d/Config.js"></script>
+<script type="text/javascript" src="../src/mago3d/Constant.js"></script>
+<script type="text/javascript" src="../src/mago3d/Message.js"></script>
+<script type="text/javascript" src="../src/mago3d/ManagerFactory.js"></script>
+<script type="text/javascript" src="../src/mago3d/Atmosphere.js"></script>
+<script type="text/javascript" src="../src/mago3d/GeometryUtil.js"></script>
+<script type="text/javascript" src="../src/mago3d/GeometryModifier.js"></script>
+<script type="text/javascript" src="../src/mago3d/Line.js"></script>
+<script type="text/javascript" src="../src/mago3d/Plane.js"></script>
+<script type="text/javascript" src="../src/mago3d/Point3D.js"></script>
+<script type="text/javascript" src="../src/mago3d/Shader.js"></script>
+<script type="text/javascript" src="../src/mago3d/ShaderSource.js"></script>
+<script type="text/javascript" src="../src/mago3d/ReaderWriter.js"></script>
+<script type="text/javascript" src="../src/mago3d/Renderer.js"></script>
+<script type="text/javascript" src="../src/mago3d/Selection.js"></script>
+<script type="text/javascript" src="../src/mago3d/VBOManager.js"></script>
+<script type="text/javascript" src="../src/mago3d/CesiumManager.js"></script>
+<script type="text/javascript" src="../src/mago3d/PostFxShader.js"></script>
+<script type="text/javascript" src="../src/mago3d/FBO.js"></script>
+<script type="text/javascript" src="../src/mago3d/Geometry.js"></script>
+<script type="text/javascript" src="../src/mago3d/Accessor.js"></script>
+<script type="text/javascript" src="../src/mago3d/NeoTexture.js"></script>
+<script type="text/javascript" src="../src/mago3d/BoundingBox.js"></script>
+<script type="text/javascript" src="../src/mago3d/BlockModels.js"></script>
+<script type="text/javascript" src="../src/mago3d/FileRequestControler.js"></script>
+<script type="text/javascript" src="../src/mago3d/ManagerUtils.js"></script>
+<script type="text/javascript" src="../src/mago3d/NeoReferenceModels.js"></script>
+<script type="text/javascript" src="../src/mago3d/OcclusionCullOctree.js"></script>
+<script type="text/javascript" src="../src/mago3d/Octree.js"></script>
+<script type="text/javascript" src="../src/mago3d/VisibleObjectsControler.js"></script>
+<script type="text/javascript" src="../src/mago3d/Matrix4.js"></script>
+<script type="text/javascript" src="../src/mago3d/Lego.js"></script>
+<script type="text/javascript" src="../src/mago3d/Camera.js"></script>
+<script type="text/javascript" src="../src/mago3d/GeoLocationData.js"></script>
+<script>
+	var managerFactory = null;
+	
+	$.ajax({
+		url: "/sample/database.json",
+		type: "GET",
+		dataType: "json",
+		async : true,
+		success: function(result){
+			// TODO DB 에서 고객사별 환경 설정을 읽어서 초기화
+			getBlocksConfig(result);
+		},
+		error: function(e){
+			alert(e.responseText);
+		}
+	});
+	
+	function getBlocksConfig(magoConfig) {
+		// blocks 정보를 db에서 읽어 오는 예제
+		$.ajax({
+			url: "/sample/blocks.json",
+			type: "GET",
+			dataType: "json",
+			async : true,
+			success: function(blocksConfig){
+				/* var queryString = window.location.search;
+				var viewType = "0";
+				if(queryString == undefined || queryString == null || queryString.length == 0) {
+					// TODO 나중에는 문자나 조건을 좀 달리 해야할거 같음
+					viewType = "0";
+				} else {
+					viewType = "1";
+				} */
+				managerFactory = new ManagerFactory(null, "magoContainer", magoConfig, blocksConfig);
+				
+				// 사용하는 예제
+				/* 
+				var blocks = result.blocks;
+				var blockId = "F110T";
+				var block = blocks[blockId];
+				console.log("map 처럼 key 로 뽑을 경우" + block.LATITUDE);
+				for(var key in blocks) {
+					block = blocks[key];
+					console.log(key + "---------------" + block.LATITUDE);
+				} 
+				*/
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	
+	// render mode 
+	function changeRenderMode(renderMode) {
+		var api = new API("renderMode");
+		api.setRenderMode(renderMode);
+		if(managerFactory != null) {
+			managerFactory.callAPI(api);
+		}
+	}
+	
+	// 블록 검색 
+	function searchBlock() {
+		var api = new API("search");
+		var blockType = $("#blockType").val();
+		var blockId = $("#blockId").val();
+		api.setBlockType(blockType);
+		api.setBlockId(blockId);
+		if(managerFactory != null) {
+			managerFactory.callAPI(api);
+		}
+	}
+</script>
+</body>
+</html>
