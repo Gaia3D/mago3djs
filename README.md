@@ -29,3 +29,6 @@ server를 실행하기 전에 Dependencies를 설치해줍니다. <br>
 
 #####  서버 실행 <br>
 &emsp;<code>C:\git\repository\mago3djs>node server.js</code><br>
+
+#####  데이터 폴더 링크<br>
+mklink /d "C:\git\repository\mago3djs\data" "C:\data"
