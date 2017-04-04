@@ -647,13 +647,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					}
 					else
 					{
-						if(lod > 0)
-						{
-							indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-							if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
-								indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-						}
-						else indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						//if(lod > 0)
+						//{
+						//	indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
+						//	if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+						//		indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						//}
+						//else indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 					}
 					
 					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);

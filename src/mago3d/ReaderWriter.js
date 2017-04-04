@@ -1227,16 +1227,22 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		
 		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
+		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
+		bytesReaded += buildingNameLength;
+		/* khj(20170331)
 		var buildingName = "";
 		for(var j=0; j<buildingNameLength; j++) {
 			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
 		}
-		
-		
+		*/
 		
 		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		longitude = 128.594998;
+		latitude = 34.904209;
+		altitude = 50.0;
 		
 		// TEST.*********
 		altitude = 50.0;
@@ -1258,10 +1264,15 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
 		
 		
+		var buildingNameDivided = buildingName.split("_");
+		neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
+		neoBuilding.buildingType = buildingNameDivided[3];
+		/* khj(20170331) : before converted jt data path has been changed.
 		var buildingNameDivided = buildingName.split("-");
 		var tempBuildingId = buildingNameDivided[2].split("_");
 		neoBuilding.buildingId = tempBuildingId[0];
 		neoBuilding.buildingType = buildingNameDivided[1];
+		*/
 		
 		neoBuilding.buildingFileName = buildingName;
 		if(neoBuilding.metaData == undefined) {

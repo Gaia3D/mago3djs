@@ -288,12 +288,19 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 				// 3) Indices.*************************************************************************************************
 				var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
+				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+				bytesReaded += 1;
+				bytesReaded = bytesReaded + sizeLevels * 4;
+				bytesReaded = bytesReaded + sizeLevels * 2;
+				/* khj(20170331)
 				var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
+				*/
 				bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.*** 
 			}
 			
 			// in asimetricVersion must load the block's lego.***
+			/* khj(20170331)
 			if(block.lego == undefined) block.lego = new Lego();
 			
 			block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -303,6 +310,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			block.lego.vbo_vicks_container.deleteGlObjects(gl);
 			block.lego.vbo_vicks_container = undefined;
 			block.lego = undefined;
+			*/
 			
 			continue;
 		}
@@ -380,8 +388,25 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			// 3) Indices.*************************************************************************************************
 			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
+			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+			bytesReaded +=1;
+			var sizeThresholds = [];
+			for(var k = 0; k < sizeLevels; k++)
+			{
+				sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
+				bytesReaded += 4;
+			}
+			var indexMarkers = [];
+			for(var k = 0; k < sizeLevels; k++)
+			{
+				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2));
+				bytesReaded += 2;
+			}
+			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+			/* khj(20170331)
 			var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
+			*/
 			vbo_vi_cacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2*shortIndicesValues_count;
@@ -397,6 +422,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		}
 		
 		// in asimetricVersion must load the block's lego.***
+		/* khj(20170331)
 		if(block.lego == undefined) block.lego = new Lego();
 		
 		block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -406,6 +432,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		block.lego.vbo_vicks_container.deleteGlObjects(gl);
 		block.lego.vbo_vicks_container = undefined;
 		block.lego = undefined;
+		*/
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };

@@ -2748,7 +2748,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			//squaredDistLod1 = 60;
 			//squaredDistLod2 = 500000*1000;
 			
-			if(neoBuilding.buildingType == "MOP")
+			if(neoBuilding.buildingType == "outfitting")
+			//if(neoBuilding.buildingType == "MOP") khj(20170331)
 			{
 				if(this.renderingModeTemp == 0)
 					this.myCameraSC.frustum.fov = 0.2;
@@ -2801,7 +2802,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		var geometryDataPath = this.readerWriter.geometryDataPath;
 		var buildingFolderName = neoBuilding.buildingFileName;
 		var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-		var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks";
+		var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+		//var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks"; khj(20170331)
 		//  var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
 	
 		var lowestOctree;
@@ -2899,7 +2901,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		// LOD 1.****************************************************************************************************************
 		// LOD 1.****************************************************************************************************************
 		// LOD 1.****************************************************************************************************************
-		if(neoBuilding.buildingType == "MOP")
+		if(neoBuilding.buildingType == "outfitting")
+		//if(neoBuilding.buildingType == "MOP") khj(20170331)
 			return;
 		
 		lowestOctreesCount = visibleObjControlerOctreesAux.currentVisibles1.length;
@@ -3087,8 +3090,10 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					var buildingFolderName = neoBuilding.buildingFileName;
 					//var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks";
-					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Block";
+					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+					//var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks"; khj(20170331)
+					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+					//var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Block";
 					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
 				}
@@ -3175,8 +3180,10 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 					var buildingFolderName = neoBuilding.buildingFileName;
 					//var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks";
-					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Block";
+					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+					//var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Blocks";
+					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+					//var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Block";
 					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
 				}
@@ -3395,7 +3402,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
-				if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "MOP")
+				if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "outfitting")
+				//if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "MOP") khj(20170331)
 					continue;
 				
 				if(this.renderingModeTemp == 0)
@@ -3465,7 +3473,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(neoBuilding == undefined)
 					continue;
 				
-				if(neoBuilding.buildingType == "MOP")
+				if(neoBuilding.buildingType == "outfitting")
+				//if(neoBuilding.buildingType == "MOP") khj(20170331)
 					continue;
 				
 				
@@ -3639,7 +3648,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
-				if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "MOP")
+				if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "outfitting")
+				//if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "MOP") khj(20170331)
 					continue;
 				
 				if(this.renderingModeTemp == 0)
@@ -3724,7 +3734,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				if(neoBuilding == undefined)
 					continue;
 				
-				if(neoBuilding.buildingType == "MOP")
+				if(neoBuilding.buildingType == "outfitting")
+				//if(neoBuilding.buildingType == "MOP") // khj(20170331)
 					continue;
 				
 				// if the building is highlighted, the use highlight oneColor4.*********************
@@ -3732,18 +3743,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				{
 					gl.uniform1i(currentShader.bUse1Color_loc, true);
 					gl.uniform4fv(currentShader.oneColor4_loc, this.highLightColor4); //.***
-				}
-				else
-				{
-					gl.uniform1i(currentShader.bUse1Color_loc, false);
-				}
-				//----------------------------------------------------------------------------------
-				
-				// if the building has changed color.***********************************************
-				if(neoBuilding.isColorChanged)
-				{
-					gl.uniform1i(currentShader.bUse1Color_loc, true);
-					gl.uniform4fv(currentShader.oneColor4_loc, [this.magoPolicy.color[0],this.magoPolicy.color[1],this.magoPolicy.color[2], 1.0]); //.***
 				}
 				else
 				{
@@ -4558,7 +4557,8 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		
 		if(!this.magoPolicy.getShowOutFitting())
 		{
-			if(neoBuilding.buildingType == "MOP")
+			if(neoBuilding.buildingType == "outfitting")
+			//if(neoBuilding.buildingType == "MOP") khj(20170331)
 			{
 				continue;
 			}
@@ -4640,9 +4640,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			{
 				// 1rst, we must know the buildingType.***
 				var structureTypedBuilding;
-				if(neoBuilding.buildingType == "MOP")
+				if(neoBuilding.buildingType == "outfitting")
+				//if(neoBuilding.buildingType == "MOP") khj(20170331)
 				{
-					structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("MSP", neoBuilding.buildingId);
+					structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("structure", neoBuilding.buildingId);
+					// khj(20170331)
+					//structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("MSP", neoBuilding.buildingId);
 				}
 				else
 					structureTypedBuilding = neoBuilding;
@@ -4674,14 +4677,40 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				
 				if(newLocation) {
 					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION+40, structureTypedBuilding.geoLocationDataAux);
-					var offsetAltitude = 2.0;
+					var offsetAltitude = 9.0;
 					if(neoBuilding.bbox)
 					{
-						//offsetAltitude = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) / 2.0;
+						offsetAltitude = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) / 2.0;
 					}
-					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION+offsetAltitude, structureTypedBuilding.geoLocationDataAux);
-					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					//this.pointSC.set(0.0, 0.0, 50.0);
+					var longitude;
+					var latitude;
+					var elevation;
+					
+					if(structureTypedBuilding.geoLocationDataAux)
+					{
+						longitude = structureTypedBuilding.geoLocationDataAux.longitude;
+						latitude = structureTypedBuilding.geoLocationDataAux.latitude;
+						elevation = structureTypedBuilding.geoLocationDataAux.elevation;
+						
+						if(neoBuilding.buildingType == "outfitting")
+						{
+							elevation += offsetAltitude;
+						}
+					}
+					else
+					{
+						longitude = newLocation.LONGITUDE;
+						latitude = newLocation.LATITUDE;
+						elevation = newLocation.ELEVATION;
+						if(neoBuilding.buildingType == "outfitting")
+						{
+							elevation += offsetAltitude;
+						}
+					}
+
+					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, structureTypedBuilding.geoLocationDataAux);
+					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION+offsetAltitude, structureTypedBuilding.geoLocationDataAux);
+
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 
 					var traslationVector;
@@ -4747,7 +4776,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		if(this.renderingModeTemp == 0)
 			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 		else if(this.renderingModeTemp == 1)
-			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
+			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 15.2/2.0;
 		else if(this.renderingModeTemp == 2)
 			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 		//if(neoBuilding.metaData) {
@@ -5189,13 +5218,6 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
  */
 CesiumManager.prototype.highLightBuildings = function()
 {
-	// 1rst, init colorChanged.***
-	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
-	for(var i=0; i<buildingsCount; i++)
-	{
-		this.neoBuildingsList.neoBuildings_Array[i].isColorChanged = false;
-	}
-	
 	// 1rst, init highlightiedBuildings.***
 	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
 	for(var i=0; i<buildingsCount; i++)
@@ -5203,7 +5225,8 @@ CesiumManager.prototype.highLightBuildings = function()
 		this.neoBuildingsList.neoBuildings_Array[i].isHighLighted = false;
 	}
 	
-	var buildingType = "MSP";
+	var buildingType = "structure";
+	//var buildingType = "MSP"; khj(0331)
 	var highLightingBuildingsCount = this.magoPolicy.highLightedBuildings.length;
 	for(var i=0; i<highLightingBuildingsCount; i++)
 	{
@@ -5236,31 +5259,6 @@ CesiumManager.prototype.renderModeChanged = function()
 	}
 	
 }
-
-CesiumManager.prototype.policyColorChanged = function()
-{
-	// 1rst, init colorChanged.***
-	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
-	for(var i=0; i<buildingsCount; i++)
-	{
-		this.neoBuildingsList.neoBuildings_Array[i].isColorChanged = false;
-	}
-	
-	var buildingType = "MSP";
-	var colorChangedBuildingsCount = this.magoPolicy.colorBuildings.length;
-	for(var i=0; i<colorChangedBuildingsCount; i++)
-	{
-		var colorChangedBuildingId = this.magoPolicy.colorBuildings[i];
-		var colorChangedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, colorChangedBuildingId);
-		if(colorChangedBuilding)
-		{
-			colorChangedBuilding.isColorChanged = true;
-			colorChangedBuilding.extraColor = [this.magoPolicy.color[0], this.magoPolicy.color[1], this.magoPolicy.color[2]];
-			
-		}
-		//var hola = 0;
-	}
-};
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장

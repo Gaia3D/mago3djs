@@ -12,6 +12,8 @@ var NeoReference = function() {
 	// 1) Object ID.***
 	this._id = 0;
 	
+	this.objectId = "";
+	
 	// 2) Block Idx.***
 	this._block_idx = -1;
 	
@@ -486,9 +488,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		{
 			var hola = 0;
 		}
-		
+
 		motherNeoReferencesArray[neoRef._id] = neoRef;
 		this.neoRefsIndices.push(neoRef._id);
+		
+		var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+		var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+		bytes_readed += objectIdLength;
 		
 		// 2) Block's Idx.***
 		var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
