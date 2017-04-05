@@ -130,9 +130,9 @@
 
     var server = app.listen(argv.port, argv.public ? undefined : 'localhost', function() {
     	if (argv.public) {
-    		console.log('공개적 서비스가 시작 되었습니다. Connect to http://localhost:%d/', server.address().port);
+    		console.log('Mago3d(공개) 서비스가 시작 되었습니다. Connect to http://localhost:%d/', server.address().port);
     	} else {
-    		console.log('로컬 서비스가 시작 되었습니다. Connect to http://localhost:%d/', server.address().port);
+    		console.log('Mago3d 서비스가 시작 되었습니다. Connect to http://localhost:%d/', server.address().port);
     	}
     });
 
