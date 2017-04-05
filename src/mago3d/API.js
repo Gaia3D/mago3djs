@@ -28,6 +28,8 @@ var API = function(apiName) {
 	this.blockType = null;
 	// outfitting 표시/비표시
 	this.showOutFitting = false;
+	// boundingBox 표시/비표시
+	this.showBoundingBox = false;
 	// frustum culling 가시 거리(M단위)
 	this.frustumFarDistance = 0;
 	// highlighting
@@ -97,6 +99,13 @@ API.prototype.getShowOutFitting = function() {
 };
 API.prototype.setShowOutFitting = function(showOutFitting) {
 	this.showOutFitting = showOutFitting;
+};
+
+API.prototype.getShowBoundingBox = function() {
+	return this.showBoundingBox;
+};
+API.prototype.setShowBoundingBox = function(showBoundingBox) {
+	this.showBoundingBox = showBoundingBox;
 };
 
 API.prototype.getFrustumFarDistance = function() {
