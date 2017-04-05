@@ -356,6 +356,8 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var endBuff = bytesReaded + 4*verticesFloatValues_count;
 
 			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+			if(endBuff > 1000000)
+				var hola = 0;
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*

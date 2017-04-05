@@ -113,6 +113,22 @@ BoundingBox.prototype.getXLength = function() {
 };
 
 /**
+ * 어떤 일을 하고 있습니까?
+ * @returns result
+ */
+BoundingBox.prototype.getYLength = function() {
+	return this.maxY - this.minY;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns result
+ */
+BoundingBox.prototype.getZLength = function() {
+	return this.maxZ - this.minZ;
+};
+
+/**
  * 영역 박스의 중심을 획득
  * @param resultPoint3d
  * @returns resultPoint3d
