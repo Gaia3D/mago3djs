@@ -304,10 +304,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		},
 		// demo 용
 		demo : function(renderMode, json) {
-			MagoConfig.getInformation().demoBlockConfig = json;
-			var api = new API("demo");
-			api.setRenderMode(renderMode);
-			magoManager.callAPI(api);
+//			MagoConfig.getInformation().demoBlockConfig = json;
+//			var api = new API("demo");
+//			api.setRenderMode(renderMode);
+//			magoManager.callAPI(api);
 		}
 	};
 };

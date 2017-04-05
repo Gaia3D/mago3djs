@@ -28,57 +28,91 @@
 	<div style="width:100% ;min-height: 500px;">
 		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
-			<div style="padding-left: 10px; padding-top: 20px;">Tutorials</div>
+			<div style="padding-left: 10px; padding-top: 20px;">ShipBuilding</div>
+			
 			<div style="padding-left: 10px; padding-top: 20px;">
-				<input type="radio" id="fullshipRender" name="renderMode" value="0" onclick="changeRender('0');" />
-				<label for="fullshipRender"> 호선 </label><br/>
-				<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" />
+				<label for="shipId">이름</label>
+				<select id="shipId" name="shipId" style="height: 25px;">
+					<option value="testId" selected="selected">세종 대왕급</option>
+					<option value="testId">충무공 이순신급</option>
+					<option value="testId">광개토 대왕급</option>
+				</select>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<div>Deploy
+					<input type="radio" id="fullshipRender" name="renderMode" value="0" onclick="changeRender('0');" style="margin-left: 26px;"/>
+					<label for="fullshipRender"> 호선 </label>
+				</div>
+				<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 84px;"/>
 				<label for="deployRender"> 지번 전개 </label><!-- <br/>
 				<input type="radio" id="demoDeployRender" name="renderMode" value="2" onclick="changeRender('2');" />
 				<label for="demoDeployRender"> 지번 전개 데모 </label> -->
 			</div>
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
-				<input type="radio" id="showOutFitting" name="outFitting" onclick="changeOutFitting(true);" />
-				<label for="showOutFitting"> OutFitting 표시 </label><br/>
-				<input type="radio" id="hideOutFitting" name="outFitting" onclick="changeOutFitting(false);" />
-				<label for="hideOutFitting"> OutFitting 비표시 </label>
+				<div>OutFitting
+					<input type="radio" id="showOutFitting" name="outFitting" onclick="changeOutFitting(true);" />
+					<label for="showOutFitting"> 표시 </label>
+				</div>
+				<input type="radio" id="hideOutFitting" name="outFitting" onclick="changeOutFitting(false);" style="margin-left: 84px;"/>
+				<label for="hideOutFitting"> 비표시 </label>
 			</div>
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
-				<label for="frustumFarDistance"> 가시거리(M) </label>
-				<input type="text" id="frustumFarDistance" name="frustumFarDistance" size="2" /> 
+				<label for="frustumFarDistance">가시 거리 </label>
+				<input type="text" id="frustumFarDistance" name="frustumFarDistance" placeholder=" 미터(m)" size="4" style="height: 20px;"/> 
 				<button type="button" id="changeFrustumFarDistanceAPI" class="btn btn-default btn-sm">적용</button>
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px; padding-top: 25px;">
 				<label for="blockType">블록 타입</label>
-				<select id="blockType" name="blockType">
+				<select id="blockType" name="blockType" style="height: 25px;">
 					<option value="MSP" selected="selected">Structure</option>
 					<option value="MOP">OutFitting</option>
 				</select><br/>
-					
-				<label for="blockId">블록 ID</label>
-				<select id="blockId" name="blockId">
+				<div style="margin-top: 5px;"></div>	
+				<label for="blockId" style="margin-top: 35px;">블록 ID</label>
+				<select id="blockId" name="blockId" style="width:75px; height: 25px;">
 				</select>
 				<button type="button" id="searchBlockAPI" class="btn btn-default btn-sm">이동</button>
 			</div>
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
-				<label for="blockIds">블록 ID(복수 ,연결 )</label><br/>
-				<input type="text" id="blockIds" name="blockIds" size="17" /><br/>
-				<label for="colorBlock">Color(16진수)</label>
-				<select id="colorBlock" name="colorBlock" style="margin-top: 5px;">
-					<option value="">없음</option>
-					<option value="255,0,0">빨강</option>
-					<option value="255,255,0">노랑</option>
-					<option value="0,255,0">녹색</option>
-					<option value="0,0,255">파랑</option>
-					<option value="255,0,255">분홍</option>
-					<option value="0,0,0">검정</option>
+				<div>단일 블럭 변경</div>
+				<div><label for="blockIds">블록 ID</label></div>
+				<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/><br/>
+				<div style="margin-top: 5px;"></div>	
+				<label for="colorBlock">색깔</label>
+				<select id="colorBlock" name="colorBlock" style="width:100px; height: 25px;">
+					<option value=""> 없음 </option>
+					<option value="255,0,0"> 빨강 </option>
+					<option value="255,255,0"> 노랑 </option>
+					<option value="0,255,0"> 녹색 </option>
+					<option value="0,0,255"> 파랑 </option>
+					<option value="255,0,255"> 분홍 </option>
+					<option value="0,0,0"> 검정 </option>
 				</select><br/>
-				<button type="button" id="changeHighLightingAPI" class="btn btn-default btn-sm">HighLighting</button>
-                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">색변경</button>
+				<button type="button" id="changeHighLightingAPI" style="height: 24px;">HighLighting</button>
+                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
+				<div><label for="blockIds">블록 ID</label></div>
+				<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/><br/>
+				<div style="margin-top: 5px;"></div>	
+				<label for="colorBlock">색깔</label>
+				<select id="colorBlock" name="colorBlock" style="width:100px; height: 25px;">
+					<option value=""> 없음 </option>
+					<option value="255,0,0"> 빨강 </option>
+					<option value="255,255,0"> 노랑 </option>
+					<option value="0,255,0"> 녹색 </option>
+					<option value="0,0,255"> 파랑 </option>
+					<option value="255,0,255"> 분홍 </option>
+					<option value="0,0,0"> 검정 </option>
+				</select><br/>
+				<button type="button" id="changeHighLightingAPI" style="height: 24px;">HighLighting</button>
+                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
 			</div>
 		</div>
 		</form>
@@ -87,7 +121,7 @@
 		</div>
 	</div>
 	
-	<footer style="clear:both; padding-top:30px; text-align: center;">
+	<footer style="clear:both; padding-top:15px; text-align: center;">
 		<address>Gaia3D 팀에서 만들었습니다.</address>
 		<small>Copyright &copy; 2017 Gaia3D</small>
 	</footer>
@@ -160,10 +194,11 @@
 			success: function(blocksConfig){
 				var blocks = blocksConfig.blocks;
 				for (var blockId in blocks) {
+					var tempBlockId = blockId.split("_");
 					$('#blockId').append($('<option>',
 					{
-						value: blockId,
-						text : blockId 
+						value: tempBlockId[1],
+						text : tempBlockId[1] 
 					}));
 				}
 			},

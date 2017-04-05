@@ -5489,7 +5489,7 @@ CesiumManager.prototype.callAPI = function(api) {
 		// frustum culling 가시 거리
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
 	} else if(apiName === "demo") {
-		this.renderingModeTemp = api.getRenderMode();
-		this.loadDemoBlocks();
+//		this.renderingModeTemp = api.getRenderMode();
+//		this.loadDemoBlocks();
 	}
 };
