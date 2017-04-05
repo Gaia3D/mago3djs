@@ -3835,7 +3835,44 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture); 
 			
 			
-			var visibleBuildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
+			var visibleBuildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
+			//if(visibleBuildingsCount > 0)
+			//	visibleBuildingsCount = 10;
+			
+			for(var b=0; b<visibleBuildingsCount; b++)
+			{
+				neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[b];
+				if(neoBuilding.buildingId == "testId_F110T")
+				{
+					var hola = 0;
+				}
+				gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
+				
+				if(this.renderingModeTemp == 0)
+				{
+					gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+				}
+				else{
+					if(neoBuilding.geoLocationDataAux)
+					{
+						gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.geoLocationDataAux.positionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
+					}
+					else{
+						gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+						gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
+						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+					}
+				}
+				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+				gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
+				//this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
+			}
+			
+			visibleBuildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 			//if(visibleBuildingsCount > 0)
 			//	visibleBuildingsCount = 10;
 			
@@ -3869,7 +3906,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				}
 				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
-				this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
+				//this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
 			}
 			
 		}
@@ -4649,21 +4686,10 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		if(!this.magoPolicy.getShowOutFitting())
 		{
 			if(neoBuilding.buildingType == "outfitting")
-			//if(neoBuilding.buildingType == "MOP") khj(20170331)
 			{
 				continue;
 			}
 		}
-		
-		//if(neoBuilding.buildingFileName == "F4D_ALL-MSP-P520T_R114")
-		//{
-		//	var hola = 0;
-		//}
-		//if(neoBuilding.buildingId == "F140T")
-		//{
-		//	var hola = 0;
-		//}
-		
 		
 		// 1) check if there are cartesian position.***
 		if(neoBuilding.buildingPosition == undefined) {
@@ -4718,7 +4744,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			continue;
 		}
 		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-		var realBuildingPos;
+		var realBuildingPos = undefined; // necesary init to undefined.***
 		if(this.renderingModeTemp == 0)
 		{
 			realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
@@ -4750,6 +4776,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				if(structureTypedBuilding.bbox == undefined)
 					continue;
 				
+				if(structureTypedBuilding.buildingId == "testId_P320T")
+				{
+					var hola = 0;
+				}
+				
 				// now calculate traslation vector.***
 				this.pointSC_2 = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC_2);
 				this.pointSC_2.x = -this.pointSC_2.x;
@@ -4768,10 +4799,10 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				
 				if(newLocation) {
 					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION+40, structureTypedBuilding.geoLocationDataAux);
-					var offsetAltitude = 9.0;
+					//var offsetAltitude = 0.0;
 					if(neoBuilding.bbox)
 					{
-						offsetAltitude = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) / 2.0;
+						//offsetAltitude = (neoBuilding.bbox.maxZ - neoBuilding.bbox.minZ) / 2.0;
 					}
 					var longitude;
 					var latitude;
@@ -4785,7 +4816,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 						
 						if(neoBuilding.buildingType == "outfitting")
 						{
-							elevation += offsetAltitude;
+							//elevation += offsetAltitude;
 						}
 					}
 					else
@@ -4795,11 +4826,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 						elevation = newLocation.ELEVATION;
 						if(neoBuilding.buildingType == "outfitting")
 						{
-							elevation += offsetAltitude;
+							//elevation += offsetAltitude;
 						}
 					}
 
-					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, structureTypedBuilding.geoLocationDataAux);
+					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, structureTypedBuilding.geoLocationDataAux);
+					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, neoBuilding.geoLocationDataAux);
 					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION+offsetAltitude, structureTypedBuilding.geoLocationDataAux);
 
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
@@ -4828,12 +4860,22 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
 					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
 					
-				} else {
+				} 
+				else 
+				{
+					if(neoBuilding.buildingId == "testId_P320T")
+					{
+						var hola = 0;
+					}
 					// use the normal data.***
-					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
+					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC); // original.***
+					realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos ); // original.***
+					
+					//realBuildingPos = neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos;
 				}
-			} else {
+			} 
+			else 
+			{
 				//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 				//this.pointSC.set(0.0, 0.0, 50.0);
 				/*
@@ -4844,15 +4886,30 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				realBuildingPos.y += neoBuilding.geoLocationDataAux.aditionalTraslation.y;
 				realBuildingPos.z += neoBuilding.geoLocationDataAux.aditionalTraslation.z;
 				*/
+				if(neoBuilding.buildingId == "testId_P320T")
+				{
+					var hola = 0;
+				}
 				realBuildingPos = neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos;
 			}
-		} else {
+		} 
+		else 
+		{
+			if(neoBuilding.buildingId == "testId_P320T")
+			{
+				var hola = 0;
+			}
 			this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 			realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
 		}
 		// end calculating realPosition of the building.------------------------------------------------------------------------
 		
 		if(realBuildingPos == undefined) continue;
+		
+		if(neoBuilding.buildingId == "testId_P320T")
+		{
+			var hola = 0;
+		}
 		
 		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding.buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
