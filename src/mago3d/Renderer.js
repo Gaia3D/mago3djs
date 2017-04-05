@@ -1457,9 +1457,9 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 				
 				vbo_vicky.pos_vboDataArray = undefined;
 				
-				if(gl.getError() != gl.NO_ERROR) {
-					alert('WebGL ERROR!!! *** XXXXXXXX***');
-				}
+				//if(gl.getError() != gl.NO_ERROR) {
+				//	alert('WebGL ERROR!!! *** XXXXXXXX***');
+				//}
 			}
 			return;
 		}
@@ -1535,6 +1535,122 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_COLOR_cacheKey);
 		gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+		
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param neoRefList_array 변수
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ * @param isInterior 변수
+ * @param standardShader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ */
+Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, shader, ssao_idx, isHighLighted) {
+	if(lodBuilding.vbo_vicks_container._vbo_cacheKeysArray.length == 0) {
+		return;
+	}
+	gl.frontFace(gl.CCW);
+	// ssao_idx = -1 -> pickingMode.***
+	// ssao_idx = 0 -> depth.***
+	// ssao_idx = 1 -> ssao.***
+	
+	if(ssao_idx == 0) // depth.***
+	{
+		// 1) Position.*********************************************
+		var vbo_vicky = lodBuilding.vbo_vicks_container._vbo_cacheKeysArray[0]; // there are only one.***
+		if(vbo_vicky.MESH_VERTEX_cacheKey == null) {
+			if(vbo_vicky.pos_vboDataArray != undefined) //dataArrayByteLength > 0
+			{
+				vbo_vicky.MESH_VERTEX_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.pos_vboDataArray, gl.STATIC_DRAW);
+				
+				vbo_vicky.pos_vboDataArray = undefined;
+				
+				//if(gl.getError() != gl.NO_ERROR) {
+				//	alert('WebGL ERROR!!! *** XXXXXXXX***');
+				//}
+			}
+			return;
+		}
+		
+		var vertices_count = vbo_vicky.vertexCount;
+		if(vertices_count == 0) {
+			return;
+		}
+		
+		
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+	} else if(ssao_idx == 1) // ssao.***
+	{
+		var vbo_vicky = lodBuilding.vbo_vicks_container._vbo_cacheKeysArray[0]; // there are only one.***
+		var vertices_count = vbo_vicky.vertexCount;
+		
+		if(vertices_count == 0) {
+			return;
+		}
+		
+		if(isHighLighted && isHighLighted == true)
+		{
+			var hola = 0;
+		}
+		
+		// 1) Position.*********************************************
+		if(vbo_vicky.MESH_VERTEX_cacheKey == null) {
+			if(vbo_vicky.pos_vboDataArray != undefined) //dataArrayByteLength > 0
+			{
+				vbo_vicky.MESH_VERTEX_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.pos_vboDataArray, gl.STATIC_DRAW);
+				
+				vbo_vicky.pos_vboDataArray = undefined;
+			}
+			return;
+		}
+		
+		// 2) Normal.*********************************************
+		if(vbo_vicky.MESH_NORMAL_cacheKey == null) {
+			if(vbo_vicky.nor_vboDataArray != undefined) //dataArrayByteLength > 0
+			{
+				vbo_vicky.MESH_NORMAL_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_NORMAL_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.nor_vboDataArray, gl.STATIC_DRAW);
+				
+				vbo_vicky.nor_vboDataArray = undefined;
+			}
+			return;
+		}
+		
+		// 3) Color.*********************************************
+		if(vbo_vicky.MESH_COLOR_cacheKey == null) {
+			if(vbo_vicky.col_vboDataArray != undefined) //dataArrayByteLength > 0
+			{
+				vbo_vicky.MESH_COLOR_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_COLOR_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.col_vboDataArray, gl.STATIC_DRAW);
+				
+				vbo_vicky.col_vboDataArray = undefined;
+			}
+			return;
+		}
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_VERTEX_cacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_NORMAL_cacheKey);
+		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+		
+		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.MESH_COLOR_cacheKey);
+		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
 		
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 	}
