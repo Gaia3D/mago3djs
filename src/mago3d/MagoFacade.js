@@ -53,6 +53,15 @@ function changeOutFittingAPI(mode) {
 	}
 }
 
+//boundingBox 표시/비표시
+function changeBoundingBoxAPI(mode) {
+	var api = new API("changeBoundingBox");
+	api.setShowBoundingBox(mode);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
 // frustum culling 가시 거리
 function changeFrustumFarDistanceAPI(frustumFarDistance) {
 	var api = new API("changefrustumFarDistance");
