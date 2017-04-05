@@ -70,6 +70,7 @@ ShaderSource.textureShaderFragmentSource = "\n\
 		gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.textureA1ShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -103,6 +104,7 @@ ShaderSource.textureA1ShaderFragmentSource = "\n\
 		gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.standardShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -134,6 +136,7 @@ ShaderSource.standardShaderFragmentSource = "\n\
 		gl_FragColor = vec4(vColor, 1.);\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.cloudShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -162,6 +165,7 @@ ShaderSource.cloudShaderFragmentSource = "\n\
 		gl_FragColor = vec4(vColor, 1.);\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.blendingCubeShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -186,6 +190,7 @@ ShaderSource.blendingCubeShaderFragmentSource = "\n\
 		gl_FragColor = vColor;\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.pCloudShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -214,6 +219,7 @@ ShaderSource.pCloundShaderFragmentSource = "\n\
 		gl_FragColor = vColor;\n\
 	}";
 
+	//**************************************************************************************************************************
 //어떤 용도
 ShaderSource.texNormalShaderVertexSource = "\n\
 	attribute vec3 position;\n\
@@ -823,12 +829,6 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
 		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-		//if(vNormal.z < 0.0)\n\
-		//{\n\
-		//	vNormal.x *= -1.0;\n\
-		//	vNormal.y *= -1.0;\n\
-		//	vNormal.z *= -1.0;\n\
-		//}\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		if(bUse1Color)\n\
@@ -1003,13 +1003,10 @@ ShaderSource.lodBuildingDepthFsSource = "\n\
 		//gl_FragData[0].b = -depth; // test\n\
 	}";
 	
-	
-	
-	
-	
+
 // Lego Shaders.************************************************************************************************************************************************
-// Lego Shaders.************************************************************************
-// Lego Shaders.************************************************************************
+// Lego Shaders.************************************************************************************************************************************************
+// Lego Shaders.************************************************************************************************************************************************
 	
 	//어떤 용도
 ShaderSource.LegoSsaoVsSource = "\n\
@@ -1225,9 +1222,234 @@ ShaderSource.LegoDepthFsSource = "\n\
 	
 	
 	
+// box Depth Shader.************************************************************************************************
+// box Depth Shader.************************************************************************************************
+// box Depth Shader.************************************************************************************************
+
+	//어떤 용도
+ShaderSource.boxDepthVsSource = "\n\
+	attribute vec3 position;\n\
+	\n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 buildingRotMatrix;  \n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 aditionalPosition;\n\
+	\n\
+	varying float depth;  \n\
+	void main() {	\n\
+		vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		gl_Position = ModelViewProjectionMatrixRelToEye * pos4; // original.**\n\
+		\n\
+		\n\
+		//linear depth in camera space (0..far)\n\
+		depth = (modelViewMatrixRelToEye * pos4).z/far; // Original.***\n\
+	}";
 	
 	
+	//어떤 용도
+ShaderSource.boxDepthFsSource = "\n\
+	#ifdef GL_ES\n\
+	precision highp float;\n\
+	#endif\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	\n\
+	varying float depth;  \n\
+	\n\
+	vec4 packDepth(const in float depth) {\n\
+		//const vec4 bit_shift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0); // original.***\n\
+		const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+		//const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0); // original.***\n\
+		const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+		vec4 res = fract(depth * bit_shift);\n\
+		res -= res.xxyz * bit_mask; // original.***\n\
+		return res;  \n\
+	}\n\
+	\n\
+	void main() {     \n\
+		gl_FragData[0] = packDepth(-depth); // original.***\n\
+		//gl_FragData[0].r = -depth/far; // original\n\
+		//gl_FragData[0].r = -depth; // test\n\
+		//gl_FragData[0].g = -depth; // test\n\
+		//gl_FragData[0].b = -depth; // test\n\
+	}";
 	
+	
+// box Shaders.********************************************************************************************************************************
+// box Shaders.********************************************************************************************************************************
+// box Shaders.********************************************************************************************************************************
+	
+	//어떤 용도
+ShaderSource.boxSsaoVsSource = "\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 projectionMatrix;  \n\
+	uniform mat4 modelViewMatrix;// No used. *** \n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform mat4 buildingRotMatrix;  \n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec4 oneColor4;\n\
+	uniform bool bUse1Color;\n\
+	uniform vec3 scale;\n\
+	uniform bool bScale;\n\
+	\n\
+	varying vec3 vNormal;\n\
+	varying vec2 vTexCoord;  \n\
+	varying vec3 uAmbientColor;\n\
+	varying vec3 vLightWeighting;\n\
+	varying vec4 vcolor4;\n\
+	\n\
+	void main() {	\n\
+		vec4 position2 = vec4(position.xyz, 1.0);\n\
+		if(bScale)\n\
+		{\n\
+			position2.x *= scale.x;\n\
+			position2.y *= scale.y;\n\
+			position2.z *= scale.z;\n\
+		}\n\
+		vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		\n\
+		vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
+		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+		uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+		if(bUse1Color)\n\
+		{\n\
+			vcolor4 = oneColor4;\n\
+		}\n\
+		else\n\
+		{\n\
+			vcolor4 = color4;\n\
+		}\n\
+	}";
+	
+	
+	//어떤 용도
+ShaderSource.boxSsaoFsSource = "\n\
+	#ifdef GL_ES\n\
+		precision highp float;\n\
+		#endif\n\
+	uniform sampler2D depthTex;\n\
+	uniform sampler2D noiseTex;  \n\
+	uniform sampler2D diffuseTex;\n\
+	uniform bool hasTexture;\n\
+	varying vec3 vNormal;\n\
+	uniform mat4 projectionMatrix;\n\
+	uniform mat4 m;\n\
+	uniform vec2 noiseScale;\n\
+	uniform float near;\n\
+	uniform float far;            \n\
+	uniform float fov;\n\
+	uniform float aspectRatio;    \n\
+	uniform float screenWidth;    \n\
+	uniform float screenHeight;    \n\
+	uniform vec3 kernel[16];   \n\
+	uniform vec4 vColor4Aux;\n\
+	\n\
+	varying vec2 vTexCoord;   \n\
+	varying vec3 vLightWeighting;\n\
+	varying vec4 vcolor4;\n\
+	\n\
+	const int kernelSize = 16;  \n\
+	//const float radius = 0.01;      \n\
+	//const float radius = 0.15;      \n\
+	const float radius = 0.5;      \n\
+	\n\
+	float unpackDepth(const in vec4 rgba_depth) {\n\
+		//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\
+		const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+		float depth = dot(rgba_depth, bit_shift);\n\
+		return depth;\n\
+	}                \n\
+	\n\
+	vec3 getViewRay(vec2 tc) {\n\
+		float hfar = 2.0 * tan(fov/2.0) * far;\n\
+		float wfar = hfar * aspectRatio;    \n\
+		vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+		return ray;                      \n\
+	}         \n\
+			   \n\
+	//linear view space depth\n\
+	float getDepth(vec2 coord) {                          \n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}    \n\
+	\n\
+	void main() {          \n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+		//screenPos.y = 1.0 - screenPos.y;   \n\
+		\n\
+		\n\
+		float linearDepth = getDepth(screenPos);          \n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+				\n\
+		vec3 normal2 = normalize(vNormal);   \n\
+				\n\
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+		vec3 bitangent = cross(normal2, tangent);\n\
+		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+		\n\
+		float occlusion = 0.0;\n\
+		for(int i = 0; i < kernelSize; ++i) {    	 \n\
+			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;        \n\
+			float sampleDepth = -sample.z/far;\n\
+			float depthBufferValue = getDepth(offset.xy);				              \n\
+			//float range_check = abs(linearDepth - depthBufferValue); // original.***\n\
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998; // modified.***\n\
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth) {\n\
+				occlusion +=  1.0;\n\
+			}\n\
+			\n\
+		}   \n\
+		   \n\
+		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+								   \n\
+		vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+		vec3 L = normalize(lightPos);\n\
+		float DiffuseFactor = dot(normal2, L);\n\
+		float NdotL = abs(DiffuseFactor);\n\
+		vec3 diffuse = vec3(NdotL);\n\
+		vec3 ambient = vec3(1.0);\n\
+		vec4 textureColor;\n\
+		textureColor = vcolor4;\n\
+		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
+		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+		//gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting); \n\
+		//gl_FragColor.rgb = textureColor.xyz; \n\
+		gl_FragColor.a = 1.0;   \n\
+	}";
 	
 	
 	

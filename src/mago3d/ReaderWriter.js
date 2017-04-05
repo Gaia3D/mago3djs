@@ -1394,6 +1394,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				
 				// test for 1500 blocks.***
+				/*
 				if(neoBuilding.bbox == undefined)
 					neoBuilding.bbox = new BoundingBox();
 				neoBuilding.bbox.minX = neoBuilding.metaData.oct_min_x;
@@ -1402,6 +1403,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.bbox.maxX = neoBuilding.metaData.oct_max_x;
 				neoBuilding.bbox.maxY = neoBuilding.metaData.oct_max_y;
 				neoBuilding.bbox.maxZ = neoBuilding.metaData.oct_max_z;
+				*/
 				// end // test for 1500 blocks.***
 			  
 			    //BR_Project._f4d_header_readed_finished = true;
