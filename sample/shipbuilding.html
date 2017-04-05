@@ -60,6 +60,15 @@
 			</div>
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
+				<div>BoundingBox
+					<input type="radio" id="showBoundingBox" name="boundingBox" onclick="changeBoundingBox(true);" />
+					<label for="showBoundingBox"> 표시 </label>
+				</div>
+				<input type="radio" id="hideBoundingBox" name="boundingBox" onclick="changeBoundingBox(false);" style="margin-left: 107px;"/>
+				<label for="hideBoundingBox"> 비표시 </label>
+			</div>
+			
+			<div style="padding-left: 10px; padding-top: 20px;">
 				<label for="frustumFarDistance">가시 거리 </label>
 				<input type="text" id="frustumFarDistance" name="frustumFarDistance" placeholder=" 미터(m)" size="4" style="height: 20px;"/> 
 				<button type="button" id="changeFrustumFarDistanceAPI" class="btn btn-default btn-sm">적용</button>
@@ -166,6 +175,14 @@
 <script type="text/javascript" src="../src/mago3d/GeoLocationData.js"></script>
 <script type="text/javascript" src="../src/mago3d/MagoFacade.js"></script>
 <script type="text/javascript" src="../src/mago3d/Policy.js"></script>
+<script type="text/javascript" src="../src/mago3d/Box.js"></script>
+<script type="text/javascript" src="../src/mago3d/Vertex.js"></script>
+<script type="text/javascript" src="../src/mago3d/Triangle.js"></script>
+<script type="text/javascript" src="../src/mago3d/TriSurface.js"></script>
+<script type="text/javascript" src="../src/mago3d/TriPolyhedron.js"></script>
+<script type="text/javascript" src="../src/mago3d/VertexList.js"></script>
+<script type="text/javascript" src="../src/mago3d/VertexMatrix.js"></script>
+<script type="text/javascript" src="../src/mago3d/Color.js"></script>
 <script>
 	var managerFactory = null;
 	magoStart(null, "magoContainer");
@@ -179,6 +196,7 @@
 			changeRender("1");
 			// outfitting  비표시
 			changeOutFitting(false);
+			changeBoundingBox(false);
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
 			return;
@@ -242,6 +260,13 @@
 		if(mode) document.getElementById("showOutFitting").checked = true;
 		else document.getElementById("hideOutFitting").checked = true;
 		changeOutFittingAPI(mode);
+	}
+	
+	// boundingBox 표시/비표시
+	function changeBoundingBox(mode) {
+		if(mode) document.getElementById("showBoundingBox").checked = true;
+		else document.getElementById("hideBoundingBox").checked = true;
+		changeBoundingBoxAPI(mode);
 	}
 	
 	// 가시 거리
