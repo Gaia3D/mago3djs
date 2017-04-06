@@ -564,6 +564,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if(refMatrixIdxKey == -1)
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
 					else{
+						if(neoReference.tMatrixAuxArray == undefined)
+							continue;
+						
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 					}
 				}
@@ -693,7 +696,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender) {
+Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, refMatrixIdxKey) {
 	// render_neoRef
 	var neoRefs_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if(neoRefs_count == 0) return;
@@ -810,7 +813,18 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
 
-				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+				if(refMatrixIdxKey == undefined)
+					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+				else{
+					if(refMatrixIdxKey == -1)
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+					else{
+						if(neoReference.tMatrixAuxArray == undefined)
+							continue;
+						
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+					}
+				}
 				
 				if(neoReference.moveVector != undefined) {
 					gl.uniform1i(standardShader.hasAditionalMov_loc, true);
