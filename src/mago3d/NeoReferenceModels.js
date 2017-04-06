@@ -18,8 +18,9 @@ var NeoReference = function() {
 	this._block_idx = -1;
 	
 	// 3) Transformation Matrix.***
-	this._matrix4 = new Matrix4();
-	this._originalMatrix4 = new Matrix4(); // 
+	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
+	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
+	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
 	
 	// 4) Tex coords cache_key.***
 	this.MESH_TEXCOORD_cacheKey;
@@ -48,6 +49,30 @@ var NeoReference = function() {
  */
 NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
 	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
+	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
+	if(this.tMatrixAuxArray == undefined)
+		this.tMatrixAuxArray = [];
+	
+	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.hasKeyMatrix = function(idxKey) {
+	if(this.tMatrixAuxArray == undefined)
+		return false;
+	
+	if(this.tMatrixAuxArray[idxKey] == undefined)
+		return false;
+	else
+		return true;
 };
 
 /**
@@ -408,6 +433,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
+//*************************************************************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesMotherAndIndices
@@ -426,6 +452,26 @@ var NeoReferencesMotherAndIndices = function() {
 	
 	this.exterior_ocCullOctree;
 	this.interior_ocCullOctree; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix 변수
+ */
+NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
+	var refIndicesCount = this.neoRefsIndices.length;
+	for(var i=0; i<refIndicesCount; i++)
+	{
+		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix 변수
+ */
+NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) {
+	return this.motherNeoRefsList[this.neoRefsIndices[idx]];
 };
 
 /**
