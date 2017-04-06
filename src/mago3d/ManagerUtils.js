@@ -71,6 +71,10 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	resultGeoLocationData.latitude = latitude;
 	resultGeoLocationData.elevation = altitude;
 	
+	resultGeoLocationData.heading = heading;
+	resultGeoLocationData.pitch = pitch;
+	resultGeoLocationData.roll = roll;
+	
 	resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.longitude, resultGeoLocationData.latitude, resultGeoLocationData.elevation);
 	
 	// High and Low values of the position.********************************************************************
@@ -91,12 +95,14 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	resultGeoLocationData.rotMatrix = new Matrix4(); 
 	resultGeoLocationData.rotMatrixInv = new Matrix4(); 
 	
-	var xRotMatrix = new Matrix4(); 
-	var yRotMatrix = new Matrix4(); 
-	var zRotMatrix = new Matrix4(); 
+	var xRotMatrix = new Matrix4();  // created as identity matrix.***
+	var yRotMatrix = new Matrix4();  // created as identity matrix.***
+	var zRotMatrix = new Matrix4();  // created as identity matrix.***
 	
 	// test. we simulate that heading is 45 degrees.***
 	heading = 30.0;
+	pitch = 40.0;
+	roll = 125;
 	
 	if(heading != undefined)
 	{
@@ -115,7 +121,9 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	
 	Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
 	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
-	resultGeoLocationData.tMatrix = zRotatedTMatrix;
+	var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+	var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
 	
 	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
