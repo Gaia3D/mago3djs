@@ -5569,14 +5569,10 @@ CesiumManager.prototype.loadDemoBlocks = function()
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 CesiumManager.prototype.getObjectIndexFile = function() {
-	
 	this.readerWriter.getObjectIndexFile(	this.scene.context._gl, 
 											this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, 
 											this.readerWriter, 
 											this.neoBuildingsList);
-											
-	
-	
 };
 
 /**
@@ -5592,13 +5588,19 @@ CesiumManager.prototype.callAPI = function(api) {
 		this.magoPolicy.highLightedBuildings.length = 0;
 		var projectId = api.getProjectId();
 		var blockIds = api.getBlockIds().split(",");
-		var objectIds = api.getObjectIds().split(",");
+		var objectIds = null;
+		var isExistObjectIds = false;
+		if(api.getObjectIds() != null && api.getObjectIds().length != 0) {
+			objectIds = api.getObjectIds().split(",");
+			isExistObjectIds = true;
+		}
 		var hightedBuilds = [];
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
 			projectLayer.setBlockId(blockIds[i]);
-			projectLayer.setObjectId(objectIds[i]);
+			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i]);
+			else projectLayer.setObjectId(null);
 			hightedBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setHighLightedBuildings(hightedBuilds);
@@ -5607,13 +5609,19 @@ CesiumManager.prototype.callAPI = function(api) {
 		this.magoPolicy.colorBuildings.length = 0;
 		var projectId = api.getProjectId();
 		var blockIds = api.getBlockIds().split(",");
-		var objectIds = api.getObjectIds().split(",");
+		var objectIds = null;
+		var isExistObjectIds = false;
+		if(api.getObjectIds() != null && api.getObjectIds().length != 0) {
+			objectIds = api.getObjectIds().split(",");
+			isExistObjectIds = true;
+		}
 		var colorBuilds = [];
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
 			projectLayer.setBlockId(blockIds[i]);
-			projectLayer.setObjectId(objectIds[i]);
+			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i]);
+			else projectLayer.setObjectId(null);
 			colorBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
