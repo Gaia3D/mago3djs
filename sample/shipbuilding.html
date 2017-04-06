@@ -89,11 +89,15 @@
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
 				<div>단일 블럭 변경</div>
-				<div><label for="blockIds">블록 ID</label></div>
-				<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/><br/>
+				<label for="singleBlockId">블록 ID</label>
+				<input type="text" id="singleBlockId" name="singleBlockId" size="10" style="margin-top:3px; height: 20px;"/>
+				<div>
+					<label for="objectIds">Object ID</label>
+				</div>
+				<input type="text" id="objectIds" name="objectIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/>
 				<div style="margin-top: 5px;"></div>	
-				<label for="colorBlock">색깔</label>
-				<select id="colorBlock" name="colorBlock" style="width:100px; height: 25px;">
+				<label for="colorSingleBlock">색깔</label>
+				<select id="colorSingleBlock" name="colorSingleBlock" style="width:100px; height: 25px;">
 					<option value=""> 없음 </option>
 					<option value="255,0,0"> 빨강 </option>
 					<option value="255,255,0"> 노랑 </option>
@@ -102,16 +106,21 @@
 					<option value="255,0,255"> 분홍 </option>
 					<option value="0,0,0"> 검정 </option>
 				</select><br/>
-				<button type="button" id="changeHighLightingAPI" style="height: 24px;">HighLighting</button>
-                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
+				<button type="button" id="changeHighLightingSingleAPI" style="height: 24px;">HighLighting</button>
+                <button type="button" id="changeColorSingleAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
 			</div>
 			
 			<div style="padding-left: 10px; padding-top: 20px;">
+				<div>복수 블럭 변경</div>
 				<div><label for="blockIds">블록 ID</label></div>
-				<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/><br/>
+				<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/>
+				<div>
+					<label for="objectId">Object ID</label>
+					<input type="text" id="objectId" name="objectId" size="10" style="margin-top:3px; height: 20px;"/>
+				</div>
 				<div style="margin-top: 5px;"></div>	
-				<label for="colorBlock">색깔</label>
-				<select id="colorBlock" name="colorBlock" style="width:100px; height: 25px;">
+				<label for="colorBlockS">색깔</label>
+				<select id="colorBlockS" name="colorBlockS" style="width:100px; height: 25px;">
 					<option value=""> 없음 </option>
 					<option value="255,0,0"> 빨강 </option>
 					<option value="255,255,0"> 노랑 </option>
@@ -120,8 +129,8 @@
 					<option value="255,0,255"> 분홍 </option>
 					<option value="0,0,0"> 검정 </option>
 				</select><br/>
-				<button type="button" id="changeHighLightingAPI" style="height: 24px;">HighLighting</button>
-                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
+				<button type="button" id="changeHighLightingMultiAPI" style="height: 24px;">HighLighting</button>
+                <button type="button" id="changeColorMultiAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
 			</div>
 		</div>
 		</form>
