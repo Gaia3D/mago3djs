@@ -25,21 +25,22 @@
 		</div>
 	</header>
 	
-	<div style="width:100% ;min-height: 500px;">
+	<div style="width:100% ;min-height: 500px; font-size: 14px;">
 		<form id="searchForm" name="searchForm" action="">
 		<div style="float: left; min-width: 200px;">
-			<div style="padding-left: 10px; padding-top: 20px;">ShipBuilding</div>
+			<div style="padding-left: 10px; padding-top: 15px;">ShipBuilding</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<label for="projectId">이름</label>
 				<select id="projectId" name="projectId" style="height: 25px;">
 					<option value="testId" selected="selected">세종 대왕급</option>
 					<option value="testId">충무공 이순신급</option>
 					<option value="testId">광개토 대왕급</option>
 				</select>
+				<hr style="height:1;">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<div>Deploy
 					<input type="radio" id="fullshipRender" name="renderMode" value="0" onclick="changeRender('0');" style="margin-left: 26px;"/>
 					<label for="fullshipRender"> 호선 </label>
@@ -48,9 +49,10 @@
 					<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 84px;"/>
 					<label for="deployRender"> 지번 전개 </label>
 				</div>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<div>OutFitting
 					<input type="radio" id="showOutFitting" name="outFitting" value="true" onclick="changeOutFitting(true);" />
 					<label for="showOutFitting"> 표시 </label>
@@ -59,9 +61,10 @@
 					<input type="radio" id="hideOutFitting" name="outFitting" value="false" onclick="changeOutFitting(false);" style="margin-left: 84px;"/>
 					<label for="hideOutFitting"> 비표시 </label>
 				</div>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<div>BoundingBox
 					<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
 					<label for="showBoundingBox"> 표시 </label>
@@ -69,27 +72,28 @@
 				<div>
 					<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" style="margin-left: 107px;"/>
 					<label for="hideBoundingBox"> 비표시 </label>
-					</div>
+				</div>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<div>그림자
-					<input type="radio" id="showShadow" name="shadow" value="true" onclick="changeShadow(true);" style="margin-left: 29px;"/>
+					<input type="radio" id="showShadow" name="shadow" value="true" onclick="changeShadow(true);" style="margin-left: 15px;"/>
 					<label for="showShadow"> 표시 </label>
-				</div>
-				<div>
-					<input type="radio" id="hideShadow" name="shadow" value="false" onclick="changeShadow(false);" style="margin-left: 84px;"/>
+					<input type="radio" id="hideShadow" name="shadow" value="false" onclick="changeShadow(false);" />
 					<label for="hideShadow"> 비표시 </label>
 				</div>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
+			<div style="padding-left: 10px;">
 				<label for="frustumFarDistance">가시 거리 </label>
 				<input type="text" id="frustumFarDistance" name="frustumFarDistance" placeholder=" 미터(m)" size="4" style="height: 20px;"/> 
 				<button type="button" id="changeFrustumFarDistanceAPI" class="btn btn-default btn-sm">적용</button>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 25px;">
+			<div style="padding-left: 10px;">
 				<div>
 					<label for="blockType">블록 타입</label>
 					<select id="blockType" name="blockType" style="height: 25px;">
@@ -102,19 +106,19 @@
 					<label for="blockId" style="margin-top: 35px;">블록 ID</label>
 					<select id="blockId" name="blockId" style="width:75px; height: 25px;">
 					</select>
-					<button type="button" id="searchBlockAPI" class="btn btn-default btn-sm">이동</button>
+					<button type="button" id="searchBlockAPI" class="btn btn-default btn-sm">검색</button>
 				</div>
+				<hr style="height:1">
 			</div>
 			
-			<div style="padding-left: 10px; padding-top: 20px;">
-				<div>* 블럭:Object(1:1,1:N,N:N)</div>
-				<div><label for="blockIds">블록 ID</label></div>
+			<div style="padding-left: 10px;">
+				<div><label for="blockIds">블록 ID(하나만 입력)</label></div>
 				<div>
 					<input type="text" id="blockIds" name="blockIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/>
 				</div>
 				<div style="margin-top: 5px;"></div>
 				<div>
-					<label for="objectIds">Object ID</label>
+					<label for="objectIds">Object ID(하나만 입력)</label>
 				</div>
 				<div>
 					<input type="text" id="objectIds" name="objectIds" size="21" placeholder="   , 구분 입력" style="margin-top:3px; height: 20px;"/>
@@ -133,16 +137,57 @@
 					</select><br/>
 					<button type="button" id="changeHighLightingAPI" style="height: 24px;">HighLighting</button>
 	                <button type="button" id="changeColorAPI" class="btn btn-default btn-sm" style="margin-top: 5px;">적용</button>
-				</div>	                
+				</div>
+				<hr style="height:1">	                
+			</div>
+			
+			<div style="padding-left: 10px;">
+				<div>
+					<label for="moveblockId">블록 ID</label>
+					<select id="moveblockId" name="moveblockId" style="width:75px; height: 25px;">
+					</select>
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>
+					<label for="latitude">위도 </label>
+					<input type="text" id="latitude" name="latitude" size="12" style="height: 20px;"/> 
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>
+					<label for="longitude">경도 </label>
+					<input type="text" id="longitude" name="longitude" size="12" style="height: 20px;"/> 
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>
+					<label for="elevation">높이 </label>
+					<input type="text" id="elevation" name="elevation" size="12" style="height: 20px;"/> 
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>
+					<label for="heading">HEADING </label>
+					<input type="text" id="heading" name="heading" size="2" style="height: 20px;"/> 
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>
+					<label for="pitch">PITCH </label>
+					<input type="text" id="pitch" name="pitch" size="2" style="height: 20px;"/> 
+					<label for="roll">ROLL </label>
+					<input type="text" id="roll" name="roll" size="2" style="height: 20px;"/> 
+				</div>
+				<div style="margin-top: 3px;"></div>
+				<div>	
+					<button type="button" id="changeHighLightingAPI" style="height: 24px;">변환 행렬</button>
+				</div>
+				<hr style="height:1">	                
 			</div>
 		</div>
 		</form>
-		<div style="padding-top: 30px; padding-left: 20px; width: 97%;">
+		<div style="padding-top: 10px; padding-left: 20px; width: 97%;">
 			<div id="magoContainer"></div>
 		</div>
 	</div>
 	
-	<footer style="clear:both; padding-top:15px; text-align: center;">
+	<footer style="clear:both; text-align: center;">
 		<address>Gaia3D 팀에서 만들었습니다.</address>
 		<small>Copyright &copy; 2017 Gaia3D</small>
 	</footer>
@@ -228,7 +273,15 @@
 				var blocks = blocksConfig.blocks;
 				for (var blockId in blocks) {
 					var tempBlockId = blockId.split("_");
+					// 블록 이동
 					$('#blockId').append($('<option>',
+					{
+						value: tempBlockId[1],
+						text : tempBlockId[1] 
+					}));
+					
+					// 블록 변환
+					$('#moveBlockId').append($('<option>',
 					{
 						value: tempBlockId[1],
 						text : tempBlockId[1] 
@@ -339,12 +392,12 @@
 			e.preventDefault();
 			return false;
 		}
-		if ($.trim($("#objectIds").val()) === ""){
+		/* if ($.trim($("#objectIds").val()) === ""){
 			alert("Object ID를 입력해 주세요.");
 			$("#objectIds").focus();
 			e.preventDefault();
 			return false;
-		}
+		} */
 		
 		var blockIds = $("#blockIds").val().split(",");
 		var objectIds = $("#objectIds").val().split(",");
@@ -377,12 +430,12 @@
 			e.preventDefault();
 			return false;
 		}
-		if ($.trim($("#objectIds").val()) === ""){
+		/* if ($.trim($("#objectIds").val()) === ""){
 			alert("Object ID를 입력해 주세요.");
 			$("#objectIds").focus();
 			e.preventDefault();
 			return false;
-		}
+		} */
 		var blockIds = $("#blockIds").val().split(",");
 		var objectIds = $("#objectIds").val().split(",");
 		if(blockIds.length == 1) {
