@@ -1824,6 +1824,19 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 	}
+	
+	// LOD 2, 3.***************************************************************************************************************************************
+	var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles2.length;
+	for(var i=0; i<lowestOctreesCount; i++) 
+	{
+		lowestOctree = visibleObjControlerOctrees.currentVisibles2[i];
+		
+		if(lowestOctree.lego == undefined) 
+			continue;
+		
+		
+	}
+	
 		/*
 		var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 			for(var i=0; i<lowestOctreesCount; i++) {
