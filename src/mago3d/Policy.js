@@ -11,6 +11,8 @@ var Policy = function() {
 	
 	// outfitting 표시 여부
 	this.showOutFitting = false;
+	// boundingBox 표시/비표시
+	this.showBoundingBox = false;
 	// far frustum 거리
 	this.frustumFarSquaredDistance = 5000000;
 	// highlighting
@@ -28,6 +30,13 @@ Policy.prototype.getShowOutFitting = function() {
 };
 Policy.prototype.setShowOutFitting = function(showOutFitting) {
 	this.showOutFitting = showOutFitting;
+};
+
+Policy.prototype.getShowBoundingBox = function() {
+	return this.showBoundingBox;
+};
+Policy.prototype.setShowBoundingBox = function(showBoundingBox) {
+	this.showBoundingBox = showBoundingBox;
 };
 
 Policy.prototype.getFrustumFarSquaredDistance = function() {
