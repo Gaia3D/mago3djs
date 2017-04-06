@@ -113,3 +113,18 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 		managerFactory.callAPI(api);
 	}
 }
+
+function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+	var api = new API("changeLocationAndRotation");
+	api.setProjectId(projectId);
+	api.setBlockId(blockId);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(elevation);
+	api.setHeading(heading);
+	api.setPitch(pitch);
+	api.setRoll(roll);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}

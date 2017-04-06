@@ -27,7 +27,14 @@ var API = function(apiName) {
 	// 경도
 	this.longitude = 0;
 	// 높이
-	this.height = 0;
+	this.elevation = 0;
+	// heading
+	this.heading = 0;
+	// pitch
+	this.pitch = 0;
+	// roll
+	this.roll = 0;
+	
 	// 색깔
 	this.color = 0;
 	// structs = MSP, outfitting = MOP
@@ -102,11 +109,32 @@ API.prototype.setLongitude = function(longitude) {
 	this.longitude = longitude;
 };
 
-API.prototype.getHeight = function() {
-	return this.height;
+API.prototype.getElevation = function() {
+	return this.elevation;
 };
-API.prototype.setHeight = function(height) {
-	this.height = height;
+API.prototype.setElevation = function(elevation) {
+	this.elevation = elevation;
+};
+
+API.prototype.getHeading = function() {
+	return this.heading;
+};
+API.prototype.setHeading = function(heading) {
+	this.heading = heading;
+};
+
+API.prototype.getPitch = function() {
+	return this.pitch;
+};
+API.prototype.setPitch = function(pitch) {
+	this.pitch = pitch;
+};
+
+API.prototype.getRoll = function() {
+	return this.roll;
+};
+API.prototype.setRoll = function(roll) {
+	this.roll = roll;
 };
 
 API.prototype.getColor = function() {

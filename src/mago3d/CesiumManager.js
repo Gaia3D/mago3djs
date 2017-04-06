@@ -5428,6 +5428,13 @@ CesiumManager.prototype.renderModeChanged = function()
 }
 
 /**
+ * 변환 행렬
+ */
+CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) {
+	
+}
+
+/**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 CesiumManager.prototype.loadDemoBlocks = function()
@@ -5679,5 +5686,14 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeFrustumFarDistance") {
 		// frustum culling 가시 거리
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
+	} else if(apiName === "changeLocationAndRotation") {
+		// 변환 행렬
+		this.changeLocationAndRotation(	api.projectId + "_" + api.blockId, 
+										api.latitude, 
+										api.longitude, 
+										api.elevation, 
+										api.heading, 
+										api.pitch, 
+										api.roll);
 	}
 };
