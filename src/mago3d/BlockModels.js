@@ -291,7 +291,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 				bytesReaded += 1;
 				bytesReaded = bytesReaded + sizeLevels * 4;
-				bytesReaded = bytesReaded + sizeLevels * 2;
+				bytesReaded = bytesReaded + sizeLevels * 4;
 				/* khj(20170331)
 				var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
@@ -401,8 +401,8 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var indexMarkers = [];
 			for(var k = 0; k < sizeLevels; k++)
 			{
-				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2));
-				bytesReaded += 2;
+				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+4));
+				bytesReaded += 4;
 			}
 			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
 			/* khj(20170331)
