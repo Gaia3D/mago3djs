@@ -13,8 +13,11 @@ var Policy = function() {
 	this.showOutFitting = false;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
+	// 그림자 표시/비표시
+	this.showShadow = false;
 	// far frustum 거리
 	this.frustumFarSquaredDistance = 5000000;
+	
 	// highlighting
 	this.highLightedBuildings = [];
 	// color
@@ -37,6 +40,13 @@ Policy.prototype.getShowBoundingBox = function() {
 };
 Policy.prototype.setShowBoundingBox = function(showBoundingBox) {
 	this.showBoundingBox = showBoundingBox;
+};
+
+Policy.prototype.getShowShadow = function() {
+	return this.showShadow;
+};
+Policy.prototype.setShowShadow = function(showShadow) {
+	this.showShadow = showShadow;
 };
 
 Policy.prototype.getFrustumFarSquaredDistance = function() {
