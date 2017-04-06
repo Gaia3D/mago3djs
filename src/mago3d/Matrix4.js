@@ -68,6 +68,7 @@ Matrix4.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z) 
 	var quaternion = new Quaternion();
 	quaternion.rotationAngDeg(angDeg, axis_x, axis_y, axis_z);
 	this.rotationByQuaternion(quaternion);
+	quaternion = undefined;
 };
 
 /**
@@ -81,6 +82,7 @@ Matrix4.prototype.rotationAxisAngRad = function(angRad, axis_x, axis_y, axis_z) 
 	var quaternion = new Quaternion();
 	quaternion.rotationAngRad(angRad, axis_x, axis_y, axis_z);
 	this.rotationByQuaternion(quaternion);
+	quaternion = undefined;
 };
 
 /**
@@ -189,22 +191,7 @@ Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d) {
  * @returns resultMat
  */	
 Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) {
-	/*
-	CKK_Matrix4 operator*(const CKK_Matrix4 &A) 
-	{
-		// Copied From Carve.***
-		CKK_Matrix4 c;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				c.m[i][j] = 0.0;
-				for (int k = 0; k < 4; k++) {
-					c.m[i][j] += A.m[k][j] * m[i][k];
-				}
-			}
-		}
-		return c;
-	}
-	*/
+
 	if(resultMat == undefined) resultMat = new Matrix4();
  
 	for(var i=0; i<4; i++) {

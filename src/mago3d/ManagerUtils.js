@@ -62,7 +62,7 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	return true;
 };
 
-ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, resultGeoLocationData) {
+ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) {
 	
 	if(resultGeoLocationData == undefined) resultGeoLocationData = new GeoLocationData();
 	
@@ -91,18 +91,44 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	resultGeoLocationData.rotMatrix = new Matrix4(); 
 	resultGeoLocationData.rotMatrixInv = new Matrix4(); 
 	
+	var xRotMatrix = new Matrix4(); 
+	var yRotMatrix = new Matrix4(); 
+	var zRotMatrix = new Matrix4(); 
+	
+	// test. we simulate that heading is 45 degrees.***
+	heading = 30.0;
+	
+	if(heading != undefined)
+	{
+		zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, 1.0);
+	}
+	
+	if(pitch != undefined)
+	{
+		xRotMatrix.rotationAxisAngDeg(pitch, 1.0, 0.0, 0.0);
+	}
+	
+	if(roll != undefined)
+	{
+		yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0);
+	}
+	
 	Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
-	Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
+	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
+	resultGeoLocationData.tMatrix = zRotatedTMatrix;
 	
 	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
 	
+	// now, calculates the inverses.***
+	Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
 	Cesium.Matrix4.inverse(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
 
 	return resultGeoLocationData;
 };
+
 
 ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) {
 	// renderingMode = 0 => assembled.***

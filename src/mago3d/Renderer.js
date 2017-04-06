@@ -352,7 +352,7 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
  * @param ssao_idx 변수
  */
 Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager,
-		isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod) {
+		isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) {
 	// render_neoRef
 	var neoRefs_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if(neoRefs_count == 0) return;
@@ -558,8 +558,15 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					var hola = 0;
 					}
 				// Must applicate the transformMatrix of the reference object.***
-
-				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+				if(refMatrixIdxKey == undefined)
+					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+				else{
+					if(refMatrixIdxKey == -1)
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
+					else{
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+					}
+				}
 				
 				if(neoReference.moveVector != undefined) {
 					gl.uniform1i(standardShader.hasAditionalMov_loc, true);
