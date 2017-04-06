@@ -16,6 +16,11 @@ var GeoLocationData = function() {
 	this.position;
 	this.positionHIGH;
 	this.positionLOW;
+	
+	this.heading;
+	this.pitch;
+	this.roll;
+	
 	this.bboxAbsoluteCenterPos;
 	
 	// F4D Matrix4.****
