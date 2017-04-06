@@ -5431,7 +5431,38 @@ CesiumManager.prototype.renderModeChanged = function()
  * 변환 행렬
  */
 CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) {
+	var neoBuilding = this.getNeoBuildingById("structure", projectIdAndBlockId);
 	
+	if(neoBuilding == undefined)
+		return;
+	
+	neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuilding.geoLocationDataAux);
+	
+	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+
+	var traslationVector;
+	var realBuildingPos;
+	realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+	traslationVector = neoBuilding.geoLocationDataAux.tMatrix.rotatePoint3D(this.pointSC_2, traslationVector );
+	neoBuilding.geoLocationDataAux.position.x += traslationVector.x;
+	neoBuilding.geoLocationDataAux.position.y += traslationVector.y;
+	neoBuilding.geoLocationDataAux.position.z += traslationVector.z;
+	//neoBuilding.geoLocationDataAux.positionHIGH;
+	neoBuilding.geoLocationDataAux.aditionalTraslation = traslationVector;
+	neoBuilding.geoLocationDataAux.positionLOW[0] += traslationVector.x;
+	neoBuilding.geoLocationDataAux.positionLOW[1] += traslationVector.y;
+	neoBuilding.geoLocationDataAux.positionLOW[2] += traslationVector.z;
+	
+	realBuildingPos.x += traslationVector.x;
+	realBuildingPos.y += traslationVector.y;
+	realBuildingPos.z += traslationVector.z;
+	
+	if(neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos == undefined)
+		neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos = new Point3D();
+	
+	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.x = realBuildingPos.x;
+	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
+	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
 }
 
 /**
@@ -5689,11 +5720,11 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeLocationAndRotation") {
 		// 변환 행렬
 		this.changeLocationAndRotation(	api.projectId + "_" + api.blockId, 
-										api.latitude, 
-										api.longitude, 
-										api.elevation, 
-										api.heading, 
-										api.pitch, 
-										api.roll);
+										parseFloat(api.latitude), 
+										parseFloat(api.longitude), 
+										parseFloat(api.elevation), 
+										parseFloat(api.heading), 
+										parseFloat(api.pitch), 
+										parseFloat(api.roll));
 	}
 };

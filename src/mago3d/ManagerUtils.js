@@ -100,9 +100,9 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	var zRotMatrix = new Matrix4();  // created as identity matrix.***
 	
 	// test. we simulate that heading is 45 degrees.***
-	heading = 30.0;
-	pitch = 40.0;
-	roll = 125;
+	//heading = 30.0;
+	//pitch = 40.0;
+	//roll = 125;
 	
 	if(heading != undefined)
 	{
