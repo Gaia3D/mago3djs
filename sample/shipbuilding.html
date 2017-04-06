@@ -26,7 +26,7 @@
 	</header>
 	
 	<div style="width:100% ;min-height: 500px; font-size: 14px;">
-		<form id="searchForm" name="searchForm" action="">
+		<form id="searchForm" name="searchForm" action="/" onsubmit="return false;">
 		<div style="float: left; min-width: 200px;">
 			<div style="padding-left: 10px; padding-top: 15px;">ShipBuilding</div>
 			
@@ -46,7 +46,7 @@
 					<label for="fullshipRender"> 호선 </label>
 				</div>
 				<div>
-					<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 84px;"/>
+					<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 76px;"/>
 					<label for="deployRender"> 지번 전개 </label>
 				</div>
 				<hr style="height:1">
@@ -58,7 +58,7 @@
 					<label for="showOutFitting"> 표시 </label>
 				</div>
 				<div>
-					<input type="radio" id="hideOutFitting" name="outFitting" value="false" onclick="changeOutFitting(false);" style="margin-left: 84px;"/>
+					<input type="radio" id="hideOutFitting" name="outFitting" value="false" onclick="changeOutFitting(false);" style="margin-left: 74px;"/>
 					<label for="hideOutFitting"> 비표시 </label>
 				</div>
 				<hr style="height:1">
@@ -70,7 +70,7 @@
 					<label for="showBoundingBox"> 표시 </label>
 				</div>
 				<div>
-					<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" style="margin-left: 107px;"/>
+					<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" style="margin-left: 95px;"/>
 					<label for="hideBoundingBox"> 비표시 </label>
 				</div>
 				<hr style="height:1">
@@ -143,24 +143,24 @@
 			
 			<div style="padding-left: 10px;">
 				<div>
-					<label for="moveblockId">블록 ID</label>
-					<select id="moveblockId" name="moveblockId" style="width:75px; height: 25px;">
+					<label for="moveBlockId">블록 ID</label>
+					<select id="moveBlockId" name="moveBlockId" style="width:75px; height: 25px;">
 					</select>
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>
 					<label for="latitude">위도 </label>
-					<input type="text" id="latitude" name="latitude" size="12" style="height: 20px;"/> 
+					<input type="text" id="latitude" name="latitude" size="15" style="height: 20px;"/> 
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>
 					<label for="longitude">경도 </label>
-					<input type="text" id="longitude" name="longitude" size="12" style="height: 20px;"/> 
+					<input type="text" id="longitude" name="longitude" size="15" style="height: 20px;"/> 
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>
 					<label for="elevation">높이 </label>
-					<input type="text" id="elevation" name="elevation" size="12" style="height: 20px;"/> 
+					<input type="text" id="elevation" name="elevation" size="15" style="height: 20px;"/> 
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>
@@ -176,7 +176,7 @@
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>	
-					<button type="button" id="changeHighLightingAPI" style="height: 24px;">변환 행렬</button>
+					<button type="button" id="changeLocationAndRotationAPI" style="height: 24px;">변환 행렬</button>
 				</div>
 				<hr style="height:1">	                
 			</div>
@@ -358,6 +358,13 @@
 		changeColorAPI($("#projectId").val(), $("#blockIds").val(), $("#objectIds").val(), $("#colorBlock").val());
 	});
 	
+	// 변환행렬
+	$("#changeLocationAndRotationAPI").click(function(e) {
+		changeLocationAndRotationCheck(e);
+		changeLocationAndRotationAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
+										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
+	});
+	
 	$("#frustumFarDistance").on("keydown","",function(e){
 		if (e.keyCode == 13) {
 			e.preventDefault();
@@ -389,7 +396,6 @@
 		if ($.trim($("#blockIds").val()) === ""){
 			alert("블록 ID를 입력해 주세요.");
 			$("#blockIds").focus();
-			e.preventDefault();
 			return false;
 		}
 		/* if ($.trim($("#objectIds").val()) === ""){
@@ -418,7 +424,6 @@
 		if ($.trim($("#colorBlock").val()) !== ""){
 			alert("Color 를 선택하실 수 없습니다.");
 			$("#colorBlock").focus();
-			e.preventDefault();
 			return false;
 		}
 	}
@@ -427,7 +432,6 @@
 		if ($.trim($("#blockIds").val()) === ""){
 			alert("블록 ID를 입력해 주세요.");
 			$("#blockIds").focus();
-			e.preventDefault();
 			return false;
 		}
 		/* if ($.trim($("#objectIds").val()) === ""){
@@ -454,7 +458,76 @@
 		if ($.trim($("#colorBlock").val()) === ""){
 			alert("Color 를 선택하여 주세요.");
 			$("#colorBlock").focus();
+			return false;
+		}
+	}
+	
+	$("#latitude").on("keydown","",function(e){
+		if (e.keyCode == 13) {
 			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	$("#longitude").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	$("#elevation").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	$("#heading").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	$("#pitch").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	$("#roll").on("keydown","",function(e){
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			//blocksCheck("keydown");			
+		}
+	});
+	
+	function changeLocationAndRotationCheck(e) {
+		if ($.trim($("#latitude").val()) === ""){
+			alert("위도를 입력해 주세요.");
+			$("#latitude").focus();
+			return false;
+		}
+		if ($.trim($("#longitude").val()) === ""){
+			alert("경도를 입력해 주세요.");
+			$("#longitude").focus();
+			return false;
+		}
+		if ($.trim($("#elevation").val()) === ""){
+			alert("높이를 입력해 주세요.");
+			$("#elevation").focus();
+			return false;
+		}
+		if ($.trim($("#heading").val()) === ""){
+			alert("heading을 입력해 주세요.");
+			$("#heading").focus();
+			return false;
+		}
+		if ($.trim($("#pitch").val()) === ""){
+			alert("pitch를 입력해 주세요.");
+			$("#pitch").focus();
+			return false;
+		}
+		if ($.trim($("#roll").val()) === ""){
+			alert("roll를 입력해 주세요.");
+			$("#roll").focus();
 			return false;
 		}
 	}
