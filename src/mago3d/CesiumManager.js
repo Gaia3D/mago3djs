@@ -5552,22 +5552,34 @@ CesiumManager.prototype.callAPI = function(api) {
 	if(apiName === "changeRender") {
 		this.renderingModeTemp = api.getRenderMode();
 	} else if(apiName === "searchBlock") {
-		this.flyToBuilding(api.getBlockType(), api.getBlockId());
+		this.flyToBuilding(api.getBlockType(), api.getProjectId() + "_"+ api.getBlockId());
 	} else if(apiName === "changeHighLighting") {
 		this.magoPolicy.highLightedBuildings.length = 0;
-		var blockIds = api.getHighLightedBuildings().split(",");
+		var projectId = api.getProjectId();
+		var blockIds = api.getBlockIds().split(",");
+		var objectIds = api.getObjectIds().split(",");
 		var hightedBuilds = [];
 		for(var i=0, count = blockIds.length; i<count; i++) {
-			hightedBuilds.push(blockIds[i].trim());
+			var projectLayer = new ProjectLayer();
+			projectLayer.setProjectId(projectId);
+			projectLayer.setBlockId(blockIds[i]);
+			projectLayer.setObjectId(objectIds[i]);
+			hightedBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setHighLightedBuildings(hightedBuilds);
 		this.highLightBuildings();
 	} else if(apiName === "changeColor") {
 		this.magoPolicy.colorBuildings.length = 0;
-		var blockIds = api.getColorBuildings().split(",");
+		var projectId = api.getProjectId();
+		var blockIds = api.getBlockIds().split(",");
+		var objectIds = api.getObjectIds().split(",");
 		var colorBuilds = [];
 		for(var i=0, count = blockIds.length; i<count; i++) {
-			colorBuilds.push(blockIds[i].trim());
+			var projectLayer = new ProjectLayer();
+			projectLayer.setProjectId(projectId);
+			projectLayer.setBlockId(blockIds[i]);
+			projectLayer.setObjectId(objectIds[i]);
+			colorBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
 		
@@ -5585,11 +5597,10 @@ CesiumManager.prototype.callAPI = function(api) {
 		this.magoPolicy.setShowOutFitting(api.getShowOutFitting());
 	} else if(apiName === "changeBoundingBox") {
 		this.magoPolicy.setShowBoundingBox(api.getShowBoundingBox());
+	} else if(apiName === "changeShadow") {
+		this.magoPolicy.setShowShadow(api.getShowShadow());
 	} else if(apiName === "changeFrustumFarDistance") {
 		// frustum culling 가시 거리
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
-	} else if(apiName === "demo") {
-//		this.renderingModeTemp = api.getRenderMode();
-//		this.loadDemoBlocks();
 	}
 };

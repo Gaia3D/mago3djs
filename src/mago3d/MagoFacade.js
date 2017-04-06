@@ -45,18 +45,27 @@ function changeRenderAPI(renderMode) {
 }
 
 // outfitting 표시/비표시
-function changeOutFittingAPI(mode) {
+function changeOutFittingAPI(isShow) {
 	var api = new API("changeOutFitting");
-	api.setShowOutFitting(mode);
+	api.setShowOutFitting(isShow);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
 }
 
-//boundingBox 표시/비표시
-function changeBoundingBoxAPI(mode) {
+// boundingBox 표시/비표시
+function changeBoundingBoxAPI(isShow) {
 	var api = new API("changeBoundingBox");
-	api.setShowBoundingBox(mode);
+	api.setShowBoundingBox(isShow);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
+// 그림자 표시/비표시
+function changeShadowAPI(isShow) {
+	var api = new API("changeShadow");
+	api.setShowShadow(isShow);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
@@ -72,8 +81,9 @@ function changeFrustumFarDistanceAPI(frustumFarDistance) {
 }
 
 // 블록 검색 
-function searchBlockAPI(blockType, blockId) {
+function searchBlockAPI(projectId, blockType, blockId) {
 	var api = new API("searchBlock");
+	api.setProjectId(projectId);
 	api.setBlockType(blockType);
 	api.setBlockId(blockId);
 	if(managerFactory != null) {
@@ -82,18 +92,22 @@ function searchBlockAPI(blockType, blockId) {
 }
 
 // highlighting
-function changeHighLightingAPI(blockIds) {
+function changeHighLightingAPI(projectId, blockIds, objectIds) {
 	var api = new API("changeHighLighting");
-	api.setHighLightedBuildings(blockIds);
+	api.setProjectId(projectId);
+	api.setBlockIds(blockIds);
+	api.setObjectIds(objectIds);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
 }
 
 // color
-function changeColorAPI(blockIds, color) {
+function changeColorAPI(projectId, blockIds, objectIds, color) {
 	var api = new API("changeColor");
-	api.setColorBuildings(blockIds);
+	api.setProjectId(projectId);
+	api.setBlockIds(blockIds);
+	api.setObjectIds(objectIds);
 	api.setColor(color);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);

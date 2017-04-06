@@ -11,8 +11,14 @@ var API = function(apiName) {
 	
 	// api 이름
 	this.apiName = apiName;
+	// project id
+	this.projectId = null;
 	// block id
 	this.blockId = null;
+	// blockIds
+	this.blockIds = null;
+	// objectIds
+	this.objectIds = null;
 	
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
@@ -30,14 +36,16 @@ var API = function(apiName) {
 	this.showOutFitting = false;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
+	// 그림자 표시/비표시
+	this.showShadow = false;
 	// frustum culling 가시 거리(M단위)
 	this.frustumFarDistance = 0;
-	// highlighting
-	this.highLightedBuildings = [];
-	// color
-	this.colorBuildings = [];
-	// show/hide
-	this.hideBuildings = [];
+//	// highlighting
+//	this.highLightedBuildings = [];
+//	// color
+//	this.colorBuildings = [];
+//	// show/hide
+//	this.hideBuildings = [];
 	
 };
 
@@ -45,11 +53,32 @@ API.prototype.getAPIName = function() {
 	return this.apiName;
 };
 
+API.prototype.getProjectId = function() {
+	return this.projectId;
+};
+API.prototype.setProjectId = function(projectId) {
+	this.projectId = projectId;
+};
+
 API.prototype.getBlockId = function() {
 	return this.blockId;
 };
 API.prototype.setBlockId = function(blockId) {
 	this.blockId = blockId;
+};
+
+API.prototype.getBlockIds = function() {
+	return this.blockIds;
+};
+API.prototype.setBlockIds = function(blockIds) {
+	this.blockIds = blockIds;
+};
+
+API.prototype.getObjectIds = function() {
+	return this.objectIds;
+};
+API.prototype.setObjectIds = function(objectIds) {
+	this.objectIds = objectIds;
 };
 
 API.prototype.getRenderMode = function() {
@@ -108,6 +137,13 @@ API.prototype.setShowBoundingBox = function(showBoundingBox) {
 	this.showBoundingBox = showBoundingBox;
 };
 
+API.prototype.getShowShadow = function() {
+	return this.showShadow;
+};
+API.prototype.setShowShadow = function(showShadow) {
+	this.showShadow = showShadow;
+};
+
 API.prototype.getFrustumFarDistance = function() {
 	return this.frustumFarDistance;
 };
@@ -115,24 +151,24 @@ API.prototype.setFrustumFarDistance = function(frustumFarDistance) {
 	this.frustumFarDistance = frustumFarDistance;
 };
 
-API.prototype.getHighLightedBuildings = function() {
-	return this.highLightedBuildings;
-};
-API.prototype.setHighLightedBuildings = function(highLightedBuildings) {
-	this.highLightedBuildings = highLightedBuildings;
-};
-
-API.prototype.getColorBuildings = function() {
-	return this.colorBuildings;
-};
-API.prototype.setColorBuildings = function(colorBuildings) {
-	this.colorBuildings = colorBuildings;
-};
-
-API.prototype.getHideBuildings = function() {
-	return this.hideBuildings;
-};
-API.prototype.setHideBuildings = function(hideBuildings) {
-	this.hideBuildings = hideBuildings;
-};
+//API.prototype.getHighLightedBuildings = function() {
+//	return this.highLightedBuildings;
+//};
+//API.prototype.setHighLightedBuildings = function(highLightedBuildings) {
+//	this.highLightedBuildings = highLightedBuildings;
+//};
+//
+//API.prototype.getColorBuildings = function() {
+//	return this.colorBuildings;
+//};
+//API.prototype.setColorBuildings = function(colorBuildings) {
+//	this.colorBuildings = colorBuildings;
+//};
+//
+//API.prototype.getHideBuildings = function() {
+//	return this.hideBuildings;
+//};
+//API.prototype.setHideBuildings = function(hideBuildings) {
+//	this.hideBuildings = hideBuildings;
+//};
 
