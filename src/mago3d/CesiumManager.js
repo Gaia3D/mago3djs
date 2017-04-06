@@ -1874,6 +1874,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	var renderTexture = false;
 	var ssao_idx = -1;
 	var minSize = 0.0;
+	var refTMatrixIdxKey = -1;
 	var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 	for(var i=0; i<lowestOctreesCount; i++) {
 		lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
@@ -1882,13 +1883,14 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			continue;
 
 		neoBuilding = lowestOctree.neoBuildingOwner;
-		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+		//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 		
 		if(this.renderingModeTemp == 0)
 		{
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+			refTMatrixIdxKey = -1;
 		}
 		else{
 			if(neoBuilding.geoLocationDataAux)
@@ -1896,18 +1898,27 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.geoLocationDataAux.positionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
+				
+				// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
+				//if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
+				//{
+				//	if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
+				//	lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+				//}
+				refTMatrixIdxKey = 0;
 			}
 			else{
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+				refTMatrixIdxKey = -1;
 			}
 		}
 
 		if(i == 0)
 			minSize = 0.1;
 		else minSize = 0.1;
-		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize);
+		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 	
 	// 2) LOD 1.*********************************************************************************************************************
@@ -1922,13 +1933,14 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			continue;
 		
 		neoBuilding = lowestOctree.neoBuildingOwner;
-		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
+		//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 		
 		if(this.renderingModeTemp == 0)
 		{
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+			refTMatrixIdxKey = -1;
 		}
 		else{
 			if(neoBuilding.geoLocationDataAux)
@@ -1936,18 +1948,27 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.geoLocationDataAux.positionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
+				
+				// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
+				//if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
+				//{
+				//	if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
+				//	lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+				//}
+				refTMatrixIdxKey = 0;
 			}
 			else{
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
+				refTMatrixIdxKey = -1;
 			}
 		}
 
 		if(i == 0)
 			minSize = 0.9;
 		else minSize = 0.9;
-		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize);
+		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 	
 	// 2) LOD 2 & 3.************************************************************************************************************************************
@@ -2239,7 +2260,7 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
 	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-	
+	var idxKeyMatrix = -1;
 	if(this.renderingModeTemp == 0) {
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.buildingSelected.buildingPositionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.buildingSelected.buildingPositionLOW); 
@@ -2247,6 +2268,7 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 		if(this.buildingSelected.geoLocationDataAux) {
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.buildingSelected.geoLocationDataAux.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.buildingSelected.geoLocationDataAux.positionLOW);
+			idxKeyMatrix = 0;
 		} else {
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.buildingSelected.buildingPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.buildingSelected.buildingPositionLOW);
@@ -2265,7 +2287,7 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 	var renderTexture = false;
 	var minSize = 0.0;
 	var refsCount = this.octreeSelected.setRenderedFalseToAllReferences();
-	this.renderer.renderNeoRefListsAsimetricVersion(gl, this.octreeSelected.neoReferencesMotherAndIndices, this.buildingSelected, this, isInterior, currentShader, renderTexture, ssao_idx, minSize);
+	this.renderer.renderNeoRefListsAsimetricVersion(gl, this.octreeSelected.neoReferencesMotherAndIndices, this.buildingSelected, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, undefined, idxKeyMatrix);
 	
 	gl.disableVertexAttribArray(currentShader.position3_loc);
 	//gl.disableVertexAttribArray(currentShader.normal3_loc);
@@ -3260,7 +3282,6 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition,
 };
 
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
@@ -3381,7 +3402,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
 						if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
 						{
-							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix())
+							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
 							lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 						}
 						refTMatrixIdxKey = 0;
@@ -3437,7 +3458,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
 						if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
 						{
-							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix())
+							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
 							lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 						}
 						refTMatrixIdxKey = 0;
@@ -3645,7 +3666,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
 						if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
 						{
-							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix())
+							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
 							lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 						}
 						refTMatrixIdxKey = 0;
@@ -3700,7 +3721,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						// check if the references of the lowestOctree has the geoLocationDataAux tMatrix.***
 						if(lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0))
 						{
-							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix())
+							if( !lowestOctree.neoReferencesMotherAndIndices.getNeoReference(0).hasKeyMatrix(0))
 							lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 						}
 						refTMatrixIdxKey = 0;
