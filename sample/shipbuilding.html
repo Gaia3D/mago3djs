@@ -25,7 +25,7 @@
 		</div>
 	</header>
 	
-	<div style="width:100% ;min-height: 500px; font-size: 14px;">
+	<div style="width:100% ;min-height: 500px; font-size: 12px;">
 		<form id="searchForm" name="searchForm" action="/" onsubmit="return false;">
 		<div style="float: left; min-width: 200px;">
 			<div style="padding-left: 10px; padding-top: 15px;">
@@ -54,7 +54,7 @@
 					<label for="fullshipRender"> 호선 </label>
 				</div>
 				<div>
-					<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 76px;"/>
+					<input type="radio" id="deployRender" name="renderMode" value="1" onclick="changeRender('1');" style="margin-left: 69px;"/>
 					<label for="deployRender"> 지번 전개 </label>
 				</div>
 				<hr style="height:1">
@@ -66,7 +66,7 @@
 					<label for="showOutFitting"> 표시 </label>
 				</div>
 				<div>
-					<input type="radio" id="hideOutFitting" name="outFitting" value="false" onclick="changeOutFitting(false);" style="margin-left: 74px;"/>
+					<input type="radio" id="hideOutFitting" name="outFitting" value="false" onclick="changeOutFitting(false);" style="margin-left: 64px;"/>
 					<label for="hideOutFitting"> 비표시 </label>
 				</div>
 				<hr style="height:1">
@@ -78,7 +78,7 @@
 					<label for="showBoundingBox"> 표시 </label>
 				</div>
 				<div>
-					<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" style="margin-left: 95px;"/>
+					<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" style="margin-left: 81px;"/>
 					<label for="hideBoundingBox"> 비표시 </label>
 				</div>
 				<hr style="height:1">
@@ -168,12 +168,9 @@
 				<div style="margin-top: 3px;"></div>
 				<div>
 					<label for="elevation">높이 </label>
-					<input type="text" id="elevation" name="elevation" size="15" style="height: 20px;"/> 
-				</div>
-				<div style="margin-top: 3px;"></div>
-				<div>
+					<input type="text" id="elevation" name="elevation" size="1" style="height: 20px;"/> 
 					<label for="heading">HEADING </label>
-					<input type="text" id="heading" name="heading" size="2" style="height: 20px;"/> 
+					<input type="text" id="heading" name="heading" size="1" style="height: 20px;"/> 
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>
@@ -187,6 +184,18 @@
 					<button type="button" id="changeLocationAndRotationAPI" style="height: 24px;">변환 행렬</button>
 				</div>
 				<hr style="height:1">	                
+			</div>
+			
+			<div style="padding-left: 10px;">
+				<div>마우스 이동모드
+					<input type="radio" id="mouseBlockMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');" style="margin-left: 6px;"/>
+					<label for="mouseBlockMove"> Block </label>
+				</div>
+				<div>
+					<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');" style="margin-left: 97px;"/>
+					<label for="mouseObjectMove"> Object </label>
+				</div>
+				<hr style="height:1">
 			</div>
 		</div>
 		</form>
@@ -266,6 +275,8 @@
 			changeOutFitting(false);
 			changeBoundingBox(false);
 			changeShadow(false);
+			// 지번 전개
+			changeMouseMode("0");
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
 			return;
@@ -316,31 +327,16 @@
 		});
 	});
 	
-	function changeRender(renderMode) {
-		$("input:radio[name='renderMode']:radio[value='" + renderMode + "']").prop("checked", true);
-		changeRenderAPI(renderMode);
-	}
-	
-	/* function demoRenderMode(renderMode) {
-		$.ajax({
-			url: "/sample/blocks_demo.json",
-			type: "GET",
-			dataType: "json",
-			success: function(blocksConfig){
-				if(managerFactory != null) {
-					managerFactory.demo(renderMode, blocksConfig);
-				}
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-	} */
-	
 	// mago3d 활성화/비활성화
 	function changeMagoState(isShow) {
 		$("input:radio[name='magoState']:radio[value='" + isShow + "']").prop("checked", true);
 		changeMagoStateAPI(isShow);
+	}
+	
+	// deploy 타입
+	function changeRender(renderMode) {
+		$("input:radio[name='renderMode']:radio[value='" + renderMode + "']").prop("checked", true);
+		changeRenderAPI(renderMode);
 	}
 	
 	// outfitting 표시/비표시
@@ -390,6 +386,12 @@
 		changeLocationAndRotationAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
 										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
 	});
+	
+	// Mouse move 타입
+	function changeMouseMove(mouseMoveMode) {
+		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
+		changeMouseMoveAPI(mouseMoveMode);
+	}
 	
 	$("#moveBlockId").change(function() {
 		var blocks = blocksConfig.blocks;
