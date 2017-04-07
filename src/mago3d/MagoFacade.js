@@ -123,8 +123,9 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 	}
 }
 
-function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
-	var api = new API("changeLocationAndRotation");
+// location 과 rotation을 적용
+function changePositionAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+	var api = new API("changePosition");
 	api.setProjectId(projectId);
 	api.setBlockId(blockId);
 	api.setLatitude(latitude);
@@ -136,4 +137,17 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
+}
+
+// location 과 rotation를 알람
+function showPosition(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+	var message = 	" project = " + projectId + "\n"
+					+ " blockId = " + blockId + "\n"
+					+ " latitude = " + latitude + "\n"
+					+ " longitude = " + longitude + "\n"
+					+ " elevation = " + elevation + "\n"
+					+ " heading = " + heading + "\n"
+					+ " pitch = " + pitch + "\n"
+					+ " roll = " + roll;
+	alert(message);
 }
