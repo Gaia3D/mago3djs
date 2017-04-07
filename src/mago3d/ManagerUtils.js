@@ -104,17 +104,17 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	//pitch = 40.0;
 	//roll = 125;
 	
-	if(heading != undefined)
+	if(heading != undefined && heading != 0)
 	{
 		zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, 1.0);
 	}
 	
-	if(pitch != undefined)
+	if(pitch != undefined && pitch != 0)
 	{
 		xRotMatrix.rotationAxisAngDeg(pitch, 1.0, 0.0, 0.0);
 	}
 	
-	if(roll != undefined)
+	if(roll != undefined && roll != 0)
 	{
 		yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0);
 	}
