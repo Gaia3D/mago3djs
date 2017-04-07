@@ -387,7 +387,7 @@
 										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
 	});
 	
-	// Mouse move 타입
+	// 마우스 클릭 객체 이동 모드 변경
 	function changeMouseMove(mouseMoveMode) {
 		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
 		changeMouseMoveAPI(mouseMoveMode);
