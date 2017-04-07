@@ -140,7 +140,7 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
 }
 
 // location 과 rotation를 알람
-function showPosition(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
 	var message = 	" project = " + projectId + "\n"
 					+ " blockId = " + blockId + "\n"
 					+ " latitude = " + latitude + "\n"
@@ -150,4 +150,13 @@ function showPosition(projectId, blockId, latitude, longitude, elevation, headin
 					+ " pitch = " + pitch + "\n"
 					+ " roll = " + roll;
 	alert(message);
+}
+
+// mouse move 타입
+function changeMouseMoveAPI(mouseMoveMode) {
+	var api = new API("changeMouseMove");
+	api.setMouseMoveMode(mouseMoveMode);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
 }
