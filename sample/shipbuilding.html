@@ -184,7 +184,7 @@
 				</div>
 				<div style="margin-top: 3px;"></div>
 				<div>	
-					<button type="button" id="changePositionAPI" style="height: 24px;">변환 행렬</button>
+					<button type="button" id="changeLocationAndRotationAPI" style="height: 24px;">변환 행렬</button>
 				</div>
 				<hr style="height:1">	                
 			</div>
@@ -381,9 +381,9 @@
 	});
 	
 	// 변환행렬
-	$("#changePositionAPI").click(function(e) {
-		changePositionCheck(e);
-		changePositionAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
+	$("#changeLocationAndRotationAPI").click(function(e) {
+		changeLocationAndRotationCheck(e);
+		changeLocationAndRotationAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
 										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
 	});
 	
