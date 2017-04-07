@@ -5439,7 +5439,7 @@ CesiumManager.prototype.renderModeChanged = function()
 /**
  * 변환 행렬
  */
-CesiumManager.prototype.changePosition = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) {
+CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) {
 	var neoBuilding = this.getNeoBuildingById("structure", projectIdAndBlockId);
 	
 	if(neoBuilding == undefined)
@@ -5801,9 +5801,9 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeFrustumFarDistance") {
 		// frustum culling 가시 거리
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
-	} else if(apiName === "changePosition") {
+	} else if(apiName === "changeLocationAndRotation") {
 		// 변환 행렬
-		this.changePosition(api.projectId + "_" + api.blockId, 
+		this.changeLocationAndRotation(api.projectId + "_" + api.blockId, 
 							parseFloat(api.latitude), 
 							parseFloat(api.longitude), 
 							parseFloat(api.elevation), 

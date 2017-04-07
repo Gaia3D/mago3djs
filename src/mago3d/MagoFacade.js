@@ -124,8 +124,8 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 }
 
 // location 과 rotation을 적용
-function changePositionAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
-	var api = new API("changePosition");
+function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+	var api = new API("changeLocationAndRotation");
 	api.setProjectId(projectId);
 	api.setBlockId(blockId);
 	api.setLatitude(latitude);
