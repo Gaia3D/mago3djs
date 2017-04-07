@@ -281,6 +281,7 @@
 			success: function(jsonBlocksConfig){
 				blocksConfig = jsonBlocksConfig;
 				var blocks = jsonBlocksConfig.blocks;
+				var i=0;
 				for (var blockId in blocks) {
 					var block = blocks[blockId];
 					var tempBlockId = blockId.split("_");
@@ -297,13 +298,16 @@
 						value: tempBlockId[1],
 						text : tempBlockId[1] 
 					}));
-
-					$("#latitude").val(block.LATITUDE);
-					$("#longitude").val(block.LONGITUDE);
-					$("#elevation").val(block.ELEVATION);
-					$("#heading").val(block.HEADING);
-					$("#pitch").val(block.PITCH);
-					$("#roll").val(block.ROLL);
+					
+					if(i == 0) {
+						$("#latitude").val(block.LATITUDE);
+						$("#longitude").val(block.LONGITUDE);
+						$("#elevation").val(block.ELEVATION);
+						$("#heading").val(block.HEADING);
+						$("#pitch").val(block.PITCH);
+						$("#roll").val(block.ROLL);
+					}
+					i++;
 				}
 			},
 			error: function(e){
