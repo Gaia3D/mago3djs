@@ -57,6 +57,8 @@ var API = function(apiName) {
 //	// show/hide
 //	this.hideBuildings = [];
 	
+	// 0 = block mode, 1 = object mode
+	this.mouseMoveMode = 0;
 };
 
 API.prototype.getMagoEnable = function() {
@@ -189,24 +191,9 @@ API.prototype.setFrustumFarDistance = function(frustumFarDistance) {
 	this.frustumFarDistance = frustumFarDistance;
 };
 
-//API.prototype.getHighLightedBuildings = function() {
-//	return this.highLightedBuildings;
-//};
-//API.prototype.setHighLightedBuildings = function(highLightedBuildings) {
-//	this.highLightedBuildings = highLightedBuildings;
-//};
-//
-//API.prototype.getColorBuildings = function() {
-//	return this.colorBuildings;
-//};
-//API.prototype.setColorBuildings = function(colorBuildings) {
-//	this.colorBuildings = colorBuildings;
-//};
-//
-//API.prototype.getHideBuildings = function() {
-//	return this.hideBuildings;
-//};
-//API.prototype.setHideBuildings = function(hideBuildings) {
-//	this.hideBuildings = hideBuildings;
-//};
-
+API.prototype.getMouseMoveMode = function() {
+	return this.mouseMoveMode;
+};
+API.prototype.setMouseMoveMode = function(mouseMoveMode) {
+	this.mouseMoveMode = mouseMoveMode;
+};

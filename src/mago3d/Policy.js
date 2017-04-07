@@ -29,6 +29,9 @@ var Policy = function() {
 	this.color = [];
 	// show/hide
 	this.hideBuildings = [];
+	
+	// 0 = block mode, 1 = object mode
+	this.mouseMoveMode = 0;
 };
 
 Policy.prototype.getMagoEnable = function() {
@@ -92,4 +95,11 @@ Policy.prototype.getHideBuildings = function() {
 };
 Policy.prototype.setHideBuildings = function(hideBuildings) {
 	this.hideBuildings = hideBuildings;
+};
+
+Policy.prototype.getMouseMoveMode = function() {
+	return this.mouseMoveMode;
+};
+Policy.prototype.setMouseMoveMode = function(mouseMoveMode) {
+	this.mouseMoveMode = mouseMoveMode;
 };
