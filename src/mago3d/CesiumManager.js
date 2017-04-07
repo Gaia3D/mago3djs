@@ -2010,21 +2010,32 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 		
 		if(this.renderingModeTemp == 0) {
 			//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, neoBuilding.move_matrix);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 		} else {
 			if(neoBuilding.geoLocationDataAux) {
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
+				gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.geoLocationDataAux.positionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
 			} else {
 				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
+				gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, neoBuilding.move_matrix);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 			}
 		}
 		
-		this.renderer.renderLodBuilding(gl, lowestOctree.lego, this, currentShader, ssao_idx);
+
+		gl.uniform1i(currentShader.hasTexture_loc, false); //.***	
+		gl.uniform4fv(currentShader.color4Aux_loc, [lowestOctree.lego.selColor4.r/255.0, lowestOctree.lego.selColor4.g/255.0, lowestOctree.lego.selColor4.b/255.0, 1.0]);
+		
+		gl.uniform1i(currentShader.hasAditionalMov_loc, false);
+		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
+
+				
+		this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader, ssao_idx);
 		
 	}
 	
