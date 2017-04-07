@@ -5759,7 +5759,7 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
-		this.magoPolicy.setHideBuildings = api.gethideBuilds();
+		this.magoPolicy.setHideBuildings(api.gethideBuilds());
 	} else if(apiName === "move") {
 		
 	} else if(apiName === "changeOutFitting") {
@@ -5773,12 +5773,14 @@ CesiumManager.prototype.callAPI = function(api) {
 		this.magoPolicy.setFrustumFarSquaredDistance(api.getFrustumFarDistance() * api.getFrustumFarDistance());
 	} else if(apiName === "changeLocationAndRotation") {
 		// 변환 행렬
-		this.changeLocationAndRotation(api.projectId + "_" + api.blockId, 
-							parseFloat(api.latitude), 
-							parseFloat(api.longitude), 
-							parseFloat(api.elevation), 
-							parseFloat(api.heading), 
-							parseFloat(api.pitch), 
-							parseFloat(api.roll));
+		this.changeLocationAndRotation(api.getProjectId() + "_" + api.getBlockId(), 
+							parseFloat(api.getLatitude()), 
+							parseFloat(api.getLongitude()), 
+							parseFloat(api.getElevation()), 
+							parseFloat(api.getHeading()), 
+							parseFloat(api.getPitch()), 
+							parseFloat(api.getRoll()));
+	} else if(apiName === "changeMouseMove") {
+		this.magoPolicy.setMouseMoveMode(api.getMouseMoveMode());
 	}
 };
