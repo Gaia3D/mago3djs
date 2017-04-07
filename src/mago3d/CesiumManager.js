@@ -4843,6 +4843,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				if(structureTypedBuilding.bbox == undefined)
 					continue;
 				
+				if(neoBuilding.buildingId == "testId_P320T")
+				{
+					var hola = 0;
+				}
+				
 				
 				// now calculate traslation vector.***
 				this.pointSC_2 = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC_2);
@@ -5439,6 +5444,9 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuilding.geoLocationDataAux);
 	
 	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+	this.pointSC_2.x = -this.pointSC.x;
+	this.pointSC_2.y = -this.pointSC.y;
+	this.pointSC_2.z = -this.pointSC.z;
 
 	var traslationVector;
 	var realBuildingPos;
