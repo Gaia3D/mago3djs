@@ -141,7 +141,7 @@ function changePositionAPI(projectId, blockId, latitude, longitude, elevation, h
 
 // location 과 rotation를 알람
 function showPosition(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
-	var message = 	" project = " + Project + "\n"
+	var message = 	" project = " + projectId + "\n"
 					+ " blockId = " + blockId + "\n"
 					+ " latitude = " + latitude + "\n"
 					+ " longitude = " + longitude + "\n"
@@ -149,5 +149,5 @@ function showPosition(projectId, blockId, latitude, longitude, elevation, headin
 					+ " heading = " + heading + "\n"
 					+ " pitch = " + pitch + "\n"
 					+ " roll = " + roll;
-	alert();
+	alert(message);
 }
