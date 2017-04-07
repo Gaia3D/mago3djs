@@ -369,6 +369,10 @@ function genNoiseTextureRGBA(gl, w, h, pixels) {
  * @param numFrustums 변수
  */
 CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
+	
+	// mago3d 활성화가 아니면 화면을 그리지 않음
+	if(!this.magoPolicy.getMagoEnable()) return;
+	
 	var isLastFrustum = false;
 	this.frustumIdx = frustumIdx;
 	this.numFrustums = numFrustums;
@@ -5652,7 +5656,9 @@ CesiumManager.prototype.getObjectIndexFile = function() {
  */
 CesiumManager.prototype.callAPI = function(api) {
 	var apiName = api.getAPIName();
-	if(apiName === "changeRender") {
+	if(apiName === "changeMagoState") {
+		this.magoPolicy.setMagoEnable(api.getMagoEnable());
+	} else if(apiName === "changeRender") {
 		this.renderingModeTemp = api.getRenderMode();
 	} else if(apiName === "searchBlock") {
 		this.flyToBuilding(api.getBlockType(), api.getProjectId() + "_"+ api.getBlockId());

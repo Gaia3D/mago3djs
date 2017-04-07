@@ -9,6 +9,9 @@ var Policy = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	// mago3d 활성화/비활성화 여부
+	this.magoEnable = true;
+	
 	// outfitting 표시 여부
 	this.showOutFitting = false;
 	// boundingBox 표시/비표시
@@ -26,6 +29,13 @@ var Policy = function() {
 	this.color = [];
 	// show/hide
 	this.hideBuildings = [];
+};
+
+Policy.prototype.getMagoEnable = function() {
+	return this.magoEnable;
+};
+Policy.prototype.setMagoEnable = function(magoEnable) {
+	this.magoEnable = magoEnable;
 };
 
 Policy.prototype.getShowOutFitting = function() {

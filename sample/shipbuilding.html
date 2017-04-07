@@ -28,7 +28,15 @@
 	<div style="width:100% ;min-height: 500px; font-size: 14px;">
 		<form id="searchForm" name="searchForm" action="/" onsubmit="return false;">
 		<div style="float: left; min-width: 200px;">
-			<div style="padding-left: 10px; padding-top: 15px;">ShipBuilding</div>
+			<div style="padding-left: 10px; padding-top: 15px;">
+				<div>Mago3D
+					<input type="radio" id="magoEnable" name="magoState" value="0" checked="checked" onclick="changeMagoState(true);" />
+					<label for="magoEnable"> 활성 </label>
+					<input type="radio" id="magoDisable" name="magoState" value="1" onclick="changeMagoState(false);"/>
+					<label for="magoDisable"> 비활성 </label>
+				</div>
+				<hr style="height:1">
+			</div>
 			
 			<div style="padding-left: 10px;">
 				<label for="projectId">이름</label>
@@ -245,6 +253,7 @@
 <script>
 	var managerFactory = null;
 	magoStart(null, "magoContainer");
+	var blocksConfig = null;
 	
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000); 
@@ -269,9 +278,11 @@
 			url: "/sample/blocks.json",
 			type: "GET",
 			dataType: "json",
-			success: function(blocksConfig){
-				var blocks = blocksConfig.blocks;
+			success: function(jsonBlocksConfig){
+				blocksConfig = jsonBlocksConfig;
+				var blocks = jsonBlocksConfig.blocks;
 				for (var blockId in blocks) {
+					var block = blocks[blockId];
 					var tempBlockId = blockId.split("_");
 					// 블록 이동
 					$('#blockId').append($('<option>',
@@ -286,6 +297,13 @@
 						value: tempBlockId[1],
 						text : tempBlockId[1] 
 					}));
+
+					$("#latitude").val(block.LATITUDE);
+					$("#longitude").val(block.LONGITUDE);
+					$("#elevation").val(block.ELEVATION);
+					$("#heading").val(block.HEADING);
+					$("#pitch").val(block.PITCH);
+					$("#roll").val(block.ROLL);
 				}
 			},
 			error: function(e){
@@ -315,11 +333,15 @@
 		});
 	} */
 	
+	// mago3d 활성화/비활성화
+	function changeMagoState(isShow) {
+		$("input:radio[name='magoState']:radio[value='" + isShow + "']").prop("checked", true);
+		changeMagoStateAPI(isShow);
+	}
+	
 	// outfitting 표시/비표시
 	function changeOutFitting(isShow) {
 		$("input:radio[name='outFitting']:radio[value='" + isShow + "']").prop("checked", true);
-		/* if(isShow) $("#showOutFitting").prop("checked", true);
-		else $("#hideOutFitting").prop("checked", true); */
 		changeOutFittingAPI(isShow);
 	}
 	
@@ -363,6 +385,19 @@
 		changeLocationAndRotationCheck(e);
 		changeLocationAndRotationAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
 										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
+	});
+	
+	$("#moveBlockId").change(function() {
+		var blocks = blocksConfig.blocks;
+		var blockId = $("#projectId").val() + "_" + $("#moveBlockId").val();	
+		var block = blocks[blockId];
+
+		$("#latitude").val(block.LATITUDE);
+		$("#longitude").val(block.LONGITUDE);
+		$("#elevation").val(block.ELEVATION);
+		$("#heading").val(block.HEADING);
+		$("#pitch").val(block.PITCH);
+		$("#roll").val(block.ROLL);
 	});
 	
 	$("#frustumFarDistance").on("keydown","",function(e){

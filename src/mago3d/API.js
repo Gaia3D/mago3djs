@@ -9,6 +9,9 @@ var API = function(apiName) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	// mago3d 활성화/비활성화 여부
+	this.magoEnable = true;
+	
 	// api 이름
 	this.apiName = apiName;
 	// project id
@@ -54,6 +57,13 @@ var API = function(apiName) {
 //	// show/hide
 //	this.hideBuildings = [];
 	
+};
+
+API.prototype.getMagoEnable = function() {
+	return this.magoEnable;
+};
+API.prototype.setMagoEnable = function(magoEnable) {
+	this.magoEnable = magoEnable;
 };
 
 API.prototype.getAPIName = function() {

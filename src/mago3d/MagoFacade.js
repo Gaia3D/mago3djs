@@ -35,6 +35,15 @@ function getBlocksConfig(viewer, renderDivId, magoConfig) {
 	});
 }
 
+// mago3d 활성화/비활성화
+function changeMagoStateAPI(isShow) {
+	var api = new API("changeMagoState");
+	api.setMagoEnable(isShow);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
 // render mode 
 function changeRenderAPI(renderMode) {
 	var api = new API("changeRender");
