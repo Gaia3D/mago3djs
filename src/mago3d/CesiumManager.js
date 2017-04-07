@@ -2063,7 +2063,11 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	this.octreeSelected = selectionCandidateLowestOctreesArray[idx];
 	
 	if(this.octreeSelected == undefined)
+	{
+		this.buildingSelected = undefined;
 		return undefined;
+	}
+		
 	
 	this.buildingSelected = selectionCandidateLowestOctreesArray[idx].neoBuildingOwner;
 	selectionCandidateLowestOctreesArray = undefined;
