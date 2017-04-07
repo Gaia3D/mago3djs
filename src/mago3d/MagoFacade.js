@@ -152,7 +152,7 @@ function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, ele
 	alert(message);
 }
 
-// mouse move 타입
+// 마우스 클릭 객체 이동 모드 변경
 function changeMouseMoveAPI(mouseMoveMode) {
 	var api = new API("changeMouseMove");
 	api.setMouseMoveMode(mouseMoveMode);
