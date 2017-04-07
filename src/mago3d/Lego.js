@@ -13,6 +13,7 @@ var Lego = function() {
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArrayBuffer;
+	this.selColor4;
 };
 
 Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, bytesReaded) {
