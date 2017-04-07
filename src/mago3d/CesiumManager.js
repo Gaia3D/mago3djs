@@ -4952,7 +4952,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		if(this.renderingModeTemp == 0)
 			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 		else if(this.renderingModeTemp == 1)
-			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 15.2/2.0;
+			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 5.2/2.0;
 		else if(this.renderingModeTemp == 2)
 			this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 		//if(neoBuilding.metaData) {
@@ -5066,7 +5066,7 @@ CesiumManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 	var i=0; 
 	var resultNeoBuilding;
 	while(!find && i<buildingCount) {
-		if(this.neoBuildingsList.neoBuildings_Array[i].buildingId == buildingId && this.neoBuildingsList.neoBuildings_Array[i].buildingType) {
+		if(this.neoBuildingsList.neoBuildings_Array[i].buildingId == buildingId && this.neoBuildingsList.neoBuildings_Array[i].buildingType == buildingType) {
 			find = true;
 			resultNeoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
 		}
@@ -5475,6 +5475,76 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.x = realBuildingPos.x;
 	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
 	neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
+	
+	// now, must change the keyMatrix of the references of the octrees.***
+	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+	var lowestOctreesArray = [];
+	neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	
+	var lowestOctreesCount = lowestOctreesArray.length;
+	for(var i=0; i<lowestOctreesCount; i++)
+	{
+		if(lowestOctreesArray[i].neoReferencesMotherAndIndices)
+			lowestOctreesArray[i].neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+	}
+	
+	lowestOctreesArray = undefined;
+	
+	// repeat this for outfitting building.*********************************************************************************************************************
+	// repeat this for outfitting building.*********************************************************************************************************************
+	// repeat this for outfitting building.*********************************************************************************************************************
+	var neoBuildingOutffiting = this.getNeoBuildingById("outfitting", projectIdAndBlockId);
+	
+	if(neoBuildingOutffiting == undefined)
+		return;
+	
+	neoBuildingOutffiting.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuildingOutffiting.geoLocationDataAux);
+	
+	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+	this.pointSC_2.x = -this.pointSC.x;
+	this.pointSC_2.y = -this.pointSC.y;
+	this.pointSC_2.z = -this.pointSC.z;
+
+	var traslationVector = undefined;
+	var realBuildingPos = undefined;
+	realBuildingPos = neoBuildingOutffiting.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+	traslationVector = neoBuildingOutffiting.geoLocationDataAux.tMatrix.rotatePoint3D(this.pointSC_2, traslationVector );
+	neoBuildingOutffiting.geoLocationDataAux.position.x += traslationVector.x;
+	neoBuildingOutffiting.geoLocationDataAux.position.y += traslationVector.y;
+	neoBuildingOutffiting.geoLocationDataAux.position.z += traslationVector.z;
+	//neoBuildingOutffiting.geoLocationDataAux.positionHIGH;
+	neoBuildingOutffiting.geoLocationDataAux.aditionalTraslation = traslationVector;
+	neoBuildingOutffiting.geoLocationDataAux.positionLOW[0] += traslationVector.x;
+	neoBuildingOutffiting.geoLocationDataAux.positionLOW[1] += traslationVector.y;
+	neoBuildingOutffiting.geoLocationDataAux.positionLOW[2] += traslationVector.z;
+	
+	realBuildingPos.x += traslationVector.x;
+	realBuildingPos.y += traslationVector.y;
+	realBuildingPos.z += traslationVector.z;
+	
+	if(neoBuildingOutffiting.geoLocationDataAux.bboxAbsoluteCenterPos == undefined)
+		neoBuildingOutffiting.geoLocationDataAux.bboxAbsoluteCenterPos = new Point3D();
+	
+	neoBuildingOutffiting.geoLocationDataAux.bboxAbsoluteCenterPos.x = realBuildingPos.x;
+	neoBuildingOutffiting.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
+	neoBuildingOutffiting.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
+	
+	// now, must change the keyMatrix of the references of the octrees.***
+	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+	if(neoBuildingOutffiting.octree)
+	{
+		var lowestOctreesArray = [];
+		neoBuildingOutffiting.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+		
+		var lowestOctreesCount = lowestOctreesArray.length;
+		for(var i=0; i<lowestOctreesCount; i++)
+		{
+			if(lowestOctreesArray[i].neoReferencesMotherAndIndices)
+				lowestOctreesArray[i].neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuildingOutffiting.geoLocationDataAux.rotMatrix);
+		}
+		
+		lowestOctreesArray = undefined;
+	}
 }
 
 /**
