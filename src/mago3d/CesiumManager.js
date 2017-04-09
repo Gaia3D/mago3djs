@@ -2614,9 +2614,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
 		intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
 		
-		
 
-		
 		// register the movement.***
 		if(this.buildingSelected.moveVector == undefined)
 			this.buildingSelected.moveVector = new Point3D();
