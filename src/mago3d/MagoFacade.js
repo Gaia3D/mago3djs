@@ -1,11 +1,28 @@
 'use strict';
 
-// mago3d 시작
+/**
+ * 화면단 UI와 연동 되는 API. APIGateWay 혹은 API 클래스로 클래스명 수정 예정
+ * @class MagoFacade
+ */
+
+/**
+ * mago3d 시작
+ * 
+ * @param viewer cesium 혹은 world wind view 클래스
+ * @param html 내 rendering 할 div id명
+ * @return
+ */
 function magoStart(viewer, renderDivId) {
 	getMagoConfig(viewer, renderDivId);
 }
 
-// mago3d 환경 설정을 얻어옴
+/**
+ * mago3d 환경 설정을 얻어옴
+ * 
+ * @param viewer cesium 혹은 world wind view 클래스
+ * @param html 내 rendering 할 div id명
+ * @return
+ */
 function getMagoConfig(viewer, renderDivId) {
 	$.ajax({
 		url: "/sample/database.json",
@@ -20,7 +37,14 @@ function getMagoConfig(viewer, renderDivId) {
 	});
 }
 	
-// blocks 정보를 가져옴
+/**
+ * blocks 정보를 가져옴
+ * 
+ * @param viewer cesium 혹은 world wind view 클래스
+ * @param html 내 rendering 할 div id명
+ * @param magoConfig mago 환경 설정 config 파일
+ * @return
+ */
 function getBlocksConfig(viewer, renderDivId, magoConfig) {
 	$.ajax({
 		url: "/sample/blocks.json",
@@ -35,7 +59,12 @@ function getBlocksConfig(viewer, renderDivId, magoConfig) {
 	});
 }
 
-// mago3d 활성화/비활성화
+/**
+ * mago3d 활성화/비활성화
+ * 
+ * @param isShow true = 활성화, false = 비활성화
+ * @return
+ */
 function changeMagoStateAPI(isShow) {
 	var api = new API("changeMagoState");
 	api.setMagoEnable(isShow);
@@ -44,7 +73,12 @@ function changeMagoStateAPI(isShow) {
 	}
 }
 
-// render mode 
+/**
+ * render mode
+ * 
+ * @param renderMode 0 = 호선, 1 = 지번전개
+ * @return
+ */
 function changeRenderAPI(renderMode) {
 	var api = new API("changeRender");
 	api.setRenderMode(renderMode);
@@ -53,7 +87,12 @@ function changeRenderAPI(renderMode) {
 	}
 }
 
-// outfitting 표시/비표시
+/**
+ * outfitting 표시/비표시
+ * 
+ * @param isShow true = 활성화, false = 비활성화
+ * @return
+ */
 function changeOutFittingAPI(isShow) {
 	var api = new API("changeOutFitting");
 	api.setShowOutFitting(isShow);
@@ -62,7 +101,12 @@ function changeOutFittingAPI(isShow) {
 	}
 }
 
-// boundingBox 표시/비표시
+/**
+ * boundingBox 표시/비표시
+ * 
+ * @param isShow true = 활성화, false = 비활성화
+ * @return
+ */
 function changeBoundingBoxAPI(isShow) {
 	var api = new API("changeBoundingBox");
 	api.setShowBoundingBox(isShow);
@@ -71,7 +115,12 @@ function changeBoundingBoxAPI(isShow) {
 	}
 }
 
-// 그림자 표시/비표시
+/**
+ * 그림자 표시/비표시
+ * 
+ * @param isShow true = 활성화, false = 비활성화
+ * @return
+ */
 function changeShadowAPI(isShow) {
 	var api = new API("changeShadow");
 	api.setShowShadow(isShow);
@@ -80,7 +129,12 @@ function changeShadowAPI(isShow) {
 	}
 }
 
-// frustum culling 가시 거리
+/**
+ * frustum culling 가시 거리
+ * 
+ * @param frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
+ * @return
+ */
 function changeFrustumFarDistanceAPI(frustumFarDistance) {
 	var api = new API("changefrustumFarDistance");
 	api.setFrustumFarDistance(frustumFarDistance);
@@ -89,7 +143,14 @@ function changeFrustumFarDistanceAPI(frustumFarDistance) {
 	}
 }
 
-// 블록 검색 
+/**
+ * 블록검색
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockType structure, outfitting
+ * @param blockId block id
+ * @return
+ */
 function searchBlockAPI(projectId, blockType, blockId) {
 	var api = new API("searchBlock");
 	api.setProjectId(projectId);
@@ -100,7 +161,14 @@ function searchBlockAPI(projectId, blockType, blockId) {
 	}
 }
 
-// highlighting
+/**
+ * highlighting
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockIds block id. 복수개의 경우 , 로 입력
+ * @param objectIds object id. 복수개의 경우 , 로 입력
+ * @return
+ */
 function changeHighLightingAPI(projectId, blockIds, objectIds) {
 	var api = new API("changeHighLighting");
 	api.setProjectId(projectId);
@@ -111,7 +179,15 @@ function changeHighLightingAPI(projectId, blockIds, objectIds) {
 	}
 }
 
-// color
+/**
+ * color 변경
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockIds block id. 복수개의 경우 , 로 입력
+ * @param objectIds object id. 복수개의 경우 , 로 입력
+ * @param color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
+ * @return
+ */
 function changeColorAPI(projectId, blockIds, objectIds, color) {
 	var api = new API("changeColor");
 	api.setProjectId(projectId);
@@ -123,7 +199,19 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 	}
 }
 
-// location 과 rotation을 적용
+/**
+ * lcation and rotation 변경
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockId block id
+ * @param latitude 위도
+ * @param longitude 경도
+ * @param elevation 높이
+ * @param heading 좌, 우
+ * @param pitch 위, 아래
+ * @param roll 좌, 우 기울기
+ * @return
+ */
 function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
 	var api = new API("changeLocationAndRotation");
 	api.setProjectId(projectId);
@@ -139,7 +227,19 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
 	}
 }
 
-// location 과 rotation를 알람
+/**
+ * block 이동된 후 lcation and rotation 알림
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockId block id
+ * @param latitude 위도
+ * @param longitude 경도
+ * @param elevation 높이
+ * @param heading 좌, 우
+ * @param pitch 위, 아래
+ * @param roll 좌, 우 기울기
+ * @return
+ */
 function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
 	var message = 	" project = " + projectId + "\n"
 					+ " blockId = " + blockId + "\n"
@@ -152,7 +252,12 @@ function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, ele
 	alert(message);
 }
 
-// 마우스 클릭 객체 이동 모드 변경
+/**
+ * 마우스 클릭 객체 이동 대상 변경
+ * 
+ * @param mouseMoveMode 0 = block, 1 = object
+ * @return
+ */
 function changeMouseMoveAPI(mouseMoveMode) {
 	var api = new API("changeMouseMove");
 	api.setMouseMoveMode(mouseMoveMode);
