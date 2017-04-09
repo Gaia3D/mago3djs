@@ -5908,8 +5908,8 @@ CesiumManager.prototype.callAPI = function(api) {
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i]);
-			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i]);
+			projectLayer.setBlockId(blockIds[i].trim());
+			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i].trim());
 			else projectLayer.setObjectId(null);
 			hightedBuilds.push(projectLayer);
 		}
@@ -5929,8 +5929,8 @@ CesiumManager.prototype.callAPI = function(api) {
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i]);
-			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i]);
+			projectLayer.setBlockId(blockIds[i].trim());
+			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i].trim());
 			else projectLayer.setObjectId(null);
 			colorBuilds.push(projectLayer);
 		}

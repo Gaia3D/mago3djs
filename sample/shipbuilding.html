@@ -359,7 +359,7 @@
 	
 	// 가시 거리
 	$("#changeFrustumFarDistanceAPI").click(function() {
-		changeFrustumFarDistanceCheck();
+		if(!changeFrustumFarDistanceCheck()) return false;
 		changeFrustumFarDistanceAPI($("#frustumFarDistance").val());
 	});
 	
@@ -370,19 +370,19 @@
 	
 	// highlighting
 	$("#changeHighLightingAPI").click(function(e) {
-		changeHighLightingCheck(e);
+		if(!changeHighLightingCheck(e)) return false;
 		changeHighLightingAPI($("#projectId").val(), $("#blockIds").val(), $("#objectIds").val());
 	});
 	
 	// 색변경
 	$("#changeColorAPI").click(function(e) {
-		changeColorCheck(e);
+		if(!changeColorCheck(e)) return false;
 		changeColorAPI($("#projectId").val(), $("#blockIds").val(), $("#objectIds").val(), $("#colorBlock").val());
 	});
 	
 	// 변환행렬
 	$("#changeLocationAndRotationAPI").click(function(e) {
-		changeLocationAndRotationCheck(e);
+		if(!changeLocationAndRotationCheck(e)) return false;
 		changeLocationAndRotationAPI(	$("#projectId").val(), $("#moveBlockId").val(), $("#latitude").val(), $("#longitude").val(), 
 										$("#elevation").val(), $("#heading").val(), $("#pitch").val(), $("#roll").val());
 	});
@@ -419,6 +419,7 @@
 			$("#frustumFarDistance").focus();
 			return false;
 		}
+		return true;
 	}
 	
 	$("#blockIds").on("keydown","",function(e){
@@ -449,7 +450,7 @@
 		var blockIds = $("#blockIds").val().split(",");
 		var objectIds = $("#objectIds").val().split(",");
 		if(blockIds.length == 1) {
-			if(objectIds.length == 1) {
+			if(objectIds.length <= 1) {
 				// block과 object가 1:1
 			} else {
 				// block과 object가 1:N
@@ -467,6 +468,7 @@
 			$("#colorBlock").focus();
 			return false;
 		}
+		return true;
 	}
 	
 	function changeColorCheck(e) {
@@ -484,7 +486,7 @@
 		var blockIds = $("#blockIds").val().split(",");
 		var objectIds = $("#objectIds").val().split(",");
 		if(blockIds.length == 1) {
-			if(objectIds.length == 1) {
+			if(objectIds.length <= 1) {
 				// block과 object가 1:1
 			} else {
 				// block과 object가 1:N
@@ -501,6 +503,7 @@
 			$("#colorBlock").focus();
 			return false;
 		}
+		return true;
 	}
 	
 	$("#latitude").on("keydown","",function(e){
@@ -571,6 +574,7 @@
 			$("#roll").focus();
 			return false;
 		}
+		return true;
 	}
 </script>
 </body>
