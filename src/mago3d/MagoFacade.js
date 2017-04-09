@@ -241,15 +241,6 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
  * @return
  */
 function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
-//	var message = 	" project = " + projectId + "\n"
-//					+ " blockId = " + blockId + "\n"
-//					+ " latitude = " + latitude + "\n"
-//					+ " longitude = " + longitude + "\n"
-//					+ " elevation = " + elevation + "\n"
-//					+ " heading = " + heading + "\n"
-//					+ " pitch = " + pitch + "\n"
-//					+ " roll = " + roll;
-	
 	$("#projectId").val(projectId);
 	$("#moveBlockId").val(blockId);
 	$("#latitude").val(latitude);
