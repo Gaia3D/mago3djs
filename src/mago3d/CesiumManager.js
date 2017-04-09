@@ -2644,6 +2644,15 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 			var newHeight = cartographic.height;
 			
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+			var dividedName = this.buildingSelected.buildingId.split("_");
+			showLocationAndRotationAPI(	dividedName[0], 
+										dividedName[1], 
+										this.buildingSelected.geoLocationDataAux.latitude, 
+										this.buildingSelected.geoLocationDataAux.longitude,
+										this.buildingSelected.geoLocationDataAux.elevation,
+										this.buildingSelected.geoLocationDataAux.heading,
+										this.buildingSelected.geoLocationDataAux.pitch,
+										this.buildingSelected.geoLocationDataAux.roll);
 		}
 		
 	}
