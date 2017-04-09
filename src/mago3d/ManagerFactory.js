@@ -113,22 +113,47 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		magoManager.handler.setInputAction(function(movement) {
 			if(magoManager.mouseLeftDown) {
 				if(movement.startPosition.x != movement.endPosition.x || movement.startPosition.y != movement.endPosition.y) {
-					if(magoManager.objectSelected != undefined) {
-						// move the selected object.***
-						magoManager.mouse_x = movement.startPosition.x;
-						magoManager.mouse_y = movement.startPosition.y;
-						
-						// 1rst, check if there are objects to move.***
-						if(magoManager.mustCheckIfDragging) {
-							if(magoManager.isDragging(magoManager.scene)) {
-								magoManager.mouseDragging = true;
-								disableCameraMotion(false);
+					
+					// distinguish 2 modes.******************************************************
+					if(magoManager.magoPolicy.mouseMoveMode == 0) // blocks move.***
+					{
+						if(magoManager.buildingSelected != undefined) {
+							// move the selected object.***
+							magoManager.mouse_x = movement.startPosition.x;
+							magoManager.mouse_y = movement.startPosition.y;
+							
+							// 1rst, check if there are objects to move.***
+							if(magoManager.mustCheckIfDragging) {
+								if(magoManager.isDragging(magoManager.scene)) {
+									magoManager.mouseDragging = true;
+									disableCameraMotion(false);
+								}
+								magoManager.mustCheckIfDragging = false;
 							}
-							magoManager.mustCheckIfDragging = false;
+						} else {
+							magoManager.isCameraMoving = true; // if no object is selected.***
 						}
-					} else {
-						magoManager.isCameraMoving = true; // if no object is selected.***
 					}	
+					else if(magoManager.magoPolicy.mouseMoveMode == 1) // objects move.***
+					{
+						if(magoManager.objectSelected != undefined) {
+							// move the selected object.***
+							magoManager.mouse_x = movement.startPosition.x;
+							magoManager.mouse_y = movement.startPosition.y;
+							
+							// 1rst, check if there are objects to move.***
+							if(magoManager.mustCheckIfDragging) {
+								if(magoManager.isDragging(magoManager.scene)) {
+									magoManager.mouseDragging = true;
+									disableCameraMotion(false);
+								}
+								magoManager.mustCheckIfDragging = false;
+							}
+						} else {
+							magoManager.isCameraMoving = true; // if no object is selected.***
+						}
+					}
+					//---------------------------------------------------------------------------------
 					magoManager.isCameraMoving = true; // test.***
 					if(magoManager.mouseDragging) {
 						//magoManager.moveSelectedObject(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray); // original.***

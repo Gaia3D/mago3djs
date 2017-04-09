@@ -191,6 +191,7 @@ var CesiumManager = function() {
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
 	this.pointSC_2= new Point3D();
+	this.arrayAuxSC = [];
 	
 	this.currentTimeSC;
 	this.dateSC;
@@ -1593,7 +1594,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
-		this.objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees);
+		this.arrayAuxSC.length = 0;
+		this.objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees, this.arrayAuxSC);
+		this.buildingSelected = this.arrayAuxSC[0];
+		this.octreeSelected = this.arrayAuxSC[1];
+		this.arrayAuxSC.length = 0;
 	}
 	
 	// 1) The depth render.***************************************************************************************************
@@ -1742,7 +1747,7 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
  * @param renderables_neoRefLists_array 변수
  * @returns selectionCandidateObjectsArray[idx]
  */
-CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, scene, visibleObjControlerOctrees) {
+CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, scene, visibleObjControlerOctrees, resultSelectedArray) {
 	// Picking render.***
 	// Picking render.***
 	// Picking render.***
@@ -2060,19 +2065,23 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	var selectedObject = this.selectionCandidateObjectsArray[idx];
 	this.selectionCandidateObjectsArray.length = 0;
 	
-	this.octreeSelected = selectionCandidateLowestOctreesArray[idx];
+	var currentOctreeSelected = selectionCandidateLowestOctreesArray[idx];
 	
-	if(this.octreeSelected == undefined)
+	if(currentOctreeSelected == undefined)
 	{
-		this.buildingSelected = undefined;
+		currentSelectedBuilding = undefined;
 		return undefined;
 	}
 		
 	
-	this.buildingSelected = selectionCandidateLowestOctreesArray[idx].neoBuildingOwner;
+	var currentSelectedBuilding = selectionCandidateLowestOctreesArray[idx].neoBuildingOwner;
 	selectionCandidateLowestOctreesArray = undefined;
 	
-	console.log(this.buildingSelected.buildingFileName);
+	resultSelectedArray[0] = currentSelectedBuilding;
+	resultSelectedArray[1] = currentOctreeSelected;
+	resultSelectedArray[2] = selectedObject;
+	
+	console.log(currentSelectedBuilding.buildingFileName);
 	
 	return selectedObject;
 
@@ -2388,14 +2397,36 @@ CesiumManager.prototype.enableCameraMotion = function(state, scene) {
 CesiumManager.prototype.isDragging = function(scene) {
 	// test function.***
 	var gl = scene._context._gl;
-	//var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array); // original.***
-	var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees);
 	
-	if(current_objectSelected == this.objectSelected) {
-		return true;
-	} else {
-		return false;
+	if(this.magoPolicy.mouseMoveMode == 0) // buildings move.***
+	{
+		this.arrayAuxSC.length = 0;
+		var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees, this.arrayAuxSC);
+		var currentBuildingSelected = this.arrayAuxSC[0];
+		this.arrayAuxSC.length = 0;
+		
+		if(currentBuildingSelected == this.buildingSelected) {
+			return true;
+		} else {
+			return false;
+		}
 	}
+	else if(this.magoPolicy.mouseMoveMode == 1) // objects move.***
+	{
+		//var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array); // original.***
+		this.arrayAuxSC.length = 0;
+		var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, scene, this.visibleObjControlerOctrees, this.arrayAuxSC);
+		this.arrayAuxSC.length = 0;
+		
+		if(current_objectSelected == this.objectSelected) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	else
+		return false;
+	
 };
 
 /**
@@ -2478,78 +2509,70 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 	
 	var gl = scene._context._gl;
 	
-	// 1rst, check if the clicked point is the selected object.***
-	//var current_selectedObject = this.getSelectedObjectPicking(gl, scene, renderables_neoRefLists_array);
-	//if(current_selectedObject != this.objectSelected)
-	//	return;
-	
-	//this.objMovState
-	
 	var cameraPosition = scene.context._us._cameraPosition;
 	//this.enableCameraMotion(false, scene);
-	
-	// create a XY_plane in the selected_pixel_position.***
-	if(this.selObjMovePlane == undefined) {
-		this.calculateSelObjMovePlaneAsimetricMode(gl, cameraPosition, scene, renderables_neoRefLists_array);
-	}
-	
-	// world ray = camPos + lambda*camDir.***
-	var camera = scene._camera;
-	var camPos = camera._position;
-	
-	var windowPosition = new Cesium.Cartesian2(this.mouse_x, this.mouse_y);
-	var camRay = new Cesium.Ray();
-	camRay = camera.getPickRay(windowPosition, camRay);
-	var rayWorldSpace = new Cesium.Cartesian3(camRay.direction.x, camRay.direction.y, camRay.direction.z);
-	
-	
-	// transform world_ray to building_ray.***
-	var camPosBuilding = new Cesium.Cartesian3();
-	//camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
-	
-	var camDirBuilding = new Cesium.Cartesian3();
-	//camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
-	
-	
-	if(this.renderingModeTemp == 0) {
-		camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
-		camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
-	} else {
-		if(this.buildingSelected.geoLocationDataAux) {
-			camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, camPos, camPosBuilding);
-			camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.rotMatrixInv._floatArrays, rayWorldSpace, camDirBuilding);
-		} else {
-			camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
-			camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding);
-		}
-	}
-	
-	
-	
-	// now, intersect building_ray with the selObjMovePlane.***
-	var line = new Line();
-	line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
-	
-	var intersectionPoint = new Point3D();
-	intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
-	
-	// register the movement.***
-	if(this.objectSelected.moveVector == undefined)
-		this.objectSelected.moveVector = new Point3D();
-	
-	//this.thereAreStartMovePoint;
-	//this.startMovPoint;
-	
-	if(!this.thereAreStartMovePoint) {
-		this.startMovPoint = intersectionPoint;
-		this.startMovPoint.add(-this.objectSelected.moveVector.x, -this.objectSelected.moveVector.y, -this.objectSelected.moveVector.z);
-		this.thereAreStartMovePoint = true;
-	} else {
-		var difX = intersectionPoint.x - this.startMovPoint.x;
-		var difY = intersectionPoint.y - this.startMovPoint.y;
-		var difZ = intersectionPoint.z - this.startMovPoint.z;
+	if(this.magoPolicy.mouseMoveMode == 0) // buildings move.***
+	{
 		
-		this.objectSelected.moveVector.set(difX, difY, difZ);
+	}
+	else if(this.magoPolicy.mouseMoveMode == 1) // objects move.***
+	{
+		// create a XY_plane in the selected_pixel_position.***
+		if(this.selObjMovePlane == undefined) {
+			this.calculateSelObjMovePlaneAsimetricMode(gl, cameraPosition, scene, renderables_neoRefLists_array);
+		}
+		
+		// world ray = camPos + lambda*camDir.***
+		var camera = scene._camera;
+		var camPos = camera._position;
+		
+		var windowPosition = new Cesium.Cartesian2(this.mouse_x, this.mouse_y);
+		var camRay = new Cesium.Ray();
+		camRay = camera.getPickRay(windowPosition, camRay);
+		var rayWorldSpace = new Cesium.Cartesian3(camRay.direction.x, camRay.direction.y, camRay.direction.z);
+
+		// transform world_ray to building_ray.***
+		var camPosBuilding = new Cesium.Cartesian3();
+		//camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
+		
+		var camDirBuilding = new Cesium.Cartesian3();
+		//camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
+
+		if(this.renderingModeTemp == 0) {
+			camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
+			camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
+		} else {
+			if(this.buildingSelected.geoLocationDataAux) {
+				camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, camPos, camPosBuilding);
+				camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.rotMatrixInv._floatArrays, rayWorldSpace, camDirBuilding);
+			} else {
+				camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, camPos, camPosBuilding);
+				camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.move_matrix_inv, rayWorldSpace, camDirBuilding);
+			}
+		}
+
+		// now, intersect building_ray with the selObjMovePlane.***
+		var line = new Line();
+		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
+		
+		var intersectionPoint = new Point3D();
+		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
+		
+		// register the movement.***
+		if(this.objectSelected.moveVector == undefined)
+			this.objectSelected.moveVector = new Point3D();
+		
+		if(!this.thereAreStartMovePoint) {
+			this.startMovPoint = intersectionPoint;
+			this.startMovPoint.add(-this.objectSelected.moveVector.x, -this.objectSelected.moveVector.y, -this.objectSelected.moveVector.z);
+			this.thereAreStartMovePoint = true;
+		} else {
+			var difX = intersectionPoint.x - this.startMovPoint.x;
+			var difY = intersectionPoint.y - this.startMovPoint.y;
+			var difZ = intersectionPoint.z - this.startMovPoint.z;
+			
+			this.objectSelected.moveVector.set(difX, difY, difZ);
+		}
 	}
 };
 
