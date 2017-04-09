@@ -386,6 +386,8 @@ var NeoBuilding = function() {
 	this.allFilesLoaded = false;
 	this.isReadyToRender = false;
 	
+	this.moveVector;
+	
 	// The simple building.***********************************************
 	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
 	
