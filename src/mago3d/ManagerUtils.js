@@ -158,10 +158,17 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	
 	Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
 	resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
-	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
-	var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
-	var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
-	resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
+	
+	// Roll-Pitch-Heading order rotation.***********************************************************************
+	//var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
+	//var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+	//var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	
+	// Heading-Pitch-Roll order rotation.***********************************************************************
+	var aRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, aRotatedTMatrix);
+	var abRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(aRotatedTMatrix, abRotatedTMatrix);
+	var abcRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(abRotatedTMatrix, abcRotatedTMatrix);
+	resultGeoLocationData.tMatrix = abcRotatedTMatrix;
 	
 	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
