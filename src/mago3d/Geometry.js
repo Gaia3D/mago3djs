@@ -389,6 +389,7 @@ var NeoBuilding = function() {
 	this.moveVector; // no used.***
 	
 	// aditional data.****************************************************
+	this.useAditionalColor;
 	this.aColor4;
 	
 	// The simple building.***********************************************
