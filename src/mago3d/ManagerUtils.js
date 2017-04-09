@@ -64,16 +64,26 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) {
 	
+	if(longitude == undefined || latitude == undefined)
+		return;
+	
 	if(resultGeoLocationData == undefined) resultGeoLocationData = new GeoLocationData();
 	
 	// 0) Position.********************************************************************************************
 	resultGeoLocationData.longitude = longitude;
 	resultGeoLocationData.latitude = latitude;
-	resultGeoLocationData.elevation = altitude;
 	
-	resultGeoLocationData.heading = heading;
-	resultGeoLocationData.pitch = pitch;
-	resultGeoLocationData.roll = roll;
+	if(altitude != undefined)
+		resultGeoLocationData.elevation = altitude;
+	
+	if(heading != undefined)
+		resultGeoLocationData.heading = heading;
+	
+	if(pitch != undefined)
+		resultGeoLocationData.pitch = pitch;
+	
+	if(roll != undefined)
+		resultGeoLocationData.roll = roll;
 	
 	resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.longitude, resultGeoLocationData.latitude, resultGeoLocationData.elevation);
 	
@@ -90,10 +100,37 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
     //var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
-	resultGeoLocationData.tMatrix = new Matrix4();
-	resultGeoLocationData.tMatrixInv = new Matrix4(); 
-	resultGeoLocationData.rotMatrix = new Matrix4(); 
-	resultGeoLocationData.rotMatrixInv = new Matrix4(); 
+	if(resultGeoLocationData.tMatrix == undefined)
+		resultGeoLocationData.tMatrix = new Matrix4();
+	else
+		resultGeoLocationData.tMatrix.Identity();
+	
+	if(resultGeoLocationData.geoLocMatrix == undefined)
+		resultGeoLocationData.geoLocMatrix = new Matrix4();
+	else
+		resultGeoLocationData.geoLocMatrix.Identity();
+	
+	if(resultGeoLocationData.geoLocMatrixInv == undefined)
+		resultGeoLocationData.geoLocMatrixInv = new Matrix4();
+	else
+		resultGeoLocationData.geoLocMatrixInv.Identity();
+	
+	//---------------------------------------------------------
+	
+	if(resultGeoLocationData.tMatrixInv == undefined)
+		resultGeoLocationData.tMatrixInv = new Matrix4(); 
+	else
+		resultGeoLocationData.tMatrixInv.Identity(); 
+	
+	if(resultGeoLocationData.rotMatrix == undefined)
+		resultGeoLocationData.rotMatrix = new Matrix4(); 
+	else
+		resultGeoLocationData.rotMatrix.Identity(); 
+	
+	if(resultGeoLocationData.rotMatrixInv == undefined)
+		resultGeoLocationData.rotMatrixInv = new Matrix4(); 
+	else
+		resultGeoLocationData.rotMatrixInv.Identity(); 
 	
 	var xRotMatrix = new Matrix4();  // created as identity matrix.***
 	var yRotMatrix = new Matrix4();  // created as identity matrix.***
@@ -104,22 +141,23 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	//pitch = 40.0;
 	//roll = 125;
 	
-	if(heading != undefined && heading != 0)
+	if(resultGeoLocationData.heading != undefined && resultGeoLocationData.heading != 0)
 	{
-		zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, 1.0);
+		zRotMatrix.rotationAxisAngDeg(resultGeoLocationData.heading, 0.0, 0.0, 1.0);
 	}
 	
-	if(pitch != undefined && pitch != 0)
+	if(resultGeoLocationData.pitch != undefined && resultGeoLocationData.pitch != 0)
 	{
-		xRotMatrix.rotationAxisAngDeg(pitch, 1.0, 0.0, 0.0);
+		xRotMatrix.rotationAxisAngDeg(resultGeoLocationData.pitch, 1.0, 0.0, 0.0);
 	}
 	
-	if(roll != undefined && roll != 0)
+	if(resultGeoLocationData.roll != undefined && resultGeoLocationData.roll != 0)
 	{
-		yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0);
+		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, 1.0, 0.0);
 	}
 	
 	Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
+	resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
 	var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
 	var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
@@ -133,6 +171,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	// now, calculates the inverses.***
 	Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
 	Cesium.Matrix4.inverse(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
+	Cesium.Matrix4.inverse(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
 
 	return resultGeoLocationData;
 };
