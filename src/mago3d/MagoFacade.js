@@ -241,15 +241,27 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
  * @return
  */
 function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
-	var message = 	" project = " + projectId + "\n"
-					+ " blockId = " + blockId + "\n"
-					+ " latitude = " + latitude + "\n"
-					+ " longitude = " + longitude + "\n"
-					+ " elevation = " + elevation + "\n"
-					+ " heading = " + heading + "\n"
-					+ " pitch = " + pitch + "\n"
-					+ " roll = " + roll;
-	alert(message);
+//	var message = 	" project = " + projectId + "\n"
+//					+ " blockId = " + blockId + "\n"
+//					+ " latitude = " + latitude + "\n"
+//					+ " longitude = " + longitude + "\n"
+//					+ " elevation = " + elevation + "\n"
+//					+ " heading = " + heading + "\n"
+//					+ " pitch = " + pitch + "\n"
+//					+ " roll = " + roll;
+	
+	$("#projectId").val(projectId);
+	$("#moveBlockId").val(blockId);
+	$("#latitude").val(latitude);
+	$("#longitude").val(longitude);
+	if(elevation === undefined) elevation = 0;
+	$("#elevation").val(elevation);
+	if(heading === undefined) heading = 0;
+	$("#heading").val(heading);
+	if(pitch === undefined) pitch = 0;
+	$("#pitch").val(pitch);
+	if(roll === undefined) roll = 0;
+	$("#roll").val(roll);
 }
 
 /**
