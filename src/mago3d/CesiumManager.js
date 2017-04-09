@@ -5547,7 +5547,7 @@ CesiumManager.prototype.highLightBuildings = function()
 	for(var i=0; i<highLightingBuildingsCount; i++)
 	{
 		var highLightedBuildingId = this.magoPolicy.highLightedBuildings[i];
-		var highLightedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, highLightedBuildingId);
+		var highLightedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, "testId_" + highLightedBuildingId.blockId);
 		if(highLightedBuilding)
 		{
 			highLightedBuilding.isHighLighted = true;
@@ -5574,6 +5574,14 @@ CesiumManager.prototype.renderModeChanged = function()
 	
 	}
 	
+}
+
+CesiumManager.prototype.policyColorChanged = function(projectAndBlockId)
+{
+	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
+	
+	var hola = 0;
 }
 
 /**
@@ -5929,7 +5937,8 @@ CesiumManager.prototype.callAPI = function(api) {
 		var rgbColor = api.getColor().split(",");
 		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
 		this.magoPolicy.setColor(rgbArray);
-		this.policyColorChanged();
+		var projectAndBlockId = projectId + "_" + blockIds[0];
+		this.policyColorChanged(projectAndBlockId);
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
