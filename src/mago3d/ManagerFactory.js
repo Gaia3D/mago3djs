@@ -107,7 +107,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 					
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
-			magoManager.mouseLeftDown = true;
+			magoManager.mouseMiddleDown = true;
 		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
 
 		magoManager.handler.setInputAction(function(movement) {
@@ -163,6 +163,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			} else{
 				magoManager.mouseDragging = false;
 				disableCameraMotion(true);
+				if(magoManager.mouseMiddleDown)
+				{
+					magoManager.isCameraMoving = true;
+				}
 			}
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
@@ -196,7 +200,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			//vm.pickedPolygon = false;
 			//disableCameraMotion(true)
 			magoManager.isCameraMoving = false;
-			magoManager.mouseLeftDown = false;
+			magoManager.mouseMiddleDown = false;
 			magoManager.mouseDragging = false;
 			magoManager.selObjMovePlane = undefined;
 			magoManager.mustCheckIfDragging = true;

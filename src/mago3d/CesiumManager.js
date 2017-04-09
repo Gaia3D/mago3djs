@@ -40,6 +40,7 @@ var CesiumManager = function() {
 	this.mouse_x = 0;
 	this.mouse_y = 0;
 	this.mouseLeftDown = false;
+	this.mouseMiddleDown = false;
 	this.mouseDragging = false;
 	this.selObjMovePlane;
 	
@@ -1522,7 +1523,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 //	var neoVisibleBuildingsArray = [];
 	
 	// do frustum culling.***
-	if(!this.isCameraMoving && !this.mouseLeftDown) 
+	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown) 
 	{
 		//var camera = scene.frameState.camera;
 		var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
@@ -5579,6 +5580,7 @@ CesiumManager.prototype.renderModeChanged = function()
 CesiumManager.prototype.policyColorChanged = function(projectAndBlockId)
 {
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
 	
 	
 	var hola = 0;
