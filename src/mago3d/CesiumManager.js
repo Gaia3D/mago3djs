@@ -2622,7 +2622,6 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 		
 		if(!this.thereAreStartMovePoint) {
 			this.startMovPoint = intersectionPoint;
-			//this.startMovPoint.add(-this.buildingSelected.moveVector.x, -this.buildingSelected.moveVector.y, -this.buildingSelected.moveVector.z);
 			this.thereAreStartMovePoint = true;
 		} else {
 			var difX = intersectionPoint.x - this.startMovPoint.x;
@@ -2643,6 +2642,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 			var newHeight = cartographic.height;
 			
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+			
 			var dividedName = this.buildingSelected.buildingId.split("_");
 			showLocationAndRotationAPI(	dividedName[0], 
 										dividedName[1], 
@@ -2920,8 +2920,8 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				}
 			}
 			
-			var squaredDistLod0 = 500;
-			var squaredDistLod1 = 4000;
+			var squaredDistLod0 = 300;
+			var squaredDistLod1 = 2000;
 			var squaredDistLod2 = 500000*1000;
 			if(this.renderingModeTemp == 1) {
 				squaredDistLod0 = 300;
@@ -5581,7 +5581,14 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId)
 {
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
 	
+	// 1rst, init colorChanged.***
+	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
+	for(var i=0; i<buildingsCount; i++)
+	{
+		this.neoBuildingsList.neoBuildings_Array[i].isColorChanged = false;
+	}
 	
+	neoBuilding.isColorChanged = true;
 	
 	var hola = 0;
 }
