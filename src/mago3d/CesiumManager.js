@@ -2384,7 +2384,8 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 		pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, pixelPos, pixelPosBuilding);
 	} else {
 		if(this.buildingSelected.geoLocationDataAux) {
-			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, pixelPos, pixelPosBuilding);
+			//pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, pixelPos, pixelPosBuilding);
+			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.geoLocMatrixInv._floatArrays, pixelPos, pixelPosBuilding);
 		} else {
 			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, pixelPos, pixelPosBuilding);
 		}
