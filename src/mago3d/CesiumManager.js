@@ -236,10 +236,8 @@ var CesiumManager = function() {
 //	this.loadObjectIndexFile = false;
 };
 
-// real time radiosity shader http://madebyevan.com/webgl-path-tracing/
-//http://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html // GOOD TUTORIALS !!!!!!!!!!!!!!!!!!!!!!!!!!!
 /**
- * 어떤 일을 하고 있습니까?
+ * noise texture를 생성
  * @param gl 변수
  * @param w 변수
  * @param h 변수
@@ -1629,7 +1627,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택된 object를 취득
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
@@ -1742,7 +1740,7 @@ CesiumManager.prototype.getSelectedObjectPicking = function(gl, scene, renderabl
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택된 object 를 asimetric mode로 취득
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
@@ -2089,7 +2087,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 카메라 공간의 ray를 취득
  * @param gl 변수
  * @param scene 변수
  * @param resultRay 변수
@@ -2115,7 +2113,7 @@ CesiumManager.prototype.getRayCamSpace = function(gl, scene, resultRay) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택된 object의 움직임 plane를 계산
  * @param gl 변수
  * @param cameraPosition 변수
  * @param scene 변수
@@ -2218,7 +2216,7 @@ CesiumManager.prototype.calculateSelObjMovePlane = function(gl, cameraPosition, 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택된 object의 움직임 plane를 계산하여 asimetric mode 로 취득
  * @param gl 변수
  * @param cameraPosition 변수
  * @param scene 변수
@@ -2429,7 +2427,7 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 	*/
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 카메라 motion 활성화
  * @param state 변수
  * @param scene 변수
  */	
@@ -2442,7 +2440,7 @@ CesiumManager.prototype.enableCameraMotion = function(state, scene) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * dragging 중인지 아닌지를 판단
  * @param gl 변수
  * @param scene 변수
  */
@@ -2482,7 +2480,7 @@ CesiumManager.prototype.isDragging = function(scene) {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택 객체를 움직임
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
@@ -2551,7 +2549,7 @@ CesiumManager.prototype.moveSelectedObject = function(scene, renderables_neoRefL
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
