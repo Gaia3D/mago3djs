@@ -1,6 +1,3 @@
-
-
-
 'use strict';
 
 /**
@@ -24,6 +21,12 @@ var Box = function() {
 	this.vBOVertexIdxCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 };
 
+/**
+ * axis aligned bounding box
+ * @param xLength
+ * @param yLength
+ * @param zLength
+ */
 Box.prototype.makeAABB = function(xLength, yLength, zLength)
 {
 	// this makes a box centered on the center of the box.***
