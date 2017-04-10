@@ -1606,7 +1606,10 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);  
 	
-	this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
+	if(this.magoPolicy.showShadow)
+	{
+		this.renderLowestOctreeLegoAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerOctrees);
+	}
 	this.depthFboNeo.unbind();
 	
 	// 2) ssao render.************************************************************************************************************
@@ -2384,7 +2387,8 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 		pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, pixelPos, pixelPosBuilding);
 	} else {
 		if(this.buildingSelected.geoLocationDataAux) {
-			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, pixelPos, pixelPosBuilding);
+			//pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.tMatrixInv._floatArrays, pixelPos, pixelPosBuilding); // original.***
+			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.geoLocationDataAux.geoLocMatrixInv._floatArrays, pixelPos, pixelPosBuilding);
 		} else {
 			pixelPosBuilding = Cesium.Matrix4.multiplyByPoint(this.buildingSelected.transfMat_inv, pixelPos, pixelPosBuilding);
 		}
