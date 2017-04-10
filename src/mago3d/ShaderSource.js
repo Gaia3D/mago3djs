@@ -391,7 +391,8 @@ ShaderSource.ssaoFsSource = "\n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
-		vec3 normal2 = normalize(vNormal);   \n\
+		//vec3 normal2 = normalize(vNormal);   \n\
+		vec3 normal2 = vNormal;   \n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -537,9 +538,9 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
 		if(vNormal.z < 0.0)\n\
 		{\n\
-			vNormal.x *= -1.0;\n\
-			vNormal.y *= -1.0;\n\
-			vNormal.z *= -1.0;\n\
+			//vNormal.x *= -1.0;\n\
+			//vNormal.y *= -1.0;\n\
+			//vNormal.z *= -1.0;\n\
 		}\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
@@ -901,7 +902,8 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
-		vec3 normal2 = normalize(vNormal);   \n\
+		//vec3 normal2 = normalize(vNormal);   \n\
+		vec3 normal2 = vNormal;   \n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1114,7 +1116,8 @@ ShaderSource.LegoSsaoFsSource = "\n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
-		vec3 normal2 = normalize(vNormal);   \n\
+		//vec3 normal2 = normalize(vNormal);   \n\
+		vec3 normal2 = vNormal;   \n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1412,7 +1415,8 @@ ShaderSource.boxSsaoFsSource = "\n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
-		vec3 normal2 = normalize(vNormal);   \n\
+		//vec3 normal2 = normalize(vNormal);   \n\
+		vec3 normal2 = vNormal;   \n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\

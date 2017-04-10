@@ -24,8 +24,8 @@ var GeoLocationData = function() {
 	this.bboxAbsoluteCenterPos;
 	
 	// F4D Matrix4.****
-	this.geoLocMatrix; // this is just the cartographic transformation matrix.***
-	this.geoLocMatrixInv; // this is just the cartographic transformation matrix.***
+	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
+	this.geoLocMatrixInv; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
 	this.tMatrix;      // this contains translation & rotations.***
 	this.tMatrixInv;   // this contains translation & rotations.***
 	this.rotMatrix;    // this contains only rotation.***
