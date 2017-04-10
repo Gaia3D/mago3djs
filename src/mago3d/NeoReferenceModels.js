@@ -540,6 +540,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		
 		var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 		var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+		neoRef.objectId = objectId;
 		bytes_readed += objectIdLength;
 		
 		// 2) Block's Idx.***

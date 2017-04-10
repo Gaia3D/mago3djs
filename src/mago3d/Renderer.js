@@ -484,7 +484,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				if(magoManager.objectSelected == neoReference) {
 					gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
 					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-				} else {
+				} 
+				else if(magoManager.magoPolicy.colorChangedObjectId == neoReference.objectId)
+				{
+					gl.uniform1i(standardShader.hasTexture_loc, false); //.***	
+					gl.uniform4fv(standardShader.color4Aux_loc, [magoManager.magoPolicy.color[0],magoManager.magoPolicy.color[1],magoManager.magoPolicy.color[2], 1.0]);
+				}
+				else 
+				{
 					//if(neoReference.texture != undefined && renderTexture)
 					if(renderTexture) {
 						if(neoReference.hasTexture) {

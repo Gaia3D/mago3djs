@@ -5575,7 +5575,7 @@ CesiumManager.prototype.renderModeChanged = function()
 	
 }
 
-CesiumManager.prototype.policyColorChanged = function(projectAndBlockId)
+CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 {
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
 	
@@ -5587,6 +5587,7 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId)
 	}
 	
 	neoBuilding.isColorChanged = true;
+	this.magoPolicy.colorChangedObjectId = objectId;
 	
 	var hola = 0;
 }
@@ -5931,12 +5932,18 @@ CesiumManager.prototype.callAPI = function(api) {
 			isExistObjectIds = true;
 		}
 		var colorBuilds = [];
+		var firstObjectId;
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
 			projectLayer.setBlockId(blockIds[i].trim());
-			if(isExistObjectIds) projectLayer.setObjectId(objectIds[i].trim());
-			else projectLayer.setObjectId(null);
+			if(isExistObjectIds) 
+			{
+				projectLayer.setObjectId(objectIds[i].trim());
+				objectIds = objectIds[0];
+			}
+			else
+				projectLayer.setObjectId(null);
 			colorBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
@@ -5945,7 +5952,7 @@ CesiumManager.prototype.callAPI = function(api) {
 		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
 		this.magoPolicy.setColor(rgbArray);
 		var projectAndBlockId = projectId + "_" + blockIds[0];
-		this.policyColorChanged(projectAndBlockId);
+		this.policyColorChanged(projectAndBlockId, objectIds);
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
