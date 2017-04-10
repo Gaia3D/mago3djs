@@ -602,8 +602,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
-		//vec3 normal2 = normalize(vNormal);   \n\
-		vec3 normal2 = vNormal;   \n\
+		vec3 normal2 = normalize(vNormal);   \n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
