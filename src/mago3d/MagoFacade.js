@@ -200,7 +200,7 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 }
 
 /**
- * lcation and rotation 변경
+ * location and rotation 변경
  * 
  * @param projectId 프로젝트 아이디
  * @param blockId block id
@@ -228,7 +228,37 @@ function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, e
 }
 
 /**
- * block 이동된 후 lcation and rotation 알림
+ * 블럭의 location and rotation 정보를 취득
+ * TODO 기능 정의가 명확히 되지 않아 return 값을 현재의 계층 구조를 임시로 유지
+ * 
+ * @param projectId 프로젝트 아이디
+ * @param blockId block id
+ * @return building
+ */
+function getLocationAndRotationAPI(projectId, blockId) {
+	
+//	// 호출하는 블럭이 frustum culling 안에 있을 경우.
+//	var building = getLocationAndRotationAPI("testId", "F110T");
+//	if(building.geoLocationDataAux !== undefined) {
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.latitude);
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.longitude);
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.elevation);
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.heading);
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.pitch);
+//		console.log("@@@@@@@@@@@@@@@@" + building.geoLocationDataAux.roll);
+//	}
+	
+	var api = new API("getLocationAndRotation");
+	api.setProjectId(projectId);
+	api.setBlockId(blockId);
+	if(managerFactory != null) {
+		var building = managerFactory.callAPI(api);
+		return building;
+	}
+}
+
+/**
+ * block 이동된 후 location and rotation 알림
  * 
  * @param projectId 프로젝트 아이디
  * @param blockId block id
