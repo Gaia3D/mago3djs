@@ -32,6 +32,9 @@ var Policy = function() {
 	
 	// 0 = block mode, 1 = object mode
 	this.mouseMoveMode = 0;
+	
+	// provisional.***
+	this.colorChangedObjectId;
 };
 
 Policy.prototype.getMagoEnable = function() {
