@@ -376,6 +376,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	
 	gl.enable(gl.CULL_FACE);
 	//gl.disable(gl.CULL_FACE);
+	
+	gl.frontFace(gl.CCW);
 		
 	//if(ssao_idx == 0)
 	//	gl.disable(gl.CULL_FACE);
