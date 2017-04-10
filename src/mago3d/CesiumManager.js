@@ -5055,7 +5055,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.x = realBuildingPos.x;
 					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
 					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
-					
 				} 
 				else 
 				{
@@ -5965,6 +5964,8 @@ CesiumManager.prototype.callAPI = function(api) {
 							parseFloat(api.getHeading()), 
 							parseFloat(api.getPitch()), 
 							parseFloat(api.getRoll()));
+	} else if(apiName === "getLocationAndRotation") {
+		return this.neoBuildingsList.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
 	} else if(apiName === "changeMouseMove") {
 		this.magoPolicy.setMouseMoveMode(api.getMouseMoveMode());
 	}

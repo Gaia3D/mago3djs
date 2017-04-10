@@ -304,7 +304,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	return {
 		// api gateway 역할
 		callAPI : function(api) {
-			magoManager.callAPI(api);
+			var result = magoManager.callAPI(api);
+			if(api.getAPIName() === "getLocationAndRotation") {
+				return result;
+			}
 		},
 		// 초기화 api
 		init : function() {
