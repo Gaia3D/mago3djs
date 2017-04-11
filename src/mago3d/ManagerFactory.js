@@ -220,6 +220,100 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
 	}
 	
+	// KeyPressEvents.**************************************
+	document.addEventListener('keydown', function(e) {
+		setKey(e);
+	}, false);
+	
+	function setKey(event) {
+		var increDeg = 3.0;
+		if (event.key === "q" || event.key === "Q") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					currentHeading+increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
+				}
+			}
+			
+		}
+		else if (event.key === "a" || event.key === "A") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					currentHeading-increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
+				}
+			}
+			
+		}
+		else if (event.key === "w" || event.key === "W") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					selectedBuilding.geoLocationDataAux.heading, currentPitch+increDeg, selectedBuilding.geoLocationDataAux.roll);
+				}
+			}
+			
+		}
+		else if (event.key === "s" || event.key === "S") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					selectedBuilding.geoLocationDataAux.heading, currentPitch-increDeg, selectedBuilding.geoLocationDataAux.roll);
+				}
+			}
+			
+		}
+		else if (event.key === "e" || event.key === "E") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll+increDeg);
+				}
+			}
+			
+		}
+		else if (event.key === "d" || event.key === "D") {  // right arrow 
+			// get current building selected.***
+			var selectedBuilding = magoManager.buildingSelected;
+			if(selectedBuilding != undefined)
+			{
+				if(selectedBuilding.geoLocationDataAux != undefined)
+				{
+					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll-increDeg);
+				}
+			}
+			
+		}
+	}
+
+	
 	// world wind 구현체를 이용
 	function drawWorldWind() {
 	}

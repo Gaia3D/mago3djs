@@ -2641,7 +2641,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 			var newHeight = cartographic.height;
 			
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
-			
+			/*
 			var dividedName = this.buildingSelected.buildingId.split("_");
 			showLocationAndRotationAPI(	dividedName[0], 
 										dividedName[1], 
@@ -2651,6 +2651,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 										this.buildingSelected.geoLocationDataAux.heading,
 										this.buildingSelected.geoLocationDataAux.pitch,
 										this.buildingSelected.geoLocationDataAux.roll);
+										*/
 		}
 		
 	}
@@ -5602,6 +5603,8 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 		return;
 	
 	neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuilding.geoLocationDataAux);
+	if(neoBuilding.geoLocationDataAux == undefined)
+		return;
 	
 	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 	this.pointSC_2.x = -this.pointSC.x;
@@ -5649,6 +5652,16 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 		lowestOctreesArray = undefined;
 	}
 	
+	var dividedName = neoBuilding.buildingId.split("_");
+	showLocationAndRotationAPI(	dividedName[0], 
+								dividedName[1], 
+								neoBuilding.geoLocationDataAux.latitude, 
+								neoBuilding.geoLocationDataAux.longitude,
+								neoBuilding.geoLocationDataAux.elevation,
+								neoBuilding.geoLocationDataAux.heading,
+								neoBuilding.geoLocationDataAux.pitch,
+								neoBuilding.geoLocationDataAux.roll);
+	
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
@@ -5659,6 +5672,8 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	
 	// "longitude", "latitude" and "elevation" is from the structure block.***
 	neoBuildingOutffiting.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuildingOutffiting.geoLocationDataAux);
+	if(neoBuildingOutffiting.geoLocationDataAux == undefined)
+		return;
 	
 	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC); // the centerpoint is taken from structure block.***
 	this.pointSC_2.x = -this.pointSC.x;

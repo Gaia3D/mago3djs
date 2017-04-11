@@ -64,14 +64,15 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) {
 	
-	if(longitude == undefined || latitude == undefined)
-		return;
-	
 	if(resultGeoLocationData == undefined) resultGeoLocationData = new GeoLocationData();
 	
 	// 0) Position.********************************************************************************************
-	resultGeoLocationData.longitude = longitude;
-	resultGeoLocationData.latitude = latitude;
+
+	if(longitude != undefined)
+		resultGeoLocationData.longitude = longitude;
+	
+	if(latitude != undefined)
+		resultGeoLocationData.latitude = latitude;
 	
 	if(altitude != undefined)
 		resultGeoLocationData.elevation = altitude;
@@ -84,6 +85,9 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	
 	if(roll != undefined)
 		resultGeoLocationData.roll = roll;
+	
+	if(resultGeoLocationData.longitude == undefined || resultGeoLocationData.latitude == undefined)
+		return;
 	
 	resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.longitude, resultGeoLocationData.latitude, resultGeoLocationData.elevation);
 	
