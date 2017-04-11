@@ -3472,6 +3472,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 		var frustum = camera.frustum;
 //		var current_frustum_near = scene._context._us._currentFrustum.x;
 		var current_frustum_far = scene._context._us._currentFrustum.y;
+		if(current_frustum_far > 5000000)current_frustum_far = 5000000;
 		var currentShader;
 		var shaderProgram;
 		var neoBuilding;
