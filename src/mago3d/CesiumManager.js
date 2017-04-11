@@ -1528,8 +1528,9 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 
-			this.myCameraSC.near = scene._frustumCommandsList[this.frustumIdx].near;
+		this.myCameraSC.near = scene._frustumCommandsList[this.frustumIdx].near;
 		this.myCameraSC.far = scene._frustumCommandsList[this.frustumIdx].far;
+		this.myCameraSC.frustum.fov = scene._camera.frustum.fov;
 		var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up);
 		//var frustumVolume = scene._frameState.cullingVolume; // original.***
 		//var frustumVolume = scene._camera.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up); // original.***
