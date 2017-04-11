@@ -1528,10 +1528,13 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 
-		this.myCameraSC.near = scene._frustumCommandsList[this.frustumIdx].near;
-		this.myCameraSC.far = scene._frustumCommandsList[this.frustumIdx].far;
+		//this.myCameraSC.near = scene._frustumCommandsList[this.frustumIdx].near;
+		//this.myCameraSC.far = scene._frustumCommandsList[this.frustumIdx].far;
+		this.myCameraSC.near = scene._context._us._currentFrustum.x;
+		this.myCameraSC.far = scene._context._us._currentFrustum.y;
 		this.myCameraSC.frustum.fov = scene._camera.frustum.fov;
 		var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up);
+		
 		//var frustumVolume = scene._frameState.cullingVolume; // original.***
 		//var frustumVolume = scene._camera.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up); // original.***
 		this.currentVisibleNeoBuildings_array.length = 0;
@@ -3473,8 +3476,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 		var camera = this.scene._camera;
 		var frustum = camera.frustum;
 //		var current_frustum_near = scene._context._us._currentFrustum.x;
-		var current_frustum_far = scene._context._us._currentFrustum.y;
-		//var current_frustum_far = scene._frustumCommandsList[this.frustumIdx].far;
+		//var current_frustum_far = scene._context._us._currentFrustum.y;
+		var current_frustum_far = scene._frustumCommandsList[0].far;//this.frustumIdx
 		//if(current_frustum_far > 5000000)current_frustum_far = 5000000;
 		var currentShader;
 		var shaderProgram;
