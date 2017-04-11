@@ -20,7 +20,7 @@ var Server = require('karma').Server;
 
 var paths = {
 	data : './data',
-	source_js : [ './src/mago3d/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js' ],
+	source_js : [ './src/mago3d/*.js', './src/mago3d/*/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js' ],
 //	source_images : './images/*',
 //	source_css : './src/css/*',
 	dest_js : './build/mago3d',
