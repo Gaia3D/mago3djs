@@ -1,4 +1,12 @@
 ﻿ * 해야 할 목록
+  
+timeline 삭제
+  
+$(viewer._animation.container).css('visibility', 'visible');
+$(viewer._timeline.container).css('visibility', 'visible');
+viewer.forceResize();
+visible -> hidden 
+  
 
 1 디랙토리 구조
  1) 3d_data
