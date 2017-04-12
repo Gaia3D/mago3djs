@@ -1,0 +1,62 @@
+
+$(viewer._animation.container).css('visibility', 'hidden'); 
+        $(viewer._timeline.container).css('visibility', 'hidden'); 
+        viewer.forceResize();
+
+.divWrap {position: absolute; top: 5px;left: 5px; z-index: 9999}
+
+.divBusinessPlaceIcon {position: absolute; top: 55px;right: 95px;  z-index: 9999}
+.divRightIcon {position: absolute; top: 140px;right: 5px;}
+
+.toolbars {
+    background: rgba(42, 42, 42, 0.8);
+    border-radius: 4px;
+    margin: 10px 0px 0px 0px;
+    font-size:14px;
+    color:white;
+    width:327px;
+    padding:10px;
+    position: relative;
+}
+.toolbars.hide {
+    margin-top:10px;
+    display:none;
+    padding:7px;
+}
+
+
+<div id="divToolbar5Hide" class="toolbars hide" style="cursor: pointer;" onclick='doSearchBoxOpen("divToolbar5");return false;'>
+            <span class="glyphicon glyphicon-tasks" style='vertical-align: middle;font-size:24px'></span>
+            <span class="btnSmall">테스트</span>            
+        </div>
+
+		 <div class="divWrap" id="divWrap">
+			<div id="divToolbar5" class="toolbars">
+	        	<a href="#" onclick='doSearchBoxClose("divToolbar5");return false;' style="position: absolute;top:-10px;right:-15px;">
+	                
+	            </a>
+				<div class="mb5">
+	                <div style="width:100px;display: inline-block;">Mago3d</div>
+	                	<input type="radio" id="magoEnable" name="magoState" value="0" checked="checked" onclick="changeMagoState(true);" class="commonElementBG" />
+						<label for="magoEnable"> 활성 </label>&nbsp;&nbsp;
+						<input type="radio" id="magoDisable" name="magoState" value="1" onclick="changeMagoState(false);" class="commonElementBG" />
+						<label for="magoDisable"> 비활성 </label>
+	            </div>
+	            <div>test</div>
+	            <div>test</div>
+	            <div>test</div>
+	            <div>test</div>
+			</div>
+		</div>
+		
+		<div class="divBusinessPlaceIcon" id="divBusinessPlaceIcon">
+			<button type="button" class="cesium-button cesium-toolbar-button" id="btnBusinessPlaceIconGJ">
+            	우리집
+        	</button>
+        </div>
+        
+        <div class="divRightIcon" id="divBusinessPlaceIcon">
+			<button type="button" class="cesium-button cesium-toolbar-button" id="btnBusinessPlaceIconGJ">
+            	GT
+        	</button>
+        </div>
