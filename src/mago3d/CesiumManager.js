@@ -5555,7 +5555,7 @@ CesiumManager.prototype.highLightBuildings = function()
 	for(var i=0; i<highLightingBuildingsCount; i++)
 	{
 		var highLightedBuildingId = this.magoPolicy.highLightedBuildings[i];
-		var highLightedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, "testId_" + highLightedBuildingId.blockId);
+		var highLightedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, highLightedBuildingId.projectId + "_" + highLightedBuildingId.blockId);
 		if(highLightedBuilding)
 		{
 			highLightedBuilding.isHighLighted = true;
