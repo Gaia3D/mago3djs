@@ -1524,7 +1524,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown) 
 	{
 		//var camera = scene.frameState.camera;
-		var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
+		//var cameraModev = this.isCameraMoved(cameraPosition, 1.0);
 		
 		if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 
@@ -1543,7 +1543,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 			//this.neoBuildingsList.setNeoBuildingsFrustumCulled(false);
 		}
 		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
-		//this.doFrustumCullingNeoBuildings(myCullingVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
 		this.prepareNeoBuildingsAsimetricVersion(gl);
 	}
 	
@@ -5022,47 +5021,28 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					var longitude;
 					var latitude;
 					var elevation;
+					var heading, pitc, roll;
 					
 					if(structureTypedBuilding.geoLocationDataAux)
 					{
 						longitude = structureTypedBuilding.geoLocationDataAux.longitude;
 						latitude = structureTypedBuilding.geoLocationDataAux.latitude;
 						elevation = structureTypedBuilding.geoLocationDataAux.elevation;
+						heading = structureTypedBuilding.geoLocationDataAux.heading;
+						pitch = structureTypedBuilding.geoLocationDataAux.pitch;
+						roll = structureTypedBuilding.geoLocationDataAux.roll;
 					}
 					else
 					{
 						longitude = newLocation.LONGITUDE;
 						latitude = newLocation.LATITUDE;
 						elevation = newLocation.ELEVATION;
+						heading = newLocation.HEADING;
+						pitch = newLocation.PITCH;
+						roll = newLocation.ROLL;
 					}
 
-					//neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, structureTypedBuilding.geoLocationDataAux);
-					neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuilding.geoLocationDataAux);
-
-					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-
-					var traslationVector;
-					realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-					traslationVector = neoBuilding.geoLocationDataAux.tMatrix.rotatePoint3D(this.pointSC_2, traslationVector );
-					neoBuilding.geoLocationDataAux.position.x += traslationVector.x;
-					neoBuilding.geoLocationDataAux.position.y += traslationVector.y;
-					neoBuilding.geoLocationDataAux.position.z += traslationVector.z;
-					//neoBuilding.geoLocationDataAux.positionHIGH;
-					neoBuilding.geoLocationDataAux.aditionalTraslation = traslationVector;
-					neoBuilding.geoLocationDataAux.positionLOW[0] += traslationVector.x;
-					neoBuilding.geoLocationDataAux.positionLOW[1] += traslationVector.y;
-					neoBuilding.geoLocationDataAux.positionLOW[2] += traslationVector.z;
-					
-					realBuildingPos.x += traslationVector.x;
-					realBuildingPos.y += traslationVector.y;
-					realBuildingPos.z += traslationVector.z;
-					
-					if(neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos == undefined)
-						neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos = new Point3D();
-					
-					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.x = realBuildingPos.x;
-					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.y = realBuildingPos.y;
-					neoBuilding.geoLocationDataAux.bboxAbsoluteCenterPos.z = realBuildingPos.z;
+					this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, elevation, heading, pitch, roll);
 				} 
 				else 
 				{
