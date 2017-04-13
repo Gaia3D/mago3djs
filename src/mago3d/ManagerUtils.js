@@ -181,6 +181,51 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	return resultGeoLocationData;
 };
 
+ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
+{
+	if(resultSplitValue == undefined)
+		resultSplitValue = new SplitValue();
+	
+	var doubleHigh;
+	if (value >= 0.0) {
+		doubleHigh = Math.floor(value / 65536.0) * 65536.0;
+		resultSplitValue.high = doubleHigh;
+		resultSplitValue.low = value - doubleHigh;
+	} else {
+		doubleHigh = Math.floor(-value / 65536.0) * 65536.0;
+		resultSplitValue.high = -doubleHigh;
+		resultSplitValue.low = value + doubleHigh;
+	}
+
+	return resultSplitValue;
+};
+
+ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, resultSplitPoint3fvLow)
+{
+	if(point3fv == undefined)
+		return undefined;
+	
+	if(resultSplitPoint3fvHigh == undefined)
+		resultSplitPoint3fvHigh = new Float32Array(3);
+	
+	if(resultSplitPoint3fvLow == undefined)
+		resultSplitPoint3fvLow = new Float32Array(3);
+	
+	var posSplitX = new SplitValue();
+	posSplitX = this.calculateSplitedValues(point3fv[0], posSplitX);
+	var posSplitY = new SplitValue();
+	posSplitY = this.calculateSplitedValues(point3fv[1], posSplitY);
+	var posSplitZ = new SplitValue();
+	posSplitZ = this.calculateSplitedValues(point3fv[2], posSplitZ);
+	
+	resultSplitPoint3fvHigh[0] = posSplitX.high;
+	resultSplitPoint3fvHigh[1] = posSplitY.high;
+	resultSplitPoint3fvHigh[2] = posSplitZ.high;
+	
+	resultSplitPoint3fvLow[0] = posSplitX.low;
+	resultSplitPoint3fvLow[1] = posSplitY.low;
+	resultSplitPoint3fvLow[2] = posSplitZ.low;
+};
 
 ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) {
 	// renderingMode = 0 => assembled.***

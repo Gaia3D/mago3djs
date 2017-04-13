@@ -96,15 +96,16 @@ var CesiumManager = function() {
 	this.atmosphere = new Atmosphere();
 	
 	// Vars.****************************************************************
-	this.modelViewProjRelToEye_matrix = new Float32Array(16);
-	this.modelViewRelToEye_matrix = new Float32Array(16);
-	this.modelView_matrix = new Float32Array(16);
-	this.projection_matrix = new Float32Array(16);
-	this.normalMat3 = new Cesium.Matrix3();
-	this.normalMat3_array = new Float32Array(9);
-	this.normalMat4 = new Cesium.Matrix4();
-	this.normalMat4_array = new Float32Array(16);
-	this.mvMatInv = new Cesium.Matrix4();
+	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
+	this.modelViewProjRelToEye_matrix = new Float32Array(16); // old.***
+	this.modelViewRelToEye_matrix = new Float32Array(16); // old.***
+	this.modelView_matrix = new Float32Array(16); // old.***
+	this.projection_matrix = new Float32Array(16); // old.***
+	this.normalMat3 = new Cesium.Matrix3(); // old.***
+	this.normalMat3_array = new Float32Array(9); // old.***
+	this.normalMat4 = new Cesium.Matrix4(); // old.***
+	this.normalMat4_array = new Float32Array(16); // old.***
+	this.mvMatInv = new Cesium.Matrix4(); // old.***
 	
 	this.currentVisible_terranTiles_array = [];
 	this.currentVisibleBuildings_array = []; // delete this.***
@@ -761,7 +762,7 @@ CesiumManager.prototype.calculateEncodedCameraPositionMCHighLow = function(encod
 	
 	encodedCamPosMC_High[0] = camSplitVelue_X.high;
 	encodedCamPosMC_High[1] = camSplitVelue_Y.high;
-	this.encodedCamPosMC_High[2] = camSplitVelue_Z.high;
+	encodedCamPosMC_High[2] = camSplitVelue_Z.high;
   
 	encodedCamPosMC_Low[0] = camSplitVelue_X.low;
 	encodedCamPosMC_Low[1] = camSplitVelue_Y.low;
@@ -1105,6 +1106,31 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
 		}
 	}
 };
+
+/**
+ * ??
+ * @param scene 변수
+ * @param isLastFrustum 변수
+ */
+CesiumManager.prototype.upDateSceneState = function(sceneState) {
+	// here updates the modelView and modelViewProjection matrices of the scene.***
+	
+	// * if this is in Cesium:
+	var scene = this.scene;
+	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays); 
+	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays); 
+	Cesium.Matrix4.toArray(scene._context._us._modelView, sceneState.modelViewMatrix._floatArrays); 
+	Cesium.Matrix4.toArray(scene._context._us._projection, sceneState.projectionMatrix._floatArrays); 
+	
+	var cameraPosition = scene.context._us._cameraPosition;
+	ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z] ,sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
+	
+	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, sceneState.modelViewMatrixInv._floatArrays);
+	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);
+
+	// * else if this is in WebWorldWind:
+	// TODO:
+}
 
 /**
  * object index 파일을 읽어서 Frustum Culling으로 화면에 rendering
@@ -1546,16 +1572,8 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.prepareNeoBuildingsAsimetricVersion(gl);
 	}
 	
-	
-	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
-	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix); 
-	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.*** 
-	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix); 
-	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix); 
-	//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
-
-	// Calculate encodedCamPosMC high and low values.********************************************************
-	this.calculateEncodedCameraPositionMCHighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
+	// update the matrices of the scene and the camera position.***
+	this.upDateSceneState(this.sceneState);
 	
 	// Normal matrix.********************************************************************
 	this.mvMatInv = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, this.mvMatInv);
@@ -1885,9 +1903,9 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	//gl.enableVertexAttribArray(currentShader.normal3_loc);
 
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 	
 	// 1) LOD 0.*********************************************************************************************************************
 	// 1) LOD 0.*********************************************************************************************************************
@@ -2260,10 +2278,10 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 		gl.enableVertexAttribArray(currentShader.position3_loc);
 		//gl.enableVertexAttribArray(currentShader.normal3_loc);
 
-		gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-		gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+		gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+		gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); 
+		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 		var idxKeyMatrix = -1;
 		if(this.renderingModeTemp == 0) {
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.buildingSelected.buildingPositionHIGH);
@@ -2317,18 +2335,14 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 					gl.useProgram(shaderProgram);
 					gl.enableVertexAttribArray(currentShader.position3_loc);
 
-					gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-					gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-					gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-					gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-					gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-					gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+					gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+					gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); 
+					gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+					gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+					gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 					
 					gl.uniform1f(currentShader.near_loc, current_frustum_near);		
 					gl.uniform1f(currentShader.far_loc, current_frustum_far); 
-					
-					gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-					gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
 					
 					gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 					gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
@@ -3501,18 +3515,18 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			if(currentShader.normal3_loc != -1)
 				gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+			
+			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
 			gl.uniform1f(currentShader.near_loc, frustum._near);	
 			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
 
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 			
 			//neoBuilding.setRenderedFalseToAllReferences();
 			var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
@@ -3652,18 +3666,17 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.useProgram(shaderProgram);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-			
-			gl.uniform1f(currentShader.near_loc, frustum._near);		
+			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+
+			gl.uniform1f(currentShader.near_loc, frustum._near);	
 			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
-			
-			gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+
+			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 			
 			gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
@@ -3752,18 +3765,18 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			if(currentShader.normal3_loc != -1) gl.enableVertexAttribArray(currentShader.normal3_loc);
 
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
+			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
 			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			//gl.uniform1f(currentShader.far_loc, frustum._far); // Original.***
-			gl.uniform1f(currentShader.far_loc, current_frustum_far); // test.***	
-			
-			gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+
+			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
+			//--------------------------------------------------------------------------------------------------------------
 				
 			gl.uniform1i(currentShader.depthTex_loc, 0);	
 			gl.uniform1i(currentShader.noiseTex_loc, 1);	
@@ -3915,20 +3928,19 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			gl.enableVertexAttribArray(currentShader.color4_loc);
-
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+			
+			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
 			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			//gl.uniform1f(currentShader.far_loc, frustum._far);	
 			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
-			
-			gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+
+			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
+			//-----------------------------------------------------------------------------------------------------
 			gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
 			
@@ -4018,19 +4030,19 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.enableVertexAttribArray(currentShader.normal3_loc);
 				gl.disableVertexAttribArray(currentShader.color4_loc);
 
-				gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-				gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-				gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-				gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
+				gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+				gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+				gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+				gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
 				gl.uniform1f(currentShader.near_loc, frustum._near);	
-				//gl.uniform1f(currentShader.far_loc, frustum._far);	
 				gl.uniform1f(currentShader.far_loc, current_frustum_far); 
-				
-				gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-				gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
+
+				gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
+				//-----------------------------------------------------------------------------------------------------------
+			
 				gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 				gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***	
 				gl.uniform1i(currentShader.bScale_loc, true);
