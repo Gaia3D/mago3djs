@@ -97,15 +97,6 @@ var CesiumManager = function() {
 	
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
-	this.modelViewProjRelToEye_matrix = new Float32Array(16); // old.***
-	this.modelViewRelToEye_matrix = new Float32Array(16); // old.***
-	this.modelView_matrix = new Float32Array(16); // old.***
-	this.projection_matrix = new Float32Array(16); // old.***
-	this.normalMat3 = new Cesium.Matrix3(); // old.***
-	this.normalMat3_array = new Float32Array(9); // old.***
-	this.normalMat4 = new Cesium.Matrix4(); // old.***
-	this.normalMat4_array = new Float32Array(16); // old.***
-	this.mvMatInv = new Cesium.Matrix4(); // old.***
 	
 	this.currentVisible_terranTiles_array = [];
 	this.currentVisibleBuildings_array = []; // delete this.***
@@ -131,9 +122,6 @@ var CesiumManager = function() {
 	
 	this.lastCamPos = new Point3D();
 	this.squareDistUmbral = 22.0;
-	
-	this.encodedCamPosMC_High = new Float32Array(3);
-	this.encodedCamPosMC_Low = new Float32Array(3);
 	
 	this.compRefList_array;
 	this.compRefList_array_background;
@@ -1112,7 +1100,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
  * @param scene 변수
  * @param isLastFrustum 변수
  */
-CesiumManager.prototype.upDateSceneState = function(sceneState) {
+CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 	// here updates the modelView and modelViewProjection matrices of the scene.***
 	
 	// * if this is in Cesium:
@@ -1127,6 +1115,13 @@ CesiumManager.prototype.upDateSceneState = function(sceneState) {
 	
 	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, sceneState.modelViewMatrixInv._floatArrays);
 	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);
+	
+	//sceneState.camera.frustum.far[0] = scene._context._us._currentFrustum.y;
+	sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far;
+	sceneState.camera.frustum.near[0] = scene._frustumCommandsList[0].near;
+	sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
+	sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
+	sceneState.camera.frustum.aspectRatio = scene._camera.frustum._aspectRatio;
 
 	// * else if this is in WebWorldWind:
 	// TODO:
@@ -1172,12 +1167,6 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 	} else {
 		this.detailed_neoBuilding = undefined;
 	}
-	
-	//if(!this.isCameraMoving)
-	//{
-	//	this.currentRenderables_neoRefLists_array.length = 0;
-	//	this.getRenderablesDetailedNeoBuilding(gl, scene, this.detailed_neoBuilding , this.currentRenderables_neoRefLists_array);
-	//}
 
 	if(this.bPicking == true) {
 		this.objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array);
@@ -1544,8 +1533,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	
 	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
 	
-//	var neoVisibleBuildingsArray = [];
-	
 	// do frustum culling.***
 	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown) 
 	{
@@ -1573,17 +1560,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	}
 	
 	// update the matrices of the scene and the camera position.***
-	this.upDateSceneState(this.sceneState);
-	
-	// Normal matrix.********************************************************************
-	this.mvMatInv = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, this.mvMatInv);
-	//var normalMat = new Cesium.Matrix4();
-	this.normalMat4 = Cesium.Matrix4.transpose(this.mvMatInv, this.normalMat4);// Original.***
-	//this.normalMat4 = Cesium.Matrix4.clone(this.mvMatInv, this.normalMat4);
-	this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
-
-	//Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array); 
-	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array); 
+	this.upDateSceneStateMatrices(this.sceneState);
 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
@@ -3481,17 +3458,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 	} else {
 	
 		var isInterior = false; // no used.***
-		// Render Detailed.****************************************************************************************************************************************
-		//this.renderer.renderNeoRefListsAsimetricVersion(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
-		//return;
-		// End render detailed.------------------------------------------------------------------------------------------------------------------------------------
-		
-		var camera = this.scene._camera;
-		var frustum = camera.frustum;
-//		var current_frustum_near = scene._context._us._currentFrustum.x;
-		//var current_frustum_far = scene._context._us._currentFrustum.y;
-		var current_frustum_far = scene._frustumCommandsList[0].far;//this.frustumIdx
-		//if(current_frustum_far > 5000000)current_frustum_far = 5000000;
+
 		var currentShader;
 		var shaderProgram;
 		var neoBuilding;
@@ -3523,8 +3490,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
-			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);	
+			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far); 
 
 			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 			
@@ -3647,10 +3614,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						refTMatrixIdxKey = -1;
 					}
 				}
-				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
-				//this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, neoBuilding.currentRenderablesNeoRefLists);
+
 				if(i == 0)
 					minSize = 0.9;
 				else minSize = 0.9;
@@ -3673,8 +3637,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
-			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);	
+			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far); 
 
 			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 			
@@ -3739,9 +3703,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
-				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 				
 				this.renderer.renderLodBuilding(gl, lowestOctree.lego, this, currentShader, ssao_idx);
 				
@@ -3771,20 +3732,19 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
 			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-
-			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
-
 			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
-			//--------------------------------------------------------------------------------------------------------------
-				
+			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);	
+			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far); 
+
+			gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
+			gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);	
+			gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+			gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
+			
 			gl.uniform1i(currentShader.depthTex_loc, 0);	
 			gl.uniform1i(currentShader.noiseTex_loc, 1);	
 			gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-			gl.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-			gl.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
-			gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
-			gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
+			
 			gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);	
 			gl.uniform3fv(currentShader.kernel16_loc, this.kernel);	
 			gl.activeTexture(gl.TEXTURE0);
@@ -3936,8 +3896,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
-			gl.uniform1f(currentShader.near_loc, frustum._near);	
-			gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);	
+			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far); 
 
 			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 			//-----------------------------------------------------------------------------------------------------
@@ -3947,8 +3907,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.uniform1i(currentShader.depthTex_loc, 0);	
 			gl.uniform1i(currentShader.noiseTex_loc, 1);	
 			gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-			gl.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-			gl.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
+			gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
+			gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);	
 			gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
 			gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
 		
@@ -4006,9 +3966,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 					}
 				}
-				//gl.uniformMatrix4fv(currentShader.buildingRotMatrix, false, neoBuilding.move_matrix);
-				//gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.buildingPositionHIGH);
-				//gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.buildingPositionLOW);
 
 				if(lowestOctree.lego == undefined) {
 					continue;
@@ -4037,8 +3994,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 
-				gl.uniform1f(currentShader.near_loc, frustum._near);	
-				gl.uniform1f(currentShader.far_loc, current_frustum_far); 
+				gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);	
+				gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far); 
 
 				gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
 				//-----------------------------------------------------------------------------------------------------------
@@ -4053,8 +4010,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				gl.uniform1i(currentShader.depthTex_loc, 0);	
 				gl.uniform1i(currentShader.noiseTex_loc, 1);	
 				gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-				gl.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-				gl.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);	
+				gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
+				gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);	
 				gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
 				gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
 			

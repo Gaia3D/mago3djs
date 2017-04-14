@@ -12,6 +12,6 @@ var Camera = function() {
 	this.position = new Point3D();
 	this.direction = new Point3D();
 	this.up = new Point3D();
+	this.frustum = new Frustum();
 	
-	// TODO: camera fov, fovy, near, far, etc.***
 };
