@@ -21,4 +21,7 @@ var SceneState = function() {
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);
 	
+	this.camera = new Camera();
+	
+	
 };

@@ -8,7 +8,7 @@ var GeoLocationData = function() {
 	if(!(this instanceof GeoLocationData)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	this.name = "noName";
 	this.longitude; 
 	this.latitude;
 	this.elevation;
@@ -30,7 +30,6 @@ var GeoLocationData = function() {
 	this.tMatrixInv;   // this contains translation & rotations.***
 	this.rotMatrix;    // this contains only rotation.***
 	this.rotMatrixInv; // this contains only rotation.***
-	
 	
 	// Aditional.***
 	this.aditionalTraslation;
@@ -65,4 +64,5 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 	pointAux = undefined;
 	
 	return resultCamera;
-}
+};
+
