@@ -16,6 +16,10 @@ var MetaData = function() {
 	this.longitude;
 	this.altitude;
 	
+	this.heading;
+	this.pitch;
+	this.roll;
+	
 	this.bbox; // BoundingBox.***
 	this.imageLodCount;
 	

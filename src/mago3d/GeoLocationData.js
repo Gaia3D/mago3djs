@@ -4,23 +4,26 @@
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  */
-var GeoLocationData = function() {
+var GeoLocationData = function(geoLocationDataName) {
 	if(!(this instanceof GeoLocationData)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	this.name = "noName";
+	if(geoLocationDataName == undefined)
+		this.name = "noName";
+	else
+		this.name = geoLocationDataName;
 	this.longitude; 
 	this.latitude;
 	this.elevation;
-	
-	this.position;
-	this.positionHIGH;
-	this.positionLOW;
 	
 	this.heading;
 	this.pitch;
 	this.roll;
 	
+	this.position;
+	this.positionHIGH;
+	this.positionLOW;
+
 	this.bboxAbsoluteCenterPos;
 	
 	// F4D Matrix4.****
@@ -65,4 +68,55 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 	
 	return resultCamera;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationDataManager
+ */
+var GeoLocationDataManager = function() {
+	if(!(this instanceof GeoLocationDataManager)) {
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	this.geoLocationDataArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ */
+GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) {
+	
+	var geoLocationData = new GeoLocationData(geoLocationName);
+	this.geoLocationDataArray.push(geoLocationData);
+	return geoLocationData;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
