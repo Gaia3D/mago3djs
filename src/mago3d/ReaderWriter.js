@@ -1218,6 +1218,9 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 	var bbLengthX;
 	var bbLengthY;
 	var bbLengthZ;
+	var heading;
+	var pitch;
+	var roll;
 	
 	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); 
 	bytesReaded += 4;
@@ -1243,6 +1246,10 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		longitude = 128.594998;
 		latitude = 34.904209;
 		altitude = 50.0;
+		
+		heading = 0.0;
+		pitch = 0.0;
+		roll = 0.0;
 		
 		// TEST.*********
 		altitude = 50.0;

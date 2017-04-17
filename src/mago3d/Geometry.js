@@ -166,20 +166,21 @@ var NeoBuilding = function() {
 	this.transfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
 	this.transfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
 	
+	this.geoLocationDataManager = new GeoLocationDataManager();
 	this.geoLocationDataAux; // there are positions and matrices.***
 	this.isDemoBlock = false;
 	//this.isHighLighted;
 	
 	// create the default blocks_lists.*****************************
-	this._blocksList_Container = new BlocksListsContainer();
-	this._blocksList_Container.newBlocksList("Blocks1");
+	//this._blocksList_Container = new BlocksListsContainer();
+	//this._blocksList_Container.newBlocksList("Blocks1");
 	//this._blocksList_Container.newBlocksList("Blocks2");
 	//this._blocksList_Container.newBlocksList("Blocks3");
 	//this._blocksList_Container.newBlocksList("BlocksBone");
 	//this._blocksList_Container.newBlocksList("Blocks4");
 	
 	// create the references lists.*********************************
-	this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
+	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = [];
 	this.preExtractedLowestOctreesArray = [];
 	this.motherNeoReferencesArray = []; // asimetric mode.***

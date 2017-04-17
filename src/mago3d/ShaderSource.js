@@ -520,6 +520,7 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
+	varying vec3 vertexPos;\n\
 	\n\
 	void main() {	\n\
 		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
@@ -530,10 +531,12 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		\n\
+		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
+		//vertexPos = gl_Position.xyz;\n\
 		vec3 rotatedNormal = mat3(RefTransfMatrix) * normal;\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-		uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+		uAmbientColor = vec3(0.8);\n\
+		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
 		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
 		if(vNormal.z < 0.0)\n\
@@ -548,6 +551,7 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 	}";
 	
 //어떤 용도
+// test.***
 ShaderSource.modelRefSsaoFsSource = "\n\
 	#ifdef GL_ES\n\
 		precision highp float;\n\
@@ -572,9 +576,19 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	varying vec2 vTexCoord;   \n\
 	varying vec3 vLightWeighting;\n\
 	\n\
+	varying vec3 ambientColor;\n\
+	varying vec3 diffuseColor;\n\
+	varying vec3 specularColor;\n\
+	varying vec3 vertexPos;\n\
+	\n\
 	const int kernelSize = 16;  \n\
 	//const float radius = 0.01;      \n\
 	const float radius = 0.15;      \n\
+	\n\
+	const float ambientReflectionCoef = 0.5;  \n\
+	const float diffuseReflectionCoef = 1.0;  \n\
+	const float specularReflectionCoef = 1.0; \n\
+	const float shininessVal = 5.0; \n\
 	\n\
 	float unpackDepth(const in vec4 rgba_depth) {\n\
 		//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\
@@ -628,13 +642,24 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		}   \n\
 		   \n\
 		occlusion = 1.0 - occlusion / float(kernelSize);\n\
-								   \n\
-		vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-		vec3 L = normalize(lightPos);\n\
-		float DiffuseFactor = dot(normal2, L);\n\
-		float NdotL = abs(DiffuseFactor);\n\
-		vec3 diffuse = vec3(NdotL);\n\
-		vec3 ambient = vec3(1.0);\n\
+		\n\
+		vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
+		vec3 L = normalize(lightPos - vertexPos);\n\
+		//vec3 L = normalize(lightPos);\n\
+		float lambertian = max(dot(normal2, L), 0.0);\n\
+		float specular = 0.0;\n\
+		if(lambertian > 0.0) {\n\
+			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+			\n\
+			// Compute the specular term\n\
+			float specAngle = max(dot(R, V), 0.0);\n\
+			specular = pow(specAngle, shininessVal);\n\
+		}\n\
+		//float DiffuseFactor = dot(normal2, L);\n\
+		//float NdotL = abs(DiffuseFactor);\n\
+		//vec3 diffuse = vec3(NdotL);\n\
+		//vec3 ambient = vec3(1.0);\n\
 		vec4 textureColor;\n\
 		if(hasTexture)\n\
 		{\n\
@@ -643,12 +668,122 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		else{\n\
 			textureColor = vColor4Aux;\n\
 		}\n\
-		//gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
-		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8 * occlusion)); // test.***\n\
+		vec3 specularColor = vec3(0.7);\n\
+		vec3 ambientColor = vec3(textureColor.x * 0.4, textureColor.y * 0.4, textureColor.z * 0.4);\n\
+		gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0);\n\
+		//gl_FragColor.rgb = vec3((textureColor.xyz*0.2 + textureColor.xyz*0.8)*vLightWeighting * occlusion); \n\
+		//gl_FragColor.a = 1.0;   \n\
+	}";
+	/*
+	// original.***
+ShaderSource.modelRefSsaoFsSource = "\n\
+	#ifdef GL_ES\n\
+		precision highp float;\n\
+		#endif\n\
+	uniform sampler2D depthTex;\n\
+	uniform sampler2D noiseTex;  \n\
+	uniform sampler2D diffuseTex;\n\
+	uniform bool hasTexture;\n\
+	varying vec3 vNormal;\n\
+	uniform mat4 projectionMatrix;\n\
+	uniform mat4 m;\n\
+	uniform vec2 noiseScale;\n\
+	uniform float near;\n\
+	uniform float far;            \n\
+	uniform float fov;\n\
+	uniform float aspectRatio;    \n\
+	uniform float screenWidth;    \n\
+	uniform float screenHeight;    \n\
+	uniform vec3 kernel[16];   \n\
+	uniform vec4 vColor4Aux;\n\
+	\n\
+	varying vec2 vTexCoord;   \n\
+	varying vec3 vLightWeighting;\n\
+	\n\
+	varying vec3 ambientColor;\n\
+	varying vec3 diffuseColor;\n\
+	varying vec3 specularColor;\n\
+	\n\
+	const int kernelSize = 16;  \n\
+	//const float radius = 0.01;      \n\
+	const float radius = 0.15;      \n\
+	\n\
+	const float ambientReflectionCoef = 1.0;  \n\
+	const float diffuseReflectionCoef = 1.0;  \n\
+	const float specularReflectionCoef = 1.0; \n\
+	\n\
+	float unpackDepth(const in vec4 rgba_depth) {\n\
+		//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\
+		const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+		float depth = dot(rgba_depth, bit_shift);\n\
+		return depth;\n\
+	}                \n\
+	\n\
+	vec3 getViewRay(vec2 tc) {\n\
+		float hfar = 2.0 * tan(fov/2.0) * far;\n\
+		float wfar = hfar * aspectRatio;    \n\
+		vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+		return ray;                      \n\
+	}         \n\
+			   \n\
+	//linear view space depth\n\
+	float getDepth(vec2 coord) {                          \n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}    \n\
+	\n\
+	void main() {          \n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+		//screenPos.y = 1.0 - screenPos.y;   \n\
+		\n\
+		\n\
+		float linearDepth = getDepth(screenPos);          \n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+				\n\
+		//vec3 normal2 = normalize(vNormal);   \n\
+		vec3 normal2 = vNormal;   \n\
+				\n\
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+		vec3 bitangent = cross(normal2, tangent);\n\
+		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+		\n\
+		float occlusion = 0.0;\n\
+		for(int i = 0; i < kernelSize; ++i) {    	 \n\
+			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;        \n\
+			float sampleDepth = -sample.z/far;\n\
+			float depthBufferValue = getDepth(offset.xy);				              \n\
+			//float range_check = abs(linearDepth - depthBufferValue); // original.***\n\
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998; // modified.***\n\
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth) {\n\
+				occlusion +=  1.0;\n\
+			}\n\
+			\n\
+		}   \n\
+		   \n\
+		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+		\n\
+		vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+		vec3 L = normalize(lightPos);\n\
+		float DiffuseFactor = dot(normal2, L);\n\
+		float NdotL = abs(DiffuseFactor);\n\
+		vec3 diffuse = vec3(NdotL);\n\
+		vec3 ambient = vec3(1.0);\n\
+		vec3 specular = vec3(1.0);\n\
+		vec4 textureColor;\n\
+		if(hasTexture)\n\
+		{\n\
+			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+		}\n\
+		else{\n\
+			textureColor = vColor4Aux;\n\
+		}\n\
 		gl_FragColor.rgb = vec3((textureColor.xyz*0.2 + textureColor.xyz*0.8)*vLightWeighting * occlusion); \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
-
+*/
 	//****************************************************************************************************************************************
 	
 //어떤 용도
