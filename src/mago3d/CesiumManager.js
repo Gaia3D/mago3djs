@@ -1509,7 +1509,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		if(!isLastFrustum) return;
 	}
 	
-	if(!isLastFrustum) return;
+	//if(!isLastFrustum) return;
 	
 	this.frustumIdx = frustumIdx;
 	this.numFrustums = numFrustums;
@@ -1551,13 +1551,18 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		//var frustumVolume = scene._frameState.cullingVolume; // original.***
 		//var frustumVolume = scene._camera.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up); // original.***
-		this.currentVisibleNeoBuildings_array.length = 0;
+		
 		if(frustumIdx == 0)
 		{
 			//this.neoBuildingsList.setNeoBuildingsFrustumCulled(false);
 		}
-		this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
-		this.prepareNeoBuildingsAsimetricVersion(gl);
+		if(this.isLastFrustum)
+		{
+			this.currentVisibleNeoBuildings_array.length = 0;
+			this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
+			this.prepareNeoBuildingsAsimetricVersion(gl);
+		}
+		
 	}
 	
 	// update the matrices of the scene and the camera position.***
