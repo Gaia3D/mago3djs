@@ -1137,7 +1137,7 @@ CesiumManager.prototype.renderNeoBuildings = function(scene, isLastFrustum) {
 	var cameraPosition = scene.context._us._cameraPosition;
 //	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
 	
-	if(!isLastFrustum) return;
+	//if(!isLastFrustum) return;
 	
 	if(this.textureAux_1x1 == undefined) {
 		this.textureAux_1x1 = gl.createTexture();
@@ -1509,10 +1509,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		if(!isLastFrustum) return;
 	}
 	
-	//if(!isLastFrustum) return;
+	if(!isLastFrustum) return;
 	
 	this.frustumIdx = frustumIdx;
 	this.numFrustums = numFrustums;
+	this.isLastFrustum = isLastFrustum;
 	var gl = scene.context._gl;
 	var cameraPosition = scene.context._us._cameraPosition;
 //	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
@@ -5065,14 +5066,26 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
 		if(frustumCull != Cesium.Intersect.OUTSIDE) {
 			// min dist to see detailed.***
-			if(squaredDistToCamera < lod0_minSquaredDist) {
-				this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
-			} else if(squaredDistToCamera < lod1_minSquaredDist) {
-				this.visibleObjControlerBuildings.currentVisibles1.push(neoBuilding);
-			} else if(squaredDistToCamera < lod2_minSquaredDist) {
-				this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
-			} else if(squaredDistToCamera < lod3_minSquaredDist) {
-				this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
+			if(this.isLastFrustum)
+			{
+				if(squaredDistToCamera < lod0_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
+				} else if(squaredDistToCamera < lod1_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles1.push(neoBuilding);
+				} else if(squaredDistToCamera < lod2_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
+				} else if(squaredDistToCamera < lod3_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
+				}
+			}
+			else{
+				if(squaredDistToCamera < lod1_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles1.push(neoBuilding);
+				} else if(squaredDistToCamera < lod2_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
+				} else if(squaredDistToCamera < lod3_minSquaredDist) {
+					this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
+				}
 			}
 			//neoBuilding.frustumCulled = true;
 		} 
