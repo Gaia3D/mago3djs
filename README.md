@@ -32,3 +32,7 @@ server를 실행하기 전에 Dependencies를 설치해줍니다. <br>
 
 #####  데이터 폴더 링크<br>
 mklink /d "C:\git\repository\mago3djs\data" "C:\data"
+
+## LICENSE
+Apache License Version 2.0
+http://www.apache.org/licenses/
