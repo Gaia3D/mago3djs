@@ -1,10 +1,6 @@
 # Mago3DJs
 웹 GIS 플랫폼(Cesium...)을 이용한 다중 블록 가시화(3D) 시스템
 
-##  Architecture
-
-<img src ="http://i.imgur.com/HtcQ8vC.png" width = 400>
-
 ## Development Environment
  - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
  - [eclipse neon(필수)](https://www.eclipse.org/downloads/eclipse-packages/)
