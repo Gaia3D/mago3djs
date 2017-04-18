@@ -1285,9 +1285,10 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		if(neoBuilding.metaData == undefined) {
 			neoBuilding.metaData = new MetaData();
 		}
-		neoBuilding.metaData.latitude = latitude;
-		neoBuilding.metaData.longitude = longitude;
-		neoBuilding.metaData.altitude = altitude;
+		if(neoBuilding.metaData.geographicCoord == undefined)
+			neoBuilding.metaData.geographicCoord = new GeographicCoord();
+		
+		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
 		
 		if(neoBuilding.metaData.bbox == undefined) {
 			neoBuilding.metaData.bbox = new BoundingBox();

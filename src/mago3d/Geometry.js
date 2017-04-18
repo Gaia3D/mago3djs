@@ -152,21 +152,24 @@ var NeoBuilding = function() {
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
-	this.buildingPosition;     // TODO: put this inside of a geoLocationData.***
-	this.buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
-	this.buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
 	this.frustumCulled = false;
 	
+	// delete.***
+	this.buildingPosition;     // TODO: put this inside of a geoLocationData.***
+	this.buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
+	this.buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
 	this.move_matrix; // PositionMatrix (only rotations).*** // TODO: put this inside of a geoLocationData.***
 	this.move_matrix_inv; // Inverse of PositionMatrix.***   // TODO: put this inside of a geoLocationData.***
 	this.buildingPosMat_inv; // f4d matrix4.***              // TODO: put this inside of a geoLocationData.***
 	this.transfMat_inv; // cesium matrix4.***                // TODO: put this inside of a geoLocationData.***
 	this.transfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
 	this.transfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
+	// end delete.---
 	
-	this.geoLocationDataManager = new GeoLocationDataManager();
+	// a building can have 1 or more geoLocations, throght the time for example.***
+	this.geoLocDataManager = new GeoLocationDataManager();
 	this.geoLocationDataAux; // there are positions and matrices.***
 	this.isDemoBlock = false;
 	//this.isHighLighted;

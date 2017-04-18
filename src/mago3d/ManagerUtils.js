@@ -5,9 +5,9 @@ function ManagerUtils() {};
 ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	var metaData = neoBuilding.metaData;
 	if( metaData == undefined
-			|| metaData.longitude == undefined 
-			|| metaData.latitude == undefined 
-			|| metaData.altitude == undefined ) return false;
+			|| metaData.geographicCoord.longitude == undefined 
+			|| metaData.geographicCoord.latitude == undefined 
+			|| metaData.geographicCoord.altitude == undefined ) return false;
 	
 	// 0) PositionMatrix.************************************************************************
 	var position;
@@ -17,7 +17,7 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	}
 	else
 	{
-		position = Cesium.Cartesian3.fromDegrees(metaData.longitude, metaData.latitude, metaData.altitude);
+		position = Cesium.Cartesian3.fromDegrees(metaData.geographicCoord.longitude, metaData.geographicCoord.latitude, metaData.geographicCoord.altitude);
 	}
 	neoBuilding.buildingPosition = position; 
 	
@@ -62,20 +62,56 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 	return true;
 };
 
+ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) {
+	// this function dont modifies the geographic coords.***
+	// "newPivotPoint" is the desired position of the new origen of coords, for example: 
+	// in a building you can desire the center of the bbox as the origin of the coords.***
+	if(geoLocationData == undefined)
+		return;
+	
+	var rawTranslation = new Point3D();
+	rawTranslation.set(-newPivotPoint.x, -newPivotPoint.y, -newPivotPoint.z);
+
+	var traslationVector;
+	var realBuildingPos;
+	realBuildingPos = geoLocationData.tMatrix.transformPoint3D(newPivotPoint, realBuildingPos );
+	traslationVector = geoLocationData.tMatrix.rotatePoint3D(rawTranslation, traslationVector );
+	geoLocationData.position.x += traslationVector.x;
+	geoLocationData.position.y += traslationVector.y;
+	geoLocationData.position.z += traslationVector.z;
+	//geoLocationData.positionHIGH;
+	geoLocationData.aditionalTraslation = traslationVector;
+	geoLocationData.positionLOW[0] += traslationVector.x;
+	geoLocationData.positionLOW[1] += traslationVector.y;
+	geoLocationData.positionLOW[2] += traslationVector.z;
+	
+	realBuildingPos.x += traslationVector.x;
+	realBuildingPos.y += traslationVector.y;
+	realBuildingPos.z += traslationVector.z;
+	
+	if(geoLocationData.pivotPoint == undefined)
+		geoLocationData.pivotPoint = new Point3D();
+	
+	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+};
+
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) {
 	
-	if(resultGeoLocationData == undefined) resultGeoLocationData = new GeoLocationData();
+	if(resultGeoLocationData == undefined) 
+		resultGeoLocationData = new GeoLocationData();
 	
 	// 0) Position.********************************************************************************************
-
+	if(resultGeoLocationData.geographicCoord == undefined)
+		resultGeoLocationData.geographicCoord = new GeographicCoord();
+	
 	if(longitude != undefined)
-		resultGeoLocationData.longitude = longitude;
+		resultGeoLocationData.geographicCoord.longitude = longitude;
 	
 	if(latitude != undefined)
-		resultGeoLocationData.latitude = latitude;
+		resultGeoLocationData.geographicCoord.latitude = latitude;
 	
 	if(altitude != undefined)
-		resultGeoLocationData.elevation = altitude;
+		resultGeoLocationData.geographicCoord.altitude = altitude;
 	
 	if(heading != undefined)
 		resultGeoLocationData.heading = heading;
@@ -86,20 +122,19 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if(roll != undefined)
 		resultGeoLocationData.roll = roll;
 	
-	if(resultGeoLocationData.longitude == undefined || resultGeoLocationData.latitude == undefined)
+	if(resultGeoLocationData.geographicCoord.longitude == undefined || resultGeoLocationData.geographicCoord.latitude == undefined)
 		return;
 	
-	resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.longitude, resultGeoLocationData.latitude, resultGeoLocationData.elevation);
+	// *if this in Cesium:
+	resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
 	
 	// High and Low values of the position.********************************************************************
-	//var splitValue = Cesium.EncodedCartesian3.encode(position); // no works.***
-	var splitVelue_X  = Cesium.EncodedCartesian3.encode(resultGeoLocationData.position.x);
-	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(resultGeoLocationData.position.y);
-	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(resultGeoLocationData.position.z);
-	
-	resultGeoLocationData.positionHIGH = new Float32Array([splitVelue_X.high, splitVelue_Y.high, splitVelue_Z.high]);
-	resultGeoLocationData.positionLOW = new Float32Array([splitVelue_X.low, splitVelue_Y.low, splitVelue_Z.low]);
-	
+	if(resultGeoLocationData.positionHIGH == undefined)
+		resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]);
+	if(resultGeoLocationData.positionLOW == undefined)
+		resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]);
+	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
+
 	// Determine the elevation of the position.***********************************************************
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
     //var height = cartographic.height;
@@ -140,11 +175,6 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	var yRotMatrix = new Matrix4();  // created as identity matrix.***
 	var zRotMatrix = new Matrix4();  // created as identity matrix.***
 	
-	// test. we simulate that heading is 45 degrees.***
-	//heading = 30.0;
-	//pitch = 40.0;
-	//roll = 125;
-	
 	if(resultGeoLocationData.heading != undefined && resultGeoLocationData.heading != 0)
 	{
 		zRotMatrix.rotationAxisAngDeg(resultGeoLocationData.heading, 0.0, 0.0, -1.0);
@@ -177,6 +207,12 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
 	Cesium.Matrix4.inverse(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
 	Cesium.Matrix4.inverse(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
+	
+	// finally assing the pivotPoint.***
+	if(resultGeoLocationData.pivotPoint == undefined)
+		resultGeoLocationData.pivotPoint = new Point3D();
+	
+	resultGeoLocationData.pivotPoint.set(resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z);
 
 	return resultGeoLocationData;
 };

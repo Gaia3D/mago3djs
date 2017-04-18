@@ -8,23 +8,25 @@ var GeoLocationData = function(geoLocationDataName) {
 	if(!(this instanceof GeoLocationData)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	this.name;
 	if(geoLocationDataName == undefined)
 		this.name = "noName";
 	else
 		this.name = geoLocationDataName;
-	this.longitude; 
-	this.latitude;
-	this.elevation;
+	
+	this.geographicCoord; // longitude, latitude, altitude.***
 	
 	this.heading;
 	this.pitch;
 	this.roll;
 	
+	this.date; // year - month - day - hour - min - seg - miliseg.***
+	
 	this.position;
 	this.positionHIGH;
 	this.positionLOW;
 
-	this.bboxAbsoluteCenterPos;
+	this.pivotPoint; // Point3D().***
 	
 	// F4D Matrix4.****
 	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
@@ -86,10 +88,19 @@ var GeoLocationDataManager = function() {
  * @class GeoLocationData
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) {
-	
+	if(geoLocationName == undefined)
+		geoLocationName = "noName" + this.geoLocationDataArray.length.toString();
 	var geoLocationData = new GeoLocationData(geoLocationName);
 	this.geoLocationDataArray.push(geoLocationData);
 	return geoLocationData;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ */
+GeoLocationDataManager.prototype.getGeoLocationData = function(idx) {
+	return this.geoLocationDataArray[idx];
 };
 
 
