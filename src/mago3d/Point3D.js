@@ -95,3 +95,25 @@ Point3D.prototype.set = function(_x, _y, _z) {
 Point3D.prototype.add = function(_x, _y, _z) {
 	this.x += _x; this.y += _y; this.z += _z;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

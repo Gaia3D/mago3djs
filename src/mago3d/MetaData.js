@@ -11,10 +11,7 @@ var MetaData = function() {
 	
 	this.guid; // must be undefined initially.***
 	this.version = "";
-	
-	this.latitude;
-	this.longitude;
-	this.altitude;
+	this.geographicCoord; // longitude, latitude, altitude.***
 	
 	this.heading;
 	this.pitch;
