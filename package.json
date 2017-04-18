@@ -7,7 +7,7 @@
     "test": "jasmine"
   },
   "author": "Gaia3d",
-  "license": "BSD",
+  "license": "Apache-2.0",
   "devDependencies": {
     "browserify": "^13.3.0",
     "chai": "^3.5.0",
