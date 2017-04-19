@@ -736,6 +736,23 @@ Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctree
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
+Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
+	var subOctreesCount = this.subOctrees_array.length;
+	
+	if(subOctreesCount == 0 && this.triPolyhedronsCount > 0) {
+		if(this.neoReferencesMotherAndIndices)
+				this.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(idxKey, matrix);
+	} else {
+		for(var i=0; i<subOctreesCount; i++) {
+			this.subOctrees_array[i].multiplyKeyTransformMatrix(idxKey, matrix);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
 Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) {
 	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	

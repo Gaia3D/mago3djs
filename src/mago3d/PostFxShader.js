@@ -579,7 +579,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	
@@ -650,7 +650,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -693,7 +693,7 @@ PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) {
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
@@ -757,7 +757,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) {
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -798,7 +798,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -838,7 +838,7 @@ PostFxShadersManager.prototype.createDepthShaderBox = function(gl) {
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -881,7 +881,7 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) {
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	//shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
