@@ -156,18 +156,6 @@ var NeoBuilding = function() {
 	this.bboxAbsoluteCenterPos;
 	this.frustumCulled = false;
 	
-	// delete.***
-	this.buildingPosition;     // TODO: put this inside of a geoLocationData.***
-	this.buildingPositionHIGH; // TODO: put this inside of a geoLocationData.***
-	this.buildingPositionLOW;  // TODO: put this inside of a geoLocationData.***
-	this.move_matrix; // PositionMatrix (only rotations).*** // TODO: put this inside of a geoLocationData.***
-	this.move_matrix_inv; // Inverse of PositionMatrix.***   // TODO: put this inside of a geoLocationData.***
-	this.buildingPosMat_inv; // f4d matrix4.***              // TODO: put this inside of a geoLocationData.***
-	this.transfMat_inv; // cesium matrix4.***                // TODO: put this inside of a geoLocationData.***
-	this.transfMat; // f4d matrix4.***                    // TODO: put this inside of a geoLocationData.***
-	this.transfMatInv; // f4d matrix4.***                 // TODO: put this inside of a geoLocationData.***
-	// end delete.---
-	
 	// a building can have 1 or more geoLocations, throght the time for example.***
 	this.geoLocDataManager = new GeoLocationDataManager();
 	this.geoLocationDataAux; // there are positions and matrices.***
@@ -214,7 +202,7 @@ var NeoBuilding = function() {
 	this.lod3Building;
 	
 	// SCRATCH.*********************************
-	this.point3d_scratch = new Point3D();
+	this.point3d_scratch = new Point3D(); 
 	this.point3d_scratch_2 = new Point3D();
 };
 
@@ -315,6 +303,9 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  * @returns point3d_scrath_2
  */
 NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absoluteCamera, resultCamera) {
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
 	
