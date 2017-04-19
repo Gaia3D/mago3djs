@@ -66,7 +66,7 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 };
 
 ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) {
-	// this function dont modifies the geographic coords.***
+	// this function NO modifies the geographic coords.***
 	// "newPivotPoint" is the desired position of the new origen of coords, for example: 
 	// in a building you can desire the center of the bbox as the origin of the coords.***
 	if(geoLocationData == undefined)

@@ -152,14 +152,15 @@ var NeoBuilding = function() {
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
+	this.buildingFileName = "";
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
 	this.frustumCulled = false;
 	
-	// a building can have 1 or more geoLocations, throght the time for example.***
+	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
 	this.geoLocDataManager = new GeoLocationDataManager();
-	this.geoLocationDataAux; // there are positions and matrices.***
-	this.isDemoBlock = false;
+	this.geoLocationDataAux; // old. created for HeavyIndustries.***
+	this.isDemoBlock = false; // test.***
 	//this.isHighLighted;
 	
 	// create the default blocks_lists.*****************************
@@ -172,8 +173,8 @@ var NeoBuilding = function() {
 	
 	// create the references lists.*********************************
 	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
-	this.currentRenderablesNeoRefLists = [];
-	this.preExtractedLowestOctreesArray = [];
+	this.currentRenderablesNeoRefLists = []; // test. no used. waiting for background process.***
+	this.preExtractedLowestOctreesArray = []; // test. no used. waiting for background process.***
 	this.motherNeoReferencesArray = []; // asimetric mode.***
 	this.motherBlocksArray = []; // asimetric mode.***
 	
@@ -181,13 +182,11 @@ var NeoBuilding = function() {
 	this.textures_loaded = [];
 	
 	// The octree.********************************************************
-	this.octree; // f4d_octree. Interior objects.***
+	this.octree; // f4d_octree. ***
 	this.octreeLoadedAllFiles = false;
-	
-	this.buildingFileName = "";
-	
-	this.allFilesLoaded = false;
-	this.isReadyToRender = false;
+
+	this.allFilesLoaded = false; // no used yet...
+	this.isReadyToRender = false; // no used yet...
 	
 	this.moveVector; // no used.***
 	

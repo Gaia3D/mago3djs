@@ -30,14 +30,14 @@ var GeoLocationData = function(geoLocationDataName) {
 	
 	// F4D Matrix4.****
 	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
-	this.geoLocMatrixInv; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
+	this.geoLocMatrixInv; // this is just the cartographic transformation matrixInv determined by (lon, lat, elev).***
 	this.tMatrix;      // this contains translation & rotations.***
 	this.tMatrixInv;   // this contains translation & rotations.***
 	this.rotMatrix;    // this contains only rotation.***
 	this.rotMatrixInv; // this contains only rotation.***
 	
 	// Aditional.***
-	this.aditionalTraslation;
+	this.aditionalTraslation; // no used yet.***
 };
 
 /**
