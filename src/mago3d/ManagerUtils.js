@@ -3,6 +3,9 @@
 function ManagerUtils() {};
 
 ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
+	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
+	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
+	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
 	var metaData = neoBuilding.metaData;
 	if( metaData == undefined
 			|| metaData.geographicCoord.longitude == undefined 
