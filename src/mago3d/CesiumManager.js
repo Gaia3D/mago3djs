@@ -4962,8 +4962,9 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				else 
 				{
 					// use the normal data.***
+					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
+					realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 				}
 			} 
 			else 
@@ -4973,8 +4974,9 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		} 
 		else 
 		{
+			var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 			this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-			realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
+			realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 		}
 		// end calculating realPosition of the building.------------------------------------------------------------------------
 		
