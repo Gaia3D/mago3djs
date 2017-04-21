@@ -414,6 +414,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		
 		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving) 
 		{
+			if(neoBuilding.buildingId == "testId_F110T")
+			{
+				var hola = 0;
+			}
 			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
