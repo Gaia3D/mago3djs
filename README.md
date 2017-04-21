@@ -27,7 +27,11 @@ server를 실행하기 전에 Dependencies를 설치해줍니다. <br>
 &emsp;<code>C:\git\repository\mago3djs>node server.js</code><br>
 
 #####  데이터 폴더 링크<br>
+##### 데이터 폴더 생성
 mklink /d "C:\git\repository\mago3djs\data" "C:\data"
+
+#### 데이터 폴더 삭제
+C:\git\repository\mago3djs>rmdir data
 
 ## LICENSE
 Apache License Version 2.0
