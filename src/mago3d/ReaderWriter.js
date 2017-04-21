@@ -534,30 +534,30 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(arrayBuffer, neoSimpleBu
 	
 	for(var i=0; i<accessors_count; i++) {
 		var accesor = neoSimpleBuilding.newAccesor();
-		accesor.buffer_id = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.bufferId = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.accesor_type = this.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+		accesor.accesorType = this.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 		bytesReaded += 1; // 0= position, 1= normal, 2= color, 3= texcoord.***
-		accesor.buffer_start = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.bufferStart = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		accesor.stride = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.data_ytpe = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.dataType = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		accesor.dimension = this.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 		bytesReaded += 1;
 		
-		accesor.max_x = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.max_y = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.max_z = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.min_x = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.minX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.min_y = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.minY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		accesor.min_z = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
+		accesor.minZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 	}
 	

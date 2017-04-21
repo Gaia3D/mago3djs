@@ -14,7 +14,7 @@ var Block = function() {
 	this.mIFCEntityType = -1;
 	this.isSmallObj = false;
 	this.radius = 10;  
-	this.vertex_count = 0; // only for test.*** delete this.***
+	this.vertexCount = 0; // only for test.*** delete this.***
 	
 	this.lego; // legoBlock.***
 };
@@ -30,7 +30,7 @@ Block.prototype.deleteObjects = function(gl) {
 	this.mIFCEntityType = undefined;
 	this.isSmallObj = undefined;
 	this.radius = undefined;  
-	this.vertex_count = undefined; // only for test.*** delete this.***
+	this.vertexCount = undefined; // only for test.*** delete this.***
 	
 	if(this.lego) this.lego.deleteGlObjects(gl);
 	
@@ -73,7 +73,7 @@ BlocksList.prototype.newBlock = function() {
 BlocksList.prototype.getBlock = function(idx) {
 	if(this.blocksArray == undefined) return null;
 	
-	if(idx >= 0 && idx <this.blocksArray.length) {
+	if(idx >= 0 && idx < this.blocksArray.length) {
 		return this.blocksArray[idx];
 	}
 	return null;
@@ -87,14 +87,14 @@ BlocksList.prototype.getBlock = function(idx) {
 BlocksList.prototype.deleteGlObjects = function(gl) {
 	if(this.blocksArray == undefined) return;
 	
-	for(var i=0, blocksCount = this.blocksArray.length; i<blocksCount; i++) {
+	for(var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++) {
 		var block = this.blocksArray[i];
 		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
 		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
 		block.mIFCEntityType = undefined;
 		block.isSmallObj = undefined;
 		block.radius = undefined;  
-		block.vertex_count = undefined; // only for test.*** delete this.***
+		block.vertexCount = undefined; // only for test.*** delete this.***
 		if(block.lego) {
 			block.lego.vbo_vicks_container.deleteGlObjects(gl);
 			block.lego.vbo_vicks_container = undefined;
@@ -119,23 +119,23 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
 	
-	for(var i=0; i<blocksCount; i++) {
+	for(var i = 0; i < blocksCount; i++) {
 		var block = this.newBlock();
 		  
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
-		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
-		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
-		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
 		  
-		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
-		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
-		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
 		bytesReaded += 4;
 		
 		var maxLength = bbox.getMaxLength();
@@ -145,96 +145,96 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 		block.radius = maxLength/2.0;
 		
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
 		bytesReaded += 4;
-		for(var j=0; j<vboDatasCount; j++) {
+		for(var j = 0; j < vboDatasCount; j++) {
 		
 			// 1) Positions array.***************************************************************************************
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
 			bytesReaded += 4;
-			var verticesFloatValues_count = vertex_count * 3;
+			var verticesFloatValuesCount = vertexCount * 3;
 			
-			block.vertex_count = vertex_count;
+			block.vertexCount = vertexCount;
 
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 4*verticesFloatValues_count;
+			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 
-			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+			vboViCacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*
-			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			vboViCacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_VERTEX_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
-			bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 			 
 			// 2) Normals.************************************************************************************************
-			vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			var normalByteValues_count = vertex_count * 3;
+			var normalByteValuesCount = vertexCount * 3;
 			//Test.***********************
 			//for(var j=0; j<normalByteValues_count; j++)
 			//{
 			//	var value_x = readWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 			//}
 			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1*normalByteValues_count;
+			endBuff = bytesReaded + 1 * normalByteValuesCount;
 			
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			vboViCacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_NORMAL_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
-			bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
+			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 			
 			// 3) Indices.*************************************************************************************************
-			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			startBuff = bytesReaded;
-			endBuff = bytesReaded + 2*shortIndicesValues_count;
+			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
 			  
-			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			vboViCacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.MESH_FACES_cacheKey);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
-			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
-			vbo_vi_cacheKey.indicesCount = shortIndicesValues_count;  
+			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+			vboViCacheKey.indicesCount = shortIndicesValuesCount;  
 			
 			// TEST.***
 			//****************************************************************************************************AAA
 			/*
-			this.vbo_vi_cacheKey_aux = vbo_vi_cacheKey;
-			if(this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey == undefined)
+			this.vboViCacheKey_aux = vboViCacheKey;
+			if(this.vboViCacheKeyvboViCacheKey_aux.MESH_VERTEX_cacheKey == undefined)
 			{
 				this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
-				//this.vbo_vi_cacheKey_aux.pos_vboDataArray = undefined;
-				this.vbo_vi_cacheKey_aux.pos_vboDataArray = null;
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_VERTEX_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.pos_vboDataArray = undefined;
+				this.vboViCacheKey_aux.pos_vboDataArray = null;
 				
 			}
 			
-			if(this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey == undefined)
+			if(this.vboViCacheKey_aux.MESH_NORMAL_cacheKey == undefined)
 			{
-				this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
-				//this.vbo_vi_cacheKey_aux.nor_vboDataArray = undefined;
-				this.vbo_vi_cacheKey_aux.nor_vboDataArray = null;
+				this.vboViCacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_NORMAL_cacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.nor_vboDataArray = undefined;
+				this.vboViCacheKey_aux.nor_vboDataArray = null;
 					
 			}
 			
-			if(this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey == undefined)
+			if(this.vboViCacheKey_aux.MESH_FACES_cacheKey == undefined)
 			{
-				this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.MESH_FACES_cacheKey);
-				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
-				//this.vbo_vi_cacheKey_aux.idx_vboDataArray = undefined;
-				this.vbo_vi_cacheKey_aux.idx_vboDataArray = null;
+				this.vboViCacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_FACES_cacheKey);
+				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.idx_vboDataArray = undefined;
+				this.vboViCacheKey_aux.idx_vboDataArray = null;
 					
 			}
 			*/
@@ -254,7 +254,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); 
 	bytesReaded += 4;
 	
-	for(var i=0; i<blocksCount; i++) {
+	for(var i = 0; i< blocksCount; i++) {
 		//var block = this.newBlock(); // old.***
 		var block = new Block();
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
@@ -263,40 +263,40 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		
 		// check if block exist.***
 		if(motherBlocksArray[blockIdx]) {
-			bytesReaded += 4*6; // boundingBox.***
+			bytesReaded += 4 * 6; // boundingBox.***
 			// New for read multiple vbo datas (indices cannot superate 65535 value).***
 			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			for(var j=0; j<vboDatasCount; j++) {
+			for(var j = 0; j < vboDatasCount; j++) {
 				// 1) Positions array.***************************************************************************************
-				var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
-				var verticesFloatValues_count = vertex_count * 3;
+				var verticesFloatValuesCount = vertexCount * 3;
 				
-				block.vertex_count = vertex_count;
+				block.vertexCount = vertexCount;
 
 				var startBuff = bytesReaded;
-				var endBuff = bytesReaded + 4*verticesFloatValues_count;
-				bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+				var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+				bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 				 
 				// 2) Normals.************************************************************************************************
-				vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
-				var normalByteValues_count = vertex_count * 3;
-				bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
+				var normalByteValuesCount = vertexCount * 3;
+				bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 				
 				// 3) Indices.*************************************************************************************************
-				var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 				bytesReaded += 1;
 				bytesReaded = bytesReaded + sizeLevels * 4;
 				bytesReaded = bytesReaded + sizeLevels * 4;
 				/* khj(20170331)
-				var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+				var bigTrianglesshortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				*/
-				bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.*** 
+				bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.*** 
 			}
 			
 			// in asimetricVersion must load the block's lego.***
@@ -344,51 +344,49 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
 		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		for(var j=0; j<vboDatasCount; j++) {
+		for(var j = 0; j < vboDatasCount; j++) {
 			// 1) Positions array.***************************************************************************************
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			var verticesFloatValues_count = vertex_count * 3;
+			var verticesFloatValuesCount = vertexCount * 3;
 			
-			block.vertex_count = vertex_count;
+			block.vertexCount = vertexCount;
 
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 4*verticesFloatValues_count;
+			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 
-			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			if(endBuff > 1000000)
-				var hola = 0;
-			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+			vboViCacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			
 			/*
-			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			vboViCacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_VERTEX_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
-			bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 			 
 			// 2) Normals.************************************************************************************************
-			vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			var normalByteValues_count = vertex_count * 3;
-			//Test.***********************
-			//for(var j=0; j<normalByteValues_count; j++)
+			var normalByteValuesCount = vertexCount * 3;
+			//Test.***********************vertexCount
+			//for(var j=0; j<normalByteValuesCount; j++)
 			//{
 			//	var value_x = readWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 			//}
 			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1*normalByteValues_count;
+			endBuff = bytesReaded + 1 * normalByteValuesCount;
 			
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			vboViCacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_NORMAL_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
-			bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
+			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 			
 			// 3) Indices.*************************************************************************************************
-			var shortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 			bytesReaded +=1;
@@ -401,7 +399,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var indexMarkers = [];
 			for(var k = 0; k < sizeLevels; k++)
 			{
-				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+4)); // original with 16bits reading that is error.***
+				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded + 4)); // original with 16bits reading that is error.***
 				//indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
 				bytesReaded += 4;
 			}
@@ -410,18 +408,18 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			*/
-			vbo_vi_cacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
-			endBuff = bytesReaded + 2*shortIndicesValues_count;
+			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
 			  
-			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			vboViCacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.MESH_FACES_cacheKey);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */ 
-			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
-			vbo_vi_cacheKey.indicesCount = shortIndicesValues_count;  
+			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+			vboViCacheKey.indicesCount = shortIndicesValuesCount;  
 		}
 		
 		// in asimetricVersion must load the block's lego.***
