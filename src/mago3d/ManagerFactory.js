@@ -392,6 +392,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		var api = new API("renderMode");
 		api.setRenderMode(MagoConfig.getInformation().renderingConfg.renderMode);
 		magoManager.callAPI(api);
+		
+		if(!MagoConfig.getInformation().renderingConfg.timelineEnable) {
+			// visible <---> hidden
+			$(viewer._animation.container).css("visibility", "hidden");
+			$(viewer._timeline.container).css("visibility", "hidden");
+			viewer.forceResize();
+		}
 	}
 	
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리

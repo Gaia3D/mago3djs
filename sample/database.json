@@ -29,7 +29,8 @@
 	},
 	"renderingConfg" : {
 		"renderMode" : "1",
-		"cullFaceEnable" : false
+		"cullFaceEnable" : false,
+		"timelineEnable" : false
 	},
 	"geoConfig" : {
 		"initEntity" : {
