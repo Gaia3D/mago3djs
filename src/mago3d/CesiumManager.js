@@ -2906,7 +2906,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				
 				if(neoBuilding.octree)
 				{
-					neoBuilding.octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+					//neoBuilding.octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				}
 			}
 		}
@@ -3148,6 +3148,11 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 
 			if(refListsParsingCount < maxRefListParsingCount) {
 				// must parse the arraybuffer data.***
+				//test.***
+				if(neoBuilding.buildingId == "F110T")
+				{
+					var hola = 0;
+				}
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, lowestOctree.neoBuildingOwner.motherNeoReferencesArray, this.matrix4SC);
@@ -4829,7 +4834,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					
 					if(neoBuilding.octree)
 					{
-						neoBuilding.octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+						//neoBuilding.octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 					}
 					
 					var hola = 0;
