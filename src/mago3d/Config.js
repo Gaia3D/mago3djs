@@ -122,6 +122,16 @@ MagoConfig.initRenderingConfig = function(jsonConfig) {
 		} else {
 			jsonConfig.renderingConfg.cullFaceEnable = true;
 		}
+		
+		if(jsonConfig.renderingConfg.timelineEnable === undefined
+				|| jsonConfig.renderingConfg.timelineEnable === null 
+				|| jsonConfig.renderingConfg.timelineEnable === "" 
+				|| jsonConfig.renderingConfg.timelineEnable === false
+				|| jsonConfig.renderingConfg.timelineEnable === "false") {
+			jsonConfig.renderingConfg.timelineEnable = false;
+		} else {
+			jsonConfig.renderingConfg.timelineEnable = true;
+		}
 	}
 	
 	this.jsonConfig.renderingConfg = jsonConfig.renderingConfg;
