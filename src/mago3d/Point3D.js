@@ -8,19 +8,20 @@ var Point3D = function() {
 	if(!(this instanceof Point3D)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.x = 0.0;
 	this.y = 0.0;
 	this.z = 0.0;
 };
 
 /**
+ * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
 Point3D.prototype.destroy = function() {
-    this.x = null;
-    this.y = null;
-    this.z = null;
+	this.x = null;
+	this.y = null;
+	this.z = null;
 };
 
 /**
@@ -32,6 +33,7 @@ Point3D.prototype.getModul = function() {
 };
 
 /**
+ * 
  * 어떤 일을 하고 있습니까?
  */
 Point3D.prototype.unitary = function() {
@@ -42,22 +44,18 @@ Point3D.prototype.unitary = function() {
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * nomal 계산
  * @param point 변수
  * @param resultPoint 변수
- * @returns resultPoint 
+ * @returns resultPoint
  */
 Point3D.prototype.crossProduct = function(point, resultPoint) {
 	if(resultPoint == undefined) resultPoint = new Point3D();
-	
-	var px = point.x;
-	var py = point.y;
-	var pz = point.z;
-	
-	resultPoint.x = this.y*pz - py*this.z; 
-	resultPoint.y = px*this.z - this.x*pz; 
-	resultPoint.z = this.x*py - px*this.y;
-	
+
+	resultPoint.x = this.y * point.z - point.y * this.z;
+	resultPoint.y = point.x * this.z - this.x * point.z;
+	resultPoint.z = this.x * point.y - point.x * this.y;
+
 	return resultPoint;
 };
 
@@ -68,52 +66,30 @@ Point3D.prototype.crossProduct = function(point, resultPoint) {
  * @param pz 변수
  * @returns dx*dx + dy*dy + dz*dz
  */
-Point3D.prototype.squareDistTo = function(px, py, pz) {
-    var dx = this.x - px;
-    var dy = this.y - py;
-    var dz = this.z - pz;
-  
-    return dx*dx + dy*dy + dz*dz;
+Point3D.prototype.squareDistTo = function(x, y, z) {
+	var dx = this.x - x;
+	var dy = this.y - y;
+	var dz = this.z - z;
+
+	return dx*dx + dy*dy + dz*dz;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param _x 변수
- * @param _y 변수
- * @param _z 변수
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
  */
-Point3D.prototype.set = function(_x, _y, _z) {
-	this.x = _x; this.y = _y; this.z = _z;
+Point3D.prototype.set = function(x, y, z) {
+	this.x = x; this.y = y; this.z = z;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param _x 변수
- * @param _y 변수
- * @param _z 변수
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
  */
-Point3D.prototype.add = function(_x, _y, _z) {
-	this.x += _x; this.y += _y; this.z += _z;
+Point3D.prototype.add = function(x, y, z) {
+	this.x += x; this.y += y; this.z += z;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
