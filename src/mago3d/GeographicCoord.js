@@ -16,7 +16,9 @@ var GeographicCoord = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns neoRef
+ * @param longitude 경도
+ * @param latitude 위도
+ * @param altitude 고도
  */
 GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude) {
 	this.longitude = longitude;

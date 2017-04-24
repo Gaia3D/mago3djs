@@ -6055,10 +6055,7 @@ CesiumManager.prototype.loadDemoBlocks = function()
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 CesiumManager.prototype.getObjectIndexFile = function() {
-	this.readerWriter.getObjectIndexFile(	this.scene.context._gl,
-											this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE,
-											this.readerWriter,
-											this.neoBuildingsList);
+	this.readerWriter.getObjectIndexFile(	this.scene.context._gl,	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this.readerWriter, this.neoBuildingsList);
 };
 
 /**

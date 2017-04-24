@@ -394,20 +394,20 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j=0; j<texture_type_nameLegth; j++){
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+			for(var j = 0; j< texture_type_nameLegth; j++){
+				neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
 
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++){
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
 
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
-			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			if(neoRef.texture.texId == undefined)
+				neoRef.texture.texId = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/
@@ -657,19 +657,19 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_type_nameLegth; j++) {
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+				neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
 
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++) {
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
 
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
-			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			if(neoRef.texture.texId == undefined)
+				neoRef.texture.texId = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/

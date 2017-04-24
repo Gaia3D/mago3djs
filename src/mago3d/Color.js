@@ -20,32 +20,32 @@ var Color = function() {
   
 /**
  * 어떤 일을 하고 있습니까?
- * @param _r 변수
- * @param _g 변수
- * @param _b 변수
- * @param _a 변수
+ * @param red 변수
+ * @param green 변수
+ * @param blue 변수
+ * @param alpha 변수
  */
-Color.prototype.set = function(_r, _g, _b, _a) {
-	this.r = _r; this.g = _g; this.b = _b; this.a = _a;
+Color.prototype.set = function(red, green, blue, alpha) {
+	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };
   
 /**
  * 어떤 일을 하고 있습니까?
- * @param _r 변수
- * @param _g 변수
- * @param _b 변수
+ * @param red 변수
+ * @param green 변수
+ * @param blue 변수
  */
-Color.prototype.setRGB = function(_r, _g, _b) {
-	this.r = _r; this.g = _g; this.b = _b; 
+Color.prototype.setRGB = function(red, green, blue) {
+	this.r = red; this.g = green; this.b = blue;
 };
   
 /**
  * 어떤 일을 하고 있습니까?
- * @param _r 변수
- * @param _g 변수
- * @param _b 변수
- * @param _alpha 변수
+ * @param red 변수
+ * @param green 변수
+ * @param blue 변수
+ * @param alpha 변수
  */
-Color.prototype.setRGBA = function(_r, _g, _b, _alpha) {
-	this.r = _r; this.g = _g; this.b = _b;  this.a = _alpha;
+Color.prototype.setRGBA = function(red, green, blue, alpha) {
+	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };

@@ -162,19 +162,19 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 			}
 
 			// Check if the texture is loaded.********************************************************************************
-			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
+			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
 				if(magoManager.backGround_fileReadings_count > 10) continue;
 
 				// 1rst, check if the texture is loaded.***
-				var tex_id = neoBuilding.getTextureId(neoReference.texture);
-				if(tex_id == undefined) {
+				var texId = neoBuilding.getTextureId(neoReference.texture);
+				if(texId == undefined) {
 					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
 					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
-					neoReference.texture.tex_id = tex_id;
+					neoReference.texture.texId = texId;
 				}
 			}
 
@@ -186,12 +186,12 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 				if(renderTexture) {
 					if(neoReference.hasTexture) {
 						if(neoReference.texture != undefined) {
-							if(neoReference.texture.tex_id != undefined) {
+							if(neoReference.texture.texId != undefined) {
 								gl.uniform1i(standardShader.hasTexture_loc, true); //.***
-								if(current_tex_id != neoReference.texture.tex_id) {
+								if(current_tex_id != neoReference.texture.texId) {
 									//gl.activeTexture(gl.TEXTURE2);
-									gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.tex_id);
-									current_tex_id = neoReference.texture.tex_id;
+									gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.texId);
+									current_tex_id = neoReference.texture.texId;
 								}
 							} else {
 								continue;
@@ -463,19 +463,19 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			}
 
 			// Check if the texture is loaded.********************************************************************************
-			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
+			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
 				if(magoManager.backGround_fileReadings_count > 10) continue;
 
 				// 1rst, check if the texture is loaded.***
-				var tex_id = neoBuilding.getTextureId(neoReference.texture);
-				if(tex_id == undefined) {
+				var texId = neoBuilding.getTextureId(neoReference.texture);
+				if(texId == undefined) {
 					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
 					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
-					neoReference.texture.tex_id = tex_id;
+					neoReference.texture.texId = texId;
 				}
 			}
 			if(neoBuilding.isHighLighted)
@@ -500,12 +500,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if(renderTexture) {
 						if(neoReference.hasTexture) {
 							if(neoReference.texture != undefined) {
-								if(neoReference.texture.tex_id != undefined) {
+								if(neoReference.texture.texId != undefined) {
 									gl.uniform1i(standardShader.hasTexture_loc, true); //.***
-									if(current_tex_id != neoReference.texture.tex_id) {
+									if(current_tex_id != neoReference.texture.texId) {
 										//gl.activeTexture(gl.TEXTURE2);
-										gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.tex_id);
-										current_tex_id = neoReference.texture.tex_id;
+										gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.texId);
+										current_tex_id = neoReference.texture.texId;
 									}
 								} else {
 									continue;
@@ -1043,19 +1043,19 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 			}
 
 			// Check if the texture is loaded.********************************************************************************
-			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
+			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
 				if(magoManager.backGround_fileReadings_count > 10) continue;
 
 				// 1rst, check if the texture is loaded.***
-				var tex_id = neoBuilding.getTextureId(neoReference.texture);
-				if(tex_id == undefined) {
+				var texId = neoBuilding.getTextureId(neoReference.texture);
+				if(texId == undefined) {
 					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
 					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
-					neoReference.texture.tex_id = tex_id;
+					neoReference.texture.texId = texId;
 				}
 			}
 
@@ -1067,12 +1067,12 @@ Renderer.prototype.renderNeoRefListsLegoAsimetricVersion = function(gl, neoRefLi
 				if(renderTexture) {
 					if(neoReference.hasTexture) {
 						if(neoReference.texture != undefined) {
-							if(neoReference.texture.tex_id != undefined) {
+							if(neoReference.texture.texId != undefined) {
 								gl.uniform1i(standardShader.hasTexture_loc, true); //.***
-								if(current_tex_id != neoReference.texture.tex_id) {
+								if(current_tex_id != neoReference.texture.texId) {
 									//gl.activeTexture(gl.TEXTURE2);
-									gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.tex_id);
-									current_tex_id = neoReference.texture.tex_id;
+									gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.texId);
+									current_tex_id = neoReference.texture.texId;
 								}
 							} else {
 								continue;
@@ -1336,19 +1336,19 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 
 			// Check if the texture is loaded.********************************************************************************
 			/*
-			if(neoReference.texture != undefined && neoReference.texture.tex_id == undefined) {
+			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
 				if(magoManager.backGround_fileReadings_count > 10) continue;
 
 				// 1rst, check if the texture is loaded.***
-				var tex_id = neoBuilding.getTextureId(neoReference.texture);
-				if(tex_id == undefined) {
+				var texId = neoBuilding.getTextureId(neoReference.texture);
+				if(texId == undefined) {
 					// Load the texture.***
-					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+					var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
 					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 					magoManager.backGround_fileReadings_count ++;
 					continue;
 				} else {
-					neoReference.texture.tex_id = tex_id;
+					neoReference.texture.texId = texId;
 				}
 			}
 			*/
@@ -1884,10 +1884,10 @@ Renderer.prototype.renderNeoSimpleBuildingPostFxShader = function(gl, neoBuildin
 	}
 
 	// now, check accesors.***
-	var accesorsCount = simpBuild.accesors_array.length;
+	var accesorsCount = simpBuild.accesorsArray.length;
 	var stride = 0;
 	for(var i=0; i<accesorsCount; i++) {
-		var accesor = simpBuild.accesors_array[i];
+		var accesor = simpBuild.accesorsArray[i];
 
 		var normalize_data = false;
 		//var dataType = undefined;
@@ -1988,10 +1988,10 @@ Renderer.prototype.renderNeoSimpleBuildingDepthShader = function(gl, neoBuilding
 	//gl.activeTexture(gl.TEXTURE2); // for diffuse texture.***
 
 	// now, check accesors.***
-	var accesorsCount = simpBuild.accesors_array.length;
+	var accesorsCount = simpBuild.accesorsArray.length;
 	var stride = 0;
 	for(var i=0; i<accesorsCount; i++) {
-		var accesor = simpBuild.accesors_array[i];
+		var accesor = simpBuild.accesorsArray[i];
 
 		var normalize_data = false;
 		//var dataType = undefined;

@@ -433,21 +433,21 @@ ReaderWriter.prototype.readNeoReferences = function(gl, neoRefsList, arrayBuffer
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			for(var j=0; j<texture_type_nameLegth; j++) {
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));
+				neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));
 				bytesReaded += 1; // for example "diffuse".***
 			}
 
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			for(var j=0; j<texture_fileName_Legth; j++) {
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));
+				neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));
 				bytesReaded += 1;
 			}
 
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
-			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			if(neoRef.texture.texId == undefined)
+				neoRef.texture.texId = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/
@@ -1577,9 +1577,9 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, mag
 ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) {
 	var neoRefImage = new Image();
 	neoRefImage.onload = function() {
-		if(texture.tex_id == undefined) texture.tex_id = gl.createTexture();
+		if(texture.texId == undefined) texture.texId = gl.createTexture();
 
-		handleTextureLoaded(gl, neoRefImage, texture.tex_id);
+		handleTextureLoaded(gl, neoRefImage, texture.texId);
 		//BR_Project._f4d_lod0Image_readed_finished = true;
 
 		neoBuilding.textures_loaded.push(texture);

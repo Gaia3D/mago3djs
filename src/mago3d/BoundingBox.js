@@ -48,7 +48,7 @@ BoundingBox.prototype.deleteObjects = function() {
 
 /**
  * 영역 박스 확대
- * @param point3d 변수
+ * @param dist 변수
  */
 BoundingBox.prototype.expand = function(dist) {
 	this.minX -= dist;
@@ -62,7 +62,7 @@ BoundingBox.prototype.expand = function(dist) {
 
 /**
  * 영역 박스에 포인트를 추가하면서 영역을 변경
- * @param point3d
+ * @param point3d 변수
  */
 BoundingBox.prototype.addPoint3D = function(point3d) {
 	if(point3d.x < this.minX) this.minX = point3d.x;
@@ -96,10 +96,10 @@ BoundingBox.prototype.addBox = function(boundingBox) {
  */
 BoundingBox.prototype.getMaxLength = function() {
 	var result = this.maxX - this.minX;
-	var dim_y = this.maxY - this.minY;
-	var dim_z = this.maxZ - this.minZ;
-	if(dim_y > result) result = dim_y;
-	if(dim_z > result) result = dim_z;
+	var dimY = this.maxY - this.minY;
+	var dimZ = this.maxZ - this.minZ;
+	if(dimY > result) result = dimY;
+	if(dimZ > result) result = dimZ;
 
 	return result;
 };

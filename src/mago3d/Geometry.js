@@ -12,9 +12,9 @@ var Texture = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.texture_type_name = "";
-	this.texture_image_fileName = "";
-	this.tex_id;
+	this.textureTypeName = "";
+	this.textureImageFileName = "";
+	this.texId;
 };
 
 /**
@@ -26,8 +26,8 @@ var NeoSimpleBuilding = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.accesors_array = [];
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.accesorsArray = [];
+	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
 };
 
@@ -37,7 +37,7 @@ var NeoSimpleBuilding = function() {
  */
 NeoSimpleBuilding.prototype.newAccesor = function() {
 	var accesor = new Accessor();
-	this.accesors_array.push(accesor);
+	this.accesorsArray.push(accesor);
 	return accesor;
 };
 
@@ -76,7 +76,7 @@ var LodBuilding = function() {
 	// this class is for use for LOD2 and LOD3 buildings.***
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
@@ -96,17 +96,17 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 		bbox.maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 
-		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		var vboViCacheKey = this.vboVicksContainer.newVBOVertexIdxCacheKey();
 
 		// 1) Positions.************************************************************************************************
 		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValues_count = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4*verticesFloatValues_count;
-		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
+		vboViCacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
 
-		vbo_vi_cacheKey.vertexCount = vertexCount;
+		vboViCacheKey.vertexCount = vertexCount;
 
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
@@ -115,7 +115,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			var normalsByteValues_count = vertexCount * 3;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*normalsByteValues_count;
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			vboViCacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
 		}
 
@@ -126,7 +126,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			var colorsByteValues_count = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1*colorsByteValues_count;
-			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			vboViCacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
 		}
 
@@ -179,7 +179,7 @@ var NeoBuilding = function() {
 	this.motherBlocksArray = []; // asimetric mode.***
 
 	// Textures loaded.***************************************************
-	this.textures_loaded = [];
+	this.texturesLoaded = [];
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -221,27 +221,27 @@ NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param texture 변수
- * @returns tex_id
+ * @returns texId
  */
 NeoBuilding.prototype.getTextureId = function(texture) {
 	/*
-	this.texture_type_name = "";
-	this.texture_image_fileName = "";
-	this.tex_id = undefined;
+	this.textureTypeName = "";
+	this.textureImageFileName = "";
+	this.texId = undefined;
 	*/
-	var tex_id;
-	var textures_loaded_count = this.textures_loaded.length;
+	var texId;
+	var texturesLoadedCount = this.texturesLoaded.length;
 	var find = false;
 	var i=0;
-	while(!find && i<textures_loaded_count) {
-		if(this.textures_loaded[i].texture_image_fileName == texture.texture_image_fileName) {
+	while(!find && i < texturesLoadedCount ) {
+		if(this.texturesLoadedCount[i].textureImageFileName == texture.textureImageFileName) {
 			find = true;
-			tex_id = this.textures_loaded[i].tex_id;
+			texId = this.texturesLoaded[i].texId;
 		}
 		i++;
 	}
 
-	return tex_id;
+	return texId;
 };
 
 /**
