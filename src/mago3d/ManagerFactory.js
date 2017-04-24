@@ -3,7 +3,7 @@
 /**
  * Factory method 패턴을 사용해서 cesium, worldwind 등을 wrapping 해 주는 클래스
  * @class ManagerFactory
- * 
+ *
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
  * @param magoConfig mago3d 설정값 json object
@@ -14,21 +14,21 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	var magoManager = null;
 	var scene = null;
-	
-	if(magoConfig.deployConfig === null 
-			|| magoConfig.deployConfig === '' 
-			|| magoConfig.deployConfig.viewLibrary === null 
-			|| magoConfig.deployConfig.viewLibrary === '' 
+
+	if(magoConfig.deployConfig === null
+			|| magoConfig.deployConfig === ''
+			|| magoConfig.deployConfig.viewLibrary === null
+			|| magoConfig.deployConfig.viewLibrary === ''
 			|| magoConfig.deployConfig.viewLibrary === Constant.CESIUM) {
 		// 환경 설정
 		MagoConfig.init(magoConfig, blocksConfig);
-		
+
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
-		
+
 		// background provider 적용
 		if(magoConfig.backgroundProvider.enable) {
 			backgroundProvider();
@@ -49,7 +49,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	} else if(magoConfig.deployConfig.viewLibrary === Constant.WORLDWIND) {
 		viewer = null;
 	}
-	
+
 	// 실제 화면에 object를 rendering 하는 메인 메서드
 	function draw() {
 		if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.CESIUM) {
@@ -58,27 +58,27 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			//
 		}
 	}
-	
+
 	// cesium을 구현체로서 이용
 	function drawCesium() {
 		var gl = viewer.scene.context._gl;
 		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(gl); 
-		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); 
+		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl);
 		viewer.scene.magoManager.scene = viewer.scene;
-		
+
 		// Start postRender version.***********************************************
 		magoManager = viewer.scene.magoManager;
 		scene = viewer.scene;
 		//scene.copyGlobeDepth = true;
 		viewer.scene.globe.depthTestAgainstTerrain = true;
-		
+
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		viewer.scene.magoManager.getObjectIndexFile();
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
 	}
-	
+
 	// 뭐하는 메서드 인가?
 	function disableCameraMotion(state){
 		viewer.scene.screenSpaceCameraController.enableRotate = state;
@@ -87,24 +87,24 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		viewer.scene.screenSpaceCameraController.enableTilt = state;
 		viewer.scene.screenSpaceCameraController.enableTranslate = state;
 	}
-	
+
 	// 이벤트 확장
 	function addMouseAction() {
 		magoManager.handler.setInputAction(function(click) {
 			magoManager.dateSC = new Date();
 			magoManager.startTimeSC = magoManager.dateSC.getTime();
 			//secondsUsed = this.currentTimeSC - this.startTimeSC;
-					
+
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
-		
+
 		magoManager.handler.setInputAction(function(click) {
 			magoManager.dateSC = new Date();
 			magoManager.startTimeSC = magoManager.dateSC.getTime();
 			//secondsUsed = this.currentTimeSC - this.startTimeSC;
-					
+
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseMiddleDown = true;
@@ -113,7 +113,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		magoManager.handler.setInputAction(function(movement) {
 			if(magoManager.mouseLeftDown) {
 				if(movement.startPosition.x != movement.endPosition.x || movement.startPosition.y != movement.endPosition.y) {
-					
+
 					// distinguish 2 modes.******************************************************
 					if(magoManager.magoPolicy.mouseMoveMode == 0) // blocks move.***
 					{
@@ -121,7 +121,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 							// move the selected object.***
 							magoManager.mouse_x = movement.startPosition.x;
 							magoManager.mouse_y = movement.startPosition.y;
-							
+
 							// 1rst, check if there are objects to move.***
 							if(magoManager.mustCheckIfDragging) {
 								if(magoManager.isDragging(magoManager.scene)) {
@@ -133,14 +133,14 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 						} else {
 							magoManager.isCameraMoving = true; // if no object is selected.***
 						}
-					}	
+					}
 					else if(magoManager.magoPolicy.mouseMoveMode == 1) // objects move.***
 					{
 						if(magoManager.objectSelected != undefined) {
 							// move the selected object.***
 							magoManager.mouse_x = movement.startPosition.x;
 							magoManager.mouse_y = movement.startPosition.y;
-							
+
 							// 1rst, check if there are objects to move.***
 							if(magoManager.mustCheckIfDragging) {
 								if(magoManager.isDragging(magoManager.scene)) {
@@ -181,7 +181,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.mustCheckIfDragging = true;
 			magoManager.thereAreStartMovePoint = false;
 			disableCameraMotion(true);
-			
+
 			magoManager.dateSC = new Date();
 			magoManager.currentTimeSC = magoManager.dateSC.getTime();
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
@@ -194,7 +194,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				}
 			}
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
-		
+
 		magoManager.handler.setInputAction(function(movement) {
 			// if picked
 			//vm.pickedPolygon = false;
@@ -206,7 +206,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			magoManager.mustCheckIfDragging = true;
 			magoManager.thereAreStartMovePoint = false;
 			disableCameraMotion(true);
-			
+
 			magoManager.dateSC = new Date();
 			magoManager.currentTimeSC = magoManager.dateSC.getTime();
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
@@ -219,15 +219,15 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			}
 	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
 	}
-	
+
 	// KeyPressEvents.**************************************
 	document.addEventListener('keydown', function(e) {
 		setKey(e);
 	}, false);
-	
+
 	function setKey(event) {
 		var increDeg = 3.0;
-		if (event.key === "q" || event.key === "Q") {  // right arrow 
+		if (event.key === "q" || event.key === "Q") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -235,13 +235,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					currentHeading+increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
 				}
 			}
-			
+
 		}
-		else if (event.key === "a" || event.key === "A") {  // right arrow 
+		else if (event.key === "a" || event.key === "A") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -249,13 +249,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					currentHeading-increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
 				}
 			}
-			
+
 		}
-		else if (event.key === "w" || event.key === "W") {  // right arrow 
+		else if (event.key === "w" || event.key === "W") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -263,13 +263,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, currentPitch+increDeg, selectedBuilding.geoLocationDataAux.roll);
 				}
 			}
-			
+
 		}
-		else if (event.key === "s" || event.key === "S") {  // right arrow 
+		else if (event.key === "s" || event.key === "S") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -277,13 +277,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, currentPitch-increDeg, selectedBuilding.geoLocationDataAux.roll);
 				}
 			}
-			
+
 		}
-		else if (event.key === "e" || event.key === "E") {  // right arrow 
+		else if (event.key === "e" || event.key === "E") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -291,13 +291,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll+increDeg);
 				}
 			}
-			
+
 		}
-		else if (event.key === "d" || event.key === "D") {  // right arrow 
+		else if (event.key === "d" || event.key === "D") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
@@ -305,19 +305,19 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
 					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation, 
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll-increDeg);
 				}
 			}
-			
+
 		}
 	}
 
-	
+
 	// world wind 구현체를 이용
 	function drawWorldWind() {
 	}
-	
+
 	/**
 	 * background provider
 	 */
@@ -326,14 +326,14 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			url : MagoConfig.getInformation().backgroundProvider.url,
 			layers : MagoConfig.getInformation().backgroundProvider.layers,
 			parameters : {
-				service : MagoConfig.getInformation().backgroundProvider.parameters.service, 
-				version : MagoConfig.getInformation().backgroundProvider.parameters.version, 
-				request : MagoConfig.getInformation().backgroundProvider.parameters.request, 
-				transparent : MagoConfig.getInformation().backgroundProvider.parameters.transparent, 
-				//tiled : MagoConfig.getInformation().backgroundProvider.parameters.tiled, 
-				format : MagoConfig.getInformation().backgroundProvider.parameters.format 
-//				time : MagoConfig.getInformation().backgroundProvider.parameters.time, 
-//		    	rand : MagoConfig.getInformation().backgroundProvider.parameters.rand, 
+				service : MagoConfig.getInformation().backgroundProvider.parameters.service,
+				version : MagoConfig.getInformation().backgroundProvider.parameters.version,
+				request : MagoConfig.getInformation().backgroundProvider.parameters.request,
+				transparent : MagoConfig.getInformation().backgroundProvider.parameters.transparent,
+				//tiled : MagoConfig.getInformation().backgroundProvider.parameters.tiled,
+				format : MagoConfig.getInformation().backgroundProvider.parameters.format
+//				time : MagoConfig.getInformation().backgroundProvider.parameters.time,
+//		    	rand : MagoConfig.getInformation().backgroundProvider.parameters.rand,
 //		    	asdf : MagoConfig.getInformation().backgroundProvider.parameters.asdf
 			}
 			//,proxy: new Cesium.DefaultProxy('/proxy/')
@@ -342,7 +342,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 //		if(index) viewer.imageryLayers.addImageryProvider(provider, index);
 		viewer.imageryLayers.addImageryProvider(provider);
 	}
-	
+
 	/**
 	 * zoomTo 할 Entity
 	 * @returns entities
@@ -350,49 +350,49 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	function initEntity() {
 		return viewer.entities.add({
 			name : MagoConfig.getInformation().geoConfig.initEntity.name,
-			position: Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initEntity.longitude, 
-													MagoConfig.getInformation().geoConfig.initEntity.latitude, 
+			position: Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initEntity.longitude,
+													MagoConfig.getInformation().geoConfig.initEntity.latitude,
 													MagoConfig.getInformation().geoConfig.initEntity.height),
 			box : {
 				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
 				//material : Cesium.Color.TRANSPARENT
 				fill : false,
-			    material : Cesium.Color.TRANSPARENT,
-			    outline : true,
-			    outlineWidth : 3.0,
-			    outlineColor : Cesium.Color.BLACK
+				material : Cesium.Color.TRANSPARENT,
+				outline : true,
+				outlineWidth : 3.0,
+				outlineColor : Cesium.Color.BLACK
 			}
 		});
 	}
-	
+
 	// terrain 적용 유무를 설정
 	function initTerrain() {
 		if(MagoConfig.getInformation().geoConfig.initTerrain.enable) {
 			var terrainProvider = new Cesium.CesiumTerrainProvider({
 				url : MagoConfig.getInformation().geoConfig.initTerrain.url,
-			    requestWaterMask: MagoConfig.getInformation().geoConfig.initTerrain.requestWaterMask,
+				requestWaterMask: MagoConfig.getInformation().geoConfig.initTerrain.requestWaterMask,
 				requestVertexNormals: MagoConfig.getInformation().geoConfig.initTerrain.requestVertexNormals
 			});
 			viewer.terrainProvider = terrainProvider;
 		}
 	}
-	
+
 	// 최초 로딩시 이동할 카메라 위치
 	function initCamera() {
 		viewer.camera.flyTo({
-		    destination : Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initCamera.longitude, 
-														MagoConfig.getInformation().geoConfig.initCamera.latitude, 
+			destination : Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initCamera.longitude,
+														MagoConfig.getInformation().geoConfig.initCamera.latitude,
 														MagoConfig.getInformation().geoConfig.initCamera.height),
-		    duration: MagoConfig.getInformation().geoConfig.initCamera.duration
+			duration: MagoConfig.getInformation().geoConfig.initCamera.duration
 		});
 	}
-	
+
 	// deploy 타입 적용
 	function initRenderMode() {
 		var api = new API("renderMode");
 		api.setRenderMode(MagoConfig.getInformation().renderingConfg.renderMode);
 		magoManager.callAPI(api);
-		
+
 		if(!MagoConfig.getInformation().renderingConfg.timelineEnable) {
 			// visible <---> hidden
 			$(viewer._animation.container).css("visibility", "hidden");
@@ -400,7 +400,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			viewer.forceResize();
 		}
 	}
-	
+
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
 		// api gateway 역할

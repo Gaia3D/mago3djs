@@ -13,7 +13,7 @@
 		gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);\n\
 		vColor=color;\n\
 		}";
-		
+
 	var shader_fragment_source="\n\
 		precision mediump float;\n\
 		varying vec3 vColor;\n\
@@ -28,7 +28,7 @@
 		http://blogs.agi.com/insight3d/index.php/2008/09/03/precisions-precisions/ // GPU RTE HighValue-LowValue
 		uniform vec3 uViewerHigh;
 		uniform vec3 uViewerLow;
-		 
+
 		void main(void)
 		{
 			vec3 highDifference = vec3(gl_Vertex.xyz - uViewerHigh);
@@ -64,7 +64,7 @@
 			return vec4(highDifference + lowDifference, 1.0);\n\
 		}\n\
 		*/
-		
+
 /**
  * 조명 입력 및 재질 구성을 기반으로 렌더링 된 각 픽셀의 색상을 계산하기위한 수학적 계산 및 알고리즘을 포함하는 작은 스크립트
  * @class Shader
@@ -73,19 +73,19 @@ var Shader = function() {
 	if(!(this instanceof Shader)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.shader_name;
-    this.shader_vertex_source;
+	this.shader_vertex_source;
 	this.shader_fragment_source;
 	this.SHADER_PROGRAM;
-	
+
 	this.shader_vertex;
 	this.shader_fragment;
-	
+
 	this._ModelViewProjectionMatrixRelToEye;
 	this._RefTransfMatrix;
 	this._NormalMatrix;
-	
+
 	this._encodedCamPosHIGH;
 	this._encodedCamPosLOW;
 	this._BuildingPosHIGH;
@@ -96,7 +96,7 @@ var Shader = function() {
 	this._position;
 	this._texcoord;
 	this._normal;
-	
+
 	// test.***
 	this.samplerUniform;
 };
@@ -109,9 +109,9 @@ var ShadersManager = function() {
 	if(!(this instanceof ShadersManager)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.shaders_array = [];
-	
+
 	// Create shaders to render F4D_Format.**********************
 	// 1) Standard shader, that can render light mapping.***
 };
@@ -123,11 +123,11 @@ var ShadersManager = function() {
  */
 ShadersManager.prototype.getMagoShader = function(idx) {
 	var shader;
-	
+
 	if(idx >= 0 && idx < this.shaders_array.length) {
 		shader = this.shaders_array[idx];
 	}
-	
+
 	return shader;
 };
 
@@ -140,8 +140,8 @@ ShadersManager.prototype.getShader = function(gl, source, type, typeString) {
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-	  alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
-	  return false;
+		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
+		return false;
 	}
 	return shader;
 };
@@ -166,12 +166,12 @@ ShadersManager.prototype.createDefaultShader = function(gl) {
 ShadersManager.prototype.createColorSelectionShader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	
+
 	shader.shader_vertex_source = ShaderSource.colorShaderVertexSource;
 	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
-		
+
 	shader.shader_fragment_source = ShaderSource.colorShaderFragmentSource;
-		
+
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
 	shader.SHADER_PROGRAM = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
@@ -179,7 +179,7 @@ ShadersManager.prototype.createColorSelectionShader = function(gl) {
 	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
 	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
 	gl.linkProgram(shader.SHADER_PROGRAM);
-	
+
 	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
 	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
 	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
@@ -196,10 +196,10 @@ ShadersManager.prototype.createColorSelectionShader = function(gl) {
 ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	
+
 	shader.shader_vertex_source = ShaderSource.textureShaderVertexSource;
 	shader.shader_fragment_source = ShaderSource.textureShaderFragmentSource;
-		
+
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	shader.SHADER_PROGRAM = gl.createProgram();
@@ -227,7 +227,7 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) {
 ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) {
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	
+
 	shader.shader_vertex_source = ShaderSource.textureA1ShaderVertexSource;
 	shader.shader_fragment_source = ShaderSource.textureA1ShaderFragmentSource;
 
@@ -258,10 +258,10 @@ ShadersManager.prototype.createStandardShader = function(gl) {
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
-	
+
 	standard_shader.shader_vertex_source = ShaderSource.standardShaderVertexSource;
 	standard_shader.shader_fragment_source = ShaderSource.standardShaderFragmentSource;
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
 	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
@@ -289,10 +289,10 @@ ShadersManager.prototype.createCloudShader = function(gl) {
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
-	
+
 	standard_shader.shader_vertex_source = ShaderSource.cloudShaderVertexSource;
 	standard_shader.shader_fragment_source = ShaderSource.cloudShaderFragmentSource;
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
 	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
@@ -322,7 +322,7 @@ ShadersManager.prototype.createBlendingCubeShader = function(gl) {
 
 	standard_shader.shader_vertex_source = ShaderSource.blendingCubeShaderVertexSource;
 	standard_shader.shader_fragment_source = ShaderSource.blendingCubeShaderFragmentSource;
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
 	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
@@ -350,7 +350,7 @@ ShadersManager.prototype.createPCloudShader = function(gl) {
 
 	standard_shader.shader_vertex_source = ShaderSource.pCloudShaderVertexSource;
 	standard_shader.shader_fragment_source = ShaderSource.pCloundShaderFragmentSource;
-		
+
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
 	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
@@ -378,7 +378,7 @@ ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) {
 	this.shaders_array.push(shader);
 	shader.shader_vertex_source = ShaderSource.texNormalShaderVertexSource;
 	shader.shader_fragment_source = ShaderSource.texNormalShaderFragmentSource;
-		
+
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
 	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
@@ -394,10 +394,10 @@ ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) {
 	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
 	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
 	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	
+
 	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
 	shader._NormalMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
-	
+
 	//shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 	shader.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
 	shader._lightDirection = gl.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
@@ -406,5 +406,5 @@ ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) {
 	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 	shader._normal = gl.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
-  
+
 //# sourceURL=Shader.js

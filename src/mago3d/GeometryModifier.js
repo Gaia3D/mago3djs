@@ -9,11 +9,11 @@ var GeometryModifier = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
- * @memberof GeometryModifier 
- * 
+ * @memberof GeometryModifier
+ *
  * @param f4d_point3d 변수
  * @param px 변수
  * @param py 변수
@@ -24,11 +24,11 @@ GeometryModifier.prototype.setPoint3d = function(f4d_point3d, px, py, pz) {
 	f4d_point3d.y = py;
 	f4d_point3d.z = pz;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param f4d_point3d 변수
  * @param px 변수
  * @param py 변수
@@ -39,14 +39,14 @@ GeometryModifier.prototype.point3dSquareDistTo = function(f4d_point3d, px, py, p
 	var dx = f4d_point3d.x - px;
 	var dy = f4d_point3d.y - py;
 	var dz = f4d_point3d.z - pz;
-	  
+
 	return dx*dx + dy*dy + dz*dz;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param matrix4 변수
  * @param float32array 변수
  */
@@ -55,14 +55,14 @@ GeometryModifier.prototype.Matrix4SetByFloat32Array = function(matrix4, float32a
 		matrix4._floatArrays[i] = float32array[i];
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param matrix4 변수
  * @param point3d 변수
- * @returns transformedPoint3d 
+ * @returns transformedPoint3d
  */
 GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) {
 	var transformedPoint3d = new Point3D();
@@ -72,32 +72,32 @@ GeometryModifier.prototype.Matrix4TransformPoint3D = function(matrix4, point3d) 
 
 	// Note: idx = 4*col+row;.***
 	//_floatArrays
-		
+
 	// Old version.*************************************************************************************************************************
 	//transformedPoint3d.x = point3d.x*matrix4.get(0,0) + point3d.y*matrix4.get(1,0) + point3d.z*matrix4.get(2,0) + matrix4.get(3,0);
 	//transformedPoint3d.y = point3d.x*matrix4.get(0,1) + point3d.y*matrix4.get(1,1) + point3d.z*matrix4.get(2,1) + matrix4.get(3,1);
 	//transformedPoint3d.z = point3d.x*matrix4.get(0,2) + point3d.y*matrix4.get(1,2) + point3d.z*matrix4.get(2,2) + matrix4.get(3,2);
 	//--------------------------------------------------------------------------------------------------------------------------------------
-		
+
 	// New version. Acces directly to the array.**********************************************************************************************************************
 	transformedPoint3d.x = point3d.x*matrix4._floatArrays[0] + point3d.y*matrix4._floatArrays[4] + point3d.z*matrix4._floatArrays[8] + matrix4._floatArrays[12];
 	transformedPoint3d.y = point3d.x*matrix4._floatArrays[1] + point3d.y*matrix4._floatArrays[5] + point3d.z*matrix4._floatArrays[9] + matrix4._floatArrays[13];
 	transformedPoint3d.z = point3d.x*matrix4._floatArrays[2] + point3d.y*matrix4._floatArrays[6] + point3d.z*matrix4._floatArrays[10] + matrix4._floatArrays[14];
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------
-		
+
 	return transformedPoint3d;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param matrixA 변수
  * @param matrixB 변수
  * @retuns resultMat
  */
 GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matrixB) {
-	//CKK_Matrix4 operator*(const CKK_Matrix4 &A) 
+	//CKK_Matrix4 operator*(const CKK_Matrix4 &A)
 	//{
 	//	// Copied From Carve.***
 	//	CKK_Matrix4 c;
@@ -111,7 +111,7 @@ GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matr
 	//	}
 	//	return c;
 	//}
-	
+
 	var resultMat = new Matrix4();
 	for(var i=0; i<4; i++)
 	{
@@ -129,11 +129,11 @@ GeometryModifier.prototype.Matrix4GetMultipliedByMatrix = function(matrixA, matr
 	}
 	return resultMat;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param reference 변수
  * @param matrix 변수
  */
@@ -146,7 +146,7 @@ GeometryModifier.prototype.referenceMultiplyTransformMatrix = function(reference
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param compRefList 변수
  * @param matrix 변수
  */
@@ -164,11 +164,11 @@ GeometryModifier.prototype.compoundReferencesListMultiplyReferencesMatrices = fu
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param compRefList 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -185,10 +185,10 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
   return tmp.buffer;
 };
 */
-	
+
 	var visibleCompRefObjectsArray = new CompoundReferencesList();
 	visibleCompRefObjectsArray._myBlocksList = compRefList._myBlocksList;
-	
+
 	var ocCulling_box = compRefList._ocCulling._ocCulling_box;
 	var indicesVisiblesArray_interior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_interior)
@@ -198,9 +198,9 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 		{
 			visibleCompRefObjectsArray._compoundRefsArray.push(compRefList._compoundRefsArray[indicesVisiblesArray_interior[i]]);
 		}
-		
+
 	}
-	
+
 	var infinite_ocCulling_box = compRefList._ocCulling._infinite_ocCulling_box;
 	var indicesVisiblesArray_exterior = this.occlusionCullingOctreeCellGetIndicesVisiblesForEye(infinite_ocCulling_box, eye_x, eye_y, eye_z);
 	if(indicesVisiblesArray_exterior)
@@ -216,11 +216,11 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 
 	return visibleCompRefObjectsArray;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param compRefList_container 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -240,11 +240,11 @@ GeometryModifier.prototype.compoundReferencesListContainerGetVisibleCompRefObjec
 	}
 	return visibleCompRefObjectsArray_Total;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param buildingProject 변수
  * @param eye_x 변수
  * @param eye_y 변수
@@ -255,19 +255,19 @@ GeometryModifier.prototype.bRbuildingProjectGetVisibleCompRefLists = function(bu
 	// 1rst, check if the eye is in the building.***
 	var InteriorCompRefList_container = buildingProject._interiorCompRefList_Container;
 	var interior_visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(InteriorCompRefList_container, eye_x, eye_y, eye_z);
-		
+
 	var compRefList_container = buildingProject._compRefList_Container;
 	var visibleCompRefLists = this.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_container, eye_x, eye_y, eye_z);
-	  
+
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 
 	return total_visibleCompRefLists;
 };
-	
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  * @param min_x 변수
  * @param max_x 변수
@@ -284,11 +284,11 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetDimensions = function(oc
 	ocCullOctreeCell.minZ = min_z;
 	ocCullOctreeCell.maxZ = max_z;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function(ocCullOctreeCell) {
@@ -301,14 +301,14 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 	// |          |          |     |          |          |       |
 	// |     0    |     1    |     |    4     |    5     |       |
 	// |          |          |     |          |          |       -----------------> X
-	// |----------|----------|     |----------|----------|  
-	
+	// |----------|----------|     |----------|----------|
+
 	if(ocCullOctreeCell._subBoxesArray.length > 0)
 	{
 		var half_x= (ocCullOctreeCell.maxX + ocCullOctreeCell.minX)/2.0;
 		var half_y= (ocCullOctreeCell.maxY + ocCullOctreeCell.minY)/2.0;
 		var half_z= (ocCullOctreeCell.maxZ + ocCullOctreeCell.minZ)/2.0;
-		
+
 		// Old.***************************************************************************************************************************************************
 		//ocCullOctreeCell._subBoxesArray[0].setDimensions(ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
 		//ocCullOctreeCell._subBoxesArray[1].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
@@ -319,19 +319,19 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 		//ocCullOctreeCell._subBoxesArray[5].setDimensions(half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
 		//ocCullOctreeCell._subBoxesArray[6].setDimensions(half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		//ocCullOctreeCell._subBoxesArray[7].setDimensions(ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
-		
+
 		// New version.*********************************************************************************************************************************************
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[0], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[1], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   ocCullOctreeCell.minZ, half_z);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[2], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[3], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   ocCullOctreeCell.minZ, half_z);
-		
+
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[4], ocCullOctreeCell.minX, half_x,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[5], half_x, ocCullOctreeCell.maxX,   ocCullOctreeCell.minY, half_y,   half_z, ocCullOctreeCell.maxZ);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[6], half_x, ocCullOctreeCell.maxX,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		this.occlusionCullingOctreeCellSetDimensions(ocCullOctreeCell._subBoxesArray[7], ocCullOctreeCell.minX, half_x,   half_y, ocCullOctreeCell.maxY,   half_z, ocCullOctreeCell.maxZ);
 		//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-		
+
 		for(var i=0; i<ocCullOctreeCell._subBoxesArray.length; i++)
 		{
 			//ocCullOctreeCell._subBoxesArray[i].setSizesSubBoxes(); // Old.***
@@ -339,11 +339,11 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
 		}
 	}
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
@@ -352,7 +352,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellSetSizesSubBoxes = function
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersects = false;
-	
+
 	if(x>ocCullOctreeCell.minX && x<ocCullOctreeCell.maxX) {
 		if(y>ocCullOctreeCell.minY && y<ocCullOctreeCell.maxY) {
 			if(z>ocCullOctreeCell.minZ && z<ocCullOctreeCell.maxZ) {
@@ -360,14 +360,14 @@ GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = fun
 			}
 		}
 	}
-	
+
 	return intersects;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
@@ -376,7 +376,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellIntersectsWithPoint3D = fun
  */
 GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D = function(ocCullOctreeCell, x, y, z) {
 	var intersectedSubBox = null;
-	
+
 	if(ocCullOctreeCell._ocCulling_Cell_owner == null)
 	{
 		// This is the mother_cell.***
@@ -385,17 +385,17 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 			return null;
 		}
 	}
-	
+
 	var subBoxes_count = ocCullOctreeCell._subBoxesArray.length;
 	if(subBoxes_count > 0)
 	{
 		var center_x = (ocCullOctreeCell.minX + ocCullOctreeCell.maxX)/2.0;
 		var center_y = (ocCullOctreeCell.minY + ocCullOctreeCell.maxY)/2.0;
 		var center_z = (ocCullOctreeCell.minZ + ocCullOctreeCell.maxZ)/2.0;
-		
+
 		var intersectedSubBox_aux = null;
 		var intersectedSubBox_idx = undefined;
-		
+
 		if(x<center_x)
 		{
 			// Here are the boxes number 0, 3, 4, 7.***
@@ -412,7 +412,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 				else intersectedSubBox_idx = 7;
 			}
 		}
-		else 
+		else
 		{
 			// Here are the boxes number 1, 2, 5, 6.***
 			if(y<center_y)
@@ -428,48 +428,48 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 				else intersectedSubBox_idx = 6;
 			}
 		}
-		
+
 		intersectedSubBox_aux = ocCullOctreeCell._subBoxesArray[intersectedSubBox_idx];
 		intersectedSubBox = this.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D(intersectedSubBox_aux, x, y, z);
-		
+
 	}
 	else
 	{
 		intersectedSubBox = ocCullOctreeCell;
 	}
-	
+
 	return intersectedSubBox;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  * @param x 변수
  * @param y 변수
  * @param z 변수
  * @returns indicesVisiblesArray
- */	
+ */
 GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = function(ocCullOctreeCell, eye_x, eye_y, eye_z) {
 	var indicesVisiblesArray = null;
 	var intersectedSubBox = this.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D(ocCullOctreeCell, eye_x, eye_y, eye_z);
-	
+
 	if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
 	{
 		indicesVisiblesArray = intersectedSubBox._indicesArray;
 	}
-	
+
 	return indicesVisiblesArray;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param ocCullOctreeCell 변수
  * @param expansionDist 변수
- */	
+ */
 GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCullOctreeCell, expansionDist) {
 	ocCullOctreeCell.minX -= expansionDist;
 	ocCullOctreeCell.maxX += expansionDist;
@@ -478,11 +478,11 @@ GeometryModifier.prototype.occlusionCullingOctreeCellExpandBox = function(ocCull
 	ocCullOctreeCell.minZ -= expansionDist;
 	ocCullOctreeCell.maxZ += expansionDist;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param vtArraysCacheKeys_container 변수
  * @returns vt_cacheKey
  */
@@ -491,28 +491,28 @@ GeometryModifier.prototype.vertexTexcoordsArraysCacheKeysContainerNewVertexTexco
 	vtArraysCacheKeys_container._vtArrays_cacheKeys_array.push(vt_cacheKey);
 	return vt_cacheKey;
 };
-	
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param blockList 변수
  * @param idx 변수
- * @returns block 
+ * @returns block
  */
 GeometryModifier.prototype.blocksListGetBlock = function(blockList, idx) {
 	var block = null;
-	  
+
 	if(idx >= 0 && idx <blockList.blocksArray.length) {
 		block = blockList.blocksArray[idx];
 	}
 	return block;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param blockList_container 변수
  * @param blocksList_name 변수
  * @returns blocksList
@@ -523,15 +523,15 @@ GeometryModifier.prototype.blocksListsContainerNewBlocksList = function(blockLis
 	blockList_container.blocksListsArray.push(blocksList);
 	return blocksList;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param blockList_container 변수
  * @param blockList_name 변수
  * @returns blocksList
- */	  
+ */
 GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList_container, blockList_name) {
 	var blocksLists_count = blockList_container.blocksListsArray.length;
 	var found = false;
@@ -549,16 +549,16 @@ GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList
 	}
 	return blocksList;
 };
-	  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param buildingProject 변수
- */	  
+ */
 GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = function(buildingProject) {
 	// Create 5 BlocksLists: "Blocks1", "Blocks2", "Blocks3", Blocks4" and "BlocksBone".***
-	  
+
 	// Old.*********************************************************
 	//this._blocksList_Container.newBlocksList("Blocks1");
 	//this._blocksList_Container.newBlocksList("Blocks2");
@@ -566,18 +566,18 @@ GeometryModifier.prototype.bRbuildingProjectCreateDefaultBlockReferencesLists = 
 	//this._blocksList_Container.newBlocksList("Blocks4");
 	//this._blocksList_Container.newBlocksList("BlocksBone");
 	//----------------------------------------------------------------
-	  
+
 	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks1");
 	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks2");
 	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks3");
 	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "Blocks4");
 	this.f4dBlocksListsContainer_newBlocksList(buildingProject._blocksList_Container, "BlocksBone");
 };
-	
+
 /**
  * 어떤 일을 하고 있습니까?
  * @memberof GeometryModifier
- * 
+ *
  * @param buildingProjectsList 변수
  * @returns br_buildingProject
  */
@@ -585,10 +585,10 @@ GeometryModifier.prototype.bRbuildingProjectsListNewBRProject = function(buildin
 	//var titol = "holes a tothom"
 	//var br_buildingProject = new BRBuildingProject({Titol : titol});
 	var br_buildingProject = new BRBuildingProject();
-	  
+
 	// Create the blocks lists default.***
 	this.bRbuildingProjectCreateDefaultBlockReferencesLists(br_buildingProject);
-	  
+
 	buildingProjectsList._BR_buildingsArray.push(br_buildingProject);
 	return br_buildingProject;
 };

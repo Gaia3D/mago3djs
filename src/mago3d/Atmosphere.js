@@ -2,7 +2,7 @@
 
 /**
  * 하늘에 구름을 관리하는 매니저
- * 
+ *
  * @class Atmosphere
  */
 var Atmosphere = function() {
@@ -16,7 +16,7 @@ var Atmosphere = function() {
 
 /**
  * 구름이 땅에 그림자를 그릴때 사용함
- * 
+ *
  * @class ShadowBlendingCube
  */
 var ShadowBlendingCube = function() {
@@ -35,7 +35,7 @@ var ShadowBlendingCube = function() {
 
 /**
  * 구름이 땅에 그림자를 그릴때 초기화
- * 
+ *
  * @param vtxMat
  *            변수
  * @param tTriMat
@@ -137,7 +137,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 
 /**
  * 그래픽 카드에 데이터를 올릴때 요청
- * 
+ *
  * @returns floatArray
  */
 ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
@@ -148,7 +148,7 @@ ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
 
 /**
  * 그래픽 카드에 데이터를 올릴때 사용(삼각형을 이루어 주는 순서)
- * 
+ *
  * @returns shortArray
  */
 ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
@@ -161,7 +161,7 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
 
 /**
  * 구름 매니저
- * 
+ *
  * @class CloudsManager
  */
 var CloudsManager = function() {
@@ -173,7 +173,7 @@ var CloudsManager = function() {
 
 /**
  * 원형 구름 생성
- * 
+ *
  * @returns circularCloud
  */
 CloudsManager.prototype.newCircularCloud = function() {
@@ -184,7 +184,7 @@ CloudsManager.prototype.newCircularCloud = function() {
 
 /**
  * 원형 구름
- * 
+ *
  * @class CircularCloud
  */
 var CircularCloud = function() {
@@ -232,7 +232,7 @@ var CircularCloud = function() {
 
 /**
  * 그래픽 카드에 올릴 데이터를 요청
- * 
+ *
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
@@ -242,7 +242,7 @@ CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
 
 /**
  * 그래픽 카드에 올릴 데이터를 요청(삼각형)
- * 
+ *
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOIndicesShortArray = function() {
@@ -255,7 +255,7 @@ CircularCloud.prototype.getVBOIndicesShortArray = function() {
 
 /**
  * 그래픽 카드에 올릴 데이터를 요청(Vertex)
- * 
+ *
  * @returns floatArray
  */
 CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
@@ -265,7 +265,7 @@ CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
 
 /**
  * 그래픽 카드에 올릴 데이터를 요청(삼삭형 순서)
- * 
+ *
  * @returns shortArray
  */
 CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
@@ -278,7 +278,7 @@ CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
 
 /**
  * 로케이션을 따라서 회전
- * 
+ *
  * @param vtxMat
  *            변수
  */
@@ -331,7 +331,7 @@ CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
 
 /**
  * 구름 생성
- * 
+ *
  * @param logitude
  *            경도
  * @param latitude
@@ -372,9 +372,9 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 	var splitVelueZ = Cesium.EncodedCartesian3.encode(position.z);
 
 	this.positionHIGH = new Float32Array([ splitVelueX.high, splitVelueY.high,
-			splitVelueZ.high ]);
+		splitVelueZ.high ]);
 	this.positionLOW = new Float32Array([ splitVelueX.low, splitVelueY.low,
-			splitVelueZ.low ]);
+		splitVelueZ.low ]);
 
 	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
 	var cloudPoint3d = this.bbox.getCenterPoint3d(cloudPoint3d);
@@ -386,7 +386,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 
 /**
  * mesh 생성
- * 
+ *
  * @param vtxMat
  *            변수
  * @param tTriMat
@@ -464,7 +464,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	angRad = 0.0;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for ( var i = 0; i < numPointsForRing; i++ ) {
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -482,7 +482,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	menorRingRadius = this.radius * 0.7;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for (var i = 0; i < numPointsForRing; i++ ) {
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -501,7 +501,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
 	randomValue = 0.6 + 0.3 * Math.random();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for ( var i = 0; i < numPointsForRing; i++ ) {
 		// randomValue = (2+Math.random())/2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();

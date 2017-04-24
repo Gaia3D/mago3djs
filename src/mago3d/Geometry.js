@@ -1,9 +1,9 @@
 'use strict';
 
 
-// F4D ReferenceObject.************************************************************************************************************************* // 
+// F4D ReferenceObject.************************************************************************************************************************* //
 /**
- * 맵 이미지. 머티리얼에는 텍스처에 대한 참조가 포함될 수 있으므로 머티리얼의 셰이더는 객체의 표면색을 계산하는 동안 텍스처를 사용할 수 있습니다. 
+ * 맵 이미지. 머티리얼에는 텍스처에 대한 참조가 포함될 수 있으므로 머티리얼의 셰이더는 객체의 표면색을 계산하는 동안 텍스처를 사용할 수 있습니다.
  * 오브제의 표면의 기본 색상 (알베도) 외에도 텍스쳐는 반사율이나 거칠기와 같은 재질 표면의 많은 다른면을 나타낼 수 있습니다.
  * @class Texture
  */
@@ -11,7 +11,7 @@ var Texture = function() {
 	if(!(this instanceof Texture)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.texture_type_name = "";
 	this.texture_image_fileName = "";
 	this.tex_id;
@@ -25,7 +25,7 @@ var NeoSimpleBuilding = function() {
 	if(!(this instanceof NeoSimpleBuilding)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.accesors_array = [];
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
@@ -33,7 +33,7 @@ var NeoSimpleBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns accesor 
+ * @returns accesor
  */
 NeoSimpleBuilding.prototype.newAccesor = function() {
 	var accesor = new Accessor();
@@ -79,25 +79,25 @@ var LodBuilding = function() {
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
- 
+
 LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
 	{
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 		var bytesReaded = 0;
-		
+
 		// 1rst, read bbox.***
 		var bbox = new BoundingBox();
 		bbox.minX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.minY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.minZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		  
+
 		bbox.maxX = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		
+
 		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
-		
+
 		// 1) Positions.************************************************************************************************
 		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValues_count = vertexCount * 3;
@@ -105,9 +105,9 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 		var endBuff = bytesReaded + 4*verticesFloatValues_count;
 		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
-		
+
 		vbo_vi_cacheKey.vertexCount = vertexCount;
-		
+
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasNormals) {
@@ -118,7 +118,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
 		}
-		
+
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasColors) {
@@ -129,16 +129,16 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
 		}
-		
+
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoord = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 //		if(hasTexCoord) {
 //			// TODO:
 //		}
-		
+
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}	
- };
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -148,7 +148,7 @@ var NeoBuilding = function() {
 	if(!(this instanceof NeoBuilding)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
@@ -156,13 +156,13 @@ var NeoBuilding = function() {
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
 	this.frustumCulled = false;
-	
+
 	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
 	this.geoLocDataManager = new GeoLocationDataManager();
 	this.geoLocationDataAux; // old. created for HeavyIndustries.***
 	this.isDemoBlock = false; // test.***
 	//this.isHighLighted;
-	
+
 	// create the default blocks_lists.*****************************
 	//this._blocksList_Container = new BlocksListsContainer();
 	//this._blocksList_Container.newBlocksList("Blocks1");
@@ -170,38 +170,38 @@ var NeoBuilding = function() {
 	//this._blocksList_Container.newBlocksList("Blocks3");
 	//this._blocksList_Container.newBlocksList("BlocksBone");
 	//this._blocksList_Container.newBlocksList("Blocks4");
-	
+
 	// create the references lists.*********************************
 	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = []; // test. no used. waiting for background process.***
 	this.preExtractedLowestOctreesArray = []; // test. no used. waiting for background process.***
 	this.motherNeoReferencesArray = []; // asimetric mode.***
 	this.motherBlocksArray = []; // asimetric mode.***
-	
+
 	// Textures loaded.***************************************************
 	this.textures_loaded = [];
-	
+
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
 	this.octreeLoadedAllFiles = false;
 
 	this.allFilesLoaded = false; // no used yet...
 	this.isReadyToRender = false; // no used yet...
-	
+
 	this.moveVector; // no used.***
-	
+
 	// aditional data.****************************************************
 
-	
+
 	// The simple building.***********************************************
 	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
-	
+
 	// The lodBuildings.***
 	this.lod2Building;
 	this.lod3Building;
-	
+
 	// SCRATCH.*********************************
-	this.point3d_scratch = new Point3D(); 
+	this.point3d_scratch = new Point3D();
 	this.point3d_scratch_2 = new Point3D();
 };
 
@@ -240,7 +240,7 @@ NeoBuilding.prototype.getTextureId = function(texture) {
 		}
 		i++;
 	}
-	
+
 	return tex_id;
 };
 
@@ -282,7 +282,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
-	
+
 	if(this.buildingPosMat_inv == undefined) {
 		this.buildingPosMat_inv = new Matrix4();
 		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
@@ -290,7 +290,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 	this.point3d_scratch.set(relative_eye_pos_x, relative_eye_pos_y, relative_eye_pos_z);
 	this.point3d_scratch_2 = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, this.point3d_scratch_2);
-  
+
 	return this.point3d_scratch_2;
 };
 
@@ -307,7 +307,7 @@ NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absolute
 	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
-	
+
 	if(this.buildingPosMat_inv == undefined) {
 		this.buildingPosMat_inv = new Matrix4();
 		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv); // this is rotationMatrixInverse.***
@@ -315,13 +315,13 @@ NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absolute
 
 	this.point3d_scratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);
 	resultCamera.position = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.position);
-	
+
 	this.point3d_scratch.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
 	resultCamera.direction = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.direction);
-	
+
 	this.point3d_scratch.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
 	resultCamera.up = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.up);
-  
+
 	return resultCamera;
 };
 
@@ -333,7 +333,7 @@ var NeoBuildingsList = function() {
 	if(!(this instanceof NeoBuildingsList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.neoBuildings_Array = [];
 };
 
@@ -365,7 +365,7 @@ NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, build
 		}
 		i++;
 	}
-	
+
 	return resultBuilding;
 };
 
@@ -382,22 +382,3 @@ NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulle
 	}
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

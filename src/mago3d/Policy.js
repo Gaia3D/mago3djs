@@ -8,10 +8,10 @@ var Policy = function() {
 	if(!(this instanceof Policy)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// mago3d 활성화/비활성화 여부
 	this.magoEnable = true;
-	
+
 	// outfitting 표시 여부
 	this.showOutFitting = false;
 	// boundingBox 표시/비표시
@@ -20,7 +20,7 @@ var Policy = function() {
 	this.showShadow = false;
 	// far frustum 거리
 	this.frustumFarSquaredDistance = 5000000;
-	
+
 	// highlighting
 	this.highLightedBuildings = [];
 	// color
@@ -29,10 +29,10 @@ var Policy = function() {
 	this.color = [];
 	// show/hide
 	this.hideBuildings = [];
-	
+
 	// 0 = block mode, 1 = object mode
 	this.mouseMoveMode = 0;
-	
+
 	// provisional.***
 	this.colorChangedObjectId;
 };

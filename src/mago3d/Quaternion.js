@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 /**
 * 어떤 일을 하고 있습니까?
 * @class Quaternion
@@ -10,7 +8,7 @@ var Quaternion = function() {
 	if(!(this instanceof Quaternion)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.x = 0.0;
 	this.y = 0.0;
 	this.z = 0.0;

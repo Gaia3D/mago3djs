@@ -1,6 +1,3 @@
-
-
-
 'use strict';
 
 /**
@@ -11,7 +8,7 @@ var TriSurface = function() {
 	if(!(this instanceof TriSurface)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.trianglesArray = [];
 };
 

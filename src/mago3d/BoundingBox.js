@@ -8,12 +8,12 @@ var BoundingBox = function() {
 	if(!(this instanceof BoundingBox)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
-	this.minX = 1000000.0; 
+
+	this.minX = 1000000.0;
 	this.minY = 1000000.0;
 	this.minZ = 1000000.0;
-  
-	this.maxX = -1000000.0; 
+
+	this.maxX = -1000000.0;
 	this.maxY = -1000000.0;
 	this.maxZ = -1000000.0;
 };
@@ -26,8 +26,8 @@ BoundingBox.prototype.setInit = function(point3d) {
 	this.minX = point3d.x;
 	this.minY = point3d.y;
 	this.minZ = point3d.z;
-  
-	this.maxX = point3d.x; 
+
+	this.maxX = point3d.x;
 	this.maxY = point3d.y;
 	this.maxZ = point3d.z;
 };
@@ -40,8 +40,8 @@ BoundingBox.prototype.deleteObjects = function() {
 	this.minX = undefined;
 	this.minY = undefined;
 	this.minZ = undefined;
-  
-	this.maxX = undefined; 
+
+	this.maxX = undefined;
 	this.maxY = undefined;
 	this.maxZ = undefined;
 };
@@ -54,7 +54,7 @@ BoundingBox.prototype.expand = function(dist) {
 	this.minX -= dist;
 	this.minY -= dist;
 	this.minZ -= dist;
-  
+
 	this.maxX += dist;
 	this.maxY += dist;
 	this.maxZ += dist;
@@ -67,10 +67,10 @@ BoundingBox.prototype.expand = function(dist) {
 BoundingBox.prototype.addPoint3D = function(point3d) {
 	if(point3d.x < this.minX) this.minX = point3d.x;
 	else if(point3d.x > this.maxX) this.maxX = point3d.x;
-  
+
 	if(point3d.y < this.minY) this.minY = point3d.y;
 	else if(point3d.y > this.maxY) this.maxY = point3d.y;
-  
+
 	if(point3d.z < this.minZ) this.minZ = point3d.z;
 	else if(point3d.z > this.maxZ) this.maxZ = point3d.z;
 };
@@ -78,14 +78,14 @@ BoundingBox.prototype.addPoint3D = function(point3d) {
 /**
  * 영역 박스에 새로운 박스를 포함해서 새로 그림
  * @param boundingBox 변수
- */  
+ */
 BoundingBox.prototype.addBox = function(boundingBox) {
 	if(boundingBox.minX < this.minX) this.minX = boundingBox.minX;
 	if(boundingBox.maxX > this.maxX) this.maxX = boundingBox.maxX;
-  
+
 	if(boundingBox.minY < this.minY) this.minY = boundingBox.minY;
 	if(boundingBox.maxY > this.maxY) this.maxY = boundingBox.maxY;
-  
+
 	if(boundingBox.minZ < this.minZ) this.minZ = boundingBox.minZ;
 	if(boundingBox.maxZ > this.maxZ) this.maxZ = boundingBox.maxZ;
 };
@@ -134,8 +134,8 @@ BoundingBox.prototype.getZLength = function() {
  * @returns resultPoint3d
  */
 BoundingBox.prototype.getCenterPoint3d = function(resultPoint3d) {
-	if(resultPoint3d == undefined) resultPoint3d = new Point3D();
-	
+	if ( resultPoint3d == undefined ) resultPoint3d = new Point3D();
+
 	resultPoint3d.set((this.maxX + this.minX)/2, (this.maxY + this.minY)/2, (this.maxZ + this.minZ)/2);
 	return resultPoint3d;
 };
