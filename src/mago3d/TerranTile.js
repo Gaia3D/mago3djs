@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 /**
  * 어떤 일을 하고 있습니까?
  * @class TerranTile
@@ -10,7 +8,7 @@ var TerranTile = function() {
 	if(!(this instanceof TerranTile)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	//           +-----+-----+
 	//           |     |     |
 	//           |  3  |  2  |
@@ -20,14 +18,14 @@ var TerranTile = function() {
 	//           |  0  |  1  |
 	//           |     |     |
 	//           +-----+-----+
-	
+
 	this._depth = 0; // qudtree depth. 0 => mother_quadtree.***
 	this._numberName = 1; // mother quadtree.***
 	this._terranTile_owner;
 	this._BR_buildingsArray = [];
 	this._boundingBox; // dont use this.***
 	this._pCloudMesh_array = []; // 1rst aproximation to the pointCloud data. Test.***
-	
+
 	this.position; // absolute position, for do frustum culling.***
 	this.radius; // aprox radius for this tile.***
 
@@ -36,16 +34,16 @@ var TerranTile = function() {
 	this.rightUp_position;
 	this.leftUp_position;
 	this.visibilityType;
-  
+
 	//this.longitude_min; // delete this.***
 	//this.longitude_max; // delete this.***
 	//this.latitude_min; // delete this.***
 	//this.latitude_max; // delete this.***
-	
+
 	this.subTiles_array = [];
 	this.terranIndexFile_readed = false;
 	this.empty_tile = false;
-	
+
 	// File.***************************************************
 	this.fileReading_started = false;
 	this.fileReading_finished = false;
@@ -53,10 +51,10 @@ var TerranTile = function() {
 	this.fileBytesReaded = 0;
 	this.fileParsingFinished = false;
 	this.projectsParsed_count = 0;
-	
+
 	this.current_BRProject_parsing;
 	this.current_BRProject_parsing_state = 0;
-	
+
 	this.readWriter;
 };
 
@@ -129,14 +127,14 @@ TerranTile.prototype.makeTree = function(max_depth) {
 TerranTile.prototype.calculatePositionByLonLat = function() {
 	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
 	var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
-	
-	this.position = Cesium.Cartesian3.fromDegrees(lon_mid, lat_mid, 0.0); 
-	
-	this.leftDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_min, 0.0); 
-	this.rightDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_min, 0.0); 
-	this.rightUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_max, 0.0); 
-	this.leftUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_max, 0.0); 
-	
+
+	this.position = Cesium.Cartesian3.fromDegrees(lon_mid, lat_mid, 0.0);
+
+	this.leftDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_min, 0.0);
+	this.rightDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_min, 0.0);
+	this.rightUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_max, 0.0);
+	this.leftUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_max, 0.0);
+
 	this.radius = Cesium.Cartesian3.distance(this.leftDown_position, this.rightUp_position)/2.0 * 0.9;
 };
 
@@ -145,7 +143,7 @@ TerranTile.prototype.calculatePositionByLonLat = function() {
  */
 TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
 	this.calculatePositionByLonLat();
-	
+
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
 
@@ -163,90 +161,90 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 		return;
-	
+
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 	var auxScratch;
 	var header = BR_Project._header;
 	var arrayBuffer = this.fileArrayBuffer;
 	var bytes_readed = this.fileBytesReaded;
-	
+
 	if(this.readWriter == undefined)
 		this.readWriter = new ReaderWriter();
-	
+
 	// 1) Version(5 chars).***********
 	for(var j=0; j<version_string_length; j++){
 		header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
-	
+
 	header._f4d_version = 2;
-	
+
 	// 3) Global unique ID.*********************
 	intAux_scratch = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for(var j=0; j<intAux_scratch; j++){
 		header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
-	
+
 	// 4) Location.*************************
 	header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	
+
 	//header._elevation += 70.0; // delete this. TEST.!!!
-	
+
 	// 6) BoundingBox.************************
-	header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
-	header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4; 
+	header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	
+
 	var semiHeight = (header._boundingBox.maxZ - header._boundingBox.minZ )/2.0;
 	header._elevation = 45.0 + semiHeight-0.5;
-	
+
 	var isLarge = false;
 	if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
 	{
 		isLarge = true;
 	}
-	
+
 	if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
 	{
 		header.isSmall = true;
 	}
-	
+
 	var imageLODs_count = this.readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-	
+
 	// Now, must calculate some params of the project.**********************************************
 	// 0) PositionMatrix.************************************************************************
 	// Determine the elevation of the position.***********************************************************
 	var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);
 	var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-    var height = cartographic.height;
+	var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
-	
+
 	//var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation);  // Original.***
-	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height); 
-	
-	BR_Project.buildingPosition = position; 
-	
+	position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, height);
+
+	BR_Project.buildingPosition = position;
+
 	// High and Low values of the position.****************************************************
 	var splitValue = Cesium.EncodedCartesian3.encode(position);
 	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
 	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
 	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-	
+
 	BR_Project.buildingPositionHIGH = new Float32Array(3);
 	BR_Project.buildingPositionHIGH[0] = splitVelue_X.high;
 	BR_Project.buildingPositionHIGH[1] = splitVelue_Y.high;
 	BR_Project.buildingPositionHIGH[2] = splitVelue_Z.high;
-	
+
 	BR_Project.buildingPositionLOW = new Float32Array(3);
 	BR_Project.buildingPositionLOW[0] = splitVelue_X.low;
 	BR_Project.buildingPositionLOW[1] = splitVelue_Y.low;
 	BR_Project.buildingPositionLOW[2] = splitVelue_Z.low;
-	
+
 	this.fileBytesReaded = bytes_readed;
 };
 
@@ -259,46 +257,46 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	var fileLegth = this.fileArrayBuffer.byteLength;
 	if(this.fileBytesReaded >= fileLegth)
 		return;
-	
+
 	if(this.readWriter == undefined)
 		this.readWriter = new ReaderWriter();
-	
+
 	var bytes_readed = this.fileBytesReaded;
 	var startBuff;
 	var endBuff;
 	var arrayBuffer = this.fileArrayBuffer;
-	
+
 	if(BR_Project._simpleBuilding_v1 == undefined)
 		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
-	
+
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var vbo_objects_count = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-	
+
 	// single interleaved buffer mode.*********************************************************************************
 	for(var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
 	{
 		var simpObj = simpBuildingV1.newSimpleObject();
 		var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
-		
+
 		var iDatas_count = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + (4*3+2*2+1*4)*iDatas_count; // fPos_usTex_bNor.****
 		vt_cacheKey.verticesArrayBuffer = arrayBuffer.slice(startBuff, endBuff);
-		
+
 		bytes_readed = bytes_readed + (4*3+2*2+1*4)*iDatas_count; // updating data.***
-		
+
 		vt_cacheKey._vertices_count = iDatas_count;
-		
+
 	}
-	
+
 	// Finally read the 4byte color.***
 	var color_4byte_temp = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	
+
 	//var b = color_4byte_temp & 0xFF;
     //var g = (color_4byte_temp & 0xFF00) >>> 8;
     //var r = (color_4byte_temp & 0xFF0000) >>> 16;
     //var a = ( (color_4byte_temp & 0xFF000000) >>> 24 ) / 255 ;
-	
+
 	this.fileBytesReaded = bytes_readed;
 };
 
@@ -312,21 +310,21 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
 
 	if(BR_Project._simpleBuilding_v1 == undefined)
 		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
-	
+
 	if(this.readWriter == undefined)
 		this.readWriter = new ReaderWriter();
-	
+
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	
+
 	// Read the image.**********************************************************************************
 	var bytes_readed = this.fileBytesReaded;
 	var arrayBuffer = this.fileArrayBuffer;
-	
+
 	var nailImageSize = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	var startBuff = bytes_readed;
 	var endBuff = bytes_readed + nailImageSize;
 	simpBuildingV1.textureArrayBuffer = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
-	
+
 	bytes_readed += nailImageSize;
 
 	this.fileBytesReaded = bytes_readed;
@@ -343,13 +341,13 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
 		this.fileParsingFinished = true;
 		return;
 	}
-	
+
 	if(this.readWriter == undefined)
 		this.readWriter = new ReaderWriter();
-	
+
 	var arrayBuffer = this.fileArrayBuffer;
 	var projects_count = this.readWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
-	
+
 	if(projects_count == 0)
 		this.empty_tile = true;
 
@@ -359,17 +357,17 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
 		// 1rst, read the relative rawFile_path.***
 		var rawFileNamePath_length = this.readWriter.readInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;// only debug test.***
 		var rawFileNamePath = "";
-		
+
 		for(var j=0; j<rawFileNamePath_length; j++){
 			rawFileNamePath += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 		}
 		*/
 		var bytes_readed = this.fileBytesReaded;
 		this.fileBytesReaded = bytes_readed;
-		
+
 		this.current_BRProject_parsing = this.newBRProject();
 		//this.current_BRProject_parsing._f4d_rawPathName = rawFileNamePath;
-		
+
 		this.parseFileHeader(this.current_BRProject_parsing);
 		this.parseFileSimpleBuilding(this.current_BRProject_parsing);
 		this.parseFileNailImage(this.current_BRProject_parsing, magoManager);
@@ -390,27 +388,27 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
 		this.fileParsingFinished = true;
 		return;
 	}
-	
+
 	if(this.readWriter == undefined)
 		this.readWriter = new ReaderWriter();
-	
+
 	var projects_count = this.readWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
-	
+
 	if(this.projectsParsed_count >= projects_count)
 	{
 		this.fileParsingFinished = true;
 		this.fileBytesReaded = null;
 		return;
 	}
-	
+
 	if(this.current_BRProject_parsing_state == 0)
 	{
 		if(this.projectsParsed_count == 0)
 			this.fileBytesReaded = 4;
-		
+
 		this.current_BRProject_parsing = this.newBRProject();
 	}
-	
+
 	var BR_Project = this.current_BRProject_parsing;
 
 	// Read header, simpleBuilding, and the nailImage.***
@@ -441,19 +439,19 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
 	if(subTiles_count == 4) {
 		var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
 		var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
-		
+
 		subTile = this.subTiles_array[0];
 		subTile.setDimensions(this.longitude_min, lon_mid, this.latitude_min, lat_mid);
-		
+
 		subTile = this.subTiles_array[1];
 		subTile.setDimensions(lon_mid, this.longitude_max, this.latitude_min, lat_mid);
-		
+
 		subTile = this.subTiles_array[2];
 		subTile.setDimensions(lon_mid, this.longitude_max, lat_mid, this.latitude_max);
-		
+
 		subTile = this.subTiles_array[3];
 		subTile.setDimensions(this.longitude_min, lon_mid, lat_mid, this.latitude_max);
-		
+
 		for(var i=0; i<subTiles_count; i++) {
 			this.subTiles_array[i].setDimensionsSubTiles();
 		}
@@ -485,7 +483,7 @@ TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
 TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux) {
 	var intersectedTiles_array = [];
 	this.getIntersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
-	
+
 	var intersectedTiles_count = intersectedTiles_array.length;
 	for(var i=0; i<intersectedTiles_count; i++) {
 		intersectedTiles_array[i].getSmallestTiles(intersectedSmallestTiles_array);
@@ -502,9 +500,9 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
 TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
 	// Cesium dependency.***
 	if(this.position == undefined) return;
-	
+
 	if(boundingSphere_Aux == undefined) boundingSphere_Aux = new Cesium.BoundingSphere();
-	
+
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
 	boundingSphere_Aux.center.x = this.position.x;
@@ -515,20 +513,20 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 	boundingSphere_Aux.center = this.leftDown_position;
 	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
-	
+
 	boundingSphere_Aux.center = this.rightDown_position;
 	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
-	
+
 	boundingSphere_Aux.center = this.rightUp_position;
 	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
-	
+
 	boundingSphere_Aux.center = this.leftUp_position;
 	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
 	*/
-	
+
 	if(this.visibilityType == Cesium.Intersect.OUTSIDE) {
 		// OUTSIDE.***
 		// do nothing.***

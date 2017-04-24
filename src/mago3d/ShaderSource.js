@@ -337,7 +337,7 @@ ShaderSource.ssaoVsSource = "\n\
 		vNormal = (normalMatrix4 * vec4(-normal.x, -normal.y, -normal.z, 1.0)).xyz;\n\
 		vTexCoord = texCoord;\n\
 	}";
-	
+
 //어떤 용도
 ShaderSource.ssaoFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -465,7 +465,7 @@ ShaderSource.showDepthVsSource = "\n\
 		\n\
 		vVSPos = modelViewMatrixRelToEye * pos4;\n\
 	}";
-	
+
 //어떤 용도
 ShaderSource.showDepthFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -549,7 +549,7 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 	}";
-	
+
 //어떤 용도
 // test.***
 ShaderSource.modelRefSsaoFsSource = "\n\
@@ -785,7 +785,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	}";
 */
 	//****************************************************************************************************************************************
-	
+
 //어떤 용도
 ShaderSource.renderShowDepthVsSource = "\n\
 	attribute vec3 position;\n\
@@ -868,7 +868,7 @@ ShaderSource.colorSelectionSsaoVsSource = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}";
-	
+
 ShaderSource.colorSelectionSsaoFsSource = "\n\
 		precision highp float;\n\
 	uniform vec4 vColor4Aux;\n\
@@ -876,7 +876,7 @@ ShaderSource.colorSelectionSsaoFsSource = "\n\
 	void main() {          \n\
 		gl_FragColor = vColor4Aux;\n\
 	}";
-	
+
 	//*************************************************************************************************************************
 //어떤 용도
 ShaderSource.simpleDepthSsaoVsSource = "\n\
@@ -902,7 +902,7 @@ ShaderSource.simpleDepthSsaoVsSource = "\n\
 		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		zDepth = (modelViewMatrixRelToEye * pos4).z/far; // Original.***\n\
 	}";
-	
+
 //어떤 용도
 ShaderSource.simpleDepthSsaoFsSource = "\n\
 		precision highp float;\n\
@@ -924,7 +924,7 @@ ShaderSource.simpleDepthSsaoFsSource = "\n\
 // LOD Building Shaders.****************************************************************
 // LOD Building Shaders.****************************************************************
 // LOD Building Shaders.****************************************************************
-	
+
 	//어떤 용도
 ShaderSource.LodBuildingSsaoVsSource = "\n\
 	attribute vec3 position;\n\
@@ -977,8 +977,8 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 			vcolor4 = color4;\n\
 		}\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.LodBuildingSsaoFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1077,7 +1077,7 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
-	
+
 // LOD Building Depth Shader.************************************************************************************************
 // LOD Building Depth Shader.************************************************************************************************
 // LOD Building Depth Shader.************************************************************************************************
@@ -1111,8 +1111,8 @@ ShaderSource.lodBuildingDepthVsSource = "\n\
 		//linear depth in camera space (0..far)\n\
 		depth = (modelViewMatrixRelToEye * pos4).z/far; // Original.***\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.lodBuildingDepthFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1140,12 +1140,12 @@ ShaderSource.lodBuildingDepthFsSource = "\n\
 		//gl_FragData[0].g = -depth; // test\n\
 		//gl_FragData[0].b = -depth; // test\n\
 	}";
-	
+
 
 // Lego Shaders.************************************************************************************************************************************************
 // Lego Shaders.************************************************************************************************************************************************
 // Lego Shaders.************************************************************************************************************************************************
-	
+
 	//어떤 용도
 ShaderSource.LegoSsaoVsSource = "\n\
 	attribute vec3 position;\n\
@@ -1191,8 +1191,8 @@ ShaderSource.LegoSsaoVsSource = "\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		vcolor4 = color4;\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.LegoSsaoFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1291,7 +1291,7 @@ ShaderSource.LegoSsaoFsSource = "\n\
 		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
-	
+
 // Lego Depth Shader.************************************************************************************************
 // Lego Depth Shader.************************************************************************************************
 // Lego Depth Shader.************************************************************************************************
@@ -1327,8 +1327,8 @@ ShaderSource.LegoDepthVsSource = "\n\
 		//linear depth in camera space (0..far)\n\
 		depth = (modelViewMatrixRelToEye * pos4).z/far; // Original.***\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.LegoDepthFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1356,11 +1356,11 @@ ShaderSource.LegoDepthFsSource = "\n\
 		//gl_FragData[0].g = -depth; // test\n\
 		//gl_FragData[0].b = -depth; // test\n\
 	}";
-	
-	
-	
-	
-	
+
+
+
+
+
 // box Depth Shader.************************************************************************************************
 // box Depth Shader.************************************************************************************************
 // box Depth Shader.************************************************************************************************
@@ -1394,8 +1394,8 @@ ShaderSource.boxDepthVsSource = "\n\
 		//linear depth in camera space (0..far)\n\
 		depth = (modelViewMatrixRelToEye * pos4).z/far; // Original.***\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.boxDepthFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1423,12 +1423,12 @@ ShaderSource.boxDepthFsSource = "\n\
 		//gl_FragData[0].g = -depth; // test\n\
 		//gl_FragData[0].b = -depth; // test\n\
 	}";
-	
-	
+
+
 // box Shaders.********************************************************************************************************************************
 // box Shaders.********************************************************************************************************************************
 // box Shaders.********************************************************************************************************************************
-	
+
 	//어떤 용도
 ShaderSource.boxSsaoVsSource = "\n\
 	attribute vec3 position;\n\
@@ -1490,8 +1490,8 @@ ShaderSource.boxSsaoVsSource = "\n\
 			vcolor4 = color4;\n\
 		}\n\
 	}";
-	
-	
+
+
 	//어떤 용도
 ShaderSource.boxSsaoFsSource = "\n\
 	#ifdef GL_ES\n\
@@ -1590,28 +1590,3 @@ ShaderSource.boxSsaoFsSource = "\n\
 		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

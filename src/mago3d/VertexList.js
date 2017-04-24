@@ -9,7 +9,7 @@ var VertexList = function() {
 	if(!(this instanceof VertexList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.vertexArray = [];
 };
 
@@ -60,7 +60,7 @@ VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance)
  */
 VertexList.prototype.getBoundingBox = function(resultBox) {
 	if(resultBox == undefined) resultBox = new BoundingBox();
-	
+
 	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
 		if(i==0) resultBox.setInit (this.vertexArray[i].point3d);
 		else resultBox.addPoint3D(this.vertexArray[i].point3d);
@@ -78,12 +78,3 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 		transformMatrix.transformPoint3D(vertex.point3d, vertex.point3d);
 	}
 };
-
-
-
-
-
-
-
-
-

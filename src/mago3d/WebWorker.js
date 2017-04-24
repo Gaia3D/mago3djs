@@ -2,8 +2,8 @@
 
 //importScripts('../Build/CesiumUnminified/SonGeometryJScript.js'); // No.***
 //importScripts('GeometryUtil.js'); // Yes.***
-//importScripts('GeometryModifier.js'); 
-//importScripts('Point3D.js'); 
+//importScripts('GeometryModifier.js');
+//importScripts('Point3D.js');
 //importScripts('CullingVolume.js');
 
 // Test son.*****************************************************
@@ -25,7 +25,7 @@ var geoModifier = new GeometryModifier();
 onmessage = function(e) {
 	console.log('Message received from main script');
 	var workerResult = 'Result: sonete';
-  
+
 	console.log('Posting message back to main script');
 	//postMessage(workerResult);
 	var result = possibleCameraPositionChanged(e);
@@ -47,26 +47,26 @@ function getFrustumIntersectedProjectBuildings(projectsList, cullingVolume)
 	var last_squared_dist = undefined;
 	var detailed_building = undefined;
 	var building_projects_count = projectsList._BR_buildingsArray.length;
-	
+
 	for(var p_counter = 0; p_counter<building_projects_count; p_counter++)
 	{
 		var BR_Project = projectsList._BR_buildingsArray[p_counter];
 		var squaredDistToCamera = Cartesian3.distanceSquared(cameraPosition, BR_Project.buildingPosition);
 		var min_squaredDist_to_see_detailed = 40000;
 		var min_squaredDist_to_see = 10000000;
-		
+
 		if(squaredDistToCamera > min_squaredDist_to_see)
 			continue;
-		
+
 		var boundingSphere_Aux = new BoundingSphere();
 		boundingSphere_Aux.center = BR_Project.buildingPosition;
 		boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
-		
+
 		//----------------------------------------------------------------------------------------------------------------------------
 		// var frameState = scene._frameState;
-		
+
 		var frustumCull = frameState.cullingVolume.computeVisibility(boundingSphere_Aux);
-		if(frustumCull !== Intersect.OUTSIDE) 
+		if(frustumCull !== Intersect.OUTSIDE)
 		{
 			if(squaredDistToCamera < min_squaredDist_to_see_detailed)// min dist to see detailed.***
 			{
@@ -91,10 +91,10 @@ function getFrustumIntersectedProjectBuildings(projectsList, cullingVolume)
 				buildings_array.push(BR_Project);
 			}
 		}
-		
+
 	}
-	
-	
+
+
 	return buildings_array;
 };
 */
@@ -108,11 +108,11 @@ function possibleCameraPositionChanged(e) {
 	var interiorCompRefList_Container = e.data[1];
 	var camPos = e.data[2];
 	//var compRefList_array = e.data[2];
-	
+
 	var eye_x = camPos.x;
 	var eye_y = camPos.y;
 	var eye_z = camPos.z;
-	
+
 	var interior_visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
 	var visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
 	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
@@ -121,19 +121,19 @@ function possibleCameraPositionChanged(e) {
 	//var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
 
 	return total_visibleCompRefLists;
-	  /*
+	/*
 	// 1rst, frustum culling.*******************
 	var projectsList = e.data[0];
 	var cullingVolume = e.data[1];
 	//var projects_list = getFrustumIntersectedProjectBuildings(projectsList, cullingVolume);
-	
-	
+
+
 	var squaredDist = lastCamPos.squareDistTo(currentCamPos.x, currentCamPos.y, currentCamPos.z);
 	if(squaredDist > squareDistUmbral)
 	{
 		// Camera position changed.***
-		lastCamPos.set(currentCamPos.x, currentCamPos.y, currentCamPos.z); 
-		
+		lastCamPos.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+
 	}
 	else{
 		// Camera doesnt moved.***

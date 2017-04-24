@@ -119,14 +119,4 @@ Box.prototype.makeAABB = function(xLength, yLength, zLength)
 	triangle = triSurface.newTriangle();
 	triangle.setVertices(vertexList.getVertex(3), vertexList.getVertex(4), vertexList.getVertex(7));
 	
-	
 };
-
-
-
-
-
-
-
-
-

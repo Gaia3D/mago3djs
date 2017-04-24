@@ -1,7 +1,5 @@
 'use strict';
 
-
-  
 /**
  * 어떤 일을 하고 있습니까?
  * @class ByteColor
@@ -10,13 +8,13 @@ var ByteColor = function() {
 	if(!(this instanceof ByteColor)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._byte_r = 0;
 	this._byte_g = 0;
 	this._byte_b = 0;
 	this._byte_alfa = 255;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -26,7 +24,7 @@ ByteColor.prototype.destroy = function() {
 	this._byte_b = null;
 	this._byte_alfa = null;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param byteRed 변수
@@ -38,7 +36,7 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue) {
 	this._byte_g = byteGreen;
 	this._byte_b = byteBlue;
 };
-  
+
 /**
 * 어떤 일을 하고 있습니까?
 * @class Point2D
@@ -47,7 +45,7 @@ var Point2D = function() {
 	if(!(this instanceof Point2D)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.x = 0.0;
 	this.y = 0.0;
 	this._idx_in_list; // delete this.***
@@ -61,7 +59,7 @@ var Point3DAux = function() {
 	if(!(this instanceof Point3DAux)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.x = 0.0;
 	this.y = 0.0;
 	this.z = 0.0;
@@ -76,7 +74,7 @@ var TTriangle = function() {
 	if(!(this instanceof TTriangle)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.m_vertex_1;
 	this.m_vertex_2;
 	this.m_vertex_3;
@@ -90,8 +88,8 @@ var TTriangle = function() {
  */
 TTriangle.prototype.setVertices = function(vtx_1, vtx_2, vtx_3) {
 	this.m_vertex_1 = vtx_1;
-  	this.m_vertex_2 = vtx_2;
-  	this.m_vertex_3 = vtx_3;
+	this.m_vertex_2 = vtx_2;
+	this.m_vertex_3 = vtx_3;
 };
 
 /**
@@ -99,8 +97,8 @@ TTriangle.prototype.setVertices = function(vtx_1, vtx_2, vtx_3) {
  */
 TTriangle.prototype.invert = function() {
 	var vertexAux = this.m_vertex_2;
-  	this.m_vertex_2 = this.m_vertex_3;
-  	this.m_vertex_3 = vertexAux;
+	this.m_vertex_2 = this.m_vertex_3;
+	this.m_vertex_3 = vertexAux;
 };
 
 /**
@@ -111,7 +109,7 @@ var TTrianglesList = function() {
 	if(!(this instanceof TTrianglesList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.tTrianglesArray = [];
 };
 
@@ -155,7 +153,7 @@ var TTrianglesMatrix = function() {
 	if(!(this instanceof TTrianglesMatrix)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.tTrianglesListsArray = [];
 	// SCRATX.*********************
 	this.totalTTrianglesArraySC = [];
@@ -192,7 +190,7 @@ TTrianglesMatrix.prototype.getTotalTTrianglesArray = function(resultTotalTTriang
 			resultTotalTTrianglesArray.push(tTriangle);
 		}
 	}
-	
+
 	return resultTotalTTrianglesArray;
 };
 
@@ -203,7 +201,7 @@ TTrianglesMatrix.prototype.getTotalTTrianglesArray = function(resultTotalTTriang
 TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
 	this.totalTTrianglesArraySC.length = 0;
 	this.totalTTrianglesArraySC = this.getTotalTTrianglesArray(this.totalTTrianglesArraySC);
-	
+
 	var tTriangle;
 	var shortArray = new Uint16Array(tTriangles_count*3);
 	for(var i=0, tTriangles_count = this.totalTTrianglesArraySC.length; i<tTriangles_count; i++) {
@@ -212,7 +210,7 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
 		shortArray[i*3+1] = tTriangle.m_vertex_2.m_idx_inList;
 		shortArray[i*3+2] = tTriangle.m_vertex_3.m_idx_inList;
 	}
-	
+
 	return shortArray;
 };
 
@@ -229,7 +227,7 @@ var VertexMatrix = function() {
 	if(!(this instanceof VertexMatrix)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.vertexListsArray = [];
 	// SCTRATXH.******************
 	this.totalVertexArraySC = [];
@@ -265,7 +263,7 @@ VertexMatrix.prototype.getVertexList = function(idx) {
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) {
 	if(resultBox == undefined) resultBox = new BoundingBox();
-	
+
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	for(var i=0, total_vertex_count = this.totalVertexArraySC.length; i<total_vertex_count; i++) {
@@ -299,7 +297,7 @@ VertexMatrix.prototype.getVertexCount = function() {
 	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
 		vertexCount += this.vertexListsArray[i].getVertexCount();
 	}
-	
+
 	return vertexCount;
 };
 
@@ -316,7 +314,7 @@ VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
 			resultTotalVertexArray.push(vertex);
 		}
 	}
-	
+
 	return resultTotalVertexArray;
 };
 
@@ -328,21 +326,21 @@ VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
 VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	
+
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*6);
-	
+
 	for(var i=0; i<total_vertex_count; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*6] = vertex.point3d.x;
 		resultFloatArray[i*6+1] = vertex.point3d.y;
 		resultFloatArray[i*6+2] = vertex.point3d.z;
-		
+
 		resultFloatArray[i*6+3] = vertex.color4.r;
 		resultFloatArray[i*6+4] = vertex.color4.g;
 		resultFloatArray[i*6+5] = vertex.color4.b;
 	}
-	
+
 	return resultFloatArray;
 };
 
@@ -354,22 +352,22 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
 VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	
+
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*7);
-	
+
 	for(var i=0; i<total_vertex_count; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*7] = vertex.point3d.x;
 		resultFloatArray[i*7+1] = vertex.point3d.y;
 		resultFloatArray[i*7+2] = vertex.point3d.z;
-		
+
 		resultFloatArray[i*7+3] = vertex.color4.r;
 		resultFloatArray[i*7+4] = vertex.color4.g;
 		resultFloatArray[i*7+5] = vertex.color4.b;
 		resultFloatArray[i*7+6] = vertex.color4.a;
 	}
-	
+
 	return resultFloatArray;
 };
 
@@ -381,17 +379,17 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	
+
 	var total_vertex_count = this.totalVertexArraySC.length;
 	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*3);
-	
+
 	for(var i=0; i<total_vertex_count; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*3] = vertex.point3d.x;
 		resultFloatArray[i*3+1] = vertex.point3d.y;
 		resultFloatArray[i*3+2] = vertex.point3d.z;
 	}
-	
+
 	return resultFloatArray;
 };
 
@@ -424,18 +422,18 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 		vtxList_1 = this.vertexListsArray[i];
 		vtxList_2 = this.vertexListsArray[i+1];
 		tTrianglesList = tTrianglesMatrix.newTTrianglesList();
-		
+
 		vertex_count = vtxList_1.vertexArray.length;
 		for(var j=0; j<vertex_count; j++) {
 			tTriangle_1 = tTrianglesList.newTTriangle();
 			tTriangle_2 = tTrianglesList.newTTriangle();
-			
+
 			if(j == vertex_count-1) {
-				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(0)); 
-				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(0), vtxList_1.getVertex(0)); 
+				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(0));
+				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(0), vtxList_1.getVertex(0));
 			} else {
-				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(j+1)); 
-				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j+1), vtxList_1.getVertex(j+1)); 
+				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(j+1));
+				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j+1), vtxList_1.getVertex(j+1));
 			}
 		}
 	}
@@ -453,7 +451,7 @@ VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
 };
 
 
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class Polygon
@@ -462,7 +460,7 @@ var Polygon = function() {
 	if(!(this instanceof Polygon)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.mPoint3DArray = [];
 };
 
@@ -492,7 +490,7 @@ var TrianglesSurface= function() {
 	if(!(this instanceof TrianglesSurface)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.mPoint3DArray = [];
 	this.mTrianglesArray = [];
 };
@@ -508,7 +506,7 @@ TrianglesSurface.prototype.destroy = function() {
 		ftriangle = null;
 	}
 	this.mTrianglesArray = null;
-	  
+
 	// 2nd, destroy points3d.*************************************
 	for(var i=0, points_count = this.mPoint3DArray.length; i<points_count; i++) {
 		var point = this.mPoint3DArray[i];
@@ -530,29 +528,29 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 	} else {
 		current_meshArrays = generalVBOArraysContainer.meshArrays[meshArrays_count-1]; // take the last.***
 	}
-	  
+
 	// max unsigned short =  65,535
 	var max_indices = 65000;
-	  
+
 	for(var i=0, ftriangles_count = this.mTrianglesArray.length; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
 			current_meshArrays = generalVBOArraysContainer.newVertexColorIdx_Array();
 		}
-		  
+
 		var ftriangle = this.mTrianglesArray[i];
 		var idx_p1 = ftriangle.m_point_1_idx;
 		var idx_p2 = ftriangle.m_point_2_idx;
 		var idx_p3 = ftriangle.m_point_3_idx;
-		  
+
 		var color_p1 = ftriangle.m_color_1;
 		var color_p2 = ftriangle.m_color_2;
 		var color_p3 = ftriangle.m_color_3;
-		  
+
 		var p1 = this.mPoint3DArray[idx_p1];
 		var p2 = this.mPoint3DArray[idx_p2];
 		var p3 = this.mPoint3DArray[idx_p3];
-		  
-		  // Point 1.***
+
+		// Point 1.***
 		current_meshArrays.mesh_vertices.push(p1.x);
 		current_meshArrays.mesh_vertices.push(p1.y);
 		current_meshArrays.mesh_vertices.push(p1.z);
@@ -560,7 +558,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 		current_meshArrays.mesh_colors.push(color_p1.r);
 		current_meshArrays.mesh_colors.push(color_p1.g);
 		current_meshArrays.mesh_colors.push(color_p1.b);
-	  
+
 		// Point 2.***
 		current_meshArrays.mesh_vertices.push(p2.x);
 		current_meshArrays.mesh_vertices.push(p2.y);
@@ -569,7 +567,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 		current_meshArrays.mesh_colors.push(color_p2.r);
 		current_meshArrays.mesh_colors.push(color_p2.g);
 		current_meshArrays.mesh_colors.push(color_p2.b);
-	  
+
 		// Point 3.***
 		current_meshArrays.mesh_vertices.push(p3.x);
 		current_meshArrays.mesh_vertices.push(p3.y);
@@ -593,10 +591,10 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 	} else {
 		current_meshArrays = general_VertexIdxVBO_ArraysContainer._meshArrays[meshArrays_count-1]; // take the last.***
 	}
-	  
+
 	// max unsigned short =  65,535
 	var max_indices = 65000;
-	  
+
 	var ftriangles_count = this.mTrianglesArray.length;
 	var curr_vtx_count = current_meshArrays.mesh_vertices.length/3;
 	for(var i=0, vtx_count = this.mPoint3DArray.length; i<vtx_count; i++) {
@@ -605,13 +603,13 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(general_VertexIdxVB
 		current_meshArrays.mesh_vertices.push(point.y);
 		current_meshArrays.mesh_vertices.push(point.z);
 	}
-	  
+
 	for(var i=0; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
 			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 			curr_vtx_count = 0;
 		}
-		  
+
 		var ftriangle = this.mTrianglesArray[i];
 		var idx_p1 = ftriangle.m_point_1_idx;
 		var idx_p2 = ftriangle.m_point_2_idx;
@@ -635,36 +633,36 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(general_Ver
 	} else {
 		current_meshArrays = general_VertexIdxVBO_ArraysContainer._meshArrays[meshArrays_count-1]; // take the last.***
 	}
-	  
+
 	// max unsigned short =  65,535
 	var max_indices = 65000;
-	  
+
 	for(var i=0, ftriangles_count = this.mTrianglesArray.length; i<ftriangles_count; i++) {
 		if(current_meshArrays.mesh_vertices.length/3 >= max_indices) {
 			current_meshArrays = general_VertexIdxVBO_ArraysContainer.newVertexIdxArray();
 		}
-		  
+
 		var ftriangle = this.mTrianglesArray[i];
 		var idx_p1 = ftriangle.m_point_1_idx;
 		var idx_p2 = ftriangle.m_point_2_idx;
 		var idx_p3 = ftriangle.m_point_3_idx;
-		  
+
 		var p1 = this.mPoint3DArray[idx_p1];
 		var p2 = this.mPoint3DArray[idx_p2];
 		var p3 = this.mPoint3DArray[idx_p3];
-		  
+
 		// Point 1.***
 		current_meshArrays.mesh_vertices.push(p1.x);
 		current_meshArrays.mesh_vertices.push(p1.y);
 		current_meshArrays.mesh_vertices.push(p1.z);
 		current_meshArrays.mesh_tri_indices.push(current_meshArrays.mesh_vertices.length/3 - 1);
-		  
+
 		// Point 2.***
 		current_meshArrays.mesh_vertices.push(p2.x);
 		current_meshArrays.mesh_vertices.push(p2.y);
 		current_meshArrays.mesh_vertices.push(p2.z);
 		current_meshArrays.mesh_tri_indices.push(current_meshArrays.mesh_vertices.length/3 - 1);
-		  
+
 		// Point 3.***
 		current_meshArrays.mesh_vertices.push(p3.x);
 		current_meshArrays.mesh_vertices.push(p3.y);
@@ -700,14 +698,14 @@ TrianglesSurface.prototype.newTriangle = function() {
  */
 TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
 	var transformedTrianglesSurface = new TrianglesSurface();
-	  
+
 	// 1) copy and transform the points3d.***
 	for(var i=0, points_count = this.mPoint3DArray.length; i<points_count; i++) {
 		var point3d = this.mPoint3DArray[i];
 		var transformed_point = matrix4.transformPoint3D(point3d);
 		transformedTrianglesSurface.mPoint3DArray.push(transformed_point);
 	}
-	  
+
 	// 2) copy the triangles.***
 	for(var i=0, tri_count = this.mTrianglesArray.length; i<tri_count; i++) {
 		var tri = this.mTrianglesArray[i];
@@ -724,19 +722,19 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
 TrianglesSurface.prototype.getBoundingBox = function() {
 	var points_count = this.mPoint3DArray.length;
 	if(points_count == 0) return null;
-	  
+
 	var bb = new BoundingBox();
 	var first_point3d = this.mPoint3DArray[0];
 	bb.setInit(first_point3d);
-	  
+
 	for(var i=1; i<points_count; i++) {
 		var point3d = this.mPoint3DArray[i];
 		bb.addPoint3D(point3d);
 	}
-	  
+
 	return bb;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class Fpolyhedron
@@ -745,7 +743,7 @@ var Fpolyhedron= function() {
 	if(!(this instanceof Fpolyhedron)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.mFTrianglesSurfacesArray = [];
 	this.mIFCEntityType = -1;
 };
@@ -807,7 +805,7 @@ Fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4) {
 		var transformed_ftriangles_surface = ftriangles_surface.getTransformedTrianglesSurface(matrix4);
 		transformedFPolyhedron.mFTrianglesSurfacesArray.push(transformed_ftriangles_surface);
 	}
-	  
+
 	return transformedFPolyhedron;
 };
 
@@ -818,7 +816,7 @@ Fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4) {
 Fpolyhedron.prototype.getBoundingBox = function() {
 	var ftriSurfaces_count = this.mFTrianglesSurfacesArray.length;
 	if(ftriSurfaces_count == 0) return null;
-	  
+
 	var bb = null;
 	for(var i=0; i<ftriSurfaces_count; i++) {
 		var ftriangles_surface = this.mFTrianglesSurfacesArray[i];
@@ -826,10 +824,10 @@ Fpolyhedron.prototype.getBoundingBox = function() {
 		if(bb == null) {
 			if(current_bb != null) bb = current_bb;
 		} else {
-			if(current_bb != null) bb.addBox(current_bb);	
+			if(current_bb != null) bb.addBox(current_bb);
 		}
 	}
-	  
+
 	return bb;
 };
 
@@ -841,7 +839,7 @@ var FpolyhedronsList= function() {
 	if(!(this instanceof FpolyhedronsList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.mFPolyhedronsArray = [];
 };
 
@@ -859,7 +857,7 @@ FpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns fpolyhedron 
+ * @returns fpolyhedron
  */
 FpolyhedronsList.prototype.newFPolyhedron = function() {
 	var fpolyhedron = new Fpolyhedron();
@@ -877,19 +875,19 @@ var Reference = function() {
 	if(!(this instanceof Reference)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// 1) Object ID.***
 	this._id = 0;
-	
+
 	// 2) Block Idx.***
 	this._block_idx = -1;
-	
+
 	// 3) Transformation Matrix.***
 	this._matrix4 = new Matrix4();
 
 	// 4) New. Only save the cache_key, and free geometry data.***
 	//this._VBO_ByteColorsCacheKeys_Container = new VBOByteColorCacheKeysContainer(); // provisionally delete this.***
-	
+
 	// 4') may be only save the cache_key_idx.***
 	this._VBO_ByteColorsCacheKeys_Container_idx = -1; // Test. Do this for possibly use with workers.***
 };
@@ -912,7 +910,7 @@ Reference.prototype.multiplyTransformMatrix = function(matrix) {
 Reference.prototype.getBoundingBox = function(blocksList) {
 	var block = blocksList.getBlock(this._block_idx);
 	if(block == null) return null;
-	
+
 	var block_fpolyhedron = block._fpolyhedron;
 	var transformed_fpolyhedron = block_fpolyhedron.getTransformedFPolyhedron(this._matrix4);
 	var bb = transformed_fpolyhedron.getBoundingBox();
@@ -937,7 +935,7 @@ var CompoundReference = function() {
 	if(!(this instanceof CompoundReference)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._referencesList = [];
 };
 
@@ -957,7 +955,7 @@ CompoundReference.prototype.getBoundingBox = function(blocksList) {
 			if(current_bb != null) bb.addBox(current_bb);
 		}
 	}
-	
+
 	return bb;
 };
 
@@ -979,7 +977,7 @@ var CompoundReferencesList = function() {
 	if(!(this instanceof CompoundReferencesList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.name = "";
 	this._compoundRefsArray = [];
 	this._lodLevel = -1;
@@ -1037,7 +1035,7 @@ CompoundReferencesList.prototype.getBoundingBox = function(blocksList) {
 CompoundReferencesList.prototype.newCompoundReference = function() {
 	var compRef = new CompoundReference();
 	this._compoundRefsArray.push(compRef);
-	
+
 	return compRef;
 };
 
@@ -1063,7 +1061,7 @@ var CompoundReferencesListContainer = function() {
 	if(!(this instanceof CompoundReferencesListContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.compRefsListArray = [];
 };
 
@@ -1109,10 +1107,10 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 		}
 		i++;
 	}
-	
+
 	return result_compRefList;
 };
-  
+
   //VBO container.**************************************************************************************************************** //
   /*
   var VertexColorIdx_Arrays = function()
@@ -1120,7 +1118,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	  this.mesh_vertices = [];
 	  this.mesh_colors = [];
 	  this.mesh_tri_indices = [];
-	  
+
 	  this.MESH_VERTEX_cacheKey= null;
 	  this.MESH_COLORS_cacheKey= null;
 	  this.MESH_FACES_cacheKey= null;
@@ -1130,7 +1128,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
   {
 	  this.meshArrays = []; // "VertexColorIdx_Arrays" container.***
   };
-  
+
   VBO_ArraysContainer.prototype.newVertexColorIdx_Array = function()
   {
 	  var vci_array = new VertexColorIdx_Arrays();
@@ -1138,9 +1136,9 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	  return vci_array;
   };
   */
-  
+
   // F4D Block - Reference with LightMapping.****************************************************************************** //
-  // Vertices and Indices VBO.********************************************************************************************* // 
+  // Vertices and Indices VBO.********************************************************************************************* //
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1150,9 +1148,9 @@ var VertexIdxArrays = function() {
 	if(!(this instanceof VertexIdxArrays)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.indicesCount = -1;
-	  
+
 	this.MESH_VERTEX_cacheKey= null;
 	this.MESH_FACES_cacheKey= null;
 };
@@ -1165,7 +1163,7 @@ var VertexIdxVBOArraysContainer = function() {
 	if(!(this instanceof VertexIdxVBOArraysContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._meshArrays = [];
 };
 
@@ -1187,7 +1185,7 @@ var ByteColorsVBOArrays = function() {
 	if(!(this instanceof ByteColorsVBOArrays)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.MESH_COLORS_cacheKey= null;
 };
 
@@ -1199,7 +1197,7 @@ var ByteColorsVBOArraysContainer = function() {
 	if(!(this instanceof ByteColorsVBOArraysContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._meshArrays = [];
 };
 
@@ -1212,7 +1210,7 @@ ByteColorsVBOArraysContainer.prototype.newByteColorsVBOArray = function() {
 	this._meshArrays.push(byteColors_array);
 	return byteColors_array;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class VertexTexcoordsArrays
@@ -1221,11 +1219,11 @@ var VertexTexcoordsArrays = function() {
 	if(!(this instanceof VertexTexcoordsArrays)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._vertices_array = [];
 	this._texcoords_array = [];
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class VNTInterleavedCacheKeys
@@ -1234,13 +1232,13 @@ var VNTInterleavedCacheKeys = function() {
 	if(!(this instanceof VNTInterleavedCacheKeys)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.VNT_cacheKey = null;
 	this.indices_cacheKey = null;
 	this._vertices_count = 0;
 	this.indicesCount = 0;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class VertexTexcoordsArraysCacheKeys
@@ -1249,12 +1247,12 @@ var VertexTexcoordsArraysCacheKeys = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeys)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._verticesArray_cacheKey = null;
 	this._texcoordsArray_cacheKey = null;
 	this._vertices_count = 0;
 	this._normalsArray_cacheKey = null;
-	  
+
 	// arrayBuffers.***
 	this.verticesArrayBuffer;
 	this.texCoordsArrayBuffer;
@@ -1269,7 +1267,7 @@ var VertexTexcoordsArraysCacheKeysContainer = function() {
 	if(!(this instanceof VertexTexcoordsArraysCacheKeysContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._vtArrays_cacheKeys_array = [];
 };
 
@@ -1291,7 +1289,7 @@ var SimpleObject = function() {
 	if(!(this instanceof SimpleObject)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._vtCacheKeys_container = new VertexTexcoordsArraysCacheKeysContainer();
 };
 
@@ -1303,7 +1301,7 @@ var SimpleStorey = function() {
 	if(!(this instanceof SimpleStorey)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._simpleObjects_array = [];
 };
 
@@ -1325,7 +1323,7 @@ var SimpleBuilding = function() {
 	if(!(this instanceof SimpleBuilding)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._simpleStoreys_list = [];
 	//this._simpleBuildingImage = new Image();
 	this._simpleBuildingTexture;
@@ -1341,7 +1339,7 @@ SimpleBuilding.prototype.newSimpleStorey = function() {
 	this._simpleStoreys_list.push(storey);
 	return storey;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class SimpleBuildingV1
@@ -1350,7 +1348,7 @@ var SimpleBuildingV1 = function() {
 	if(!(this instanceof SimpleBuildingV1)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// this class is for faster rendering XDO converted projects.***
 	this._simpleObjects_array = [];
 	this._simpleBuildingTexture; // Mini texture. Possibly coincident with texture_3.***
@@ -1358,12 +1356,12 @@ var SimpleBuildingV1 = function() {
 	this._texture_1;
 	this._texture_2;
 	this._texture_3; // Smallest texture.***
-  
+
 	this.color;
-  
+
 	// arrayBuffers.***
 	this.textureArrayBuffer; // use this for all textures.***
-  
+
 	// for SPEED TEST.***
 	this._vnt_cacheKeys;
 };
@@ -1377,7 +1375,7 @@ SimpleBuildingV1.prototype.newSimpleObject = function() {
 	this._simpleObjects_array.push(simpleObject);
 	return simpleObject;
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class Header
@@ -1386,31 +1384,32 @@ var Header = function() {
 	if(!(this instanceof Header)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._f4d_version = 1;
 	this._version = ""; // provisional for xdo.***
 	this._type = -1;
 	this._global_unique_id = "";
-	
+
 	this._latitude = 0.0;
 	this._longitude = 0.0;
 	this._elevation = 0.0;
-	
+
 	// Dont use this, if possible.***
-	//this._yaw = 0.0; 
+	//this._yaw = 0.0;
 	//this._pitch = 0.0;
 	//this._roll = 0.0;
-	
+
 	this._boundingBox = new BoundingBox();
 	this._octZerothBox = new BoundingBox(); // Provisionally...
 	this._dataFileName = "";
 	this._nailImageSize = 0;
-	
+
 	// Depending the bbox size, determine the LOD.***
 	//this.bbox.maxLegth = 0.0;
 	this.isSmall = false;
-  };
-  
+
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class BRBuildingProject
@@ -1419,9 +1418,9 @@ var BRBuildingProject = function() {
 	if(!(this instanceof BRBuildingProject)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._header = new Header();
-	  
+
 	// Block-Reference version of buildingProjects.***
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
@@ -1429,11 +1428,11 @@ var BRBuildingProject = function() {
 	this.buildingPosition;
 	this.buildingPositionHIGH;
 	this.buildingPositionLOW;
-	  
+
 	// Blocks data.***************************************************************
 	this._blocksList_Container = new BlocksListsContainer();
 	this.createDefaultBlockReferencesLists();
-	  
+
 	// Compound references data.**************************************************
 	this.octree;
 	this._compRefList_Container = new CompoundReferencesListContainer(); // Exterior objects lists.***
@@ -1441,57 +1440,57 @@ var BRBuildingProject = function() {
 	// SimpleBuilding.***************
 	this._simpleBuilding = new SimpleBuilding(); // ifc simple building.***
 	this._simpleBuilding_v1;
-	  
+
 	//this._boundingBox;
 	this.radius_aprox;
-	
+
 	// Test for stadistic. Delete this in the future.***
 	this._total_triangles_count = 0;
-	
+
 	// Test for use workers.*****************************************************************
 	this._VBO_ByteColorsCacheKeysContainer_List = [];
 	// End test for use workers.-------------------------------------------------------------
-	
+
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this._visibleCompRefLists_scratch = new CompoundReferencesList();
 	this.point3d_scratch = new Point3D();
 	this.point3d_scratch_2 = new Point3D();
-	
+
 	// Header, SimpleBuildingGeometry and nailImage path-strings.**********************************
 	this._f4d_rawPathName = ""; // Use only this.***
-	
+
 	this._f4d_headerPathName = "";
 	this._f4d_header_readed = false;
 	this._f4d_header_readed_finished = false;
-	
+
 	this._f4d_simpleBuildingPathName = "";
 	this._f4d_simpleBuilding_readed = false;
 	this._f4d_simpleBuilding_readed_finished = false;
-	
+
 	this._f4d_nailImagePathName = "";
 	this._f4d_nailImage_readed = false;
 	this._f4d_nailImage_readed_finished = false;
-	
+
 	this._f4d_lod0ImagePathName = "";
 	this._f4d_lod0Image_readed = false;
 	this._f4d_lod0Image_readed_finished = false;
 	this._f4d_lod0Image_exists = true;
-	
+
 	this._f4d_lod1ImagePathName = "";
 	this._f4d_lod1Image_readed = false;
 	this._f4d_lod1Image_readed_finished = false;
 	this._f4d_lod1Image_exists = true;
-	
+
 	this._f4d_lod2ImagePathName = "";
 	this._f4d_lod2Image_readed = false;
 	this._f4d_lod2Image_readed_finished = false;
 	this._f4d_lod2Image_exists = true;
-	
+
 	this._f4d_lod3ImagePathName = "";
 	this._f4d_lod3Image_readed = false;
 	this._f4d_lod3Image_readed_finished = false;
 	this._f4d_lod3Image_exists = true;
-	
+
 	// for SPEEDTEST. Delete after test.***
 	this._xdo_simpleBuildingPathName = "";
 	this._xdo_simpleBuilding_readed = false;
@@ -1510,7 +1509,7 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
 		compRefList = _interiorCompRefList_Container.compRefsListArray[i];
 		compRefs_count = compRefList._compoundRefsArray.length;
 		for(var j=0; j<compRefs_count; j++) {
-			
+
 		}
 	}
 };
@@ -1521,14 +1520,14 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
  * @param absolute_eye_y 변수
  * @param absolute_eye_z 변수
  * @returns point3d_scratch_2
- */ 
+ */
 BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
 	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
-	
+
 	if(this.buildingPosMat_inv == undefined)
 	{
 		this.buildingPosMat_inv = new Matrix4();
@@ -1537,7 +1536,7 @@ BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = functi
 
 	this.point3d_scratch.set(relative_eye_pos_x, relative_eye_pos_y, relative_eye_pos_z);
 	this.point3d_scratch_2 = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, this.point3d_scratch_2);
-  
+
 	return this.point3d_scratch_2;
 };
 
@@ -1611,11 +1610,11 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
 			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
 			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
 			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
-			
+
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
 	}
-	  
+
 	return this.radius_aprox;
 };
 
@@ -1624,11 +1623,11 @@ BRBuildingProject.prototype.getRadiusAprox = function() {
  * @returns _boundingBox
  */
 BRBuildingProject.prototype.getBoundingBox = function() {
-	  /*
+ /*
 	  if(this._boundingBox == undefined)
 	  {
 		  var boundingBox = null;
-		  
+
 		  var compRefLists_count = this._compRefList_Container.compRefsListArray.length;
 		  for(var i=0; i<compRefLists_count; i++)
 		  {
@@ -1645,11 +1644,11 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 				  if(bb != null)
 					  this._boundingBox.addBox(bb);
 			  }
-			  
+
 		  }
 	  }
 	  */
-	  
+
 	// Return the compReflList's occlussionCullingMotherBox.***
 	if(this._boundingBox == undefined) {
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
@@ -1661,11 +1660,11 @@ BRBuildingProject.prototype.getBoundingBox = function() {
 			this._boundingBox.maxY = compRefList._ocCulling._ocCulling_box.maxY;
 			this._boundingBox.minZ = compRefList._ocCulling._ocCulling_box.minZ;
 			this._boundingBox.maxZ = compRefList._ocCulling._ocCulling_box.maxZ;
-			
+
 			this.radius_aprox = this._boundingBox.getMaxLength() / 2.0;
 		}
 	}
-	  
+
 	return this._boundingBox;
 };
 
@@ -1677,11 +1676,11 @@ BRBuildingProject.prototype.createDefaultBlockReferencesLists = function() {
 	this._blocksList_Container.newBlocksList("Blocks1");
 	this._blocksList_Container.newBlocksList("Blocks2");
 	this._blocksList_Container.newBlocksList("Blocks3");
-	 
+
 	this._blocksList_Container.newBlocksList("BlocksBone");
 	this._blocksList_Container.newBlocksList("Blocks4");
 };
-  
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class PCloudMesh
@@ -1690,7 +1689,7 @@ var PCloudMesh = function() {
 	if(!(this instanceof PCloudMesh)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// this is a temporary class to render mesh from point cloud.***
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
 	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
@@ -1698,16 +1697,16 @@ var PCloudMesh = function() {
 	this._pCloudPosition;
 	this._pCloudPositionHIGH;
 	this._pCloudPositionLOW;
-	
+
 	this._header = new Header();
 	this.vbo_datas = new VBOVertexIdxCacheKeysContainer(); // temp.***
-	
+
 	this._f4d_rawPathName = "";
-	
+
 	this._f4d_headerPathName = "";
 	this._f4d_header_readed = false;
 	this._f4d_header_readed_finished = false;
-	
+
 	this._f4d_geometryPathName = "";
 	this._f4d_geometry_readed = false;
 	this._f4d_geometry_readed_finished = false;
@@ -1721,7 +1720,7 @@ var BRBuildingProjectsList = function() {
 	if(!(this instanceof BRBuildingProjectsList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this._BR_buildingsArray = [];
 	this._boundingBox;
 	this._pCloudMesh_array = []; // 1rst aproximation to the pointCloud data. Test.***
@@ -1744,7 +1743,7 @@ BRBuildingProjectsList.prototype.newBRProject = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @returns _boundingBox
- */ 
+ */
 BRBuildingProjectsList.prototype.getBoundingBox = function() {
 	if(this._boundingBox == undefined) {
 		var buildingProjects_count = this._BR_buildingsArray.length;
@@ -1764,5 +1763,3 @@ BRBuildingProjectsList.prototype.getBoundingBox = function() {
 	}
 	return this._boundingBox;
 };
-
-

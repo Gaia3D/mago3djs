@@ -8,38 +8,38 @@ var NeoReference = function() {
 	if(!(this instanceof NeoReference)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// 1) Object ID.***
 	this._id = 0;
-	
+
 	this.objectId = "";
-	
+
 	// 2) Block Idx.***
 	this._block_idx = -1;
-	
+
 	// 3) Transformation Matrix.***
 	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
 	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
 	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
-	
+
 	// 4) Tex coords cache_key.***
 	this.MESH_TEXCOORD_cacheKey;
-	
+
 	// 5) The texture image.***
 	this.hasTexture = false;
 	this.texture; // Texture
-	
+
 	// 6) 1 color.***
 	this.color4; //new Color();
-	
+
 	// 7) selection color.***
 	this.selColor4; //new Color(); // use for selection only.***
-	
+
 	this.vertex_count = 0;// provisional. for checking vertexCount of the block.*** delete this.****
-	
+
 	// 8) movement of the object.***
 	this.moveVector; // Point3D.***
-	
+
 	// 9) check for render.***
 	this.bRendered = false;
 };
@@ -58,7 +58,7 @@ NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
 	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
 	if(this.tMatrixAuxArray == undefined)
 		this.tMatrixAuxArray = [];
-	
+
 	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
 };
 
@@ -68,7 +68,7 @@ NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
 NeoReference.prototype.hasKeyMatrix = function(idxKey) {
 	if(this.tMatrixAuxArray == undefined)
 		return false;
-	
+
 	if(this.tMatrixAuxArray[idxKey] == undefined)
 		return false;
 	else
@@ -81,41 +81,41 @@ NeoReference.prototype.hasKeyMatrix = function(idxKey) {
 NeoReference.prototype.deleteGlObjects = function(gl) {
 	// 1) Object ID.***
 	this._id = undefined;
-	
+
 	// 2) Block Idx.***
 	this._block_idx = undefined;
-	
+
 	// 3) Transformation Matrix.***
 	this._matrix4._floatArrays = undefined;
 	this._matrix4 = undefined;
 	this._originalMatrix4._floatArrays = undefined;
-	this._originalMatrix4 = undefined; // 
-	
+	this._originalMatrix4 = undefined; //
+
 	// 4) Tex coords cache_key.***
 	if(this.MESH_TEXCOORD_cacheKey) {
 		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey);
 		this.MESH_TEXCOORD_cacheKey = undefined;
 	}
-	
+
 	// 5) The texture image.***
 	this.hasTexture = undefined;
 	this.texture = undefined; // Texture
-	
+
 	// 6) 1 color.***
 	this.color4 = undefined; //new Color();
-	
+
 	// 7) selection color.***
 	this.selColor4 = undefined; //new Color(); // use for selection only.***
-	
+
 	this.vertex_count = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
-	
+
 	// 8) movement of the object.***
 	this.moveVector = undefined; // Point3D.***
-	
+
 	this.bRendered = undefined;
 };
 
-// F4D References list.************************************************************************************************************************* // 
+// F4D References list.************************************************************************************************************************* //
 /**
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesList
@@ -124,19 +124,19 @@ var NeoReferencesList = function() {
 	if(!(this instanceof NeoReferencesList)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.name = "";
 	this.neoRefs_Array = [];
 	this.blocksList;
 	this.lod_level = -1;
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
-	
+
 	this.neoBuildingOwner;
-	
-	this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); 
-	this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); 
-	
+
+	this.exterior_ocCullOctree = new OcclusionCullingOctreeCell();
+	this.interior_ocCullOctree = new OcclusionCullingOctreeCell();
+
 	this._currentVisibleIndices = []; // Determined by occlusion culling.***
 	this._currentVisibleIndicesSC = []; // Determined by occlusion culling.***
 	this._currentVisibleIndicesSC_2 = []; // Determined by occlusion culling.***
@@ -198,19 +198,19 @@ NeoReferencesList.prototype.deleteGlObjects = function(gl) {
 		this.neoRefs_Array[i] = undefined;
 	}
 	this.neoRefs_Array.length = 0;
-	
+
 	//this.name = undefined;
 	//this.neoRefs_Array = undefined;
 	this.blocksList = undefined;
 	this.lod_level = undefined;
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
-	
+
 	this.neoBuildingOwner = undefined;
-	
-	this.exterior_ocCullOctree = undefined; 
-	this.interior_ocCullOctree = undefined; 
-	
+
+	this.exterior_ocCullOctree = undefined;
+	this.interior_ocCullOctree = undefined;
+
 	this._currentVisibleIndices = undefined; // Determined by occlusion culling.***
 	this._currentVisibleIndicesSC = undefined; // Determined by occlusion culling.***
 	this._currentVisibleIndicesSC_2 = undefined; // Determined by occlusion culling.***
@@ -267,55 +267,55 @@ NeoReferencesList.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y,
  */
 NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	
+
 	var startBuff;
 	var endBuff;
 	var bytes_readed = 0;
 	var neoRefs_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	
+
 	for(var i=0; i<neoRefs_count; i++) {
 		var neoRef = this.newNeoReference();
-		
+
 		// 1) Id.***
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
-		
+
 		// 2) Block's Idx.***
 		var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._block_idx = blockIdx;
-		
+
 		// 3) Transform Matrix4.***
 		neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
-		neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+
+		neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		//var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		/*
 		// Short mode. NO, can not use gl_repeat.***
 		var texcoordShortValues_count = vertex_count * 2;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + 2*texcoordShortValues_count;
-		
+
 		neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
 		gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 		gl.bufferData(gl.ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-		  
+
 		bytes_readed = bytes_readed + 2*texcoordShortValues_count; // updating data.***
 		*/
 		// Float mode.**************************************************************
@@ -326,83 +326,83 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 			// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
+
 			var daya_bytes;
 			if(data_type == 5121) daya_bytes = 1;
-			
+
 			var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var alfa = 255;
-			
+
 			if(dim == 4) {
 				alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			}
-			
+
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
-		
+
 		var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_colors) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
+
 			var daya_bytes;
 			if(data_type == 5121) daya_bytes = 1;
-			
-			var colors_count = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+
+			var colors_count = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j = 0; j<colors_count; j++) {
 				// temporally, waste data.***
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				
-				if(dim == 4) {					
+
+				if(dim == 4) {
 					var alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
 
 			}
 		}
-		
+
 		var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-		
+
 		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef.vertex_count = vertex_count;
-			
+
 			var texcoordFloatValues_count = vertex_count * 2;
 			startBuff = bytes_readed;
 			endBuff = bytes_readed + 4*texcoordFloatValues_count;
-			
+
 			neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
 			gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  
+
 			bytes_readed = bytes_readed + 4*texcoordFloatValues_count; // updating data.***
 		}
 		// End texcoords float mode.-------------------------------------------------
-			
+
 		// 4) short texcoords.*****
 		var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0) {
 
 			neoRef.texture = new Texture();
 			neoRef.hasTexture = true;
-			
+
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_type_nameLegth; j++){
 				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
-			
+
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++){
 				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
-			
+
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
 			if(neoRef.texture.tex_id == undefined)
@@ -415,21 +415,21 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 			neoRef.hasTexture = false;
 		}
 	}
-	
+
 	// Now occlusion cullings.***
-	
+
 	// Occlusion culling octree data.*****
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
-	
-	var ocCullBox = this.interior_ocCullOctree; 
+
+	var ocCullBox = this.interior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	ocCullBox.setSizesSubBoxes();
-	
+
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
@@ -446,12 +446,12 @@ var NeoReferencesMotherAndIndices = function() {
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
 	this.blocksList; // local blocks list. used only for parse data.***
 	this.neoRefsIndices = [];
-	
+
 	this.fileLoadState = 0;
 	this.dataArraybuffer;
-	
+
 	this.exterior_ocCullOctree;
-	this.interior_ocCullOctree; 
+	this.interior_ocCullOctree;
 };
 
 /**
@@ -483,13 +483,13 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) {
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	if(this.blocksList)
 		this.blocksList.deleteGlObjects(gl);
-	
+
 	this.blocksList = undefined;
 	this.neoRefsIndices = undefined;
-	
+
 	this.fileLoadState = 0;
 	this.dataArraybuffer = undefined;
-	
+
 	this.exterior_ocCullOctree = undefined;
 	this.interior_ocCullOctree = undefined;
 };
@@ -516,19 +516,19 @@ NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = functi
  */
 NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	
+
 	var startBuff;
 	var endBuff;
 	var bytes_readed = 0;
 	var neoRefs_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	
+
 	for(var i=0; i<neoRefs_count; i++) {
 		var neoRef = new NeoReference();
-		
+
 		// 1) Id.***
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
-		
+
 		this.motherNeoRefsList = motherNeoReferencesArray;
 		if(motherNeoReferencesArray[neoRef._id] != undefined)
 		{
@@ -537,48 +537,48 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 		motherNeoReferencesArray[neoRef._id] = neoRef;
 		this.neoRefsIndices.push(neoRef._id);
-		
+
 		var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 		var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
 		neoRef.objectId = objectId;
 		bytes_readed += objectIdLength;
-		
+
 		// 2) Block's Idx.***
 		var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._block_idx = blockIdx;
-		
+
 		// 3) Transform Matrix4.***
 		neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
-		neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
-		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+
+		neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		
+
 		//var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		/*
 		// Short mode. NO, can not use gl_repeat.***
 		var texcoordShortValues_count = vertex_count * 2;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + 2*texcoordShortValues_count;
-		
+
 		neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
 		gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 		gl.bufferData(gl.ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-		  
+
 		bytes_readed = bytes_readed + 2*texcoordShortValues_count; // updating data.***
 		*/
 		// Float mode.**************************************************************
@@ -589,82 +589,82 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
+
 			var daya_bytes;
 			if(data_type == 5121) daya_bytes = 1;
-			
+
 			var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			var alfa = 255;
-			
+
 			if(dim == 4) {
 				alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 			}
-			
+
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
-		
+
 		var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_colors) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
+
 			var daya_bytes;
 			if(data_type == 5121) daya_bytes = 1;
-			
-			var colors_count = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; 
+
+			var colors_count = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j = 0; j<colors_count; j++) {
 				// temporally, waste data.***
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				
-				if(dim == 4) {					
+
+				if(dim == 4) {
 					var alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
 			}
 		}
-		
+
 		var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-		
+
 		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef.vertex_count = vertex_count;
-			
+
 			var texcoordFloatValues_count = vertex_count * 2;
 			startBuff = bytes_readed;
 			endBuff = bytes_readed + 4*texcoordFloatValues_count;
-			
+
 			neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
 			gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  
+
 			bytes_readed = bytes_readed + 4*texcoordFloatValues_count; // updating data.***
 		}
 		// End texcoords float mode.-------------------------------------------------
-			
+
 		// 4) short texcoords.*****
 		var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0) {
 
 			neoRef.texture = new Texture();
 			neoRef.hasTexture = true;
-			
+
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_type_nameLegth; j++) {
 				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
-			
+
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++) {
 				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
-			
+
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
 			if(neoRef.texture.tex_id == undefined)
@@ -683,31 +683,31 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		}
 
 	}
-	
+
 	// Now occlusion cullings.***
-	
+
 	// Occlusion culling octree data.*****
 	if(this.exterior_ocCullOctree == undefined)
-		this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); 
-	
+		this.exterior_ocCullOctree = new OcclusionCullingOctreeCell();
+
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
-	
+
 	if(this.interior_ocCullOctree == undefined)
-		this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); 
-	
-	var ocCullBox = this.interior_ocCullOctree; 
+		this.interior_ocCullOctree = new OcclusionCullingOctreeCell();
+
+	var ocCullBox = this.interior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	ocCullBox.setSizesSubBoxes();
-	
+
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
-// F4D References list container ********************************************************************************************************** // 
+// F4D References list container ********************************************************************************************************** //
 /**
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesListsContainer
@@ -716,13 +716,13 @@ var NeoReferencesListsContainer = function() {
 	if(!(this instanceof NeoReferencesListsContainer)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	this.neoRefsLists_Array = [];
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param blocksList 변수 
+ * @param blocksList 변수
  */
 NeoReferencesListsContainer.prototype.newNeoRefsList = function(blocksList) {
 	var neoRefList = new NeoReferencesList();
