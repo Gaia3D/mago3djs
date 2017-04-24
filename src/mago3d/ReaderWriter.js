@@ -593,7 +593,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				blocksList.dataArraybuffer = arrayBuffer;
@@ -630,7 +630,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
@@ -665,7 +665,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				neoRefsList.dataArraybuffer = arrayBuffer;
@@ -699,7 +699,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				if(lowestOctree.lego)
@@ -739,7 +739,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuildin
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				lodBuilding.dataArraybuffer = arrayBuffer;
@@ -781,7 +781,7 @@ ReaderWriter.prototype.getNeoReferences = function(gl, fileName, neoRefList_cont
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				if(subOctreeNumberName != undefined) {
@@ -844,7 +844,7 @@ ReaderWriter.prototype.getNeoSimpleBuilding = function(gl, fileName, neoSimpleBu
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.readNeoSimpleBuilding(arrayBuffer, neoSimpleBuilding );
@@ -949,7 +949,7 @@ ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, re
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				var bytes_readed = 0;
@@ -991,7 +991,7 @@ ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsLi
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				// write code here.***
@@ -1055,7 +1055,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
 	pCloud._f4d_header_readed = true;
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				// write code here.***
@@ -1181,7 +1181,7 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter,
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
@@ -1323,7 +1323,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				if(neoBuilding.metaData == undefined) {
@@ -1378,7 +1378,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				if(neoBuilding.metaData == undefined) {
@@ -1622,7 +1622,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				//var BR_Project = new BRBuildingProject(); // Test.***
@@ -1663,7 +1663,7 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('loadend', function(){
-		if(oReq.status === 200) {
+		if(oReq.status === 200 || oReq.status === 304) {
 			var arrayBuffer = oReq.response;
 			if(arrayBuffer) {
 				// write code here.***
