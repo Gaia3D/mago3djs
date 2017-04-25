@@ -1,3 +1,7 @@
+/**
+ * Copy of Cesium
+ */
+
 (function() {
     'use strict';
     /*jshint node:true*/
