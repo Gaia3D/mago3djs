@@ -451,12 +451,12 @@ var BlocksListsContainer = function() {
 
 /**
  * 새 블록 리스트를 생성
- * @param blocksList_name 변수
+ * @param blocksListName 변수
  * @returns blocksList
  */
-BlocksListsContainer.prototype.newBlocksList = function(blocksList_name) {
+BlocksListsContainer.prototype.newBlocksList = function(blocksListName) {
 	var blocksList = new BlocksList();
-	blocksList.name = blocksList_name;
+	blocksList.name = blocksListName;
 	this.blocksListsArray.push(blocksList);
 	return blocksList;
 };

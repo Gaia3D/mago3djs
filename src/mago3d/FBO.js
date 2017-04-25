@@ -3,7 +3,6 @@
 /**
  * 어떤 일을 하고 있습니까?
  * @class FBO
- * 
  * @param gl 변수
  * @param width 변수
  * @param height 변수
