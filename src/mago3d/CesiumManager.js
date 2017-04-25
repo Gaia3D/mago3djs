@@ -3746,6 +3746,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						minSize = 0.0;
 					else minSize = 0.0;
 					//minSize = lowestOctree.squareDistToEye/10000;
+					if(neoBuilding.buildingType == "basicBuilding")
+					{
+						renderTexture = true;
+					}
+					else renderTexture = false;
 					this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 				}
 
@@ -3803,6 +3808,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						minSize = 0.9;
 					else minSize = 0.9;
 					//minSize = lowestOctree.squareDistToEye/10000 + 1.0;
+					if(neoBuilding.buildingType == "basicBuilding")
+					{
+						renderTexture = true;
+					}
+					else renderTexture = false;
 					this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, 1, refTMatrixIdxKey);
 				}
 			}
@@ -4814,6 +4824,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			if(neoBuilding.buildingType == "outfitting")
 				continue;
 		}
+		
+		if(i == 3937)
+		{
+			var hola =0;
+		}
 
 		// 1) check if there are a geoLocation.***
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -4830,7 +4845,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					var heading = neoBuilding.metaData.heading;
 					var pitch = neoBuilding.metaData.pitch;
 					var roll = neoBuilding.metaData.roll;
-					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude-500.0, heading, pitch, roll, buildingGeoLocation);
+					
+					if(neoBuilding.buildingType == "basicBuilding")
+						ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
+					else 
+						ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude-500.0, heading, pitch, roll, buildingGeoLocation);
 
 					if(neoBuilding.octree)
 					{

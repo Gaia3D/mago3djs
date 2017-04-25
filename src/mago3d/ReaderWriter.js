@@ -1270,10 +1270,19 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		// create a building and set the location.***
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
 
-
+		if(i == 0)
+		{
+			var hola = 0;
+		}
 		var buildingNameDivided = buildingName.split("_");
 		neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
 		neoBuilding.buildingType = buildingNameDivided[3];
+		
+		if(neoBuilding.buildingType == undefined)
+		{
+			neoBuilding.buildingType = "basicBuilding";
+		}
+		
 		/* khj(20170331) : before converted jt data path has been changed.
 		var buildingNameDivided = buildingName.split("-");
 		var tempBuildingId = buildingNameDivided[2].split("_");
@@ -1582,7 +1591,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
 		//BR_Project._f4d_lod0Image_readed_finished = true;
 
-		neoBuilding.textures_loaded.push(texture);
+		neoBuilding.texturesLoaded.push(texture);
 
 		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};
