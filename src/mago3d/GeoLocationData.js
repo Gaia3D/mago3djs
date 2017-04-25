@@ -3,6 +3,7 @@
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
+ * @param geoLocationDataName 변수
  */
 var GeoLocationData = function(geoLocationDataName) {
 	if(!(this instanceof GeoLocationData)) {
@@ -43,6 +44,9 @@ var GeoLocationData = function(geoLocationDataName) {
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
+ * @param absoluteCamera 변수
+ * @param resultCamera 변수
+ * @returns resultCamera
  */
 GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera) {
 	var pointAux = new Point3D();
@@ -86,6 +90,8 @@ var GeoLocationDataManager = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
+ * @param geoLocationName 변수
+ * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) {
 	if(geoLocationName == undefined)
@@ -98,6 +104,8 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
+ * @param idx
+ * @returns this.geoLoactionDataArray[idx]
  */
 GeoLocationDataManager.prototype.getGeoLocationData = function(idx) {
 	return this.geoLocationDataArray[idx];

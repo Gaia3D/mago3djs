@@ -35,11 +35,11 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 
 		// 1) Positions.************************************************************************************************
 		var vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var verticesFloatValues_count = vertexCount * 3;
+		var verticesFloatValuesCount = vertexCount * 3;
 		var startBuff = bytesReaded;
-		var endBuff = bytesReaded + 4*verticesFloatValues_count;
+		var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(dataArraybuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 		vbo_vi_cacheKey.vertexCount = vertexCount;
 
@@ -47,22 +47,22 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 		var hasNormals = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasNormals) {
 			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var normalsByteValues_count = vertexCount * 3;
+			var normalsByteValuesCount = vertexCount * 3;
 			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1*normalsByteValues_count;
+			endBuff = bytesReaded + 1 * normalsByteValuesCount;
 			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(dataArraybuffer.slice(startBuff, endBuff));
-			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
+			bytesReaded = bytesReaded + 1 * normalsByteValuesCount; // updating data.***
 		}
 
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasColors) {
 			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var colorsByteValues_count = vertexCount * 4;
+			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 1*colorsByteValues_count;
+			var endBuff = bytesReaded + 1 * colorsByteValuesCount;
 			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(dataArraybuffer.slice(startBuff, endBuff));
-			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
+			bytesReaded = bytesReaded + 1 * colorsByteValuesCount; // updating data.***
 		}
 
 		// 4) TexCoord.****************************************************************************************************

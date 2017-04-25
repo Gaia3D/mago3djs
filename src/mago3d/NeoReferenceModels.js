@@ -157,7 +157,7 @@ NeoReferencesList.prototype.newNeoReference = function() {
  * @returns neoRef
  */
 NeoReferencesList.prototype.setRenderedFalseToAllReferences = function() {
-	for(var i=0, neoRefs_count = this.neoRefs_Array.length; i<neoRefs_count; i++) {
+	for(var i = 0, neoRefsCount = this.neoRefs_Array.length; i < neoRefsCount; i++) {
 		var neoRef = this.neoRefs_Array[i];
 		neoRef.bRendered = false;
 	}
@@ -168,7 +168,7 @@ NeoReferencesList.prototype.setRenderedFalseToAllReferences = function() {
  * @returns neoRef
  */
 NeoReferencesList.prototype.setRenderedTrueToReferencesWithId = function(id) {
-	for(var i=0, neoRefs_count = this.neoRefs_Array.length; i<neoRefs_count; i++) {
+	for(var i = 0, neoRefsCount = this.neoRefs_Array.length; i < neoRefsCount; i++) {
 		var neoRef = this.neoRefs_Array[i];
 		if(neoRef._id == id) {
 			neoRef.bRendered = true;
@@ -182,7 +182,7 @@ NeoReferencesList.prototype.setRenderedTrueToReferencesWithId = function(id) {
  * @param matrix 변수
  */
 NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
-	for(var i=0, neoRefs_count = this.neoRefs_Array.length; i<neoRefs_count; i++) {
+	for(var i = 0, neoRefsCount = this.neoRefs_Array.length; i < neoRefsCount; i++) {
 		var neoRef = this.neoRefs_Array[i];
 		neoRef.multiplyTransformMatrix(matrix);
 	}
@@ -193,7 +193,7 @@ NeoReferencesList.prototype.multiplyReferencesMatrices = function(matrix) {
  * @param matrix 변수
  */
 NeoReferencesList.prototype.deleteGlObjects = function(gl) {
-	for(var i=0, neoRefs_count = this.neoRefs_Array.length; i<neoRefs_count; i++) {
+	for(var i = 0, neoRefsCount = this.neoRefs_Array.length; i < neoRefsCount; i++) {
 		this.neoRefs_Array[i].deleteGlObjects(gl);
 		this.neoRefs_Array[i] = undefined;
 	}
@@ -231,7 +231,7 @@ NeoReferencesList.prototype.updateCurrentVisibleIndicesInterior = function(eye_x
  */
 NeoReferencesList.prototype.updateCurrentAllIndicesInterior = function() {
 	this._currentVisibleIndices.length = 0;
-	for(var i=0, neoRefs_count = this.neoRefs_Array.length; i<neoRefs_count; i++) {
+	for(var i = 0, neoRefsCount = this.neoRefs_Array.length; i < neoRefsCount; i++) {
 		this._currentVisibleIndices.push(i);
 	}
 };
@@ -271,9 +271,9 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 	var startBuff;
 	var endBuff;
 	var bytes_readed = 0;
-	var neoRefs_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-	for(var i=0; i<neoRefs_count; i++) {
+	for(var i = 0; i < neoRefsCount; i++) {
 		var neoRef = this.newNeoReference();
 
 		// 1) Id.***
@@ -394,20 +394,20 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j=0; j<texture_type_nameLegth; j++){
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+			for(var j = 0; j< texture_type_nameLegth; j++){
+				neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
 
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++){
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
 
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
-			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			if(neoRef.texture.texId == undefined)
+				neoRef.texture.texId = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/
@@ -520,9 +520,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	var startBuff;
 	var endBuff;
 	var bytes_readed = 0;
-	var neoRefs_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-	for(var i=0; i<neoRefs_count; i++) {
+	for(var i = 0; i < neoRefsCount; i++) {
 		var neoRef = new NeoReference();
 
 		// 1) Id.***
@@ -657,19 +657,19 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Now, read the texture_type and texture_file_name.***
 			var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_type_nameLegth; j++) {
-				neoRef.texture.texture_type_name += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+				neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 			}
 
 			var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			for(var j=0; j<texture_fileName_Legth; j++) {
-				neoRef.texture.texture_image_fileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 			}
 
 			/*
 			// 1pixel texture, wait for texture to load.********************************************
-			if(neoRef.texture.tex_id == undefined)
-				neoRef.texture.tex_id = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.tex_id);
+			if(neoRef.texture.texId == undefined)
+				neoRef.texture.texId = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			*/
