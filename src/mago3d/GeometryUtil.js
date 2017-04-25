@@ -1423,8 +1423,8 @@ var BRBuildingProject = function() {
 
 	// Block-Reference version of buildingProjects.***
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
-	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
-	this.buildingPosMat_inv;
+	this.moveMatrixInv = new Float32Array(16); // Inverse of PositionMatrix.***
+	this.buildingPosMatInv;
 	this.buildingPosition;
 	this.buildingPositionHIGH;
 	this.buildingPositionLOW;
@@ -1453,8 +1453,8 @@ var BRBuildingProject = function() {
 
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this._visibleCompRefLists_scratch = new CompoundReferencesList();
-	this.point3d_scratch = new Point3D();
-	this.point3d_scratch_2 = new Point3D();
+	this.point3dScratch = new Point3D();
+	this.point3dScratch2 = new Point3D();
 
 	// Header, SimpleBuildingGeometry and nailImage path-strings.**********************************
 	this._f4d_rawPathName = ""; // Use only this.***
@@ -1519,7 +1519,7 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function() {
  * @param absolute_eye_x 변수
  * @param absolute_eye_y 변수
  * @param absolute_eye_z 변수
- * @returns point3d_scratch_2
+ * @returns point3dScratch2
  */
 BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
 	// 1rst, calculate the relative eye position.***
@@ -1528,16 +1528,16 @@ BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = functi
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
 
-	if(this.buildingPosMat_inv == undefined)
+	if(this.buildingPosMatInv == undefined)
 	{
-		this.buildingPosMat_inv = new Matrix4();
-		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
+		this.buildingPosMatInv = new Matrix4();
+		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
 	}
 
-	this.point3d_scratch.set(relative_eye_pos_x, relative_eye_pos_y, relative_eye_pos_z);
-	this.point3d_scratch_2 = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, this.point3d_scratch_2);
+	this.point3dScratch.set(relative_eye_pos_x, relative_eye_pos_y, relative_eye_pos_z);
+	this.point3dScratch2 = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, this.point3dScratch2);
 
-	return this.point3d_scratch_2;
+	return this.point3dScratch2;
 };
 
 /**
@@ -1692,7 +1692,7 @@ var PCloudMesh = function() {
 
 	// this is a temporary class to render mesh from point cloud.***
 	this.move_matrix = new Float32Array(16); // PositionMatrix.***
-	this.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
+	this.moveMatrixInv = new Float32Array(16); // Inverse of PositionMatrix.***
 	this.pCloudPosMat_inv;
 	this._pCloudPosition;
 	this._pCloudPositionHIGH;

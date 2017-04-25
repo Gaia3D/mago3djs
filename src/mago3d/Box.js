@@ -17,8 +17,8 @@ var Box = function() {
 	//    0----------1        4----------5
 	
 	this.triPolyhedron = new TriPolyhedron();
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
-	this.vBOVertexIdxCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
+	this.vBOVertexIdxCacheKey = this.vboVicksContainer.newVBOVertexIdxCacheKey();
 };
 
 /**

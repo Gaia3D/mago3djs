@@ -12,9 +12,9 @@ var Texture = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.texture_type_name = "";
-	this.texture_image_fileName = "";
-	this.tex_id;
+	this.textureTypeName = "";
+	this.textureImageFileName = "";
+	this.texId;
 };
 
 /**
@@ -26,8 +26,8 @@ var NeoSimpleBuilding = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.accesors_array = [];
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.accesorsArray = [];
+	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
 };
 
@@ -37,7 +37,7 @@ var NeoSimpleBuilding = function() {
  */
 NeoSimpleBuilding.prototype.newAccesor = function() {
 	var accesor = new Accessor();
-	this.accesors_array.push(accesor);
+	this.accesorsArray.push(accesor);
 	return accesor;
 };
 
@@ -76,7 +76,7 @@ var LodBuilding = function() {
 	// this class is for use for LOD2 and LOD3 buildings.***
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
@@ -96,38 +96,38 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 		bbox.maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 
-		var vbo_vi_cacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		var vboViCacheKey = this.vboVicksContainer.newVBOVertexIdxCacheKey();
 
 		// 1) Positions.************************************************************************************************
-		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var verticesFloatValues_count = vertexCount * 3;
+		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+		var verticesFloatValuesCount = vertexCount * 3;
 		var startBuff = bytesReaded;
-		var endBuff = bytesReaded + 4*verticesFloatValues_count;
-		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+		var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+		vboViCacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
-		vbo_vi_cacheKey.vertexCount = vertexCount;
+		vboViCacheKey.vertexCount = vertexCount;
 
 		// 2) Normals.*****************************************************************************************************
-		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded + 1); bytesReaded += 1;
 		if(hasNormals) {
-			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var normalsByteValues_count = vertexCount * 3;
+			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+			var normalsByteValuesCount = vertexCount * 3;
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 1*normalsByteValues_count;
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
-			bytesReaded = bytesReaded + 1*normalsByteValues_count; // updating data.***
+			var endBuff = bytesReaded + 1 * normalsByteValuesCount;
+			vboViCacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1 * normalsByteValuesCount; // updating data.***
 		}
 
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if(hasColors) {
 			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var colorsByteValues_count = vertexCount * 4;
+			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 1*colorsByteValues_count;
-			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
-			bytesReaded = bytesReaded + 1*colorsByteValues_count; // updating data.***
+			var endBuff = bytesReaded + 1 * colorsByteValuesCount;
+			vboViCacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 1 * colorsByteValuesCount; // updating data.***
 		}
 
 		// 4) TexCoord.****************************************************************************************************
@@ -179,7 +179,7 @@ var NeoBuilding = function() {
 	this.motherBlocksArray = []; // asimetric mode.***
 
 	// Textures loaded.***************************************************
-	this.textures_loaded = [];
+	this.texturesLoaded = [];
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -201,8 +201,8 @@ var NeoBuilding = function() {
 	this.lod3Building;
 
 	// SCRATCH.*********************************
-	this.point3d_scratch = new Point3D();
-	this.point3d_scratch_2 = new Point3D();
+	this.point3dScratch = new Point3D();
+	this.point3dScratch2 = new Point3D();
 };
 
 /**
@@ -210,8 +210,8 @@ var NeoBuilding = function() {
  * @returns neoRef
  */
 NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
-	var neoRefs_count = this.motherNeoReferencesArray.length;
-	for(var i=0; i<neoRefs_count; i++)
+	var neoRefsCount = this.motherNeoReferencesArray.length;
+	for(var i = 0; i < neoRefsCount; i++)
 	{
 		var neoRef = this.motherNeoReferencesArray[i];
 		neoRef.bRendered = false;
@@ -221,37 +221,37 @@ NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
 /**
  * 어떤 일을 하고 있습니까?
  * @param texture 변수
- * @returns tex_id
+ * @returns texId
  */
 NeoBuilding.prototype.getTextureId = function(texture) {
 	/*
-	this.texture_type_name = "";
-	this.texture_image_fileName = "";
-	this.tex_id = undefined;
+	this.textureTypeName = "";
+	this.textureImageFileName = "";
+	this.texId = undefined;
 	*/
-	var tex_id;
-	var textures_loaded_count = this.textures_loaded.length;
+	var texId;
+	var texturesLoadedCount = this.texturesLoaded.length;
 	var find = false;
 	var i=0;
-	while(!find && i<textures_loaded_count) {
-		if(this.textures_loaded[i].texture_image_fileName == texture.texture_image_fileName) {
+	while(!find && i < texturesLoadedCount ) {
+		if(this.texturesLoadedCount[i].textureImageFileName == texture.textureImageFileName) {
 			find = true;
-			tex_id = this.textures_loaded[i].tex_id;
+			texId = this.texturesLoaded[i].texId;
 		}
 		i++;
 	}
 
-	return tex_id;
+	return texId;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
+ * @param eyeX 변수
+ * @param eyeY 변수
+ * @param eyeZ 변수
  */
-NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eye_x, eye_y, eye_z) {
-	this._neoRefLists_Container.updateCurrentVisibleIndicesOfLists(eye_x, eye_y, eye_z);
+NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eyeX, eyeY, eyeZ) {
+	this._neoRefLists_Container.updateCurrentVisibleIndicesOfLists(eyeX, eyeY, eyeZ);
 };
 
 /**
@@ -263,43 +263,42 @@ NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
+ * @returns metaData.bbox.isPoint3dInside(eyeX, eyeY, eyeZ);
  */
-NeoBuilding.prototype.isCameraInsideOfBuilding = function(eye_x, eye_y, eye_z) {
-	return this.metaData.bbox.isPoint3dInside(eye_x, eye_y, eye_z);
+NeoBuilding.prototype.isCameraInsideOfBuilding = function(eyeX, eyeY, eyeZ) {
+	return this.metaData.bbox.isPoint3dInside(eyeX, eyeY, eyeZ);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param absolute_eye_x 변수
- * @param absolute_eye_y 변수
- * @param absolute_eye_z 변수
- * @returns point3d_scrath_2
+ * @param absoluteEyeX 변수
+ * @param absoluteEyeY 변수
+ * @param absoluteEyeZ 변수
+ * @returns point3dScrath2
  */
-NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absolute_eye_x, absolute_eye_y, absolute_eye_z) {
+NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absoluteEyeX, absoluteEyeY, absoluteEyeZ) {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
-	var relative_eye_pos_x = absolute_eye_x - buildingPosition.x;
-	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
-	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
+	var relativeEyePosX = absoluteEyeX - buildingPosition.x;
+	var relativeEyePosY = absoluteEyeY - buildingPosition.y;
+	var relativeEyePosZ = absoluteEyeZ - buildingPosition.z;
 
-	if(this.buildingPosMat_inv == undefined) {
-		this.buildingPosMat_inv = new Matrix4();
-		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv);
+	if(this.buildingPosMatInv == undefined) {
+		this.buildingPosMatInv = new Matrix4();
+		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
 	}
 
-	this.point3d_scratch.set(relative_eye_pos_x, relative_eye_pos_y, relative_eye_pos_z);
-	this.point3d_scratch_2 = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, this.point3d_scratch_2);
+	this.point3dScratch.set(relativeEyePosX, relativeEyePosY, relativeEyePosZ);
+	this.point3dScratch2 = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, this.point3dScratch2);
 
-	return this.point3d_scratch_2;
+	return this.point3dScratch2;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param absolute_eye_x 변수
- * @param absolute_eye_y 변수
- * @param absolute_eye_z 변수
- * @returns point3d_scrath_2
+ * @param absoluteCamera 변수
+ * @param resultCamera 변수
+ * @returns resultCamera
  */
 NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absoluteCamera, resultCamera) {
 	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
@@ -308,19 +307,19 @@ NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absolute
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
 
-	if(this.buildingPosMat_inv == undefined) {
-		this.buildingPosMat_inv = new Matrix4();
-		this.buildingPosMat_inv.setByFloat32Array(this.move_matrix_inv); // this is rotationMatrixInverse.***
+	if(this.buildingPosMatInv == undefined) {
+		this.buildingPosMatInv = new Matrix4();
+		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv); // this is rotationMatrixInverse.***
 	}
 
-	this.point3d_scratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);
-	resultCamera.position = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.position);
+	this.point3dScratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);
+	resultCamera.position = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.position);
 
-	this.point3d_scratch.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
-	resultCamera.direction = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.direction);
+	this.point3dScratch.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
+	resultCamera.direction = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.direction);
 
-	this.point3d_scratch.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
-	resultCamera.up = this.buildingPosMat_inv.transformPoint3D(this.point3d_scratch, resultCamera.up);
+	this.point3dScratch.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
+	resultCamera.up = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.up);
 
 	return resultCamera;
 };
@@ -334,7 +333,7 @@ var NeoBuildingsList = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.neoBuildings_Array = [];
+	this.neoBuildingsArray = [];
 };
 
 /**
@@ -343,7 +342,7 @@ var NeoBuildingsList = function() {
  */
 NeoBuildingsList.prototype.newNeoBuilding = function() {
 	var neoBuilding = new NeoBuilding();
-	this.neoBuildings_Array.push(neoBuilding);
+	this.neoBuildingsArray.push(neoBuilding);
 	return neoBuilding;
 };
 
@@ -353,15 +352,15 @@ NeoBuildingsList.prototype.newNeoBuilding = function() {
  */
 NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId) {
 	var resultBuilding;
-	var buildingsCount = this.neoBuildings_Array.length;
+	var buildingsCount = this.neoBuildingsArray.length;
 	var found = false;
 	var i=0;
-	while(!found && i<buildingsCount)
+	while(!found && i < buildingsCount)
 	{
-		if(this.neoBuildings_Array[i].buildingType == buildingType && this.neoBuildings_Array[i].buildingId == buildingId)
+		if(this.neoBuildingsArray[i].buildingType == buildingType && this.neoBuildingsArray[i].buildingId == buildingId)
 		{
 			found = true;
-			resultBuilding = this.neoBuildings_Array[i];
+			resultBuilding = this.neoBuildingsArray[i];
 		}
 		i++;
 	}
@@ -374,11 +373,11 @@ NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, build
  * @returns neoBuilding
  */
 NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulled) {
-	var buildingsCount = this.neoBuildings_Array.length;
+	var buildingsCount = this.neoBuildingsArray.length;
 
-	for(var i=0; i<buildingsCount; i++)
+	for(var i = 0; i < buildingsCount; i++)
 	{
-		this.neoBuildings_Array[i].frustumCulled = bFrustumCulled;
+		this.neoBuildingsArray[i].frustumCulled = bFrustumCulled;
 	}
 
 };
