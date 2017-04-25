@@ -10,10 +10,9 @@ var GeoLocationData = function(geoLocationDataName) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.name;
-	if(geoLocationDataName == undefined)
-		this.name = "noName";
-	else
-		this.name = geoLocationDataName;
+	
+	if(geoLocationDataName == undefined) this.name = "noName";
+	else this.name = geoLocationDataName;
 	
 	this.geographicCoord; // longitude, latitude, altitude.***
 	
