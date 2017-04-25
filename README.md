@@ -23,8 +23,11 @@ server를 실행하기 전에 Dependencies를 설치해줍니다. <br>
 ####  node Setup <br>
 &emsp;<code>npm install --save-dev yargs express url compression request</code>
 
-#####  서버 실행 <br>
+####  서버 실행 <br>
+##### Local 서버 실행<br>
 &emsp;<code>C:\git\repository\mago3djs>node server.js</code><br>
+##### public 서버 실행<br>
+&emsp;<code>C:\git\repository\mago3djs>node server.js --public true</code><br>
 
 ####  데이터 폴더 링크<br>
 ##### 데이터 폴더 생성
