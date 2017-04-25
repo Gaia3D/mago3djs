@@ -414,7 +414,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
-			if(neoBuilding.buildingId == "testId_F110T")
+			if(neoBuilding.buildingType == "basicBuilding")
 			{
 				var hola = 0;
 			}
@@ -425,6 +425,13 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 
+		if(neoBuilding.buildingType == "basicBuilding")
+		{
+			var hola = 0;
+			if(ssao_idx == 1)
+				hola = 0;
+		}
+			
 		// New version. Use occlussion indices.***
 		var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
@@ -470,7 +477,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				var texId = neoBuilding.getTextureId(neoReference.texture);
 				if(texId == undefined) {
 					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
+					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images_Resized/"+neoReference.texture.textureImageFileName;
 					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 					magoManager.backGround_fileReadings_count ++;
 					continue;
@@ -539,6 +546,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 									gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 									gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
 								}
+							}
+							else
+							{
+								gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+								gl.uniform4fv(standardShader.color4Aux_loc, [0.8, 0.8, 0.8, 1.0]);
 							}
 						}
 						else if(ssao_idx == 0) // depth render.***

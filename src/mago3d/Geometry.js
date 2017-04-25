@@ -224,17 +224,12 @@ NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
  * @returns texId
  */
 NeoBuilding.prototype.getTextureId = function(texture) {
-	/*
-	this.textureTypeName = "";
-	this.textureImageFileName = "";
-	this.texId = undefined;
-	*/
 	var texId;
 	var texturesLoadedCount = this.texturesLoaded.length;
 	var find = false;
 	var i=0;
 	while(!find && i < texturesLoadedCount ) {
-		if(this.texturesLoadedCount[i].textureImageFileName == texture.textureImageFileName) {
+		if(this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) {
 			find = true;
 			texId = this.texturesLoaded[i].texId;
 		}
