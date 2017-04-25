@@ -2535,7 +2535,7 @@ CesiumManager.prototype.moveSelectedObject = function(scene, renderables_neoRefL
 	camPosBuilding = Cesium.Matrix4.multiplyByPoint(this.detailed_neoBuilding.transfMat_inv, camPos, camPosBuilding);
 
 	var camDirBuilding = new Cesium.Cartesian3();
-	camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.detailed_neoBuilding.move_matrix_inv, rayWorldSpace, camDirBuilding); // "move_matrix_inv" is only rotation matrix.***
+	camDirBuilding = Cesium.Matrix4.multiplyByPoint(this.detailed_neoBuilding.moveMatrixInv, rayWorldSpace, camDirBuilding); // "moveMatrixInv" is only rotation matrix.***
 
 	// now, intersect building_ray with the selObjMovePlane.***
 	var line = new Line();
@@ -2755,9 +2755,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 
 		if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
 
-		if(neoBuilding.buildingPosMat_inv == undefined) {
-			neoBuilding.buildingPosMat_inv = new Matrix4();
-			neoBuilding.buildingPosMat_inv.setByFloat32Array(neoBuilding.move_matrix_inv);
+		if(neoBuilding.buildingPosMatInv == undefined) {
+			neoBuilding.buildingPosMatInv = new Matrix4();
+			neoBuilding.buildingPosMatInv.setByFloat32Array(neoBuilding.moveMatrixInv);
 		}
 
 		var camera = scene.frameState.camera;
@@ -2767,9 +2767,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, 
 		var transformedCamUp;
 
 		this.pointSC.set(cameraDir.x, cameraDir.y, cameraDir.z);
-		transformedCamDir = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamDir);
+		transformedCamDir = neoBuilding.buildingPosMatInv.transformPoint3D(this.pointSC, transformedCamDir);
 		this.pointSC.set(camera.up.x, camera.up.y, camera.up.z);
-		transformedCamUp = neoBuilding.buildingPosMat_inv.transformPoint3D(this.pointSC, transformedCamUp);
+		transformedCamUp = neoBuilding.buildingPosMatInv.transformPoint3D(this.pointSC, transformedCamUp);
 
 		this.myCameraSC.position.x = transformedCamPos.x;
 		this.myCameraSC.position.y = transformedCamPos.y;
@@ -2927,9 +2927,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 		if(lod == 0 || lod == 1)
 		{
 			if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
-			//if(neoBuilding.buildingPosMat_inv == undefined) {
-			//    neoBuilding.buildingPosMat_inv = new Matrix4();
-			//    neoBuilding.buildingPosMat_inv.setByFloat32Array(neoBuilding.move_matrix_inv);
+			//if(neoBuilding.buildingPosMatInv == undefined) {
+			//    neoBuilding.buildingPosMatInv = new Matrix4();
+			//    neoBuilding.buildingPosMatInv.setByFloat32Array(neoBuilding.moveMatrixInv);
 			//}
 
 			var camera = scene.frameState.camera;
@@ -3312,8 +3312,8 @@ CesiumManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition,
 		var neoRefLists_count = neoRefListsArray.length;
 		for(var i = 0; i<neoRefLists_count; i++) {
 			var neoRefList = neoRefListsArray[i];
-			var neoRefs_count = neoRefList.neoRefs_Array.length;
-			for(var j=0; j<neoRefs_count; j++) {
+			var neoRefsCount = neoRefList.neoRefs_Array.length;
+			for(var j = 0; j < neoRefsCount; j++) {
 				var neoRef = neoRefList.neoRefs_Array[j];
 				if(neoRef.selColor4 == undefined) neoRef.selColor4 = new Color();
 
@@ -4076,8 +4076,8 @@ CesiumManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, 
 		var neoRefLists_count = neoRefListsArray.length;
 		for(var i = 0; i<neoRefLists_count; i++) {
 			var neoRefList = neoRefListsArray[i];
-			var neoRefs_count = neoRefList.neoRefs_Array.length;
-			for(var j=0; j<neoRefs_count; j++) {
+			var neoRefsCount = neoRefList.neoRefs_Array.length;
+			for(var j=0; j<neoRefsCount; j++) {
 				var neoRef = neoRefList.neoRefs_Array[j];
 				if(neoRef.selColor4 == undefined) neoRef.selColor4 = new Color();
 
@@ -4671,8 +4671,8 @@ CesiumManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 	//neoBuilding.buildingPositionLOW = undefined;
 
 	//neoBuilding.move_matrix = undefined; // PositionMatrix (only rotations).***
-	//neoBuilding.move_matrix_inv = undefined; // Inverse of PositionMatrix.***
-	//neoBuilding.buildingPosMat_inv = undefined; // f4d matrix4.***
+	//neoBuilding.moveMatrixInv = undefined; // Inverse of PositionMatrix.***
+	//neoBuilding.buildingPosMatInv = undefined; // f4d matrix4.***
 	//neoBuilding.transfMat_inv = undefined; // cesium matrix4.***
 	//neoBuilding.transfMat = undefined; // f4d matrix4.***
 	//neoBuilding.transfMatInv = undefined; // f4d matrix4.***
@@ -4790,12 +4790,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 
 	var maxNumberOfCalculatingPositions = 4000;
 	var currentCalculatingPositionsCount = 0;
-	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
+	var neoBuildings_count = this.neoBuildingsList.neoBuildingsArray.length;
 	for(var i=0; i<neoBuildings_count; i++) {
-		//if(this.neoBuildingsList.neoBuildings_Array[i].frustumCulled)
+		//if(this.neoBuildingsList.neoBuildingsArray[i].frustumCulled)
 		//	continue;
 
-		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
 
 		if(this.renderingModeTemp == 0 || this.renderingModeTemp == 1)
 		{
@@ -5060,12 +5060,12 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings_OLD = function(frustumVolum
 
 	var maxNumberOfCalculatingPositions = 4000;
 	var currentCalculatingPositionsCount = 0;
-	var neoBuildings_count = this.neoBuildingsList.neoBuildings_Array.length;
+	var neoBuildings_count = this.neoBuildingsList.neoBuildingsArray.length;
 	for(var i=0; i<neoBuildings_count; i++) {
-		//if(this.neoBuildingsList.neoBuildings_Array[i].frustumCulled)
+		//if(this.neoBuildingsList.neoBuildingsArray[i].frustumCulled)
 		//	continue;
 
-		var neoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
 
 		if(this.renderingModeTemp == 0 || this.renderingModeTemp == 1)
 		{
@@ -5375,14 +5375,14 @@ CesiumManager.prototype.flyToBuilding = function(buildingType, buildingId) {
  * 어떤 일을 하고 있습니까?
  */
 CesiumManager.prototype.getNeoBuildingById = function(buildingType, buildingId) {
-	var buildingCount = this.neoBuildingsList.neoBuildings_Array.length;
+	var buildingCount = this.neoBuildingsList.neoBuildingsArray.length;
 	var find = false;
 	var i=0;
 	var resultNeoBuilding;
 	while(!find && i<buildingCount) {
-		if(this.neoBuildingsList.neoBuildings_Array[i].buildingId == buildingId && this.neoBuildingsList.neoBuildings_Array[i].buildingType == buildingType) {
+		if(this.neoBuildingsList.neoBuildingsArray[i].buildingId == buildingId && this.neoBuildingsList.neoBuildingsArray[i].buildingType == buildingType) {
 			find = true;
-			resultNeoBuilding = this.neoBuildingsList.neoBuildings_Array[i];
+			resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
 		}
 		i++;
 	}
@@ -5709,10 +5709,10 @@ CesiumManager.prototype.doFrustumCullingClouds = function(frustumVolume, visible
 CesiumManager.prototype.highLightBuildings = function()
 {
 	// 1rst, init highlightiedBuildings.***
-	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
+	var buildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
 	for(var i=0; i<buildingsCount; i++)
 	{
-		this.neoBuildingsList.neoBuildings_Array[i].isHighLighted = false;
+		this.neoBuildingsList.neoBuildingsArray[i].isHighLighted = false;
 	}
 
 	var buildingType = "structure";
@@ -5755,10 +5755,10 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectI
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
 
 	// 1rst, init colorChanged.***
-	var buildingsCount = this.neoBuildingsList.neoBuildings_Array.length;
+	var buildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
 	for(var i=0; i<buildingsCount; i++)
 	{
-		this.neoBuildingsList.neoBuildings_Array[i].isColorChanged = false;
+		this.neoBuildingsList.neoBuildingsArray[i].isColorChanged = false;
 	}
 
 	neoBuilding.isColorChanged = true;

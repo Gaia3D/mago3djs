@@ -241,12 +241,12 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList) {
 		for(var j=0; j<vboDatasCount; j++) {
 			// 1) Positions array.***************************************************************************************
 			var vertex_count = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var verticesFloatValues_count = vertex_count * 3;
+			var verticesFloatValuesCount = vertex_count * 3;
 
 			block.vertex_count = vertex_count;
 
 			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 4*verticesFloatValues_count;
+			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 
 			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
@@ -256,7 +256,7 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList) {
 			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
-			bytesReaded = bytesReaded + 4*verticesFloatValues_count; // updating data.***
+			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 			// 2) Normals.************************************************************************************************
 			vertex_count = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -301,10 +301,10 @@ ReaderWriter.prototype.readNeoReferences = function(gl, neoRefsList, arrayBuffer
 	var startBuff;
 	var endBuff;
 	var bytesReaded = 0;
-	var neoRefs_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 
-	for(var i=0; i<neoRefs_count; i++) {
+	for(var i=0; i < neoRefsCount; i++) {
 		var neoRef = neoRefsList.newNeoReference();
 
 		// 1) Id.***
@@ -1305,7 +1305,7 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		bbox.maxZ = neoBuilding.bbox.maxZ;
 	}
 
-	neoBuildingsList.neoBuildings_Array.reverse();
+	neoBuildingsList.neoBuildingsArray.reverse();
 };
 
 /**
@@ -1799,7 +1799,7 @@ ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude
 	var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
 	neoBuilding.move_matrix = new Float32Array(16); // PositionMatrix.***
-	neoBuilding.move_matrix_inv = new Float32Array(16); // Inverse of PositionMatrix.***
+	neoBuilding.moveMatrixInv = new Float32Array(16); // Inverse of PositionMatrix.***
 
 	Cesium.Transforms.eastNorthUpToFixedFrame(position, undefined, neoBuilding.move_matrix);
 	neoBuilding.transfMat_inv = new Float32Array(16);
@@ -1811,7 +1811,7 @@ ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude
 	neoBuilding.buildingPosition = position;
 	// note: "neoBuilding.move_matrix" is only rotation matrix.***
 
-	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.move_matrix_inv);
+	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.moveMatrixInv);
 
 	// 1) Blocks.*******************************************************************************************************************************
 	var blocksListContainer = neoBuilding._blocksList_Container;

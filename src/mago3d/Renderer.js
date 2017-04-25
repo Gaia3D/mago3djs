@@ -354,8 +354,8 @@ Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuildin
 Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager,
 		isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) {
 	// render_neoRef
-	var neoRefs_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
-	if(neoRefs_count == 0) return;
+	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
+	if(neoRefsCount == 0) return;
 
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
@@ -707,8 +707,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
  */
 Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, refMatrixIdxKey) {
 	// render_neoRef
-	var neoRefs_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
-	if(neoRefs_count == 0) return;
+	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
+	if(neoRefsCount == 0) return;
 
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
