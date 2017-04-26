@@ -399,8 +399,8 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var indexMarkers = [];
 			for ( var k = 0; k < sizeLevels; k++ )
 			{
-				indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded + 4)); // original with 16bits reading that is error.***
-				//indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
+				//indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded + 4)); // original with 16bits reading that is error.***
+				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
 				bytesReaded += 4;
 			}
 			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];

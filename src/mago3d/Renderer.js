@@ -656,9 +656,22 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					}
 
 					if(renderTexture && neoReference.hasTexture) {
-						if(block.vertex_count <= neoReference.vertex_count) {
+						if(block.vertexCount <= neoReference.vertexCount) {
+							var refVboData = neoReference.vBOVertexIdxCacheKeysContainer._vbo_cacheKeysArray[n];
+							
+							if(refVboData.MESH_TEXCOORDS_cacheKey == undefined) {
+								if(refVboData.tcoord_vboDataArray == undefined) continue;
+
+								refVboData.MESH_TEXCOORDS_cacheKey = gl.createBuffer ();
+								gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.MESH_TEXCOORDS_cacheKey);
+								gl.bufferData(gl.ARRAY_BUFFER, refVboData.tcoord_vboDataArray, gl.STATIC_DRAW);
+								//this.vbo_vi_cacheKey_aux.tcoord_vboDataArray = [];
+								refVboData.tcoord_vboDataArray = null;
+
+								continue;
+							}
 							gl.enableVertexAttribArray(standardShader.texCoord2_loc);
-							gl.bindBuffer(gl.ARRAY_BUFFER, neoReference.MESH_TEXCOORD_cacheKey);
+							gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.MESH_TEXCOORDS_cacheKey);
 							gl.vertexAttribPointer(standardShader.texCoord2_loc, 2, gl.FLOAT, false,0,0);
 						} else {
 							if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
