@@ -22,8 +22,11 @@ var NeoReference = function() {
 	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
 	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
 
-	// 4) Tex coords cache_key.***
-	this.MESH_TEXCOORD_cacheKey;
+	// 4) VBO datas container.***
+	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
+	
+	// 4) Tex coords cache_key.*** // old.***
+	this.MESH_TEXCOORD_cacheKey; // old.***
 
 	// 5) The texture image.***
 	this.hasTexture = false;
@@ -35,7 +38,7 @@ var NeoReference = function() {
 	// 7) selection color.***
 	this.selColor4; //new Color(); // use for selection only.***
 
-	this.vertex_count = 0;// provisional. for checking vertexCount of the block.*** delete this.****
+	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 
 	// 8) movement of the object.***
 	this.moveVector; // Point3D.***
@@ -90,12 +93,12 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 	this._matrix4 = undefined;
 	this._originalMatrix4._floatArrays = undefined;
 	this._originalMatrix4 = undefined; //
-
-	// 4) Tex coords cache_key.***
-	if(this.MESH_TEXCOORD_cacheKey) {
-		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey);
-		this.MESH_TEXCOORD_cacheKey = undefined;
-	}
+	
+	// 4) Tex coords cache_key.*** // old.***
+	if(this.MESH_TEXCOORD_cacheKey) { // old.***
+		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey); // old.***
+		this.MESH_TEXCOORD_cacheKey = undefined; // old.***
+	} // old.***
 
 	// 5) The texture image.***
 	this.hasTexture = undefined;
@@ -344,24 +347,86 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 		}
 
 		var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		
+		if(has_colors || has_texCoords)
+		{
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			
+			if(vboDatasCount > 0)
+			{
+				if(neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+					neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
+			}
+			
+			for(var j=0; j<vboDatasCount; j++)
+			{
+				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+				
+				if(has_colors)
+				{
+					var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+					var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+					var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+					if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
+					else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
+					else if(data_type == 5126) daya_bytes = 4;
+					
+					var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					var verticesFloatValuesCount = vertexCount * dim;
+					neoRef.vertexCount = vertexCount; // no necessary.***
+					startBuff = bytesReaded;
+					endBuff = bytesReaded + daya_bytes * verticesFloatValuesCount; 
+					vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					
+					bytesReaded += daya_bytes * verticesFloatValuesCount; // updating data.***
+				}
+				
+				if(has_texCoords)
+				{
+					var data_type = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+					
+					var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+					if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
+					else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
+					else if(data_type == 5126) daya_bytes = 4;
+					
+					var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+					neoRef.vertexCount = vertexCount; // no necessary.***
+					startBuff = bytesReaded;
+					endBuff = bytesReaded + daya_bytes * verticesFloatValuesCount; 
+					vboViCacheKey.tcoord_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					
+					bytesReaded += daya_bytes * verticesFloatValuesCount;
+				}
+			}
+		}
+		/*
 		if(has_colors) {
+			if(neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+				neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
+			
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 			var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 			var daya_bytes;
 			if(data_type == 5121) daya_bytes = 1;
-
-			var colors_count = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for(var j = 0; j<colors_count; j++) {
-				// temporally, waste data.***
-				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-
-				if(dim == 4) {
-					var alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				}
-
+			
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			for(var j=0; j<vboDatasCount; j++)
+			{
+				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var verticesFloatValuesCount = vertexCount * dim;
+				//neoRef.vertexCount = vertexCount; // no necessary.***
+				startBuff = bytesReaded;
+				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+			
+				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+				vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+				
+				bytesReaded += 4 * verticesFloatValuesCount; // updating data.***
 			}
 		}
 
@@ -369,21 +434,28 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 
 		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords) {
-			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef.vertex_count = vertex_count;
+			if(neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+				neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
+			
+			var data_type = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 
-			var texcoordFloatValues_count = vertex_count * 2;
-			startBuff = bytes_readed;
-			endBuff = bytes_readed + 4*texcoordFloatValues_count;
-
-			neoRef.MESH_TEXCOORD_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, neoRef.MESH_TEXCOORD_cacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-
-			bytes_readed = bytes_readed + 4*texcoordFloatValues_count; // updating data.***
+			var vboDatasCount = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			for(var j=0; j<vboDatasCount; j++)
+			{
+				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var verticesFloatValuesCount = vertexCount * 2;
+				//neoRef.vertexCount = vertexCount; // no necessary.***
+				startBuff = bytesReaded;
+				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+			
+				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+				vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+				
+				bytesReaded += 4 * verticesFloatValuesCount;
+			}
 		}
 		// End texcoords float mode.-------------------------------------------------
+		*/
 
 		// 4) short texcoords.*****
 		var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
@@ -583,6 +655,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		*/
 		// Float mode.**************************************************************
 		// New modifications for xxxx 20161013.*****************************
+		
+		
 		var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_1_color) {
 			// "type" : one of following
@@ -605,7 +679,65 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			neoRef.color4 = new Color();
 			neoRef.color4.set(r, g, b, alfa);
 		}
+		
+		var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		
+		if(has_colors || has_texCoords)
+		{
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			
+			if(vboDatasCount > 0)
+			{
+				if(neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+					neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
+			}
+			
+			for(var j=0; j<vboDatasCount; j++)
+			{
+				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+				
+				if(has_colors)
+				{
+					var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+					var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
+					var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+					if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
+					else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
+					else if(data_type == 5126) daya_bytes = 4;
+					
+					var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+					var verticesFloatValuesCount = vertexCount * dim;
+					neoRef.vertexCount = vertexCount; // no necessary.***
+					startBuff = bytes_readed;
+					endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+					vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					
+					bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+				}
+				
+				if(has_texCoords)
+				{
+					var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+					
+					var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+					if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
+					else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
+					else if(data_type == 5126) daya_bytes = 4;
+					
+					var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+					var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+					neoRef.vertexCount = vertexCount; // no necessary.***
+					startBuff = bytes_readed;
+					endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+					vboViCacheKey.tcoord_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					
+					bytes_readed += daya_bytes * verticesFloatValuesCount;
+				}
+			}
+		}
+		/*
 		var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		if(has_colors) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
@@ -646,7 +778,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			bytes_readed = bytes_readed + 4*texcoordFloatValues_count; // updating data.***
 		}
 		// End texcoords float mode.-------------------------------------------------
-
+		*/
+		
 		// 4) short texcoords.*****
 		var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0) {
