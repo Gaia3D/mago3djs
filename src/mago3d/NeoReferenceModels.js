@@ -506,6 +506,8 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 };
 
 //*************************************************************************************************************************************************************
+//*************************************************************************************************************************************************************
+//*************************************************************************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesMotherAndIndices
@@ -524,6 +526,8 @@ var NeoReferencesMotherAndIndices = function() {
 
 	this.exterior_ocCullOctree;
 	this.interior_ocCullOctree;
+	
+	this.currentVisibleIndices = [];
 };
 
 /**
@@ -535,6 +539,37 @@ NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(id
 	for(var i=0; i<refIndicesCount; i++)
 	{
 		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
+	}
+};
+
+NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z) {
+	if(isExterior)
+	{
+		if(this.exterior_ocCullOctree != undefined)
+		{
+			if(this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
+			{
+				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
+				
+			}
+			else{
+				this.currentVisibleIndices = this.neoRefsIndices;
+			}
+			
+		}
+	}
+	else{
+		if(this.interior_ocCullOctree != undefined)
+		{
+			if(this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
+			{
+				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
+				
+			}
+			else{
+				this.currentVisibleIndices = this.neoRefsIndices;
+			}
+		}
 	}
 };
 
