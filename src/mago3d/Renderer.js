@@ -433,13 +433,15 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		}
 			
 		// New version. Use occlussion indices.***
-		var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
+		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length; // original.***
+		var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 
 		for(var k=0; k<visibleIndices_count; k++) {
 
-			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
-			var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]];
+			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good, but old.***
+			//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]];// orignal.***
+			var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
 			if(!neoReference || neoReference== undefined) {
 				continue;
 			}
