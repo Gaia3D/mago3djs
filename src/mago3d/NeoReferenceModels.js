@@ -815,7 +815,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		// End texcoords float mode.-------------------------------------------------
 		*/
 		
-		// 4) short texcoords.*****
+		// 4) short texcoords. OLD. Change this for Materials.***
 		var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 		if(textures_count > 0) {
 

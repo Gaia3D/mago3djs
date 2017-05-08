@@ -1382,7 +1382,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
  */
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) {
 	//BR_Project._f4d_header_readed = true;
-	//magoManager.fileRequestControler.filesRequestedCount += 1;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
 	var oReq = new XMLHttpRequest();
@@ -1435,8 +1435,8 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		}
 		arrayBuffer = undefined;
 
-		//magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
 	});
 
 	oReq.open("GET", fileName, true);

@@ -163,14 +163,6 @@ var NeoBuilding = function() {
 	this.isDemoBlock = false; // test.***
 	//this.isHighLighted;
 
-	// create the default blocks_lists.*****************************
-	//this._blocksList_Container = new BlocksListsContainer();
-	//this._blocksList_Container.newBlocksList("Blocks1");
-	//this._blocksList_Container.newBlocksList("Blocks2");
-	//this._blocksList_Container.newBlocksList("Blocks3");
-	//this._blocksList_Container.newBlocksList("BlocksBone");
-	//this._blocksList_Container.newBlocksList("Blocks4");
-
 	// create the references lists.*********************************
 	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = []; // test. no used. waiting for background process.***
@@ -179,7 +171,7 @@ var NeoBuilding = function() {
 	this.motherBlocksArray = []; // asimetric mode.***
 
 	// Textures loaded.***************************************************
-	this.texturesLoaded = [];
+	this.texturesLoaded = []; 
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -188,7 +180,7 @@ var NeoBuilding = function() {
 	this.allFilesLoaded = false; // no used yet...
 	this.isReadyToRender = false; // no used yet...
 
-	this.moveVector; // no used.***
+	this.moveVector; 
 
 	// aditional data.****************************************************
 
