@@ -1003,12 +1003,14 @@ CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl) {
 			// 1) The buildings metaData.*************************************************************************************
 			var metaData = neoBuilding.metaData;
 			if(metaData.fileLoadState == CODE.fileLoadState.READY) {
-				//if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
+				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
 				var neoBuildingHeaderPath = geometryDataPath + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
-				continue;
-				//}
+				//continue;
+				}
+				else
+					return;
 			}
 
 		}
@@ -1023,12 +1025,14 @@ CesiumManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl) {
 			// 1) The buildings metaData.*************************************************************************************
 			var metaData = neoBuilding.metaData;
 			if(metaData.fileLoadState == CODE.fileLoadState.READY) {
-				//if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
+				if(this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) {
 					// must read metadata file.***
 				var neoBuildingHeaderPath = geometryDataPath + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
-				continue;
-				//}
+				//continue;
+				}
+				else
+					return;
 			}
 
 		}
@@ -2647,9 +2651,21 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 
 			// test.*** see the cartographic values of the intersected point.***
 			var newPosition = new Point3D();
-			newPosition.add(this.buildingSelected.geoLocationDataAux.pivotPoint.x, this.buildingSelected.geoLocationDataAux.pivotPoint.y, this.buildingSelected.geoLocationDataAux.pivotPoint.z);
-			//bboxAbsoluteCenterPos
+			
+
 			newPosition.add(difX, difY, difZ);
+			var geoLocationData;
+			if(this.renderingModeTemp == 0) {
+				geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
+			} else {
+				if(this.buildingSelected.geoLocationDataAux) {
+					geoLocationData = this.buildingSelected.geoLocationDataAux;
+				} else {
+					geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
+				}
+			}
+			
+			newPosition.add(geoLocationData.pivotPoint.x, geoLocationData.pivotPoint.y, geoLocationData.pivotPoint.z);
 
 			//var cartographic = Cesium.Ellipsoid.cartesianToCartographic(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
 			var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(newPosition.x, newPosition.y, newPosition.z));
@@ -2965,9 +2981,17 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			var squaredDistLod0 = 300;
 			var squaredDistLod1 = 2000;
 			var squaredDistLod2 = 500000*1000;
-			if(this.renderingModeTemp == 1) {
+			if(this.renderingModeTemp == 1) 
+			{
 				squaredDistLod0 = 300;
 				squaredDistLod1 = 1000;
+				squaredDistLod2 = 500000*1000;
+			}
+			
+			if(neoBuilding.buildingType == "basicBuilding")
+			{
+				squaredDistLod0 = 500;
+				squaredDistLod1 = 25000;
 				squaredDistLod2 = 500000*1000;
 			}
 			//squaredDistLod0 = 20;
@@ -3120,6 +3144,9 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 
 CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene, visibleObjControlerOctrees) {
 
+	if(this.fileRequestControler.filesRequestedCount >= this.fileRequestControler.maxFilesRequestedCount)
+		return;
+	
 	var refList;
 	var maxRefListParsingCount = 30;
 	var refListsParsingCount = 0;
@@ -3161,6 +3188,8 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 				this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
 
 			}
+			else
+				return;
 
 			// test
 			//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -3211,6 +3240,8 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
 				}
+				else
+				return;
 
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
@@ -3257,6 +3288,8 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 				this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
 
 			}
+			else
+				return;
 			// test
 			//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 
@@ -3302,6 +3335,8 @@ CesiumManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, sce
 					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
 				}
+				else
+				return;
 				// test
 				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 				continue;
@@ -4843,6 +4878,8 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var maxNumberOfCalculatingPositions = 4000;
 	var currentCalculatingPositionsCount = 0;
 	var neoBuildings_count = this.neoBuildingsList.neoBuildingsArray.length;
+	
+	
 	for(var i=0; i<neoBuildings_count; i++) {
 		//if(this.neoBuildingsList.neoBuildingsArray[i].frustumCulled)
 		//	continue;
@@ -5001,6 +5038,15 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 
 		if(realBuildingPos == undefined)
 			continue;
+		
+		if(neoBuilding.buildingType == "basicBuilding")
+		{
+			//squaredDistLod0 = 500;
+			//squaredDistLod1 = 55000;
+			//squaredDistLod2 = 500000*1000;
+			lod0_minSquaredDist = 50000.0;
+			var hola = 0;
+		}
 
 		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, neoBuilding.buildingPosition); // original.****
 		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos);
