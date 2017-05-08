@@ -49,8 +49,8 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox) {
 	
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	for(var i=0, total_vertex_count = this.totalVertexArraySC.length; i<total_vertex_count; i++) {
-		if(i==0) resultBox.setInit (this.totalVertexArraySC[i].point3d);
+	for(var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) {
+		if(i == 0) resultBox.setInit (this.totalVertexArraySC[i].point3d);
 		else resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
 	}
 	return resultBox;
@@ -60,13 +60,13 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox) {
  * 어떤 일을 하고 있습니까?
  */
 VertexMatrix.prototype.setVertexIdxInList = function() {
-	var idx_in_list = 0;
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+	var idxInList = 0;
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
 		var vtxList = this.vertexListsArray[i];
-		for(var j=0, vertex_count = vtxList.vertexArray.length; j<vertex_count; j++) {
+		for(var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) {
 			var vertex = vtxList.getVertex(j);
-			vertex.m_idx_inList = idx_in_list;
-			idx_in_list++;
+			vertex.mIdxInList = idxInList;
+			idxInList++;
 		}
 	}
 };
@@ -77,7 +77,7 @@ VertexMatrix.prototype.setVertexIdxInList = function() {
  */
 VertexMatrix.prototype.getVertexCount = function() {
 	var vertexCount = 0;
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
 		vertexCount += this.vertexListsArray[i].getVertexCount();
 	}
 	
@@ -90,9 +90,9 @@ VertexMatrix.prototype.getVertexCount = function() {
  * @returns resultTotalVertexArray
  */
 VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
 		var vtxList = this.vertexListsArray[i];
-		for(var j=0, vertex_count = vtxList.vertexArray.length; j<vertex_count; j++) {
+		for(var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) {
 			var vertex = vtxList.getVertex(j);
 			resultTotalVertexArray.push(vertex);
 		}
@@ -110,10 +110,10 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
-	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*6);
+	var totalVertexCount = this.totalVertexArraySC.length;
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 6);
 	
-	for(var i=0; i<total_vertex_count; i++) {
+	for(var i = 0; i < totalVertexCount; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*6] = vertex.point3d.x;
 		resultFloatArray[i*6+1] = vertex.point3d.y;
@@ -136,10 +136,10 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
-	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*7);
+	var totalVertexCount = this.totalVertexArraySC.length;
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 7);
 	
-	for(var i=0; i<total_vertex_count; i++) {
+	for(var i = 0; i < totalVertexCount; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*7] = vertex.point3d.x;
 		resultFloatArray[i*7+1] = vertex.point3d.y;
@@ -163,10 +163,10 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
-	var total_vertex_count = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(total_vertex_count*3);
+	var totalVertexCount = this.totalVertexArraySC.length;
+	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 3);
 	
-	for(var i=0; i<total_vertex_count; i++) {
+	for(var i = 0; i < totalVertexCount; i++) {
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*3] = vertex.point3d.x;
 		resultFloatArray[i*3+1] = vertex.point3d.y;
@@ -178,14 +178,14 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param dir_x 변수
- * @param dir_y 변수
- * @param dir_z 변수
+ * @param dirX 변수
+ * @param dirY 변수
+ * @param dirZ 변수
  * @param distance 변수
  */
-VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
-		this.vertexListsArray[i].translateVertices(dir_x, dir_y, dir_z, distance);
+VertexMatrix.prototype.translateVertices = function(dirX, dirY, dirZ, distance) {
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+		this.vertexListsArray[i].translateVertices(dirX, dirY, dirZ, distance);
 	}
 };
 
@@ -195,28 +195,28 @@ VertexMatrix.prototype.translateVertices = function(dir_x, dir_y, dir_z, distanc
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) {
 	// condition: all the vertex lists must have the same number of vertex.***
-	var vtxList_1;
-	var vtxList_2;
+	var vtxList1;
+	var vtxList2;
 	var tTrianglesList;
-	var tTriangle_1;
-	var tTriangle_2;
-	var vertex_count = 0;
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count-1; i++) {
-		vtxList_1 = this.vertexListsArray[i];
-		vtxList_2 = this.vertexListsArray[i+1];
+	var tTriangle1;
+	var tTriangle2;
+	var vertexCount = 0;
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount-1; i++) {
+		vtxList1 = this.vertexListsArray[i];
+		vtxList2 = this.vertexListsArray[i+1];
 		tTrianglesList = tTrianglesMatrix.newTTrianglesList();
 		
-		vertex_count = vtxList_1.vertexArray.length;
-		for(var j=0; j<vertex_count; j++) {
-			tTriangle_1 = tTrianglesList.newTTriangle();
-			tTriangle_2 = tTrianglesList.newTTriangle();
+		vertexCount = vtxList1.vertexArray.length;
+		for(var j = 0; j < vertexCount; j++) {
+			tTriangle1 = tTrianglesList.newTTriangle();
+			tTriangle2 = tTrianglesList.newTTriangle();
 			
-			if(j == vertex_count-1) {
-				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(0)); 
-				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(0), vtxList_1.getVertex(0)); 
+			if(j == vertexCount-1) {
+				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(0)); 
+				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(0), vtxList1.getVertex(0)); 
 			} else {
-				tTriangle_1.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j), vtxList_2.getVertex(j+1)); 
-				tTriangle_2.setVertices(vtxList_1.getVertex(j), vtxList_2.getVertex(j+1), vtxList_1.getVertex(j+1)); 
+				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(j+1)); 
+				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j+1), vtxList1.getVertex(j+1)); 
 			}
 		}
 	}
@@ -227,7 +227,7 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
  * @param transformMatrix
  */
 VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
-	for(var i=0, vertexLists_count = this.vertexListsArray.length; i<vertexLists_count; i++) {
+	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
 		var vtxList = this.vertexListsArray[i];
 		vtxList.transformPointsByMatrix4(transformMatrix);
 	}
