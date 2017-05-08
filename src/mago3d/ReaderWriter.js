@@ -240,35 +240,35 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList) {
 		var vboDatasCount = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		for(var j=0; j<vboDatasCount; j++) {
 			// 1) Positions array.***************************************************************************************
-			var vertex_count = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var verticesFloatValuesCount = vertex_count * 3;
+			var vertexCount = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var verticesFloatValuesCount = vertexCount * 3;
 
-			block.vertex_count = vertex_count;
+			block.vertexCount = vertexCount;
 
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 
 			var vbo_vi_cacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.posVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 
 			/*
-			vbo_vi_cacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_VERTEX_cacheKey);
+			vbo_vi_cacheKey.meshVertexCacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.meshVertexCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 			// 2) Normals.************************************************************************************************
-			vertex_count = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			var normalByteValues_count = vertex_count * 3;
+			vertexCount = this.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var normalByteValues_count = vertexCount * 3;
 
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1*normalByteValues_count;
 
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.norVboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.MESH_NORMAL_cacheKey);
+			vbo_vi_cacheKey.meshNormalCacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey.meshNormalCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 1*normalByteValues_count; // updating data.***
@@ -278,10 +278,10 @@ ReaderWriter.prototype.readNeoBlocks = function(gl, arrayBuffer, blocksList) {
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2*shortIndicesValues_count;
 
-			vbo_vi_cacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.idxVboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vbo_vi_cacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.MESH_FACES_cacheKey);
+			vbo_vi_cacheKey.meshFacesCacheKey= gl.createBuffer ();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vi_cacheKey.meshFacesCacheKey);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */
 			bytesReaded = bytesReaded + 2*shortIndicesValues_count; // updating data.***
@@ -406,11 +406,11 @@ ReaderWriter.prototype.readNeoReferences = function(gl, neoRefsList, arrayBuffer
 		if(has_texCoords) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded+2);
 			bytesReaded += 2;
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			neoRef.vertex_count = vertex_count;
+			neoRef.vertexCount = vertexCount;
 
-			var texcoordFloatValues_count = vertex_count * 2;
+			var texcoordFloatValues_count = vertexCount * 2;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 4*texcoordFloatValues_count;
 
@@ -575,7 +575,7 @@ ReaderWriter.prototype.readNeoSimpleBuilding = function(arrayBuffer, neoSimpleBu
 	vbo_vicky.buffer.dataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
 	vbo_vicky.buffer.dataArrayByteLength = buffer_length;
 
-	//vbo_vicky.pos_vboDataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
+	//vbo_vicky.posVboDataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
 
 	// Now, the 1extrude simpleBuilding.**********************************************************
 	//var h=0;
@@ -1689,14 +1689,14 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 						var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
 						//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
 
-						var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertex_count.***
+						var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertexCount.***
 						startBuff = bytes_readed;
 						//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
 						endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
 
 						//vt_cacheKey._verticesArray_cacheKey = gl.createBuffer ();
-						vbo_vertexIdx_data.MESH_VERTEX_cacheKey = gl.createBuffer ();
-						gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.MESH_VERTEX_cacheKey);
+						vbo_vertexIdx_data.meshVertexCacheKey = gl.createBuffer ();
+						gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.meshVertexCacheKey);
 						gl.bufferData(gl.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), gl.STATIC_DRAW);
 
 						//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
@@ -1725,8 +1725,8 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 						// End test.------------------------------------------------------------------------------------
 						*/
 
-						vbo_vertexIdx_data.MESH_FACES_cacheKey= gl.createBuffer ();
-						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.MESH_FACES_cacheKey);
+						vbo_vertexIdx_data.meshFacesCacheKey= gl.createBuffer ();
+						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.meshFacesCacheKey);
 						gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 
 						bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***

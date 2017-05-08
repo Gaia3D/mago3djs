@@ -164,7 +164,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 
 			/*
 			vboViCacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_VERTEX_cacheKey);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshVertexCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
@@ -183,8 +183,8 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 
 			vboViCacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vboViCacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_NORMAL_cacheKey);
+			vboViCacheKey.meshNormalCacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshNormalCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
@@ -198,7 +198,7 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			vboViCacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
 			vboViCacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.MESH_FACES_cacheKey);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.meshFacesCacheKey);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */
 			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
@@ -208,33 +208,33 @@ BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
 			//****************************************************************************************************AAA
 			/*
 			this.vboViCacheKey_aux = vboViCacheKey;
-			if(this.vboViCacheKeyvboViCacheKey_aux.MESH_VERTEX_cacheKey == undefined)
+			if(this.vboViCacheKeyvboViCacheKey_aux.meshVertexCacheKey == undefined)
 			{
-				this.vbo_vi_cacheKey_aux.MESH_VERTEX_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_VERTEX_cacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.pos_vboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.pos_vboDataArray = undefined;
-				this.vboViCacheKey_aux.pos_vboDataArray = null;
+				this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.meshVertexCacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.posVboDataArray = undefined;
+				this.vboViCacheKey_aux.posVboDataArray = null;
 
 			}
 
-			if(this.vboViCacheKey_aux.MESH_NORMAL_cacheKey == undefined)
+			if(this.vboViCacheKey_aux.meshNormalCacheKey == undefined)
 			{
-				this.vboViCacheKey_aux.MESH_NORMAL_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_NORMAL_cacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.nor_vboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.nor_vboDataArray = undefined;
-				this.vboViCacheKey_aux.nor_vboDataArray = null;
+				this.vboViCacheKey_aux.meshNormalCacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.meshNormalCacheKey);
+				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.norVboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.norVboDataArray = undefined;
+				this.vboViCacheKey_aux.norVboDataArray = null;
 
 			}
 
-			if(this.vboViCacheKey_aux.MESH_FACES_cacheKey == undefined)
+			if(this.vboViCacheKey_aux.meshFacesCacheKey == undefined)
 			{
-				this.vboViCacheKey_aux.MESH_FACES_cacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.MESH_FACES_cacheKey);
-				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.idx_vboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.idx_vboDataArray = undefined;
-				this.vboViCacheKey_aux.idx_vboDataArray = null;
+				this.vboViCacheKey_aux.meshFacesCacheKey = gl.createBuffer ();
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.meshFacesCacheKey);
+				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
+				//this.vboViCacheKey_aux.idxVboDataArray = undefined;
+				this.vboViCacheKey_aux.idxVboDataArray = null;
 
 			}
 			*/
@@ -356,11 +356,11 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 
 			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vboViCacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.posVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 
 			/*
-			vboViCacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_VERTEX_cacheKey);
+			vboViCacheKey.meshVertexCacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshVertexCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
@@ -377,10 +377,10 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1 * normalByteValuesCount;
 
-			vboViCacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.norVboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vboViCacheKey.MESH_NORMAL_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.MESH_NORMAL_cacheKey);
+			vboViCacheKey.meshNormalCacheKey = gl.createBuffer ();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshNormalCacheKey);
 			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			  */
 			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
@@ -412,10 +412,10 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
 
-			vboViCacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.idxVboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			/*
-			vboViCacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.MESH_FACES_cacheKey);
+			vboViCacheKey.meshFacesCacheKey= gl.createBuffer ();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.meshFacesCacheKey);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
 			 */
 			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***

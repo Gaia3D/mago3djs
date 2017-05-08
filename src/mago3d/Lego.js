@@ -38,7 +38,7 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 		var verticesFloatValuesCount = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		vbo_vi_cacheKey.pos_vboDataArray = new Float32Array(dataArraybuffer.slice(startBuff, endBuff));
+		vbo_vi_cacheKey.posVboDataArray = new Float32Array(dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 		vbo_vi_cacheKey.vertexCount = vertexCount;
@@ -50,7 +50,7 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 			var normalsByteValuesCount = vertexCount * 3;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1 * normalsByteValuesCount;
-			vbo_vi_cacheKey.nor_vboDataArray = new Int8Array(dataArraybuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.norVboDataArray = new Int8Array(dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1 * normalsByteValuesCount; // updating data.***
 		}
 
@@ -61,7 +61,7 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1 * colorsByteValuesCount;
-			vbo_vi_cacheKey.col_vboDataArray = new Uint8Array(dataArraybuffer.slice(startBuff, endBuff));
+			vbo_vi_cacheKey.colVboDataArray = new Uint8Array(dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1 * colorsByteValuesCount; // updating data.***
 		}
 

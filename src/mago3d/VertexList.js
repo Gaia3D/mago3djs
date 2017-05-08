@@ -42,14 +42,14 @@ VertexList.prototype.getVertexCount = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param dir_x 변수
- * @param dir_y 변수
- * @param dir_z 변수
+ * @param dirX 변수
+ * @param dirY 변수
+ * @param dirZ 변수
  * @param distance 변수
  */
-VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance) {
-	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
-		this.vertexArray[i].translate(dir_x, dir_y, dir_z, distance);
+VertexList.prototype.translateVertices = function(dirX, dirY, dirZ, distance) {
+	for(var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) {
+		this.vertexArray[i].translate(dirX, dirY, dirZ, distance);
 	}
 };
 
@@ -61,8 +61,8 @@ VertexList.prototype.translateVertices = function(dir_x, dir_y, dir_z, distance)
 VertexList.prototype.getBoundingBox = function(resultBox) {
 	if(resultBox == undefined) resultBox = new BoundingBox();
 
-	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
-		if(i==0) resultBox.setInit (this.vertexArray[i].point3d);
+	for(var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) {
+		if(i == 0) resultBox.setInit (this.vertexArray[i].point3d);
 		else resultBox.addPoint3D(this.vertexArray[i].point3d);
 	}
 	return resultBox;
@@ -73,7 +73,7 @@ VertexList.prototype.getBoundingBox = function(resultBox) {
  * @param transformMatrix 변수
  */
 VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) {
-	for(var i=0, vertex_count = this.vertexArray.length; i<vertex_count; i++) {
+	for(var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) {
 		var vertex = this.vertexArray[i];
 		transformMatrix.transformPoint3D(vertex.point3d, vertex.point3d);
 	}
