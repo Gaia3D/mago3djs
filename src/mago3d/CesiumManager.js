@@ -4875,7 +4875,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	var pitch = 0.0;
 	var roll = 0.0;
 
-	var maxNumberOfCalculatingPositions = 4000;
+	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
 	var neoBuildings_count = this.neoBuildingsList.neoBuildingsArray.length;
 	
@@ -4935,15 +4935,18 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 						//neoBuilding.octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 					}
 
-					var hola = 0;
+					currentCalculatingPositionsCount ++;
 				}
 			}
 		}
 
 		if(neoBuilding.bbox == undefined)
 		{
-			// Test for 1500 blocks.***
-			this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
+			if(currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
+			{
+				this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
+				currentCalculatingPositionsCount++;
+			}
 			continue;
 		}
 
@@ -4953,12 +4956,18 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		{
 			//note: here no use the pivotPoint bcos we are frustumCulling.***
 			var geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0); // the idx = 0 -> is the 1rst (default).***
+			if(geoLoc == undefined)
+				continue;
 			realBuildingPos = geoLoc.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 		}
 
 		// calculate realPosition of the building.****************************************************************************
 		else if(this.renderingModeTemp == 1 || this.renderingModeTemp == 2) // 0 = assembled mode. 1 = dispersed mode.***
 		{
+			if(currentCalculatingPositionsCount >= maxNumberOfCalculatingPositions)
+			{
+				continue;
+			}
 			if(neoBuilding.geoLocationDataAux == undefined)
 			{
 				// 1rst, we must know the buildingType.***
@@ -5013,14 +5022,15 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 					}
 
 					this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, elevation, heading, pitch, roll);
+					currentCalculatingPositionsCount ++;
 				}
 				else
 				{
 					// use the normal data. never enter here.***
 					continue;
-					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+					//var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+					//realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 				}
 			}
 			else
