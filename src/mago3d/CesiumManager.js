@@ -5017,6 +5017,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				else
 				{
 					// use the normal data. never enter here.***
+					continue;
 					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 					realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
