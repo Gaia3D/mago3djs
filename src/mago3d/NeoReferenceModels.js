@@ -110,7 +110,7 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 	// 7) selection color.***
 	this.selColor4 = undefined; //new Color(); // use for selection only.***
 
-	this.vertex_count = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
+	this.vertexCount = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
 
 	// 8) movement of the object.***
 	this.moveVector = undefined; // Point3D.***
@@ -308,10 +308,10 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-		//var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		//var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		/*
 		// Short mode. NO, can not use gl_repeat.***
-		var texcoordShortValues_count = vertex_count * 2;
+		var texcoordShortValues_count = vertexCount * 2;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + 2*texcoordShortValues_count;
 
@@ -378,7 +378,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 					neoRef.vertexCount = vertexCount; // no necessary.***
 					startBuff = bytesReaded;
 					endBuff = bytesReaded + daya_bytes * verticesFloatValuesCount; 
-					vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 					
 					bytesReaded += daya_bytes * verticesFloatValuesCount; // updating data.***
 				}
@@ -424,7 +424,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 			
 				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-				vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+				vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 				
 				bytesReaded += 4 * verticesFloatValuesCount; // updating data.***
 			}
@@ -449,7 +449,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 			
 				var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-				vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+				vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 				
 				bytesReaded += 4 * verticesFloatValuesCount;
 			}
@@ -675,10 +675,10 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-		//var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		//var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		/*
 		// Short mode. NO, can not use gl_repeat.***
-		var texcoordShortValues_count = vertex_count * 2;
+		var texcoordShortValues_count = vertexCount * 2;
 		startBuff = bytes_readed;
 		endBuff = bytes_readed + 2*texcoordShortValues_count;
 
@@ -747,7 +747,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 					neoRef.vertexCount = vertexCount; // no necessary.***
 					startBuff = bytes_readed;
 					endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-					vboViCacheKey.col_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 					
 					bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
 				}
@@ -799,10 +799,10 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		// End New modifications for xxxx 20161013.-------------------------
 		if(has_texCoords) {
 			var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			var vertex_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef.vertex_count = vertex_count;
+			var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef.vertexCount = vertexCount;
 
-			var texcoordFloatValues_count = vertex_count * 2;
+			var texcoordFloatValues_count = vertexCount * 2;
 			startBuff = bytes_readed;
 			endBuff = bytes_readed + 4*texcoordFloatValues_count;
 

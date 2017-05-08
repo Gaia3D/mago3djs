@@ -1112,9 +1112,9 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	  this.mesh_colors = [];
 	  this.mesh_tri_indices = [];
 
-	  this.MESH_VERTEX_cacheKey= null;
-	  this.MESH_COLORS_cacheKey= null;
-	  this.MESH_FACES_cacheKey= null;
+	  this.meshVertexCacheKey= null;
+	  this.meshColorsCacheKey= null;
+	  this.meshFacesCacheKey= null;
   };
 
   var VBO_ArraysContainer = function()
@@ -1144,8 +1144,8 @@ var VertexIdxArrays = function() {
 
 	this.indicesCount = -1;
 
-	this.MESH_VERTEX_cacheKey= null;
-	this.MESH_FACES_cacheKey= null;
+	this.meshVertexCacheKey= null;
+	this.meshFacesCacheKey= null;
 };
 
 /**
@@ -1179,7 +1179,7 @@ var ByteColorsVBOArrays = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.MESH_COLORS_cacheKey= null;
+	this.meshColorsCacheKey= null;
 };
 
 /**

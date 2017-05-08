@@ -12,8 +12,7 @@ var TriSurface = function() {
 	this.trianglesArray = [];
 };
 
-TriSurface.prototype.newTriangle = function()
-{
+TriSurface.prototype.newTriangle = function() {
 	var triangle = new Triangle();
 	this.trianglesArray.push(triangle);
 	return triangle;

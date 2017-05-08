@@ -19,7 +19,6 @@ var Triangle= function() {
  * 어떤 일을 하고 있습니까?
  */
 Triangle.prototype.destroy = function() {
-
 	this.vertex0 = undefined;
 	this.vertex1 = undefined;
 	this.vertex2 = undefined;
@@ -28,22 +27,20 @@ Triangle.prototype.destroy = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param point_1 변수
- * @param point_2 변수
- * @param point_3 변수
+ * @param vertex0 변수
+ * @param vertex1 변수
+ * @param vertex2 변수
  */
-Triangle.prototype.setVertices = function(vertex_0, vertex_1, vertex_2) {
-	this.vertex0 = vertex_0;
-	this.vertex1 = vertex_1;
-	this.vertex2 = vertex_2;
+Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2) {
+	this.vertex0 = vertex0;
+	this.vertex1 = vertex1;
+	this.vertex2 = vertex2;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param point_1 변수
  */
-Triangle.prototype.calculatePlaneNormal = function()
-{
+Triangle.prototype.calculatePlaneNormal = function() {
 	if(this.normal == undefined)
 		this.normal = new Point3D();
 
@@ -53,10 +50,11 @@ Triangle.prototype.calculatePlaneNormal = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param point_1 변수
+ * @param idxVertex 변수
+ * @param resultCrossProduct 변수
+ * @returns resultCrossProduct
  */
-Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct)
-{
+Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct) {
 	if(resultCrossProduct == undefined)
 		resultCrossProduct = new Point3D();
 

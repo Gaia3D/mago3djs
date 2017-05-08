@@ -56,11 +56,11 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param dir_x 변수
- * @param dir_y 변수
- * @param dir_z 변수
+ * @param dirX 변수
+ * @param dirY 변수
+ * @param dirZ 변수
  * @param distance 변수
  */
-Vertex.prototype.translate = function(dir_x, dir_y, dir_z, distance) {
-	this.point3d.add(dir_x*distance, dir_y*distance, dir_z*distance);
+Vertex.prototype.translate = function(dirX, dirY, dirZ, distance) {
+	this.point3d.add(dirX * distance, dirY * distance, dirZ * distance);
 };
