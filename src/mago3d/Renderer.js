@@ -1595,6 +1595,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 	}
+	
 };
 
 /**
