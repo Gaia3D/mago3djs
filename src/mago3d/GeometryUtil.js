@@ -206,9 +206,9 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function() {
 	var shortArray = new Uint16Array(tTrianglesCount * 3);
 	for(var i = 0, tTrianglesCount = this.totalTTrianglesArraySC.length; i < tTrianglesCount; i++) {
 		tTriangle = this.totalTTrianglesArraySC[i];
-		shortArray[i*3] = tTriangle.mVertex1.m_idx_inList;
-		shortArray[i*3+1] = tTriangle.mVertex2.m_idx_inList;
-		shortArray[i*3+2] = tTriangle.mVertex3.m_idx_inList;
+		shortArray[i*3] = tTriangle.mVertex1.mIdxInList;
+		shortArray[i*3+1] = tTriangle.mVertex2.mIdxInList;
+		shortArray[i*3+2] = tTriangle.mVertex3.mIdxInList;
 	}
 
 	return shortArray;
@@ -277,7 +277,7 @@ VertexMatrix.prototype.setVertexIdxInList = function() {
 		var vtxList = this.vertexListsArray[i];
 		for(var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) {
 			var vertex = vtxList.getVertex(j);
-			vertex.m_idx_inList = idxInIist;
+			vertex.mIdxInList = idxInIist;
 			idxInIist++;
 		}
 	}
@@ -517,7 +517,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 	var currentMeshArrays = null;
 	var meshArraysCount = generalVBOArraysContainer.meshArrays.length;
 	if(meshArraysCount == 0) {
-		currentMeshArrays = generalVBOArraysContainer.newVertexColorIdx_Array();
+		currentMeshArrays = generalVBOArraysContainer.newVertexColorIdxArray();
 	} else {
 		currentMeshArrays = generalVBOArraysContainer.meshArrays[meshArraysCount - 1]; // take the last.***
 	}
@@ -526,46 +526,46 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 	var maxIndices = 65000;
 
 	for(var i = 0, ftrianglesCount = this.mTrianglesArray.length; i < ftrianglesCount; i++) {
-		if(currentMeshArrays.mesh_vertices.length/3 >= maxIndices) {
-			currentMeshArrays = generalVBOArraysContainer.newVertexColorIdx_Array();
+		if(currentMeshArrays.meshVertices.length/3 >= maxIndices) {
+			currentMeshArrays = generalVBOArraysContainer.newVertexColorIdxArray();
 		}
 
 		var ftriangle = this.mTrianglesArray[i];
-		var idxP1 = ftriangle.m_point_1_idx;
-		var idxP2 = ftriangle.m_point_2_idx;
-		var idxP3 = ftriangle.m_point_3_idx;
+		var idxP1 = ftriangle.mPoint1Idx;
+		var idxP2 = ftriangle.mPoint2Idx;
+		var idxP3 = ftriangle.mPoint3Idx;
 
-		var colorP1 = ftriangle.m_color_1;
-		var colorP2 = ftriangle.m_color_2;
-		var colorP3 = ftriangle.m_color_3;
+		var colorP1 = ftriangle.mColor1;
+		var colorP2 = ftriangle.mColor2;
+		var colorP3 = ftriangle.mColor3;
 
 		var p1 = this.mPoint3DArray[idxP1];
 		var p2 = this.mPoint3DArray[idxP2];
 		var p3 = this.mPoint3DArray[idxP3];
 
 		// Point 1.***
-		currentMeshArrays.mesh_vertices.push(p1.x);
-		currentMeshArrays.mesh_vertices.push(p1.y);
-		currentMeshArrays.mesh_vertices.push(p1.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p1.x);
+		currentMeshArrays.meshVertices.push(p1.y);
+		currentMeshArrays.meshVertices.push(p1.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 		currentMeshArrays.mesh_colors.push(colorP1.r);
 		currentMeshArrays.mesh_colors.push(colorP1.g);
 		currentMeshArrays.mesh_colors.push(colorP1.b);
 
 		// Point 2.***
-		currentMeshArrays.mesh_vertices.push(p2.x);
-		currentMeshArrays.mesh_vertices.push(p2.y);
-		currentMeshArrays.mesh_vertices.push(p2.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p2.x);
+		currentMeshArrays.meshVertices.push(p2.y);
+		currentMeshArrays.meshVertices.push(p2.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 		currentMeshArrays.mesh_colors.push(colorP2.r);
 		currentMeshArrays.mesh_colors.push(colorP2.g);
 		currentMeshArrays.mesh_colors.push(colorP2.b);
 
 		// Point 3.***
-		currentMeshArrays.mesh_vertices.push(p3.x);
-		currentMeshArrays.mesh_vertices.push(p3.y);
-		currentMeshArrays.mesh_vertices.push(p3.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p3.x);
+		currentMeshArrays.meshVertices.push(p3.y);
+		currentMeshArrays.meshVertices.push(p3.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 		currentMeshArrays.mesh_colors.push(colorP3.r);
 		currentMeshArrays.mesh_colors.push(colorP3.g);
 		currentMeshArrays.mesh_colors.push(colorP3.b);
@@ -589,24 +589,24 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(generalVertexIdxVBO
 	var maxIndices = 65000;
 
 	var ftrianglesCount = this.mTrianglesArray.length;
-	var currVtxCount = currentMeshArrays.mesh_vertices.length/3;
+	var currVtxCount = currentMeshArrays.meshVertices.length/3;
 	for(var i = 0, vtxCount = this.mPoint3DArray.length; i < vtxCount; i++) {
 		var point = this.mPoint3DArray[i];
-		currentMeshArrays.mesh_vertices.push(point.x);
-		currentMeshArrays.mesh_vertices.push(point.y);
-		currentMeshArrays.mesh_vertices.push(point.z);
+		currentMeshArrays.meshVertices.push(point.x);
+		currentMeshArrays.meshVertices.push(point.y);
+		currentMeshArrays.meshVertices.push(point.z);
 	}
 
 	for(var i = 0; i < ftrianglesCount; i++) {
-		if(currentMeshArrays.mesh_vertices.length/3 >= maxIndices) {
+		if(currentMeshArrays.meshVertices.length/3 >= maxIndices) {
 			currentMeshArrays = generalVertexIdxVBOArraysContainer.newVertexIdxArray();
 			currVtxCount = 0;
 		}
 
 		var ftriangle = this.mTrianglesArray[i];
-		var idxP1 = ftriangle.m_point_1_idx;
-		var idxP2 = ftriangle.m_point_2_idx;
-		var idxP3 = ftriangle.m_point_3_idx;
+		var idxP1 = ftriangle.mPoint1Idx;
+		var idxP2 = ftriangle.mPoint2Idx;
+		var idxP3 = ftriangle.mPoint3Idx;
 
 		currentMeshArrays.mesh_tri_indices.push(idxP1 + currVtxCount);
 		currentMeshArrays.mesh_tri_indices.push(idxP2 + currVtxCount);
@@ -631,36 +631,36 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(generalVert
 	var maxIndices = 65000;
 
 	for(var i = 0, ftrianglesCount = this.mTrianglesArray.length; i < ftrianglesCount; i++) {
-		if(currentMeshArrays.mesh_vertices.length/3 >= maxIndices) {
+		if(currentMeshArrays.meshVertices.length/3 >= maxIndices) {
 			currentMeshArrays = generalVertexIdxVBOArraysContainer.newVertexIdxArray();
 		}
 
 		var ftriangle = this.mTrianglesArray[i];
-		var idxP1 = ftriangle.m_point_1_idx;
-		var idxP2 = ftriangle.m_point_2_idx;
-		var idxP3 = ftriangle.m_point_3_idx;
+		var idxP1 = ftriangle.mPoint1Idx;
+		var idxP2 = ftriangle.mPoint2Idx;
+		var idxP3 = ftriangle.mPoint3Idx;
 
 		var p1 = this.mPoint3DArray[idxP1];
 		var p2 = this.mPoint3DArray[idxP2];
 		var p3 = this.mPoint3DArray[idxP3];
 
 		// Point 1.***
-		currentMeshArrays.mesh_vertices.push(p1.x);
-		currentMeshArrays.mesh_vertices.push(p1.y);
-		currentMeshArrays.mesh_vertices.push(p1.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p1.x);
+		currentMeshArrays.meshVertices.push(p1.y);
+		currentMeshArrays.meshVertices.push(p1.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 
 		// Point 2.***
-		currentMeshArrays.mesh_vertices.push(p2.x);
-		currentMeshArrays.mesh_vertices.push(p2.y);
-		currentMeshArrays.mesh_vertices.push(p2.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p2.x);
+		currentMeshArrays.meshVertices.push(p2.y);
+		currentMeshArrays.meshVertices.push(p2.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 
 		// Point 3.***
-		currentMeshArrays.mesh_vertices.push(p3.x);
-		currentMeshArrays.mesh_vertices.push(p3.y);
-		currentMeshArrays.mesh_vertices.push(p3.z);
-		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.mesh_vertices.length/3 - 1);
+		currentMeshArrays.meshVertices.push(p3.x);
+		currentMeshArrays.meshVertices.push(p3.y);
+		currentMeshArrays.meshVertices.push(p3.z);
+		currentMeshArrays.mesh_tri_indices.push(currentMeshArrays.meshVertices.length/3 - 1);
 	}
 };
 
@@ -703,7 +703,7 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4) {
 	for(var i = 0, triCount = this.mTrianglesArray.length; i < triCount; i++) {
 		var tri = this.mTrianglesArray[i];
 		var transformedTri = transformedTrianglesSurface.newTriangle();
-		transformedTri.setPoints3DIndices(tri.m_point_1_idx, tri.m_point_2_idx, tri.m_point_3_idx);
+		transformedTri.setPoints3DIndices(tri.mPoint1Idx, tri.mPoint2Idx, tri.mPoint3Idx);
 	}
 	return transformedTrianglesSurface;
 };
@@ -1108,13 +1108,13 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
   /*
   var VertexColorIdx_Arrays = function()
   {
-	  this.mesh_vertices = [];
+	  this.meshVertices = [];
 	  this.mesh_colors = [];
 	  this.mesh_tri_indices = [];
 
-	  this.MESH_VERTEX_cacheKey= null;
-	  this.MESH_COLORS_cacheKey= null;
-	  this.MESH_FACES_cacheKey= null;
+	  this.meshVertexCacheKey= null;
+	  this.meshColorsCacheKey= null;
+	  this.meshFacesCacheKey= null;
   };
 
   var VBO_ArraysContainer = function()
@@ -1122,7 +1122,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	  this.meshArrays = []; // "VertexColorIdx_Arrays" container.***
   };
 
-  VBO_ArraysContainer.prototype.newVertexColorIdx_Array = function()
+  VBO_ArraysContainer.prototype.newVertexColorIdxArray = function()
   {
 	  var vci_array = new VertexColorIdx_Arrays();
 	  this.meshArrays.push(vci_array);
@@ -1144,8 +1144,8 @@ var VertexIdxArrays = function() {
 
 	this.indicesCount = -1;
 
-	this.MESH_VERTEX_cacheKey= null;
-	this.MESH_FACES_cacheKey= null;
+	this.meshVertexCacheKey= null;
+	this.meshFacesCacheKey= null;
 };
 
 /**
@@ -1179,7 +1179,7 @@ var ByteColorsVBOArrays = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.MESH_COLORS_cacheKey= null;
+	this.meshColorsCacheKey= null;
 };
 
 /**

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Point 테스트</title>
+
+	<link rel="shortcut icon" type="image/png" href="/thirdparty/jasmine-2.5.2/jasmine_favicon.png">
+	<link rel="stylesheet" href="../thirdparty/jasmine-2.5.2/jasmine.css">
+
+	<script src="../thirdparty/jasmine-2.5.2/jasmine.js"></script>
+	<script src="../thirdparty/jasmine-2.5.2/jasmine-html.js"></script>
+	<script src="../thirdparty/jasmine-2.5.2/boot.js"></script>
+
+	<!-- include source files here... -->
+	<script src="../src/mago3d/Point3D.js"></script>
+
+	<!-- include spec files here... -->
+	<script src="../test/Point3DTest.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var console_reporter = new jasmine.ConsoleReporter()
+		jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+		jasmine.getEnv().addReporter(console_reporter);
+		jasmine.getEnv().execute();
+	</script>
+</body>
+</html>

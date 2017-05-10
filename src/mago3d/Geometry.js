@@ -103,7 +103,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 		var verticesFloatValuesCount = vertexCount * 3;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		vboViCacheKey.pos_vboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
+		vboViCacheKey.posVboDataArray = new Float32Array(this.dataArraybuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 		vboViCacheKey.vertexCount = vertexCount;
@@ -115,7 +115,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			var normalsByteValuesCount = vertexCount * 3;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1 * normalsByteValuesCount;
-			vboViCacheKey.nor_vboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			vboViCacheKey.norVboDataArray = new Int8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1 * normalsByteValuesCount; // updating data.***
 		}
 
@@ -126,7 +126,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
 			var endBuff = bytesReaded + 1 * colorsByteValuesCount;
-			vboViCacheKey.col_vboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
+			vboViCacheKey.colVboDataArray = new Uint8Array(this.dataArraybuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1 * colorsByteValuesCount; // updating data.***
 		}
 

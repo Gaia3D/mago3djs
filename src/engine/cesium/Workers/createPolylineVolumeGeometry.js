@@ -5941,7 +5941,7 @@ define('Core/Matrix3',[
 
         var m10 = cosTheta * sinPsi;
         var m11 = cosPhi * cosPsi + sinPhi * sinTheta * sinPsi;
-        var m12 = -sinTheta * cosPhi + cosPhi * sinTheta * sinPsi;
+        var m12 = -sinPhi * cosPsi + cosPhi * sinTheta * sinPsi;
 
         var m20 = -sinTheta;
         var m21 = sinPhi * cosTheta;
@@ -24736,7 +24736,7 @@ define('Core/HeadingPitchRoll',[
      * Computes the heading, pitch and roll from a quaternion (see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles )
      *
      * @param {Quaternion} quaternion The quaternion from which to retrieve heading, pitch, and roll, all expressed in radians.
-     * @param {Quaternion} [result] The object in which to store the result. If not provided, a new instance is created and returned.
+     * @param {HeadingPitchRoll} [result] The object in which to store the result. If not provided, a new instance is created and returned.
      * @returns {HeadingPitchRoll} The modified result parameter or a new HeadingPitchRoll instance if one was not provided.
      */
     HeadingPitchRoll.fromQuaternion = function(quaternion, result) {
@@ -25080,9 +25080,9 @@ define('Core/Quaternion',[
                 if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
             Check.typeOf.object('headingPitchRoll', headingOrHeadingPitchRoll);
         } else {
-            Check.typeOf.number(headingOrHeadingPitchRoll, 'heading');
-            Check.typeOf.number(pitchOrResult, 'pitch');
-            Check.typeOf.number(roll, 'roll');
+            Check.typeOf.number('heading', headingOrHeadingPitchRoll);
+            Check.typeOf.number('pitch', pitchOrResult);
+            Check.typeOf.number('roll', roll);
         }
                 var hpr;
         if (headingOrHeadingPitchRoll instanceof HeadingPitchRoll) {
