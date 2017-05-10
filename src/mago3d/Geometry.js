@@ -27,7 +27,7 @@ var NeoSimpleBuilding = function() {
 	}
 
 	this.accesorsArray = [];
-	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.texturesArray = [];
 };
 
@@ -76,7 +76,7 @@ var LodBuilding = function() {
 	// this class is for use for LOD2 and LOD3 buildings.***
 	// provisionally use this class, but in the future use "NeoSimpleBuilding".***
 	this.dataArraybuffer; // binary data.***
-	this.vboVicksContainer = new VBOVertexIdxCacheKeysContainer();
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
@@ -96,7 +96,7 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 		bbox.maxY = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.maxZ = new Float32Array(this.dataArraybuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 
-		var vboViCacheKey = this.vboVicksContainer.newVBOVertexIdxCacheKey();
+		var vboViCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 
 		// 1) Positions.************************************************************************************************
 		var vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
