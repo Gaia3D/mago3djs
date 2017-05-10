@@ -45,7 +45,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 	var trianglesCount;
 	var triSurface;
 	var triSurfacesCount = this.triSurfacesArray.length;
-	for(var i=0; i<triSurfacesCount; i++) {
+	for(var i = 0; i < triSurfacesCount; i++) {
 		triSurface = this.triSurfacesArray[i];
 		trianglesCount = triSurface.trianglesArray.length;
 		for(var j = 0; j < trianglesCount; j++) {
