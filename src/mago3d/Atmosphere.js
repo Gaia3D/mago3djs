@@ -36,10 +36,8 @@ var ShadowBlendingCube = function() {
 /**
  * 구름이 땅에 그림자를 그릴때 초기화
  *
- * @param vtxMat
- *            변수
- * @param tTriMat
- *            변수
+ * @param vtxMat 변수
+ * @param tTriMat 변수
  */
 ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	// create a blending cube, with faces inverted.***

@@ -397,7 +397,7 @@ NeoReferencesList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWri
 					neoRef.vertexCount = vertexCount; // no necessary.***
 					startBuff = bytesReaded;
 					endBuff = bytesReaded + daya_bytes * verticesFloatValuesCount; 
-					vboViCacheKey.tcoord_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 					
 					bytesReaded += daya_bytes * verticesFloatValuesCount;
 				}
@@ -766,7 +766,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 					neoRef.vertexCount = vertexCount; // no necessary.***
 					startBuff = bytes_readed;
 					endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-					vboViCacheKey.tcoord_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+					vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 					
 					bytes_readed += daya_bytes * verticesFloatValuesCount;
 				}

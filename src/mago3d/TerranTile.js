@@ -35,10 +35,10 @@ var TerranTile = function() {
 	this.leftUp_position;
 	this.visibilityType;
 
-	//this.longitude_min; // delete this.***
-	//this.longitude_max; // delete this.***
-	//this.latitude_min; // delete this.***
-	//this.latitude_max; // delete this.***
+	//this.longitudeMin; // delete this.***
+	//this.longitudeMax; // delete this.***
+	//this.latitudeMin; // delete this.***
+	//this.latitudeMax; // delete this.***
 
 	this.subTiles_array = [];
 	this.terranIndexFile_readed = false;
@@ -86,37 +86,37 @@ TerranTile.prototype.newSubTerranTile = function() {
  * 어떤 일을 하고 있습니까?
  */
 TerranTile.prototype.make4subTiles = function() {
-	for(var i=0; i<4; i++) {
+	for(var i = 0; i < 4; i++) {
 		var subTile = this.newSubTerranTile();
 	}
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param lon_min 변수
- * @param lon_max 변수
- * @param lat_min 변수
- * @param lat_max 변수
+ * @param lonMin 변수
+ * @param lonMax 변수
+ * @param latMin 변수
+ * @param latMax 변수
  */
-TerranTile.prototype.setDimensions = function(lon_min, lon_max, lat_min, lat_max) {
-	this.longitude_min = lon_min;
-	this.longitude_max = lon_max;
-	this.latitude_min = lat_min;
-	this.latitude_max = lat_max;
+TerranTile.prototype.setDimensions = function(lonMin, lonMax, latMin, latMax) {
+	this.longitudeMin = lonMin;
+	this.longitudeMax = lonMax;
+	this.latitudeMin = latMin;
+	this.latitudeMax = latMax;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param max_depth 변수
+ * @param maxDepth 변수
  */
-TerranTile.prototype.makeTree = function(max_depth) {
-	if(this._depth < max_depth)
+TerranTile.prototype.makeTree = function(maxDepth) {
+	if(this._depth < maxDepth)
 	{
-		var subTile_aux;
-		for(var i=0; i<4; i++)
+		var subTileAux;
+		for(var i = 0; i < 4; i++)
 		{
-			subTile_aux = this.newSubTerranTile();
-			subTile_aux.makeTree(max_depth);
+			subTileAux = this.newSubTerranTile();
+			subTileAux.makeTree(maxDepth);
 		}
 	}
 };
@@ -125,15 +125,15 @@ TerranTile.prototype.makeTree = function(max_depth) {
  * 어떤 일을 하고 있습니까?
  */
 TerranTile.prototype.calculatePositionByLonLat = function() {
-	var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
-	var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
+	var lon_mid = (this.longitudeMax + this.longitudeMin)/2.0;
+	var lat_mid = (this.latitudeMax + this.latitudeMin)/2.0;
 
 	this.position = Cesium.Cartesian3.fromDegrees(lon_mid, lat_mid, 0.0);
 
-	this.leftDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_min, 0.0);
-	this.rightDown_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_min, 0.0);
-	this.rightUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_max, this.latitude_max, 0.0);
-	this.leftUp_position = Cesium.Cartesian3.fromDegrees(this.longitude_min, this.latitude_max, 0.0);
+	this.leftDown_position = Cesium.Cartesian3.fromDegrees(this.longitudeMin, this.latitudeMin, 0.0);
+	this.rightDown_position = Cesium.Cartesian3.fromDegrees(this.longitudeMax, this.latitudeMin, 0.0);
+	this.rightUp_position = Cesium.Cartesian3.fromDegrees(this.longitudeMax, this.latitudeMax, 0.0);
+	this.leftUp_position = Cesium.Cartesian3.fromDegrees(this.longitudeMin, this.latitudeMax, 0.0);
 
 	this.radius = Cesium.Cartesian3.distance(this.leftDown_position, this.rightUp_position)/2.0 * 0.9;
 };
@@ -437,20 +437,20 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
 	if(subTiles_count == 4) {
-		var lon_mid = (this.longitude_max + this.longitude_min)/2.0;
-		var lat_mid = (this.latitude_max + this.latitude_min)/2.0;
+		var lon_mid = (this.longitudeMax + this.longitudeMin)/2.0;
+		var lat_mid = (this.latitudeMax + this.latitudeMin)/2.0;
 
 		subTile = this.subTiles_array[0];
-		subTile.setDimensions(this.longitude_min, lon_mid, this.latitude_min, lat_mid);
+		subTile.setDimensions(this.longitudeMin, lon_mid, this.latitudeMin, lat_mid);
 
 		subTile = this.subTiles_array[1];
-		subTile.setDimensions(lon_mid, this.longitude_max, this.latitude_min, lat_mid);
+		subTile.setDimensions(lon_mid, this.longitudeMax, this.latitudeMin, lat_mid);
 
 		subTile = this.subTiles_array[2];
-		subTile.setDimensions(lon_mid, this.longitude_max, lat_mid, this.latitude_max);
+		subTile.setDimensions(lon_mid, this.longitudeMax, lat_mid, this.latitudeMax);
 
 		subTile = this.subTiles_array[3];
-		subTile.setDimensions(this.longitude_min, lon_mid, lat_mid, this.latitude_max);
+		subTile.setDimensions(this.longitudeMin, lon_mid, lat_mid, this.latitudeMax);
 
 		for(var i=0; i<subTiles_count; i++) {
 			this.subTiles_array[i].setDimensionsSubTiles();
