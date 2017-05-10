@@ -229,11 +229,12 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		var increDeg = 3.0;
 		if (event.key === "q" || event.key === "Q") {  // right arrow
 			// get current building selected.***
-			var selectedBuilding = magoManager.buildingSelected;
+			var selectedBuilding = magoManager.buildingSelected;	
 			if(selectedBuilding != undefined)
 			{
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.heading == undefined) selectedBuilding.geoLocationDataAux.heading = 0; 
 					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					currentHeading+increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
@@ -248,6 +249,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			{
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.heading == undefined) selectedBuilding.geoLocationDataAux.heading = 0; 
 					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					currentHeading-increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
@@ -262,6 +264,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			{
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.pitch == undefined) selectedBuilding.geoLocationDataAux.pitch = 0; 
 					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, currentPitch+increDeg, selectedBuilding.geoLocationDataAux.roll);
@@ -276,6 +279,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			{
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.pitch == undefined) selectedBuilding.geoLocationDataAux.pitch = 0; 
 					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, currentPitch-increDeg, selectedBuilding.geoLocationDataAux.roll);
@@ -287,9 +291,10 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
-			{
+			{		
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.roll == undefined) selectedBuilding.geoLocationDataAux.roll = 0; 
 					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll+increDeg);
@@ -304,6 +309,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			{
 				if(selectedBuilding.geoLocationDataAux != undefined)
 				{
+					if(selectedBuilding.geoLocationDataAux.roll == undefined) selectedBuilding.geoLocationDataAux.roll = 0; 
 					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
 					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll-increDeg);
