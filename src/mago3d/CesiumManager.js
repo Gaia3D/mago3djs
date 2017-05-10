@@ -1109,19 +1109,23 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 
 	// * if this is in Cesium:
 	var scene = this.scene;
-	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._modelView, sceneState.modelViewMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._projection, sceneState.projectionMatrix._floatArrays);
+	var uniformState = scene._context.uniformState;
+	//var uniformState = scene._context._us;
+	Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
+	//Cesium.Matrix4.toArray(uniformState._modelView, sceneState.modelViewMatrix._floatArrays);// original.***
+	//sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.multiply(uniformState.model, uniformState.view, sceneState.modelViewMatrix._floatArrays);
+	sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
+	Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays);
 
 	var cameraPosition = scene.context._us._cameraPosition;
 	ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z] ,sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 
-	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, sceneState.modelViewMatrixInv._floatArrays);
-	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);
+	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
+	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 
-	//sceneState.camera.frustum.far[0] = scene._context._us._currentFrustum.y;
-	sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far;
+	sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far; // original.***
+	//sceneState.camera.frustum.far[0] = 5000000.0;
 	sceneState.camera.frustum.near[0] = scene._frustumCommandsList[0].near;
 	sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
 	sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
@@ -1570,6 +1574,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	}
 
 	// update the matrices of the scene and the camera position.***
+	//if(!this.isLastFrustum)
 	this.upDateSceneStateMatrices(this.sceneState);
 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
@@ -2393,8 +2398,9 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 	pixelPosCamCoord[2] = this.resultRaySC[2] * realZDepth;
 
 	// now, must transform this pixelCamCoord to world coord.***
-	var mv_inv = new Cesium.Matrix4();
-	mv_inv = Cesium.Matrix4.inverse(scene._context._us._modelView, mv_inv);
+	//var mv_inv = new Cesium.Matrix4();
+	//mv_inv = Cesium.Matrix4.inverse(scene._context._us._modelView, mv_inv);
+	var mv_inv = this.sceneState.modelViewMatrixInv._floatArrays;
 	var pixelPosCamCoordCartesian = new Cesium.Cartesian3(pixelPosCamCoord[0], pixelPosCamCoord[1], pixelPosCamCoord[2]);
 	var pixelPos = new Cesium.Cartesian3();
 	pixelPos = Cesium.Matrix4.multiplyByPoint(mv_inv, pixelPosCamCoordCartesian, pixelPos);
@@ -3421,6 +3427,9 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
 	gl.frontFace(gl.CCW);
+	//gl.depthFunc(gl.GREATER);
+	//gl.enable(gl.CULL_FACE);
+	gl.depthRange(0.0, 1.0);
 
 	if(ssao_idx == -1) {
 		//var isInterior = false; // no used.***
@@ -5027,10 +5036,14 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				else
 				{
 					// use the normal data. never enter here.***
-					continue;
-					//var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					//realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+					if(neoBuilding.buildingType == "basicBuilding")
+					{
+						var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+						this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+						realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+					}
+					else continue;
+					
 				}
 			}
 			else
