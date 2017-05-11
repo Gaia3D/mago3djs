@@ -2990,7 +2990,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			if(this.renderingModeTemp == 1) 
 			{
 				squaredDistLod0 = 300;
-				squaredDistLod1 = 1000;
+				squaredDistLod1 = 2000;
 				squaredDistLod2 = 500000*1000;
 			}
 			
@@ -3779,9 +3779,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 					if(lowestOctree.neoReferencesMotherAndIndices == undefined) continue;
 
-					//refList = lowestOctree.neoRefsList_Array[0];
-					//if(refList == undefined)
-					//	continue;
 					if(lowestOctree == this.octreeSelected)
 					{
 						var hola =0;
@@ -3789,8 +3786,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-					//if(neoBuilding.buildingType == "MOP")
-					//	continue;
 
 					if(this.renderingModeTemp == 0)
 					{
@@ -3963,6 +3958,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				{
 					gl.uniform1i(currentShader.bUse1Color_loc, true);
 					gl.uniform4fv(currentShader.oneColor4_loc, this.highLightColor4); //.***
+				}
+				else if(neoBuilding.isColorChanged)
+				{
+					gl.uniform1i(currentShader.bUse1Color_loc, true);
+					gl.uniform4fv(currentShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
 				}
 				else
 				{
@@ -5881,8 +5881,24 @@ CesiumManager.prototype.renderModeChanged = function()
 
 };
 
+CesiumManager.prototype.buildingColorChanged = function(projectAndBlockId, color)
+{
+	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
+	if(neoBuilding)
+	{
+		if(neoBuilding.aditionalColor == undefined)
+		{
+			neoBuilding.aditionalColor = new Color();
+		}
+		neoBuilding.isColorChanged = true;
+		neoBuilding.aditionalColor.setRGB(color[0], color[1], color[2]);
+	}
+};
+
 CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 {
+	// old.***
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
 
 	// 1rst, init colorChanged.***
@@ -6252,7 +6268,8 @@ CesiumManager.prototype.callAPI = function(api) {
 		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
 		this.magoPolicy.setColor(rgbArray);
 		var projectAndBlockId = projectId + "_" + blockIds[0];
-		this.policyColorChanged(projectAndBlockId, objectIds);
+		//this.policyColorChanged(projectAndBlockId, objectIds);
+		this.buildingColorChanged(projectAndBlockId, rgbArray);
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {

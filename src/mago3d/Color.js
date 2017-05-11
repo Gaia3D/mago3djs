@@ -11,11 +11,15 @@ var Color = function() {
 	if(!(this instanceof Color)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	//this[0] = 0.0;
+	//this[1] = 0.0;
+	//this[2] = 0.0;
+	//this[3] = 1.0;
+
 	this.r = 0;
 	this.g = 0;
 	this.b = 0;
-	this.a = 0;
+	this.a = 1;
 };
   
 /**
@@ -26,6 +30,10 @@ var Color = function() {
  * @param alpha 변수
  */
 Color.prototype.set = function(red, green, blue, alpha) {
+	//this[0] = red;
+	//this[1] = green;
+	//this[2] = blue;
+	//this[3] = alpha;
 	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };
   
@@ -36,6 +44,9 @@ Color.prototype.set = function(red, green, blue, alpha) {
  * @param blue 변수
  */
 Color.prototype.setRGB = function(red, green, blue) {
+	//this[0] = red;
+	//this[1] = green;
+	//this[2] = blue;
 	this.r = red; this.g = green; this.b = blue;
 };
   
@@ -47,5 +58,21 @@ Color.prototype.setRGB = function(red, green, blue) {
  * @param alpha 변수
  */
 Color.prototype.setRGBA = function(red, green, blue, alpha) {
+	//this[0] = red;
+	//this[1] = green;
+	//this[2] = blue;
+	//this[3] = alpha;
 	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };
+
+
+
+
+
+
+
+
+
+
+
+
