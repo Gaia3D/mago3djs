@@ -6267,9 +6267,14 @@ CesiumManager.prototype.callAPI = function(api) {
 		var rgbColor = api.getColor().split(",");
 		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
 		this.magoPolicy.setColor(rgbArray);
-		var projectAndBlockId = projectId + "_" + blockIds[0];
-		//this.policyColorChanged(projectAndBlockId, objectIds);
-		this.buildingColorChanged(projectAndBlockId, rgbArray);
+		
+		var buildingsCount = colorBuilds.length;
+		for(var i=0; i<buildingsCount; i++)
+		{
+			var projectAndBlockId = projectId + "_" + blockIds[i];
+			//this.policyColorChanged(projectAndBlockId, objectIds);
+			this.buildingColorChanged(projectAndBlockId, rgbArray);
+		}
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
