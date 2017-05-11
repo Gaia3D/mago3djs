@@ -262,6 +262,7 @@ function getLocationAndRotationAPI(projectId, blockId) {
  * 
  * @param projectId 프로젝트 아이디
  * @param blockId block id
+ * @param objectId object id
  * @param latitude 위도
  * @param longitude 경도
  * @param elevation 높이
@@ -270,9 +271,10 @@ function getLocationAndRotationAPI(projectId, blockId) {
  * @param roll 좌, 우 기울기
  * @return
  */
-function showLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+function showLocationAndRotationAPI(projectId, blockId, objectId, latitude, longitude, elevation, heading, pitch, roll) {
 	$("#projectId").val(projectId);
 	$("#moveBlockId").val(blockId);
+	if(objectId !== undefined && objectId !== null) $("#moveObjectId").val(objectId);
 	$("#latitude").val(latitude);
 	$("#longitude").val(longitude);
 	if(elevation === undefined) elevation = 0;
