@@ -374,7 +374,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 //		gl.disable(gl.CULL_FACE);
 //	}
 
-	gl.enable(gl.CULL_FACE);
+	//gl.enable(gl.CULL_FACE);
 	//gl.disable(gl.CULL_FACE);
 
 	gl.frontFace(gl.CCW);
@@ -588,7 +588,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
 					else{
 						if(neoReference.tMatrixAuxArray == undefined)
+						{
+							//neoReference.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);
+							// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 							continue;
+						}
 
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 					}
