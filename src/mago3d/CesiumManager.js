@@ -2100,6 +2100,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	resultSelectedArray[1] = currentOctreeSelected;
 	resultSelectedArray[2] = selectedObject;
 
+	if(selectedObject != undefined) console.log("objectId = " + selectedObject.objectId);
 	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
@@ -6253,13 +6254,11 @@ CesiumManager.prototype.callAPI = function(api) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
 			projectLayer.setBlockId(blockIds[i].trim());
-			if(isExistObjectIds)
-			{
-				projectLayer.setObjectId(objectIds[i].trim());
-				objectIds = objectIds[0];
-			}
-			else
-				projectLayer.setObjectId(null);
+			if(isExistObjectIds) {
+				for(var j=0, objectCount = objectIds.length; j<objectCount; j++) {
+					projectLayer.setObjectId(objectIds[j].trim());
+				}
+			} else projectLayer.setObjectId(null);
 			colorBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
