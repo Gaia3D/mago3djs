@@ -5897,6 +5897,41 @@ CesiumManager.prototype.buildingColorChanged = function(projectAndBlockId, color
 	}
 };
 
+CesiumManager.prototype.objectColorChanged = function(projectAndBlockId, objectId, color)
+{
+	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
+	if(neoBuilding)
+	{
+		var neoReference;
+		var neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
+		var found = false;
+		var i = 0;
+		while(!found && i<neoReferencesCount)
+		{
+			if(neoBuilding.motherNeoReferencesArray[i])
+			{
+				if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
+				{
+					neoReference = neoBuilding.motherNeoReferencesArray[i];
+					found = true;
+				}
+			}
+			i++;
+		}
+		
+		if(neoReference)
+		{
+			if(neoReference.aditionalColor == undefined)
+			{
+				neoReference.aditionalColor = new Color();
+			}
+			
+			neoReference.aditionalColor.setRGB(color[0], color[1], color[2]);
+		}
+	}
+};
+
 CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 {
 	// old.***
@@ -6275,9 +6310,16 @@ CesiumManager.prototype.callAPI = function(api) {
 		var buildingsCount = colorBuilds.length;
 		for(var i=0; i<buildingsCount; i++)
 		{
-			var projectAndBlockId = projectId + "_" + blockIds[i];
-
-			this.buildingColorChanged(projectAndBlockId, rgbArray);
+			//var projectAndBlockId = projectId + "_" + blockIds[i]; // old.***
+			var projectAndBlockId = colorBuilds[i].projectId + "_" + colorBuilds[i].blockId;
+			if(colorBuilds[i].objectId == null)
+			{
+				this.buildingColorChanged(projectAndBlockId, rgbArray);
+			}
+			else{
+				this.objectColorChanged(projectAndBlockId, colorBuilds[i].objectId, rgbArray);
+			}
+			
 		}
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
