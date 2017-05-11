@@ -6273,7 +6273,7 @@ CesiumManager.prototype.callAPI = function(api) {
 		for(var i=0; i<buildingsCount; i++)
 		{
 			var projectAndBlockId = projectId + "_" + blockIds[i];
-			//this.policyColorChanged(projectAndBlockId, objectIds);
+
 			this.buildingColorChanged(projectAndBlockId, rgbArray);
 		}
 	} else if(apiName === "show") {
