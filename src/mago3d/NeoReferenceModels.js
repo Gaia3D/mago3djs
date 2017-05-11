@@ -34,6 +34,7 @@ var NeoReference = function() {
 
 	// 6) 1 color.***
 	this.color4; //new Color();
+	this.aditionalColor; // used when object color was changed.***
 
 	// 7) selection color.***
 	this.selColor4; //new Color(); // use for selection only.***
