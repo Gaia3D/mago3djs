@@ -6033,7 +6033,7 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 								dividedName[1],
 								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
 								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.elevation,
+								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
 								neoBuilding.geoLocationDataAux.heading,
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
