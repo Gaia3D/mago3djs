@@ -2100,7 +2100,19 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	resultSelectedArray[1] = currentOctreeSelected;
 	resultSelectedArray[2] = selectedObject;
 
-	if(selectedObject != undefined) console.log("objectId = " + selectedObject.objectId);
+	if(selectedObject != undefined) {
+		var buildingInfo = currentSelectedBuilding.buildingId.split("_");
+		showLocationAndRotationAPI(	buildingInfo[0],
+				buildingInfo[1],
+				selectedObject.objectId,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
+				currentSelectedBuilding.geoLocationDataAux.heading,
+				currentSelectedBuilding.geoLocationDataAux.pitch,
+				currentSelectedBuilding.geoLocationDataAux.roll);
+		console.log("objectId = " + selectedObject.objectId);
+	}
 	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
@@ -6031,9 +6043,10 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	var dividedName = neoBuilding.buildingId.split("_");
 	showLocationAndRotationAPI(	dividedName[0],
 								dividedName[1],
+								null,
 								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
 								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.elevation,
+								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
 								neoBuilding.geoLocationDataAux.heading,
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
