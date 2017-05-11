@@ -169,6 +169,9 @@ var NeoBuilding = function() {
 	this.preExtractedLowestOctreesArray = []; // test. no used. waiting for background process.***
 	this.motherNeoReferencesArray = []; // asimetric mode.***
 	this.motherBlocksArray = []; // asimetric mode.***
+	
+	// Aditional Color.***************************************************
+	this.aditionalColor; // use for colorChanged.***
 
 	// Textures loaded.***************************************************
 	this.texturesLoaded = []; 
