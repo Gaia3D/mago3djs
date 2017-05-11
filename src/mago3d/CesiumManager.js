@@ -3429,7 +3429,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 	gl.frontFace(gl.CCW);
 	//gl.depthFunc(gl.GREATER);
 	//gl.enable(gl.CULL_FACE);
-	gl.depthRange(0.0, 1.0);
+	//gl.depthRange(0.0, 1.0);
 
 	if(ssao_idx == -1) {
 		//var isInterior = false; // no used.***
