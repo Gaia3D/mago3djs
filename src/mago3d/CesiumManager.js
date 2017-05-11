@@ -6250,15 +6250,18 @@ CesiumManager.prototype.callAPI = function(api) {
 		}
 		var colorBuilds = [];
 		for(var i=0, count = blockIds.length; i<count; i++) {
-			var projectLayer = new ProjectLayer();
-			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i].trim());
 			if(isExistObjectIds) {
 				for(var j=0, objectCount = objectIds.length; j<objectCount; j++) {
+					var projectLayer = new ProjectLayer();
+					projectLayer.setProjectId(projectId);
+					projectLayer.setBlockId(blockIds[i].trim());
 					projectLayer.setObjectId(objectIds[j].trim());
 					colorBuilds.push(projectLayer);
 				}
-			} else { 
+			} else {
+				var projectLayer = new ProjectLayer();
+				projectLayer.setProjectId(projectId);
+				projectLayer.setBlockId(blockIds[i].trim());
 				projectLayer.setObjectId(null);
 				colorBuilds.push(projectLayer);
 			}
