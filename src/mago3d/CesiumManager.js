@@ -6249,7 +6249,6 @@ CesiumManager.prototype.callAPI = function(api) {
 			isExistObjectIds = true;
 		}
 		var colorBuilds = [];
-		var firstObjectId;
 		for(var i=0, count = blockIds.length; i<count; i++) {
 			var projectLayer = new ProjectLayer();
 			projectLayer.setProjectId(projectId);
@@ -6257,9 +6256,12 @@ CesiumManager.prototype.callAPI = function(api) {
 			if(isExistObjectIds) {
 				for(var j=0, objectCount = objectIds.length; j<objectCount; j++) {
 					projectLayer.setObjectId(objectIds[j].trim());
+					colorBuilds.push(projectLayer);
 				}
-			} else projectLayer.setObjectId(null);
-			colorBuilds.push(projectLayer);
+			} else { 
+				projectLayer.setObjectId(null);
+				colorBuilds.push(projectLayer);
+			}
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
 
