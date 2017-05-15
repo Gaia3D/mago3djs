@@ -198,6 +198,8 @@
 				<div>HEADING 단축키 : Q , A</div>
 				<div>PITCH 단축키 : W , S</div>
 				<div>ROLL 단축키 : E , D</div>
+				<label for="moveObjectId">선택 objectId </label>
+				<input type="text" id="moveObjectId" name="moveObjectId" size="10" style="height: 20px;"/> 
 				<hr style="height:1">
 			</div>
 		</div>
@@ -499,13 +501,13 @@
 				// block과 object가 1:1
 			} else {
 				// block과 object가 1:N
-				alert("개발중입니다.");
-				return false;
+				/* alert("개발중입니다.");
+				return false; */
 			}
 		} else {
-			// block과 object가 N:N의 관계 
+			/* // block과 object가 N:N의 관계 
 			alert("개발중입니다.");
-			return false;
+			return false; */
 		}
 		if ($.trim($("#colorBlock").val()) === ""){
 			alert("Color 를 선택하여 주세요.");

@@ -368,11 +368,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.depthRange(0, 1);
-//	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
-//		gl.enable(gl.CULL_FACE);
-//	} else {
-//		gl.disable(gl.CULL_FACE);
-//	}
+	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
+		gl.enable(gl.CULL_FACE);
+	} else {
+		gl.disable(gl.CULL_FACE);
+	}
 
 	gl.enable(gl.CULL_FACE);
 	//gl.disable(gl.CULL_FACE);
@@ -404,11 +404,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 
 	for(var j=0; j<1; j++) {
-		//var neoRefList = neoRefList_array[j];
 		var myBlocksList = neoReferencesMotherAndIndices.blocksList;
-
-		//var visibleIndices_count = neoRefList._currentVisibleIndices.length;
-
 		if(myBlocksList == undefined)
 			continue;
 
@@ -425,24 +421,21 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 
-		if(neoBuilding.buildingType == "basicBuilding")
-		{
-			var hola = 0;
-			if(ssao_idx == 1)
-				hola = 0;
-		}
+		//if(neoBuilding.buildingType == "basicBuilding")
+		//{
+		//	var hola = 0;
+		//	if(ssao_idx == 1)
+		//		hola = 0;
+		//}
 			
 		// New version. Use occlussion indices.***
-		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length; // original.***
+		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length; // no occludeCulling mode.***
 		var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
-		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 
 		for(var k=0; k<visibleIndices_count; k++) {
-
-			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good, but old.***
-			//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]];// orignal.***
+			//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]]; // no occludeCulling mode.***
 			var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
-			if(!neoReference || neoReference== undefined) {
+			if(!neoReference || neoReference == undefined) {
 				continue;
 			}
 
@@ -450,11 +443,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				continue;
 
 			block_idx = neoReference._block_idx;
-
-			//if(block_idx >= myBlocksList.blocksArray.length) {
-			//	continue;
-			//}
-			//block = myBlocksList.getBlock(block_idx); // Old.***
 			block = neoBuilding.motherBlocksArray[block_idx];
 
 			if(block == undefined)
@@ -472,25 +460,49 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			}
 
 			// Check if the texture is loaded.********************************************************************************
-			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
-				if(magoManager.backGround_fileReadings_count > 10) continue;
+			if(neoReference.texture != undefined){
+				if(neoReference.texture.texId == undefined) {
+					if(magoManager.backGround_fileReadings_count > 10) continue;
 
-				// 1rst, check if the texture is loaded.***
-				var texId = neoBuilding.getTextureId(neoReference.texture);
-				if(texId == undefined) {
-					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images_Resized/"+neoReference.texture.textureImageFileName;
-					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
-					magoManager.backGround_fileReadings_count ++;
-					continue;
-				} else {
-					neoReference.texture.texId = texId;
+					// 1rst, check if the texture is loaded.***
+					var texId = neoBuilding.getTextureId(neoReference.texture);
+					if(texId == undefined) {
+						// Load the texture.***
+						var filePath_inServer = geometryDataPath + "/" +neoBuilding.buildingFileName+"/Images_Resized/"+neoReference.texture.textureImageFileName;
+						magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
+						magoManager.backGround_fileReadings_count ++;
+						continue;
+					} else {
+						neoReference.texture.texId = texId;
+					}
 				}
 			}
+			// End checking textures loaded.------------------------------------------------------------------------------------
+			
 			if(neoBuilding.isHighLighted)
 			{
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 				gl.uniform4fv(standardShader.color4Aux_loc, magoManager.highLightColor4);
+			}
+			else if(neoBuilding.isColorChanged)
+			{
+				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+				if(magoManager.objectSelected == neoReference) {
+					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+				}
+				else{
+					gl.uniform4fv(standardShader.color4Aux_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g ,neoBuilding.aditionalColor.b ,neoBuilding.aditionalColor.a] );
+				}
+			}
+			else if(neoReference.aditionalColor)
+			{
+				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+				if(magoManager.objectSelected == neoReference) {
+					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+				}
+				else{
+					gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.aditionalColor.r, neoReference.aditionalColor.g ,neoReference.aditionalColor.b ,neoReference.aditionalColor.a] );
+				}
 			}
 			else
 			{
@@ -527,9 +539,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 							if(ssao_idx == 1) {
 								if(!neoReference.hasTexture) {
 									if(neoReference.color4) {
-										//if(neoReference.color4.a < 60)
-										//	continue;
-
 										gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 										gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
 									}
@@ -573,7 +582,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					}
 				}
 			}
-			// End checking textures loaded.------------------------------------------------------------------------------------
+			
 
 			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
 			if(block != null) {
@@ -588,7 +597,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
 					else{
 						if(neoReference.tMatrixAuxArray == undefined)
+						{
+							//neoReference.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);
+							// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 							continue;
+						}
 
 						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 					}
@@ -1595,6 +1608,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 	}
+	
 };
 
 /**

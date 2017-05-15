@@ -618,7 +618,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 				\n\
 		//vec3 normal2 = normalize(vNormal);   \n\
-		vec3 normal2 = vNormal;   \n\
+		vec3 normal2 = vNormal;\n\
 				\n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -660,6 +660,10 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		//float NdotL = abs(DiffuseFactor);\n\
 		//vec3 diffuse = vec3(NdotL);\n\
 		//vec3 ambient = vec3(1.0);\n\
+			//if(!gl_FrontFacing)\n\
+			//{\n\
+			//	discard;\n\
+			//}\n\
 		vec4 textureColor;\n\
 		if(hasTexture)\n\
 		{\n\

@@ -1109,19 +1109,23 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 
 	// * if this is in Cesium:
 	var scene = this.scene;
-	Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._modelView, sceneState.modelViewMatrix._floatArrays);
-	Cesium.Matrix4.toArray(scene._context._us._projection, sceneState.projectionMatrix._floatArrays);
+	var uniformState = scene._context.uniformState;
+	//var uniformState = scene._context._us;
+	Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
+	//Cesium.Matrix4.toArray(uniformState._modelView, sceneState.modelViewMatrix._floatArrays);// original.***
+	//sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.multiply(uniformState.model, uniformState.view, sceneState.modelViewMatrix._floatArrays);
+	sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
+	Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays);
 
 	var cameraPosition = scene.context._us._cameraPosition;
 	ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z] ,sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 
-	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(scene._context._us._modelView, sceneState.modelViewMatrixInv._floatArrays);
-	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);
+	sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
+	sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 
-	//sceneState.camera.frustum.far[0] = scene._context._us._currentFrustum.y;
-	sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far;
+	sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far; // original.***
+	//sceneState.camera.frustum.far[0] = 5000000.0;
 	sceneState.camera.frustum.near[0] = scene._frustumCommandsList[0].near;
 	sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
 	sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
@@ -1570,6 +1574,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	}
 
 	// update the matrices of the scene and the camera position.***
+	//if(!this.isLastFrustum)
 	this.upDateSceneStateMatrices(this.sceneState);
 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
@@ -2095,6 +2100,19 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	resultSelectedArray[1] = currentOctreeSelected;
 	resultSelectedArray[2] = selectedObject;
 
+	if(selectedObject != undefined) {
+		var buildingInfo = currentSelectedBuilding.buildingId.split("_");
+		showLocationAndRotationAPI(	buildingInfo[0],
+				buildingInfo[1],
+				selectedObject.objectId,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
+				currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
+				currentSelectedBuilding.geoLocationDataAux.heading,
+				currentSelectedBuilding.geoLocationDataAux.pitch,
+				currentSelectedBuilding.geoLocationDataAux.roll);
+		console.log("objectId = " + selectedObject.objectId);
+	}
 	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
@@ -2393,8 +2411,9 @@ CesiumManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cam
 	pixelPosCamCoord[2] = this.resultRaySC[2] * realZDepth;
 
 	// now, must transform this pixelCamCoord to world coord.***
-	var mv_inv = new Cesium.Matrix4();
-	mv_inv = Cesium.Matrix4.inverse(scene._context._us._modelView, mv_inv);
+	//var mv_inv = new Cesium.Matrix4();
+	//mv_inv = Cesium.Matrix4.inverse(scene._context._us._modelView, mv_inv);
+	var mv_inv = this.sceneState.modelViewMatrixInv._floatArrays;
 	var pixelPosCamCoordCartesian = new Cesium.Cartesian3(pixelPosCamCoord[0], pixelPosCamCoord[1], pixelPosCamCoord[2]);
 	var pixelPos = new Cesium.Cartesian3();
 	pixelPos = Cesium.Matrix4.multiplyByPoint(mv_inv, pixelPosCamCoordCartesian, pixelPos);
@@ -2984,7 +3003,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			if(this.renderingModeTemp == 1) 
 			{
 				squaredDistLod0 = 300;
-				squaredDistLod1 = 1000;
+				squaredDistLod1 = 2000;
 				squaredDistLod2 = 500000*1000;
 			}
 			
@@ -3421,6 +3440,9 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
 	gl.frontFace(gl.CCW);
+	//gl.depthFunc(gl.GREATER);
+	//gl.enable(gl.CULL_FACE);
+	//gl.depthRange(0.0, 1.0);
 
 	if(ssao_idx == -1) {
 		//var isInterior = false; // no used.***
@@ -3770,9 +3792,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 					if(lowestOctree.neoReferencesMotherAndIndices == undefined) continue;
 
-					//refList = lowestOctree.neoRefsList_Array[0];
-					//if(refList == undefined)
-					//	continue;
 					if(lowestOctree == this.octreeSelected)
 					{
 						var hola =0;
@@ -3780,8 +3799,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-					//if(neoBuilding.buildingType == "MOP")
-					//	continue;
 
 					if(this.renderingModeTemp == 0)
 					{
@@ -3954,6 +3971,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				{
 					gl.uniform1i(currentShader.bUse1Color_loc, true);
 					gl.uniform4fv(currentShader.oneColor4_loc, this.highLightColor4); //.***
+				}
+				else if(neoBuilding.isColorChanged)
+				{
+					gl.uniform1i(currentShader.bUse1Color_loc, true);
+					gl.uniform4fv(currentShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
 				}
 				else
 				{
@@ -5027,10 +5049,14 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				else
 				{
 					// use the normal data. never enter here.***
-					continue;
-					//var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-					//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-					//realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+					if(neoBuilding.buildingType == "basicBuilding")
+					{
+						var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+						this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+						realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+					}
+					else continue;
+					
 				}
 			}
 			else
@@ -5868,8 +5894,59 @@ CesiumManager.prototype.renderModeChanged = function()
 
 };
 
+CesiumManager.prototype.buildingColorChanged = function(projectAndBlockId, color)
+{
+	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
+	if(neoBuilding)
+	{
+		if(neoBuilding.aditionalColor == undefined)
+		{
+			neoBuilding.aditionalColor = new Color();
+		}
+		neoBuilding.isColorChanged = true;
+		neoBuilding.aditionalColor.setRGB(color[0], color[1], color[2]);
+	}
+};
+
+CesiumManager.prototype.objectColorChanged = function(projectAndBlockId, objectId, color)
+{
+	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
+	
+	if(neoBuilding)
+	{
+		var neoReference;
+		var neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
+		var found = false;
+		var i = 0;
+		while(!found && i<neoReferencesCount)
+		{
+			if(neoBuilding.motherNeoReferencesArray[i])
+			{
+				if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
+				{
+					neoReference = neoBuilding.motherNeoReferencesArray[i];
+					found = true;
+				}
+			}
+			i++;
+		}
+		
+		if(neoReference)
+		{
+			if(neoReference.aditionalColor == undefined)
+			{
+				neoReference.aditionalColor = new Color();
+			}
+			
+			neoReference.aditionalColor.setRGB(color[0], color[1], color[2]);
+		}
+	}
+};
+
 CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 {
+	// old.***
 	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
 
 	// 1rst, init colorChanged.***
@@ -5966,9 +6043,10 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	var dividedName = neoBuilding.buildingId.split("_");
 	showLocationAndRotationAPI(	dividedName[0],
 								dividedName[1],
+								null,
 								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
 								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.elevation,
+								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
 								neoBuilding.geoLocationDataAux.heading,
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
@@ -6219,27 +6297,43 @@ CesiumManager.prototype.callAPI = function(api) {
 			isExistObjectIds = true;
 		}
 		var colorBuilds = [];
-		var firstObjectId;
 		for(var i=0, count = blockIds.length; i<count; i++) {
-			var projectLayer = new ProjectLayer();
-			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i].trim());
-			if(isExistObjectIds)
-			{
-				projectLayer.setObjectId(objectIds[i].trim());
-				objectIds = objectIds[0];
-			}
-			else
+			if(isExistObjectIds) {
+				for(var j=0, objectCount = objectIds.length; j<objectCount; j++) {
+					var projectLayer = new ProjectLayer();
+					projectLayer.setProjectId(projectId);
+					projectLayer.setBlockId(blockIds[i].trim());
+					projectLayer.setObjectId(objectIds[j].trim());
+					colorBuilds.push(projectLayer);
+				}
+			} else {
+				var projectLayer = new ProjectLayer();
+				projectLayer.setProjectId(projectId);
+				projectLayer.setBlockId(blockIds[i].trim());
 				projectLayer.setObjectId(null);
-			colorBuilds.push(projectLayer);
+				colorBuilds.push(projectLayer);
+			}
 		}
 		this.magoPolicy.setColorBuildings(colorBuilds);
 
 		var rgbColor = api.getColor().split(",");
 		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
 		this.magoPolicy.setColor(rgbArray);
-		var projectAndBlockId = projectId + "_" + blockIds[0];
-		this.policyColorChanged(projectAndBlockId, objectIds);
+		
+		var buildingsCount = colorBuilds.length;
+		for(var i=0; i<buildingsCount; i++)
+		{
+			//var projectAndBlockId = projectId + "_" + blockIds[i]; // old.***
+			var projectAndBlockId = colorBuilds[i].projectId + "_" + colorBuilds[i].blockId;
+			if(colorBuilds[i].objectId == null)
+			{
+				this.buildingColorChanged(projectAndBlockId, rgbArray);
+			}
+			else{
+				this.objectColorChanged(projectAndBlockId, colorBuilds[i].objectId, rgbArray);
+			}
+			
+		}
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
