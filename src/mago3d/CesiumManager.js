@@ -2103,17 +2103,29 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	if(selectedObject != undefined) {
 		var buildingInfo = currentSelectedBuilding.buildingId.split("_");
 		showLocationAndRotationAPI(	buildingInfo[0],
-				buildingInfo[1],
-				selectedObject.objectId,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
-				currentSelectedBuilding.geoLocationDataAux.heading,
-				currentSelectedBuilding.geoLocationDataAux.pitch,
-				currentSelectedBuilding.geoLocationDataAux.roll);
-		console.log("objectId = " + selectedObject.objectId);
+									buildingInfo[1],
+									selectedObject.objectId,
+									currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
+									currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
+									currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
+									currentSelectedBuilding.geoLocationDataAux.heading,
+									currentSelectedBuilding.geoLocationDataAux.pitch,
+									currentSelectedBuilding.geoLocationDataAux.roll);
+		
+		if(MagoConfig.getInformation().callbackConfig.enable) {
+			selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
+										buildingInfo[0],
+										buildingInfo[1],
+										selectedObject.objectId,
+										currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
+										currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
+										currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
+										currentSelectedBuilding.geoLocationDataAux.heading,
+										currentSelectedBuilding.geoLocationDataAux.pitch,
+										currentSelectedBuilding.geoLocationDataAux.roll);
+		}
 	}
-	console.log(currentSelectedBuilding.buildingFileName);
+//	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
 
@@ -6050,7 +6062,20 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 								neoBuilding.geoLocationDataAux.heading,
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
-
+	
+	if(MagoConfig.getInformation().callbackConfig.enable) {
+		selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
+									dividedName[0],
+									dividedName[1],
+									null,
+									neoBuilding.geoLocationDataAux.geographicCoord.latitude,
+									neoBuilding.geoLocationDataAux.geographicCoord.longitude,
+									neoBuilding.geoLocationDataAux.geographicCoord.altitude,
+									neoBuilding.geoLocationDataAux.heading,
+									neoBuilding.geoLocationDataAux.pitch,
+									neoBuilding.geoLocationDataAux.roll);
+	}
+	
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
@@ -6355,7 +6380,6 @@ CesiumManager.prototype.callAPI = function(api) {
 		var buildingId = api.getProjectId() + "_" + api.getBlockId();
 		var buildingType = "structure";
 		var building = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, buildingId);
-
 
 		this.changeLocationAndRotation(api.getProjectId() + "_" + api.getBlockId(),
 							parseFloat(api.getLatitude()),
