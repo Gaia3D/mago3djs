@@ -6061,6 +6061,21 @@ CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 								neoBuilding.geoLocationDataAux.heading,
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
+	
+	if(MagoConfig.getInformation().callbackConfig.enable) {
+		var objectId = null;
+		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
+		selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
+									dividedName[0],
+									dividedName[1],
+									objectId,
+									neoBuilding.geoLocationDataAux.geographicCoord.latitude,
+									neoBuilding.geoLocationDataAux.geographicCoord.longitude,
+									neoBuilding.geoLocationDataAux.geographicCoord.altitude,
+									neoBuilding.geoLocationDataAux.heading,
+									neoBuilding.geoLocationDataAux.pitch,
+									neoBuilding.geoLocationDataAux.roll);
+	}
 };
 
 /**
