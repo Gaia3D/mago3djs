@@ -2108,22 +2108,9 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	}
 	if(selectedObject != undefined) {
 		this.displayLocationAndRotation(currentSelectedBuilding);
-		/*
-		var buildingInfo = currentSelectedBuilding.buildingId.split("_");
-		showLocationAndRotationAPI(	buildingInfo[0],
-				buildingInfo[1],
-				selectedObject.objectId,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
-				currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
-				currentSelectedBuilding.geoLocationDataAux.heading,
-				currentSelectedBuilding.geoLocationDataAux.pitch,
-				currentSelectedBuilding.geoLocationDataAux.roll);
-		
-		*/
 		console.log("objectId = " + selectedObject.objectId);
 	}
-	console.log(currentSelectedBuilding.buildingFileName);
+//	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
 
@@ -6053,6 +6040,7 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectI
 /**
  * 변환 행렬
  */
+ 
 CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var latitude, longitude, altitude, heading, pitch, roll;
@@ -6097,18 +6085,7 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 	{
 		neoBuilding.octree.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 	}
-	/*
-	var dividedName = neoBuilding.buildingId.split("_");
-	showLocationAndRotationAPI(	dividedName[0],
-								dividedName[1],
-								null,
-								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
-								neoBuilding.geoLocationDataAux.heading,
-								neoBuilding.geoLocationDataAux.pitch,
-								neoBuilding.geoLocationDataAux.roll);
-								*/
+
 
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
@@ -6414,7 +6391,6 @@ CesiumManager.prototype.callAPI = function(api) {
 		var buildingId = api.getProjectId() + "_" + api.getBlockId();
 		var buildingType = "structure";
 		var building = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, buildingId);
-
 
 		this.changeLocationAndRotation(api.getProjectId() + "_" + api.getBlockId(),
 							parseFloat(api.getLatitude()),

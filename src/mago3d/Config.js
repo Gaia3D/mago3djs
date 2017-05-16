@@ -30,6 +30,8 @@ MagoConfig.init = function(jsonConfig, blocksConfig) {
 	
 	// block 정보 설정
 	MagoConfig.initBlocksConfig(blocksConfig);
+	// callback 정보 설정
+	MagoConfig.initCallbackConfig(jsonConfig);
 };
 
 /**
@@ -279,3 +281,13 @@ MagoConfig.initBlocksConfig = function(blocksConfig) {
 	if(blocksConfig === null || blocksConfig.blocks === null || blocksConfig.blocks === undefined) return;
 	this.jsonConfig.blockConfig = blocksConfig;
 };
+
+/**
+ * callback 정보 설정
+ * 
+ * @param blocksConfig 블락 정보 설정 설정
+ */
+MagoConfig.initCallbackConfig = function(jsonConfig) {
+	this.jsonConfig.callbackConfig = jsonConfig.callbackConfig;
+};
+
