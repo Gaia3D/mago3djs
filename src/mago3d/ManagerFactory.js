@@ -64,7 +64,9 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		var gl = viewer.scene.context._gl;
 		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
 		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
-		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl);
+		viewer.scene.magoManager.postFxShadersManager.gl = gl;
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
+		viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
 		viewer.scene.magoManager.scene = viewer.scene;
 
 		// Start postRender version.***********************************************

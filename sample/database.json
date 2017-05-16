@@ -59,10 +59,6 @@
 			"buildingFileName" : [ "F4D_2089_S120T_2_old"]
 		}
 	},
-	"callbackConfig" : {
-		"enable" : false,
-		"selectedObject" : "showSelectedObject"
-	},
 	"blockConfig" : {
 		"time" : "yyyy-MM-dd hh:mi:ss",
 		"blocks" : { 

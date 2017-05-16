@@ -1130,6 +1130,9 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 	sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
 	sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
 	sceneState.camera.frustum.aspectRatio = scene._camera.frustum._aspectRatio;
+	
+	sceneState.drawingBufferWidth = scene.drawingBufferWidth;
+	sceneState.drawingBufferHeight = scene.drawingBufferHeight;
 
 	// * else if this is in WebWorldWind:
 	// TODO:
@@ -2100,30 +2103,12 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	resultSelectedArray[1] = currentOctreeSelected;
 	resultSelectedArray[2] = selectedObject;
 
+	if(currentSelectedBuilding != undefined) {
+		this.displayLocationAndRotation(currentSelectedBuilding);
+	}
 	if(selectedObject != undefined) {
-		var buildingInfo = currentSelectedBuilding.buildingId.split("_");
-		showLocationAndRotationAPI(	buildingInfo[0],
-									buildingInfo[1],
-									selectedObject.objectId,
-									currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
-									currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
-									currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
-									currentSelectedBuilding.geoLocationDataAux.heading,
-									currentSelectedBuilding.geoLocationDataAux.pitch,
-									currentSelectedBuilding.geoLocationDataAux.roll);
-		
-		if(MagoConfig.getInformation().callbackConfig.enable) {
-			selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
-										buildingInfo[0],
-										buildingInfo[1],
-										selectedObject.objectId,
-										currentSelectedBuilding.geoLocationDataAux.geographicCoord.latitude,
-										currentSelectedBuilding.geoLocationDataAux.geographicCoord.longitude,
-										currentSelectedBuilding.geoLocationDataAux.geographicCoord.altitude,
-										currentSelectedBuilding.geoLocationDataAux.heading,
-										currentSelectedBuilding.geoLocationDataAux.pitch,
-										currentSelectedBuilding.geoLocationDataAux.roll);
-		}
+		this.displayLocationAndRotation(currentSelectedBuilding);
+		console.log("objectId = " + selectedObject.objectId);
 	}
 //	console.log(currentSelectedBuilding.buildingFileName);
 
@@ -2705,6 +2690,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 			var newHeight = cartographic.height;
 
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+			this.displayLocationAndRotation(this.buildingSelected);
 		}
 
 	}
@@ -3749,7 +3735,8 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.useProgram(shaderProgram);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
-			if(currentShader.normal3_loc != -1) gl.enableVertexAttribArray(currentShader.normal3_loc);
+			//if(currentShader.normal3_loc != -1) gl.enableVertexAttribArray(currentShader.normal3_loc);
+			gl.enableVertexAttribArray(currentShader.normal3_loc);
 
 			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
@@ -3777,6 +3764,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.activeTexture(gl.TEXTURE1);
 			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 
+			// provisional.*********************************************************************
 			var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 			for(var i=0; i<lowestOctreesCount; i++) {
 				//lowestOctree.neoBuildingOwner
@@ -3789,7 +3777,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
 				lowestOctree.setRenderedFalseToAllReferences();
 			}
-			//neoBuilding.setRenderedFalseToAllReferences();
+			//-----------------------------------------------------------------------------------
 
 			//renderTexture = true;
 			// 1) LOD 0.*********************************************************************************************************************
@@ -4163,7 +4151,83 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+CesiumManager.prototype.createDefaultShaders = function(gl) {
+	// here creates the necessary shaders for mago3d.***
+	// 1) ModelReferences ssaoShader.******************************************************************************
+	var shaderName = "modelReferencesSsao";
+	var shader = this.postFxShadersManager.newShader(shaderName);
+	var ssao_vs_source = ShaderSource.modelRefSsaoVsSource;
+	var ssao_fs_source = ShaderSource.modelRefSsaoFsSource;
 
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+			
+	var uniformDataPair;
+	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvpMat4RelToEye");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	uniformDataPair.matrix4fv = this.sceneState.modelViewProjRelToEyeMatrix._floatArrays;
+	
+	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvMat4RelToEye");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	uniformDataPair.matrix4fv = this.sceneState.modelViewRelToEyeMatrix._floatArrays;
+	
+	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "pMat4");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "projectionMatrix");
+	uniformDataPair.matrix4fv = this.sceneState.projectionMatrix._floatArrays;
+	
+	uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosHigh");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	uniformDataPair.vec3fv = this.sceneState.encodedCamPosHigh;
+	
+	uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosLow");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	uniformDataPair.vec3fv = this.sceneState.encodedCamPosLow;
+	
+	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "normalMat4");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "normalMatrix4");
+	uniformDataPair.matrix4fv = this.sceneState.normalMatrix4._floatArrays;
+	
+	uniformDataPair = shader.newUniformDataPair("1f", "frustumFar");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "far");
+	uniformDataPair.floatValue = this.sceneState.camera.frustum.far;
+	
+	uniformDataPair = shader.newUniformDataPair("1f", "fovy");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "fov");
+	uniformDataPair.floatValue = this.sceneState.camera.frustum.fovyRad;
+	
+	uniformDataPair = shader.newUniformDataPair("1f", "aspectRatio");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
+	uniformDataPair.floatValue = this.sceneState.camera.frustum.aspectRatio;
+	
+	uniformDataPair = shader.newUniformDataPair("1i", "drawBuffWidht");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "screenWidth");
+	uniformDataPair.intValue = this.sceneState.drawingBufferWidth;
+	
+	uniformDataPair = shader.newUniformDataPair("1i", "drawBuffHeight");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "screenHeight");
+	uniformDataPair.intValue = this.sceneState.drawingBufferHeight;
+	
+			//gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
+			//gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
+			
+	uniformDataPair = shader.newUniformDataPair("1i", "depthTex");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "depthTex");
+	uniformDataPair.intValue = 0;
+	
+	uniformDataPair = shader.newUniformDataPair("1i", "noiseTex");
+	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "noiseTex");
+	uniformDataPair.intValue = 1;
+	
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -5976,59 +6040,29 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectI
 /**
  * 변환 행렬
  */
- /*
-CesiumManager.prototype.changeLocationAndRotation = function(neoBuilding, buildingGeoLocData, latitude, longitude, elevation, heading, pitch, roll) {
-	if(neoBuilding == undefined)
-		return;
-
-	buildingGeoLocData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, buildingGeoLocData);
-	if(buildingGeoLocData == undefined)
-		return;
-
-	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-	ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocData, this.pointSC );
-
-	// now, must change the keyMatrix of the references of the octrees.***
-	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocData.rotMatrix);
-	if(neoBuilding.octree)
-	{
-		neoBuilding.octree.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
-	}
-
+ 
+CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
+	//var projectIdAndBlockId = neoBuilding.buildingId;
+	var latitude, longitude, altitude, heading, pitch, roll;
+	latitude = neoBuilding.geoLocationDataAux.geographicCoord.latitude;
+	longitude = neoBuilding.geoLocationDataAux.geographicCoord.longitude;
+	altitude = neoBuilding.geoLocationDataAux.geographicCoord.altitude;
+	heading = neoBuilding.heading;
+	pitch = neoBuilding.pitch;
+	roll = neoBuilding.roll;
+	
 	var dividedName = neoBuilding.buildingId.split("_");
 	showLocationAndRotationAPI(	dividedName[0],
 								dividedName[1],
-								buildingGeoLocData.geographicCoord.latitude,
-								buildingGeoLocData.geographicCoord.longitude,
-								buildingGeoLocData.geographicCoord.elevation,
-								buildingGeoLocData.heading,
-								buildingGeoLocData.pitch,
-								buildingGeoLocData.roll);
+								null,
+								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
+								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
+								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
+								neoBuilding.geoLocationDataAux.heading,
+								neoBuilding.geoLocationDataAux.pitch,
+								neoBuilding.geoLocationDataAux.roll);
+};
 
-	// repeat this for outfitting building.*********************************************************************************************************************
-	// repeat this for outfitting building.*********************************************************************************************************************
-	// repeat this for outfitting building.*********************************************************************************************************************
-	var neoBuildingOutffiting = this.getNeoBuildingById("outfitting", projectIdAndBlockId);
-
-	if(neoBuildingOutffiting == undefined)
-		return;
-
-	// "longitude", "latitude" and "elevation" is from the structure block.***
-	neoBuildingOutffiting.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuildingOutffiting.geoLocationDataAux);
-	if(neoBuildingOutffiting.geoLocationDataAux == undefined)
-		return;
-
-	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC); // the centerpoint is taken from structure block.***
-	ManagerUtils.translatePivotPointGeoLocationData(neoBuildingOutffiting.geoLocationDataAux, this.pointSC );
-
-	// now, must change the keyMatrix of the references of the octrees.***
-	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
-	if(neoBuildingOutffiting.octree)
-	{
-		neoBuildingOutffiting.octree.multiplyKeyTransformMatrix(0, neoBuildingOutffiting.geoLocationDataAux.rotMatrix);
-	}
-}
-*/
 /**
  * 변환 행렬
  */
@@ -6052,30 +6086,7 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 		neoBuilding.octree.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 	}
 
-	var dividedName = neoBuilding.buildingId.split("_");
-	showLocationAndRotationAPI(	dividedName[0],
-								dividedName[1],
-								null,
-								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
-								neoBuilding.geoLocationDataAux.heading,
-								neoBuilding.geoLocationDataAux.pitch,
-								neoBuilding.geoLocationDataAux.roll);
-	
-	if(MagoConfig.getInformation().callbackConfig.enable) {
-		selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
-									dividedName[0],
-									dividedName[1],
-									null,
-									neoBuilding.geoLocationDataAux.geographicCoord.latitude,
-									neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-									neoBuilding.geoLocationDataAux.geographicCoord.altitude,
-									neoBuilding.geoLocationDataAux.heading,
-									neoBuilding.geoLocationDataAux.pitch,
-									neoBuilding.geoLocationDataAux.roll);
-	}
-	
+
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
