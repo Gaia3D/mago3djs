@@ -662,7 +662,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					// Positions.***
 
 					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-					gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false,0,0);
+					//gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false,0,0);
+					gl.vertexAttribPointer(standardShader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
 
 					// Normals.***
 					if(standardShader.normal3_loc != -1) {
