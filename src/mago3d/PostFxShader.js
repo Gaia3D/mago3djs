@@ -72,6 +72,29 @@ UniformVec3fvDataPair.prototype.bindUniform = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @class UniformVec4fvDataPair
+ * @param gl 변수
+ */
+var UniformVec4fvDataPair = function(gl, uniformName) {
+	if(!(this instanceof UniformVec4fvDataPair)) {
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.vec4fv; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+UniformVec4fvDataPair.prototype.bindUniform = function() {
+	this.gl.uniform4fv(this.uniformLocation, false, this.vec4fv);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class Uniform1fDataPair
  * @param gl 변수
  */
@@ -190,12 +213,32 @@ var PostFxShader = function(gl) {
  * @param shaderName 변수
  * @returns shader
  */
+PostFxShader.prototype.bindUniforms = function()
+{
+	var uniformsDataPairsCount = this.uniformsArray.length;
+	for(var i=0; i<uniformsDataPairsCount; i++)
+	{
+		this.uniformsArray[i].bindUniform();
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
 PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
 {
 	var uniformDataPair;//
 	if(uniformType == "Matrix4fv")
 	{
 		uniformDataPair = new UniformMatrix4fvDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if(uniformType == "Vec4fv")
+	{
+		uniformDataPair = new UniformVec4fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
@@ -491,9 +534,9 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); // no used.***
 
 	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
+	//shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
+	//shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
 };
 
 /**
