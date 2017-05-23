@@ -22,7 +22,10 @@ var TerranTile = function() {
 	this._depth = 0; // qudtree depth. 0 => mother_quadtree.***
 	this._numberName = 1; // mother quadtree.***
 	this._terranTile_owner;
-	this._BR_buildingsArray = [];
+	//------------------------------------------------------------
+	this.projectsArray = [];
+	
+	this._BR_buildingsArray = []; // Old.***
 	this._boundingBox; // dont use this.***
 	this._pCloudMesh_array = []; // 1rst aproximation to the pointCloud data. Test.***
 
@@ -63,6 +66,7 @@ var TerranTile = function() {
  * @returns br_buildingProject
  */
 TerranTile.prototype.newBRProject = function() {
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	// dont use this. delete this.***
 	var br_buildingProject = new BRBuildingProject();
 	this._BR_buildingsArray.push(br_buildingProject);
