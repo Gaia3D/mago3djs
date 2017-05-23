@@ -1186,7 +1186,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter, neoBuildingsList) {
+ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter, neoBuildingsList, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
@@ -1196,6 +1196,7 @@ ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter,
 			readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
 //			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
+			magoManager.createDeploymentGeoLocationsForHeavyIndustries();
 		} else {
 //			blocksList.fileLoadState = 500;
 		}

@@ -84,6 +84,7 @@ var GeoLocationDataManager = function() {
 	}
 	
 	this.geoLocationDataArray = [];
+	this.geoLocationDataCache = {}; // use this.***
 };
 
 /**
@@ -97,6 +98,7 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 		geoLocationName = "noName" + this.geoLocationDataArray.length.toString();
 	var geoLocationData = new GeoLocationData(geoLocationName);
 	this.geoLocationDataArray.push(geoLocationData);
+	this.geoLocationDataCache[geoLocationName] = geoLocationData;
 	return geoLocationData;
 };
 
