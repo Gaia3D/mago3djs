@@ -66,7 +66,17 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 		}
 
 		// 4) TexCoord.****************************************************************************************************
-		readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		var hasTexCoords = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if(hasTexCoords)
+		{
+			var dataType = readWriter.readUInt16(dataArraybuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;
+			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			var texcoordsValuesCount = vertexCount * 2;
+			var startBuff = bytesReaded;
+			var endBuff = bytesReaded + 4 * texcoordsValuesCount;
+			vbo_vi_cacheKey.tcoordVboDataArray = new Float32Array(dataArraybuffer.slice(startBuff, endBuff));
+			bytesReaded = bytesReaded + 4 * texcoordsValuesCount; // updating data.***
+		}
 
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}

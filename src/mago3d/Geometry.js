@@ -189,6 +189,7 @@ var NeoBuilding = function() {
 
 
 	// The simple building.***********************************************
+	this.simpleBuilding3x3Texture;
 	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
 
 	// The lodBuildings.***
