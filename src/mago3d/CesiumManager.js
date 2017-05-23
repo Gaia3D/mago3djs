@@ -5974,23 +5974,24 @@ CesiumManager.prototype.policyColorChanged = function(projectAndBlockId, objectI
 CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var latitude, longitude, altitude, heading, pitch, roll;
-	latitude = neoBuilding.geoLocationDataAux.geographicCoord.latitude;
-	longitude = neoBuilding.geoLocationDataAux.geographicCoord.longitude;
-	altitude = neoBuilding.geoLocationDataAux.geographicCoord.altitude;
-	heading = neoBuilding.heading;
-	pitch = neoBuilding.pitch;
-	roll = neoBuilding.roll;
+	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
+	latitude = geoLocationData.geographicCoord.latitude;
+	longitude = geoLocationData.geographicCoord.longitude;
+	altitude = geoLocationData.geographicCoord.altitude;
+	heading = geoLocationData.heading;
+	pitch = geoLocationData.pitch;
+	roll = geoLocationData.roll;
 	
 	var dividedName = neoBuilding.buildingId.split("_");
 	showLocationAndRotationAPI(	dividedName[0],
 								dividedName[1],
 								null,
-								neoBuilding.geoLocationDataAux.geographicCoord.latitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-								neoBuilding.geoLocationDataAux.geographicCoord.altitude,
-								neoBuilding.geoLocationDataAux.heading,
-								neoBuilding.geoLocationDataAux.pitch,
-								neoBuilding.geoLocationDataAux.roll);
+								geoLocationData.geographicCoord.latitude,
+								geoLocationData.geographicCoord.longitude,
+								geoLocationData.geographicCoord.altitude,
+								geoLocationData.heading,
+								geoLocationData.pitch,
+								geoLocationData.roll);
 	
 };
 
@@ -6000,12 +6001,13 @@ CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var latitude, longitude, altitude, heading, pitch, roll;
-	latitude = neoBuilding.geoLocationDataAux.geographicCoord.latitude;
-	longitude = neoBuilding.geoLocationDataAux.geographicCoord.longitude;
-	altitude = neoBuilding.geoLocationDataAux.geographicCoord.altitude;
-	heading = neoBuilding.heading;
-	pitch = neoBuilding.pitch;
-	roll = neoBuilding.roll;
+	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
+	latitude = geoLocationData.geographicCoord.latitude;
+	longitude = geoLocationData.geographicCoord.longitude;
+	altitude = geoLocationData.geographicCoord.altitude;
+	heading = geoLocationData.heading;
+	pitch = geoLocationData.pitch;
+	roll = geoLocationData.roll;
 	
 	var dividedName = neoBuilding.buildingId.split("_");
 	if(MagoConfig.getInformation().callbackConfig.enable) {
@@ -6015,12 +6017,12 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 									dividedName[0],
 									dividedName[1],
 									objectId,
-									neoBuilding.geoLocationDataAux.geographicCoord.latitude,
-									neoBuilding.geoLocationDataAux.geographicCoord.longitude,
-									neoBuilding.geoLocationDataAux.geographicCoord.altitude,
-									neoBuilding.geoLocationDataAux.heading,
-									neoBuilding.geoLocationDataAux.pitch,
-									neoBuilding.geoLocationDataAux.roll);
+									geoLocationData.geographicCoord.latitude,
+									geoLocationData.geographicCoord.longitude,
+									geoLocationData.geographicCoord.altitude,
+									geoLocationData.heading,
+									geoLocationData.pitch,
+									geoLocationData.roll);
 	}
 };
 
@@ -6032,19 +6034,19 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 
 	if(neoBuilding == undefined)
 		return;
-
-	neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuilding.geoLocationDataAux);
-	if(neoBuilding.geoLocationDataAux == undefined)
+	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
+	geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData);
+	if(geoLocationData == undefined)
 		return;
 
 	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-	ManagerUtils.translatePivotPointGeoLocationData(neoBuilding.geoLocationDataAux, this.pointSC );
+	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
 	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 	if(neoBuilding.octree)
 	{
-		neoBuilding.octree.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
+		neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 	}
 
 
@@ -6057,18 +6059,19 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
 		return;
 
 	// "longitude", "latitude" and "elevation" is from the structure block.***
-	neoBuildingOutffiting.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, neoBuildingOutffiting.geoLocationDataAux);
-	if(neoBuildingOutffiting.geoLocationDataAux == undefined)
+	geoLocationData = neoBuildingOutffiting.geoLocDataManager.geoLocationDataArray[0];
+	geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData);
+	if(geoLocationData == undefined)
 		return;
 
 	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC); // the centerpoint is taken from structure block.***
-	ManagerUtils.translatePivotPointGeoLocationData(neoBuildingOutffiting.geoLocationDataAux, this.pointSC );
+	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
 	//lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, neoBuilding.geoLocationDataAux.rotMatrix);
 	if(neoBuildingOutffiting.octree)
 	{
-		neoBuildingOutffiting.octree.multiplyKeyTransformMatrix(0, neoBuildingOutffiting.geoLocationDataAux.rotMatrix);
+		neoBuildingOutffiting.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 	}
 }
 
@@ -6324,7 +6327,7 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
  */
 
 CesiumManager.prototype.getObjectIndexFile = function() {
-	this.readerWriter.getObjectIndexFile(	this.scene.context._gl,	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this.readerWriter, this.neoBuildingsList);
+	this.readerWriter.getObjectIndexFile(	this.scene.context._gl,	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this.readerWriter, this.neoBuildingsList, this);
 };
 
 /**
