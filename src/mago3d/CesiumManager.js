@@ -1616,6 +1616,15 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.buildingSelected = this.arrayAuxSC[0];
 		this.octreeSelected = this.arrayAuxSC[1];
 		this.arrayAuxSC.length = 0;
+		if(this.buildingSelected != undefined) {
+			this.displayLocationAndRotation(this.buildingSelected);
+			this.selectedObjectNotice(this.buildingSelected);
+		}
+		if(this.objectSelected != undefined) {
+			//this.displayLocationAndRotation(currentSelectedBuilding);
+			//this.selectedObjectNotice(currentSelectedBuilding);
+			//console.log("objectId = " + selectedObject.objectId);
+		}
 	}
 
 	// 1) The depth render.***************************************************************************************************
@@ -1952,9 +1961,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 
-		if(i == 0)
-			minSize = 0.1;
-		else minSize = 0.1;
+		minSize = 0.0;
 		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 
@@ -2004,9 +2011,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 
-		if(i == 0)
-			minSize = 0.9;
-		else minSize = 0.9;
+		minSize = 0.0;
 		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 
@@ -2103,13 +2108,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	resultSelectedArray[1] = currentOctreeSelected;
 	resultSelectedArray[2] = selectedObject;
 
-	if(currentSelectedBuilding != undefined) {
-		this.displayLocationAndRotation(currentSelectedBuilding);
-	}
-	if(selectedObject != undefined) {
-		this.displayLocationAndRotation(currentSelectedBuilding);
-		console.log("objectId = " + selectedObject.objectId);
-	}
+	
 //	console.log(currentSelectedBuilding.buildingFileName);
 
 	return selectedObject;
@@ -2691,6 +2690,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
 			this.displayLocationAndRotation(this.buildingSelected);
+			//this.selectedObjectNotice(this.buildingSelected);
 		}
 
 	}
@@ -6062,6 +6062,22 @@ CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 								neoBuilding.geoLocationDataAux.pitch,
 								neoBuilding.geoLocationDataAux.roll);
 	
+};
+
+/**
+ * 변환 행렬
+ */
+CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
+	//var projectIdAndBlockId = neoBuilding.buildingId;
+	var latitude, longitude, altitude, heading, pitch, roll;
+	latitude = neoBuilding.geoLocationDataAux.geographicCoord.latitude;
+	longitude = neoBuilding.geoLocationDataAux.geographicCoord.longitude;
+	altitude = neoBuilding.geoLocationDataAux.geographicCoord.altitude;
+	heading = neoBuilding.heading;
+	pitch = neoBuilding.pitch;
+	roll = neoBuilding.roll;
+	
+	var dividedName = neoBuilding.buildingId.split("_");
 	if(MagoConfig.getInformation().callbackConfig.enable) {
 		var objectId = null;
 		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
