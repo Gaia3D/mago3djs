@@ -9,7 +9,7 @@ var FileRequestControler = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.maxFilesRequestedCount = 50;
+	this.maxFilesRequestedCount = 6;
 	this.filesRequestedCount = 0;
 	
 	//this.maxNeoBuildingHeaderRequestedCount = 50;
