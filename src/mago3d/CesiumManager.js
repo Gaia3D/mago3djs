@@ -1952,9 +1952,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 
-		if(i == 0)
-			minSize = 0.1;
-		else minSize = 0.1;
+		minSize = 0.0;
 		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 
@@ -2004,9 +2002,7 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 			}
 		}
 
-		if(i == 0)
-			minSize = 0.9;
-		else minSize = 0.9;
+		minSize = 0.0;
 		this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
 	}
 
@@ -2974,7 +2970,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			{
 				var hola = 0;
 			}
-
+			/*
 			if(this.renderingModeTemp == 0)
 			{
 				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -2992,6 +2988,10 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
 				}
 			}
+			*/
+			
+			buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
 			
 			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 
@@ -4950,13 +4950,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 	// Init the visible buildings array.***
 	neoVisibleBuildingsArray.length = 0;
 
-	//this.min_squaredDist_to_see_detailed = 40000; // 200m.***
-	//this.min_squaredDist_to_see_LOD0 = 250000; // 600m.***
-	//this.min_squaredDist_to_see = 10000000;
-	//this.min_squaredDist_to_see_smallBuildings = 700000;
-
-	//this.min_squaredDist_to_see_detailed = 1000000; // Test for xxxx.***
-
 	var squaredDistToCamera;
 //	var last_squared_dist;
 	this.detailed_neoBuilding;
@@ -5012,6 +5005,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 		}
 
 		// 1) check if there are a geoLocation.***
+		/*
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 		if(buildingGeoLocation == undefined)
 		{
@@ -5041,6 +5035,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 				}
 			}
 		}
+		*/
 
 		if(neoBuilding.bbox == undefined)
 		{
@@ -5070,85 +5065,13 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, n
 			{
 				continue;
 			}
-			/*
-			if(neoBuilding.geoLocationDataAux == undefined)
-			{
-				// 1rst, we must know the buildingType.***
-				var structureTypedBuilding;
-				if(neoBuilding.buildingType == "outfitting")
-				{
-					structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("structure", neoBuilding.buildingId);
-				}
-				else
-					structureTypedBuilding = neoBuilding;
 
-				if(structureTypedBuilding == undefined)
-					continue;
-
-				if(structureTypedBuilding.bbox == undefined)
-					continue;
-
-				// now calculate traslation vector.***
-				var realTimeLocBlocksList;
-
-				if(this.renderingModeTemp == 1)
-					realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
-				else if(this.renderingModeTemp == 2)
-					realTimeLocBlocksList = MagoConfig.getInformation().demoBlockConfig.blocks;
-
-				var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
-				// must calculate the realBuildingPosition (bbox_center_position).***
-
-				if(newLocation) {
-					var longitude;
-					var latitude;
-					var elevation;
-					var heading, pitc, roll;
-
-					if(structureTypedBuilding.geoLocationDataAux)
-					{
-						longitude = structureTypedBuilding.geoLocationDataAux.longitude;
-						latitude = structureTypedBuilding.geoLocationDataAux.latitude;
-						elevation = structureTypedBuilding.geoLocationDataAux.elevation;
-						heading = structureTypedBuilding.geoLocationDataAux.heading;
-						pitch = structureTypedBuilding.geoLocationDataAux.pitch;
-						roll = structureTypedBuilding.geoLocationDataAux.roll;
-					}
-					else
-					{
-						longitude = newLocation.LONGITUDE;
-						latitude = newLocation.LATITUDE;
-						elevation = newLocation.ELEVATION;
-						heading = newLocation.HEADING;
-						pitch = newLocation.PITCH;
-						roll = newLocation.ROLL;
-					}
-
-					this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, elevation, heading, pitch, roll);
-					currentCalculatingPositionsCount ++;
-				}
-				else
-				{
-					// use the normal data. never enter here.***
-					if(neoBuilding.buildingType == "basicBuilding")
-					{
-						var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-						this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-						realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-					}
-					else continue;
-					
-				}
-			}
+			//realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint; // old.***
+			if(neoBuilding.geoLocDataManager.geoLocationDataCache["deploymentLoc"])
+				realBuildingPos = neoBuilding.geoLocDataManager.geoLocationDataCache["deploymentLoc"].pivotPoint;
 			else
-				*/
-			{
-				//realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint; // old.***
-				if(neoBuilding.geoLocDataManager.geoLocationDataCache["deploymentLoc"])
-					realBuildingPos = neoBuilding.geoLocDataManager.geoLocationDataCache["deploymentLoc"].pivotPoint;
-				else
-					continue;
-			}
+				continue;
+
 		}
 		else
 		{
@@ -5638,11 +5561,6 @@ CesiumManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, f
 	//visibleBuildings_array.length = 0; // Init.***
 	//this.currentVisibleBuildings_LOD0_array.length = 0; // Init.***
 	//this.detailed_building;
-
-	//this.min_squaredDist_to_see_detailed = 40000; // 200m.***
-	//this.min_squaredDist_to_see_LOD0 = 250000; // 600m.***
-	//this.min_squaredDist_to_see = 10000000;
-	//this.min_squaredDist_to_see_smallBuildings = 700000;
 
 	var squaredDistToCamera;
 //	var squaredDistToCamera_candidate;
@@ -6339,12 +6257,13 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 	
 		newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 		// must calculate the realBuildingPosition (bbox_center_position).***
-
+		var longitude;
+		var latitude;
+		var altitude;
+		var heading, pitch, roll;
+			
 		if(newLocation) {
-			var longitude;
-			var latitude;
-			var altitude;
-			var heading, pitch, roll;
+			
 
 			longitude = newLocation.LONGITUDE;
 			latitude = newLocation.LATITUDE;
@@ -6365,15 +6284,21 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 		{
 			// use the normal data. never enter here.***
 			var hola = 0;
-			/*
+			
 			if(neoBuilding.buildingType == "basicBuilding")
 			{
-				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
-				realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+				longitude = 128.594998;
+				latitude = 34.904209;
+				altitude = 50.0;
+		
+				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
+				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
+				
+				this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
+				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			}
 			else continue;
-			*/
+			
 		}
 	}
 };

@@ -925,40 +925,6 @@ ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_i
 	// Now, make the quadtree.***
 	terranTile.makeTree(max_dpeth);
 
-	// Old.***
-	/*
-	var subTiles_count = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	if(subTiles_count == 0) {
-		// this is the smallest tile.***
-		var idxFiles_count = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		if(idxFiles_count > 1) {
-			var h=0;
-		}
-		for(var i=0; i<idxFiles_count; i++) {
-
-			BP_Project = terranTile.newBRProject();
-			BP_Project._header._f4d_version = 2;
-			// 1rst, read the files path names.************************************************************************************************************
-			f4d_headerPathName_length = this.readInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-			for(var j=0; j<f4d_headerPathName_length; j++){
-				BP_Project._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-			BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
-			BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
-			BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
-
-		}
-		// provisionally, delete all the BP_Projects created.***
-		// provisionally, delete all the BP_Projects created.***
-		// provisionally, delete all the BP_Projects created.***
-		terranTile._BR_buildingsArray.length = 0;
-	} else {
-		for(var i=0; i<4; i++) {
-			subTile = terranTile.newSubTerranTile();
-			bytes_readed = this.readTerranTileFile(gl, arrayBuffer, filePath_inServer, subTile, readerWriter, bytes_readed);
-		}
-	}
-	*/
 	return bytes_readed;
 };
 
@@ -1249,9 +1215,9 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
-		longitude = 128.594998;
-		latitude = 34.904209;
-		altitude = 50.0;
+		//longitude = 128.594998;
+		//latitude = 34.904209;
+		//altitude = 50.0;
 
 		heading = 0.0;
 		pitch = 0.0;
@@ -1266,20 +1232,9 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		/*
-		// Old.***
-		bbLengthX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		bbLengthY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		bbLengthZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		*/
 
 		// create a building and set the location.***
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
-
-		if(i == 0)
-		{
-			var hola = 0;
-		}
 		var buildingNameDivided = buildingName.split("_");
 		neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
 		neoBuilding.buildingType = buildingNameDivided[3];
