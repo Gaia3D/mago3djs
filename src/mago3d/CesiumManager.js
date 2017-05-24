@@ -1543,8 +1543,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.depthFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
 	}
 
-	//if(this.ssaoFboNeo == undefined)this.ssaoFboNeo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); // no used.***
-
 	// do frustum culling.***
 	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
@@ -1563,11 +1561,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 
 			//var frustumVolume = scene._frameState.cullingVolume; // original.***
 			//var frustumVolume = scene._camera.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up); // original.***
-
-			if(frustumIdx == 0)
-			{
-				//this.neoBuildingsList.setNeoBuildingsFrustumCulled(false);
-			}
 
 			this.currentVisibleNeoBuildings_array.length = 0;
 			this.doFrustumCullingNeoBuildings(frustumVolume, this.currentVisibleNeoBuildings_array, cameraPosition);
@@ -3533,12 +3526,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 
 					if(lowestOctree.neoReferencesMotherAndIndices == undefined) continue;
 
-					if(lowestOctree == this.octreeSelected)
-					{
-						var hola =0;
-					}
-
-
 					neoBuilding = lowestOctree.neoBuildingOwner;
 					
 					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -3662,12 +3649,10 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					gl.uniform1i(currentShader.bUse1Color_loc, false);
 				}
 				//----------------------------------------------------------------------------------
-				
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-
 
 				if(lowestOctree.lego == undefined) {
 					continue;
@@ -3734,28 +3719,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 						var hola = 0;
 					}
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
+					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
-					if(this.renderingModeTemp == 0)
-					{
-						var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-						gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-						gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-						gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-					}
-					else{
-						if(neoBuilding.geoLocationDataAux)
-						{
-							gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, neoBuilding.geoLocationDataAux.rotMatrix._floatArrays);
-							gl.uniform3fv(currentShader.buildingPosHIGH_loc, neoBuilding.geoLocationDataAux.positionHIGH);
-							gl.uniform3fv(currentShader.buildingPosLOW_loc, neoBuilding.geoLocationDataAux.positionLOW);
-						}
-						else{
-							var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-							gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-							gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-							gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-						}
-					}
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
