@@ -2596,18 +2596,21 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 
 		var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
 		camPosBuilding = Cesium.Matrix4.multiplyByPoint(buildingGeoLocation.tMatrixInv._floatArrays, camPos, camPosBuilding);
-		camDirBuilding = Cesium.Matrix4.multiplyByPoint(buildingGeoLocation.rotMatrixInv._floatArrays, rayWorldSpace, camDirBuilding);
-		//this.pointSC = buildingGeoLocation.geoLocMatrixInv.rotatePoint3D(rayWorldSpace, this.pointSC);
-		//camDirBuilding.x = this.pointSC.x;
-		//camDirBuilding.y = this.pointSC.y;
-		//camDirBuilding.z = this.pointSC.z;
+		camDirBuilding = Cesium.Matrix4.multiplyByPoint(buildingGeoLocation.rotMatrixInv._floatArrays, rayWorldSpace, camDirBuilding); // original.***
 
 		// now, intersect building_ray with the selObjMovePlane.***
 		var line = new Line();
-		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
+		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);// original.***
 
 		var intersectionPoint = new Point3D();
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
+		
+		//the movement of an object must multiply by buildingRotMatrix.***
+		var transformedIntersectPoint = new Cesium.Cartesian3();
+		transformedIntersectPoint = Cesium.Matrix4.multiplyByPoint(buildingGeoLocation.rotMatrix._floatArrays, intersectionPoint, transformedIntersectPoint); 
+		intersectionPoint.x = transformedIntersectPoint.x;
+		intersectionPoint.y = transformedIntersectPoint.y;
+		intersectionPoint.z = transformedIntersectPoint.z;
 
 		// register the movement.***
 		if(this.objectSelected.moveVector == undefined)
