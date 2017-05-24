@@ -234,12 +234,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;	
 			if(selectedBuilding != undefined)
 			{
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.heading == undefined) selectedBuilding.geoLocationDataAux.heading = 0; 
-					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					currentHeading+increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
+					if(geoLocationData.heading == undefined) geoLocationData.heading = 0; 
+					var currentHeading = geoLocationData.heading;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					currentHeading+increDeg, geoLocationData.pitch, geoLocationData.roll);
 				}
 			}
 
@@ -249,12 +250,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
 			{
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.heading == undefined) selectedBuilding.geoLocationDataAux.heading = 0; 
-					var currentHeading = selectedBuilding.geoLocationDataAux.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					currentHeading-increDeg, selectedBuilding.geoLocationDataAux.pitch, selectedBuilding.geoLocationDataAux.roll);
+					if(geoLocationData.heading == undefined) geoLocationData.heading = 0; 
+					var currentHeading = geoLocationData.heading;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					currentHeading-increDeg, geoLocationData.pitch, geoLocationData.roll);
 				}
 			}
 
@@ -264,12 +266,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
 			{
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.pitch == undefined) selectedBuilding.geoLocationDataAux.pitch = 0; 
-					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					selectedBuilding.geoLocationDataAux.heading, currentPitch+increDeg, selectedBuilding.geoLocationDataAux.roll);
+					if(geoLocationData.pitch == undefined) geoLocationData.pitch = 0; 
+					var currentPitch = geoLocationData.pitch;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					geoLocationData.heading, currentPitch+increDeg, geoLocationData.roll);
 				}
 			}
 
@@ -279,12 +282,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
 			{
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.pitch == undefined) selectedBuilding.geoLocationDataAux.pitch = 0; 
-					var currentPitch = selectedBuilding.geoLocationDataAux.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					selectedBuilding.geoLocationDataAux.heading, currentPitch-increDeg, selectedBuilding.geoLocationDataAux.roll);
+					if(geoLocationData.pitch == undefined) geoLocationData.pitch = 0; 
+					var currentPitch = geoLocationData.pitch;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					geoLocationData.heading, currentPitch-increDeg, geoLocationData.roll);
 				}
 			}
 
@@ -294,12 +298,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
 			{		
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.roll == undefined) selectedBuilding.geoLocationDataAux.roll = 0; 
-					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll+increDeg);
+					if(geoLocationData.roll == undefined) geoLocationData.roll = 0; 
+					var currentRoll = geoLocationData.roll;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					geoLocationData.heading, geoLocationData.pitch, currentRoll+increDeg);
 				}
 			}
 
@@ -309,12 +314,13 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var selectedBuilding = magoManager.buildingSelected;
 			if(selectedBuilding != undefined)
 			{
-				if(selectedBuilding.geoLocationDataAux != undefined)
+				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+				if(geoLocationData != undefined)
 				{
-					if(selectedBuilding.geoLocationDataAux.roll == undefined) selectedBuilding.geoLocationDataAux.roll = 0; 
-					var currentRoll = selectedBuilding.geoLocationDataAux.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, selectedBuilding.geoLocationDataAux.latitude, selectedBuilding.geoLocationDataAux.longitude, selectedBuilding.geoLocationDataAux.elevation,
-					selectedBuilding.geoLocationDataAux.heading, selectedBuilding.geoLocationDataAux.pitch, currentRoll-increDeg);
+					if(geoLocationData.roll == undefined) geoLocationData.roll = 0; 
+					var currentRoll = geoLocationData.roll;
+					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
+					geoLocationData.heading, geoLocationData.pitch, currentRoll-increDeg);
 				}
 			}
 
