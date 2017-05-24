@@ -523,8 +523,7 @@ ShaderSource.modelRefSsaoVsSource = "\n\
 	varying vec3 vertexPos;\n\
 	\n\
 	void main() {	\n\
-		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-		//vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -810,7 +809,7 @@ ShaderSource.renderShowDepthVsSource = "\n\
 	\n\
 	varying float depth;  \n\
 	void main() {	\n\
-		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
