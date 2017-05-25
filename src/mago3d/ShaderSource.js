@@ -864,7 +864,7 @@ ShaderSource.colorSelectionSsaoVsSource = "\n\
 	uniform vec3 aditionalPosition;\n\
 	\n\
 	void main() {	\n\
-		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 1.0);\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -934,7 +934,9 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
 	attribute vec4 color4;\n\
+	attribute vec2 texCoord;\n\
 	\n\
+	uniform sampler2D diffuseTex;\n\
 	uniform mat4 projectionMatrix;  \n\
 	uniform mat4 modelViewMatrix;// No used. *** \n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
@@ -948,9 +950,10 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 	uniform vec3 aditionalPosition;\n\
 	uniform vec4 oneColor4;\n\
 	uniform bool bUse1Color;\n\
+	uniform bool hasTexture;\n\
 	\n\
 	varying vec3 vNormal;\n\
-	varying vec2 vTexCoord;  \n\
+	varying vec2 vTexCoord;   \n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
 	varying vec4 vcolor4;\n\
@@ -980,6 +983,7 @@ ShaderSource.LodBuildingSsaoVsSource = "\n\
 		{\n\
 			vcolor4 = color4;\n\
 		}\n\
+		vTexCoord = texCoord;\n\
 	}";
 
 
@@ -1074,7 +1078,14 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		vec3 diffuse = vec3(NdotL);\n\
 		vec3 ambient = vec3(1.0);\n\
 		vec4 textureColor;\n\
-		textureColor = vcolor4;\n\
+		if(hasTexture)\n\
+		{\n\
+			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+		}\n\
+		else{\n\
+			textureColor = vcolor4;\n\
+		}\n\
+		//textureColor = vcolor4;\n\
 		////gl_FragColor.rgb = vec3((diffuse*0.2 + ambient*0.8) * occlusion); // original.***\n\
 		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
 		//gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting); \n\

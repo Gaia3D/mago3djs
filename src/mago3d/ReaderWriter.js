@@ -1533,13 +1533,42 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, mag
  */
 ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) {
 	var neoRefImage = new Image();
+	//magoManager.backGround_fileReadings_count ++;
 	neoRefImage.onload = function() {
-		if(texture.texId == undefined) texture.texId = gl.createTexture();
+		if(texture.texId == undefined) 
+			texture.texId = gl.createTexture();
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
-		//BR_Project._f4d_lod0Image_readed_finished = true;
 
 		neoBuilding.texturesLoaded.push(texture);
+
+		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
+	};
+
+	neoRefImage.onerror = function() {
+		// doesn't exist or error loading
+		return;
+	};
+
+	neoRefImage.src = filePath_inServer;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param texture 변수
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inServer, texture, magoManager) {
+	var neoRefImage = new Image();
+	//magoManager.backGround_fileReadings_count ++;
+	neoRefImage.onload = function() {
+		if(texture.texId == undefined) 
+			texture.texId = gl.createTexture();
+
+		handleTextureLoaded(gl, neoRefImage, texture.texId);
 
 		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};

@@ -531,7 +531,7 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	// uniform samplers.***
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); // no used.***
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 
 
 	// ModelReference.****
 	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
@@ -700,13 +700,10 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
-
-	//shader.program.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader.samplerUniform = gl.getUniformLocation(shader.program, "uSampler");
-	//shader._lightDirection = gl.getUniformLocation(shader.program, "uLightingDirection");
+	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
 	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
@@ -729,7 +726,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
 	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
 
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	//shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 
 	// uniform samplers.***
