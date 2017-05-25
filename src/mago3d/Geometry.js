@@ -15,6 +15,7 @@ var Texture = function() {
 	this.textureTypeName = "";
 	this.textureImageFileName = "";
 	this.texId;
+	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
 /**
@@ -174,7 +175,7 @@ var NeoBuilding = function() {
 	this.aditionalColor; // use for colorChanged.***
 
 	// Textures loaded.***************************************************
-	this.texturesLoaded = []; 
+	this.texturesLoaded = []; // material textures.***
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -190,7 +191,7 @@ var NeoBuilding = function() {
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
-	this.neoSimpleBuilding; // this is a simpleBuilding for Buildings with texture.***
+	this.neoSimpleBuilding; // no used. this is a simpleBuilding for Buildings with texture.***
 
 	// The lodBuildings.***
 	this.lod2Building;
