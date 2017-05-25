@@ -3290,28 +3290,22 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			// 1) LOD 0.*********************************************************************************************************************
 			// 1) LOD 0.*********************************************************************************************************************
 			// 1) LOD 0.*********************************************************************************************************************
+			var refTMatrixIdxKey = 0;
+			var minSize = 0.0;
 			if(this.isLastFrustum)
 			{
-				var refTMatrixIdxKey = -1;
-				var minSize = 0.0;
 				var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 				for(var i=0; i<lowestOctreesCount; i++) {
 					lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
-
 					if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
 						continue;
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-
 					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-					refTMatrixIdxKey = 0;
-
-					if(i == 0)
-						minSize = 0.0;
-					else minSize = 0.0;
+					
 					//minSize = lowestOctree.squareDistToEye/10000;
 					this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 				}
@@ -3319,15 +3313,15 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				// 2) LOD 1.*********************************************************************************************************************
 				// 2) LOD 1.*********************************************************************************************************************
 				// 2) LOD 1.*********************************************************************************************************************
+				refTMatrixIdxKey = 0;
+				minSize = 0.9;
 				lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
 				for(var i=0; i<lowestOctreesCount; i++) {
 					lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
-
 					if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
 						continue;
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-
 					if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "outfitting")
 						continue;
 
@@ -3335,11 +3329,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-					refTMatrixIdxKey = 0;
-
-					if(i == 0)
-						minSize = 0.9;
-					else minSize = 0.9;
+					
 					//minSize = lowestOctree.squareDistToEye/10000 + 1.0;
 					this.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, 1, refTMatrixIdxKey);
 				}
@@ -3409,7 +3399,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				}
 				
 				// finally check if there are legoSimpleBuildingTexture.***
-				// provisionally check simpleBuilding3x3Textures only for basicBuildings.***
 				if(lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].tcoordVboDataArray)
 				{
 					if(neoBuilding.simpleBuilding3x3Texture == undefined)
@@ -3433,7 +3422,6 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			if(currentShader.position3_loc != -1)gl.disableVertexAttribArray(currentShader.position3_loc);
 		}
 		if(ssao_idx == 1) {
-			// LOD 0. Render detailed.***
 			// 2) ssao render.************************************************************************************************************
 			// 2) ssao render.************************************************************************************************************
 			// 2) ssao render.************************************************************************************************************
@@ -3493,28 +3481,25 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			// 1) LOD 0.*********************************************************************************************************************
 			// 1) LOD 0.*********************************************************************************************************************
 			// 1) LOD 0.*********************************************************************************************************************
+			refTMatrixIdxKey = 0;
+			minSize = 0.0;
 			if(this.isLastFrustum)
 			{
 				var refTMatrixIdxKey = -1;
 				var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 				for(var i=0; i<lowestOctreesCount; i++) {
 					lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
-
-					if(lowestOctree.neoReferencesMotherAndIndices == undefined) continue;
+					if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
+						continue;
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-					
 					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-					refTMatrixIdxKey = 0;
-
-					if(i == 0)
-						minSize = 0.0;
-					else minSize = 0.0;
+					
 					//minSize = lowestOctree.squareDistToEye/10000;
-					if(neoBuilding.buildingType == "basicBuilding")
+					if(neoBuilding.texturesLoaded.length>0)
 					{
 						renderTexture = true;
 					}
@@ -3525,14 +3510,15 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 				// 2) LOD 1.*********************************************************************************************************************
 				// 2) LOD 1.*********************************************************************************************************************
 				// 2) LOD 1.*********************************************************************************************************************
+				minSize = 0.9;
+				refTMatrixIdxKey = 0;
 				lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
 				for(var i=0; i<lowestOctreesCount; i++) {
 					lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
-
-					if(lowestOctree.neoReferencesMotherAndIndices == undefined) continue;
+					if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
+						continue;
 
 					neoBuilding = lowestOctree.neoBuildingOwner;
-
 					if(this.renderingModeTemp == 0 && neoBuilding.buildingType == "outfitting")
 						continue;
 					
@@ -3540,13 +3526,9 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-					refTMatrixIdxKey = 0;
 
-					if(i == 0)
-						minSize = 0.9;
-					else minSize = 0.9;
 					//minSize = lowestOctree.squareDistToEye/10000 + 1.0;
-					if(neoBuilding.buildingType == "basicBuilding")
+					if(neoBuilding.texturesLoaded.length>0)
 					{
 						renderTexture = true;
 					}
@@ -3598,7 +3580,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
 
-
+			var lastExtureId;
 			lowestOctreesCount = visibleObjControlerOctrees.currentVisibles2.length;
 			for(var i=0; i<lowestOctreesCount; i++) {
 				lowestOctree = visibleObjControlerOctrees.currentVisibles2[i];
@@ -3634,7 +3616,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 					//gl.activeTexture(gl.TEXTURE2); 
 					gl.uniform1i(currentShader.hasTexture_loc, true);
-					gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
+					if(lastExtureId != neoBuilding.simpleBuilding3x3Texture.texId)
+					{
+						gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
+						lastExtureId = neoBuilding.simpleBuilding3x3Texture.texId;
+					}
 				}
 				else{
 					gl.uniform1i(currentShader.hasTexture_loc, false);
@@ -3734,6 +3720,11 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 					}
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
+					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+					/*
 					if(this.renderingModeTemp == 0)
 					{
 						var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -3755,6 +3746,7 @@ CesiumManager.prototype.renderLowestOctreeLegoAsimetricVersion = function(gl, ca
 							gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 						}
 					}
+					*/
 					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
@@ -5627,6 +5619,11 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 	var buildingGeoLocation;
 	for(var i=0; i<neoBuildingsCount; i++) {
 		neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+		if(i == 526)
+		{
+			var hola = 0;
+		}
+		
 		if(neoBuilding.buildingType == "outfitting")
 		{
 			structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("structure", neoBuilding.buildingId);
@@ -5646,6 +5643,11 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 		var latitude;
 		var altitude;
 		var heading, pitch, roll;
+		
+		if(neoBuilding.buildingId == "gangnam_del")
+		{
+			var hola = 0;
+		}
 			
 		if(newLocation) {
 
@@ -5668,12 +5670,14 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 		{
 			// use the normal data. never enter here.***
 			var hola = 0;
-			
+			var increLon = 0.001;
+			var increLat = 0.001;
+			/*
 			if(neoBuilding.buildingType == "basicBuilding")
 			{
 				longitude = 128.594998;
 				latitude = 34.904209;
-				altitude = 50.0;
+				altitude = 40.0;
 		
 				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
@@ -5681,8 +5685,22 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 				this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
 				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			}
-			else continue;
 			
+			if(neoBuilding.buildingId == "gangbuk_cultur")
+			{
+				longitude = 128.596;
+				latitude = 34.904;
+				altitude = 40.0;
+		
+				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
+				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
+				
+				this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
+				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
+			}
+			
+			else continue;
+			*/
 		}
 	}
 };

@@ -461,12 +461,17 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined){
+				
+			if(neoBuilding.buildingId == "gangbuk_cultur")
+			{
+				var hola = 0;
+			}
 				if(neoReference.texture.texId == undefined) {
 					if(magoManager.backGround_fileReadings_count > 10) continue;
 
 					// 1rst, check if the texture is loaded.***
 					var texId = neoBuilding.getTextureId(neoReference.texture);
-					if(texId == undefined) {
+					if(texId == undefined && neoReference.texture.fileLoadState == CODE.fileLoadState.READY) {
 						// Load the texture.***
 						var filePath_inServer = geometryDataPath + "/" +neoBuilding.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 						magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
@@ -519,6 +524,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				{
 					//if(neoReference.texture != undefined && renderTexture)
 					if(renderTexture) {
+						if(neoBuilding.buildingId == "gangbuk_cultur")
+						{
+							var hola = 0;
+						}
 						if(neoReference.hasTexture) {
 							if(neoReference.texture != undefined) {
 								if(neoReference.texture.texId != undefined) {
