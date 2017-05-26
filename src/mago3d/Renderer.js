@@ -461,14 +461,19 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 			// Check if the texture is loaded.********************************************************************************
 			if(neoReference.texture != undefined){
+				
+			if(neoBuilding.buildingId == "gangbuk_cultur")
+			{
+				var hola = 0;
+			}
 				if(neoReference.texture.texId == undefined) {
 					if(magoManager.backGround_fileReadings_count > 10) continue;
 
 					// 1rst, check if the texture is loaded.***
 					var texId = neoBuilding.getTextureId(neoReference.texture);
-					if(texId == undefined) {
+					if(texId == undefined && neoReference.texture.fileLoadState == CODE.fileLoadState.READY) {
 						// Load the texture.***
-						var filePath_inServer = geometryDataPath + "/" +neoBuilding.buildingFileName+"/Images_Resized/"+neoReference.texture.textureImageFileName;
+						var filePath_inServer = geometryDataPath + "/" +neoBuilding.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 						magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
 						magoManager.backGround_fileReadings_count ++;
 						continue;
@@ -519,6 +524,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				{
 					//if(neoReference.texture != undefined && renderTexture)
 					if(renderTexture) {
+						if(neoBuilding.buildingId == "gangbuk_cultur")
+						{
+							var hola = 0;
+						}
 						if(neoReference.hasTexture) {
 							if(neoReference.texture != undefined) {
 								if(neoReference.texture.texId != undefined) {
@@ -582,7 +591,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					}
 				}
 			}
-			
 
 			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
 			if(block != null) {
@@ -1506,7 +1514,7 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, shader, ssao_idx, isHighLighted) {
+Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, shader, ssao_idx, renderTexture) {
 	if(lodBuilding.vbo_vicks_container.vboCacheKeysArray.length == 0) {
 		return;
 	}
@@ -1554,11 +1562,6 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			return;
 		}
 
-		if(isHighLighted && isHighLighted == true)
-		{
-			var hola = 0;
-		}
-
 		// 1) Position.*********************************************
 		if(vbo_vicky.meshVertexCacheKey == null) {
 			if(vbo_vicky.posVboDataArray != undefined) //dataArrayByteLength > 0
@@ -1597,6 +1600,23 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			}
 			return;
 		}
+		
+		// 4) Texcoord.*********************************************
+		if(renderTexture)
+		{
+			if(vbo_vicky.meshTexcoordsCacheKey == null && vbo_vicky.tcoordVboDataArray != undefined) {
+				//if(vbo_vicky.tcoordVboDataArray != undefined) //dataArrayByteLength > 0
+				{
+					vbo_vicky.meshTexcoordsCacheKey = gl.createBuffer ();
+					gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
+					gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.tcoordVboDataArray, gl.STATIC_DRAW);
+
+					vbo_vicky.tcoordVboDataArray = undefined;
+				}
+				return;
+			}
+		}
+		
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
@@ -1606,6 +1626,12 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
 		gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+		
+		if(renderTexture && vbo_vicky.meshTexcoordsCacheKey)
+		{
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
+			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 	}
