@@ -1536,12 +1536,12 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
 	//magoManager.backGround_fileReadings_count ++;
 	neoRefImage.onload = function() {
-		if(texture.texId == undefined) 
-			texture.texId = gl.createTexture();
+		//if(texture.texId == undefined) 
+		//	texture.texId = gl.createTexture();
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
 		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-		neoBuilding.texturesLoaded.push(texture);
+		//neoBuilding.texturesLoaded.push(texture);
 
 		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
 	};
