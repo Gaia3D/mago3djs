@@ -176,6 +176,7 @@ var NeoBuilding = function() {
 
 	// Textures loaded.***************************************************
 	this.texturesLoaded = []; // material textures.***
+	this.texturesLoadedCache = {};
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -234,6 +235,27 @@ NeoBuilding.prototype.getTextureId = function(texture) {
 	}
 
 	return texId;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.getSameTexture = function(texture) {
+	var sameTexture;
+	var texturesLoadedCount = this.texturesLoaded.length;
+	var find = false;
+	var i=0;
+	while(!find && i < texturesLoadedCount ) {
+		if(this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) {
+			find = true;
+			sameTexture = this.texturesLoaded[i];
+		}
+		i++;
+	}
+
+	return sameTexture;
 };
 
 /**
