@@ -668,6 +668,10 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		if(hasTexture)\n\
 		{\n\
 			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			if(textureColor.w == 0.0)\n\
+			{\n\
+				discard;\n\
+			}\n\
 		}\n\
 		else{\n\
 			textureColor = vColor4Aux;\n\
