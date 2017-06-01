@@ -2896,6 +2896,14 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				var isExterior = !isCameraInsideOfBuilding;
 				lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 			}
+			
+			// if the octree has no blocks list ready, then render the lego.*****************************************
+			var myBlocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			if(myBlocksList == undefined || myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED)
+			{
+				visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
+			}
+			//--------------------------------------------------------------------------------------------------------
 
 			if(lowestOctree.neoReferencesMotherAndIndices.fileLoadState == 0) {
 				lowestOctree.neoBuildingOwner = neoBuilding; // New.***
@@ -2925,6 +2933,14 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				var isExterior = !isCameraInsideOfBuilding;
 				lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 			}
+			
+			// if the octree has no blocks list ready, then render the lego.*****************************************
+			var myBlocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			if(myBlocksList == undefined || myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED)
+			{
+				visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
+			}
+			//--------------------------------------------------------------------------------------------------------
 
 			if(lowestOctree.neoReferencesMotherAndIndices.fileLoadState == 0) {
 				lowestOctree.neoBuildingOwner = neoBuilding; // New.***
@@ -5022,9 +5038,18 @@ CesiumManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 	var i=0;
 	var resultNeoBuilding;
 	while(!find && i<buildingCount) {
-		if(this.neoBuildingsList.neoBuildingsArray[i].buildingId == buildingId && this.neoBuildingsList.neoBuildingsArray[i].buildingType == buildingType) {
-			find = true;
-			resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+		if(buildingType)
+		{
+			if(this.neoBuildingsList.neoBuildingsArray[i].buildingId == buildingId && this.neoBuildingsList.neoBuildingsArray[i].buildingType == buildingType) {
+				find = true;
+				resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+			}
+		}
+		else{
+			if(this.neoBuildingsList.neoBuildingsArray[i].buildingId == buildingId) {
+				find = true;
+				resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+			}
 		}
 		i++;
 	}
@@ -5517,7 +5542,8 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
  * 변환 행렬
  */
 CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) {
-	var neoBuilding = this.getNeoBuildingById("structure", projectIdAndBlockId);
+	//var neoBuilding = this.getNeoBuildingById("structure", projectIdAndBlockId); // original for heavyIndustries.***
+	var neoBuilding = this.getNeoBuildingById(undefined, projectIdAndBlockId);
 
 	if(neoBuilding == undefined)
 		return;
@@ -5590,6 +5616,11 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 
 		if(structureTypedBuilding.bbox == undefined)
 			continue;
+		
+		if(neoBuilding.buildingId == "KICT_main")
+		{
+			var hola = 0;
+		}
 	
 		newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 		// must calculate the realBuildingPosition (bbox_center_position).***
@@ -5602,6 +5633,8 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 		{
 			var hola = 0;
 		}
+		
+		//KICT_main_Arc_v3_with_spaces
 			
 		if(newLocation) {
 
@@ -5617,8 +5650,8 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 			
 			this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
 			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
-			//this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
-			//currentCalculatingPositionsCount ++;
+			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
+			////currentCalculatingPositionsCount ++;
 		}
 		else
 		{
