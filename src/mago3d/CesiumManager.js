@@ -5450,6 +5450,26 @@ CesiumManager.prototype.objectColorChanged = function(projectAndBlockId, objectI
 			i++;
 		}
 		
+		if(neoReference == undefined)
+		{
+			neoBuilding = this.getNeoBuildingById("outfitting", projectAndBlockId);
+			neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
+			found = false;
+			i = 0;
+			while(!found && i<neoReferencesCount)
+			{
+				if(neoBuilding.motherNeoReferencesArray[i])
+				{
+					if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
+					{
+						neoReference = neoBuilding.motherNeoReferencesArray[i];
+						found = true;
+					}
+				}
+				i++;
+			}
+		}
+		
 		if(neoReference)
 		{
 			if(neoReference.aditionalColor == undefined)
