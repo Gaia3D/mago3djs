@@ -168,8 +168,13 @@ var NeoBuilding = function() {
 	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
 	this.currentRenderablesNeoRefLists = []; // test. no used. waiting for background process.***
 	this.preExtractedLowestOctreesArray = []; // test. no used. waiting for background process.***
+	
+	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; // asimetric mode.***
 	this.motherBlocksArray = []; // asimetric mode.***
+	
+	// Current visible objects.*******************************************
+	this.currentVisibleOctreesControler; //  = new VisibleObjectsControler();
 	
 	// Aditional Color.***************************************************
 	this.aditionalColor; // use for colorChanged.***
