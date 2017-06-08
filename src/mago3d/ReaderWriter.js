@@ -1218,6 +1218,7 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		//longitude = 128.594998;
 		//latitude = 34.904209;
 		//altitude = 50.0;
+		// sangamdong 37.577984, 126.894383
 
 		heading = 0.0;
 		pitch = 0.0;

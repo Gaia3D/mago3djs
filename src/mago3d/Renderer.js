@@ -363,7 +363,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	//var secondsUsed;
 
 	var timeControlCounter = 0;
-
+	
 	gl.enable(gl.DEPTH_TEST);
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
@@ -694,35 +694,39 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					//gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false,0,0);
 					gl.vertexAttribPointer(standardShader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
 
-					// Normals.***
-					if(standardShader.normal3_loc != -1) {
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true,0,0);
-					}
+					
+					if(ssao_idx == 1)
+					{
+						// Normals.***
+						if(standardShader.normal3_loc != -1) {
+							gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
+							gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true,0,0);
+						}
 
-					if(renderTexture && neoReference.hasTexture) {
-						if(block.vertexCount <= neoReference.vertexCount) {
-							var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-							
-							if(refVboData.meshTexcoordsCacheKey == undefined) {
-								if(refVboData.tcoordVboDataArray == undefined) continue;
+						if(renderTexture && neoReference.hasTexture) {
+							if(block.vertexCount <= neoReference.vertexCount) {
+								var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+								
+								if(refVboData.meshTexcoordsCacheKey == undefined) {
+									if(refVboData.tcoordVboDataArray == undefined) continue;
 
-								refVboData.meshTexcoordsCacheKey = gl.createBuffer ();
+									refVboData.meshTexcoordsCacheKey = gl.createBuffer ();
+									gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
+									gl.bufferData(gl.ARRAY_BUFFER, refVboData.tcoordVboDataArray, gl.STATIC_DRAW);
+									//this.vbo_vi_cacheKey_aux.tcoordVboDataArray = [];
+									refVboData.tcoordVboDataArray = null;
+
+									continue;
+								}
+								gl.enableVertexAttribArray(standardShader.texCoord2_loc);
 								gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
-								gl.bufferData(gl.ARRAY_BUFFER, refVboData.tcoordVboDataArray, gl.STATIC_DRAW);
-								//this.vbo_vi_cacheKey_aux.tcoordVboDataArray = [];
-								refVboData.tcoordVboDataArray = null;
-
-								continue;
+								gl.vertexAttribPointer(standardShader.texCoord2_loc, 2, gl.FLOAT, false,0,0);
+							} else {
+								if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
 							}
-							gl.enableVertexAttribArray(standardShader.texCoord2_loc);
-							gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
-							gl.vertexAttribPointer(standardShader.texCoord2_loc, 2, gl.FLOAT, false,0,0);
 						} else {
 							if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
 						}
-					} else {
-						if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
 					}
 
 					// Indices.***
@@ -731,6 +735,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					{
 						indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
 						if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						if(indicesCount == 0)
 							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 
 					}

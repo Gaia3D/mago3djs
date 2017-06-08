@@ -333,7 +333,7 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		bytesReaded += 4;
 
 		var maxLength = bbox.getMaxLength();
-		if(maxLength < 0.9) block.isSmallObj = true;
+		if(maxLength < 0.5) block.isSmallObj = true;
 		else block.isSmallObj = false;
 
 		block.radius = maxLength/2.0;
