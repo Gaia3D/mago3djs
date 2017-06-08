@@ -202,6 +202,10 @@
 				<input type="text" id="moveObjectId" name="moveObjectId" size="10" style="height: 20px;"/> 
 				<hr style="height:1">
 			</div>
+			
+			<div style="padding-left: 10px;">
+				<div><a href="#" onclick="restoreColor(); return false;">color 복원</a></div>
+			</div>
 		</div>
 		</form>
 		<div style="padding-top: 10px; padding-left: 20px; width: 97%;">
@@ -392,6 +396,17 @@
 		if(!changeColorCheck(e)) return false;
 		changeColorAPI($("#projectId").val(), $("#blockIds").val(), $("#objectIds").val(), $("#colorBlock").val());
 	});
+	
+	// color 복원
+	function restoreColor() {
+		var restoreArray = restoreColorAPI($("#projectId").val());
+		if(restoreArray != null) {
+			for(var i=0; i<restoreArray.length; i++) {
+				var neoRefence = restoreArray[i];
+				console.log(" objectId = " + neoRefence.objectId);				
+			}
+		}
+	}
 	
 	// 변환행렬
 	$("#changeLocationAndRotationAPI").click(function(e) {

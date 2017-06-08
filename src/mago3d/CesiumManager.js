@@ -5473,6 +5473,26 @@ CesiumManager.prototype.objectColorChanged = function(projectAndBlockId, objectI
 			i++;
 		}
 		
+		if(neoReference == undefined)
+		{
+			neoBuilding = this.getNeoBuildingById("outfitting", projectAndBlockId);
+			neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
+			found = false;
+			i = 0;
+			while(!found && i<neoReferencesCount)
+			{
+				if(neoBuilding.motherNeoReferencesArray[i])
+				{
+					if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
+					{
+						neoReference = neoBuilding.motherNeoReferencesArray[i];
+						found = true;
+					}
+				}
+				i++;
+			}
+		}
+		
 		if(neoReference)
 		{
 			if(neoReference.aditionalColor == undefined)
@@ -5559,6 +5579,39 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 									geoLocationData.pitch,
 									geoLocationData.roll);
 	}
+};
+
+CesiumManager.prototype.restoreColor = function()
+{
+	var objectsArray = [];
+	var buildingCount = this.neoBuildingsList.neoBuildingsArray.length;
+	for(var i=0; i<buildingCount; i++)
+	{
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+		
+		if(neoBuilding == undefined)
+			continue;
+		if(neoBuilding.isColorChanged)
+		{
+			neoBuilding.isColorChanged = false;
+			neoBuilding.aditionalColor = undefined;
+		}
+		
+		var referencesCount = neoBuilding.motherNeoReferencesArray.length;
+		for(var j=0; j<referencesCount; j++)
+		{
+			var neoReference = neoBuilding.motherNeoReferencesArray[j];
+			if(neoReference == undefined)
+				continue;
+			if(neoReference.aditionalColor)
+			{
+				neoReference.aditionalColor = undefined;
+				objectsArray.push(neoReference);
+			}
+		}
+	}
+	
+	return objectsArray;
 };
 
 /**
@@ -5803,6 +5856,9 @@ CesiumManager.prototype.callAPI = function(api) {
 			}
 			
 		}
+	} else if(apiName == "restoreColor") {
+		var projectId = api.getProjectId();
+		return this.restoreColor(projectId);
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {
