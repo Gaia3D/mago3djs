@@ -416,7 +416,9 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 			var result = magoManager.callAPI(api);
 			if(api.getAPIName() === "getLocationAndRotation") {
 				return result;
-			}
+			} else if(api.getAPIName() === "restoreColor") {
+				return result;
+			} 
 		},
 		// 초기화 api
 		init : function() {

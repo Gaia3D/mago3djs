@@ -6114,6 +6114,39 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 	}
 };
 
+CesiumManager.prototype.restoreColor = function()
+{
+	var objectsArray = [];
+	var buildingCount = this.neoBuildingsList.neoBuildingsArray.length;
+	for(var i=0; i<buildingCount; i++)
+	{
+		var neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
+		
+		if(neoBuilding == undefined)
+			continue;
+		if(neoBuilding.isColorChanged)
+		{
+			neoBuilding.isColorChanged = false;
+			neoBuilding.aditionalColor = undefined;
+		}
+		
+		var referencesCount = neoBuilding.motherNeoReferencesArray.length;
+		for(var j=0; j<referencesCount; j++)
+		{
+			var neoReference = neoBuilding.motherNeoReferencesArray[j];
+			if(neoReference == undefined)
+				continue;
+			if(neoReference.aditionalColor)
+			{
+				neoReference.aditionalColor = undefined;
+				objectsArray.push(neoReference);
+			}
+		}
+	}
+	
+	return objectsArray;
+};
+
 /**
  * 변환 행렬
  */
@@ -6421,6 +6454,9 @@ CesiumManager.prototype.callAPI = function(api) {
 			}
 			
 		}
+	} else if(apiName == "restoreColor") {
+		var projectId = api.getProjectId();
+		return this.restoreColor(projectId);
 	} else if(apiName === "show") {
 		this.magoPolicy.setHideBuildings.length = 0;
 	} else if(apiName === "hide") {

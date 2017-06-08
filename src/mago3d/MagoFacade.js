@@ -200,6 +200,22 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 }
 
 /**
+ * color 를 변경전 color 로 복원
+ * 
+ * @param projectId 프로젝트 아이디
+ * @return 
+ */
+function restoreColorAPI(projectId) {
+	var api = new API("restoreColor");
+	api.setProjectId(projectId);
+	
+	if(managerFactory != null) {
+		var result = managerFactory.callAPI(api);
+		return result;
+	}
+}
+
+/**
  * location and rotation 변경
  * 
  * @param projectId 프로젝트 아이디
