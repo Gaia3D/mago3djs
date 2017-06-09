@@ -1592,6 +1592,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0);
 			this.prepareVisibleOctreesAsimetricVersion(gl, scene, neoBuilding);
+			this.prepareVisibleOctreesAsimetricVersionLOD2(gl, scene, neoBuilding);
 		}
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 		for(var i=0; i<buildingsCount; i++) {
@@ -3110,7 +3111,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			//squaredDistLod0 = 45000;
 			//squaredDistLod1 = 85000;
 			//squaredDistLod2 = 500000*1000;
-
+			/*
 			if(neoBuilding.buildingType == "outfitting")
 			{
 				this.myCameraSC.frustum.fov = 0.7;
@@ -3119,6 +3120,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			{
 				this.myCameraSC.frustum.fov = 0.9;
 			}
+			*/
 			//this.myCameraSC.frustum.fovy = 0.3;
 			//camera.frustum.far = 2.0;
 			this.myCameraSC.near = near;
