@@ -28,11 +28,8 @@ var Octree = function(octreeOwner) {
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
-	this.neoBuildingOwner;
 
 	this.subOctrees_array = [];
-    //this.compRefsListArray = []; // empty if this is not smallest octreeBox. NO USED. Delete this.***
-	this.neoRefsList_Array = []; // empty if this is not smallest octreeBox. normal mode.***
 	this.neoReferencesMotherAndIndices; // Asimetric mode.***
 
 	// now, for legoStructure.***
@@ -457,28 +454,32 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cesium_cullingVo
 		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) {
 			// 15x15 = 225
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
-				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod1) {
 			// 25x25 = 625
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
-				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod2) {
 			// 50x50 = 2500
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
-				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		} else {
 			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
-				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
