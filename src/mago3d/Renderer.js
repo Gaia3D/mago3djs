@@ -20,325 +20,162 @@ var Renderer = function() {
 	this.simpObj_scratch;
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
- * @param neoRefList_array 변수
- * @param neoBuilding 변수
- * @param magoManager 변수
- * @param isInterior 변수
- * @param standardShader 변수
- * @param renderTexture 변수
- * @param ssao_idx 변수
  */
-Renderer.prototype.renderNeoRefLists = function(gl, neoRefList_array, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx) {
-	// render_neoRef
-	var neoRefLists_count = neoRefList_array.length;
-	if(neoRefLists_count == 0) return;
-
-	//this.dateSC = new Date();
-	//this.startTimeSC = this.dateSC.getTime();
-	//this.currentTimeSC;
-	//var secondsUsed;
-
-	var timeControlCounter = 0;
-
-	gl.enable(gl.DEPTH_TEST);
-	//gl.disable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-//	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
-//		gl.enable(gl.CULL_FACE);
-//	} else {
-//		gl.disable(gl.CULL_FACE);
-//	}
-
-	gl.enable(gl.CULL_FACE);
-
-	//if(ssao_idx == 0)
-	//	gl.disable(gl.CULL_FACE);
-
-	// ssao_idx = -1 -> pickingMode.***
-	// ssao_idx = 0 -> depth.***
-	// ssao_idx = 1 -> ssao.***
-
-	var cacheKeys_count;
-	var reference;
-	var block_idx;
-	var block;
-	var ifc_entity;
-	var vbo_ByteColorsCacheKeys_Container;
-	var current_tex_id;
-
-	gl.activeTexture(gl.TEXTURE2); // necessary.***
-	if(renderTexture) {
-		if(ssao_idx == 1)
-			gl.uniform1i(standardShader.hasTexture_loc, true); //.***
-	} else{
-		gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
-	}
-
-	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-
-	for(var j=0; j<neoRefLists_count; j++) {
-		var neoRefList = neoRefList_array[j];
-		var myBlocksList = neoRefList_array[j].blocksList;
-
-		//var visibleIndices_count = neoRefList._currentVisibleIndices.length;
-
-		if(myBlocksList == undefined) continue;
-
-		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
-			myBlocksList.parseArrayBuffer(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter);
-			myBlocksList.dataArraybuffer = undefined;
+Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjControlerBuildings, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) {
+	var neoBuilding;
+	var minSize = 0.0;
+	var lowestOctreesCount;
+	var lowestOctree;
+	var isInterior = false; // no used.***
+	
+	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
+	for(var i=0; i<neoBuildingsCount; i++)
+	{
+		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
+		
+		if(neoBuilding.currentVisibleOctreesControler == undefined)
 			continue;
-		}
-
-		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
-
-		//if(!isInterior && neoRefList.name == "Ref_Bone")
-		//	continue;
-
-		// New version. Use occlussion indices.***
-		var visibleIndices_count = neoRefList._currentVisibleIndices.length;
-
-		visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
-		if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
+		
+		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+			
+		if(ssao_idx == 0)
 		{
-			/*
-			if(neoRefList._lodLevel == 1 || neoRefList._lodLevel == 2)
-			{
-				continue;
-			}
-
-			this.dateSC = new Date();
-			this.currentTimeSC = this.dateSC.getTime();
-			secondsUsed = this.currentTimeSC - this.startTimeSC;
-			if(secondsUsed > 60)
-			{
-				//gl.disableVertexAttribArray(standardShader.normal3_loc);
-				//gl.disableVertexAttribArray(standardShader.position3_loc);
-				//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-				return;
-			}
-			*/
+			renderTexture = false;
 		}
-
-		for(var k=0; k<visibleIndices_count; k++) {
-			//if(magoManager.isCameraMoving && isInterior && timeControlCounter == 0)
-//			if(magoManager.isCameraMoving && timeControlCounter == 0) {
-//				//if(j==4)return;
-//
-//				//this.dateSC = new Date();
-//				//this.currentTimeSC = this.dateSC.getTime();
-//				//secondsUsed = this.currentTimeSC - this.startTimeSC;
-//				//if(secondsUsed > 600) // miliseconds.***
-//				{
-//					//gl.disableVertexAttribArray(standardShader.normal3_loc);
-//					//gl.disableVertexAttribArray(standardShader.position3_loc);
-//					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-//					//return;
-//				}
-//			}
-			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
-			var neoReference = neoRefList.neoRefs_Array[k]; // TEST.***
-			if(!neoReference || neoReference== undefined) {
-				continue;
-			}
-
-			block_idx = neoReference._block_idx;
-
-			if(block_idx >= myBlocksList.blocksArray.length) {
-				continue;
-			}
-			block = myBlocksList.getBlock(block_idx);
-
-			if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
+		else if(ssao_idx == 1)
+		{
+			if(neoBuilding.texturesLoaded.length>0)
 			{
-				if(block != null) {
-					if(block.isSmallObj && magoManager.objectSelected != neoReference) continue;
-				}
+				renderTexture = true;
 			}
+			else renderTexture = false;
+		}
+		
+		// LOD0.***
+		minSize = 0.0;
+		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles0.length;
+		for(var j=0; j<lowestOctreesCount; j++) {
+			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles0[j];
+			if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
+				continue;
 
-			// Check if the texture is loaded.********************************************************************************
-			if(neoReference.texture != undefined && neoReference.texture.texId == undefined) {
-				if(magoManager.backGround_fileReadings_count > 10) continue;
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+		}
+		
+		// LOD1.***
+		minSize = 0.9;
+		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles1.length;
+		for(var j=0; j<lowestOctreesCount; j++) {
+			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles1[j];
+			if(lowestOctree.neoReferencesMotherAndIndices == undefined) 
+				continue;
 
-				// 1rst, check if the texture is loaded.***
-				var texId = neoBuilding.getTextureId(neoReference.texture);
-				if(texId == undefined) {
-					// Load the texture.***
-					var filePath_inServer = geometryDataPath + "/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.textureImageFileName;
-					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
-					magoManager.backGround_fileReadings_count ++;
-					continue;
-				} else {
-					neoReference.texture.texId = texId;
-				}
-			}
-
-			if(magoManager.objectSelected == neoReference) {
-				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-			} else {
-				//if(neoReference.texture != undefined && renderTexture)
-				if(renderTexture) {
-					if(neoReference.hasTexture) {
-						if(neoReference.texture != undefined) {
-							if(neoReference.texture.texId != undefined) {
-								gl.uniform1i(standardShader.hasTexture_loc, true); //.***
-								if(current_tex_id != neoReference.texture.texId) {
-									//gl.activeTexture(gl.TEXTURE2);
-									gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.texId);
-									current_tex_id = neoReference.texture.texId;
-								}
-							} else {
-								continue;
-							}
-						} else {
-							continue;
-						}
-					} else {
-						// if there are no texture, then use a color.***
-						if(ssao_idx == 1) {
-							if(!neoReference.hasTexture) {
-								if(neoReference.color4) {
-									//if(neoReference.color4.a < 60)
-									//	continue;
-
-									gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-									gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
-								}
-							}
-						}
-					}
-				} else {
-					// if there are no texture, then use a color.***
-					if(ssao_idx == 1)// real render.***
-					{
-						if(!neoReference.hasTexture) {
-							if(neoReference.color4) {
-								//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***
-								//	continue;
-
-								gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-								gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
-							}
-						}
-					} else if(ssao_idx == 0) // depth render.***
-					{
-						if(neoReference.color4) {
-							//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***
-							//	continue;
-						}
-					}
-				}
-			}
-
-			// End checking textures loaded.------------------------------------------------------------------------------------
-
-			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
-			if(block != null) {
-				//ifc_entity = block.mIFCEntityType;
-				//if( ifc_entity==26 || ifc_entity==27 || ifc_entity==14)
-				//	continue;
-
-				//if(magoManager.isCameraMoving && block.isSmallObj)
-				//	continue;
-
-				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
-				// Must applicate the transformMatrix of the reference object.***
-
-				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays);
-
-				if(neoReference.moveVector != undefined) {
-					gl.uniform1i(standardShader.hasAditionalMov_loc, true);
-					gl.uniform3fv(standardShader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.***
-				} else {
-					gl.uniform1i(standardShader.hasAditionalMov_loc, false);
-					gl.uniform3fv(standardShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-				}
-
-				for(var n=0; n<cacheKeys_count; n++) // Original.***
-				{
-					//var mesh_array = block.viArraysContainer._meshArrays[n];
-					this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-
-					//****************************************************************************************************AAA
-					if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey == undefined) {
-						if(this.vbo_vi_cacheKey_aux.posVboDataArray == undefined) continue;
-
-						this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer ();
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-						gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-						this.vbo_vi_cacheKey_aux.posVboDataArray = undefined;
-						//this.vbo_vi_cacheKey_aux.posVboDataArray = null;
-						continue;
-					}
-
-					if(this.vbo_vi_cacheKey_aux.meshNormalCacheKey == undefined) {
-						if(this.vbo_vi_cacheKey_aux.norVboDataArray == undefined) continue;
-
-						this.vbo_vi_cacheKey_aux.meshNormalCacheKey = gl.createBuffer ();
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.norVboDataArray, gl.STATIC_DRAW);
-						this.vbo_vi_cacheKey_aux.norVboDataArray = undefined;
-						//this.vbo_vi_cacheKey_aux.norVboDataArray = null;
-						continue;
-					}
-
-					if(this.vbo_vi_cacheKey_aux.meshFacesCacheKey == undefined) {
-						if(this.vbo_vi_cacheKey_aux.idxVboDataArray == undefined) continue;
-
-						this.vbo_vi_cacheKey_aux.meshFacesCacheKey = gl.createBuffer ();
-						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-						gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-						this.vbo_vi_cacheKey_aux.idxVboDataArray = undefined;
-						//this.vbo_vi_cacheKey_aux.idxVboDataArray = null;
-						continue;
-					}
-
-					//if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey == undefined || this.vbo_vi_cacheKey_aux.meshNormalCacheKey == undefined || this.vbo_vi_cacheKey_aux.meshFacesCacheKey == undefined)
-					//	continue;
-
-					// Positions.***
-
-					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-					gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false,0,0);
-
-					// Normals.***
-					if(standardShader.normal3_loc != -1) {
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true,0,0);
-					}
-
-					if(renderTexture && neoReference.hasTexture) {
-						if(block.vertexCount <= neoReference.vertexCount) {
-							gl.enableVertexAttribArray(standardShader.texCoord2_loc);
-							gl.bindBuffer(gl.ARRAY_BUFFER, neoReference.MESH_TEXCOORD_cacheKey);
-							gl.vertexAttribPointer(standardShader.texCoord2_loc, 2, gl.FLOAT, false,0,0);
-						} 	else{
-							if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-						}
-					} else {
-						if(standardShader.texCoord2_loc != -1) gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-					}
-
-					// Indices.***
-					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-					gl.drawElements(gl.TRIANGLES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-					//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
-				}
-			}
-			//timeControlCounter++;
-			//if(timeControlCounter > 20)
-			//	timeControlCounter = 0;
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
 		}
 	}
-	gl.enable(gl.DEPTH_TEST);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleObjControlerBuildings, magoManager, standardShader, renderTexture, ssao_idx) {
+	var neoBuilding;
+	var minSize = 0.0;
+	var lowestOctreesCount;
+	var lowestOctree;
+	var isInterior = false; // no used.***
+	var lastExtureId;
+	
+	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
+	for(var i=0; i<neoBuildingsCount; i++)
+	{
+		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
+		
+		if(neoBuilding.buildingId == "KANGBUK_del")
+		{
+			var hola = 0;
+			if(neoBuilding.currentVisibleOctreesControler && neoBuilding.currentVisibleOctreesControler.currentVisibles2.length > 181)
+			{
+				var hola = 0;
+			}
+		}
+		
+		if(neoBuilding.currentVisibleOctreesControler == undefined)
+			continue;
+		
+		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		
+		
+		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
+		for(var j=0; j<lowestOctreesCount; j++) {
+			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[j];
+
+			if(lowestOctree.lego == undefined) {
+				lowestOctree.lego = new Lego();
+				lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
+			}
+
+			if(lowestOctree.lego == undefined && lowestOctree.lego.dataArrayBuffer == undefined) 
+				continue;
+
+			if(neoBuilding == undefined)
+				continue;
+
+			if(neoBuilding.buildingType == "outfitting")
+				continue;
+
+			// if the building is highlighted, the use highlight oneColor4.*********************
+			if(ssao_idx == 1)
+			{
+				if(neoBuilding.isHighLighted)
+				{
+					gl.uniform1i(standardShader.bUse1Color_loc, true);
+					gl.uniform4fv(standardShader.oneColor4_loc, this.highLightColor4); //.***
+				}
+				else if(neoBuilding.isColorChanged)
+				{
+					gl.uniform1i(standardShader.bUse1Color_loc, true);
+					gl.uniform4fv(standardShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+				}
+				else
+				{
+					gl.uniform1i(standardShader.bUse1Color_loc, false);
+				}
+				//----------------------------------------------------------------------------------
+				renderTexture = true;
+				if(neoBuilding.simpleBuilding3x3Texture != undefined && neoBuilding.simpleBuilding3x3Texture.texId)
+				{
+					gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+					//gl.activeTexture(gl.TEXTURE2); 
+					gl.uniform1i(standardShader.hasTexture_loc, true);
+					if(lastExtureId != neoBuilding.simpleBuilding3x3Texture.texId)
+					{
+						gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
+						lastExtureId = neoBuilding.simpleBuilding3x3Texture.texId;
+					}
+				}
+				else{
+					gl.uniform1i(standardShader.hasTexture_loc, false);
+					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					renderTexture = false;
+				}
+			}
+
+			this.renderLodBuilding(gl, lowestOctree.lego, this, standardShader, ssao_idx, renderTexture);
+		}
+	}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -356,6 +193,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	// render_neoRef
 	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if(neoRefsCount == 0) return;
+	
 
 	//this.dateSC = new Date();
 	//this.startTimeSC = this.dateSC.getTime();
@@ -420,13 +258,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		}
 
 		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
-
-		//if(neoBuilding.buildingType == "basicBuilding")
-		//{
-		//	var hola = 0;
-		//	if(ssao_idx == 1)
-		//		hola = 0;
-		//}
 			
 		// New version. Use occlussion indices.***
 		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length; // no occludeCulling mode.***
@@ -439,8 +270,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				continue;
 			}
 
-			if(neoReference.bRendered)
+			if(neoReference.bRendered == magoManager.renderingFase)
+			{
 				continue;
+			}
+
 
 			block_idx = neoReference._block_idx;
 			block = neoBuilding.motherBlocksArray[block_idx];
@@ -758,7 +592,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 				}
 
-				neoReference.bRendered = true;
+					neoReference.bRendered = !neoReference.bRendered;
+
 			}
 			//timeControlCounter++;
 			//if(timeControlCounter > 20)
@@ -769,6 +604,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 	gl.enable(gl.DEPTH_TEST);
 };
+
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -783,6 +620,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
  */
 Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, refMatrixIdxKey) {
 	// render_neoRef
+	if(neoReferencesMotherAndIndices == undefined)
+		return;
+	
 	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if(neoRefsCount == 0) return;
 
@@ -790,6 +630,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	//this.startTimeSC = this.dateSC.getTime();
 	//this.currentTimeSC;
 	//var secondsUsed;
+	//
 
 	var timeControlCounter = 0;
 
@@ -843,13 +684,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 
 		// New version. Use occlussion indices.***
-		var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
+		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
+		var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
 		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 
 		for(var k=0; k<visibleIndices_count; k++) {
 
 			//var neoReference = neoRefList.neoRefs_Array[neoRefList._currentVisibleIndices[k]]; // good.***
-			var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]];
+			var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
 			if(!neoReference || neoReference== undefined) {
 				continue;
 			}
@@ -887,7 +729,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 				gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
 			}
-
+			else
+			{
+				var hola = 0;
+			}
 
 			// End checking textures loaded.------------------------------------------------------------------------------------
 
