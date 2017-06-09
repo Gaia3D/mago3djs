@@ -28,6 +28,8 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
+		
+		//viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.4;
 
 		// background provider 적용
 		if(magoConfig.backgroundProvider.enable) {
