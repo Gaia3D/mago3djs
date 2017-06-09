@@ -533,10 +533,6 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 
 
-	// ModelReference.****
-	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	//shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	//shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
 };
 
 /**
