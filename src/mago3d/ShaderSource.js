@@ -570,6 +570,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	uniform float aspectRatio;    \n\
 	uniform float screenWidth;    \n\
 	uniform float screenHeight;    \n\
+	uniform float shininessValue;\n\
 	uniform vec3 kernel[16];   \n\
 	uniform vec4 vColor4Aux;\n\
 	\n\
@@ -585,10 +586,9 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	//const float radius = 0.01;      \n\
 	const float radius = 0.15;      \n\
 	\n\
-	const float ambientReflectionCoef = 0.5;  \n\
+	const float ambientReflectionCoef = 0.5;  // default 0.5\n\
 	const float diffuseReflectionCoef = 1.0;  \n\
 	const float specularReflectionCoef = 1.0; \n\
-	const float shininessVal = 5.0; \n\
 	\n\
 	float unpackDepth(const in vec4 rgba_depth) {\n\
 		//const vec4 bit_shift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0); // original.***\n\
@@ -654,7 +654,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 			\n\
 			// Compute the specular term\n\
 			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessVal);\n\
+			specular = pow(specAngle, shininessValue);\n\
 		}\n\
 		//float DiffuseFactor = dot(normal2, L);\n\
 		//float NdotL = abs(DiffuseFactor);\n\
