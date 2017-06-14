@@ -1237,8 +1237,16 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		// create a building and set the location.***
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
 		var buildingNameDivided = buildingName.split("_");
-		neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
-		neoBuilding.buildingType = buildingNameDivided[3];
+		if(buildingNameDivided[2] != undefined)
+		{
+			neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
+			neoBuilding.buildingType = buildingNameDivided[3];
+		}
+		else
+		{
+			neoBuilding.buildingId = buildingNameDivided[1];
+			neoBuilding.buildingType = buildingNameDivided[3];
+		}
 		
 		if(neoBuilding.buildingType == undefined)
 		{

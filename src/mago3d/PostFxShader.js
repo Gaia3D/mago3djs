@@ -524,6 +524,8 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 
 	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.***
 	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.***
+	
+	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
 
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
