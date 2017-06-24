@@ -384,7 +384,7 @@ CesiumManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) {
 	} else {
 		if(this.configInformation == undefined)
 		{
-			this.configInformation = MagoConfig.getInformation();
+			this.configInformation = MagoConfig.getPolicy();
 		}
 		this.sceneState.gl = scene.context._gl;
 		this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum, frustumIdx, numFrustums);
@@ -425,7 +425,7 @@ CesiumManager.prototype.renderOrdered = function(dc)
 	//this.render_Tiles(dc);
 	if(this.configInformation == undefined)
 	{
-		this.configInformation = MagoConfig.getInformation();
+		this.configInformation = MagoConfig.getPolicy();
 	}
 		
 	var hola = 0;
@@ -1166,7 +1166,7 @@ CesiumManager.prototype.loadBuildingOctree = function(neoBuilding) {
  */
 CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 	// here updates the modelView and modelViewProjection matrices of the scene.***
-	if(this.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+	if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		// * else if this is in WebWorldWind:
 		// www dependency.****
@@ -1205,7 +1205,7 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		sceneState.drawingBufferWidth = viewport.width;
 		sceneState.drawingBufferHeight = viewport.height;
 	}
-	else if(this.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+	else if(this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// * if this is in Cesium:
 		var scene = this.scene;
@@ -1288,11 +1288,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		if(this.isLastFrustum)
 		{
 			var frustumVolume;
-			if(this.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+			if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 			{
 				frustumVolume = this.sceneState.dc.navigatorState.frustumInModelCoordinates;
 			}
-			else if(this.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+			else if(this.configInformation.geo_view_library === Constant.CESIUM)
 			{
 				if(this.myCameraSC == undefined) 
 					this.myCameraSC = new Cesium.Camera(scene);
@@ -1397,7 +1397,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	// 2) ssao render.************************************************************************************************************
 	//drawContext
 	
-	if(this.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+	if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		if(this.wwd.drawContext.currentFramebuffer)
 		{
@@ -1407,7 +1407,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 			////this.wwd.drawContext.currentFramebuffer.bind(this.sceneState.dc);
 		}
 	}
-	else if(this.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+	else if(this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		scene._context._currentFramebuffer._bind();
 	}
@@ -2587,7 +2587,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				
 			var frustumVolume;
 			var find = false;
-			if(this.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+			if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 			{
 				if(this.myCameraSC == undefined) 
 					this.myCameraSC = new Camera();
@@ -2660,7 +2660,7 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				this.detailed_building.update_currentVisibleIndices_exterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 				*/
 			}
-			else if(this.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+			else if(this.configInformation.geo_view_library === Constant.CESIUM)
 			{
 				if(this.myCameraSC == undefined) 
 					this.myCameraSC = new Cesium.Camera(scene);
@@ -4294,7 +4294,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 		
 		var intersects = false;
 		
-		if(this.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+		if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 		{
 			if(neoBuilding.provisionalSegmentsArray == undefined)
 			{
@@ -4307,7 +4307,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 			}
 			intersects = frustumVolume.intersectsSegment(neoBuilding.provisionalSegmentsArray[0].point1, neoBuilding.provisionalSegmentsArray[0].point2); // www.***
 		}
-		else if(this.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+		else if(this.configInformation.geo_view_library === Constant.CESIUM)
 		{
 			if(this.boundingSphere_Aux == undefined)
 				this.boundingSphere_Aux = new Cesium.BoundingSphere();
@@ -4383,7 +4383,7 @@ CesiumManager.prototype.flyToBuilding = function(buildingType, buildingId) {
 	if(this.renderingModeTemp == 1 || this.renderingModeTemp == 2) // 0 = assembled mode. 1 = dispersed mode.***
 	{
 		if(neoBuilding.geoLocationDataAux == undefined) {
-			var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
+			var realTimeLocBlocksList = MagoConfig.getData().alldata;
 			var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 			// must calculate the realBuildingPosition (bbox_center_position).***
 
@@ -4923,10 +4923,10 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 	roll = geoLocationData.roll;
 	
 	var dividedName = neoBuilding.buildingId.split("_");
-	if(MagoConfig.getInformation().callbackConfig.enable) {
+	if(MagoConfig.getPolicy().geo_callback_enable == "true") {
 		var objectId = null;
 		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
-		selectedObjectCallback(		MagoConfig.getInformation().callbackConfig.selectedObject,
+		selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
 									dividedName[0],
 									dividedName[1],
 									objectId,
@@ -4992,7 +4992,7 @@ CesiumManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId
  */
 CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function() {
 	// as the heavy industries special method, add new position for buildings.***.***
-	var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
+	var realTimeLocBlocksList = MagoConfig.getData().alldata;
 	var neoBuildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
 	var neoBuilding;
 	var newLocation;
@@ -5039,12 +5039,12 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 			
 		if(newLocation) {
 
-			longitude = newLocation.LONGITUDE;
-			latitude = newLocation.LATITUDE;
-			altitude = newLocation.ELEVATION;
-			heading = newLocation.HEADING;
-			pitch = newLocation.PITCH;
-			roll = newLocation.ROLL;
+			longitude = parseFloat(newLocation.longitude);
+			latitude = parseFloat(newLocation.latitude);
+			altitude = parseFloat(newLocation.height);
+			heading = parseFloat(newLocation.heading);
+			pitch = parseFloat(newLocation.pitch);
+			roll = parseFloat(newLocation.roll);
 
 			buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation, this);
@@ -5100,7 +5100,7 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 CesiumManager.prototype.getObjectIndexFile = function() {
 	if(this.configInformation == undefined)
 	{
-		this.configInformation = MagoConfig.getInformation();
+		this.configInformation = MagoConfig.getPolicy();
 	}
 	this.readerWriter.getObjectIndexFile(	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this.readerWriter, this.neoBuildingsList, this);
 };

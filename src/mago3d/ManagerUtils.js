@@ -131,7 +131,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if(magoManager.configInformation == undefined)
 		return;
 	
-	if(magoManager.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		//var origin = new WorldWind.Vec3(latitude, longitude, height);
 		var globe = magoManager.wwd.globe;
@@ -145,7 +145,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 		resultGeoLocationData.position.y = origin[1];
 		resultGeoLocationData.position.z = origin[2];
 	}
-	else if(magoManager.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
 		resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
@@ -213,7 +213,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, -1.0, 0.0);
 	}
 	
-	if(magoManager.configInformation.deployConfig.viewLibrary === Constant.WORLDWIND)
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		// * if this in webWorldWind:
 		var xAxis = new WorldWind.Vec3(0, 0, 0),
@@ -279,7 +279,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 		geoLocMatrixInvColMajorArray = geoLocMatrixInv.columnMajorComponents(geoLocMatrixInvColMajorArray);
 		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInvColMajorArray);
 	}
-	else if(magoManager.configInformation.deployConfig.viewLibrary === Constant.CESIUM)
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
 		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
@@ -367,7 +367,7 @@ ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) {
 	// 0 = assembled mode. 1 = dispersed mode.***
 	if(renderingMode == 1) {
 		if(neoBuilding.geoLocationDataAux == undefined) {
-			var realTimeLocBlocksList = MagoConfig.getInformation().blockConfig.blocks;
+			var realTimeLocBlocksList = MagoConfig.getData().alldata;
 			var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 			// must calculate the realBuildingPosition (bbox_center_position).***
 
