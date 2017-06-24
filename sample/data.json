@@ -1,0 +1,58 @@
+{
+	"alldata": {
+		"kangbukSport_del": {
+			"list_counter": 10,
+			"data_id": 761,
+			"data_group_id": 9,
+			"data_group_name": "kangbukSport_del",
+			"data_key": "kangbukSport_del",
+			"data_name": "kangbukSport_del",
+			"location": "0101000020E6100000F701486DE2B85F40111956F146CA4240",
+			"latitude": "37.58029",
+			"longitude": "126.88882",
+			"height": "45.0",
+			"heading": "324.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-24 12:45:47.963708"
+		},
+		"HS_KITC": {
+			"list_counter": 10,
+			"data_id": 760,
+			"data_group_id": 8,
+			"data_group_name": "건설기술 연구원",
+			"data_key": "HS_KITC",
+			"data_name": "건설기술 연구원",
+			"location": "0101000020E6100000F437A11001B95F401904560E2DCA4240",
+			"latitude": "37.57750",
+			"longitude": "126.89069",
+			"height": "60.0",
+			"heading": "42.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-23 16:29:32.816755"
+		},
+		"KICT_main": {
+			"list_counter": 10,
+			"data_id": 762,
+			"data_group_id": 10,
+			"data_group_name": "KICT_main",
+			"data_key": "KICT_main",
+			"data_name": "KICT_main",
+			"location": "0101000020E6100000ACC5A70018B95F40601F9DBAF2C94240",
+			"latitude": "37.57772",
+			"longitude": "126.89209",
+			"height": "50.0",
+			"heading": "9.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-24 12:46:36.296229"
+		}
+	}
+}

@@ -206,7 +206,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.depthRange(0, 1);
-	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
+	if(MagoConfig.getPolicy().geo_cull_face_enable == "true") {
 		gl.enable(gl.CULL_FACE);
 	} else {
 		gl.disable(gl.CULL_FACE);
@@ -638,7 +638,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.depthRange(0, 1);
-//	if(MagoConfig.getInformation().renderingConfg.cullFaceEnable) {
+//	if(MagoConfig.getPolicy().geo_cull_face_enable == "true") {
 //		gl.enable(gl.CULL_FACE);
 //	} else {
 //		gl.disable(gl.CULL_FACE);
