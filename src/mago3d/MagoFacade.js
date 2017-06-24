@@ -6,60 +6,6 @@
  */
 
 /**
- * mago3d 시작
- * 
- * @param viewer cesium 혹은 world wind view 클래스
- * @param html 내 rendering 할 div id명
- * @return
- */
-function magoStart(viewer, renderDivId) {
-	getMagoConfig(viewer, renderDivId);
-}
-
-/**
- * mago3d 환경 설정을 얻어옴
- * 
- * @param viewer cesium 혹은 world wind view 클래스
- * @param html 내 rendering 할 div id명
- * @return
- */
-function getMagoConfig(viewer, renderDivId) {
-	$.ajax({
-		url: "/sample/database.json",
-		type: "GET",
-		dataType: "json",
-		success: function(magoConfig){
-			getBlocksConfig(viewer, renderDivId, magoConfig);
-		},
-		error: function(e){
-			alert(e.responseText);
-		}
-	});
-}
-	
-/**
- * blocks 정보를 가져옴
- * 
- * @param viewer cesium 혹은 world wind view 클래스
- * @param html 내 rendering 할 div id명
- * @param magoConfig mago 환경 설정 config 파일
- * @return
- */
-function getBlocksConfig(viewer, renderDivId, magoConfig) {
-	$.ajax({
-		url: "/sample/blocks.json",
-		type: "GET",
-		dataType: "json",
-		success: function(blocksConfig){
-			managerFactory = new ManagerFactory(viewer, renderDivId, magoConfig, blocksConfig);
-		},
-		error: function(e){
-			alert(e.responseText);
-		}
-	});
-}
-
-/**
  * mago3d 활성화/비활성화
  * 
  * @param isShow true = 활성화, false = 비활성화

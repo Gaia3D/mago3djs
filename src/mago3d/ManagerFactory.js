@@ -6,11 +6,11 @@
  *
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
- * @param magoConfig mago3d 설정값 json object
- * @param blocksConfig block list 설정값 json object
+ * @param serverPolicy policy json object
+ * @param serverData data json object
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
+var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -18,39 +18,37 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	var magoManager = null;
 	var scene = null;
 
-	if(magoConfig.deployConfig === null
-			|| magoConfig.deployConfig === ''
-			|| magoConfig.deployConfig.viewLibrary === null
-			|| magoConfig.deployConfig.viewLibrary === ''
-			|| magoConfig.deployConfig.viewLibrary === Constant.CESIUM) {
+	if(serverPolicy.geo_view_library === null
+			|| serverPolicy.geo_view_library === ''
+			|| serverPolicy.geo_view_library === Constant.CESIUM) {
 		// 환경 설정
-		MagoConfig.init(magoConfig, blocksConfig);
-
+		MagoConfig.init(serverPolicy, serverData);
+		
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.scene.magoManager = new CesiumManager();
 		
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 
 		// background provider 적용
-		if(magoConfig.backgroundProvider.enable) {
+		if(serverPolicy.geo_server_enable == "true") {
 			backgroundProvider();
 		}
 		draw();
 		// build을 rendering 할 위치
 		initEntity();
 		// terrain 적용 여부
-		if(magoConfig.geoConfig.initTerrain.enable) {
-			initTerrain();
-		}
+//		if() {
+//			initTerrain();
+//		}
 		// 최초 로딩시 카메라 이동 여부
-		if(magoConfig.geoConfig.initCamera.enable) {
+		if(serverPolicy.geo_init_camera_enable == "true") {
 			initCamera();
 		}
 		// render Mode 적용
 		initRenderMode();
-	} else if(magoConfig.deployConfig.viewLibrary === Constant.WORLDWIND) {
+	} else if(serverPolicy.geo_view_library === Constant.WORLDWIND) {
 		// 환경 설정
-		MagoConfig.init(magoConfig, blocksConfig);
+		MagoConfig.init(serverPolicy, serverData);
 		
 		viewer = null;
 		 // Tell World Wind to log only warnings and errors.
@@ -184,9 +182,9 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드
 	function draw() {
-		if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.CESIUM) {
+		if(MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) {
 			drawCesium();
-		} else if(MagoConfig.getInformation().deployConfig.viewLibrary === Constant.WORLDWIND) {
+		} else if(MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND) {
 			//initWwwMago();
 		}
 	}
@@ -475,7 +473,6 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		}
 	}
 
-
 	// world wind 구현체를 이용
 	function drawWorldWind() {
 	}
@@ -485,18 +482,18 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	 */
 	function backgroundProvider() {
 		var provider = new Cesium.WebMapServiceImageryProvider({
-			url : MagoConfig.getInformation().backgroundProvider.url,
-			layers : MagoConfig.getInformation().backgroundProvider.layers,
+			url : MagoConfig.getPolicy().geo_server_url,
+			layers : MagoConfig.getPolicy().geo_server_layers,
 			parameters : {
-				service : MagoConfig.getInformation().backgroundProvider.parameters.service,
-				version : MagoConfig.getInformation().backgroundProvider.parameters.version,
-				request : MagoConfig.getInformation().backgroundProvider.parameters.request,
-				transparent : MagoConfig.getInformation().backgroundProvider.parameters.transparent,
-				//tiled : MagoConfig.getInformation().backgroundProvider.parameters.tiled,
-				format : MagoConfig.getInformation().backgroundProvider.parameters.format
-//				time : MagoConfig.getInformation().backgroundProvider.parameters.time,
-//		    	rand : MagoConfig.getInformation().backgroundProvider.parameters.rand,
-//		    	asdf : MagoConfig.getInformation().backgroundProvider.parameters.asdf
+				service : MagoConfig.getPolicy().geo_server_parameters_service,
+				version : MagoConfig.getPolicy().geo_server_parameters_version,
+				request : MagoConfig.getPolicy().geo_server_parameters_request,
+				transparent : MagoConfig.getPolicy().geo_server_parameters_transparent,
+				//tiled : MagoConfig.getPolicy().backgroundProvider.parameters.tiled,
+				format : MagoConfig.getPolicy().geo_server_parameters_format
+//				time : MagoConfig.getPolicy().backgroundProvider.parameters.time,
+//		    	rand : MagoConfig.getPolicy().backgroundProvider.parameters.rand,
+//		    	asdf : MagoConfig.getPolicy().backgroundProvider.parameters.asdf
 			}
 			//,proxy: new Cesium.DefaultProxy('/proxy/')
 		});
@@ -511,10 +508,8 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 	 */
 	function initEntity() {
 		return viewer.entities.add({
-			name : MagoConfig.getInformation().geoConfig.initEntity.name,
-			position: Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initEntity.longitude,
-													MagoConfig.getInformation().geoConfig.initEntity.latitude,
-													MagoConfig.getInformation().geoConfig.initEntity.height),
+			name : "여의도",
+			position: Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
 			box : {
 				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
 				//material : Cesium.Color.TRANSPARENT
@@ -529,33 +524,33 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 
 	// terrain 적용 유무를 설정
 	function initTerrain() {
-		if(MagoConfig.getInformation().geoConfig.initTerrain.enable) {
+/*		if(MagoConfig.getPolicy().geoConfig.initTerrain.enable) {
 			var terrainProvider = new Cesium.CesiumTerrainProvider({
-				url : MagoConfig.getInformation().geoConfig.initTerrain.url,
-				requestWaterMask: MagoConfig.getInformation().geoConfig.initTerrain.requestWaterMask,
-				requestVertexNormals: MagoConfig.getInformation().geoConfig.initTerrain.requestVertexNormals
+				url : MagoConfig.getPolicy().geoConfig.initTerrain.url,
+				requestWaterMask: MagoConfig.getPolicy().geoConfig.initTerrain.requestWaterMask,
+				requestVertexNormals: MagoConfig.getPolicy().geoConfig.initTerrain.requestVertexNormals
 			});
 			viewer.terrainProvider = terrainProvider;
-		}
+		}*/
 	}
 
 	// 최초 로딩시 이동할 카메라 위치
 	function initCamera() {
 		viewer.camera.flyTo({
-			destination : Cesium.Cartesian3.fromDegrees(MagoConfig.getInformation().geoConfig.initCamera.longitude,
-														MagoConfig.getInformation().geoConfig.initCamera.latitude,
-														MagoConfig.getInformation().geoConfig.initCamera.height),
-			duration: MagoConfig.getInformation().geoConfig.initCamera.duration
+			destination : Cesium.Cartesian3.fromDegrees(parseFloat(MagoConfig.getPolicy().geo_init_longitude),
+														parseFloat(MagoConfig.getPolicy().geo_init_latitude),
+														parseFloat(MagoConfig.getPolicy().geo_init_height)),
+			duration: parseInt(MagoConfig.getPolicy().geo_init_duration)
 		});
 	}
 
 	// deploy 타입 적용
 	function initRenderMode() {
 		var api = new API("renderMode");
-		api.setRenderMode(MagoConfig.getInformation().renderingConfg.renderMode);
+		api.setRenderMode("1");
 		magoManager.callAPI(api);
 
-		if(!MagoConfig.getInformation().renderingConfg.timelineEnable) {
+		if(!MagoConfig.getPolicy().geo_time_line_enable == "true") {
 			// visible <---> hidden
 			$(viewer._animation.container).css("visibility", "hidden");
 			$(viewer._timeline.container).css("visibility", "hidden");
@@ -599,7 +594,7 @@ var ManagerFactory = function(viewer, containerId, magoConfig, blocksConfig) {
 		},
 		// demo 용
 		demo : function(renderMode, json) {
-//			MagoConfig.getInformation().demoBlockConfig = json;
+//			MagoConfig.getPolicy().demoBlockConfig = json;
 //			var api = new API("demo");
 //			api.setRenderMode(renderMode);
 //			magoManager.callAPI(api);

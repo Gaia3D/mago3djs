@@ -10,7 +10,7 @@ var ReaderWriter = function() {
 	}
 
 	//this.geometryDataPath = "/F4D_GeometryData";
-	this.geometryDataPath = MagoConfig.getInformation().deployConfig.dataPath;
+	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
 	this.viArraysContainer = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
 	//var simpleBuildingImage = new Image();
