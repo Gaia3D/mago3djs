@@ -8,6 +8,8 @@ var SceneState = function() {
 	if(!(this instanceof SceneState)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	this.gl;
 
 	// this contains the model matrices and camera position.***
 	this.modelViewProjRelToEyeMatrix = new Matrix4(); // created as identity matrix.***
@@ -23,4 +25,7 @@ var SceneState = function() {
 	this.camera = new Camera();
 	this.drawingBufferWidth = new Int32Array([1000]);
 	this.drawingBufferHeight = new Int32Array([1000]);
+	
+	// webWorldWind vars.***
+	this.dc;
 };

@@ -1152,7 +1152,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.getObjectIndexFile = function(gl, fileName, readerWriter, neoBuildingsList, magoManager) {
+ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neoBuildingsList, magoManager) {
 //	magoManager.fileRequestControler.filesRequestedCount += 1;
 //	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
@@ -1532,6 +1532,50 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, mag
 	f4dTex.texImage.src = filePath_inServer;
 };
 
+ReaderWriter.prototype.decodeTGA = function(arrayBuffer) {
+	// code from toji.***
+	var content = new Uint8Array(arrayBuffer),
+		contentOffset = 18 + content[0],
+		imagetype = content[2], // 2 = rgb, only supported format for now
+		width = content[12] + (content[13] << 8),
+		height = content[14] + (content[15] << 8),
+		bpp = content[16], // should be 8,16,24,32
+		
+		bytesPerPixel = bpp / 8,
+		bytesPerRow = width * 4,
+		data, i, j, x, y;
+
+	if(!width || !height) {
+		console.error("Invalid dimensions");
+		return null;
+	}
+
+	if (imagetype != 2) {
+		console.error("Unsupported TGA format:", imagetype);
+		return null;
+	}
+
+	data = new Uint8Array(width * height * 4);
+	i = contentOffset;
+
+	// Oy, with the flipping of the rows...
+	for(y = height-1; y >= 0; --y) {
+		for(x = 0; x < width; ++x, i += bytesPerPixel) {
+			j = (x * 4) + (y * bytesPerRow);
+			data[j] = content[i+2];
+			data[j+1] = content[i+1];
+			data[j+2] = content[i+0];
+			data[j+3] = (bpp === 32 ? content[i+3] : 255);
+		}
+	}
+
+	return {
+		width: width,
+		height: height,
+		data: data
+	};
+}
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
@@ -1541,26 +1585,58 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, mag
  * @param magoManager 변수
  */
 ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) {
-	var neoRefImage = new Image();
-	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
-	//magoManager.backGround_fileReadings_count ++;
-	neoRefImage.onload = function() {
-		//if(texture.texId == undefined) 
-		//	texture.texId = gl.createTexture();
+	// Must know the fileExtension.***
+	var extension = filePath_inServer.split('.').pop();
+	
+	if(extension == "tga" || extension == "TGA" || extension == "Tga")
+	{
+		loadWithXhr(filePath_inServer).done(function(response) 
+		{
+			var arrayBuffer = response;
+			if(arrayBuffer) {
+				// decode tga.***
+				var tga = magoManager.readerWriter.decodeTGA(arrayBuffer);
+				if(tga) {
+                    gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tga.width, tga.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tga.data);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+					gl.generateMipmap(gl.TEXTURE_2D);
+					texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+                }
+			}
+		}).fail(function(status) {
+			console.log("xhr status = " + status);
+			if(status == 0) neoBuilding.metaData.fileLoadState = 500;
+			else neoBuilding.metaData.fileLoadState = status;
+		}).always(function() {
+			//magoManager.fileRequestControler.filesRequestedCount -= 1;
+			//if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+		});
+	}
+	else{
+		var neoRefImage = new Image();
+		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
+		//magoManager.backGround_fileReadings_count ++;
+		neoRefImage.onload = function() {
+			//if(texture.texId == undefined) 
+			//	texture.texId = gl.createTexture();
 
-		handleTextureLoaded(gl, neoRefImage, texture.texId);
-		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-		//neoBuilding.texturesLoaded.push(texture);
+			handleTextureLoaded(gl, neoRefImage, texture.texId);
+			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+			//neoBuilding.texturesLoaded.push(texture);
 
-		if(magoManager.backGround_fileReadings_count > 0 ) magoManager.backGround_fileReadings_count -=1;
-	};
+			if(magoManager.backGround_fileReadings_count > 0 ) 
+				magoManager.backGround_fileReadings_count -=1;
+		};
 
-	neoRefImage.onerror = function() {
-		// doesn't exist or error loading
-		return;
-	};
+		neoRefImage.onerror = function() {
+			// doesn't exist or error loading
+			return;
+		};
+		neoRefImage.src = filePath_inServer;
+	}
 
-	neoRefImage.src = filePath_inServer;
+	
 };
 
 /**
