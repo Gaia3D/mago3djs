@@ -2576,84 +2576,129 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 			
 		if(lod == 0 || lod == 1)
 		{
-			var frustumVolume;
-					if(this.configInformation.geo_view_library === Constant.WORLDWIND)
-					{
-						frustumVolume = this.sceneState.dc.navigatorState.frustumInModelCoordinates;
-					}
-					else if(this.configInformation.geo_view_library === Constant.CESIUM)
-					{
-						if(this.myCameraSC == undefined) 
-							this.myCameraSC = new Cesium.Camera(scene);
-
-						//this.myCameraSC.near = scene._frustumCommandsList[this.frustumIdx].near;
-						//this.myCameraSC.far = scene._frustumCommandsList[this.frustumIdx].far;
-						this.myCameraSC.near = scene._context._us._currentFrustum.x;
-						this.myCameraSC.far = scene._context._us._currentFrustum.y;
-						this.myCameraSC.frustum.fov = scene._camera.frustum.fov;
-						frustumVolume = this.myCameraSC.frustum.computeCullingVolume(scene._camera.position, scene._camera.direction, scene._camera.up);
-					}
-			
-			if(this.myCameraSC == undefined) 
-				this.myCameraSC = new Cesium.Camera(scene);
-
-			var camera = scene.frameState.camera;
-			var near = scene._frustumCommandsList[this.frustumIdx].near;
-			var far = scene._frustumCommandsList[this.frustumIdx].far;
-			buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
-			
-			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-
 			var squaredDistLod0 = 500;
-			var squaredDistLod1 = 4000;
+			var squaredDistLod1 = 25000;
 			var squaredDistLod2 = 500000*1000;
 			
-			if(neoBuilding.buildingType == "basicBuilding")
-			{
-				squaredDistLod0 = 500;
-				squaredDistLod1 = 25000;
-				squaredDistLod2 = 500000*1000;
-			}
 			
 			//squaredDistLod0 = 45000;
 			//squaredDistLod1 = 85000;
 			//squaredDistLod2 = 500000*1000;
+				
+			var frustumVolume;
+			var find = false;
+			if(this.configInformation.geo_view_library === Constant.WORLDWIND)
+			{
+				if(this.myCameraSC == undefined) 
+					this.myCameraSC = new Camera();
+				
+				if(this.myCameraSC2 == undefined) 
+					this.myCameraSC2 = new Camera();
+				
+				var dc = this.sceneState.dc;
+				
+				var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
+				this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
+				this.myCameraSC.frustum.near = 0.1;
+				this.myCameraSC.frustum.far = 5000000.0;
+				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
+				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
+				
+				var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
+				modelViewRelToEye.copy(dc.navigatorState.modelview);
+				modelViewRelToEye[3] = 0.0;
+				modelViewRelToEye[7] = 0.0;
+				modelViewRelToEye[11] = 0.0;
+				
+				var modelviewTranspose = WorldWind.Matrix.fromIdentity();
+				modelviewTranspose.setToTransposeOfMatrix(modelViewRelToEye);
+				
+				var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(dc.navigatorState.projection);
+				frustumRelToEye.transformByMatrix(modelviewTranspose);
+				frustumRelToEye.normalize();
 			
-			//squaredDistLod0 = 45000;
-			//squaredDistLod1 = 85000;
-			//squaredDistLod2 = 500000*1000;
-			/*
-			if(neoBuilding.buildingType == "outfitting")
-			{
-				this.myCameraSC.frustum.fov = 0.7;
-			}
-			else
-			{
-				this.myCameraSC.frustum.fov = 0.9;
-			}
-			*/
-			//this.myCameraSC.frustum.fovy = 0.3;
-			//camera.frustum.far = 2.0;
-			this.myCameraSC.near = near;
-			this.myCameraSC.far = far;
-			var myCullingVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
-			var advancedDist = 3.0;
-			var advancedCamPosX = this.myCameraSC.position.x + advancedDist * this.myCameraSC.direction.x;
-			var advancedCamPosY = this.myCameraSC.position.y + advancedDist * this.myCameraSC.direction.y;
-			var advancedCamPosZ = this.myCameraSC.position.z + advancedDist * this.myCameraSC.direction.z;
+				// then do frustum culling for interior octree.***
+				//this.detailed_building.octree.getFrustumVisibleCRefListArray(frustumRelToEye, this.intCRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+				/*
+				var transformedCamPos = this.detailed_building.getTransformedRelativeEyePosition_toBuilding(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
+				this.isCameraInsideBuilding = this.detailed_building.isCameraInsideOfBuilding(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
 
-			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
-			var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
-			var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;	
+				// Determine if the camera is inside of the building.***
+				this.intCRefList_array.length = 0; // Init.***
+
+				if(this.isCameraInsideBuilding)
+				{
+					//if(this.myCameraSC == undefined) this.myCameraSC = new Cesium.Camera(scene);
+					
+					if(this.detailed_building.buildingPosMat_inv == undefined)
+					{
+					  this.detailed_building.buildingPosMat_inv = new f4d_Matrix4();
+					  this.detailed_building.buildingPosMat_inv.setByFloat32Array(this.detailed_building.move_matrix_inv);
+					}
+
+					var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
+					modelViewRelToEye.copy(dc.navigatorState.modelview);
+					modelViewRelToEye[3] = 0.0;
+					modelViewRelToEye[7] = 0.0;
+					modelViewRelToEye[11] = 0.0;
+					
+					var modelviewTranspose = WorldWind.Matrix.fromIdentity();
+					modelviewTranspose.setToTransposeOfMatrix(modelViewRelToEye);
+					
+					var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(dc.navigatorState.projection);
+					frustumRelToEye.transformByMatrix(modelviewTranspose);
+					frustumRelToEye.normalize();
+				
+					// then do frustum culling for interior octree.***
+					this.detailed_building.octree.getFrustumVisibleCRefListArray(frustumRelToEye, this.intCRefList_array, this.boundingSphere_Aux, transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+					for(var i=0; i<this.intCRefList_array.length; i++)
+					{
+						this.intCRefList_array[i].update_currentVisibleIndices_Interior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+					}
+				}
+				this.detailed_building.update_currentVisibleIndices_exterior(transformedCamPos.x, transformedCamPos.y, transformedCamPos.z);
+				*/
+			}
+			else if(this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				if(this.myCameraSC == undefined) 
+					this.myCameraSC = new Cesium.Camera(scene);
+
+				var camera = scene.frameState.camera;
+				var near = scene._frustumCommandsList[this.frustumIdx].near;
+				var far = scene._frustumCommandsList[this.frustumIdx].far;
+				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
+				
+				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
+
+				
+				
+				//this.myCameraSC.frustum.fovy = 0.3;
+				//camera.frustum.far = 2.0;
+				this.myCameraSC.near = near;
+				this.myCameraSC.far = far;
+				var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
+				var advancedDist = 3.0;
+				//var advancedCamPosX = this.myCameraSC.position.x + advancedDist * this.myCameraSC.direction.x;
+				//var advancedCamPosY = this.myCameraSC.position.y + advancedDist * this.myCameraSC.direction.y;
+				//var advancedCamPosZ = this.myCameraSC.position.z + advancedDist * this.myCameraSC.direction.z;
+
+				// get frustumCulled lowestOctrees classified by distances.************************************************************************************
+				var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+				var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;	
+				
+				neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
+				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustumVolume, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
+																						this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
+																						squaredDistLod0, squaredDistLod1, squaredDistLod2);
+			}
+
 			
-			neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
-			var find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	myCullingVolume, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
-																					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-																					squaredDistLod0, squaredDistLod1, squaredDistLod2);
 																					
 			
 			if(!find) {

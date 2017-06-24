@@ -23,7 +23,7 @@ var Plane = function() {
  * @param pz 변수
  * @param nx 변수
  * @param ny 변수
- * @param nz 변수
+ * @param nz 변수p
  */
 Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
 	this.a = nx;
@@ -58,3 +58,21 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint) {
 		return intersectionPoint;
 	} else return undefined;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param line 변수
+ * @param intersectionPoint 변수
+ */
+Plane.prototype.intersectionSphere = function(sphere) {
+	var sphereCenter = sphere.centerPoint;
+	
+	// calculate the distance by dot_product.***
+	//var distance = 
+
+};
+
+
+
+
+

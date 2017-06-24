@@ -34,6 +34,10 @@ var Octree = function(octreeOwner) {
 
 	// now, for legoStructure.***
 	this.lego;
+	
+	// aditional data for web world wind, provisionally.******************
+	this.provisionalSegmentsArray;
+	// end provisional data.----------------------------------------------
 };
 
 /**
