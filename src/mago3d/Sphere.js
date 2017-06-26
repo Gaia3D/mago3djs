@@ -12,3 +12,19 @@ var Sphere = function() {
 	this.r = 0.0;
 	this.centerPoint = new Point3D();
 };
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Sphere.prototype.setCenterPoint = function(x, y, z) {
+	this.centerPoint.set(x, y, z);
+}
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Sphere.prototype.setRadius = function(radius) {
+	this.r = radius;
+}

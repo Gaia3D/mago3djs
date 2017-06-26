@@ -103,7 +103,42 @@
 <script>
 
 var managerFactory = null;
-		magoStart(null, "canvasOne");
+		magoStart(null, "canvasOne", null, null);
+		function magoStart(viewer, renderDivId, serverPolicy, serverData) {
+		if(serverPolicy === null) {
+			$.ajax({
+				url: "/sample/policy.json",
+				type: "GET",
+				dataType: "json",
+				success: function(serverPolicy){
+					loadData(viewer, renderDivId, serverPolicy, serverData);
+				},
+				error: function(e){
+					alert(e.responseText);
+				}
+			});
+		} else {
+			loadData(viewer, renderDivId, serverPolicy, serverData);
+		}
+	}
+		
+	function loadData(viewer, renderDivId, serverPolicy, serverData) {
+		if(serverData === null) {
+			$.ajax({
+				url: "/sample/data.json",
+				type: "GET",
+				dataType: "json",
+				success: function(serverData){
+					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+				},
+				error: function(e){
+					alert(e.responseText);
+				}
+			});
+		} else {
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+		}
+	}
 		var blocksConfig = null;
 		
 		var intervalCount = 0;
