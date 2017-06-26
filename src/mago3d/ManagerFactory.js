@@ -197,7 +197,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		magoManager.postFxShadersManager.gl = gl;
 		magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		magoManager.createDefaultShaders(gl);// A1-Use this.***
-		
 
 		// Start postRender version.***********************************************
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
@@ -551,7 +550,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		api.setRenderMode("1");
 		magoManager.callAPI(api);
 
-		if(!MagoConfig.getPolicy().geo_time_line_enable == "true") {
+		if(MagoConfig.getPolicy().geo_time_line_enable == "false") {
 			// visible <---> hidden
 			$(viewer._animation.container).css("visibility", "hidden");
 			$(viewer._timeline.container).css("visibility", "hidden");
