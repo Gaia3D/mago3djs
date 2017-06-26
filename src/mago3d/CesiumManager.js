@@ -1253,8 +1253,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(this.renderingModeTemp == 0) {
 		if(!isLastFrustum) return;
 	}
-	
-	
 
 	//if(!isLastFrustum) return;
 
@@ -5334,5 +5332,12 @@ CesiumManager.prototype.callAPI = function(api) {
 		return this.neoBuildingsList.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
 	} else if(apiName === "changeMouseMove") {
 		this.magoPolicy.setMouseMoveMode(api.getMouseMoveMode());
+	} else if(apiName === "changeInsertIssueMode") {
+		// issue 등록
+		//selectedObjectCallback(이걸 해 주면 될거 같음)
+	} else if(apiName === "changeObjectInfoViewMode") {
+		// object info 표시
+	} else if(apiName === "changeListIssueViewMode") {
+		// issue list 표시
 	}
 };
