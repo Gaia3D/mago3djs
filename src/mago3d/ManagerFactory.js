@@ -197,6 +197,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		magoManager.postFxShadersManager.gl = gl;
 		magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		magoManager.createDefaultShaders(gl);// A1-Use this.***
+		
 
 		// Start postRender version.***********************************************
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장

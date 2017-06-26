@@ -238,6 +238,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	} else {
 		gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	}
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 

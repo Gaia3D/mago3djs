@@ -605,7 +605,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	}         \n\
 			   \n\
 	//linear view space depth\n\
-	float getDepth(vec2 coord) {                          \n\
+	float getDepth(vec2 coord) {\n\
 		return unpackDepth(texture2D(depthTex, coord.xy));\n\
 	}    \n\
 	\n\
