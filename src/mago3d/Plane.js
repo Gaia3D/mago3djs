@@ -34,6 +34,20 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param dist
+ * @param nx 변수
+ * @param ny 변수
+ * @param nz 변수p
+ */
+Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) {
+	this.a = nx;
+	this.b = ny;
+	this.c = nz;
+	this.d = dist;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param line 변수
  * @param intersectionPoint 변수
  */
@@ -67,9 +81,18 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint) {
 Plane.prototype.intersectionSphere = function(sphere) {
 	var sphereCenter = sphere.centerPoint;
 	
-	// calculate the distance by dot_product.***
-	//var distance = 
+	// calculate the distance by dotProduct.***
+	var distance = sphereCenter.x * this.a + sphereCenter.y * this.b + sphereCenter.z * this.c + this.d;
 
+	if(distance < -sphere.r)
+	{
+		return Constant.INTERSECTION_OUTSIDE;
+	}
+	else if(distance < sphere.r)
+	{
+		return Constant.INTERSECTION_INTERSECT;
+	}
+	return Constant.INTERSECTION_INSIDE;
 };
 
 
