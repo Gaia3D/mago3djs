@@ -246,3 +246,48 @@ function changeMouseMoveAPI(mouseMoveMode) {
 		managerFactory.callAPI(api);
 	}
 }
+
+/**
+ * 이슈 등록 활성화 유무
+ * 
+ * @param flag true = 활성화, false = 비활성화
+ * @return
+ */
+function changeInsertIssueModeAPI(flag) {
+	var api = new API("changeInsertIssueMode");
+	api.setInsertIssueMode(flag);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * object 정보 표시 활성화 유무
+ * 
+ * @param flag true = 활성화, false = 비활성화
+ * @return
+ */
+function changeObjectInfoViewModeAPI(flag) {
+	var api = new API("changeObjectInfoViewMode");
+	api.setObjectInfoViewMode(flag);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 이슈 목록 활성화 유무
+ * 
+ * @param flag true = 활성화, false = 비활성화
+ * @return
+ */
+function changeListIssueViewModeAPI(flag) {
+	var api = new API("changeListIssueViewMode");
+	api.setListIssueViewMode(flag);
+	if(managerFactory != null) {
+		managerFactory.callAPI(api);
+	}
+}
+
+
+
