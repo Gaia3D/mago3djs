@@ -3456,7 +3456,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 			// 3) now render bboxes.*******************************************************************************************************************
 			// 3) now render bboxes.*******************************************************************************************************************
 			// 3) now render bboxes.*******************************************************************************************************************
-			/*
+			
 			if(this.magoPolicy.getShowBoundingBox())
 			{
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
@@ -3548,7 +3548,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 			// finally render selected object silhouette.**************************************************************************************
 			// finally render selected object silhouette.**************************************************************************************
 			// finally render selected object silhouette.**************************************************************************************
-			*/
+			
 		}
 		if(currentShader)
 		{
