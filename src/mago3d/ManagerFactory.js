@@ -558,6 +558,15 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		// 초기화 api
 		init : function() {
 		},
+		// flyTo
+		flyTo : function(longitude, latitude, height, duration) {
+			viewer.camera.flyTo({
+				destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+															parseFloat(latitude),
+															parseFloat(height)),
+				duration: parseInt(duration)
+			});
+		},
 		// 블락 및 부재 검색 api
 		search : function(blockId) {
 		},
