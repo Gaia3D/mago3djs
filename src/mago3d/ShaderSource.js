@@ -642,6 +642,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		}   \n\
 		   \n\
 		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+		//occlusion = 1.0;\n\
 		\n\
 		vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
 		vec3 L = normalize(lightPos - vertexPos);\n\

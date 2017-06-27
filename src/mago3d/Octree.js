@@ -429,6 +429,80 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  * @param eye_y 변수
  * @param eye_z 변수
  */
+Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleObjControlerOctrees, visibleObjControlerOctreesAux,
+																	bbox_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) {
+	var visibleOctreesArray = [];
+	var sortedOctreesArray = [];
+	var distAux = 0.0;
+	var find = false;
+
+	this.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion(bbox, visibleOctreesArray, bbox_scratch);
+	//this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
+
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = visibleOctreesArray.length;
+	for(var i=0; i<visibleOctrees_count; i++) {
+		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+	}
+
+	//if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
+	//if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
+	//if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
+
+	//squaredDistLod0 = 400;
+	//squaredDistLod1 = 2000;
+	//squaredDistLod2 = 500000*1000;
+
+	for(var i=0; i<visibleOctrees_count; i++) {
+		if(visibleOctreesArray[i].squareDistToEye < squaredDistLod0) {
+			// 15x15 = 225
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod1) {
+			// 25x25 = 625
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		} else if(visibleOctreesArray[i].squareDistToEye < squaredDistLod2) {
+			// 50x50 = 2500
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		} else {
+			if(visibleOctreesArray[i].triPolyhedronsCount > 0) {
+				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				//visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+	}
+
+	visibleOctreesArray = null;
+	sortedOctreesArray = null;
+	return find;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
 Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, visibleObjControlerOctrees, visibleObjControlerOctreesAux,
 																	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) {
 	var visibleOctreesArray = [];
@@ -579,39 +653,40 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 			}
 		}
 	}
+};
 
-	/*
-	if(boundingSphere_scratch == undefined) 
-		boundingSphere_scratch = new Cesium.BoundingSphere(); 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_octreesArray 변수
+ * @param boundingSphere_scratch 변수
+ */
+Octree.prototype.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion = function(bbox, result_octreesArray, bbox_scratch) {
+	//if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
+	if(this.subOctrees_array == undefined) return;
 
-	boundingSphere_scratch.center.x = this.centerPos.x;
-	boundingSphere_scratch.center.y = this.centerPos.y;
-	boundingSphere_scratch.center.z = this.centerPos.z;
+	if(this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
+	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
+		return;
 
-	if(this.subOctrees_array.length == 0) {
-	//boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
-		boundingSphere_scratch.radius = this.getRadiusAprox();
-	} else {
-		boundingSphere_scratch.radius = this.getRadiusAprox();
-	}
+	if(result_octreesArray == undefined) result_octreesArray = [];
+	
+	if(bbox_scratch == undefined) 
+		bbox_scratch = new BoundingBox(); 
+	
 
-	var frustumCull = cullingVolume.computeVisibility(boundingSphere_scratch);
-	if(frustumCull == Cesium.Intersect.INSIDE ) {
-		//result_octreesArray.push(this);
+	bbox_scratch.minX = this.centerPos.x - this.half_dx;
+	bbox_scratch.maxX = this.centerPos.x + this.half_dx;
+	bbox_scratch.minY = this.centerPos.y - this.half_dy;
+	bbox_scratch.maxY = this.centerPos.y + this.half_dy;
+	bbox_scratch.minZ = this.centerPos.z - this.half_dz;
+	bbox_scratch.maxZ = this.centerPos.z + this.half_dz;
+
+	var intersects = bbox.intersectsWithBBox(bbox_scratch);
+	if(intersects)
+	{
 		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
-	} else if(frustumCull == Cesium.Intersect.INTERSECTING  ) {
-		if(this.subOctrees_array.length == 0) {
-			//if(this.neoRefsList_Array.length > 0) // original.***
-			//if(this.triPolyhedronsCount > 0)
-			result_octreesArray.push(this);
-		} else {
-			for(var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) {
-				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, result_octreesArray, boundingSphere_scratch);
-			}
-		}
 	}
-	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
-	*/
 };
 
 /**
@@ -623,7 +698,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) {
 	if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
 		return;
-
+	// old. delete this.***
     // this function has Cesium dependence.***
 	if(result_octreesArray == undefined) result_octreesArray = [];
 

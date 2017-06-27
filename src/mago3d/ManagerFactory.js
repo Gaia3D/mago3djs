@@ -123,22 +123,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		
 		initWwwMago(cesiumManager, gl);
 		
-		//var f4d_topManager = new f4d_manager(); // This is the top f4d class.***
-		//f4d_topManager.f4dSelection.init(gL, drawingBufferWidth, drawingBufferHeight);
-		//f4d_wwwLayer.f4d_shadersManager.create_f4dDefaultShader(gL); 
-		/*
-		// Load function.****************************************************************************************************************
-		gL = wwd.gl;
-		var elevation = 60.0; 
-		var latitude = 37.5172076;
-		var longitude = 126.929;
-		//f4d_readerWriter.openBuildingProject(wwd, f4d_wwwLayer, 100, latitude, longitude, elevation, f4d_readerWriter); //생활동.***																							
-		f4d_readerWriter.openBuildingProject(wwd, f4d_wwwLayer, 8001, latitude, longitude, elevation, f4d_readerWriter); //생활동.***
-		
-		// Test reading tiles system.***
-		f4d_readerWriter.openF4d_TerranTile(gL, f4d_wwwLayer.f4d_terranTile, f4d_readerWriter, wwd);
-		//----------------------------------------------------------------------------------------------------------------------------------
-		
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Click event. Is different to anothers event handlers.******************************************************
 		// The common gesture-handling function.
@@ -152,12 +137,14 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 			var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
 
 			// If only one thing is picked and it is the terrain, use a go-to animator to go to the picked location.
+			/*
 			if (pickList.objects.length == 1 && pickList.objects[0].isTerrain) {
 				var position = pickList.objects[0].position;
 				//wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
 				//wwd.goTo(new WorldWind.Position(37.48666, 127.05618, 500));
 				wwd.goToOriented(new WorldWind.Position(37.48666, 127.05618, 500.0), 120.0, 80.0);
 			}
+			*/
 		};
 
 		// Listen for mouse clicks.
@@ -166,19 +153,19 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		var mouseDownEvent = function(event)
 		{
 			// Mouse down.***
-			f4d_wwwLayer.f4d_wwwManager.isCameraMoving = true;
+			cesiumManager.isCameraMoving = true;
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
 		var mouseUpEvent = function(event)
 		{
 			// Mouse up.***
-			f4d_wwwLayer.f4d_wwwManager.isCameraMoving = false;
+			cesiumManager.isCameraMoving = false;
 			
 			//f4d_wwwLayer.calculate_modelViewProjectionMatrixRelativeToEye(dc); // Execute this in mousedown_handler.***!!!!!!!!!!!!
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
-		*/
+		
 	}
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드

@@ -573,7 +573,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 						if(indicesCount == 0)
 							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-
 					}
 					else
 					{
