@@ -572,10 +572,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		},
 		// flyTo
 		flyTo : function(longitude, latitude, height, duration) {
-			var longitude = parseFloat(longitude);
-		
 			viewer.camera.flyTo({
-			
 				destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
 															parseFloat(latitude),
 															parseFloat(height)),
