@@ -1172,27 +1172,66 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		// www dependency.****
 		var dc = sceneState.dc;
 		
+		var columnMajorArray = WorldWind.Matrix.fromIdentity();
+		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
+		
 		var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
 		modelViewRelToEye.copy(dc.navigatorState.modelview);
 		modelViewRelToEye[3] = 0.0;
 		modelViewRelToEye[7] = 0.0;
 		modelViewRelToEye[11] = 0.0;
+		
+		// ModelViewMatrix.***
+		var modelView = WorldWind.Matrix.fromIdentity();
+		modelView.copy(dc.navigatorState.modelview);
+		columnMajorArray = modelView.columnMajorComponents(columnMajorArrayAux);
+		sceneState.modelViewMatrix.copyFromFloatArray(columnMajorArray);
+		
+		// ModelViewMatrix Inverse.***
+		var matrixInv = WorldWind.Matrix.fromIdentity();
+		matrixInv.invertMatrix(modelView);
+		columnMajorArray = matrixInv.columnMajorComponents(columnMajorArrayAux);
+		sceneState.modelViewMatrixInv.copyFromFloatArray(columnMajorArray);
+		
+		// NormalMatrix.***
+		sceneState.normalMatrix4.copyFromFloatArray(matrixInv);
 	  
+		// Projection Matrix.***
 		var projection = WorldWind.Matrix.fromIdentity();
 		projection.copy(dc.navigatorState.projection);
-	  
+		columnMajorArray = projection.columnMajorComponents(columnMajorArrayAux);
+		sceneState.projectionMatrix.copyFromFloatArray(columnMajorArray);
+		
+		// ModelViewRelToEyeMatrix.***
+		modelView = WorldWind.Matrix.fromIdentity();
+		modelView.copy(dc.navigatorState.modelview);
+		columnMajorArray = modelViewRelToEye.columnMajorComponents(columnMajorArray);
+		//columnMajorArray[12] = 0.0;
+		//columnMajorArray[13] = 0.0;
+		//columnMajorArray[14] = 0.0;
+		sceneState.modelViewRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
+		
+		// ModelViewProjectionRelToEyeMatrix.***
 		var modelViewProjectionRelToEye_aux = WorldWind.Matrix.fromIdentity();
 		modelViewProjectionRelToEye_aux.copy(projection);
 		modelViewProjectionRelToEye_aux.multiplyMatrix(modelViewRelToEye);
-	  
-		// End Calculate modelViewProjectionRelToEye.--------------------------------------------
 		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
 		var columnMajorArray = modelViewProjectionRelToEye_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
-	  
-		for(var i=0; i<16; i++)
-		{
-			sceneState.modelViewProjRelToEyeMatrix._floatArrays[i] = columnMajorArray[i]; 
-		}
+		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
+		
+		/*
+		// ModelViewProjectionRelToEyeMatrix.***
+		columnMajorArray = WorldWind.Matrix.fromIdentity();
+		var modelViewProjection = WorldWind.Matrix.fromIdentity();
+		modelViewProjection.copy(dc.navigatorState.modelviewProjection);
+		columnMajorArray = modelViewProjection.columnMajorComponents(columnMajorArrayAux);
+		columnMajorArray[12] = 0.0;
+		columnMajorArray[13] = 0.0;
+		columnMajorArray[14] = 0.0;
+		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
+		*/
+		//Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		//dc.navigatorState.projection
 		
 		var cameraPosition = dc.navigatorState.eyePoint;
 		sceneState.camera.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
@@ -1200,8 +1239,32 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		//sceneState.camera.up.set(scene._camera.up.x, scene._camera.up.y, scene._camera.up.z);
 		ManagerUtils.calculateSplited3fv([cameraPosition[0], cameraPosition[1], cameraPosition[2]] ,sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 		
-		// screen size.***
 		var viewport = this.wwd.viewport;
+		sceneState.camera.frustum.aspectRatio = viewport.width/viewport.height;
+		sceneState.camera.frustum.near[0] = this.wwd.navigator.nearDistance;
+		//sceneState.camera.frustum.far = 10e6;
+		sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
+		
+		
+		sceneState.camera.frustum.fovRad = Math.PI/4;
+		sceneState.camera.frustum.fovRad = 55 * Math.PI/180;
+		sceneState.camera.frustum.fovyRad = sceneState.camera.frustum.fovRad/sceneState.camera.frustum.aspectRatio;
+		//sceneState.camera.frustum.fovyRad = 45 * Math.PI/180;
+		
+		
+	 
+	 
+	 
+		// Compute the dimensions of the viewport rectangle at the near distance.
+		//var nearDistance = 1.0;
+		//var nearRect = WWMath.perspectiveFrustumRectangle(viewport.width, viewport.height, nearDistance),
+		//	left = nearRect.getMinX(),
+		//	right = nearRect.getMaxX(),
+		//	bottom = nearRect.getMinY(),
+		//	top = nearRect.getMaxY();
+		
+		// screen size.***
+		
 		sceneState.drawingBufferWidth = viewport.width;
 		sceneState.drawingBufferHeight = viewport.height;
 	}
@@ -1391,15 +1454,11 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	// 1) The depth render.***************************************************************************************************
 	//if(this.currentFramebuffer == null)
 	//	this.currentFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
-	
 	this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-
-	
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
-	
 	this.depthFboNeo.unbind();
 	
 	if(this.renderingFase == 0)
@@ -1410,7 +1469,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	// 2) ssao render.************************************************************************************************************
 	//if(this.currentFramebuffer != null)
 		//this.sceneState.gl.bindFramebuffer(this.sceneState.gl.FRAMEBUFFER, this.currentFramebuffer);
-
+	
 	if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 
@@ -3201,7 +3260,9 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 	gl.frontFace(gl.CCW);
 	//gl.depthFunc(gl.GREATER);
 	//gl.enable(gl.CULL_FACE);
-	//gl.depthRange(0.0, 1.0);
+	gl.depthRange(0.0, 1.0);
+	
+	gl.enable(gl.DEPTH_TEST);
 
 	if(ssao_idx == -1) {
 		// is selection.***
@@ -3225,6 +3286,8 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 
 		// Test render in lego.***
 		if(ssao_idx == 0) {
+			gl.disable(gl.BLEND);
+			//gl.blendFunc(gl.GL_SRC_COLOR,gl.GL_SRC_COLOR);
 			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
 			if(neoBuildingsCount > 0)
 			{
