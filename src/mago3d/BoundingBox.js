@@ -157,3 +157,68 @@ BoundingBox.prototype.isPoint3dInside = function(x, y, z) {
 
 	return true;
 };
+
+/**
+ * 영역 박스내에 존재 유무를 판단
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+BoundingBox.prototype.intersectsWithBBox = function(bbox) {
+	var intersection = true;
+
+	if(this.maxX < bbox.minX)
+	{
+		intersection = false;
+	}
+	else if(this.minX > bbox.maxX)
+	{
+		intersection = false;
+	}
+	//--------------------------------
+	else if(this.maxY < bbox.minY)
+	{
+		intersection = false;
+	}
+	else if(this.minY > bbox.maxY)
+	{
+		intersection = false;
+	}
+	//--------------------------------
+	else if(this.maxZ < bbox.minZ)
+	{
+		intersection = false;
+	}
+	else if(this.minZ > bbox.maxZ)
+	{
+		intersection = false;
+	}
+
+	return intersection;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
