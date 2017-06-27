@@ -59,6 +59,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		
         // Create the World Window.
         var wwd = new WorldWind.WorldWindow(containerId);
+		//wwd.depthBits = 32;
 		
 		// animator setting
 		wwd.goToAnimator.travelTime = 10000;
