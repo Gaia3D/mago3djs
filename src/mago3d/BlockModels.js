@@ -403,11 +403,9 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
 				bytesReaded += 4;
 			}
-			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
-			/* khj(20170331)
-			var bigTrianglesShortIndicesValues_count = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			*/
+			//var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+			var bigTrianglesShortIndicesValues_count = indexMarkers[0];
+
 			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2 * shortIndicesValuesCount;

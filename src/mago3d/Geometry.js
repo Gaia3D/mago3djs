@@ -192,11 +192,6 @@ var NeoBuilding = function() {
 
 	this.moveVector; 
 
-	// aditional data.****************************************************
-	// provisional data for webWorldWind.***
-	this.provisionalSegmentsArray;
-	// end provisional data.----------------------------------------------
-
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
 	this.neoSimpleBuilding; // no used. this is a simpleBuilding for Buildings with texture.***
