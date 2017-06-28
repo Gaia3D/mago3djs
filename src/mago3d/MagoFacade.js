@@ -144,23 +144,21 @@ function changeColorAPI(projectId, blockIds, objectIds, color) {
 /**
  * location and rotation 변경
  * 
- * @param projectId 프로젝트 아이디
- * @param blockId block id
+ * @param data_key
  * @param latitude 위도
  * @param longitude 경도
- * @param elevation 높이
+ * @param height 높이
  * @param heading 좌, 우
  * @param pitch 위, 아래
  * @param roll 좌, 우 기울기
  * @return
  */
-function changeLocationAndRotationAPI(projectId, blockId, latitude, longitude, elevation, heading, pitch, roll) {
+function changeLocationAndRotationAPI(data_key, latitude, longitude, height, heading, pitch, roll) {
 	var api = new API("changeLocationAndRotation");
-	api.setProjectId(projectId);
-	api.setBlockId(blockId);
+	api.setDataKey(data_key);
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);
-	api.setElevation(elevation);
+	api.setElevation(height);
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
