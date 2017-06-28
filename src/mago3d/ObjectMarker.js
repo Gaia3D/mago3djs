@@ -9,6 +9,6 @@ var ObjectMarker = function() {
 	if(!(this instanceof ObjectMarker)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	//this.
+	this.geoLocationData = new GeoLocationData();
 
 };
