@@ -263,21 +263,15 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 		// now calculate the inverses of the matrices.***
 		var tMatrixInv = WorldWind.Matrix.fromIdentity();
 		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
-		var tMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		tMatrixInvColMajorArray = tMatrixInv.columnMajorComponents(tMatrixInvColMajorArray);
-		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInvColMajorArray);
+		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
 		
 		var rotMatrixInv = WorldWind.Matrix.fromIdentity();
 		rotMatrixInv.invertMatrix(resultGeoLocationData.rotMatrix._floatArrays);
-		var rotMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		rotMatrixInvColMajorArray = rotMatrixInv.columnMajorComponents(rotMatrixInvColMajorArray);
-		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInvColMajorArray);
+		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInv);
 		
 		var geoLocMatrixInv = WorldWind.Matrix.fromIdentity();
 		geoLocMatrixInv.invertMatrix(resultGeoLocationData.geoLocMatrix._floatArrays);
-		var geoLocMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		geoLocMatrixInvColMajorArray = geoLocMatrixInv.columnMajorComponents(geoLocMatrixInvColMajorArray);
-		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInvColMajorArray);
+		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
 	}
 	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
