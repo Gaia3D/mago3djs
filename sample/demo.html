@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Mago3D User</title>
+	<link rel="stylesheet" href="/sample/style.css" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans"> 
+	<link rel="stylesheet" href="/sample/demo.css" />
+	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
+	
+		<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
+	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
+	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
+	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
+	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
+</head>
+
+<body>
+	<div id="recentIssueListArea" style="text-align: center; height: 30px;">
+		<span>My Issue(5건, 30일 이내)</span>
+		<img id="issueMoreImage" src="/images/plus.png" alt="more" width="24px;" height="24px;"/>
+	</div>
+	<div id="apiListArea" style="text-align: center; height: 30px;">
+		<span style="margin-left:50px; margin-right: 50px;">API 목록</span>
+		<img id="apiMoreImage" src="/images/plus.png" alt="more" width="24px;" height="24px;"/>
+	</div>
+	
+	<div id="recentIssueListContent" style="display: none">
+		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
+			<div>
+				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
+				<span style="padding-left: 10px; width:200px; overflow: hidden;">바로 가기 테스트</span>
+				<span style="float:right; padding-right: 15px; padding-top: 5px;">
+					<a href="#" onclick="flyTo('127.028889', '37.499648', '80', '2')">
+						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
+					</a>
+				</span>
+			</div>
+			<div id="issue_toggle_19">
+				<span style="padding-left: 25px;">[버그][매우중요]</span>
+				<span style="padding-left: 5px;">COLLADA</span>
+				<span style="float:right; padding-right: 20px;">2017-06-28 14:41:40</span>
+			</div>
+		</div>
+		
+		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
+			<div>
+				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
+				<span style="padding-left: 10px; width:200px; overflow: hidden;">overflow hidden test 가나라다라마바사아자차카</span>
+				<span style="float:right; padding-right: 15px; padding-top: 5px;">
+					<a href="#" onclick="flyTo('127.025199', '37.500928', '72', '2')">
+						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
+					</a>
+				</span>
+			</div>
+			<div id="issue_toggle_18">
+				<span style="padding-left: 25px;">[버그][매우중요]</span>
+				<span style="padding-left: 5px;">IFC</span>
+				<span style="float:right; padding-right: 20px;">2017-06-28 14:27:27</span>
+			</div>
+		</div>
+		
+		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
+			<div>
+				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
+				<span style="padding-left: 10px; width:200px; overflow: hidden;">바닥 색깔이 다른거 같습니다.</span>
+				<span style="float:right; padding-right: 15px; padding-top: 5px;">
+					<a href="#" onclick="flyTo('126.923279', '37.524059', '50', '2')">
+						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
+					</a>
+				</span>
+			</div>
+			<div id="issue_toggle_17">
+				<span style="padding-left: 25px;">[버그][매우중요]</span>
+				<span style="padding-left: 5px;">IFC</span>
+				<span style="float:right; padding-right: 20px;">2017-06-28 12:16:12</span>
+			</div>
+		</div>
+		
+		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
+			<div>
+				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
+				<span style="padding-left: 10px; width:200px; overflow: hidden;">천장 형광등 왼쪽 모서리 확인해 주세요.</span>
+				<span style="float:right; padding-right: 15px; padding-top: 5px;">
+					<a href="#" onclick="flyTo('126.88882', '37.58029', '45', '2')">
+						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
+					</a>
+				</span>
+			</div>
+			<div id="issue_toggle_16">
+				<span style="padding-left: 25px;">[버그][매우중요]</span>
+				<span style="padding-left: 5px;">3DS</span>
+				<span style="float:right; padding-right: 20px;">2017-06-28 12:12:45</span>
+			</div>
+		</div>
+		
+		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
+			<div>
+				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
+				<span style="padding-left: 10px; width:200px; overflow: hidden;">gangnam_del 왼쪽 하단 파이프 라인 확인</span>
+				<span style="float:right; padding-right: 15px; padding-top: 5px;">
+					<a href="#" onclick="flyTo('126.89357', '37.5792', '48', '2')">
+						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
+					</a>
+				</span>
+			</div>
+			<div id="issue_toggle_15">
+				<span style="padding-left: 25px;">[기능개선][매우중요]</span>
+				<span style="padding-left: 5px;">3DS</span>
+				<span style="float:right; padding-right: 20px;">2017-06-28 12:00:37</span>
+			</div>
+		</div>
+	</div>
+		
+
+	<div id="apiListContent" style="display: none">
+		<div style="height: 20px;"></div>
+		<div>
+			<span style="padding-left: 10px; padding-right: 100px;">Data Key</span>
+			<input type="text" id="search_data_key" name="search_data_key" size="15" />
+			<button type="button" id="searchData" >검색</button>
+		</div>
+		<div style="margin-top: 15px;">
+			<span style="padding-left: 10px; padding-right: 70px;">Bounding Box</span>
+			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
+			<label for="showBoundingBox"> 표시 </label>
+			<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
+			<label for="hideBoundingBox"> 비표시 </label>
+		</div>
+		<div style="margin-top: 15px;">
+			<span style="padding-left: 10px; padding-right: 16px;">Selecting And Moving</span>
+			<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
+			<label for="mouseAllMove"> ALL </label>
+			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
+			<label for="mouseObjectMove"> Object </label>
+		</div>
+		<div style="margin-top: 15px;">
+			<div style="padding-left: 10px;">
+				Location And Rotation
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 102px; padding-right: 12px;">
+					<label for="move_data_key">Data Key</label>
+					<input type="text" id="move_data_key" name="move_data_key" size="15" />
+				</span>
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 110px; padding-right: 12px;">
+					<label for="move_latitude">위도 </label>
+					<input type="text" id="move_latitude" name="move_latitude" size="15"/> 
+				</span> 
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 110px; padding-right: 12px;">
+					<label for="move_longitude">경도 </label>
+					<input type="text" id="move_longitude" name="move_longitude" size="15"/>
+				</span> 
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 110px; padding-right: 12px;">
+					<label for="move_height">높이 </label>
+					<input type="text" id="move_height" name="move_height" size="15" />
+				</span> 
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 97px; padding-right: 12px;">
+					<label for="move_heading">HEADING </label>
+					<input type="text" id="move_heading" name="move_heading" size="15" />
+				</span> 
+			</div>
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 110px; padding-right: 12px;">
+					<label for="move_pitch">PITCH </label>
+					<input type="text" id="move_pitch" name="move_pitch" size="15" />
+				</span>
+			</div> 
+			<div style="margin-top: 5px;">
+				<span style="padding-left: 110px; padding-right: 12px;">
+					<label for="move_roll">ROLL </label>
+					<input type="text" id="move_roll" name="move_roll" size="15" /> 
+					<button type="button" id="changeLocationAndRotationAPI">변환</button>
+				</span>
+			</div>
+		</div>
+		<div style="height: 20px;"></div>
+	</div>
+	
+		
+	<div class="trigger" >
+		<button type="button"></button>
+		<ul>
+			<li><a href="/homepage/tutorials.do">Tutorials</a></li>
+			<li><a href="/homepage/download.do">Download</a></li>
+			<li><a href="/homepage/about.do">mago3D</a></li>
+			<li>Home</li>	
+		</ul>
+	</div>
+
+	<div id="magoControllArea">
+		<div id="" style="padding-top:5px; width: 120px;">
+			<img src="/images/data_group_1.png" width="21px;" height="33px;" alt="Issue Input" />
+			<a href="#" onclick="alert('preparing...');">
+				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">JT</span>
+			</a>
+		</div>
+
+		<div id="" style="padding-top:5px; width: 120px;">
+			<img src="/images/data_group_2.png" width="21px;" height="33px;" alt="Issue Input" />
+			<a href="#" onclick="flyTo('126.88882', '37.58029', '1000', '2')">
+				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">3DS</span>
+			</a>
+		</div>
+
+		<div id="" style="padding-top:5px; width: 120px;">
+			<img src="/images/data_group_3.png" width="21px;" height="33px;" alt="Issue Input" />
+			<a href="#" onclick="flyTo('126.923279', '37.524059', '1000', '2')">
+				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">IFC</span>
+			</a>
+		</div>
+
+		<div id="" style="padding-top:5px; width: 120px;">
+			<img src="/images/data_group_4.png" width="21px;" height="33px;" alt="Issue Input" />
+			<a href="#" onclick="flyTo('127.025574', '37.499610', '1000', '2')">
+				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">COLLADA</span>
+			</a>
+		</div>
+	
+		<div style="height: 30px;"></div>
+		<div id="issueEnable" style="width: 150px;">
+			<img src="/images/issue_input.png" alt="Issue Input" width="40px;" height="50px;" />
+			<p />
+			<span id="issueEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Issue 등록</span>
+		</div>
+		<div id="objectInfoEnable" style="margin-top:10px; width:150px;">
+			<img src="/images/info_view.png" alt="Info View" width="40px;" height="50px;" />
+			<p />
+			<span id="objectInfoEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Object 정보 표시</span>
+		</div>
+		<div id="issuesEnable" style="margin-top:10px; width:150px;">
+			<img src="/images/issue_list.png" alt="Info View" width="40px;" height="50px;" />
+			<p />
+			<span id="issuesEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Issue 목록</span>
+		</div>
+		
+		<div style="margin-top:50px; width:150px;" onclick="inputIssue();">
+			<span style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">API Call Test</span>
+		</div>
+	</div>
+	
+	<!-- 맵영역 -->
+	<div id="magoContainer" style="position: absolute; width: 99%; height: 95%; margin-top: 0; padding: 0; overflow: hidden;"></div>
+
+	<form id="issue" action="/homepage/demo.do" method="post" onsubmit="return false;">
+	<div id="inputIssueLayer" style="display: none; top:40%; left:45%; width:450px; margin:-250px 0 0 -150px; " class="layer">
+	    <div class="layerHeader">
+	        <h2>Issue Register</h2>
+	        <div>
+	            <button id="inputIssueClose" type="button" title="닫기">닫기</button>
+	        </div>
+	    </div>
+	    <div class="layerContents">
+<!-- 	        <h4>테이블</h4> -->
+	        <table>
+	        	<tr>
+	        		<th style="width: 120px;">
+	        			<label for="data_group_id">데이터 그룹</label>
+	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        		</th>
+	        		<td>
+	        			<select id="data_group_id" name="data_group_id" class="select">
+							<option value="8">JT</option>
+							<option value="3">3DS</option>
+							<option value="9">IFC</option>
+							<option value="10">COLLADA</option>
+						</select>
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th>
+	        			<label for="issue_type">Issue Type</label>
+	        		</th>
+	        		<td>
+	        			<select id="issue_type" name="issue_type" class="select">
+							<option value="버그">버그</option>
+							<option value="기능개선">기능개선</option>
+							<option value="수정">수정</option>
+							<option value="기타">기타</option>
+						</select>
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th>
+	        			<label for="data_key">Data Key</label>
+	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        		</th>
+	        		<td><input id="data_key" name="data_key" class="ml" type="text" value=""/>
+						
+						<input id="latitude" name="latitude" type="hidden" value=""/>
+						<input id="longitude" name="longitude" type="hidden" value=""/>
+						<input id="height" name="height" type="hidden" value=""/>
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th>
+	        			<label for="title">제목</label>
+	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        		</th>
+	        		<td><input id="title" name="title" class="ml" type="text" value=""/>
+						
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th><label for="priority">Issue Type</label></th>
+	        		<td>
+	        			<select id="priority" name="priority" class="select">
+							<option value="매우중요">매우중요</option>
+							<option value="중요">중요</option>
+							<option value="보통">보통</option>
+							<option value="낮음">낮음</option>
+						</select>
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th><label for="due_date">마감일</label></th>
+	        		<td><input id="start_date" name="start_date" type="hidden" value=""/>
+						<input type="text" id="start_day" name="start_day" placeholder="날짜" size="7" maxlength="4" />
+						<input type="text" id="start_hour" name="start_hour" placeholder="시간" size="3" maxlength="2" />
+						<span class="delimeter">:</span>
+						<input type="text" id="start_minute" name="start_minute" placeholder="분" size="3" maxlength="2" />
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th><label for="assignee">Assignee</label></th>
+	        		<td><input id="assignee" name="assignee" class="m" placeholder="대리자" type="text" value=""/>
+						
+	        		</td>
+	        	</tr>
+	        	<tr>
+	        		<th><label for="reporter">reporter</label></th>
+	        		<td><input id="reporter" name="reporter" class="m" placeholder="보고 해야 하는 사람" type="text" value=""/>
+						
+	        		</td>
+	        	</tr>
+	        	<tr style="height: 50px;">
+	        		<th><label for="contents">내용</label></th>
+	        		<td>
+	        			<textarea id="contents" name="contents">
+						</textarea>
+	        		</td>
+	        	</tr>
+	        </table>
+	        
+	      	<div class="btns">
+	 			<button id="issueInsertButton">Save</button>
+			</div>
+	    </div>
+	</div>
+	</form>
+
+
+<script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
+<script type="text/javascript" src="/src/mago3d/Code.js"></script>
+<script type="text/javascript" src="/src/mago3d/API.js"></script>
+<script type="text/javascript" src="/src/mago3d/Config.js"></script>
+<script type="text/javascript" src="/src/mago3d/Callback.js"></script>
+<script type="text/javascript" src="/src/mago3d/Constant.js"></script>
+<script type="text/javascript" src="/src/mago3d/Message.js"></script>
+<script type="text/javascript" src="/src/mago3d/ManagerFactory.js"></script>
+<script type="text/javascript" src="/src/mago3d/Atmosphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/GeometryUtil.js"></script>
+<script type="text/javascript" src="/src/mago3d/GeometryModifier.js"></script>
+<script type="text/javascript" src="/src/mago3d/Line.js"></script>
+<script type="text/javascript" src="/src/mago3d/Plane.js"></script>
+<script type="text/javascript" src="/src/mago3d/Point3D.js"></script>
+<script type="text/javascript" src="/src/mago3d/Shader.js"></script>
+<script type="text/javascript" src="/src/mago3d/ShaderSource.js"></script>
+<script type="text/javascript" src="/src/mago3d/ReaderWriter.js"></script>
+<script type="text/javascript" src="/src/mago3d/Renderer.js"></script>
+<script type="text/javascript" src="/src/mago3d/Selection.js"></script>
+<script type="text/javascript" src="/src/mago3d/VBOManager.js"></script>
+<script type="text/javascript" src="/src/mago3d/CesiumManager.js"></script>
+<script type="text/javascript" src="/src/mago3d/PostFxShader.js"></script>
+<script type="text/javascript" src="/src/mago3d/FBO.js"></script>
+<script type="text/javascript" src="/src/mago3d/Geometry.js"></script>
+<script type="text/javascript" src="/src/mago3d/Accessor.js"></script>
+<script type="text/javascript" src="/src/mago3d/NeoTexture.js"></script>
+<script type="text/javascript" src="/src/mago3d/BoundingBox.js"></script>
+<script type="text/javascript" src="/src/mago3d/BlockModels.js"></script>
+<script type="text/javascript" src="/src/mago3d/FileRequestControler.js"></script>
+<script type="text/javascript" src="/src/mago3d/ManagerUtils.js"></script>
+<script type="text/javascript" src="/src/mago3d/NeoReferenceModels.js"></script>
+<script type="text/javascript" src="/src/mago3d/OcclusionCullOctree.js"></script>
+<script type="text/javascript" src="/src/mago3d/Octree.js"></script>
+<script type="text/javascript" src="/src/mago3d/VisibleObjectsControler.js"></script>
+<script type="text/javascript" src="/src/mago3d/Matrix4.js"></script>
+<script type="text/javascript" src="/src/mago3d/Lego.js"></script>
+<script type="text/javascript" src="/src/mago3d/Camera.js"></script>
+<script type="text/javascript" src="/src/mago3d/GeoLocationData.js"></script>
+<script type="text/javascript" src="/src/mago3d/MagoFacade.js"></script>
+<script type="text/javascript" src="/src/mago3d/Policy.js"></script>
+<script type="text/javascript" src="/src/mago3d/Box.js"></script>
+<script type="text/javascript" src="/src/mago3d/Vertex.js"></script>
+<script type="text/javascript" src="/src/mago3d/Triangle.js"></script>
+<script type="text/javascript" src="/src/mago3d/TriSurface.js"></script>
+<script type="text/javascript" src="/src/mago3d/TriPolyhedron.js"></script>
+<script type="text/javascript" src="/src/mago3d/VertexList.js"></script>
+<script type="text/javascript" src="/src/mago3d/VertexMatrix.js"></script>
+<script type="text/javascript" src="/src/mago3d/Color.js"></script>
+<script type="text/javascript" src="/src/mago3d/Quaternion.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/ProjectLayer.js"></script>
+<script type="text/javascript" src="/src/mago3d/MetaData.js"></script>
+<script type="text/javascript" src="/src/mago3d/SceneState.js"></script>
+<script type="text/javascript" src="/src/mago3d/SplitValue.js"></script>
+<script type="text/javascript" src="/src/mago3d/Frustum.js"></script>
+<script type="text/javascript" src="/src/mago3d/GeographicCoord.js"></script>
+<script type="text/javascript" src="/src/mago3d/TerranTile.js"></script>
+<script type="text/javascript" src="/src/mago3d/GlobeTile.js"></script>
+<script type="text/javascript" src="/src/mago3d/BoundingSphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/AuxiliarSegment.js"></script>
+<script type="text/javascript" src="/src/mago3d/Sphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/ObjectMarker.js"></script>
+<script>
+	var managerFactory = null;
+	var insertIssueFlag = false;
+	var objectInfoViewFlag = false;
+	var listIssueFlag = false;
+	magoStart(null, "magoContainer", null, null);
+	/* var timerId = setInterval("startMogoUI()", 1000); */
+	
+	// mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, serverPolicy, serverData) {
+		if(serverPolicy === null) {
+			$.ajax({
+				url: "/sample/policy.json",
+				type: "GET",
+				dataType: "json",
+				success: function(serverPolicy){
+					loadData(viewer, renderDivId, serverPolicy, serverData);
+				},
+				error: function(e){
+					alert(e.responseText);
+				}
+			});
+		} else {
+			loadData(viewer, renderDivId, serverPolicy, serverData);
+		}
+	}
+		
+	function loadData(viewer, renderDivId, serverPolicy, serverData) {
+		if(serverData === null) {
+			$.ajax({
+				url: "/sample/data.json",
+				type: "GET",
+				dataType: "json",
+				success: function(serverData){
+					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+				},
+				error: function(e){
+					alert(e.responseText);
+				}
+			});
+		} else {
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+		}
+	}
+	
+	/* function startMogoUI() {
+		intervalCount++;
+		if(managerFactory != null) {
+			// BoundingBox
+			changeBoundingBox(false);
+			// Selecting And Moving
+			changeMouseMove("0");
+			clearInterval(timerId);
+			console.log(" managerFactory != null, intervalCount = " + intervalCount);
+			return;
+		}
+		console.log("--------- intervalCount = " + intervalCount);
+	} */
+	
+	$(document).ready(function() {
+		$("#recentIssueListContent").show();
+		//$("#issueMoreImage").attr("src", "/images/${lang }/homepage/minus.png");
+		// BoundingBox
+		changeBoundingBox(false);
+		// Selecting And Moving
+		changeMouseMove("0");
+	});
+	$("#issueMoreImage").click(function() {
+		if($("#recentIssueListContent").css("display") == "none") {
+			$("#recentIssueListContent").show();
+			$("#apiListContent").hide();
+		} else {
+			$("#recentIssueListContent").hide();
+		}
+	});
+	$("#apiMoreImage").click(function() {
+		if($("#apiListContent").css("display") == "none") {
+			$("#apiListContent").show();
+			$("#recentIssueListContent").hide();
+		} else {
+			$("#apiListContent").hide();
+		}
+	});
+	
+	function flyTo(longitude, latitude, height, duration) {
+		managerFactory.flyTo(longitude, latitude, height, duration);
+	}
+	
+	// 이슈 등록
+	$("#issueEnable").click(function() {
+		if(insertIssueFlag) {
+			insertIssueFlag = false;
+			$("#issueEnableLabel").text("Issue 등록");
+		} else {
+			insertIssueFlag = true;
+			$("#issueEnableLabel").text("활성화 상태");
+		}
+		changeInsertIssueModeAPI(insertIssueFlag);
+	});
+	// object info 표시
+	$("#objectInfoEnable").click(function() {
+		if(objectInfoViewFlag) {
+			objectInfoViewFlag = false;
+			$("#objectInfoEnableLabel").text("Object 정보 표시");
+		} else {
+			objectInfoViewFlag = true;
+			$("#objectInfoEnableLabel").text("활성화 상태");
+		}
+		changeObjectInfoViewModeAPI(objectInfoViewFlag);
+	});
+	// issue list 표시
+	$("#issuesEnable").click(function() {
+		if(listIssueFlag) {
+			listIssueFlag = false;
+			$("#issuesEnableLabel").text("Issue 목록");
+		} else {
+			listIssueFlag = true;
+			$("#issuesEnableLabel").text("활성화 상태");
+		}
+		changeListIssueViewModeAPI(listIssueFlag);
+	});
+	
+	function inputIssue(data_name, data_key, latitude, longitude, elevation) {
+		if(insertIssueFlag) {
+			if($("#inputIssueLayer").css("display") == "none") {
+				$("#inputIssueLayer").show();
+				
+				var dt = new Date();
+				
+				
+				$("#latitude").val("37.57750");
+				$("#longitude").val("126.89069");
+				$("#height").val("60.0");
+			}
+		}
+	}
+	
+	$("#inputIssueClose").click(function() {
+		$("#inputIssueLayer").hide();
+	});
+	
+	// object 정보 표시 call back function
+	function showSelectedObject(projectId, blockId, objectId, latitude, longitude, height, heading, pitch, roll){
+		if(objectInfoViewFlag) {
+			$("#move_data_key").val(projectId + "_" + blockId);
+			$("#move_latitude").val(latitude);
+			$("#move_longitude").val(longitude);
+			$("#move_height").val(height);
+			$("#move_heading").val(heading);
+			$("#move_pitch").val(pitch);
+			$("#move_roll").val(roll);
+			
+			$.toast({
+			    heading: 'Click Object Info',
+			    text: [
+			        'projectId : ' + projectId, 
+			        'blockId : ' + blockId, 
+			        'objectId : ' + objectId,
+			        'latitude : ' + latitude,
+			        'longitude : ' + longitude,
+			        'height : ' + height,
+			        'heading : ' + heading,
+			        'pitch : ' + pitch,
+			        'roll : ' + roll
+			    ],
+				//bgColor : 'blue',
+				hideAfter: 5000,
+				icon: 'info'
+			});
+		}
+	}
+	
+	function check() {
+		if ($("#data_key").val() == "") {
+			alert(JS_MESSAGE["issue.datakey.empty"]);
+			$("#data_key").focus();
+			return false;
+		}
+		if ($("#title").val() == "") {
+			alert(JS_MESSAGE["issue.title.empty"]);
+			$("#title").focus();
+			return false;
+		}
+		/* if ($("#assignee").val() == "") {
+			alert(JS_MESSAGE["issue.assignee.empty"]);
+			$("#assignee").focus();
+			return false;
+		}
+		if ($("#reporter").val() == "") {
+			alert(JS_MESSAGE["issue.reporter.empty"]);
+			$("#reporter").focus();
+			return false;
+		} */
+		if ($("#contents").val() == "") {
+			alert(JS_MESSAGE["issue.contents.empty"]);
+			$("#contents").focus();
+			return false;
+		}
+		if ($("#start_hour").val() > 23) {
+			alert(JS_MEESAGE["issue.start_hour.proper"]);
+			$("#start_hour").focus();
+			return false;
+		}
+		if ($("#start_minute").val() > 59) {
+			alert(JS_MESSAGE["issue.start_minute.proper"]);
+			$("#start_minute").focus();
+			return false;
+		}
+	}
+	
+	var isInsertIssue = true;
+	$("#issueInsertButton").click(function() {
+		if (check() == false) {
+			return false;
+		}
+		if(isInsertIssue) {
+			isInsertIssue = false;
+			var info = $("#issue").serialize();		
+			$.ajax({
+				url: "/issue/ajax-insert-issue.do",
+				type: "POST",
+				data: info,
+				cache: false,
+				dataType: "json",
+				success: function(msg){
+					if(msg.result == "success") {
+						alert(JS_MESSAGE["insert"]);
+					} else {
+						alert(JS_MESSAGE[msg.result]);
+					}
+					
+					$("#inputIssueLayer").hide();
+					isInsertIssue = true;
+				},
+				error:function(request,status,error){
+			        //alert(JS_MESSAGE["ajax.error.message"]);
+			        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			        isInsertIssue = true;
+				}
+			});
+		} else {
+			alert(JS_MESSAGE["button.dobule.click"]);
+			return;
+		}
+	});
+	
+	
+	// Data 검색
+	$("#searchData").click(function() {
+		if ($.trim($("#search_data_key").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#search_data_key").focus();
+			return false;
+		}
+		searchDataAPI($("#search_data_key").val());
+	});
+	// boundingBox 표시/비표시
+	function changeBoundingBox(isShow) {
+		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
+		changeBoundingBoxAPI(isShow);
+	}
+	// 마우스 클릭 객체 이동 모드 변경
+	function changeMouseMove(mouseMoveMode) {
+		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
+		changeMouseMoveAPI(mouseMoveMode);
+	}
+	// 변환행렬
+	$("#changeLocationAndRotationAPI").click(function() {
+		if(!changeLocationAndRotationCheck()) return false;
+		changeLocationAndRotationAPI(	$("#move_data_key").val(), $("#move_latitude").val(), $("#move_longitude").val(), 
+										$("#move_height").val(), $("#move_heading").val(), $("#move_pitch").val(), $("#move_roll").val());
+	});
+	function changeLocationAndRotationCheck() {
+		if ($.trim($("#move_data_key").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#move_data_key").focus();
+			return false;
+		}
+		if ($.trim($("#move_latitude").val()) === ""){
+			alert("위도를 입력해 주세요.");
+			$("#move_latitude").focus();
+			return false;
+		}
+		if ($.trim($("#move_longitude").val()) === ""){
+			alert("경도를 입력해 주세요.");
+			$("#move_longitude").focus();
+			return false;
+		}
+		if ($.trim($("#move_height").val()) === ""){
+			alert("높이를 입력해 주세요.");
+			$("#move_height").focus();
+			return false;
+		}
+		if ($.trim($("#move_heading").val()) === ""){
+			alert("heading을 입력해 주세요.");
+			$("#move_heading").focus();
+			return false;
+		}
+		if ($.trim($("#move_pitch").val()) === ""){
+			alert("pitch를 입력해 주세요.");
+			$("#move_pitch").focus();
+			return false;
+		}
+		if ($.trim($("#move_roll").val()) === ""){
+			alert("roll를 입력해 주세요.");
+			$("#move_roll").focus();
+			return false;
+		}
+		return true;
+	}
+</script>
+</body>
+</html>
