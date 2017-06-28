@@ -310,6 +310,206 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	return resultGeoLocationData;
 };
 
+ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absoluteY, absoluteZ, resultGeoLocationData, magoManager) {
+
+	if(resultGeoLocationData == undefined)
+		resultGeoLocationData = new GeoLocationData();
+
+	// 0) Position.********************************************************************************************
+	if(resultGeoLocationData.geographicCoord == undefined)
+		resultGeoLocationData.geographicCoord = new GeographicCoord();
+	
+	if(magoManager.configInformation == undefined)
+		return;
+	
+	if(resultGeoLocationData.position == undefined)
+		resultGeoLocationData.position = new Point3D();
+		
+	resultGeoLocationData.position.x = absoluteX;
+	resultGeoLocationData.position.y = absoluteY;
+	resultGeoLocationData.position.z = absoluteZ;
+		
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		//var globe = magoManager.wwd.globe;
+		//var origin = new WorldWind.Vec3(0, 0, 0);
+		//origin = globe.computePointFromPosition(resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.altitude, origin);
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// *if this in Cesium:
+		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
+		// must find cartographic data.***
+		var cartographic = new Cesium.Cartographic();
+		var cartesian = new Cesium.Cartesian3();
+		cartesian.x = absoluteX;
+		cartesian.y = absoluteY;
+		cartesian.z = absoluteZ;
+		cartographic = Cesium.Cartographic.fromCartesian(cartesian, magoManager.scene._globe._ellipsoid, cartographic);
+		resultGeoLocationData.geographicCoord.longitude = cartographic.longitude * 180.0/Math.PI;
+		resultGeoLocationData.geographicCoord.latitude = cartographic.latitude * 180.0/Math.PI;
+		resultGeoLocationData.geographicCoord.altitude = cartographic.height;
+	}
+
+	// High and Low values of the position.********************************************************************
+	if(resultGeoLocationData.positionHIGH == undefined)
+		resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]);
+	if(resultGeoLocationData.positionLOW == undefined)
+		resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]);
+	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
+
+	// Determine the elevation of the position.***********************************************************
+	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+    //var height = cartographic.height;
+	// End Determine the elevation of the position.-------------------------------------------------------
+	if(resultGeoLocationData.tMatrix == undefined)
+		resultGeoLocationData.tMatrix = new Matrix4();
+	else
+		resultGeoLocationData.tMatrix.Identity();
+
+	if(resultGeoLocationData.geoLocMatrix == undefined)
+		resultGeoLocationData.geoLocMatrix = new Matrix4();
+	else
+		resultGeoLocationData.geoLocMatrix.Identity();
+
+	if(resultGeoLocationData.geoLocMatrixInv == undefined)
+		resultGeoLocationData.geoLocMatrixInv = new Matrix4();
+	else
+		resultGeoLocationData.geoLocMatrixInv.Identity();
+
+	//---------------------------------------------------------
+
+	if(resultGeoLocationData.tMatrixInv == undefined)
+		resultGeoLocationData.tMatrixInv = new Matrix4();
+	else
+		resultGeoLocationData.tMatrixInv.Identity();
+
+	if(resultGeoLocationData.rotMatrix == undefined)
+		resultGeoLocationData.rotMatrix = new Matrix4();
+	else
+		resultGeoLocationData.rotMatrix.Identity();
+
+	if(resultGeoLocationData.rotMatrixInv == undefined)
+		resultGeoLocationData.rotMatrixInv = new Matrix4();
+	else
+		resultGeoLocationData.rotMatrixInv.Identity();
+
+	var xRotMatrix = new Matrix4();  // created as identity matrix.***
+	var yRotMatrix = new Matrix4();  // created as identity matrix.***
+	var zRotMatrix = new Matrix4();  // created as identity matrix.***
+
+	if(resultGeoLocationData.heading != undefined && resultGeoLocationData.heading != 0)
+	{
+		zRotMatrix.rotationAxisAngDeg(resultGeoLocationData.heading, 0.0, 0.0, -1.0);
+	}
+
+	if(resultGeoLocationData.pitch != undefined && resultGeoLocationData.pitch != 0)
+	{
+		xRotMatrix.rotationAxisAngDeg(resultGeoLocationData.pitch, -1.0, 0.0, 0.0);
+	}
+
+	if(resultGeoLocationData.roll != undefined && resultGeoLocationData.roll != 0)
+	{
+		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, -1.0, 0.0);
+	}
+	
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		// * if this in webWorldWind:
+		var xAxis = new WorldWind.Vec3(0, 0, 0),
+		yAxis = new WorldWind.Vec3(0, 0, 0),
+		zAxis = new WorldWind.Vec3(0, 0, 0);
+		var rotMatrix = WorldWind.Matrix.fromIdentity();
+		var tMatrix = WorldWind.Matrix.fromIdentity();
+		
+		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], globe, xAxis, yAxis, zAxis);
+
+		rotMatrix.set(
+		xAxis[0], yAxis[0], zAxis[0], 0,
+		xAxis[1], yAxis[1], zAxis[1], 0,
+		xAxis[2], yAxis[2], zAxis[2], 0,
+		0, 0, 0, 1); 
+				
+		tMatrix.set(
+		xAxis[0], yAxis[0], zAxis[0], resultGeoLocationData.position.x,
+		xAxis[1], yAxis[1], zAxis[1], resultGeoLocationData.position.y,
+		xAxis[2], yAxis[2], zAxis[2], resultGeoLocationData.position.z,
+		0, 0, 0, 1);
+				
+				var columnMajorArray = WorldWind.Matrix.fromIdentity(); 
+				columnMajorArray = rotMatrix.columnMajorComponents(columnMajorArray); // no used.***
+			
+				var matrixInv = WorldWind.Matrix.fromIdentity();
+				matrixInv.invertMatrix(rotMatrix);
+				var columnMajorArrayAux_inv = WorldWind.Matrix.fromIdentity();
+				var columnMajorArray_inv = matrixInv.columnMajorComponents(columnMajorArrayAux_inv); 
+		
+		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
+		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
+		resultGeoLocationData.tMatrix.setByFloat32Array(tMatrixColMajorArray);
+		
+		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix); // "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
+
+		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
+		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
+
+		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
+		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
+		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
+		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
+		
+		// now calculate the inverses of the matrices.***
+		var tMatrixInv = WorldWind.Matrix.fromIdentity();
+		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
+		var tMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
+		tMatrixInvColMajorArray = tMatrixInv.columnMajorComponents(tMatrixInvColMajorArray);
+		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInvColMajorArray);
+		
+		var rotMatrixInv = WorldWind.Matrix.fromIdentity();
+		rotMatrixInv.invertMatrix(resultGeoLocationData.rotMatrix._floatArrays);
+		var rotMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
+		rotMatrixInvColMajorArray = rotMatrixInv.columnMajorComponents(rotMatrixInvColMajorArray);
+		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInvColMajorArray);
+		
+		var geoLocMatrixInv = WorldWind.Matrix.fromIdentity();
+		geoLocMatrixInv.invertMatrix(resultGeoLocationData.geoLocMatrix._floatArrays);
+		var geoLocMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
+		geoLocMatrixInvColMajorArray = geoLocMatrixInv.columnMajorComponents(geoLocMatrixInvColMajorArray);
+		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInvColMajorArray);
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// *if this in Cesium:
+		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
+		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);// "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
+
+		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
+		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
+
+		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
+		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
+		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
+		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
+
+		// now, calculates the inverses.***
+		Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
+		Cesium.Matrix4.inverse(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
+		Cesium.Matrix4.inverse(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
+	}
+
+	// finally assing the pivotPoint.***
+	if(resultGeoLocationData.pivotPoint == undefined)
+		resultGeoLocationData.pivotPoint = new Point3D();
+
+	resultGeoLocationData.pivotPoint.set(resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z);
+
+	return resultGeoLocationData;
+};
+
 ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
 {
 	if(resultSplitValue == undefined)
