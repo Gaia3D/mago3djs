@@ -23,6 +23,8 @@ var API = function(apiName) {
 	this.blockIds = null;
 	// objectIds
 	this.objectIds = null;
+	// data_key
+	this.dataKey = null;
 	
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
@@ -103,6 +105,13 @@ API.prototype.getObjectIds = function() {
 };
 API.prototype.setObjectIds = function(objectIds) {
 	this.objectIds = objectIds;
+};
+
+API.prototype.getDataKey = function() {
+	return this.dataKey;
+};
+API.prototype.setDataKey = function(dataKey) {
+	this.dataKey = dataKey;
 };
 
 API.prototype.getRenderMode = function() {
