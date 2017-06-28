@@ -151,6 +151,7 @@ var CesiumManager = function() {
 	this.renders_counter = 0;
 	this.render_time = 0;
 	this.bPicking = false;
+	this.bObjectMarker = true;
 
 	this.scene;
 
@@ -1424,7 +1425,19 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	/*
+	
+	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
+	{
+		var pixelPos = new Point3D();
+		pixelPos = this.calculatePixelPositionAsimetricMode(gl, scene, pixelPos);
+		var objMarker = this.objMarkerManager.newObjectMarker();
+		
+		ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
+		this.renderingFase = !this.renderingFase;
+		
+		this.bPicking = false;
+	}
+	
 	if(this.bPicking == true && isLastFrustum)
 	{
 		this.arrayAuxSC.length = 0;
@@ -1441,19 +1454,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 			//this.selectedObjectNotice(currentSelectedBuilding);
 			//console.log("objectId = " + selectedObject.objectId);
 		}
-	}
-	*/
-	
-	if(this.bPicking == true && isLastFrustum)
-	{
-		var pixelPos = new Point3D();
-		pixelPos = this.calculatePixelPositionAsimetricMode(gl, scene, pixelPos);
-		var objMarker = this.objMarkerManager.newObjectMarker();
 		
-		ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
-		this.renderingFase = !this.renderingFase;
-		
-		this.bPicking = false;
 	}
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1501,6 +1502,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
         //this.wwd.drawContext.bindProgram(wwwCurrentProgram);
 		gl.activeTexture(gl.TEXTURE0);
 		//gl.bindTexture(gl.TEXTURE_2D, wwwCurrentTexture);
+		this.wwd.drawContext.redrawRequested = true;
 	}
 	
 };
@@ -2666,7 +2668,6 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				
 			if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 			{
-				
 				if(this.myCameraSC == undefined) 
 					this.myCameraSC = new Camera();
 				
@@ -2675,19 +2676,24 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				
 				var dc = this.sceneState.dc;
 				
+				if(neoBuilding.buildingId == "gangnam_del")
+				{
+					var hola = 0;
+				}
+				
 				var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
 				this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
-				this.myCameraSC.frustum.near = 0.1;
-				this.myCameraSC.frustum.far = 5000000.0;
+				//this.myCameraSC.frustum.near = 0.1;
+				//this.myCameraSC.frustum.far = 5000000.0;
 				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
 				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 				/*
 				var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
 				modelViewRelToEye.copy(dc.navigatorState.modelview);
-				//modelViewRelToEye[3] = 0.0;
-				//modelViewRelToEye[7] = 0.0;
-				//modelViewRelToEye[11] = 0.0;
+				modelViewRelToEye[3] = 0.0;
+				modelViewRelToEye[7] = 0.0;
+				modelViewRelToEye[11] = 0.0;
 				
 				var modelviewTranspose = WorldWind.Matrix.fromIdentity();
 				modelviewTranspose.setToTransposeOfMatrix(modelViewRelToEye);
@@ -2718,16 +2724,17 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 				//this.matrixSC[13] = buildingGeoLocation.tMatrixInv._floatArrays[13];
 				//this.matrixSC[14] = buildingGeoLocation.tMatrixInv._floatArrays[14];
 				
-				frustumRelToEye.transformByMatrix(matInvTranspose);
+				frustumRelToEye.transformByMatrix(matrixInv);
 				frustumRelToEye.normalize();
 				
-				var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(matrixInv);
+				//var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(matrixInv);
 				//****************************************************************************************************************************************
 				for(var i=0; i<6; i++)
 				{
 					var plane = frustumRelToEye._planes[i];
 					this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], plane.distance);
 				}
+				
 				*/
 				if(this.myBboxSC == undefined)
 					this.myBboxSC = new BoundingBox();
@@ -2736,13 +2743,14 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 					this.myCullingVolumeBBoxSC = new BoundingBox();
 				
 				// Provisionally use a bbox to frustumCulling.***
-				var radiusAprox = 500.0;
+				var radiusAprox = 2000.0;
 				this.myCullingVolumeBBoxSC.minX = this.myCameraSC.position.x - radiusAprox;
 				this.myCullingVolumeBBoxSC.maxX = this.myCameraSC.position.x + radiusAprox;
 				this.myCullingVolumeBBoxSC.minY = this.myCameraSC.position.y - radiusAprox;
 				this.myCullingVolumeBBoxSC.maxY = this.myCameraSC.position.y + radiusAprox;
 				this.myCullingVolumeBBoxSC.minZ = this.myCameraSC.position.z - radiusAprox;
 				this.myCullingVolumeBBoxSC.maxZ = this.myCameraSC.position.z + radiusAprox;
+				
 				
 				// get frustumCulled lowestOctrees classified by distances.************************************************************************************
 				var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
@@ -2756,7 +2764,10 @@ CesiumManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = func
 																						this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 																						squaredDistLod0, squaredDistLod1, squaredDistLod2);
 				
-				
+				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
+				//																		this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
+				//																		squaredDistLod0, squaredDistLod1, squaredDistLod2);
+																						
 			}
 			else if(this.configInformation.geo_view_library === Constant.CESIUM)
 			{
@@ -4472,12 +4483,13 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 			if(neoBuilding.isDemoBlock == false)
 				continue;
 		}
-
+		
 		if(!this.magoPolicy.getShowOutFitting())
 		{
 			if(neoBuilding.buildingType == "outfitting")
 				continue;
 		}
+		
 
 		if(neoBuilding.buildingId == "buggy")
 		{
