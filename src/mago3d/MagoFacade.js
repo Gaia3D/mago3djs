@@ -90,18 +90,14 @@ function changeFrustumFarDistanceAPI(frustumFarDistance) {
 }
 
 /**
- * 블록검색
+ * 데이터 검색
  * 
- * @param projectId 프로젝트 아이디
- * @param blockType structure, outfitting
- * @param blockId block id
+ * @param dataKey 데이터 고유키
  * @return
  */
-function searchBlockAPI(projectId, blockType, blockId) {
-	var api = new API("searchBlock");
-	api.setProjectId(projectId);
-	api.setBlockType(blockType);
-	api.setBlockId(blockId);
+function searchDataAPI(dataKey) {
+	var api = new API("searchData");
+	api.setDataKey(dataKey);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}

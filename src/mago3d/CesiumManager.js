@@ -4521,12 +4521,11 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 };
 
 /**
- * blockId를 이용해서 block 검색
- * @param buildingType 0 struts, 1 outfitting
- * @param buildingId blockId
+ * dataKey 이용해서 data 검색
+ * @param dataKey
  */
-CesiumManager.prototype.flyToBuilding = function(buildingType, buildingId) {
-	var neoBuilding = this.getNeoBuildingById(buildingType, buildingId);
+CesiumManager.prototype.flyToBuilding = function(dataKey) {
+	var neoBuilding = this.getNeoBuildingById(null, dataKey);
 
 	if(neoBuilding == undefined)
 		return;
@@ -4537,7 +4536,7 @@ CesiumManager.prototype.flyToBuilding = function(buildingType, buildingId) {
 	{
 		if(neoBuilding.geoLocationDataAux == undefined) {
 			var realTimeLocBlocksList = MagoConfig.getData().alldata;
-			var newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
+			var newLocation = realTimeLocBlocksList[neoBuilding.dataKey];
 			// must calculate the realBuildingPosition (bbox_center_position).***
 
 			if(newLocation) {
@@ -5267,8 +5266,8 @@ CesiumManager.prototype.callAPI = function(api) {
 		this.magoPolicy.setMagoEnable(api.getMagoEnable());
 	} else if(apiName === "changeRender") {
 		this.renderingModeTemp = api.getRenderMode();
-	} else if(apiName === "searchBlock") {
-		this.flyToBuilding(api.getBlockType(), api.getProjectId() + "_"+ api.getBlockId());
+	} else if(apiName === "searchData") {
+		this.flyToBuilding(api.getDataKey());
 	} else if(apiName === "changeHighLighting") {
 		this.magoPolicy.highLightedBuildings.length = 0;
 		var projectId = api.getProjectId();
