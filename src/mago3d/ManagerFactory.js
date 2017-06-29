@@ -79,24 +79,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-		
-		// Define an outer and an inner boundary to make a polygon with a hole.
-        var boundaries = [];
-		var polygon = undefined; // Son.***
-		var polygonAttributes = undefined; // Son.***
-		var highlightAttributes = undefined; // Son.***
-
-        // Create a layer manager for controlling layer visibility.
-        //var layerManger = new LayerManager(wwd);
 
         // Now set up to handle highlighting.
-        var highlightController = new WorldWind.HighlightController(wwd);
+        //var highlightController = new WorldWind.HighlightController(wwd);
 
-		// Test son.**************************************************************************************************************************
-		// Create a layer to hold the f4d_tiles.**************************************************************
-		//var f4d_wwwLayer = new F4d_wwwLayer(); // Inside this layer, there are the f4d_www_Manager.***// old.***
-		//f4d_wwwLayer.wwd = wwd; // old.***
-		
 		var cesiumManager = new CesiumManager();
 		cesiumManager.wwd = wwd;
 		
@@ -108,21 +94,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		//newRenderableLayer.addRenderable(f4d_wwwLayer);// old.***
 		newRenderableLayer.addRenderable(cesiumManager);
 		// End Create a layer to hold the f4dBuildings.-------------------------------------------------------
-		
-		var f4d_readerWriter = new f4d_ReaderWriter();
-		
-		var incre_latAng = 0.001;
-		var incre_longAng = 0.001;
-		var GAIA3D__offset_latitude = -0.001;
-		var GAIA3D__offset_longitude = -0.001;
-		var GAIA3D__counter = 0;
 
 		var gl = wwd.drawContext.currentGlContext;
-		var drawingBufferWidth = 1000;
-		var drawingBufferHeight = 750;
 		
 		initWwwMago(cesiumManager, gl);
-		
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Click event. Is different to anothers event handlers.******************************************************
@@ -134,7 +109,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 
 			// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
 			// relative to the upper left corner of the canvas rather than the upper left corner of the page.
-			var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
+			//var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
 
 			// If only one thing is picked and it is the terrain, use a go-to animator to go to the picked location.
 			/*
@@ -161,8 +136,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		{
 			// Mouse up.***
 			cesiumManager.isCameraMoving = false;
-			
-			//f4d_wwwLayer.calculate_modelViewProjectionMatrixRelativeToEye(dc); // Execute this in mousedown_handler.***!!!!!!!!!!!!
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
