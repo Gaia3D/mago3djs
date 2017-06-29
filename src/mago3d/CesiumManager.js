@@ -1425,7 +1425,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	
+	/*
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
 		var pixelPos = new Point3D();
@@ -1437,6 +1437,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		this.bPicking = false;
 	}
+	*/
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
@@ -3350,6 +3351,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				{
 					this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 				}
+
 			}
 			// 2) LOD 2 & 3.************************************************************************************************************************************
 			// 2) LOD 2 & 3.************************************************************************************************************************************
@@ -3403,6 +3405,58 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 
 				this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx);
 				
+			}
+			
+			// If there are an object selected, then there are a stencilBuffer.******************************************
+			if(this.buildingSelected) // if there are an object selected then there are a building selected.***
+			{
+				gl.disable(gl.POLYGON_OFFSET_FILL);
+				gl.disable(gl.CULL_FACE);
+				gl.colorMask(true, true, true, true);
+				gl.depthMask(true);
+				
+				gl.enable(gl.STENCIL_TEST);
+				gl.stencilFunc(gl.NOTEQUAL, 0x0, 0xff);
+				gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
+				
+				// do as the "getSelectedObjectPicking".**********************************************************
+				var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
+				gl.enable(gl.DEPTH_TEST);
+				gl.depthFunc(gl.LEQUAL);
+				gl.depthRange(0, 0);
+
+				var shaderProgram = currentShader.program;
+				gl.useProgram(shaderProgram);
+				gl.enableVertexAttribArray(currentShader.position3_loc);
+
+				gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+				
+				// do the colorCoding render.***
+				var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
+				for(var i=0; i<neoBuildingsCount; i++)
+				{
+					neoBuilding = this.buildingSelected;
+					
+					var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+					
+					var currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
+					
+					// LOD0.***
+					var currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles0.length;
+					for(var j=0; j<currentVisibleLowestOctCount; j++)
+					{
+						lowestOctree = currentVisibleOctreesControler.currentVisibles0[j];
+						minSize = 0.0;
+						this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, this, isInterior, currentShader, renderTexture, ssao_idx, minSize, refTMatrixIdxKey);
+					}
+					
+				}
+				gl.disable(gl.STENCIL_TEST);
+				gl.depthRange(0, 1);// return to the normal value.***
 			}
 			
 			// 3) now render bboxes.*******************************************************************************************************************
@@ -3537,9 +3591,9 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-				var boxLengthX = 0.3;
-				var boxLengthY = 0.3;
-				var boxLengthZ = 0.3;
+				var boxLengthX = 0.1;
+				var boxLengthY = 0.1;
+				var boxLengthZ = 0.1;
 				var isHighLighted = false;
 				for(var i=0; i<objectsMarkersCount; i++)
 				{
@@ -3557,12 +3611,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, isHighLighted);
 				}
 			}
-			
-			
-			// finally render selected object silhouette.**************************************************************************************
-			// finally render selected object silhouette.**************************************************************************************
-			// finally render selected object silhouette.**************************************************************************************
-			
+
 		}
 		if(currentShader)
 		{
@@ -4483,13 +4532,13 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 			if(neoBuilding.isDemoBlock == false)
 				continue;
 		}
-		
+		/*
 		if(!this.magoPolicy.getShowOutFitting())
 		{
 			if(neoBuilding.buildingType == "outfitting")
 				continue;
 		}
-		
+		*/
 
 		if(neoBuilding.buildingId == "buggy")
 		{
@@ -5322,7 +5371,7 @@ CesiumManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = functio
 			roll = parseFloat(newLocation.roll);
 
 			buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
-			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation, this);
+			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
 			
 			this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
 			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
