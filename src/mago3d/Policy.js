@@ -32,7 +32,14 @@ var Policy = function() {
 
 	// 0 = block mode, 1 = object mode
 	this.mouseMoveMode = 0;
-
+	
+	// 이슈 등록 표시
+	this.issueInsertEnable = false;
+	// object 정보 표시
+	this.objectInfoViewEnable = false;
+	// 이슈 목록 표시
+	this.issueListEnable = false;
+	
 	// provisional.***
 	this.colorChangedObjectId;
 };
@@ -105,4 +112,23 @@ Policy.prototype.getMouseMoveMode = function() {
 };
 Policy.prototype.setMouseMoveMode = function(mouseMoveMode) {
 	this.mouseMoveMode = mouseMoveMode;
+};
+
+Policy.prototype.getIssueInsertEnable = function() {
+	return this.issueInsertEnable;
+};
+Policy.prototype.setIssueInsertEnable = function(issueInsertEnable) {
+	this.issueInsertEnable = issueInsertEnable;
+};
+Policy.prototype.getObjectInfoViewEnable = function() {
+	return this.objectInfoViewEnable;
+};
+Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) {
+	this.objectInfoViewEnable = objectInfoViewEnable;
+};
+Policy.prototype.getIssueListEnable = function() {
+	return this.issueListEnable;
+};
+Policy.prototype.setIssueListEnable = function(issueListEnable) {
+	this.issueListEnable = issueListEnable;
 };

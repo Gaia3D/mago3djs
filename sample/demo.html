@@ -242,10 +242,6 @@
 			<p />
 			<span id="issuesEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Issue 목록</span>
 		</div>
-		
-		<div style="margin-top:50px; width:150px;" onclick="inputIssue();">
-			<span style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">API Call Test</span>
-		</div>
 	</div>
 	
 	<!-- 맵영역 -->
@@ -543,17 +539,15 @@
 		changeListIssueViewModeAPI(listIssueFlag);
 	});
 	
-	function inputIssue(data_name, data_key, latitude, longitude, elevation) {
+	function showInsertIssueLayer(data_name, data_key, latitude, longitude, height) {
 		if(insertIssueFlag) {
 			if($("#inputIssueLayer").css("display") == "none") {
 				$("#inputIssueLayer").show();
 				
-				var dt = new Date();
-				
-				
-				$("#latitude").val("37.57750");
-				$("#longitude").val("126.89069");
-				$("#height").val("60.0");
+				$("#data_key").val(data_key);
+				$("#latitude").val(latitude);
+				$("#longitude").val(longitude);
+				$("#height").val(height);
 			}
 		}
 	}

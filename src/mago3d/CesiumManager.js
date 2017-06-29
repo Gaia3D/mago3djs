@@ -5260,6 +5260,16 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 									geoLocationData.heading,
 									geoLocationData.pitch,
 									geoLocationData.roll);
+		
+		// 이슈 등록 창 오픈
+		if(this.magoPolicy.getIssueInsertEnable()) {
+			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
+									dividedName[0] + "_" + dividedName[1],
+									objectId,
+									geoLocationData.geographicCoord.latitude,
+									geoLocationData.geographicCoord.longitude,
+									geoLocationData.geographicCoord.altitude);
+		}
 	}
 };
 
@@ -5543,11 +5553,13 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeMouseMove") {
 		this.magoPolicy.setMouseMoveMode(api.getMouseMoveMode());
 	} else if(apiName === "changeInsertIssueMode") {
-		// issue 등록
+		this.magoPolicy.setIssueInsertEnable(api.getIssueInsertEnable());
 		//selectedObjectCallback(이걸 해 주면 될거 같음)
 	} else if(apiName === "changeObjectInfoViewMode") {
 		// object info 표시
+		this.magoPolicy.setObjectInfoViewEnable(api.getObjectInfoViewEnable());
 	} else if(apiName === "changeListIssueViewMode") {
 		// issue list 표시
+		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
 	}
 };
