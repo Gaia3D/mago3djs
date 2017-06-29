@@ -370,6 +370,16 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				if(magoManager.objectSelected == neoReference) {
 					gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+					
+					// Active stencil if the object selected.****************************
+					gl.enable(gl.STENCIL_TEST);
+					gl.enable(gl.POLYGON_OFFSET_FILL);
+					gl.polygonOffset(1.0, 2.0); // Original.***
+					gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+					gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP);
+					gl.clearStencil(0);
+					//-------------------------------------------------------------------
+	
 				}
 				else if(magoManager.magoPolicy.colorChangedObjectId == neoReference.objectId)
 				{
@@ -603,6 +613,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	}
 
 	gl.enable(gl.DEPTH_TEST);
+	gl.disable(gl.STENCIL_TEST);
 };
 
 
@@ -626,29 +637,15 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if(neoRefsCount == 0) return;
 
-	//this.dateSC = new Date();
-	//this.startTimeSC = this.dateSC.getTime();
-	//this.currentTimeSC;
-	//var secondsUsed;
-	//
-
 	var timeControlCounter = 0;
 
 	gl.enable(gl.DEPTH_TEST);
 	//gl.disable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-//	if(MagoConfig.getPolicy().geo_cull_face_enable == "true") {
-//		gl.enable(gl.CULL_FACE);
-//	} else {
-//		gl.disable(gl.CULL_FACE);
-//	}
+	gl.depthRange(0, 1); // dont do gl_settings inside render functions. delete this.***
 
 	//gl.enable(gl.CULL_FACE);
 	gl.disable(gl.CULL_FACE);
-
-	//if(ssao_idx == 0)
-	//	gl.disable(gl.CULL_FACE);
 
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
@@ -666,27 +663,19 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 
 	for(var j=0; j<1; j++) {
-		//var neoRefList = neoRefList_array[j];
 		var myBlocksList = neoReferencesMotherAndIndices.blocksList;
-
-		//var visibleIndices_count = neoRefList._currentVisibleIndices.length;
 
 		if(myBlocksList == undefined)
 			continue;
 
 		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
-		{
-			//myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
-			//myBlocksList.dataArraybuffer = undefined;
 			continue;
-		}
 
 		if(myBlocksList.fileLoadState != CODE.fileLoadState.PARSE_FINISHED) continue;
 
 		// New version. Use occlussion indices.***
 		//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length;
 		var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
-		//visibleIndices_count = neoRefList.neoRefs_Array.length; // TEST******************************
 
 		for(var k=0; k<visibleIndices_count; k++) {
 
@@ -696,20 +685,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 				continue;
 			}
 
-			//if(neoReference.bRendered)
-			//	continue;
-
 			block_idx = neoReference._block_idx;
-
-			//if(block_idx >= myBlocksList.blocksArray.length) {
-			//	continue;
-			//}
-			//block = myBlocksList.getBlock(block_idx); // Old.***
 			block = neoBuilding.motherBlocksArray[block_idx];
 
 			if(block == undefined)
 				continue;
-
 
 			if(maxSizeToRender && block != null) {
 				if(block.radius < maxSizeToRender) continue;
@@ -722,8 +702,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 				}
 			}
 
-
-
 			if(neoReference.selColor4) {
 				//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
@@ -735,11 +713,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 			}
 
 			// End checking textures loaded.------------------------------------------------------------------------------------
-
-			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
 			if(block != null) {
-
-				//ifc_entity = block.mIFCEntityType;
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
 
@@ -806,13 +780,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 					gl.drawElements(gl.TRIANGLES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 					//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 				}
-
-				//neoReference.bRendered = true;
 			}
-			//timeControlCounter++;
-			//if(timeControlCounter > 20)
-			//	timeControlCounter = 0;
-
 		}
 	}
 
