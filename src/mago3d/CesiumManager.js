@@ -5527,11 +5527,11 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeLocationAndRotation") {
 		// 변환 행렬
 		// find the building.***
-		var buildingId = api.getProjectId() + "_" + api.getBlockId();
+		var buildingId = api.getDataKey();
 		var buildingType = "structure";
 		var building = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, buildingId);
 
-		this.changeLocationAndRotation(api.getProjectId() + "_" + api.getBlockId(),
+		this.changeLocationAndRotation(api.getDataKey(),
 							parseFloat(api.getLatitude()),
 							parseFloat(api.getLongitude()),
 							parseFloat(api.getElevation()),

@@ -1,0 +1,271 @@
+/* RESET CSS */
+* { margin:0; padding:0; outline:0; vertical-align:top; }
+article, aside, details, figcaption, figure, footer, header, hgroup, menu nav, section { display:block; }
+ul, ol, dl { list-style:none; }
+img, video { max-width:100%; border:0; vertical-align:top; }
+a {vertical-align:top; text-decoration:none; color:#000; }
+table { border-collapse:collapse; border-spacing:0; }
+input, select { vertical-align:middle; }
+body, th, td, input, select, textarea { color:#444; font-family:'Malgun Gothic','돋움',dotum, sans-serif; font-size:14px; line-height:1.8em;}
+button { cursor:pointer; font-family: 'Noto Sans', sans-serif; }
+html, body { margin:0; padding:0; width: 100%; height:100%; background-color: #fff;
+font-family: 'Noto Sans','Malgun Gothic','돋움',dotum, sans-serif;}
+ul, li {margin:0; padding:0; }
+
+
+/* ///// LAYOUT ///// */
+.mapWrap {
+height: 100%;
+background-color: #eee;
+}
+
+#recentIssueListArea {
+	position: absolute;
+	top: 5px;
+	left: 10px;
+	min-width: 210px;
+	background-color: #573592;
+    color : #FFFFFF;
+    z-index: 999;
+}
+#recentIssueListContent {
+	position: absolute;
+	top: 37px;
+	left: 10px;
+	background-color: #FFFFFF;
+	min-width: 413px;
+	z-index: 999;
+}
+#apiListArea {
+	position: absolute;
+	top: 5px;
+	left: 225px;
+	min-width: 200px;
+	background-color: #573592;
+	color : #FFFFFF;
+	z-index: 999;
+}
+#apiListContent {
+	position: absolute;
+	top: 37px;
+	left: 10px;
+	background-color: #FFFFFF;
+	min-width: 413px;
+	z-index: 999;
+}
+
+
+
+/* 공통메뉴 */
+.trigger {
+position: absolute;
+top: 5px;
+right: 220px;
+min-width: 400px;
+direction: rtl;
+z-index: 999;
+}
+.trigger > button {
+display: block;
+width: 40px;
+height: 40px;
+border: none;
+border-radius: 5px;
+/*text-indent: -999em;*/
+background-color: #0066cc;
+background-image: url(/images/ico.png);
+background-repeat: no-repeat;
+background-position: 2px -155px;
+}
+.trigger > ul {
+display: none;	
+}
+.trigger:hover > ul {
+display: block;
+position: absolute;
+top: 0px;
+right: 0px;
+background-color: #fff;
+
+
+
+}
+.trigger:hover > ul li {
+display: inline-block;	
+margin: 0 -2px;
+padding: 0 15px;
+
+line-height: 38px;
+cursor: pointer;
+color: #333;
+font-size: 13px;
+}
+.trigger:hover > ul li:hover {
+height: 40px;
+padding: 0 15px;
+color: #fff;
+background-color: #0066cc;
+}
+.trigger:hover > ul li a:hover {
+	color: #fff;
+}
+
+/* 드롭다운메뉴 */
+/* Level1 */
+.dropdownmenu > li {
+float: left;
+top: 5px;
+left: 5px;
+margin-right: 1px;
+position: relative;
+padding: 5px 50px;
+font-size: 15px;
+color: #fff;
+text-align: center;
+line-height: 30px;
+background-color: #0066cc;
+z-index: 999;
+}
+.dropdownmenu > li:hover {
+background-color: tomato;
+}
+/* Level2 */
+/* 레벨1 메뉴에 mouse over시 레벨2 위치지정*/
+.dropdownmenu > li:hover > ul {
+display: block;
+top: 40px;
+left: 0;
+box-sizing: border-box;
+}
+.dropdownmenu ul {
+position: absolute;
+display: none;
+width: 100%;
+border: 1px solid #ccc;
+}
+.dropdownmenu ul li {
+position: relative;
+color: #555;
+padding: 10px 5px;
+font-size: 12px;
+line-height: 17px;
+cursor: pointer;
+border-bottom: 1px dotted #ccc;
+background-color: #fff;
+}
+
+.dropdownmenu ul li:hover {
+
+background-color: #eee;
+}
+
+
+.mapWrap {
+}
+
+#magoControllArea {
+	position: absolute;
+	top: 50px;
+	right: 0px;
+	z-index: 999;
+}
+
+
+
+/* ///// LAYER ///// */
+.layer {
+position: absolute;
+background: #fff;
+z-index: 100;
+}
+.layerHeader {
+position: relative;
+border-bottom: 1px dotted #0066cc;
+background-color: #fff;
+}
+.layerHeader > h2 {
+padding: 10px;
+color: #0066cc;
+font-size: 15px;
+}
+.layerContents > h4 {
+margin:0;
+padding-left: 20px;
+font-size: 16px;
+font-weight: 600;
+background: url(/images/bullet_h4.png) no-repeat left 50%;
+}
+.layerHeader > div {
+position: absolute;
+top: 7px;
+right: 3px; 
+width: 30px;
+height: 30px;
+}
+.layerHeader div > button {
+width: 30px;
+height: 30px;
+border: none;
+text-indent: -999em;
+background-image: url(/images/ico.png);
+background-color: transparent;
+background-position: 1px -264px;
+}
+.layerHeader div > button:hover {
+border-radius: 15px;
+background-color: #eee;
+}
+
+/* CONTENTS */
+.layerContents {
+padding: 10px;
+overflow: hidden;
+}
+.layerContents p.groupTitle {
+margin-bottom: 5px;
+padding: 0 10px;
+color: #2955a6;
+font-weight: bold;
+}
+.layerContents .group {
+margin-bottom: 20px;
+padding: 10px;
+}
+.layerContents .group li {
+display: inline-block;
+width: 30%;
+padding: 5px 0;
+}
+.layerContents table {
+width: 100%;
+margin-bottom: 20px;
+border-top: 2px solid #0066cc;
+}
+.layerContents table th {
+background-color: #eee;
+border-left: 0px solid #ccc;
+border-bottom: 1px solid #ccc;
+} 
+.layerContents table td {
+padding: 5px;
+text-align: left;
+border-bottom: 1px solid #ccc;
+}
+
+/* 버튼 */
+.btns {
+margin: 15px 0;
+}
+.btns > button {
+width: 100%;
+padding: 10px 0;
+border-radius: 3px;
+transition: all 0.5s;
+border: none;
+color: #fff;
+background: #2955a6;
+}
+.btns > button:hover {
+background: tomato;
+}
+
