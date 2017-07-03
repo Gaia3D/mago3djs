@@ -876,6 +876,8 @@ ShaderSource.colorSelectionSsaoVsSource = "\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		gl_PointSize = 10.0;\n\
+		//gl_LineWidth = 15.0;\n\
 	}";
 
 ShaderSource.colorSelectionSsaoFsSource = "\n\
@@ -1610,3 +1612,50 @@ ShaderSource.boxSsaoFsSource = "\n\
 		//gl_FragColor.rgb = textureColor.xyz; \n\
 		gl_FragColor.a = 1.0;   \n\
 	}";
+
+	
+// PngImage Shaders.********************************************************************************************************************************
+// PngImage Shaders.********************************************************************************************************************************
+// PngImage Shaders.********************************************************************************************************************************
+
+	//어떤 용도
+ShaderSource.pngImageVsSource = "\n\
+	attribute vec3 a_position;\n\
+	attribute vec2 a_texcoord;\n\
+	uniform mat4 buildingRotMatrix;  \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform mat4 u_matrix;\n\
+	varying vec2 v_texcoord;\n\
+void main() {\n\
+    vec4 position2 = vec4(a_position.xyz, 1.0);\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+   v_texcoord = a_texcoord;\n\
+}";
+
+
+	//어떤 용도
+ShaderSource.pngImageFsSource = "\n\
+	precision mediump float;\n\
+	varying vec2 v_texcoord;\n\
+	uniform sampler2D u_texture;\n\
+void main() {\n\
+	vec4 textureColor = texture2D(u_texture, v_texcoord);\n\
+	if(textureColor.w == 0.0)\n\
+	{\n\
+		discard;\n\
+	}\n\
+   gl_FragColor = textureColor;\n\
+}";
+
+
+

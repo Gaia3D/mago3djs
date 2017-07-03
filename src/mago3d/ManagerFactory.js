@@ -104,9 +104,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		// The common gesture-handling function.
 		var handleClick = function (recognizer) {
 			// Obtain the event location.
-			var x = recognizer.clientX,
-				y = recognizer.clientY;
-
+			cesiumManager.mouse_x = event.layerX,
+			cesiumManager.mouse_y = event.layerY;
+			cesiumManager.bPicking = true;
+			
 			// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
 			// relative to the upper left corner of the canvas rather than the upper left corner of the page.
 			//var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
@@ -128,16 +129,33 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		var mouseDownEvent = function(event)
 		{
 			// Mouse down.***
+			if(event.button == 0)
+				cesiumManager.mouseLeftDown = true;
 			cesiumManager.isCameraMoving = true;
+			cesiumManager.mouse_x = event.layerX,
+			cesiumManager.mouse_y = event.layerY;
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
 		var mouseUpEvent = function(event)
 		{
 			// Mouse up.***
+			if(event.button == 0)
+				cesiumManager.mouseLeftDown = false;
 			cesiumManager.isCameraMoving = false;
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
+		
+		var mouseMoveEvent = function(event)
+		{
+			// Mouse move.***
+			cesiumManager.mouse_x = event.layerX,
+			cesiumManager.mouse_y = event.layerY;
+			if(cesiumManager.mouseLeftDown)
+				cesiumManager.manageMouseMove(event.layerX, event.layerY);
+			
+		};
+		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 		
 	}
 
@@ -222,52 +240,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		magoManager.handler.setInputAction(function(movement) {
 			if(magoManager.mouseLeftDown) {
 				if(movement.startPosition.x != movement.endPosition.x || movement.startPosition.y != movement.endPosition.y) {
-
-					// distinguish 2 modes.******************************************************
-					if(magoManager.magoPolicy.mouseMoveMode == 0) // blocks move.***
-					{
-						if(magoManager.buildingSelected != undefined) {
-							// move the selected object.***
-							magoManager.mouse_x = movement.startPosition.x;
-							magoManager.mouse_y = movement.startPosition.y;
-
-							// 1rst, check if there are objects to move.***
-							if(magoManager.mustCheckIfDragging) {
-								if(magoManager.isDragging(magoManager.scene)) {
-									magoManager.mouseDragging = true;
-									disableCameraMotion(false);
-								}
-								magoManager.mustCheckIfDragging = false;
-							}
-						} else {
-							magoManager.isCameraMoving = true; // if no object is selected.***
-						}
-					}
-					else if(magoManager.magoPolicy.mouseMoveMode == 1) // objects move.***
-					{
-						if(magoManager.objectSelected != undefined) {
-							// move the selected object.***
-							magoManager.mouse_x = movement.startPosition.x;
-							magoManager.mouse_y = movement.startPosition.y;
-
-							// 1rst, check if there are objects to move.***
-							if(magoManager.mustCheckIfDragging) {
-								if(magoManager.isDragging(magoManager.scene)) {
-									magoManager.mouseDragging = true;
-									disableCameraMotion(false);
-								}
-								magoManager.mustCheckIfDragging = false;
-							}
-						} else {
-							magoManager.isCameraMoving = true; // if no object is selected.***
-						}
-					}
-					//---------------------------------------------------------------------------------
-					magoManager.isCameraMoving = true; // test.***
-					if(magoManager.mouseDragging) {
-						//magoManager.moveSelectedObject(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray); // original.***
-						magoManager.moveSelectedObjectAsimetricMode(magoManager.scene, magoManager.currentRenderablesNeoRefListsArray);
-					}
+					magoManager.manageMouseMove(movement.startPosition.x, movement.startPosition.y);
 				}
 			} else{
 				magoManager.mouseDragging = false;
