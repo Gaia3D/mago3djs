@@ -1471,7 +1471,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	
+	/*
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
 		var pixelPos = new Point3D();
@@ -1483,7 +1483,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		this.bPicking = false;
 	}
-	
+	*/
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
@@ -3575,7 +3575,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 			var objectsMarkersCount = this.objMarkerManager.objectMarkerArray.length;
 			if(objectsMarkersCount > 0)
 			{
-				
+				/*
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 				shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
@@ -3686,7 +3686,9 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.bindTexture(gl.TEXTURE_2D, null);
 				gl.disableVertexAttribArray(currentShader.texCoord2_loc);
 				gl.disableVertexAttribArray(currentShader.position3_loc);
+				*/
 			}
+			
 		}
 		
 		
