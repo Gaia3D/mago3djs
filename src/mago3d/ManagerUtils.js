@@ -98,7 +98,7 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 };
 
-ManagerUtils.calculateWorldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
+ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
 	if(resultGeographicCoords == undefined)
 		resultGeographicCoords = new GeographicCoord();
 	
