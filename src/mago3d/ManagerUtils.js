@@ -98,6 +98,23 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 };
 
+ManagerUtils.calculateWorldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
+	if(resultGeographicCoords == undefined)
+		resultGeographicCoords = new GeographicCoord();
+	
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(absolutePoint.x, absolutePoint.y, absolutePoint.z));
+		resultGeographicCoords.longitude = cartographic.longitude * (180.0/Math.PI);
+		resultGeographicCoords.latitude = cartographic.latitude * (180.0/Math.PI);
+		resultGeographicCoords.altitude = cartographic.height;
+	}
+};
+
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) {
 
 	if(resultGeoLocationData == undefined)

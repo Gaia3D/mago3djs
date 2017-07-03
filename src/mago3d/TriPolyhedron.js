@@ -8,8 +8,8 @@ var TriPolyhedron = function() {
 	if(!(this instanceof TriPolyhedron)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
-	this.vertexList = new VertexList();
+	this.vertexMatrix = new VertexMatrix();
+	this.vertexList = this.vertexMatrix.newVertexList();
 	this.triSurfacesArray = [];
 };
 

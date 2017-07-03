@@ -1081,6 +1081,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	
 	if(extension == "tga" || extension == "TGA" || extension == "Tga")
 	{
+		//texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		loadWithXhr(filePath_inServer).done(function(response) 
 		{
 			var arrayBuffer = response;
@@ -1096,9 +1097,11 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
                 }
 			}
 		}).fail(function(status) {
-			console.log("xhr status = " + status);
-			if(status == 0) neoBuilding.metaData.fileLoadState = 500;
-			else neoBuilding.metaData.fileLoadState = status;
+			if(neoBuilding){
+				console.log("xhr status = " + status);
+				if(status == 0) neoBuilding.metaData.fileLoadState = 500;
+				else neoBuilding.metaData.fileLoadState = status;
+			}
 		}).always(function() {
 			//magoManager.fileRequestControler.filesRequestedCount -= 1;
 			//if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -1109,12 +1112,8 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
 		//magoManager.backGround_fileReadings_count ++;
 		neoRefImage.onload = function() {
-			//if(texture.texId == undefined) 
-			//	texture.texId = gl.createTexture();
-
 			handleTextureLoaded(gl, neoRefImage, texture.texId);
 			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-			//neoBuilding.texturesLoaded.push(texture);
 
 			if(magoManager.backGround_fileReadings_count > 0 ) 
 				magoManager.backGround_fileReadings_count -=1;
@@ -1125,10 +1124,9 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 			return;
 		};
 		neoRefImage.src = filePath_inServer;
-	}
-
-	
+	}	
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
