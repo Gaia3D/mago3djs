@@ -31,7 +31,7 @@ var Policy = function() {
 	this.hideBuildings = [];
 
 	// 0 = block mode, 1 = object mode
-	this.mouseMoveMode = 0;
+	this.mouseMoveMode = 1;
 
 	// provisional.***
 	this.colorChangedObjectId;
