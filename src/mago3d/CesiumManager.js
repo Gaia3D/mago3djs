@@ -1471,7 +1471,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	/*
+	
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
 		var pixelPos = new Point3D();
@@ -1483,7 +1483,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		
 		this.bPicking = false;
 	}
-	*/
+	
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
@@ -2267,7 +2267,7 @@ CesiumManager.prototype.isDragging = function(scene) {
 CesiumManager.prototype.disableCameraMotion = function(state){
 	if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-
+		this.wwd.navigator.panRecognizer.enable = false;
 	}
 	else if(this.configInformation.geo_view_library === Constant.CESIUM)
 	{
@@ -2404,7 +2404,7 @@ CesiumManager.prototype.moveSelectedObjectAsimetricMode = function(scene, render
 			if(this.geographicCoordSC == undefined)
 				this.geographicCoordSC = new GeographicCoord();
 			
-			ManagerUtils.calculateWorldPointToGeographicCoords(newPosition, this.geographicCoordSC, this);
+			ManagerUtils.worldPointToGeographicCoords(newPosition, this.geographicCoordSC, this);
 			this.changeLocationAndRotation(this.buildingSelected.buildingId, this.geographicCoordSC.latitude, this.geographicCoordSC.longitude, undefined, undefined, undefined, undefined);
 			this.displayLocationAndRotation(this.buildingSelected);
 			//this.selectedObjectNotice(this.buildingSelected);
@@ -3575,7 +3575,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 			var objectsMarkersCount = this.objMarkerManager.objectMarkerArray.length;
 			if(objectsMarkersCount > 0)
 			{
-				/*
+				
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 				shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
@@ -3637,7 +3637,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, isHighLighted);
 				}
-				*/
+				
 				// now repeat the objects markers for png images.***
 				// Png for pin image 128x128.********************************************************************
 				if(this.pin.positionBuffer == undefined)
