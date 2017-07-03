@@ -249,7 +249,7 @@ function changeMouseMoveAPI(mouseMoveMode) {
  */
 function changeInsertIssueModeAPI(flag) {
 	var api = new API("changeInsertIssueMode");
-	api.setInsertIssueMode(flag);
+	api.setIssueInsertEnable(flag);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
@@ -263,7 +263,7 @@ function changeInsertIssueModeAPI(flag) {
  */
 function changeObjectInfoViewModeAPI(flag) {
 	var api = new API("changeObjectInfoViewMode");
-	api.setObjectInfoViewMode(flag);
+	api.setObjectInfoViewEnable(flag);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}
@@ -277,7 +277,7 @@ function changeObjectInfoViewModeAPI(flag) {
  */
 function changeListIssueViewModeAPI(flag) {
 	var api = new API("changeListIssueViewMode");
-	api.setListIssueViewMode(flag);
+	api.setIssueListEnable(flag);
 	if(managerFactory != null) {
 		managerFactory.callAPI(api);
 	}

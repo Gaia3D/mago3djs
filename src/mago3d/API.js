@@ -63,9 +63,12 @@ var API = function(apiName) {
 	// 0 = block mode, 1 = object mode
 	this.mouseMoveMode = 0;
 	
-	this.insertIssueMode = false;
-	this.objectInfoViewMode = false;
-	this.listIssueViewMode = false;
+	// 이슈 등록 표시
+	this.issueInsertEnable = false;
+	// object 정보 표시
+	this.objectInfoViewEnable = false;
+	// 이슈 목록 표시
+	this.issueListEnable = false;
 };
 
 API.prototype.getMagoEnable = function() {
@@ -212,23 +215,21 @@ API.prototype.setMouseMoveMode = function(mouseMoveMode) {
 	this.mouseMoveMode = mouseMoveMode;
 };
 
-API.prototype.getInsertIssueMode = function() {
-	return this.insertIssueMode;
+API.prototype.getIssueInsertEnable = function() {
+	return this.issueInsertEnable;
 };
-API.prototype.setInsertIssueMode = function(insertIssueMode) {
-	this.insertIssueMode = insertIssueMode;
+API.prototype.setIssueInsertEnable = function(issueInsertEnable) {
+	this.issueInsertEnable = issueInsertEnable;
 };
-
-API.prototype.getObjectInfoViewMode = function() {
-	return this.objectInfoViewMode;
+API.prototype.getObjectInfoViewEnable = function() {
+	return this.objectInfoViewEnable;
 };
-API.prototype.setObjectInfoViewMode = function(objectInfoViewMode) {
-	this.objectInfoViewMode = objectInfoViewMode;
+API.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) {
+	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-
-API.prototype.getListIssueViewMode = function() {
-	return this.listIssueViewMode;
+API.prototype.getIssueListEnable = function() {
+	return this.issueListEnable;
 };
-API.prototype.setListIssueViewMode = function(listIssueViewMode) {
-	this.listIssueViewMode = listIssueViewMode;
+API.prototype.setIssueListEnable = function(issueListEnable) {
+	this.issueListEnable = issueListEnable;
 };
