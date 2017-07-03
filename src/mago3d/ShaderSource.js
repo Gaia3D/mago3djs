@@ -1650,7 +1650,7 @@ ShaderSource.pngImageFsSource = "\n\
 	uniform sampler2D u_texture;\n\
 void main() {\n\
 	vec4 textureColor = texture2D(u_texture, v_texcoord);\n\
-	if(textureColor.w == 0.0)\n\
+	if(textureColor.w < 0.1)\n\
 	{\n\
 		discard;\n\
 	}\n\
