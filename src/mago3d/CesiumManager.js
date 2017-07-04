@@ -1194,7 +1194,8 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		
 		// ModelViewMatrix Inverse.***
 		var matrixInv = WorldWind.Matrix.fromIdentity();
-		matrixInv.invertMatrix(modelView);
+		//matrixInv.invertMatrix(modelView);
+		matrixInv.invertOrthonormalMatrix(modelView);
 		columnMajorArray = matrixInv.columnMajorComponents(columnMajorArrayAux);
 		sceneState.modelViewMatrixInv.copyFromFloatArray(columnMajorArray);
 		
@@ -1246,13 +1247,14 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		
 		var viewport = this.wwd.viewport;
 		sceneState.camera.frustum.aspectRatio = viewport.width/viewport.height;
-		sceneState.camera.frustum.near[0] = this.wwd.navigator.nearDistance;
-		sceneState.camera.frustum.far = 1000;
+		//sceneState.camera.frustum.near[0] = this.wwd.navigator.nearDistance;
+		sceneState.camera.frustum.near[0] = 0.1;
+		sceneState.camera.frustum.far = 1000.0;
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
 		
 		sceneState.camera.frustum.fovRad = Math.PI/4;
-		sceneState.camera.frustum.fovRad = 55 * Math.PI/180;
+		sceneState.camera.frustum.fovRad = 56 * Math.PI/180;
 		sceneState.camera.frustum.fovyRad = sceneState.camera.frustum.fovRad/sceneState.camera.frustum.aspectRatio;
 		//sceneState.camera.frustum.fovyRad = 45 * Math.PI/180;
 
@@ -1464,9 +1466,10 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	
+	/*
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
+		this.bPicking = false;
 		var pixelPos = new Point3D();
 		pixelPos = this.calculatePixelPositionAsimetricMode(gl, scene, pixelPos);
 		var objMarker = this.objMarkerManager.newObjectMarker();
@@ -1474,9 +1477,9 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		this.renderingFase = !this.renderingFase;
 		
-		this.bPicking = false;
+		
 	}
-	
+	*/
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
@@ -3568,7 +3571,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 			var objectsMarkersCount = this.objMarkerManager.objectMarkerArray.length;
 			if(objectsMarkersCount > 0)
 			{
-				
+				/*
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 				shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
@@ -3630,7 +3633,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, isHighLighted);
 				}
-				
+				*/
 				/*
 				// now repeat the objects markers for png images.***
 				// Png for pin image 128x128.********************************************************************
