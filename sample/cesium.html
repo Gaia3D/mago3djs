@@ -3,10 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Mago3D User</title>
+	<title>Cesium Demo | mago3D</title>
 	<link rel="stylesheet" href="/sample/style.css" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans"> 
-	<link rel="stylesheet" href="/sample/demo.css" />
+	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
 	
 		<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
@@ -17,175 +17,176 @@
 </head>
 
 <body>
-	<div id="recentIssueListArea" style="text-align: center; height: 30px;">
-		<span>My Issue(5건, 30일 이내)</span>
-		<img id="issueMoreImage" src="/images/plus.png" alt="more" width="24px;" height="24px;"/>
-	</div>
-	<div id="apiListArea" style="text-align: center; height: 30px;">
-		<span style="margin-left:50px; margin-right: 50px;">API 목록</span>
-		<img id="apiMoreImage" src="/images/plus.png" alt="more" width="24px;" height="24px;"/>
-	</div>
-	
-	<div id="recentIssueListContent" style="display: none">
-		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
-			<div>
-				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
-				<span style="padding-left: 10px; width:200px; overflow: hidden;">바로 가기 테스트</span>
-				<span style="float:right; padding-right: 15px; padding-top: 5px;">
-					<a href="#" onclick="flyTo('127.028889', '37.499648', '80', '2')">
-						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
-					</a>
-				</span>
-			</div>
-			<div id="issue_toggle_19">
-				<span style="padding-left: 25px;">[버그][매우중요]</span>
-				<span style="padding-left: 5px;">COLLADA</span>
-				<span style="float:right; padding-right: 20px;">2017-06-28 14:41:40</span>
-			</div>
-		</div>
-		
-		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
-			<div>
-				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
-				<span style="padding-left: 10px; width:200px; overflow: hidden;">overflow hidden test 가나라다라마바사아자차카</span>
-				<span style="float:right; padding-right: 15px; padding-top: 5px;">
-					<a href="#" onclick="flyTo('127.025199', '37.500928', '72', '2')">
-						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
-					</a>
-				</span>
-			</div>
-			<div id="issue_toggle_18">
-				<span style="padding-left: 25px;">[버그][매우중요]</span>
-				<span style="padding-left: 5px;">IFC</span>
-				<span style="float:right; padding-right: 20px;">2017-06-28 14:27:27</span>
-			</div>
-		</div>
-		
-		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
-			<div>
-				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
-				<span style="padding-left: 10px; width:200px; overflow: hidden;">바닥 색깔이 다른거 같습니다.</span>
-				<span style="float:right; padding-right: 15px; padding-top: 5px;">
-					<a href="#" onclick="flyTo('126.923279', '37.524059', '50', '2')">
-						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
-					</a>
-				</span>
-			</div>
-			<div id="issue_toggle_17">
-				<span style="padding-left: 25px;">[버그][매우중요]</span>
-				<span style="padding-left: 5px;">IFC</span>
-				<span style="float:right; padding-right: 20px;">2017-06-28 12:16:12</span>
-			</div>
-		</div>
-		
-		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
-			<div>
-				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
-				<span style="padding-left: 10px; width:200px; overflow: hidden;">천장 형광등 왼쪽 모서리 확인해 주세요.</span>
-				<span style="float:right; padding-right: 15px; padding-top: 5px;">
-					<a href="#" onclick="flyTo('126.88882', '37.58029', '45', '2')">
-						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
-					</a>
-				</span>
-			</div>
-			<div id="issue_toggle_16">
-				<span style="padding-left: 25px;">[버그][매우중요]</span>
-				<span style="padding-left: 5px;">3DS</span>
-				<span style="float:right; padding-right: 20px;">2017-06-28 12:12:45</span>
-			</div>
-		</div>
-		
-		<div style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px; background: gainsboro">
-			<div>
-				<img id="issueMoreImage" src="/images/bullet_h4.png" alt="" />
-				<span style="padding-left: 10px; width:200px; overflow: hidden;">gangnam_del 왼쪽 하단 파이프 라인 확인</span>
-				<span style="float:right; padding-right: 15px; padding-top: 5px;">
-					<a href="#" onclick="flyTo('126.89357', '37.5792', '48', '2')">
-						<img id="issueMoreImage" src="/images/btn_going.png" width="26" height="26" alt="" />
-					</a>
-				</span>
-			</div>
-			<div id="issue_toggle_15">
-				<span style="padding-left: 25px;">[기능개선][매우중요]</span>
-				<span style="padding-left: 5px;">3DS</span>
-				<span style="float:right; padding-right: 20px;">2017-06-28 12:00:37</span>
-			</div>
-		</div>
-	</div>
-		
-
-	<div id="apiListContent" style="display: none">
-		<div style="height: 20px;"></div>
+	<div class="ctrl">
 		<div>
-			<span style="padding-left: 10px; padding-right: 100px;">Data Key</span>
-			<input type="text" id="search_data_key" name="search_data_key" size="15" />
-			<button type="button" id="searchData" >검색</button>
+			<button id="issueEnable">Issue 등록</button>
+			<button id="objectInfoEnable">Object 정보</button>	
+			<button id="issuesEnable">Issues 정보</button>
 		</div>
-		<div style="margin-top: 15px;">
-			<span style="padding-left: 10px; padding-right: 70px;">Bounding Box</span>
-			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
-			<label for="showBoundingBox"> 표시 </label>
-			<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
-			<label for="hideBoundingBox"> 비표시 </label>
-		</div>
-		<div style="margin-top: 15px;">
-			<span style="padding-left: 10px; padding-right: 16px;">Selecting And Moving</span>
-			<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
-			<label for="mouseAllMove"> ALL </label>
-			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
-			<label for="mouseObjectMove"> Object </label>
-		</div>
-		<div style="margin-top: 15px;">
-			<div style="padding-left: 10px;">
-				Location And Rotation
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 102px; padding-right: 12px;">
-					<label for="move_data_key">Data Key</label>
-					<input type="text" id="move_data_key" name="move_data_key" size="15" />
-				</span>
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 110px; padding-right: 12px;">
-					<label for="move_latitude">위도 </label>
-					<input type="text" id="move_latitude" name="move_latitude" size="15"/> 
-				</span> 
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 110px; padding-right: 12px;">
-					<label for="move_longitude">경도 </label>
-					<input type="text" id="move_longitude" name="move_longitude" size="15"/>
-				</span> 
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 110px; padding-right: 12px;">
-					<label for="move_height">높이 </label>
-					<input type="text" id="move_height" name="move_height" size="15" />
-				</span> 
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 97px; padding-right: 12px;">
-					<label for="move_heading">HEADING </label>
-					<input type="text" id="move_heading" name="move_heading" size="15" />
-				</span> 
-			</div>
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 110px; padding-right: 12px;">
-					<label for="move_pitch">PITCH </label>
-					<input type="text" id="move_pitch" name="move_pitch" size="15" />
-				</span>
-			</div> 
-			<div style="margin-top: 5px;">
-				<span style="padding-left: 110px; padding-right: 12px;">
-					<label for="move_roll">ROLL </label>
-					<input type="text" id="move_roll" name="move_roll" size="15" /> 
-					<button type="button" id="changeLocationAndRotationAPI">변환</button>
-				</span>
-			</div>
-		</div>
-		<div style="height: 20px;"></div>
-	</div>
+		<ul>
+			<li id="issueMoreImage">My Issue</li>
+			<li id="apiMoreImage">API목록</li>
+		</ul>
 	
+		<div id="recentIssueListContent" style="display: none">
+			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
+				<div>
+					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
+					<span style="padding-left: 10px; width:200px; overflow: hidden;">건물이 겹쳤어요!</span>
+					<span style="float:right; padding-right: 15px; padding-top: 5px;">
+						<a href="#" onclick="flyTo('126.89624', '37.58084', '60', '2')">
+							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
+						</a>
+					</span>
+				</div>
+				<div id="issue_toggle_14">
+					<span style="padding-left: 25px;">[버그][매우중요]</span>
+					<span style="padding-left: 5px;">Project4</span>
+					<span style="float:right; padding-right: 20px;">2017-06-30 19:07:54</span>
+				</div>
+			</div>
+		
+			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
+				<div>
+					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
+					<span style="padding-left: 10px; width:200px; overflow: hidden;">지붕이 나달나달함</span>
+					<span style="float:right; padding-right: 15px; padding-top: 5px;">
+						<a href="#" onclick="flyTo('126.89035', '37.57707', '65', '2')">
+							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
+						</a>
+					</span>
+				</div>
+				<div id="issue_toggle_13">
+					<span style="padding-left: 25px;">[버그][매우중요]</span>
+					<span style="padding-left: 5px;">Project4</span>
+					<span style="float:right; padding-right: 20px;">2017-06-30 19:00:32</span>
+				</div>
+			</div>
+		
+			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
+				<div>
+					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
+					<span style="padding-left: 10px; width:200px; overflow: hidden;">장애인 주차장이 없습니다</span>
+					<span style="float:right; padding-right: 15px; padding-top: 5px;">
+						<a href="#" onclick="flyTo('126.89624', '37.58084', '60', '2')">
+							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
+						</a>
+					</span>
+				</div>
+				<div id="issue_toggle_12">
+					<span style="padding-left: 25px;">[버그][매우중요]</span>
+					<span style="padding-left: 5px;">Project3</span>
+					<span style="float:right; padding-right: 20px;">2017-06-30 17:50:37</span>
+				</div>
+			</div>
+		
+			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
+				<div>
+					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
+					<span style="padding-left: 10px; width:200px; overflow: hidden;">공중집, 기둥 필요함</span>
+					<span style="float:right; padding-right: 15px; padding-top: 5px;">
+						<a href="#" onclick="flyTo('127.027567', '37.497918', '55', '2')">
+							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
+						</a>
+					</span>
+				</div>
+				<div id="issue_toggle_11">
+					<span style="padding-left: 25px;">[버그][매우중요]</span>
+					<span style="padding-left: 5px;">Project3</span>
+					<span style="float:right; padding-right: 20px;">2017-06-30 17:43:05</span>
+				</div>
+			</div>
+		
+			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
+				<div>
+					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
+					<span style="padding-left: 10px; width:200px; overflow: hidden;">건물 수리할때 위험함</span>
+					<span style="float:right; padding-right: 15px; padding-top: 5px;">
+						<a href="#" onclick="flyTo('126.89035', '37.57707', '65', '2')">
+							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
+						</a>
+					</span>
+				</div>
+				<div id="issue_toggle_10">
+					<span style="padding-left: 25px;">[버그][매우중요]</span>
+					<span style="padding-left: 5px;">Project3</span>
+					<span style="float:right; padding-right: 20px;">2017-06-30 17:39:59</span>
+				</div>
+			</div>
+		</div>
+		
+		<div id="apiListContent" style="display: none">
+			<div style="height: 20px;"></div>
+			<div>
+				<span style="padding-left: 10px; padding-right: 100px;">Data Key</span>
+				<input type="text" id="search_data_key" name="search_data_key" size="15" />
+				<button type="button" id="searchData" style="width: 50px; background: #727272; font-size: 1.2rem;">검색</button>
+			</div>
+			<div style="margin-top: 15px;">
+				<span style="padding-left: 10px; padding-right: 70px;">Bounding Box</span>
+				<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
+				<label for="showBoundingBox"> 표시 </label>
+				<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
+				<label for="hideBoundingBox"> 비표시 </label>
+			</div>
+			<div style="margin-top: 15px;">
+				<span style="padding-left: 10px; padding-right: 16px;">Selecting And Moving</span>
+				<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
+				<label for="mouseAllMove"> ALL </label>
+				<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
+				<label for="mouseObjectMove"> Object </label>
+			</div>
+			<div style="margin-top: 15px;">
+				<div style="padding-left: 10px;">
+					Location And Rotation
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 102px; padding-right: 12px;">
+						<label for="move_data_key">Data Key</label>
+						<input type="text" id="move_data_key" name="move_data_key" size="15" />
+					</span>
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 110px; padding-right: 12px;">
+						<label for="move_latitude">위도 </label>
+						<input type="text" id="move_latitude" name="move_latitude" size="15"/> 
+					</span> 
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 110px; padding-right: 12px;">
+						<label for="move_longitude">경도 </label>
+						<input type="text" id="move_longitude" name="move_longitude" size="15"/>
+					</span> 
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 110px; padding-right: 12px;">
+						<label for="move_height">높이 </label>
+						<input type="text" id="move_height" name="move_height" size="15" />
+					</span> 
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 97px; padding-right: 12px;">
+						<label for="move_heading">HEADING </label>
+						<input type="text" id="move_heading" name="move_heading" size="15" />
+					</span> 
+				</div>
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 110px; padding-right: 12px;">
+						<label for="move_pitch">PITCH </label>
+						<input type="text" id="move_pitch" name="move_pitch" size="15" />
+					</span>
+				</div> 
+				<div style="margin-top: 5px;">
+					<span style="padding-left: 110px; padding-right: 12px;">
+						<label for="move_roll">ROLL </label>
+						<input type="text" id="move_roll" name="move_roll" size="15" /> 
+						<button type="button" id="changeLocationAndRotationAPI">변환</button>
+					</span>
+				</div>
+			</div>
+			<div style="height: 20px;"></div>
+		</div>
+	</div>
 		
 	<div class="trigger" >
 		<button type="button"></button>
@@ -193,63 +194,21 @@
 			<li><a href="/homepage/tutorials.do">Tutorials</a></li>
 			<li><a href="/homepage/download.do">Download</a></li>
 			<li><a href="/homepage/about.do">mago3D</a></li>
-			<li>Home</li>	
+			<li><a href="/homepage/index.do">Home</a></li>	
 		</ul>
 	</div>
-
-	<div id="magoControllArea">
-		<div id="" style="padding-top:5px; width: 120px;">
-			<img src="/images/data_group_1.png" width="21px;" height="33px;" alt="Issue Input" />
-			<a href="#" onclick="alert('preparing...');">
-				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">JT</span>
-			</a>
-		</div>
-
-		<div id="" style="padding-top:5px; width: 120px;">
-			<img src="/images/data_group_2.png" width="21px;" height="33px;" alt="Issue Input" />
-			<a href="#" onclick="flyTo('126.88882', '37.58029', '1000', '2')">
-				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">3DS</span>
-			</a>
-		</div>
-
-		<div id="" style="padding-top:5px; width: 120px;">
-			<img src="/images/data_group_3.png" width="21px;" height="33px;" alt="Issue Input" />
-			<a href="#" onclick="flyTo('126.923279', '37.524059', '1000', '2')">
-				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">IFC</span>
-			</a>
-		</div>
-
-		<div id="" style="padding-top:5px; width: 120px;">
-			<img src="/images/data_group_4.png" width="21px;" height="33px;" alt="Issue Input" />
-			<a href="#" onclick="flyTo('127.025574', '37.499610', '1000', '2')">
-				<span style="padding-left:10px; width: 50px; bold; color: #FFFFFF;">COLLADA</span>
-			</a>
-		</div>
 	
-		<div style="height: 30px;"></div>
-		<div id="issueEnable" style="width: 150px;">
-			<img src="/images/issue_input.png" alt="Issue Input" width="40px;" height="50px;" />
-			<p />
-			<span id="issueEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Issue 등록</span>
-		</div>
-		<div id="objectInfoEnable" style="margin-top:10px; width:150px;">
-			<img src="/images/info_view.png" alt="Info View" width="40px;" height="50px;" />
-			<p />
-			<span id="objectInfoEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Object 정보 표시</span>
-		</div>
-		<div id="issuesEnable" style="margin-top:10px; width:150px;">
-			<img src="/images/issue_list.png" alt="Info View" width="40px;" height="50px;" />
-			<p />
-			<span id="issuesEnableLabel" style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">Issue 목록</span>
-		</div>
-		
-		<div style="margin-top:50px; width:150px;" onclick="inputIssue();">
-			<span style="margin-top: 5px; width: 50px; bold; color: #FFFFFF;">API Call Test</span>
-		</div>
+	<div class="shortcut" style="top:60px;">
+		<p>바로가기</p>
+		<ul>
+			<li onclick="flyTo('126.893570', '37.579200', '500', '3')">3DS 통합 가시화</li>
+			<li onclick="flyTo('126.928576', '37.524107', '500', '3')">IFC 통합 가시화</li>
+			<li onclick="flyTo('127.027548', '37.497969', '500', '3')">Collada 통합 가시화</li>
+		</ul>
 	</div>
 	
 	<!-- 맵영역 -->
-	<div id="magoContainer" style="position: absolute; width: 99%; height: 95%; margin-top: 0; padding: 0; overflow: hidden;"></div>
+	<div id="magoContainer" style="position: absolute; width: 100%; height: 100%; margin-top: 0; padding: 0; overflow: hidden;"></div>
 
 	<form id="issue" action="/homepage/demo.do" method="post" onsubmit="return false;">
 	<div id="inputIssueLayer" style="display: none; top:40%; left:45%; width:450px; margin:-250px 0 0 -150px; " class="layer">
@@ -269,14 +228,13 @@
 	        		</th>
 	        		<td>
 	        			<select id="data_group_id" name="data_group_id" class="select">
-							<option value="8">JT</option>
-							<option value="3">3DS</option>
-							<option value="9">IFC</option>
-							<option value="10">COLLADA</option>
+							<option value="2">Project3</option>
+							<option value="3">Project1</option>
+							<option value="4">Project2</option>
 						</select>
 	        		</td>
 	        	</tr>
-	        	<tr>
+				<tr>
 	        		<th>
 	        			<label for="issue_type">Issue Type</label>
 	        		</th>
@@ -291,11 +249,10 @@
 	        	</tr>
 	        	<tr>
 	        		<th>
-	        			<label for="data_key">Data Key</label>
+						<label for="data_key">Data Key</label>
 	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
 	        		</th>
 	        		<td><input id="data_key" name="data_key" class="ml" type="text" value=""/>
-						
 						<input id="latitude" name="latitude" type="hidden" value=""/>
 						<input id="longitude" name="longitude" type="hidden" value=""/>
 						<input id="height" name="height" type="hidden" value=""/>
@@ -307,7 +264,6 @@
 	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
 	        		</th>
 	        		<td><input id="title" name="title" class="ml" type="text" value=""/>
-						
 	        		</td>
 	        	</tr>
 	        	<tr>
@@ -345,22 +301,18 @@
 	        	<tr style="height: 50px;">
 	        		<th><label for="contents">내용</label></th>
 	        		<td>
-	        			<textarea id="contents" name="contents">
-						</textarea>
+	        			<textarea id="contents" name="contents"></textarea>
 	        		</td>
 	        	</tr>
 	        </table>
-	        
-	      	<div class="btns">
+			<div class="btns">
 	 			<button id="issueInsertButton">Save</button>
 			</div>
 	    </div>
 	</div>
 	</form>
 
-
 <script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
-<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 <script type="text/javascript" src="/src/mago3d/Code.js"></script>
 <script type="text/javascript" src="/src/mago3d/API.js"></script>
 <script type="text/javascript" src="/src/mago3d/Config.js"></script>
@@ -423,6 +375,11 @@
 <script type="text/javascript" src="/src/mago3d/ObjectMarker.js"></script>
 <script type="text/javascript" src="/src/mago3d/Pin.js"></script>
 <script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('chrome') < 0) { 
+		alert("이 데모 페이지는 대용량 웹 데이터 처리를 위해 Chrome 브라우저에 최적화 되어 있습니다. \n원활한 서비스 이용을 위해 Chrome 브라우저를 이용  하시기 바랍니다.");
+	}
+
 	var managerFactory = null;
 	var insertIssueFlag = false;
 	var objectInfoViewFlag = false;
@@ -434,7 +391,7 @@
 	function magoStart(viewer, renderDivId, serverPolicy, serverData) {
 		if(serverPolicy === null) {
 			$.ajax({
-				url: "/sample/policy.json",
+				url: "/sample/policy-cesium.json",
 				type: "GET",
 				dataType: "json",
 				success: function(serverPolicy){
@@ -467,23 +424,9 @@
 		}
 	}
 	
-	/* function startMogoUI() {
-		intervalCount++;
-		if(managerFactory != null) {
-			// BoundingBox
-			changeBoundingBox(false);
-			// Selecting And Moving
-			changeMouseMove("0");
-			clearInterval(timerId);
-			console.log(" managerFactory != null, intervalCount = " + intervalCount);
-			return;
-		}
-		console.log("--------- intervalCount = " + intervalCount);
-	} */
-	
 	$(document).ready(function() {
-		$("#recentIssueListContent").show();
-		//$("#issueMoreImage").attr("src", "/images/${lang }/homepage/minus.png");
+		//$("#recentIssueListContent").show();
+		
 		// BoundingBox
 		changeBoundingBox(false);
 		// Selecting And Moving
@@ -491,17 +434,23 @@
 	});
 	$("#issueMoreImage").click(function() {
 		if($("#recentIssueListContent").css("display") == "none") {
+			$("#issueMoreImage").addClass("on");
+			$("#apiMoreImage").removeClass("on");
 			$("#recentIssueListContent").show();
 			$("#apiListContent").hide();
 		} else {
+			$("#issueMoreImage").removeClass("on");
 			$("#recentIssueListContent").hide();
 		}
 	});
 	$("#apiMoreImage").click(function() {
 		if($("#apiListContent").css("display") == "none") {
+			$("#apiMoreImage").addClass("on");
+			$("#issueMoreImage").removeClass("on");
 			$("#apiListContent").show();
 			$("#recentIssueListContent").hide();
 		} else {
+			$("#apiMoreImage").removeClass("on");
 			$("#apiListContent").hide();
 		}
 	});
@@ -514,10 +463,12 @@
 	$("#issueEnable").click(function() {
 		if(insertIssueFlag) {
 			insertIssueFlag = false;
-			$("#issueEnableLabel").text("Issue 등록");
+			//$("#issueEnable").val("Issue 등록");
+			$("#issueEnable").removeClass("on");
 		} else {
 			insertIssueFlag = true;
-			$("#issueEnableLabel").text("활성화 상태");
+			//$("#issueEnable").val("Issue 등록중");
+			$("#issueEnable").addClass("on");
 		}
 		changeInsertIssueModeAPI(insertIssueFlag);
 	});
@@ -525,36 +476,43 @@
 	$("#objectInfoEnable").click(function() {
 		if(objectInfoViewFlag) {
 			objectInfoViewFlag = false;
-			$("#objectInfoEnableLabel").text("Object 정보 표시");
+			$("#objectInfoEnable").removeClass("on");
+			//$("#objectInfoEnableLabel").text("Object 정보 표시");
 		} else {
 			objectInfoViewFlag = true;
-			$("#objectInfoEnableLabel").text("활성화 상태");
+			//$("#objectInfoEnableLabel").text("활성화 상태");
+			$("#objectInfoEnable").addClass("on");			
 		}
 		changeObjectInfoViewModeAPI(objectInfoViewFlag);
 	});
 	// issue list 표시
 	$("#issuesEnable").click(function() {
+		alert("준비중 입니다.");
+		return;
 		if(listIssueFlag) {
 			listIssueFlag = false;
-			$("#issuesEnableLabel").text("Issue 목록");
+			$("#issuesEnable").removeClass("on");
+			//$("#issuesEnableLabel").text("Issue 목록");
 		} else {
 			listIssueFlag = true;
-			$("#issuesEnableLabel").text("활성화 상태");
+			$("#issuesEnable").addClass("on");
+			//$("#issuesEnableLabel").text("활성화 상태");
 		}
 		changeListIssueViewModeAPI(listIssueFlag);
 	});
 	
-	function inputIssue(data_name, data_key, latitude, longitude, elevation) {
+	// issue input layer call back function
+	function showInsertIssueLayer(data_name, data_key, latitude, longitude, height) {
 		if(insertIssueFlag) {
 			if($("#inputIssueLayer").css("display") == "none") {
 				$("#inputIssueLayer").show();
 				
-				var dt = new Date();
+				$("#data_key").val(data_name);
+				$("#latitude").val(latitude);
+				$("#longitude").val(longitude);
+				$("#height").val(height);
 				
-				
-				$("#latitude").val("37.57750");
-				$("#longitude").val("126.89069");
-				$("#height").val("60.0");
+				console.log("data_name = " + data_name + ", data_key = " + data_key + ", latitude = " + latitude + ", longitude = " + longitude + ", height = " + height); 
 			}
 		}
 	}
@@ -655,6 +613,7 @@
 					
 					$("#inputIssueLayer").hide();
 					isInsertIssue = true;
+					ajaxIssueList();
 				},
 				error:function(request,status,error){
 			        //alert(JS_MESSAGE["ajax.error.message"]);
@@ -667,7 +626,6 @@
 			return;
 		}
 	});
-	
 	
 	// Data 검색
 	$("#searchData").click(function() {
@@ -731,6 +689,59 @@
 			return false;
 		}
 		return true;
+	}
+	
+	// TODO issue url 밑에 있어야 할지도 모르겠다.
+	function ajaxIssueList() {
+		var info = "";		
+		$.ajax({
+			url: "/homepage/ajax-list-issue.do",
+			type: "GET",
+			data: info,
+			dataType: "json",
+			success: function(msg){
+				if(msg.result == "success") {
+					var issueList = msg.issueList;
+					var content = "";
+					
+					if(issueList == null || issueList.length == 0) {
+						content += 	"<div style=\"text-align: center; padding-top:20px; height: 50px;\">"
+								+	"	Issue가 존재하지 않습니다."
+								+	"</div>";
+					} else {
+						for(i=0; i<issueList.length; i++ ) {
+							var issue = null;
+							issue = issueList[i];
+							content = content 
+								+ 	"<div style=\"padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro\">"
+								+ 	"	<div>"
+								+ 	"		<img src=\"/images/${lang }/homepage/bullet_h4.png\" alt=\"\" />"
+								+ 	"		<span style=\"padding-left: 10px; width:200px; overflow: hidden;\">" + issue.title + "</span>"
+								+ 	"		<span style=\"float:right; padding-right: 15px; padding-top: 5px;\">"
+								+ 	"			<a href=\"#\" onclick=\"flyTo('" + issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">"
+								+ 	"				<img src=\"/images/${lang }/homepage/btn_going.png\" width=\"26\" height=\"26\" alt=\"\" />"
+								+ 	"			</a>"
+								+ 	"		</span>"
+								+ 	"	</div>"
+								+ 	"	<div id=\"issue_toggle_" + issue.issue_id + "\">"
+								+ 	"		<span style=\"padding-left: 25px;\">[" +  issue.issue_type + "][" + issue.priority + "]</span>"
+								+ 	"		<span style=\"padding-left: 5px;\">" + issue.data_group_name  + "</span>"
+								+ 	"		<span style=\"float:right; padding-right: 20px;\">" + issue.insert_date.substring(0,19) + "</span>"
+								+ 	"	</div>"
+								+ 	"</div>";
+						}
+					}
+					$("#recentIssueListContent").empty();
+					$("#recentIssueListContent").html(content);
+				} else {
+					alert(JS_MESSAGE[msg.result]);
+				}
+			},
+			error:function(request,status,error){
+		        //alert(JS_MESSAGE["ajax.error.message"]);
+				console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			}
+		});
 	}
 </script>
 </body>

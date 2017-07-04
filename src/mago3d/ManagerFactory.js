@@ -156,7 +156,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 			
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
+	
 		
+		wwd.navigator.lookAtLocation.latitude = 37.57750;
+	    wwd.navigator.lookAtLocation.longitude = 126.89069;
+	    wwd.navigator.range = 2000; // 2 million meters above the ellipsoid
+	    //wwd.redraw();
 	}
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드

@@ -1487,7 +1487,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.arrayAuxSC.length = 0;
 		if(this.buildingSelected != undefined) {
 			this.displayLocationAndRotation(this.buildingSelected);
-			//this.selectedObjectNotice(this.buildingSelected);
+			this.selectedObjectNotice(this.buildingSelected);
 		}
 		if(this.objectSelected != undefined) {
 			//this.displayLocationAndRotation(currentSelectedBuilding);

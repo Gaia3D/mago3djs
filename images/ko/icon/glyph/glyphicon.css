@@ -1,0 +1,307 @@
+@font-face {
+	font-family: 'glyphicon';
+	src:url('glyphicon.eot');
+	src:url('glyphicon.eot#iefix') format('embedded-opentype'),
+		url('glyphicon.ttf') format('truetype'),
+		url('glyphicon.woff') format('woff'),
+		url('glyphicon.svg#glyphicon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.icon-glyph {
+    /* use !important to prevent issues with browser extensions that change fonts */
+	font-family: 'glyphicon' !important;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	vertical-align: text-bottom;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.glyph-lock-circle:before {
+	content: "\e927";
+}
+.glyph-lock-dot:before {
+	content: "\e928";
+}
+.glyph-lock:before {
+	content: "\e929";
+}
+.glyph-unlock-circle:before {
+	content: "\e95a";
+}
+.glyph-unlock-dot:before {
+	content: "\e95b";
+}
+.glyph-unlock:before {
+	content: "\e95c";
+}
+.glyph-drop-circle:before {
+	content: "\e930";
+}
+.glyph-drop-dot:before {
+	content: "\e954";
+}
+.glyph-drop:before {
+	content: "\e955";
+}
+.glyph-fold-circle:before {
+	content: "\e956";
+}
+.glyph-fold-dot:before {
+	content: "\e957";
+}
+.glyph-fold:before {
+	content: "\e958";
+}
+.glyph-next-dot:before {
+	content: "\e959";
+}
+.glyph-first:before {
+	content: "\e91d";
+}
+.glyph-last:before {
+	content: "\e926";
+}
+.glyph-next:before {
+	content: "\e932";
+}
+.glyph-prev:before {
+	content: "\e941";
+}
+.glyph-bottom-circle:before {
+	content: "\e900";
+}
+.glyph-bottom-dot:before {
+	content: "\e901";
+}
+.glyph-bottom:before {
+	content: "\e902";
+}
+.glyph-chart-circle:before {
+	content: "\e903";
+}
+.glyph-chart-dot:before {
+	content: "\e904";
+}
+.glyph-chart:before {
+	content: "\e905";
+}
+.glyph-check-circle:before {
+	content: "\e906";
+}
+.glyph-check-dot:before {
+	content: "\e907";
+}
+.glyph-check:before {
+	content: "\e908";
+}
+.glyph-dashboard-circle:before {
+	content: "\e909";
+}
+.glyph-dashboard-dot:before {
+	content: "\e90a";
+}
+.glyph-dashboard:before {
+	content: "\e90b";
+}
+.glyph-db-circle:before {
+	content: "\e90c";
+}
+.glyph-db-dot:before {
+	content: "\e90d";
+}
+.glyph-db:before {
+	content: "\e90e";
+}
+.glyph-desktop-circle:before {
+	content: "\e90f";
+}
+.glyph-desktop-dot:before {
+	content: "\e910";
+}
+.glyph-desktop:before {
+	content: "\e911";
+}
+.glyph-down-circle:before {
+	content: "\e912";
+}
+.glyph-down-dot:before {
+	content: "\e913";
+}
+.glyph-down:before {
+	content: "\e914";
+}
+.glyph-emark-circle:before {
+	content: "\e915";
+}
+.glyph-emark-dot:before {
+	content: "\e916";
+}
+.glyph-emark:before {
+	content: "\e917";
+}
+.glyph-ex-circle:before {
+	content: "\e918";
+}
+.glyph-ex-dot:before {
+	content: "\e919";
+}
+.glyph-ex:before {
+	content: "\e91a";
+}
+.glyph-first-circle:before {
+	content: "\e91b";
+}
+.glyph-first-dot:before {
+	content: "\e91c";
+}
+.glyph-home-circle:before {
+	content: "\e91e";
+}
+.glyph-home-dot:before {
+	content: "\e91f";
+}
+.glyph-home:before {
+	content: "\e920";
+}
+.glyph-imark-circle:before {
+	content: "\e921";
+}
+.glyph-imark-dot:before {
+	content: "\e922";
+}
+.glyph-imark:before {
+	content: "\e923";
+}
+.glyph-last-circle:before {
+	content: "\e924";
+}
+.glyph-last-dot:before {
+	content: "\e925";
+}
+.glyph-monitor-circle:before {
+	content: "\e92a";
+}
+.glyph-monitor-dot:before {
+	content: "\e92b";
+}
+.glyph-monitor:before {
+	content: "\e92c";
+}
+.glyph-mouse-circle:before {
+	content: "\e92d";
+}
+.glyph-mouse-dot:before {
+	content: "\e92e";
+}
+.glyph-mouse:before {
+	content: "\e92f";
+}
+.glyph-next-circle:before {
+	content: "\e931";
+}
+.glyph-off-circle:before {
+	content: "\e933";
+}
+.glyph-off-dot:before {
+	content: "\e934";
+}
+.glyph-off:before {
+	content: "\e935";
+}
+.glyph-on-circle:before {
+	content: "\e936";
+}
+.glyph-on-dot:before {
+	content: "\e937";
+}
+.glyph-on:before {
+	content: "\e938";
+}
+.glyph-out-circle:before {
+	content: "\e939";
+}
+.glyph-out-dot:before {
+	content: "\e93a";
+}
+.glyph-out:before {
+	content: "\e93b";
+}
+.glyph-plus-circle:before {
+	content: "\e93c";
+}
+.glyph-plus-dot:before {
+	content: "\e93d";
+}
+.glyph-plus:before {
+	content: "\e93e";
+}
+.glyph-prev-circle:before {
+	content: "\e93f";
+}
+.glyph-prev-dot:before {
+	content: "\e940";
+}
+.glyph-qmark-circle:before {
+	content: "\e942";
+}
+.glyph-qmark-dot:before {
+	content: "\e943";
+}
+.glyph-qmark:before {
+	content: "\e944";
+}
+.glyph-refresh-circle:before {
+	content: "\e945";
+}
+.glyph-refresh-dot:before {
+	content: "\e946";
+}
+.glyph-refresh:before {
+	content: "\e947";
+}
+.glyph-settings-circle:before {
+	content: "\e948";
+}
+.glyph-settings-dot:before {
+	content: "\e949";
+}
+.glyph-settings:before {
+	content: "\e94a";
+}
+.glyph-top-circle:before {
+	content: "\e94b";
+}
+.glyph-top-dot:before {
+	content: "\e94c";
+}
+.glyph-top:before {
+	content: "\e94d";
+}
+.glyph-up-circle:before {
+	content: "\e94e";
+}
+.glyph-up-dot:before {
+	content: "\e94f";
+}
+.glyph-up:before {
+	content: "\e950";
+}
+.glyph-users-circle:before {
+	content: "\e951";
+}
+.glyph-users-dot:before {
+	content: "\e952";
+}
+.glyph-users:before {
+	content: "\e953";
+}
+
