@@ -798,8 +798,6 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 //어떤 용도
 ShaderSource.renderShowDepthVsSource = "\n\
 	attribute vec3 position;\n\
-	attribute vec3 normal;\n\
-	attribute vec2 texCoord;\n\
 	\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 RefTransfMatrix;\n\
@@ -1628,7 +1626,6 @@ ShaderSource.pngImageVsSource = "\n\
 	uniform vec3 buildingPosLOW;\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
-	uniform mat4 u_matrix;\n\
 	varying vec2 v_texcoord;\n\
 void main() {\n\
     vec4 position2 = vec4(a_position.xyz, 1.0);\n\
@@ -1639,7 +1636,7 @@ void main() {\n\
 	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 	vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-   v_texcoord = a_texcoord;\n\
+    v_texcoord = a_texcoord;\n\
 }";
 
 

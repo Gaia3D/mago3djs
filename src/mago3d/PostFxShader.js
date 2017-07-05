@@ -566,11 +566,9 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
+	//shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
+	//shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
 	//*********************************************************************************
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
