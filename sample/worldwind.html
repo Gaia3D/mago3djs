@@ -397,7 +397,7 @@
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
-				loadData(viewer, renderDivId, serverPolicy, serverData);
+				loadData(viewer, renderDivId, serverPolicy);
 			},
 			error: function(e){
 				alert(e.responseText);
