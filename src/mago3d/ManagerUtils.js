@@ -239,7 +239,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 		var rotMatrix = WorldWind.Matrix.fromIdentity();
 		var tMatrix = WorldWind.Matrix.fromIdentity();
 		
-		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], globe, xAxis, yAxis, zAxis);
+		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
 
 		rotMatrix.set(
 		xAxis[0], yAxis[0], zAxis[0], 0,
@@ -342,9 +342,12 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		
 	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		//var globe = magoManager.wwd.globe;
-		//var origin = new WorldWind.Vec3(0, 0, 0);
-		//origin = globe.computePointFromPosition(resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.altitude, origin);
+		var globe = magoManager.wwd.globe;
+		var resultCartographic = new WorldWind.Vec3(0, 0, 0);
+		resultCartographic = globe.computePositionFromPoint(absoluteX, absoluteY, absoluteZ, resultCartographic);
+		resultGeoLocationData.geographicCoord.longitude = resultCartographic.longitude;
+		resultGeoLocationData.geographicCoord.latitude = resultCartographic.latitude;
+		resultGeoLocationData.geographicCoord.altitude = resultCartographic.altitude;
 	}
 	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
@@ -433,7 +436,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		var rotMatrix = WorldWind.Matrix.fromIdentity();
 		var tMatrix = WorldWind.Matrix.fromIdentity();
 		
-		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], globe, xAxis, yAxis, zAxis);
+		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
 
 		rotMatrix.set(
 		xAxis[0], yAxis[0], zAxis[0], 0,
@@ -474,21 +477,15 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		// now calculate the inverses of the matrices.***
 		var tMatrixInv = WorldWind.Matrix.fromIdentity();
 		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
-		var tMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		tMatrixInvColMajorArray = tMatrixInv.columnMajorComponents(tMatrixInvColMajorArray);
-		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInvColMajorArray);
+		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
 		
 		var rotMatrixInv = WorldWind.Matrix.fromIdentity();
 		rotMatrixInv.invertMatrix(resultGeoLocationData.rotMatrix._floatArrays);
-		var rotMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		rotMatrixInvColMajorArray = rotMatrixInv.columnMajorComponents(rotMatrixInvColMajorArray);
-		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInvColMajorArray);
+		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInv);
 		
 		var geoLocMatrixInv = WorldWind.Matrix.fromIdentity();
 		geoLocMatrixInv.invertMatrix(resultGeoLocationData.geoLocMatrix._floatArrays);
-		var geoLocMatrixInvColMajorArray = WorldWind.Matrix.fromIdentity();
-		geoLocMatrixInvColMajorArray = geoLocMatrixInv.columnMajorComponents(geoLocMatrixInvColMajorArray);
-		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInvColMajorArray);
+		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
 	}
 	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{

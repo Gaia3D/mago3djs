@@ -1083,6 +1083,8 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl) {
 	shader.position3_loc = gl.getAttribLocation(shader.program, "a_position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_texcoord");
 	
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
+	
 };
 
 
