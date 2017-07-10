@@ -2228,52 +2228,58 @@ CesiumManager.prototype.disableCameraMotion = function(state){
  */
 CesiumManager.prototype.manageMouseMove = function(mouseX, mouseY) {
 
-	// distinguish 2 modes.******************************************************
-	if(this.magoPolicy.mouseMoveMode == 0) // blocks move.***
+	if(this.configInformation.geo_view_library === Constant.CESIUM)
 	{
-		if(this.buildingSelected != undefined) {
-			// move the selected object.***
-			this.mouse_x = mouseX;
-			this.mouse_y = mouseY;
+		// distinguish 2 modes.******************************************************
+		if(this.magoPolicy.mouseMoveMode == 0) // blocks move.***
+		{
+			if(this.buildingSelected != undefined) {
+				// move the selected object.***
+				this.mouse_x = mouseX;
+				this.mouse_y = mouseY;
 
-			// 1rst, check if there are objects to move.***
-			if(this.mustCheckIfDragging) {
-				if(this.isDragging(this.scene)) {
-					this.mouseDragging = true;
-					this.disableCameraMotion(false);
+				// 1rst, check if there are objects to move.***
+				if(this.mustCheckIfDragging) {
+					if(this.isDragging(this.scene)) {
+						this.mouseDragging = true;
+						this.disableCameraMotion(false);
+					}
+					this.mustCheckIfDragging = false;
 				}
-				this.mustCheckIfDragging = false;
+			} else {
+				this.isCameraMoving = true; // if no object is selected.***
 			}
-		} else {
-			this.isCameraMoving = true; // if no object is selected.***
 		}
+		else if(this.magoPolicy.mouseMoveMode == 1) // objects move.***
+		{
+			if(this.objectSelected != undefined) {
+				// move the selected object.***
+				this.mouse_x = mouseX;
+				this.mouse_y = mouseY;
+
+				// 1rst, check if there are objects to move.***
+				if(this.mustCheckIfDragging) {
+					if(this.isDragging(this.scene)) {
+						this.mouseDragging = true;
+						this.disableCameraMotion(false);
+					}
+					this.mustCheckIfDragging = false;
+				}
+			} else {
+				this.isCameraMoving = true; // if no object is selected.***
+			}
+		}
+		//---------------------------------------------------------------------------------
+		this.isCameraMoving = true; // test.***
+		if(this.mouseDragging) {
+			this.moveSelectedObjectAsimetricMode(this.scene, this.currentRenderablesNeoRefListsArray);
+		}
+
 	}
-	else if(this.magoPolicy.mouseMoveMode == 1) // objects move.***
+	else if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		if(this.objectSelected != undefined) {
-			// move the selected object.***
-			this.mouse_x = mouseX;
-			this.mouse_y = mouseY;
-
-			// 1rst, check if there are objects to move.***
-			if(this.mustCheckIfDragging) {
-				if(this.isDragging(this.scene)) {
-					this.mouseDragging = true;
-					this.disableCameraMotion(false);
-				}
-				this.mustCheckIfDragging = false;
-			}
-		} else {
-			this.isCameraMoving = true; // if no object is selected.***
-		}
+		
 	}
-	//---------------------------------------------------------------------------------
-	this.isCameraMoving = true; // test.***
-	if(this.mouseDragging) {
-		this.moveSelectedObjectAsimetricMode(this.scene, this.currentRenderablesNeoRefListsArray);
-	}
-
-	
 };
 
 
