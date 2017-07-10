@@ -169,11 +169,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 	
-		
-		wwd.navigator.lookAtLocation.latitude = MagoConfig.getPolicy().geo_init_latitude;
-	    wwd.navigator.lookAtLocation.longitude = MagoConfig.getPolicy().geo_init_longitude;
-	    wwd.navigator.range = MagoConfig.getPolicy().geo_init_height;
-	    //wwd.redraw();
+		wwd.goToAnimator.travelTime = 5000;
+		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
 	    
 	    // 이미지 경로
 	    magoManager.magoPolicy.imagePath = imagePath;
@@ -534,9 +531,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					duration: parseInt(duration)
 				});
 			} else {
-				wwd.navigator.lookAtLocation.latitude = parseFloat(latitude);
-				wwd.navigator.lookAtLocation.longitude = parseFloat(longitude);
-				wwd.navigator.range = parseFloat(height);
+				wwd.goToAnimator.travelTime = duration;
+				wwd.goTo(new WorldWind.Position(latitude, longitude, height));
 			}
 		},
 		// 블락 및 부재 검색 api

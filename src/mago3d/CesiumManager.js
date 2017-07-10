@@ -4817,10 +4817,19 @@ CesiumManager.prototype.flyToBuilding = function(dataKey) {
 
 	//var position = new Cesium.Cartesian3(this.pointSC.x, this.pointSC.y, this.pointSC.z);
 	//var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-
-	var viewer = this.scene.viewer;
-	var seconds = 3;
-	this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
+	if(this.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		var viewer = this.scene.viewer;
+		var seconds = 3;
+		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
+	}
+	else if(this.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		var geographicCoord = buildingGeoLocation.geographicCoord;
+		this.wwd.goToAnimator.travelTime = 3000;
+		this.wwd.goTo(new WorldWind.Position(latitude, longitude, height));
+	}
 };
 
 /**
