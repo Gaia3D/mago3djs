@@ -170,9 +170,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 	
 		
-		wwd.navigator.lookAtLocation.latitude = 37.57750;
-	    wwd.navigator.lookAtLocation.longitude = 126.89069;
-	    wwd.navigator.range = 2000; // 2 million meters above the ellipsoid
+		wwd.navigator.lookAtLocation.latitude = MagoConfig.getPolicy().geo_init_latitude;
+	    wwd.navigator.lookAtLocation.longitude = MagoConfig.getPolicy().geo_init_longitude;
+	    wwd.navigator.range = MagoConfig.getPolicy().geo_init_height;
 	    //wwd.redraw();
 	    
 	    // 이미지 경로
@@ -526,12 +526,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		},
 		// flyTo
 		flyTo : function(longitude, latitude, height, duration) {
-			viewer.camera.flyTo({
-				destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
-															parseFloat(latitude),
-															parseFloat(height)),
-				duration: parseInt(duration)
-			});
+			if(MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) {
+				viewer.camera.flyTo({
+					destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+																parseFloat(latitude),
+																parseFloat(height)),
+					duration: parseInt(duration)
+				});
+			} else {
+				wwd.navigator.lookAtLocation.latitude = parseFloat(latitude);
+				wwd.navigator.lookAtLocation.longitude = parseFloat(longitude);
+				wwd.navigator.range = parseFloat(height);
+			}
 		},
 		// 블락 및 부재 검색 api
 		search : function(blockId) {
