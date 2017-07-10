@@ -4805,7 +4805,8 @@ CesiumManager.prototype.flyToBuilding = function(dataKey) {
 	if(realBuildingPos == undefined)
 		return;
 
-	this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
+	//
+	
 	if(this.renderingModeTemp == 0)
 		this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 	if(this.renderingModeTemp == 1)
@@ -4819,12 +4820,14 @@ CesiumManager.prototype.flyToBuilding = function(dataKey) {
 	//var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
 	if(this.configInformation.geo_view_library === Constant.CESIUM)
 	{
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
 		var viewer = this.scene.viewer;
 		var seconds = 3;
 		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
 	}
 	else if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
+		//this.boundingSphere_Aux.center = realBuildingPos;
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 		var geographicCoord = buildingGeoLocation.geographicCoord;
 		this.wwd.goToAnimator.travelTime = 3000;
