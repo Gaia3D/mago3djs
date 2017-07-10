@@ -4837,7 +4837,7 @@ CesiumManager.prototype.flyToBuilding = function(dataKey) {
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 		var geographicCoord = buildingGeoLocation.geographicCoord;
 		this.wwd.goToAnimator.travelTime = 3000;
-		this.wwd.goTo(new WorldWind.Position(latitude, longitude, height));
+		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
 	}
 };
 
