@@ -1465,7 +1465,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	
+	/*
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
 		//this.bPicking = false;
@@ -1477,7 +1477,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.renderingFase = !this.renderingFase;
 
 	}
-	
+	*/
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
