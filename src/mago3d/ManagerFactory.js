@@ -90,9 +90,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
         // Now set up to handle highlighting.
         //var highlightController = new WorldWind.HighlightController(wwd);
 
-		var cesiumManager = new CesiumManager();
-		cesiumManager.wwd = wwd;
-		cesiumManager.sceneState.textureFlipYAxis = true;
+		magoManager = new CesiumManager();
+		magoManager.wwd = wwd;
+		magoManager.sceneState.textureFlipYAxis = true;
 		
 		var newRenderableLayer = new WorldWind.RenderableLayer();
 		newRenderableLayer.displayName = "F4D tiles";
@@ -100,21 +100,21 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
         wwd.addLayer(newRenderableLayer);
 		
 		//newRenderableLayer.addRenderable(f4d_wwwLayer);// old.***
-		newRenderableLayer.addRenderable(cesiumManager);
+		newRenderableLayer.addRenderable(magoManager);
 		// End Create a layer to hold the f4dBuildings.-------------------------------------------------------
 
 		var gl = wwd.drawContext.currentGlContext;
 		
-		initWwwMago(cesiumManager, gl);
+		initWwwMago(magoManager, gl);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Click event. Is different to anothers event handlers.******************************************************
 		// The common gesture-handling function.
 		var handleClick = function (recognizer) {
 			// Obtain the event location.
-			cesiumManager.mouse_x = event.layerX,
-			cesiumManager.mouse_y = event.layerY;
-			cesiumManager.bPicking = true;
+			magoManager.mouse_x = event.layerX,
+			magoManager.mouse_y = event.layerY;
+			magoManager.bPicking = true;
 			
 			// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
 			// relative to the upper left corner of the canvas rather than the upper left corner of the page.
@@ -138,10 +138,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		{
 			// Mouse down.***
 			if(event.button == 0)
-				cesiumManager.mouseLeftDown = true;
-			cesiumManager.isCameraMoving = true;
-			cesiumManager.mouse_x = event.layerX,
-			cesiumManager.mouse_y = event.layerY;
+				magoManager.mouseLeftDown = true;
+			magoManager.isCameraMoving = true;
+			magoManager.mouse_x = event.layerX,
+			magoManager.mouse_y = event.layerY;
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
@@ -149,18 +149,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		{
 			// Mouse up.***
 			if(event.button == 0)
-				cesiumManager.mouseLeftDown = false;
-			cesiumManager.isCameraMoving = false;
+				magoManager.mouseLeftDown = false;
+			magoManager.isCameraMoving = false;
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
 		var mouseMoveEvent = function(event)
 		{
 			// Mouse move.***
-			cesiumManager.mouse_x = event.layerX,
-			cesiumManager.mouse_y = event.layerY;
-			if(cesiumManager.mouseLeftDown)
-				cesiumManager.manageMouseMove(event.layerX, event.layerY);
+			magoManager.mouse_x = event.layerX,
+			magoManager.mouse_y = event.layerY;
+			if(magoManager.mouseLeftDown)
+				magoManager.manageMouseMove(event.layerX, event.layerY);
 			
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);

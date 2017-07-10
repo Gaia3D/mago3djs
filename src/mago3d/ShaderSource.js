@@ -1658,9 +1658,17 @@ void main() {\n\
 ShaderSource.pngImageFsSource = "\n\
 	precision mediump float;\n\
 	varying vec2 v_texcoord;\n\
+	uniform bool textureFlipYAxis;\n\
 	uniform sampler2D u_texture;\n\
 void main() {\n\
-	vec4 textureColor = texture2D(u_texture, v_texcoord);\n\
+	vec4 textureColor;\n\
+	if(textureFlipYAxis)\n\
+	{\n\
+		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
+	}\n\
+	else{\n\
+		textureColor = texture2D(u_texture, v_texcoord);\n\
+	}\n\
 	if(textureColor.w < 0.1)\n\
 	{\n\
 		discard;\n\

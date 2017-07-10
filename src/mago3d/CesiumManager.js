@@ -1212,10 +1212,13 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		modelView = WorldWind.Matrix.fromIdentity();
 		modelView.copy(dc.navigatorState.modelview);
 		columnMajorArray = modelViewRelToEye.columnMajorComponents(columnMajorArray);
-		//columnMajorArray[12] = 0.0;
-		//columnMajorArray[13] = 0.0;
-		//columnMajorArray[14] = 0.0;
 		sceneState.modelViewRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
+		
+		// ModelViewRelToEyeMatrixInv.***
+		var mvRelToEyeInv = WorldWind.Matrix.fromIdentity();
+		mvRelToEyeInv.invertOrthonormalMatrix(modelViewRelToEye);
+		columnMajorArray = mvRelToEyeInv.columnMajorComponents(columnMajorArrayAux);
+		sceneState.modelViewRelToEyeMatrixInv.copyFromFloatArray(columnMajorArray);
 		
 		// ModelViewProjectionRelToEyeMatrix.***
 		var modelViewProjectionRelToEye_aux = WorldWind.Matrix.fromIdentity();
@@ -1236,8 +1239,6 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		columnMajorArray[14] = 0.0;
 		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
 		*/
-		//Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
-		//dc.navigatorState.projection
 		
 		var cameraPosition = dc.navigatorState.eyePoint;
 		sceneState.camera.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
@@ -1252,7 +1253,7 @@ CesiumManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 		sceneState.camera.frustum.far = 1000.0;
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
-		sceneState.camera.frustum.fovRad = 56 * Math.PI/180; // pendent to know the real fov in webwroldwind.***
+		sceneState.camera.frustum.fovRad = 56.1 * Math.PI/180; // pendent to know the real fov in webwroldwind.***
 		sceneState.camera.frustum.fovyRad = sceneState.camera.frustum.fovRad/sceneState.camera.frustum.aspectRatio;
 		//sceneState.camera.frustum.fovyRad = 45 * Math.PI/180;
 
@@ -1464,7 +1465,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	/*
+	
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
 		//this.bPicking = false;
@@ -1476,7 +1477,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 		this.renderingFase = !this.renderingFase;
 
 	}
-	*/
+	
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
@@ -3627,7 +3628,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 					if(currentShader.color4_loc != -1)gl.disableVertexAttribArray(currentShader.color4_loc);
 				}
 				*/
-				/*
+				
 				// now repeat the objects markers for png images.***
 				// Png for pin image 128x128.********************************************************************
 				if(this.pin.positionBuffer == undefined)
@@ -3642,6 +3643,8 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
+				
+				gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis); 
 				// Tell the shader to get the texture from texture unit 0
 				gl.uniform1i(currentShader.texture_loc, 0);
 				gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -3678,7 +3681,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.bindTexture(gl.TEXTURE_2D, null);
 				gl.disableVertexAttribArray(currentShader.texCoord2_loc);
 				gl.disableVertexAttribArray(currentShader.position3_loc);
-				*/
+				
 			}
 			
 		}
