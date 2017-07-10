@@ -391,40 +391,32 @@
 	/* var timerId = setInterval("startMogoUI()", 1000); */
 	
 	// mago3d 시작, 정책 데이터 파일을 로딩
-	function magoStart(viewer, renderDivId, serverPolicy, serverData) {
-		if(serverPolicy === null) {
-			$.ajax({
-				url: "/sample/policy-worldwind.json",
-				type: "GET",
-				dataType: "json",
-				success: function(serverPolicy){
-					loadData(viewer, renderDivId, serverPolicy, serverData);
-				},
-				error: function(e){
-					alert(e.responseText);
-				}
-			});
-		} else {
-			loadData(viewer, renderDivId, serverPolicy, serverData);
-		}
+	function magoStart(viewer, renderDivId, serverPolicy) {
+		$.ajax({
+			url: "/sample/policy-worldwind.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				loadData(viewer, renderDivId, serverPolicy, serverData);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
 	}
 		
-	function loadData(viewer, renderDivId, serverPolicy, serverData) {
-		if(serverData === null) {
-			$.ajax({
-				url: "/sample/data.json",
-				type: "GET",
-				dataType: "json",
-				success: function(serverData){
-					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
-				},
-				error: function(e){
-					alert(e.responseText);
-				}
-			});
-		} else {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
-		}
+	function loadData(viewer, renderDivId, serverPolicy) {
+		$.ajax({
+			url: "/sample/data.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverData){
+				managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
 	}
 	
 	$(document).ready(function() {
