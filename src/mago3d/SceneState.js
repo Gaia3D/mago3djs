@@ -30,4 +30,7 @@ var SceneState = function() {
 	
 	// webWorldWind vars.***
 	this.dc;
+	
+	// provisionally.***
+	this.textureFlipYAxis = false;
 };

@@ -560,6 +560,7 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 	uniform sampler2D noiseTex;  \n\
 	uniform sampler2D diffuseTex;\n\
 	uniform bool hasTexture;\n\
+	uniform bool textureFlipYAxis;\n\
 	varying vec3 vNormal;\n\
 	uniform mat4 projectionMatrix;\n\
 	uniform mat4 m;\n\
@@ -668,7 +669,13 @@ ShaderSource.modelRefSsaoFsSource = "\n\
 		vec4 textureColor;\n\
 		if(hasTexture)\n\
 		{\n\
-			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			if(textureFlipYAxis)\n\
+			{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+			}\n\
+			else{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			}\n\
 			if(textureColor.w == 0.0)\n\
 			{\n\
 				discard;\n\
@@ -1001,6 +1008,7 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 	uniform sampler2D noiseTex;  \n\
 	uniform sampler2D diffuseTex;\n\
 	uniform bool hasTexture;\n\
+	uniform bool textureFlipYAxis;\n\
 	varying vec3 vNormal;\n\
 	uniform mat4 projectionMatrix;\n\
 	uniform mat4 m;\n\
@@ -1085,7 +1093,13 @@ ShaderSource.LodBuildingSsaoFsSource = "\n\
 		vec4 textureColor;\n\
 		if(hasTexture)\n\
 		{\n\
-			textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			if(textureFlipYAxis)\n\
+			{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+			}\n\
+			else{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			}\n\
 		}\n\
 		else{\n\
 			textureColor = vcolor4;\n\
