@@ -40,6 +40,9 @@ var Policy = function() {
 	// 이슈 목록 표시
 	this.issueListEnable = false;
 	
+	// 이미지 경로
+	this.imagePath = "";
+	
 	// provisional.***
 	this.colorChangedObjectId;
 };
@@ -131,4 +134,11 @@ Policy.prototype.getIssueListEnable = function() {
 };
 Policy.prototype.setIssueListEnable = function(issueListEnable) {
 	this.issueListEnable = issueListEnable;
+};
+
+Policy.prototype.getImagePath = function() {
+	return this.imagePath;
+};
+Policy.prototype.setImagePath = function(imagePath) {
+	this.imagePath = imagePath;
 };

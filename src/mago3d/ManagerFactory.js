@@ -10,7 +10,7 @@
  * @param serverData data json object
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
+var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, imagePath) {
 	if(!(this instanceof ManagerFactory)) {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -26,7 +26,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
 		viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
-	        url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+	        url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+	        enablePickFeatures: false
 	    }));
 		
 		viewer.scene.magoManager = new CesiumManager();
@@ -53,6 +54,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		}
 		// render Mode 적용
 		initRenderMode();
+		
+		// 이미지 경로
+		magoManager.magoPolicy.imagePath = imagePath;
 	} else if(serverPolicy.geo_view_library === Constant.WORLDWIND) {
 		// 환경 설정
 		MagoConfig.init(serverPolicy, serverData);
@@ -170,6 +174,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 	    wwd.navigator.lookAtLocation.longitude = 126.89069;
 	    wwd.navigator.range = 2000; // 2 million meters above the ellipsoid
 	    //wwd.redraw();
+	    
+	    // 이미지 경로
+	    magoManager.magoPolicy.imagePath = imagePath;
 	}
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드

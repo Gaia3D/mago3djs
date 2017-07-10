@@ -1336,37 +1336,37 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	if(this.pin.texture == undefined)
 	{
 		this.pin.texture = new Texture();
-		var filePath_inServer = "../images/PinImage.png";
+		var filePath_inServer = this.magoPolicy.imagePath + "/PinImage.png";
 		this.pin.texture.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, this.pin.texture, undefined, this);
 		this.pin.texturesArray.push(this.pin.texture);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = "../images/PinCabreado.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/PinCabreado.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = "../images/PinTijeras.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/PinTijeras.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = "../images/PinDislike.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/PinDislike.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = "../images/PinLikeGreen.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/PinLikeGreen.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = "../images/PinCarcajadas.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/PinCarcajadas.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);

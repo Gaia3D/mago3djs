@@ -384,6 +384,7 @@
 	var insertIssueFlag = false;
 	var objectInfoViewFlag = false;
 	var listIssueFlag = false;
+	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
 	/* var timerId = setInterval("startMogoUI()", 1000); */
 	
@@ -395,32 +396,32 @@
 				type: "GET",
 				dataType: "json",
 				success: function(serverPolicy){
-					loadData(viewer, renderDivId, serverPolicy, serverData);
+					loadData(viewer, renderDivId, serverPolicy);
 				},
 				error: function(e){
 					alert(e.responseText);
 				}
 			});
 		} else {
-			loadData(viewer, renderDivId, serverPolicy, serverData);
+			loadData(viewer, renderDivId, serverPolicy);
 		}
 	}
 		
-	function loadData(viewer, renderDivId, serverPolicy, serverData) {
+	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverData === null) {
 			$.ajax({
 				url: "/sample/data.json",
 				type: "GET",
 				dataType: "json",
 				success: function(serverData){
-					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
 				},
 				error: function(e){
 					alert(e.responseText);
 				}
 			});
 		} else {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
 		}
 	}
 	

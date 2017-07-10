@@ -8,15 +8,12 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans"> 
 	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	
-	<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
-  	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
+	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
-    
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="../src/engine/webworldwind/worldwind.js"></script> 
+    <script type="text/javascript" src="../src/engine/webworldwind/worldwind.js"></script> 
 	
 	<script type="text/javascript" src="../src/mago3d/Code.js"></script>
 	<script type="text/javascript" src="../src/mago3d/API.js"></script>
@@ -389,6 +386,7 @@
 	var insertIssueFlag = false;
 	var objectInfoViewFlag = false;
 	var listIssueFlag = false;
+	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
 	/* var timerId = setInterval("startMogoUI()", 1000); */
 	
@@ -418,14 +416,14 @@
 				type: "GET",
 				dataType: "json",
 				success: function(serverData){
-					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
 				},
 				error: function(e){
 					alert(e.responseText);
 				}
 			});
 		} else {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData);
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
 		}
 	}
 	
