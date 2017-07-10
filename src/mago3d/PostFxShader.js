@@ -529,6 +529,7 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 
 	// uniform samplers.***
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
@@ -697,6 +698,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");

@@ -24,8 +24,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 		// 환경 설정
 		MagoConfig.init(serverPolicy, serverData);
 		
-		if(viewer === null) viewer = new Cesium.Viewer(containerId);
+		if(viewer === null) viewer = new Cesium.Viewer(containerId, {
+			useDefaultRenderLoop : true
+		});
 		viewer.scene.magoManager = new CesiumManager();
+		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
+		// test.***
+		//viewer.scene.magoManager.cesiumWidget = viewer._cesiumWidget;
 		
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 
@@ -85,6 +90,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData) {
 
 		var cesiumManager = new CesiumManager();
 		cesiumManager.wwd = wwd;
+		cesiumManager.sceneState.textureFlipYAxis = true;
 		
 		var newRenderableLayer = new WorldWind.RenderableLayer();
 		newRenderableLayer.displayName = "F4D tiles";

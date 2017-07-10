@@ -1467,7 +1467,7 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	/*
 	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
 	{
-		this.bPicking = false;
+		//this.bPicking = false;
 		var pixelPos = new Point3D();
 		pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
 		var objMarker = this.objMarkerManager.newObjectMarker();
@@ -1494,7 +1494,6 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 			//this.selectedObjectNotice(currentSelectedBuilding);
 			//console.log("objectId = " + selectedObject.objectId);
 		}
-		
 	}
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1787,24 +1786,27 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 	{
 		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
 		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-		// LOD2.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-		for(var j=0; j<currentVisibleLowestOctCount; j++)
+		if(currentVisibleOctreesControler)
 		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
+			// LOD2.***
+			currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
+			for(var j=0; j<currentVisibleLowestOctCount; j++)
+			{
+				lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
 
-			if(lowestOctree.lego == undefined)
-				continue;
+				if(lowestOctree.lego == undefined)
+					continue;
 
-			if(lowestOctree.lego.selColor4 == undefined)
-				lowestOctree.lego.selColor4 = new Color();
-			
-			availableColor = this.selectionColor.getAvailableColor(availableColor);
+				if(lowestOctree.lego.selColor4 == undefined)
+					lowestOctree.lego.selColor4 = new Color();
+				
+				availableColor = this.selectionColor.getAvailableColor(availableColor);
 
-			lowestOctree.lego.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
-			this.selectionCandidateObjectsArray.push(undefined);
-			this.selectionCandidateLowestOctreesArray.push(lowestOctree);
-			this.selectionCandidateBuildingsArray.push(neoBuilding);
+				lowestOctree.lego.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
+				this.selectionCandidateObjectsArray.push(undefined);
+				this.selectionCandidateLowestOctreesArray.push(lowestOctree);
+				this.selectionCandidateBuildingsArray.push(neoBuilding);
+			}
 		}
 	}
 
@@ -1905,35 +1907,37 @@ CesiumManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, sce
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		
 		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-
-		// LOD2.***
-		gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-		for(var j=0; j<currentVisibleLowestOctCount; j++)
+		if(currentVisibleOctreesControler)
 		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
 
-			if(lowestOctree.lego == undefined) {
-			continue;
-			}
+			// LOD2.***
+			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
+			currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
+			for(var j=0; j<currentVisibleLowestOctCount; j++)
+			{
+				lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
 
-			if(lowestOctree.lego.fileLoadState == CODE.fileLoadState.READY) {
+				if(lowestOctree.lego == undefined) {
 				continue;
+				}
+
+				if(lowestOctree.lego.fileLoadState == CODE.fileLoadState.READY) {
+					continue;
+				}
+
+				if(lowestOctree.lego.fileLoadState == 2) {
+					continue;
+				}
+
+				gl.uniform1i(currentShader.hasTexture_loc, false); //.***
+				gl.uniform4fv(currentShader.color4Aux_loc, [lowestOctree.lego.selColor4.r/255.0, lowestOctree.lego.selColor4.g/255.0, lowestOctree.lego.selColor4.b/255.0, 1.0]);
+
+				gl.uniform1i(currentShader.hasAditionalMov_loc, false);
+				gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+
+				this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader, ssao_idx);
 			}
-
-			if(lowestOctree.lego.fileLoadState == 2) {
-				continue;
-			}
-
-			gl.uniform1i(currentShader.hasTexture_loc, false); //.***
-			gl.uniform4fv(currentShader.color4Aux_loc, [lowestOctree.lego.selColor4.r/255.0, lowestOctree.lego.selColor4.g/255.0, lowestOctree.lego.selColor4.b/255.0, 1.0]);
-
-			gl.uniform1i(currentShader.hasAditionalMov_loc, false);
-			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-
-			this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader, ssao_idx);
 		}
-		
 	}
 
 	if(currentShader.position3_loc != -1)gl.disableVertexAttribArray(currentShader.position3_loc);
@@ -3294,6 +3298,8 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
 				gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
 				
+				gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+				
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 				gl.activeTexture(gl.TEXTURE1);
@@ -3351,6 +3357,7 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 				gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 				gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 				gl.uniform1i(currentShader.hasTexture_loc, false); // initially false.***
+				gl.uniform1i(currentShader.textureFlipYAxis_loc,this.sceneState.textureFlipYAxis);
 
 				gl.uniform1i(currentShader.depthTex_loc, 0);
 				gl.uniform1i(currentShader.noiseTex_loc, 1);
@@ -3619,7 +3626,8 @@ CesiumManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, camera
 					if(currentShader.normal3_loc != -1)gl.disableVertexAttribArray(currentShader.normal3_loc);
 					if(currentShader.color4_loc != -1)gl.disableVertexAttribArray(currentShader.color4_loc);
 				}
-				
+				*/
+				/*
 				// now repeat the objects markers for png images.***
 				// Png for pin image 128x128.********************************************************************
 				if(this.pin.positionBuffer == undefined)
