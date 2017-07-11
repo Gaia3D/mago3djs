@@ -1468,7 +1468,20 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
-		if(this.magoPolicy.issueInsertEnable == true || this.magoPolicy.objectInfoViewEnable == true)
+		if(this.magoPolicy.issueInsertEnable == true)
+		{
+			if(this.objMarkerSC == undefined)
+				this.objMarkerSC = new ObjectMarker();
+			
+			var pixelPos = new Point3D();
+			pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
+			//var objMarker = this.objMarkerManager.newObjectMarker();
+			
+			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
+			this.renderingFase = !this.renderingFase;
+		}
+		
+		if(this.magoPolicy.objectInfoViewEnable == true)
 		{
 			if(this.objMarkerSC == undefined)
 				this.objMarkerSC = new ObjectMarker();
@@ -5355,13 +5368,24 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 		// 이슈 등록 창 오픈
 		if(this.magoPolicy.getIssueInsertEnable()) {
 			// insert pin.***
-			
+			//this.objMarkerSC.geoLocationData
+			/*
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
 									dividedName[0] + "_" + dividedName[1],
 									objectId,
 									geoLocationData.geographicCoord.latitude,
 									geoLocationData.geographicCoord.longitude,
 									geoLocationData.geographicCoord.altitude);
+									*/
+			if(this.objMarkerSC == undefined)
+				return;
+			
+			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
+									dividedName[0] + "_" + dividedName[1],
+									objectId,
+									this.objMarkerSC.geoLocationData.geographicCoord.latitude,
+									this.objMarkerSC.geoLocationData.geographicCoord.longitude,
+									this.objMarkerSC.geoLocationData.geographicCoord.altitude);
 		}
 	}
 };
@@ -5655,6 +5679,7 @@ CesiumManager.prototype.callAPI = function(api) {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
 	} else if(apiName === "drawInsertIssueImage") {
+		var hola = 0;
 		// pin image를 그림
 		// api.getIssueId(),
 		// api.getDataKey(),
