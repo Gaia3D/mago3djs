@@ -5650,5 +5650,12 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeListIssueViewMode") {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
+	} else if(apiName === "drawInsertIssueImage") {
+		// pin image를 그림
+		// api.getIssueId(),
+		// api.getDataKey(),
+		// api.getLatitude()),
+		// api.getLongitude()),
+		// api.getElevation()),
 	}
 };
