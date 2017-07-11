@@ -5683,7 +5683,7 @@ CesiumManager.prototype.callAPI = function(api) {
 			return;
 		
 		this.objMarkerManager.objectMarkerArray.push(this.objMarkerSC);
-		this.objMarkerSC == undefined;
+		this.objMarkerSC = new ObjectMarker();
 		// pin image를 그림
 		// api.getIssueId(),
 		// api.getDataKey(),
