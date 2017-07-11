@@ -5669,8 +5669,10 @@ CesiumManager.prototype.callAPI = function(api) {
 		
 		this.objMarkerSC.issue_id = api.getIssueId;
 		this.objMarkerSC.issue_type = api.getIssueType;
-		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(api.getLongitude, api.getLatitude, api.getHeight);
+		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(parseFloat(api.getLongitude), parseFloat(api.getLatitude), parseFloat(api.getHeight));
 		
 		objMarker.copyFrom(this.objMarkerSC);
+	} else if(apiName === "changeInsertIssueState") {
+		this.sceneState.insertIssueState = 0;
 	}
 };

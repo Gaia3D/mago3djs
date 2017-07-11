@@ -17,13 +17,10 @@ var ObjectMarker = function() {
 	//this.height = 0;
 };
 
-ObjectMarker.prototype.copyFrom(objMarker)
-{
-	if(objMarker == undefined)
-		return;
-	
-	if(objMarker.geoLocationData)
-	{
+ObjectMarker.prototype.copyFrom = function(objMarker) {
+	if(objMarker == undefined) return;
+		
+	if(objMarker.geoLocationData) {
 		this.geoLocationData.copyFrom(objMarker.geoLocationData);
 	}
 	

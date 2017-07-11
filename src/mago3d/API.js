@@ -73,6 +73,8 @@ var API = function(apiName) {
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
 	this.issueListEnable = false;
+	//
+	this.insertIssueState = 0;
 };
 
 API.prototype.getMagoEnable = function() {
@@ -249,4 +251,11 @@ API.prototype.getIssueListEnable = function() {
 };
 API.prototype.setIssueListEnable = function(issueListEnable) {
 	this.issueListEnable = issueListEnable;
+};
+
+API.prototype.getInsertIssueState = function() {
+	return this.insertIssueState;
+};
+API.prototype.setInsertIssueState = function(insertIssueState) {
+	this.insertIssueState = insertIssueState;
 };
