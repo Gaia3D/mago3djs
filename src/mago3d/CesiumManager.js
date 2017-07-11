@@ -5672,6 +5672,6 @@ CesiumManager.prototype.callAPI = function(api) {
 		if(api.getHeight != undefined) this.objMarkerSC.height = parseFloat(api.getHeight);
 		
 		this.objMarkerManager.objectMarkerArray.push(this.objMarkerSC);
-		this.objMarkerSC == undefined;
+		this.objMarkerSC = new ObjectMarker();
 	}
 };
