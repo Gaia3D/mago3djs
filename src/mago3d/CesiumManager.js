@@ -5665,13 +5665,12 @@ CesiumManager.prototype.callAPI = function(api) {
 		// pin 을 표시
 		if(this.objMarkerSC == undefined) return;
 		
+		var objMarker = this.objMarkerManager.newObjectMarker();
+		
 		this.objMarkerSC.issue_id = api.getIssueId;
 		this.objMarkerSC.issue_type = api.getIssueType;
-		if(api.getLatitude != undefined) this.objMarkerSC.latitude = parseFloat(api.getLatitude);
-		if(api.getLongitude != undefined) this.objMarkerSC.longitude = parseFloat(api.getLongitude);
-		if(api.getHeight != undefined) this.objMarkerSC.height = parseFloat(api.getHeight);
+		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(api.getLongitude, api.getLatitude, api.getHeight);
 		
-		this.objMarkerManager.objectMarkerArray.push(this.objMarkerSC);
-		this.objMarkerSC = new ObjectMarker();
+		objMarker.copyFrom(this.objMarkerSC);
 	}
 };

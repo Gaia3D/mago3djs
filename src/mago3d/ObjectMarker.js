@@ -12,9 +12,23 @@ var ObjectMarker = function() {
 	this.geoLocationData = new GeoLocationData();
 	this.issue_id = null;
 	this.issue_type = null;
-	this.latitude = 0;
-	this.longitude = 0;
-	this.height = 0;
+	//this.latitude = 0;
+	//this.longitude = 0;
+	//this.height = 0;
+};
+
+ObjectMarker.prototype.copyFrom(objMarker)
+{
+	if(objMarker == undefined)
+		return;
+	
+	if(objMarker.geoLocationData)
+	{
+		this.geoLocationData.copyFrom(objMarker.geoLocationData);
+	}
+	
+	this.issue_id = objMarker.issue_id;
+	this.issue_type = objMarker.issue_type;
 };
 
 /**
