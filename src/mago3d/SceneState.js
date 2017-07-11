@@ -31,6 +31,9 @@ var SceneState = function() {
 	// webWorldWind vars.***
 	this.dc;
 	
+	// insertIssue states.***
+	this.insertIssueState = 0; // 0 = no started. 1 = started.***
+	
 	// provisionally.***
 	this.textureFlipYAxis = false;
 };
