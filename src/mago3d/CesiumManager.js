@@ -1465,19 +1465,23 @@ CesiumManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, is
 	else{
 		var hola = 0;
 	}
-	/*
-	if(this.bPicking == true && this.bObjectMarker == true && isLastFrustum)
+	
+	if(this.bPicking == true && isLastFrustum)
 	{
-		//this.bPicking = false;
-		var pixelPos = new Point3D();
-		pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
-		var objMarker = this.objMarkerManager.newObjectMarker();
-		
-		ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
-		this.renderingFase = !this.renderingFase;
-
+		if(this.magoPolicy.issueInsertEnable == true || this.magoPolicy.objectInfoViewEnable == true)
+		{
+			if(this.objMarkerSC == undefined)
+				this.objMarkerSC = new ObjectMarker();
+			
+			var pixelPos = new Point3D();
+			pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
+			//var objMarker = this.objMarkerManager.newObjectMarker();
+			
+			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
+			this.renderingFase = !this.renderingFase;
+		}
 	}
-	*/
+	
 	
 	if(this.bPicking == true && isLastFrustum)
 	{
