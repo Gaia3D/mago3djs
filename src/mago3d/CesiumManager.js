@@ -5679,7 +5679,11 @@ CesiumManager.prototype.callAPI = function(api) {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
 	} else if(apiName === "drawInsertIssueImage") {
-		var hola = 0;
+		if(this.objMarkerSC == undefined)
+			return;
+		
+		this.objMarkerManager.objectMarkerArray.push(this.objMarkerSC);
+		this.objMarkerSC == undefined;
 		// pin image를 그림
 		// api.getIssueId(),
 		// api.getDataKey(),
