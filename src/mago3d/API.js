@@ -27,6 +27,8 @@ var API = function(apiName) {
 	this.dataKey = null;
 	// issueId
 	this.issueId = null;
+	// issueType
+	this.issueType = null;
 	
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
@@ -117,6 +119,12 @@ API.prototype.getIssueId = function() {
 };
 API.prototype.setIssueId = function(issueId) {
 	this.issueId = issueId;
+};
+API.prototype.getIssueType = function() {
+	return this.issueType;
+};
+API.prototype.setIssueType = function(issueType) {
+	this.issueId = issueType;
 };
 
 API.prototype.getDataKey = function() {
