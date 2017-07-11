@@ -584,9 +584,17 @@
 	}
 	
 	var isInsertIssue = true;
+	var randomCount = 0;
 	$("#issueInsertButton").click(function() {
 		var issue_id = new Date().getTime() / 1000;
-		drawInsertIssueImageAPI(issue_id, data_key, latitude, longitude, height);
+		var dataKeys = {"Gwangjin", "Gwangjin", "Guro", "DC", "gookjoo"};
+		var latitudes = {37.57707, 37.57707, 37.57863, 37.57819, 37.57819};
+		var longitudes = {126.89035, 126.89035, 126.89148, 126.89211, 126.89211};
+		var heights = {65, 65, 65, 50, 50};
+		
+		drawInsertIssueImageAPI(issue_id, dataKeys[randomCount % 5], latitudes[randomCount % 5], longitudes[randomCount % 5], heights[randomCount % 5]);
+		
+		randomCount++;
 		/* if (check() == false) {
 			return false;
 		}
