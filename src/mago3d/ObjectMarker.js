@@ -10,8 +10,11 @@ var ObjectMarker = function() {
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.geoLocationData = new GeoLocationData();
-	this.issue_id;
-	//
+	this.issue_id = null;
+	this.issue_type = null;
+	this.latitude = 0;
+	this.longitude = 0;
+	this.height = 0;
 };
 
 /**

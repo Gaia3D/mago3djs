@@ -287,15 +287,17 @@ function changeListIssueViewModeAPI(flag) {
  * pin image를 그림
  * 
  * @param issue_id 이슈 고유키
+ * @param issue_type 이슈 고유키
  * @param data_key 데이터 고유키
  * @param latitude 데이터 고유키
  * @param longitude 데이터 고유키
  * @param height 데이터 고유키
  * @return
  */
-function drawInsertIssueImageAPI(issue_id, data_key, latitude, longitude, height) {
+function drawInsertIssueImageAPI(issue_id, issue_type, data_key, latitude, longitude, height) {
 	var api = new API("drawInsertIssueImage");
 	api.setIssueId(issue_id);
+	api.setIssueId(issue_type);
 	api.setDataKey(data_key);
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);

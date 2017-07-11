@@ -5662,15 +5662,16 @@ CesiumManager.prototype.callAPI = function(api) {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
 	} else if(apiName === "drawInsertIssueImage") {
+		// pin 을 표시
 		if(this.objMarkerSC == undefined) return;
+		
+		this.objMarkerSC.issue_id = api.getIssueId;
+		this.objMarkerSC.issue_type = api.getIssueType;
+		if(api.getLatitude != undefined) this.objMarkerSC.latitude = parseFloat(api.getLatitude);
+		if(api.getLongitude != undefined) this.objMarkerSC.longitude = parseFloat(api.getLongitude);
+		if(api.getHeight != undefined) this.objMarkerSC.height = parseFloat(api.getHeight);
 		
 		this.objMarkerManager.objectMarkerArray.push(this.objMarkerSC);
 		this.objMarkerSC == undefined;
-		// pin image를 그림
-		// api.getIssueId(),
-		// api.getDataKey(),
-		// api.getLatitude()),
-		// api.getLongitude()),
-		// api.getElevation()),
 	}
 };
