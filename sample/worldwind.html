@@ -587,7 +587,9 @@
 	
 	var isInsertIssue = true;
 	$("#issueInsertButton").click(function() {
-		if (check() == false) {
+		var issue_id = new Date().getTime() / 1000;
+		drawInsertIssueImageAPI(issue_id, data_key, latitude, longitude, height);
+		/* if (check() == false) {
 			return false;
 		}
 		if(isInsertIssue) {
@@ -619,7 +621,7 @@
 		} else {
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
-		}
+		} */
 	});
 	
 	// Data 검색

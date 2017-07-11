@@ -72,16 +72,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
         var wwd = new WorldWind.WorldWindow(containerId);
 		//wwd.depthBits = 32;
 		
-		// animator setting
-		wwd.goToAnimator.travelTime = 10000;
-
-
-        var layers = [
+		var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
-            {layer: new WorldWind.CompassLayer(), enabled: true},
+            {layer: new WorldWind.CompassLayer(), enabled: false},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
@@ -169,7 +165,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 	
-		wwd.goToAnimator.travelTime = 5000;
+		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
 		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
 	    
 	    // 이미지 경로
@@ -531,8 +527,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					duration: parseInt(duration)
 				});
 			} else {
-				wwd.goToAnimator.travelTime = duration;
-				wwd.goTo(new WorldWind.Position(latitude, longitude, height));
+				wwd.goToAnimator.travelTime = duration * 1000;
+				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
 			}
 		},
 		// 블락 및 부재 검색 api
