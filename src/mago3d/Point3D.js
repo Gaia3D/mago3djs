@@ -25,6 +25,16 @@ Point3D.prototype.destroy = function() {
 };
 
 /**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Point3D.prototype.copyFrom = function(point3d) {
+	this.x = point3d.x;
+	this.y = point3d.y;
+	this.z = point3d.z;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  */

@@ -43,6 +43,112 @@ var GeoLocationData = function(geoLocationDataName) {
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+GeoLocationData.prototype.copyFrom = function(geoLocData) {
+	if(geoLocData == undefined)
+		return;
+	
+	this.name = geoLocData.name;
+	if(geoLocData.geographicCoord)
+	{
+		if(this.geographicCoord = undefined)
+			this.geographicCoord = new GeographicCoord();
+		
+		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.***
+	}
+	
+	this.heading = geoLocData.heading;
+	this.pitch = geoLocData.pitch;
+	this.roll = geoLocData.roll;
+	
+	this.date = geoLocData.date; // year - month - day - hour - min - seg - miliseg.***
+	
+	if(geoLocData.position)
+	{
+		if(this.position == undefined)
+			this.position = new Point3D();
+		this.position.copyFrom(geoLocData.position);
+	}
+	if(geoLocData.positionHIGH)
+	{
+		if(this.positionHIGH == undefined)
+			this.positionHIGH = new Point3D();
+		
+		this.positionHIGH.copyFrom(geoLocData.positionHIGH);
+	}
+	if(geoLocData.positionLOW)
+	{
+		if(this.positionLOW == undefined)
+			this.positionLOW = new Point3D();
+		
+		this.positionLOW.copyFrom(geoLocData.positionLOW);
+	}
+	if(geoLocData.pivotPoint)
+	{
+		if(this.pivotPoint == undefined)
+			this.pivotPoint = new Point3D();
+		
+		this.pivotPoint.copyFrom(geoLocData.pivotPoint);
+	}
+	
+	// F4D Matrix4.****
+	if(geoLocData.geoLocMatrix)
+	{
+		if(this.geoLocMatrix == undefined)
+			this.geoLocMatrix = new Matrix4();
+		
+		this.geoLocMatrix.copyFromMatrix4(geoLocData.geoLocMatrix);
+	}
+	if(geoLocData.geoLocMatrixInv)
+	{
+		if(this.geoLocMatrixInv == undefined)
+			this.geoLocMatrixInv = new Matrix4();
+		
+		this.geoLocMatrixInv.copyFromMatrix4(geoLocData.geoLocMatrixInv);
+	}
+	if(geoLocData.tMatrix)
+	{
+		if(this.tMatrix == undefined)
+			this.tMatrix = new Matrix4();
+		
+		this.tMatrix.copyFromMatrix4(geoLocData.tMatrix);
+	}
+	if(geoLocData.tMatrixInv)
+	{
+		if(this.tMatrixInv == undefined)
+			this.tMatrixInv = new Matrix4();
+		
+		this.tMatrixInv.copyFromMatrix4(geoLocData.tMatrixInv);
+	}
+    if(geoLocData.rotMatrix)
+	{
+		if(this.rotMatrix == undefined)
+			this.rotMatrix = new Matrix4();
+		
+		this.rotMatrix.copyFromMatrix4(geoLocData.rotMatrix);
+	}
+	if(geoLocData.rotMatrixInv)
+	{
+		if(this.rotMatrixInv == undefined)
+			this.rotMatrixInv = new Matrix4();
+		
+		this.rotMatrixInv.copyFromMatrix4(geoLocData.rotMatrixInv);
+	}
+	
+	if(geoLocData.aditionalTraslation)
+	{
+		if(this.aditionalTraslation == undefined)
+			this.aditionalTraslation = new Point3D();
+		
+		this.aditionalTraslation.copyFrom(geoLocData.aditionalTraslation);
+	}
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
  * @param absoluteCamera 변수
  * @param resultCamera 변수
  * @returns resultCamera
