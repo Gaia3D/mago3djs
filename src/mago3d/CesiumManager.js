@@ -5341,51 +5341,34 @@ CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
  */
 CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
-	var latitude, longitude, altitude, heading, pitch, roll;
 	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
-	latitude = geoLocationData.geographicCoord.latitude;
-	longitude = geoLocationData.geographicCoord.longitude;
-	altitude = geoLocationData.geographicCoord.altitude;
-	heading = geoLocationData.heading;
-	pitch = geoLocationData.pitch;
-	roll = geoLocationData.roll;
-	
 	var dividedName = neoBuilding.buildingId.split("_");
+	
 	if(MagoConfig.getPolicy().geo_callback_enable == "true") {
 		var objectId = null;
 		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
+		
 		selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
 									dividedName[0],
 									dividedName[1],
 									objectId,
-									geoLocationData.geographicCoord.latitude,
-									geoLocationData.geographicCoord.longitude,
-									geoLocationData.geographicCoord.altitude,
+									this.objMarkerSC.geoLocationData.geographicCoord.latitude,
+									this.objMarkerSC.geoLocationData.geographicCoord.longitude,
+									this.objMarkerSC.geoLocationData.geographicCoord.altitude,
 									geoLocationData.heading,
 									geoLocationData.pitch,
 									geoLocationData.roll);
 		
 		// 이슈 등록 창 오픈
 		if(this.magoPolicy.getIssueInsertEnable()) {
-			// insert pin.***
-			//this.objMarkerSC.geoLocationData
-			/*
-			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
-									dividedName[0] + "_" + dividedName[1],
-									objectId,
-									geoLocationData.geographicCoord.latitude,
-									geoLocationData.geographicCoord.longitude,
-									geoLocationData.geographicCoord.altitude);
-									*/
-			if(this.objMarkerSC == undefined)
-				return;
+			if(this.objMarkerSC == undefined) return;
 			
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
 									dividedName[0] + "_" + dividedName[1],
 									objectId,
 									this.objMarkerSC.geoLocationData.geographicCoord.latitude,
 									this.objMarkerSC.geoLocationData.geographicCoord.longitude,
-									this.objMarkerSC.geoLocationData.geographicCoord.altitude);
+									(parseFloat(this.objMarkerSC.geoLocationData.geographicCoord.altitude) + 10));
 		}
 	}
 };
@@ -5679,7 +5662,6 @@ CesiumManager.prototype.callAPI = function(api) {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
 	} else if(apiName === "drawInsertIssueImage") {
-		var hola = 0;
 		// pin image를 그림
 		// api.getIssueId(),
 		// api.getDataKey(),
