@@ -585,7 +585,8 @@
 	
 	var isInsertIssue = true;
 	$("#issueInsertButton").click(function() {
-		drawInsertIssueImageAPI(msg.result.issue_id, data_key, latitude, longitude, height);
+		var issue_id = new Date().getTime() / 1000;
+		drawInsertIssueImageAPI(issue_id, data_key, latitude, longitude, height);
 		/* if (check() == false) {
 			return false;
 		}
