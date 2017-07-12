@@ -5348,17 +5348,20 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 		var objectId = null;
 		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
 		
-		selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
-									dividedName[0],
-									dividedName[1],
-									objectId,
-									this.objMarkerSC.geoLocationData.geographicCoord.latitude,
-									this.objMarkerSC.geoLocationData.geographicCoord.longitude,
-									this.objMarkerSC.geoLocationData.geographicCoord.altitude,
-									geoLocationData.heading,
-									geoLocationData.pitch,
-									geoLocationData.roll);
-		
+		// click object 정보를 표시
+		if(this.magoPolicy.getObjectInfoViewEnable()) {
+			selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
+										dividedName[0],
+										dividedName[1],
+										objectId,
+										this.objMarkerSC.geoLocationData.geographicCoord.latitude,
+										this.objMarkerSC.geoLocationData.geographicCoord.longitude,
+										this.objMarkerSC.geoLocationData.geographicCoord.altitude,
+										geoLocationData.heading,
+										geoLocationData.pitch,
+										geoLocationData.roll);
+		}
+			
 		// 이슈 등록 창 오픈
 		if(this.magoPolicy.getIssueInsertEnable()) {
 			if(this.objMarkerSC == undefined) return;

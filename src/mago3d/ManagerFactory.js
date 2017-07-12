@@ -518,7 +518,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		init : function() {
 		},
 		// flyTo
-		flyTo : function(longitude, latitude, height, duration) {
+		flyTo : function(issueId, issueType, longitude, latitude, height, duration) {
 			if(MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) {
 				viewer.camera.flyTo({
 					destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
@@ -529,6 +529,17 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			} else {
 				wwd.goToAnimator.travelTime = duration * 1000;
 				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
+			}
+			// pin을 그림
+			if(issueId != null || issueType != undefined) {
+				var api = new API("drawInsertIssueImage");
+				api.setIssueId(issueId);
+				api.setIssueId(issueType);
+				api.setDataKey(null);
+				api.setLatitude(latitude);
+				api.setLongitude(longitude);
+				api.setElevation(height);
+				magoManager.callAPI(api);
 			}
 		},
 		// 블락 및 부재 검색 api
