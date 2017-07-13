@@ -5333,7 +5333,6 @@ CesiumManager.prototype.displayLocationAndRotation = function(neoBuilding) {
 								geoLocationData.heading,
 								geoLocationData.pitch,
 								geoLocationData.roll);
-	
 };
 
 /**
@@ -5664,17 +5663,27 @@ CesiumManager.prototype.callAPI = function(api) {
 	} else if(apiName === "changeListIssueViewMode") {
 		// issue list 표시
 		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
+		if(!api.getIssueListEnable()) {
+			// clear objMarkerManager objectmakersarrays 사이즈를 0 으로 하면... .됨
+			this.objMarkerManager.objectMarkerArray = [];
+		}
 	} else if(apiName === "drawInsertIssueImage") {
 		// pin 을 표시
-		if(this.objMarkerSC == undefined) return;
+		if(this.objMarkerSC == undefined) {
+			this.objMarkerSC = new ObjectMarker();
+			this.objMarkerSC.geoLocationData.geographicCoord = new GeographicCoord();
+			ManagerUtils.calculateGeoLocationData(parseFloat(api.getLongitude()), parseFloat(api.getLatitude()), parseFloat(api.getElevation()), 
+					undefined, undefined, undefined, this.objMarkerSC.geoLocationData, this);
+		}
 		
 		var objMarker = this.objMarkerManager.newObjectMarker();
 		
-		this.objMarkerSC.issue_id = api.getIssueId;
-		this.objMarkerSC.issue_type = api.getIssueType;
-		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(parseFloat(api.getLongitude), parseFloat(api.getLatitude), parseFloat(api.getHeight));
+		this.objMarkerSC.issue_id = api.getIssueId();
+		this.objMarkerSC.issue_type = api.getIssueType();
+		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(parseFloat(api.getLongitude()), parseFloat(api.getLatitude()), parseFloat(api.getElevation()));
 		
 		objMarker.copyFrom(this.objMarkerSC);
+		this.objMarkerSC = undefined;
 	} else if(apiName === "changeInsertIssueState") {
 		this.sceneState.insertIssueState = 0;
 	}

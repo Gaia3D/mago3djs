@@ -523,7 +523,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				viewer.camera.flyTo({
 					destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
 																parseFloat(latitude),
-																parseFloat(height)),
+																parseFloat(height) + 10),
 					duration: parseInt(duration)
 				});
 			} else {
