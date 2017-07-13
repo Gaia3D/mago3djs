@@ -29,6 +29,8 @@ var API = function(apiName) {
 	this.issueId = null;
 	// issueType
 	this.issueType = null;
+	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
+	this.drawType = 0;
 	
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
@@ -258,4 +260,11 @@ API.prototype.getInsertIssueState = function() {
 };
 API.prototype.setInsertIssueState = function(insertIssueState) {
 	this.insertIssueState = insertIssueState;
+};
+
+API.prototype.getDrawType = function() {
+	return this.drawType;
+};
+API.prototype.setDrawType = function(drawType) {
+	this.drawType = drawType;
 };

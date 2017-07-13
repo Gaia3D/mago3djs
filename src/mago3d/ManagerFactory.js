@@ -533,6 +533,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			// pin을 그림
 			if(issueId != null || issueType != undefined) {
 				var api = new API("drawInsertIssueImage");
+				api.setDrawType(0);
 				api.setIssueId(issueId);
 				api.setIssueId(issueType);
 				api.setDataKey(null);

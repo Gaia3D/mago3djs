@@ -274,6 +274,7 @@ function changeListIssueViewModeAPI(flag) {
 /**
  * pin image를 그림
  * 
+ * @param drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
  * @param issue_id 이슈 고유키
  * @param issue_type 이슈 고유키
  * @param data_key 데이터 고유키
@@ -282,8 +283,9 @@ function changeListIssueViewModeAPI(flag) {
  * @param height 데이터 고유키
  * @return
  */
-function drawInsertIssueImageAPI(issue_id, issue_type, data_key, latitude, longitude, height) {
+function drawInsertIssueImageAPI(drawType, issue_id, issue_type, data_key, latitude, longitude, height) {
 	var api = new API("drawInsertIssueImage");
+	api.setDrawType(drawType);
 	api.setIssueId(issue_id);
 	api.setIssueId(issue_type);
 	api.setDataKey(data_key);
