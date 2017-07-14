@@ -5370,7 +5370,7 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 									objectId,
 									this.objMarkerSC.geoLocationData.geographicCoord.latitude,
 									this.objMarkerSC.geoLocationData.geographicCoord.longitude,
-									(parseFloat(this.objMarkerSC.geoLocationData.geographicCoord.altitude) + 10));
+									(parseFloat(this.objMarkerSC.geoLocationData.geographicCoord.altitude)));
 		}
 	}
 };
