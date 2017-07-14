@@ -2125,13 +2125,13 @@
 			"data_insert_type": "SELF",
 			"insert_date": "2017-06-26 21:06:29.159998"
 		},
-		"HS_KITC": {
+		"Sample_MEP": {
 			"list_counter": 10,
 			"data_id": 1060,
 			"data_group_id": 9,
 			"data_group_name": "IFC",
-			"data_key": "HS_KITC",
-			"data_name": "HS_KITC",
+			"data_key": "Sample_MEP",
+			"data_name": "Sample_MEP",
 			"latitude": "37.520575",
 			"longitude": "126.927232",
 			"height": "60",
