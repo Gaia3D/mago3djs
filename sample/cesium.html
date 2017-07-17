@@ -3,13 +3,16 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Cesium Demo | mago3D</title>
+	<!-- <meta http-equiv="Cache-Control" content="no-cache"/>
+	<meta http-equiv="Expires" content="-1"/>
+	<meta http-equiv="Pragma" content="no-cache"/> -->
+	<title>demo | mago3D User</title>
 	<link rel="stylesheet" href="/sample/style.css" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans"> 
-	<link rel="stylesheet" href="/sample/homepage-demo.css" />
+	<link rel="stylesheet" href="/sample/homepage-demo.css?version=1" />
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
 	
-		<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
+	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
@@ -17,104 +20,85 @@
 </head>
 
 <body>
+	<div class="trigger" >
+		<button type="button"></button>
+		<ul>
+			<li><a href="/homepage/index.do">Home</a></li>
+			<li><a href="/homepage/about.do">Mago3D</a></li>	
+			<li><a href="/homepage/download.do">Download</a></li>
+			<li><a href="/homepage/tutorials.do">Tutorials</a></li>
+		</ul>
+	</div>
 	<div class="ctrl">
 		<div>
 			<button id="issueEnable">Issue 등록</button>
 			<button id="objectInfoEnable">Object 정보</button>	
-			<button id="issuesEnable">Issues 정보</button>
+			<button id="issuesEnable">Issues 표시</button>
+			<input type="hidden" id="now_latitude" name="now_latitude" value="37.58070994202406" />
+			<input type="hidden" id="now_longitude" name="now_longitude" value="126.88996581264895"  />
 		</div>
-		<ul>
+		<ul class="tab">
 			<li id="issueMoreImage">My Issue</li>
 			<li id="apiMoreImage">API목록</li>
 		</ul>
-	
-		<div id="recentIssueListContent" style="display: none">
-			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
-				<div>
-					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
-					<span style="padding-left: 10px; width:200px; overflow: hidden;">건물이 겹쳤어요!</span>
-					<span style="float:right; padding-right: 15px; padding-top: 5px;">
-						<a href="#" onclick="flyTo('126.89624', '37.58084', '60', '2')">
-							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
-						</a>
-					</span>
-				</div>
-				<div id="issue_toggle_14">
-					<span style="padding-left: 25px;">[버그][매우중요]</span>
-					<span style="padding-left: 5px;">Project4</span>
-					<span style="float:right; padding-right: 20px;">2017-06-30 19:07:54</span>
-				</div>
-			</div>
-		
-			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
-				<div>
-					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
-					<span style="padding-left: 10px; width:200px; overflow: hidden;">지붕이 나달나달함</span>
-					<span style="float:right; padding-right: 15px; padding-top: 5px;">
-						<a href="#" onclick="flyTo('126.89035', '37.57707', '65', '2')">
-							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
-						</a>
-					</span>
-				</div>
-				<div id="issue_toggle_13">
-					<span style="padding-left: 25px;">[버그][매우중요]</span>
-					<span style="padding-left: 5px;">Project4</span>
-					<span style="float:right; padding-right: 20px;">2017-06-30 19:00:32</span>
-				</div>
-			</div>
-		
-			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
-				<div>
-					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
-					<span style="padding-left: 10px; width:200px; overflow: hidden;">장애인 주차장이 없습니다</span>
-					<span style="float:right; padding-right: 15px; padding-top: 5px;">
-						<a href="#" onclick="flyTo('126.89624', '37.58084', '60', '2')">
-							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
-						</a>
-					</span>
-				</div>
-				<div id="issue_toggle_12">
-					<span style="padding-left: 25px;">[버그][매우중요]</span>
-					<span style="padding-left: 5px;">Project3</span>
-					<span style="float:right; padding-right: 20px;">2017-06-30 17:50:37</span>
-				</div>
-			</div>
-		
-			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
-				<div>
-					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
-					<span style="padding-left: 10px; width:200px; overflow: hidden;">공중집, 기둥 필요함</span>
-					<span style="float:right; padding-right: 15px; padding-top: 5px;">
-						<a href="#" onclick="flyTo('127.027567', '37.497918', '55', '2')">
-							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
-						</a>
-					</span>
-				</div>
-				<div id="issue_toggle_11">
-					<span style="padding-left: 25px;">[버그][매우중요]</span>
-					<span style="padding-left: 5px;">Project3</span>
-					<span style="float:right; padding-right: 20px;">2017-06-30 17:43:05</span>
-				</div>
-			</div>
-		
-			<div style="padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro">
-				<div>
-					<img src="/images/ko/homepage/bullet_h4.png" alt="" />
-					<span style="padding-left: 10px; width:200px; overflow: hidden;">건물 수리할때 위험함</span>
-					<span style="float:right; padding-right: 15px; padding-top: 5px;">
-						<a href="#" onclick="flyTo('126.89035', '37.57707', '65', '2')">
-							<img src="/images/ko/homepage/btn_going.png" width="26" height="26" alt="" />
-						</a>
-					</span>
-				</div>
-				<div id="issue_toggle_10">
-					<span style="padding-left: 25px;">[버그][매우중요]</span>
-					<span style="padding-left: 5px;">Project3</span>
-					<span style="float:right; padding-right: 20px;">2017-06-30 17:39:59</span>
-				</div>
-			</div>
-		</div>
-		
+		<ul id="recentIssueListContent" class="issue" style="display: none">
+			<li>
+				<p class="title">
+					2</p>
+				<p class="info">
+					<span class="tag i2">개선</span>
+					<span class="tag t2">보통</span>
+					<span>[3DS]</span>
+					<button type="button" title="바로가기" onclick="flyTo('92', 'IMPROVE', '126.89222787907022', '37.579201027091806', '59.942467783873596', '2')">바로가기</button>
+					<span class="date">2017-07-14 16:25:40</span>
+				</p>
+			</li>
+			<li>
+				<p class="title">
+					1</p>
+				<p class="info">
+					<span class="tag i1">버그</span>
+					<span class="tag t1">긴급</span>
+					<span>[3DS]</span>
+					<button type="button" title="바로가기" onclick="flyTo('91', 'BUGGER', '126.89223584621833', '37.57919616044298', '51.50571434478714', '2')">바로가기</button>
+					<span class="date">2017-07-14 16:03:45</span>
+				</p>
+			</li>
+			<li>
+				<p class="title">
+					1</p>
+				<p class="info">
+					<span class="tag i1">버그</span>
+					<span class="tag t1">긴급</span>
+					<span>[3DS]</span>
+					<button type="button" title="바로가기" onclick="flyTo('90', 'BUGGER', '126.88985686761893', '37.581318740521496', '49.24999164742479', '2')">바로가기</button>
+					<span class="date">2017-07-14 15:31:10</span>
+				</p>
+			</li>
+			<li>
+				<p class="title">
+					a</p>
+				<p class="info">
+					<span class="tag i1">버그</span>
+					<span class="tag t1">긴급</span>
+					<span>[IFC]</span>
+					<button type="button" title="바로가기" onclick="flyTo('89', 'BUGGER', '126.92742586024636', '37.52079763302676', '66.06677612119135', '2')">바로가기</button>
+					<span class="date">2017-07-14 15:21:00</span>
+				</p>
+			</li>
+			<li>
+				<p class="title">
+					555</p>
+				<p class="info">
+					<span class="tag i1">버그</span>
+					<span class="tag t1">긴급</span>
+					<span>[3DS]</span>
+					<button type="button" title="바로가기" onclick="flyTo('88', 'BUGGER', '126.8890364749291', '37.57994153741642', '52.95577447262039', '2')">바로가기</button>
+					<span class="date">2017-07-14 11:19:44</span>
+				</p>
+			</li>
+		</ul>
+
 		<div id="apiListContent" style="display: none">
 			<div style="height: 20px;"></div>
 			<div>
@@ -187,26 +171,16 @@
 			<div style="height: 20px;"></div>
 		</div>
 	</div>
-		
-	<div class="trigger" >
-		<button type="button"></button>
-		<ul>
-			<li><a href="/homepage/tutorials.do">Tutorials</a></li>
-			<li><a href="/homepage/download.do">Download</a></li>
-			<li><a href="/homepage/about.do">mago3D</a></li>
-			<li><a href="/homepage/index.do">Home</a></li>	
-		</ul>
-	</div>
-	
+
 	<div class="shortcut" style="top:60px;">
 		<p>바로가기</p>
 		<ul>
-			<li onclick="flyTo('126.893570', '37.579200', '500', '3')">3DS 통합 가시화</li>
-			<li onclick="flyTo('126.928576', '37.524107', '500', '3')">IFC 통합 가시화</li>
-			<li onclick="flyTo('127.027548', '37.497969', '500', '3')">Collada 통합 가시화</li>
+			<li onclick="flyTo(null, null, '126.88882', '37.58029', '1000', '2')">3DS</li>
+			<li onclick="flyTo(null, null, '126.927232', '37.520575', '250', '2')">IFC</li>
+			<li onclick="flyTo(null, null, '127.025574', '37.499610', '1000', '2')">COLLADA</li>
 		</ul>
-	</div>
-	
+	</div>	
+
 	<!-- 맵영역 -->
 	<div id="magoContainer" style="position: absolute; width: 100%; height: 100%; margin-top: 0; padding: 0; overflow: hidden;"></div>
 
@@ -219,68 +193,54 @@
 	        </div>
 	    </div>
 	    <div class="layerContents">
-<!-- 	        <h4>테이블</h4> -->
 	        <table>
 	        	<tr>
 	        		<th style="width: 120px;">
-	        			<label for="data_group_id">데이터 그룹</label>
-	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        			<label for="data_group_id">데이터 그룹</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
 	        		</th>
 	        		<td>
-	        			<select id="data_group_id" name="data_group_id" class="select">
-							<option value="2">Project3</option>
-							<option value="3">Project1</option>
-							<option value="4">Project2</option>
+	        			<select id="data_group_id" name="data_group_id" class="select"><option value="3">3DS</option>
+						<option value="9">IFC</option>
+						<option value="10">COLLADA</option>
 						</select>
-	        		</td>
-	        	</tr>
-				<tr>
-	        		<th>
-	        			<label for="issue_type">Issue Type</label>
-	        		</th>
-	        		<td>
-	        			<select id="issue_type" name="issue_type" class="select">
-							<option value="버그">버그</option>
-							<option value="기능개선">기능개선</option>
-							<option value="수정">수정</option>
-							<option value="기타">기타</option>
-						</select>
-	        		</td>
+					</td>
 	        	</tr>
 	        	<tr>
 	        		<th>
-						<label for="data_key">Data Key</label>
-	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
-	        		</th>
-	        		<td><input id="data_key" name="data_key" class="ml" type="text" value=""/>
-						<input id="latitude" name="latitude" type="hidden" value=""/>
-						<input id="longitude" name="longitude" type="hidden" value=""/>
-						<input id="height" name="height" type="hidden" value=""/>
-	        		</td>
+	        			<label for="issue_type">Issue Type</label></th>
+	        		<td>
+	        			<select id="issue_type" name="issue_type" class="select"><option value="BUGGER">버그</option>
+							<option value="IMPROVE">개선</option>
+							<option value="NEW">신규</option>
+							<option value="ETC">기타</option>
+							</select>
+					</td>
 	        	</tr>
 	        	<tr>
 	        		<th>
-	        			<label for="title">제목</label>
-	        			<span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        			<label for="data_key">Data Key</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
 	        		</th>
-	        		<td><input id="title" name="title" class="ml" type="text" value=""/>
-	        		</td>
+	        		<td><input id="data_key" name="data_key" class="ml" type="text" value=""/><input id="latitude" name="latitude" type="hidden" value=""/><input id="longitude" name="longitude" type="hidden" value=""/><input id="height" name="height" type="hidden" value=""/></td>
 	        	</tr>
 	        	<tr>
-	        		<th><label for="priority">Issue Type</label></th>
+	        		<th>
+	        			<label for="title">제목</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
+	        		</th>
+	        		<td><input id="title" name="title" class="ml" type="text" value=""/></td>
+	        	</tr>
+	        	<tr>
+	        		<th><label for="priority">Issue Priority</label></th>
 	        		<td>
-	        			<select id="priority" name="priority" class="select">
-							<option value="매우중요">매우중요</option>
-							<option value="중요">중요</option>
-							<option value="보통">보통</option>
-							<option value="낮음">낮음</option>
-						</select>
-	        		</td>
+	        			<select id="priority" name="priority" class="select"><option value="CRITICAL">긴급</option>
+							<option value="MUST">보통</option>
+							<option value="MINOR">낮음</option>
+							<option value="TRIVIAL">매우낮음</option>
+							</select>
+					</td>
 	        	</tr>
 	        	<tr>
 	        		<th><label for="due_date">마감일</label></th>
-	        		<td><input id="start_date" name="start_date" type="hidden" value=""/>
-						<input type="text" id="start_day" name="start_day" placeholder="날짜" size="7" maxlength="4" />
+	        		<td><input id="start_date" name="start_date" type="hidden" value=""/><input type="text" id="start_day" name="start_day" placeholder="날짜" size="7" maxlength="4" />
 						<input type="text" id="start_hour" name="start_hour" placeholder="시간" size="3" maxlength="2" />
 						<span class="delimeter">:</span>
 						<input type="text" id="start_minute" name="start_minute" placeholder="분" size="3" maxlength="2" />
@@ -288,24 +248,20 @@
 	        	</tr>
 	        	<tr>
 	        		<th><label for="assignee">Assignee</label></th>
-	        		<td><input id="assignee" name="assignee" class="m" placeholder="대리자" type="text" value=""/>
-						
-	        		</td>
+	        		<td><input id="assignee" name="assignee" class="m" placeholder="대리자" type="text" value=""/></td>
 	        	</tr>
 	        	<tr>
 	        		<th><label for="reporter">reporter</label></th>
-	        		<td><input id="reporter" name="reporter" class="m" placeholder="보고 해야 하는 사람" type="text" value=""/>
-						
-	        		</td>
+	        		<td><input id="reporter" name="reporter" class="m" placeholder="보고 해야 하는 사람" type="text" value=""/></td>
 	        	</tr>
 	        	<tr style="height: 50px;">
 	        		<th><label for="contents">내용</label></th>
 	        		<td>
-	        			<textarea id="contents" name="contents"></textarea>
-	        		</td>
-	        	</tr>
+	        			<textarea id="contents" name="contents"></textarea></td>
+				</tr>
 	        </table>
-			<div class="btns">
+	        
+	      	<div class="btns">
 	 			<button id="issueInsertButton">Save</button>
 			</div>
 	    </div>
@@ -389,7 +345,7 @@
 	/* var timerId = setInterval("startMogoUI()", 1000); */
 	
 	// mago3d 시작, 정책 데이터 파일을 로딩
-	function magoStart(viewer, renderDivId) {
+	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
 			url: "/sample/policy-cesium.json",
 			type: "GET",
@@ -448,19 +404,20 @@
 		}
 	});
 	
-	function flyTo(longitude, latitude, height, duration) {
-		managerFactory.flyTo(longitude, latitude, height, duration);
+	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
+		managerFactory.flyTo(issueId, issueType, longitude, latitude, height, duration);
+		// 현재 좌표를 저장
+		$("#now_latitude").val(latitude);
+		$("#now_longitude").val(longitude);
 	}
 	
 	// 이슈 등록
 	$("#issueEnable").click(function() {
 		if(insertIssueFlag) {
 			insertIssueFlag = false;
-			//$("#issueEnable").val("Issue 등록");
 			$("#issueEnable").removeClass("on");
 		} else {
 			insertIssueFlag = true;
-			//$("#issueEnable").val("Issue 등록중");
 			$("#issueEnable").addClass("on");
 		}
 		changeInsertIssueModeAPI(insertIssueFlag);
@@ -470,26 +427,48 @@
 		if(objectInfoViewFlag) {
 			objectInfoViewFlag = false;
 			$("#objectInfoEnable").removeClass("on");
-			//$("#objectInfoEnableLabel").text("Object 정보 표시");
 		} else {
 			objectInfoViewFlag = true;
-			//$("#objectInfoEnableLabel").text("활성화 상태");
 			$("#objectInfoEnable").addClass("on");			
 		}
 		changeObjectInfoViewModeAPI(objectInfoViewFlag);
 	});
 	// issue list 표시
 	$("#issuesEnable").click(function() {
-		alert("준비중 입니다.");
-		return;
 		if(listIssueFlag) {
 			listIssueFlag = false;
 			$("#issuesEnable").removeClass("on");
-			//$("#issuesEnableLabel").text("Issue 목록");
 		} else {
 			listIssueFlag = true;
 			$("#issuesEnable").addClass("on");
-			//$("#issuesEnableLabel").text("활성화 상태");
+			
+			// 현재 위치의 latitude, logitude를 가지고 가장 가까이에 있는 데이터 그룹에 속하는 이슈 목록을 최대 100건 받아서 표시
+			var now_latitude = $("#now_latitude").val();
+			var now_longitude = $("#now_longitude").val();
+			var info = "latitude=" + now_latitude + "&longitude=" + now_longitude;		
+			$.ajax({
+				url: "/issue/ajax-list-issue-by-geo.do",
+				type: "GET",
+				data: info,
+				dataType: "json",
+				success: function(msg){
+					if(msg.result == "success") {
+						var issueList = msg.issueList;
+						if(issueList != null && issueList.length > 0) {
+							for(i=0; i<issueList.length; i++ ) {
+								var issue = issueList[i];
+								drawInsertIssueImageAPI(0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
+							}
+						}
+					} else {
+						alert(JS_MESSAGE[msg.result]);
+					}
+				},
+				error:function(request,status,error){
+			        //alert(JS_MESSAGE["ajax.error.message"]);
+					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				}
+			});
 		}
 		changeListIssueViewModeAPI(listIssueFlag);
 	});
@@ -505,43 +484,10 @@
 				$("#longitude").val(longitude);
 				$("#height").val(height);
 				
-				console.log("data_name = " + data_name + ", data_key = " + data_key + ", latitude = " + latitude + ", longitude = " + longitude + ", height = " + height); 
+				// 현재 좌표를 저장
+				$("#now_latitude").val(latitude);
+				$("#now_longitude").val(longitude);
 			}
-		}
-	}
-	
-	$("#inputIssueClose").click(function() {
-		$("#inputIssueLayer").hide();
-	});
-	
-	// object 정보 표시 call back function
-	function showSelectedObject(projectId, blockId, objectId, latitude, longitude, height, heading, pitch, roll){
-		if(objectInfoViewFlag) {
-			$("#move_data_key").val(projectId + "_" + blockId);
-			$("#move_latitude").val(latitude);
-			$("#move_longitude").val(longitude);
-			$("#move_height").val(height);
-			$("#move_heading").val(heading);
-			$("#move_pitch").val(pitch);
-			$("#move_roll").val(roll);
-			
-			$.toast({
-			    heading: 'Click Object Info',
-			    text: [
-			        'projectId : ' + projectId, 
-			        'blockId : ' + blockId, 
-			        'objectId : ' + objectId,
-			        'latitude : ' + latitude,
-			        'longitude : ' + longitude,
-			        'height : ' + height,
-			        'heading : ' + heading,
-			        'pitch : ' + pitch,
-			        'roll : ' + roll
-			    ],
-				//bgColor : 'blue',
-				hideAfter: 5000,
-				icon: 'info'
-			});
 		}
 	}
 	
@@ -584,18 +530,8 @@
 	}
 	
 	var isInsertIssue = true;
-	var randomCount = 0;
 	$("#issueInsertButton").click(function() {
-		var issue_id = new Date().getTime() / 1000;
-		var dataKeys = ["Gwangjin", "Gwangjin", "Guro", "DC", "gookjoo"];
-		var latitudes = [37.57707, 37.57707, 37.57863, 37.57819, 37.57819];
-		var longitudes = [126.89035, 126.89035, 126.89148, 126.89211, 126.89211];
-		var heights = [65, 65, 65, 50, 50];
-		
-		drawInsertIssueImageAPI(issue_id, dataKeys[randomCount % 5], latitudes[randomCount % 5], longitudes[randomCount % 5], heights[randomCount % 5]);
-		
-		randomCount++;
-		/* if (check() == false) {
+		if (check() == false) {
 			return false;
 		}
 		if(isInsertIssue) {
@@ -610,6 +546,8 @@
 				success: function(msg){
 					if(msg.result == "success") {
 						alert(JS_MESSAGE["insert"]);
+						// pin image를 그림
+						drawInsertIssueImageAPI(1, msg.issue.issue_id, msg.issue.issue_type, $("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
 					} else {
 						alert(JS_MESSAGE[msg.result]);
 					}
@@ -624,11 +562,53 @@
 			        isInsertIssue = true;
 				}
 			});
+			
+			changeInsertIssueStateAPI(0);
 		} else {
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
-		} */
+		}
 	});
+	
+	$("#inputIssueClose").click(function() {
+		$("#inputIssueLayer").hide();
+		changeInsertIssueStateAPI(0);
+	});
+	
+	// object 정보 표시 call back function
+	function showSelectedObject(projectId, blockId, objectId, latitude, longitude, height, heading, pitch, roll){
+		if(objectInfoViewFlag) {
+			$("#move_data_key").val(projectId + "_" + blockId);
+			$("#move_latitude").val(latitude);
+			$("#move_longitude").val(longitude);
+			$("#move_height").val(height);
+			$("#move_heading").val(heading);
+			$("#move_pitch").val(pitch);
+			$("#move_roll").val(roll);
+			
+			$.toast({
+			    heading: 'Click Object Info',
+			    text: [
+			        'projectId : ' + projectId, 
+			        'blockId : ' + blockId, 
+			        'objectId : ' + objectId,
+			        'latitude : ' + latitude,
+			        'longitude : ' + longitude,
+			        'height : ' + height,
+			        'heading : ' + heading,
+			        'pitch : ' + pitch,
+			        'roll : ' + roll
+			    ],
+				//bgColor : 'blue',
+				hideAfter: 5000,
+				icon: 'info'
+			});
+			
+			// 현재 좌표를 저장
+			$("#now_latitude").val(latitude);
+			$("#now_longitude").val(longitude);
+		}
+	}
 	
 	// Data 검색
 	$("#searchData").click(function() {
@@ -708,30 +688,47 @@
 					var content = "";
 					
 					if(issueList == null || issueList.length == 0) {
-						content += 	"<div style=\"text-align: center; padding-top:20px; height: 50px;\">"
+						content += 	"<li style=\"text-align: center; padding-top:20px; height: 50px;\">"
 								+	"	Issue가 존재하지 않습니다."
-								+	"</div>";
+								+	"</li>";
 					} else {
 						for(i=0; i<issueList.length; i++ ) {
-							var issue = null;
-							issue = issueList[i];
+							var issue = issueList[i];
+							var issueTypeCss = "i1";
+							var issuePriorityCss = "t1";
+							if(issue.issue_type == "BUGGER") {
+								issueTypeCss = "i1";
+							} else if(issue.issue_type == "IMPROVE") {
+								issueTypeCss = "i2";
+							} else if(issue.issue_type == "NEW") {
+								issueTypeCss = "i3";
+							} else if(issue.issue_type == "ETC") {
+								issueTypeCss = "i4";
+							}
+							
+							if(issue.priority == "CRITICAL") {
+								issuePriorityCss = "t1";
+							} else if(issue.priority == "MUST") {
+								issuePriorityCss = "t2";
+							} else if(issue.priority == "MINOR") {
+								issuePriorityCss = "t3";
+							} else if(issue.priority == "TRIVIAL") {
+								issuePriorityCss = "t4";
+							}
+							
 							content = content 
-								+ 	"<div style=\"padding-left: 20px; padding-top: 20px; padding-bottom: 20px; background: gainsboro\">"
-								+ 	"	<div>"
-								+ 	"		<img src=\"/images/${lang }/homepage/bullet_h4.png\" alt=\"\" />"
-								+ 	"		<span style=\"padding-left: 10px; width:200px; overflow: hidden;\">" + issue.title + "</span>"
-								+ 	"		<span style=\"float:right; padding-right: 15px; padding-top: 5px;\">"
-								+ 	"			<a href=\"#\" onclick=\"flyTo('" + issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">"
-								+ 	"				<img src=\"/images/${lang }/homepage/btn_going.png\" width=\"26\" height=\"26\" alt=\"\" />"
-								+ 	"			</a>"
-								+ 	"		</span>"
-								+ 	"	</div>"
-								+ 	"	<div id=\"issue_toggle_" + issue.issue_id + "\">"
-								+ 	"		<span style=\"padding-left: 25px;\">[" +  issue.issue_type + "][" + issue.priority + "]</span>"
-								+ 	"		<span style=\"padding-left: 5px;\">" + issue.data_group_name  + "</span>"
-								+ 	"		<span style=\"float:right; padding-right: 20px;\">" + issue.insert_date.substring(0,19) + "</span>"
-								+ 	"	</div>"
-								+ 	"</div>";
+								+ 	"<li>"
+								+ 	"	<p class=\"title\">" + issue.title  + "</p>"
+								+ 	"	<p class=\"info\">"
+								+ 	"		<span class=\"tag " + issueTypeCss + "\">" + issue.issue_type_name + "</span>"
+								+ 	"		<span class=\"tag " + issuePriorityCss + "\">" + issue.priority_name + "</span>"
+								+ 	"		<span>[" + issue.data_group_name + "]</span>"
+								+ 	"		<button type=\"button\" title=\"바로가기\""
+								+				"onclick=\"flyTo('" + issue.issue_id + "', '" + issue.issue_type + "', '" 
+								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
+								+ 	"		<span class=\"date\">" + issue.insert_date.substring(0,19) + "</span>"
+								+	"	</p>"
+								+ 	"</li>";
 						}
 					}
 					$("#recentIssueListContent").empty();
