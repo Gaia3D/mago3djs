@@ -310,3 +310,14 @@ function changeInsertIssueStateAPI(insertIssueState) {
 		managerFactory.callAPI(api);
 	}
 }
+
+/**
+ * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
+ * @param eventType 어떤 마우스 동작을 원하는지를 구분
+ * @return
+ */
+function mouseMoveAPI(eventType) {
+	if(managerFactory != null) {
+		managerFactory.mouseMove(eventType);
+	}
+}

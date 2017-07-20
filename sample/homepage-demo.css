@@ -364,3 +364,18 @@ ul, li {margin:0; padding:0; }
 	color: #fff;
 	background-color: #0066cc;
 }
+
+
+/* control stick */
+/* 공통메뉴 */
+.controlStick {
+	position: absolute;
+	bottom: 20px;
+	left: 20px;
+	min-width: 160px;
+	z-index: 999;
+}
+.controlStick > li {
+	height: 50px;
+}
+

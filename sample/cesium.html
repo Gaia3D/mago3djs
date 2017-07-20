@@ -267,6 +267,19 @@
 	    </div>
 	</div>
 	</form>
+	
+	<ul class="controlStick">
+		<li>
+			<span id="moveForwardImage"><img src="/images/ko/plus.png" alt="plus" /></span>
+			<span id="moveRightImage"><img src="/images/ko/rotate_right.png" alt="rotate right" /></span>
+			<span id="moveUpImage"><img src="/images/ko/pitch_up.png" alt="plus" /></span>
+		</li>
+		<li>
+			<span id="moveBackwardImage"><img src="/images/ko/minus.png" alt="minus" /></span>
+			<span id="moveLeftImage"><img src="/images/ko/rotate_left.png" alt="rotate left" /></span>
+			<span id="moveDownImage"><img src="/images/ko/pitch_down.png" alt="down" /></span>
+		</li>
+	</ul>
 
 <script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="/src/mago3d/Code.js"></script>
@@ -743,6 +756,25 @@
 			}
 		});
 	}
+	
+	$("#moveForwardImage").click(function() {
+		mouseMoveAPI("moveForward");
+	});
+	$("#moveBackwardImage").click(function() {
+		mouseMoveAPI("moveBackward");
+	});
+	$("#moveRightImage").click(function() {
+		mouseMoveAPI("moveRight");
+	});
+	$("#moveLeftImage").click(function() {
+		mouseMoveAPI("moveLeft");
+	});
+	$("#moveUpImage").click(function() {
+		mouseMoveAPI("moveUp");
+	});
+	$("#moveDownImage").click(function() {
+		mouseMoveAPI("moveDown");
+	});
 </script>
 </body>
 </html>
