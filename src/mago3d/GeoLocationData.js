@@ -52,7 +52,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData) {
 	this.name = geoLocData.name;
 	if(geoLocData.geographicCoord)
 	{
-		if(this.geographicCoord = undefined)
+		if(this.geographicCoord == undefined)
 			this.geographicCoord = new GeographicCoord();
 		
 		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.***
@@ -73,16 +73,20 @@ GeoLocationData.prototype.copyFrom = function(geoLocData) {
 	if(geoLocData.positionHIGH)
 	{
 		if(this.positionHIGH == undefined)
-			this.positionHIGH = new Point3D();
+			this.positionHIGH = new Float32Array(3);
 		
-		this.positionHIGH.copyFrom(geoLocData.positionHIGH);
+		this.positionHIGH[0]= geoLocData.positionHIGH[0];
+		this.positionHIGH[1]= geoLocData.positionHIGH[1];
+		this.positionHIGH[2]= geoLocData.positionHIGH[2];
 	}
 	if(geoLocData.positionLOW)
 	{
 		if(this.positionLOW == undefined)
-			this.positionLOW = new Point3D();
+			this.positionLOW = new Float32Array(3);
 		
-		this.positionLOW.copyFrom(geoLocData.positionLOW);
+		this.positionLOW[0]= geoLocData.positionLOW[0];
+		this.positionLOW[1]= geoLocData.positionLOW[1];
+		this.positionLOW[2]= geoLocData.positionLOW[2];
 	}
 	if(geoLocData.pivotPoint)
 	{

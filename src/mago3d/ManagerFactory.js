@@ -8,6 +8,7 @@
  * @param containerId 뷰에서 표시할 위치 id
  * @param serverPolicy policy json object
  * @param serverData data json object
+ * @param imagePath 이미지 경로
  * @return api
  */
 var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, imagePath) {
@@ -17,58 +18,46 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 	var magoManager = null;
 	var scene = null;
+	
+	//var startMousePosition = null;
+	//var nowMousePosition = null;
 
+	// 환경 설정
+	MagoConfig.init(serverPolicy, serverData);
+	
 	if(serverPolicy.geo_view_library === null
 			|| serverPolicy.geo_view_library === ''
 			|| serverPolicy.geo_view_library === Constant.CESIUM) {
-		// 환경 설정
-		MagoConfig.init(serverPolicy, serverData);
 		
 		if(viewer === null) viewer = new Cesium.Viewer(containerId);
-		viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
-	        url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-	        enablePickFeatures: false
-	    }));
-		
+		// 기본 지도 설정
+		setDefaultDataset();
 		viewer.scene.magoManager = new CesiumManager();
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
-		// test.***
-		//viewer.scene.magoManager.cesiumWidget = viewer._cesiumWidget;
-		
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 
 		// background provider 적용
-		if(serverPolicy.geo_server_enable == "true") {
-			backgroundProvider();
-		}
+		if(serverPolicy.geo_server_enable == "true") backgroundProvider();
+		
 		draw();
 		// build을 rendering 할 위치
 		initEntity();
 		// terrain 적용 여부
-//		if() {
-//			initTerrain();
-//		}
+		/*if() {
+			initTerrain();
+		}*/
 		// 최초 로딩시 카메라 이동 여부
-		if(serverPolicy.geo_init_camera_enable == "true") {
-			initCamera();
-		}
+		if(serverPolicy.geo_init_camera_enable == "true") initCamera();
 		// render Mode 적용
 		initRenderMode();
-		
-		// 이미지 경로
-		magoManager.magoPolicy.imagePath = imagePath;
 	} else if(serverPolicy.geo_view_library === Constant.WORLDWIND) {
-		// 환경 설정
-		MagoConfig.init(serverPolicy, serverData);
 		
-		viewer = null;
-		 // Tell World Wind to log only warnings and errors.
+		// Tell World Wind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
 		// set to canvas the current gl.***
 		var canvas = document.getElementById(containerId);
-		
-        // Create the World Window.
+		// Create the World Window.
         var wwd = new WorldWind.WorldWindow(containerId);
 		//wwd.depthBits = 32;
 		
@@ -104,10 +93,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		// End Create a layer to hold the f4dBuildings.-------------------------------------------------------
 
 		var gl = wwd.drawContext.currentGlContext;
-		
 		initWwwMago(magoManager, gl);
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Click event. Is different to anothers event handlers.******************************************************
 		// The common gesture-handling function.
 		var handleClick = function (recognizer) {
@@ -134,43 +121,34 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		// Listen for mouse clicks.
 		var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
 		
-		var mouseDownEvent = function(event)
-		{
-			// Mouse down.***
-			if(event.button == 0)
-				magoManager.mouseLeftDown = true;
+		var mouseDownEvent = function(event) {
+			if(event.button == 0) magoManager.mouseLeftDown = true;
 			magoManager.isCameraMoving = true;
 			magoManager.mouse_x = event.layerX,
 			magoManager.mouse_y = event.layerY;
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
-		var mouseUpEvent = function(event)
-		{
-			// Mouse up.***
-			if(event.button == 0)
-				magoManager.mouseLeftDown = false;
+		var mouseUpEvent = function(event) {
+			if(event.button == 0) magoManager.mouseLeftDown = false;
 			magoManager.isCameraMoving = false;
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
-		var mouseMoveEvent = function(event)
-		{
-			// Mouse move.***
+		var mouseMoveEvent = function(event) {
 			magoManager.mouse_x = event.layerX,
 			magoManager.mouse_y = event.layerY;
-			if(magoManager.mouseLeftDown)
-				magoManager.manageMouseMove(event.layerX, event.layerY);
+			if(magoManager.mouseLeftDown) magoManager.manageMouseMove(event.layerX, event.layerY);
 			
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 	
 		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
 		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
-	    
-	    // 이미지 경로
-	    magoManager.magoPolicy.imagePath = imagePath;
 	}
+	
+	// 이미지 경로
+	magoManager.magoPolicy.imagePath = imagePath;
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드
 	function draw() {
@@ -238,6 +216,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			magoManager.mouse_x = click.position.x;
 			magoManager.mouse_y = click.position.y;
 			magoManager.mouseLeftDown = true;
+			
+			//nowMousePosition = startMousePosition = Cesium.Cartesian3.clone(click.position);
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 		magoManager.handler.setInputAction(function(click) {
@@ -263,6 +243,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					magoManager.isCameraMoving = true;
 				}
 			}
+			//nowMousePosition = movement.endPosition;
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) {
@@ -325,98 +306,75 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		if (event.key === "q" || event.key === "Q") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;	
-			if(selectedBuilding != undefined)
-			{
+			if(selectedBuilding != undefined) {
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.heading == undefined) geoLocationData.heading = 0; 
 					var currentHeading = geoLocationData.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					currentHeading+increDeg, geoLocationData.pitch, geoLocationData.roll);
 				}
 			}
-
-		}
-		else if (event.key === "a" || event.key === "A") {  // right arrow
+		} else if (event.key === "a" || event.key === "A") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
-			if(selectedBuilding != undefined)
-			{
+			if(selectedBuilding != undefined) {
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.heading == undefined) geoLocationData.heading = 0; 
 					var currentHeading = geoLocationData.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					currentHeading-increDeg, geoLocationData.pitch, geoLocationData.roll);
 				}
 			}
-
-		}
-		else if (event.key === "w" || event.key === "W") {  // right arrow
+		} else if (event.key === "w" || event.key === "W") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
-			if(selectedBuilding != undefined)
-			{
+			if(selectedBuilding != undefined) {
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.pitch == undefined) geoLocationData.pitch = 0; 
 					var currentPitch = geoLocationData.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					geoLocationData.heading, currentPitch+increDeg, geoLocationData.roll);
 				}
 			}
-
-		}
-		else if (event.key === "s" || event.key === "S") {  // right arrow
+		} else if (event.key === "s" || event.key === "S") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
-			if(selectedBuilding != undefined)
-			{
+			if(selectedBuilding != undefined) {
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.pitch == undefined) geoLocationData.pitch = 0; 
 					var currentPitch = geoLocationData.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					geoLocationData.heading, currentPitch-increDeg, geoLocationData.roll);
 				}
 			}
-
-		}
-		else if (event.key === "e" || event.key === "E") {  // right arrow
+		} else if (event.key === "e" || event.key === "E") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
-			if(selectedBuilding != undefined)
-			{		
+			if(selectedBuilding != undefined) {		
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.roll == undefined) geoLocationData.roll = 0; 
 					var currentRoll = geoLocationData.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					geoLocationData.heading, geoLocationData.pitch, currentRoll+increDeg);
 				}
 			}
-
-		}
-		else if (event.key === "d" || event.key === "D") {  // right arrow
+		} else if (event.key === "d" || event.key === "D") {  // right arrow
 			// get current building selected.***
 			var selectedBuilding = magoManager.buildingSelected;
-			if(selectedBuilding != undefined)
-			{
+			if(selectedBuilding != undefined) {
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if(geoLocationData != undefined)
-				{
+				if(geoLocationData != undefined) {
 					if(geoLocationData.roll == undefined) geoLocationData.roll = 0; 
 					var currentRoll = geoLocationData.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 					geoLocationData.heading, geoLocationData.pitch, currentRoll-increDeg);
 				}
 			}
-
 		}
 	}
 
@@ -504,7 +462,37 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			viewer.forceResize();
 		}
 	}
-
+	
+	// pick baseLayer
+	function setDefaultDataset() {
+		var DEFALUT_IMAGE = "ESRI World Imagery";
+		var DEFALUT_TERRAIN = "STK World Terrain meshes";
+		
+		// search default imageryProvider from baseLayerPicker
+		var imageryProvider = null;
+		var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels; 
+		for (var i in imageryProviderViewModels) {
+			var provider = imageryProviderViewModels[i];
+			if (provider.name == DEFALUT_IMAGE) {
+				imageryProvider = provider;
+				break;
+			}
+		}
+		if (imageryProvider) viewer.baseLayerPicker.viewModel.selectedImagery = imageryProvider;
+	  
+		// search default terrainProvider from baseLayerPicker
+		var terrainProvider = null;
+		var terrainProviderViewModels = viewer.baseLayerPicker.viewModel.terrainProviderViewModels
+		for (var i in terrainProviderViewModels) {
+			var provider = terrainProviderViewModels[i];
+			if (provider.name == DEFALUT_TERRAIN) {
+				terrainProvider = provider;
+				break;
+			}
+		}
+		if (terrainProvider) viewer.baseLayerPicker.viewModel.selectedTerrain = terrainProvider;
+	}
+	
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
 		// api gateway 역할
@@ -518,17 +506,29 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		init : function() {
 		},
 		// flyTo
-		flyTo : function(longitude, latitude, height, duration) {
+		flyTo : function(issueId, issueType, longitude, latitude, height, duration) {
 			if(MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) {
 				viewer.camera.flyTo({
 					destination : Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
 																parseFloat(latitude),
-																parseFloat(height)),
+																parseFloat(height) + 10),
 					duration: parseInt(duration)
 				});
 			} else {
 				wwd.goToAnimator.travelTime = duration * 1000;
 				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
+			}
+			// pin을 그림
+			if(issueId != null || issueType != undefined) {
+				var api = new API("drawInsertIssueImage");
+				api.setDrawType(0);
+				api.setIssueId(issueId);
+				api.setIssueId(issueType);
+				api.setDataKey(null);
+				api.setLatitude(latitude);
+				api.setLongitude(longitude);
+				api.setElevation(height);
+				magoManager.callAPI(api);
 			}
 		},
 		// 블락 및 부재 검색 api
@@ -553,12 +553,49 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		// 선택 블락 이동
 		move : function() {
 		},
-		// demo 용
-		demo : function(renderMode, json) {
-//			MagoConfig.getPolicy().demoBlockConfig = json;
-//			var api = new API("demo");
-//			api.setRenderMode(renderMode);
-//			magoManager.callAPI(api);
+		mouseMove : function(eventType) {
+			var camera = viewer.camera;
+			var canvas = viewer.canvas;
+			var ellipsoid = scene.globe.ellipsoid;
+			var width = canvas.clientWidth;
+	        var height = canvas.clientHeight;
+
+	        // Coordinate (0.0, 0.0) will be where the mouse was clicked.
+/*	        var x = (nowMousePosition.x - startMousePosition.x) / width;
+	        var y = -(nowMousePosition.y - startMousePosition.y) / height;
+
+	        var lookFactor = 0.05;
+	        camera.lookRight(x * lookFactor);
+	        camera.lookUp(y * lookFactor);*/
+
+		    // Change movement speed based on the distance of the camera to the surface of the ellipsoid.
+		    var cameraHeight = ellipsoid.cartesianToCartographic(camera.position).height;
+		    var moveRate = (cameraHeight) / 100.0;
+		    
+		    // 보정을 위한 값
+		    var reviseValue = 0;
+		    if(parseInt(moveRate) >= 300) reviseValue = parseInt(moveRate) * 50;
+		    else if(parseInt(moveRate) >= 20 && parseInt(moveRate) < 300) reviseValue = parseInt(moveRate) * 30;
+		    else reviseValue = parseInt(moveRate) * 10;
+		    if(reviseValue == 0) reviseValue = 5;
+		    
+		    console.log("moveRate = " + moveRate + ", reviseValue = " + reviseValue);
+		    moveRate = moveRate + reviseValue
+		    
+		    switch(eventType) {
+		    	case "moveForward" : camera.moveForward(moveRate);
+		    		break;
+		    	case "moveBackward" : camera.moveBackward(moveRate);
+	    			break;
+		    	case "moveRight" : camera.moveRight(moveRate);
+		    		break;
+		    	case "moveLeft" : camera.moveLeft(moveRate);
+		    		break;
+		    	case "moveUp" : camera.moveUp(moveRate);
+	    			break;
+		    	case "moveDown" : camera.moveDown(moveRate);
+	    			break;
+		    }
 		}
 	};
 };
