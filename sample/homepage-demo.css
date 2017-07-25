@@ -12,309 +12,370 @@ html, body { margin:0; padding:0; width: 100%; height:100%; background-color: #f
 font-family: 'Noto Sans','Malgun Gothic','돋움',dotum, sans-serif;}
 ul, li {margin:0; padding:0; }
 
-
 /* ///// LAYOUT ///// */
 .mapWrap {
-height: 100%;
-background-color: #eee;
+	height: 100%;
+	background-color: #eee;
+	background: url(/images/ko/homepage/map.jpg)
 }
-
-/* CONTROL GROUP */
-.ctrl {
-position: absolute;
-top:2px;
-left: 3px;
-z-index: 999;
-}
-.ctrl div > button {
-width: 136px;
-margin:0 0 3px;
-padding: 7px 0;
-font-size: 1em;
-border: 0;
-color: #fff;
-background: #2c303a;
-}
-.ctrl div > button.on {
-color: #fff !important;
-background: tomato;
-}
-
-
-.ctrl > ul li {
-width: 195px;
-display: inline-block;
-padding: 5px;
-font-size: 1em;
-cursor: pointer;
-border: 0;
-background-color: #fff;
-background-image: url(/images/ko/homepage/ico.png);
-background-repeat: no-repeat;
-background-position: right 5px;
-}
-.ctrl > ul li.on {
-color: #fff !important;
-background-color: tomato;
-background-image: url(/images/ko/homepage/ico.png);
-background-repeat: no-repeat;
-background-position: right -48px;
-}
-
-/* 바로가기 */
-.shortcut {
-position: absolute;
-right:3px;
-font-size: 0.9em;
-background-color: #fff;
-z-index: 999;
-}
-.shortcut p {
-padding: 5px 0 5px 25px;
-border-bottom: 1px dotted #333;
-background: url(/images/ko/homepage/ico.png) no-repeat left -462px;
-
-}
-.shortcut > ul li {
-padding: 3px 10px;
-list-style-position: inside;
-list-style-type: disc;
-
-}
-.shortcut > ul li:hover {
-color: #fff;
-background-color: #0066cc;
-}
-
-#recentIssueListContent {
-	position: absolute;
-	top: 69px;
-	left: 0px;
-	background-color: #FFFFFF;
-	min-width: 413px;
-	z-index: 999;
-}
-#apiListContent {
-	position: absolute;
-	top: 69px;
-	left: 0px;
-	background-color: #FFFFFF;
-	min-width: 413px;
-	z-index: 999;
-}
-
-
 
 /* 공통메뉴 */
 .trigger {
-position: absolute;
-top: 5px;
-right: 220px;
-min-width: 400px;
-direction: rtl;
-z-index: 999;
+	position: absolute;
+	top: 2px;
+	left: 424px;
+	min-width: 320px;
+	z-index: 999;
 }
 .trigger > button {
-display: block;
-width: 40px;
-height: 40px;
-border: none;
-border-radius: 5px;
-/*text-indent: -999em;*/
-background-color: #0066cc;
-background-image: url(/images/ko/ico.png);
-background-repeat: no-repeat;
-background-position: 2px -155px;
+	display: block;
+	width: 40px;
+	height: 34px;
+	border: none;
+	text-indent: -999em;
+	background-color: #2c303a;
+	background-image: url(/images/ko/homepage/ico.png);
+	background-repeat: no-repeat;
+	background-position: 2px -157px;
 }
 .trigger > ul {
-display: none;	
+	display: none;	
 }
 .trigger:hover > ul {
-display: block;
-position: absolute;
-top: 0px;
-right: 0px;
-background-color: #fff;
-
-
-
+	display: block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	background-color: #fff;
 }
 .trigger:hover > ul li {
-display: inline-block;	
-margin: 0 -2px;
-padding: 0 15px;
-
-line-height: 38px;
-cursor: pointer;
-color: #333;
-font-size: 13px;
+	display: inline-block;	
+	margin: 0 -2px;
+	padding: 0 15px;
+	
+	line-height: 34px;
+	cursor: pointer;
+	color: #333;
+	font-size: 13px;
 }
 .trigger:hover > ul li:hover {
-height: 40px;
-padding: 0 15px;
-color: #fff;
-background-color: #0066cc;
-}
-.trigger:hover > ul li a:hover {
+	height: 34px;
+	padding: 0 15px;
 	color: #fff;
+	background-color: tomato;
 }
 
 /* 드롭다운메뉴 */
 /* Level1 */
 .dropdownmenu > li {
-float: left;
-top: 5px;
-left: 5px;
-margin-right: 1px;
-position: relative;
-padding: 5px 50px;
-font-size: 15px;
-color: #fff;
-text-align: center;
-line-height: 30px;
-background-color: #0066cc;
-z-index: 999;
+	float: left;
+	top: 5px;
+	left: 5px;
+	margin-right: 1px;
+	position: relative;
+	padding: 5px 50px;
+	font-size: 15px;
+	color: #fff;
+	text-align: center;
+	line-height: 30px;
+	background-color: #0066cc;
 }
 .dropdownmenu > li:hover {
-background-color: tomato;
+	background-color: tomato;
 }
 /* Level2 */
 /* 레벨1 메뉴에 mouse over시 레벨2 위치지정*/
 .dropdownmenu > li:hover > ul {
-display: block;
-top: 40px;
-left: 0;
-box-sizing: border-box;
+	display: block;
+	top: 40px;
+	left: 0;
+	box-sizing: border-box;
 }
 .dropdownmenu ul {
-position: absolute;
-display: none;
-width: 100%;
-border: 1px solid #ccc;
+	position: absolute;
+	display: none;
+	width: 140px;
+	border: 1px solid #ccc;
 }
 .dropdownmenu ul li {
-position: relative;
-color: #555;
-padding: 10px 5px;
-font-size: 12px;
-line-height: 17px;
-cursor: pointer;
-border-bottom: 1px dotted #ccc;
-background-color: #fff;
+	position: relative;
+	color: #555;
+	padding: 10px 5px;
+	font-size: 12px;
+	line-height: 17px;
+	cursor: pointer;
+	border-bottom: 1px dotted #ccc;
+	background-color: #fff;
 }
-
 .dropdownmenu ul li:hover {
-
-background-color: #eee;
+	background-color: #eee;
 }
-
-
-.mapWrap {
-}
-
-#magoControllArea {
-	position: absolute;
-	top: 50px;
-	right: 0px;
-	z-index: 999;
-}
-
-
 
 /* ///// LAYER ///// */
 .layer {
-position: absolute;
-background: #fff;
-z-index: 100;
+	position: absolute;
+	background: #fff;
+	z-index: 100;
 }
 .layerHeader {
-position: relative;
-border-bottom: 1px dotted #0066cc;
-background-color: #fff;
+	position: relative;
+	border-bottom: 1px dotted #0066cc;
+	background-color: #fff;
 }
 .layerHeader > h2 {
-padding: 10px;
-color: #0066cc;
-font-size: 15px;
+	padding: 10px;
+	color: #0066cc;
+	font-size: 15px;
 }
 .layerContents > h4 {
-margin:0;
-padding-left: 20px;
-font-size: 16px;
-font-weight: 600;
-background: url(/images/ko/bullet_h4.png) no-repeat left 50%;
+	margin:0;
+	padding-left: 20px;
+	font-size: 16px;
+	font-weight: 600;
+	background: url(/images/ko/homepage/bullet_h4.png) no-repeat left 50%;
 }
 .layerHeader > div {
-position: absolute;
-top: 7px;
-right: 3px; 
-width: 30px;
-height: 30px;
+	position: absolute;
+	top: 7px;
+	right: 3px; 
+	width: 30px;
+	height: 30px;
 }
 .layerHeader div > button {
-width: 30px;
-height: 30px;
-border: none;
-text-indent: -999em;
-background-image: url(/images/ko/ico.png);
-background-color: transparent;
-background-position: 1px -264px;
+	width: 30px;
+	height: 30px;
+	border: none;
+	text-indent: -999em;
+	background-image: url(/images/ko/homepage/ico.png);
+	background-color: transparent;
+	background-position: 1px -264px;
 }
 .layerHeader div > button:hover {
-border-radius: 15px;
-background-color: #eee;
+	border-radius: 15px;
+	background-color: #eee;
 }
 
 /* CONTENTS */
 .layerContents {
-padding: 10px;
-overflow: hidden;
+	padding: 10px;
+	overflow: hidden;
 }
 .layerContents p.groupTitle {
-margin-bottom: 5px;
-padding: 0 10px;
-color: #2955a6;
-font-weight: bold;
+	margin-bottom: 5px;
+	padding: 0 10px;
+	color: #2955a6;
+	font-weight: bold;
 }
 .layerContents .group {
-margin-bottom: 20px;
-padding: 10px;
+	margin-bottom: 20px;
+	padding: 10px;
 }
 .layerContents .group li {
-display: inline-block;
-width: 30%;
-padding: 5px 0;
+	display: inline-block;
+	width: 30%;
+	padding: 5px 0;
 }
 .layerContents table {
-width: 100%;
-margin-bottom: 20px;
-border-top: 2px solid #0066cc;
+	width: 100%;
+	margin-bottom: 20px;
+	border-top: 2px solid #0066cc;
 }
 .layerContents table th {
-background-color: #eee;
-border-left: 0px solid #ccc;
-border-bottom: 1px solid #ccc;
+	background-color: #eee;
+	border-left: 0px solid #ccc;
+	border-bottom: 1px solid #ccc;
 } 
 .layerContents table td {
-padding: 5px;
-text-align: left;
-border-bottom: 1px solid #ccc;
+	padding: 5px;
+	text-align: left;
+	border-bottom: 1px solid #ccc;
 }
 
 /* 버튼 */
 .btns {
-margin: 15px 0;
+	margin: 15px 0;
 }
 .btns > button {
-width: 100%;
-padding: 10px 0;
-border-radius: 3px;
-transition: all 0.5s;
-border: none;
-color: #fff;
-background: #2955a6;
+	width: 100%;
+	padding: 10px 0;
+	border-radius: 3px;
+	transition: all 0.5s;
+	border: none;
+	color: #fff;
+	background: #2955a6;
 }
 .btns > button:hover {
-background: tomato;
+	background: tomato;
+}
+
+
+/* v1.0.2 추가 */
+/* CONTROL GROUP */
+.ctrl {
+	position: absolute;
+	top:2px;
+	left: 3px;
+	z-index: 999;
+}
+.ctrl div > button {
+	width: 136px;
+	margin:0 0 3px;
+	padding: 7px 0;
+	font-size: 1em;
+	border: 0;
+	color: #fff;
+	background: #2c303a;
+}
+.ctrl div > button.on {
+	color: #fff !important;
+	background: tomato;
+}
+.ctrl > ul.tab li {
+	width: 196px;
+	display: inline-block;
+	padding: 5px;
+	font-size: 1em;
+	cursor: pointer;
+	border: 0;
+	background-color: #fff;
+	background-image: url(/images/ko/homepage/ico.png);
+	background-repeat: no-repeat;
+	background-position: right 5px;
+}
+.ctrl > ul.tab li.on {
+	color: #fff !important;
+	background-color: tomato;
+	background-image: url(/images/ko/homepage/ico.png);
+	background-repeat: no-repeat;
+	background-position: right -48px;
+}
+
+/* My Issue 리스트 0712 */
+.ctrl .issue {
+	position: absolute;
+	top: 69px;
+	left: 0px;
+	width: 417px;
+	background: #fff;
+}
+.ctrl .issue li {
+	position: relative;
+	padding: 7px;
+	border-bottom: 1px dotted #ccc;
+	cursor: pointer;
+}
+.ctrl .issue li:hover {
+	background-color: #ffffe0;	
+}
+.ctrl .issue li p.title {
+	margin-bottom: 10px;
+	padding-left: 10px;
+}
+.ctrl .issue li p.title span {
+	display: inline-block;
+	font-weight: bold;
+}
+.ctrl .issue li p.info span.tag {
+	display: inline-block;
+	width: 47px;
+	padding:0;
+	color: #fff;
+	text-align: center;
+	border-radius: 2px;
+	font-size: 11px;
+}
+.ctrl .issue li p.info span.date {
+	display: inline-block;
+	margin-left:10px;
+	font-size: 12px;
+	color: #888;
+}
+.ctrl .issue li p > button {
+	position:absolute;
+	bottom: 8px;
+	right: 8px;
+	width: 47px;
+	height: 25px;
+	text-indent: -999em;
+	border: none;
+	background-image: url(/images/ko/homepage/ico.png);
+	background-repeat: no-repeat;
+	background-position: 10px -468px;
+	background-color: transparent;
+}
+
+/* TAG > Issue */
+.i1 {
+	background-color: #ff3300;
+}
+.i2 {
+	background-color: darkorange;
+}
+.i3 {
+	background-color: darkturquoise;
+}
+.i4 {
+	background-color: deepskyblue;
+}
+/* TAG > Type */
+.t1 {
+	background-color: #777;
+}
+.t2 {
+	background-color: #777;
+}
+.t3 {
+	background-color: #777;
+}
+.t4 {
+	background-color: #777;
+}
+
+#apiListContent {
+	position: absolute;
+	top: 69px;
+	left: 0px;
+	background-color: #FFFFFF;
+	min-width: 416px;
+	z-index: 999;
+}
+
+/* 바로가기 */
+.shortcut {
+	position: absolute;
+	right:3px;
+	font-size: 0.9em;
+	background-color: #fff;
+	z-index: 999;
+}
+.shortcut p {
+	padding: 5px 0 5px 25px;
+	border-bottom: 1px dotted #333;
+	background: url(/images/ko/homepage/ico.png) no-repeat left -462px;
+
+}
+.shortcut > ul li {
+	padding: 3px 10px;
+	list-style-position: inside;
+	list-style-type: disc;
+
+}
+.shortcut > ul li:hover {
+	color: #fff;
+	background-color: #0066cc;
+}
+
+
+/* control stick */
+/* 공통메뉴 */
+.controlStick {
+	position: absolute;
+	bottom: 20px;
+	left: 20px;
+	min-width: 160px;
+	z-index: 999;
+}
+.controlStick > li {
+	height: 50px;
 }
 

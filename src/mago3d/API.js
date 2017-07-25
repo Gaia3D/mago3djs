@@ -29,6 +29,8 @@ var API = function(apiName) {
 	this.issueId = null;
 	// issueType
 	this.issueType = null;
+	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
+	this.drawType = 0;
 	
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
@@ -73,6 +75,8 @@ var API = function(apiName) {
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
 	this.issueListEnable = false;
+	//
+	this.insertIssueState = 0;
 };
 
 API.prototype.getMagoEnable = function() {
@@ -249,4 +253,18 @@ API.prototype.getIssueListEnable = function() {
 };
 API.prototype.setIssueListEnable = function(issueListEnable) {
 	this.issueListEnable = issueListEnable;
+};
+
+API.prototype.getInsertIssueState = function() {
+	return this.insertIssueState;
+};
+API.prototype.setInsertIssueState = function(insertIssueState) {
+	this.insertIssueState = insertIssueState;
+};
+
+API.prototype.getDrawType = function() {
+	return this.drawType;
+};
+API.prototype.setDrawType = function(drawType) {
+	this.drawType = drawType;
 };
