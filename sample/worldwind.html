@@ -345,7 +345,22 @@
 	var listIssueFlag = false;
 	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
-	/* var timerId = setInterval("startMogoUI()", 1000); */
+	var intervalCount = 0;
+	var timerId = setInterval("startMogoUI()", 1000);
+	
+	function startMogoUI() {
+		intervalCount++;
+		if(managerFactory != null) {
+			// BoundingBox
+			changeBoundingBox(false);
+			// Selecting And Moving
+			changeMouseMove("0");
+			clearInterval(timerId);
+			console.log(" managerFactory != null, intervalCount = " + intervalCount);
+			return;
+		}
+		console.log("--------- intervalCount = " + intervalCount);
+	}
 	
 	// mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
@@ -376,14 +391,6 @@
 		});
 	}
 	
-	$(document).ready(function() {
-		//$("#recentIssueListContent").show();
-		
-		// BoundingBox
-		changeBoundingBox(false);
-		// Selecting And Moving
-		changeMouseMove("0");
-	});
 	$("#issueMoreImage").click(function() {
 		if($("#recentIssueListContent").css("display") == "none") {
 			$("#issueMoreImage").addClass("on");
