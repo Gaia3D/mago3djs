@@ -17,7 +17,7 @@ var ObjectMarker = function() {
 	//this.height = 0;
 };
 
-ObjectMarker.prototype.copyFrom(objMarker)
+ObjectMarker.prototype.copyFrom = function(objMarker)
 {
 	if(objMarker == undefined)
 		return;

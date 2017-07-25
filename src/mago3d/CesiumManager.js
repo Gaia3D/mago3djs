@@ -4632,7 +4632,7 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 		}
 		*/
 
-		if(neoBuilding.buildingId == "buggy")
+		if(neoBuilding.buildingId == "ctships")
 		{
 			var hola = 0;
 		}
@@ -4658,73 +4658,24 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 
 		if(realBuildingPos == undefined)
 			continue;
-		if(neoBuilding.buildingId == "Grendizer")
-		{
-			var hola = 0;
-		}
 		
 		if(neoBuilding.buildingType == "basicBuilding")
 		{
-			//squaredDistLod0 = 500;
-			//squaredDistLod1 = 55000;
-			//squaredDistLod2 = 500000*1000;
 			lod0_minSquaredDist = 50000.0;
 			var hola = 0;
 		}
-		//squareDistTo
-		//squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, realBuildingPos); // old.***
+
+		this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
 		squaredDistToCamera = cameraPosition.squareDistTo(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-		//if(squaredDistToCamera > this.min_squaredDist_to_see)
+		squaredDistToCamera -= (this.radiusAprox_aux*this.radiusAprox_aux)*2;
 		if(squaredDistToCamera > this.magoPolicy.getFrustumFarSquaredDistance())
 		{
-			//this.deleteNeoBuilding(this.scene._context._gl, neoBuilding); // original.***
 			this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
 			continue;
 		}
-		
-		
-		
+
 		var intersects = false;
-		/*
-		if(this.configInformation.geo_view_library === Constant.WORLDWIND)
 		{
-			if(neoBuilding.provisionalSegmentsArray == undefined)
-			{
-				neoBuilding.provisionalSegmentsArray = [];
-				var auxSegment = new AuxiliarSegment();
-				auxSegment.point1 = new WorldWind.Vec3();
-				auxSegment.point2 = new WorldWind.Vec3();
-				auxSegment.setPoints(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z,   realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-				neoBuilding.provisionalSegmentsArray.push(auxSegment);
-			}
-			intersects = frustumVolume.intersectsSegment(neoBuilding.provisionalSegmentsArray[0].point1, neoBuilding.provisionalSegmentsArray[0].point2); // www.***
-		}
-		else if(this.configInformation.geo_view_library === Constant.CESIUM)
-			*/
-		{
-			/*
-			if(this.boundingSphere_Aux == undefined)
-				this.boundingSphere_Aux = new Cesium.BoundingSphere();
-
-			this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
-			if(this.renderingModeTemp == 0)
-				this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
-			else if(this.renderingModeTemp == 1)
-				this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 4.2/2.0;
-			else if(this.renderingModeTemp == 2)
-				this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
-
-			if(this.radiusAprox_aux) {
-				this.boundingSphere_Aux.radius = this.radiusAprox_aux;
-			} else {
-				this.boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
-			}
-		
-			var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux); // cesium.***
-			if(frustumCull != Cesium.Intersect.OUTSIDE) {
-				intersects = true;
-			}
-			*/
 			if(this.boundingSphere_Aux == undefined)
 				this.boundingSphere_Aux = new Sphere();
 				
@@ -4749,8 +4700,6 @@ CesiumManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, c
 			}
 		}
 			
-		//var 
-		
 		if(intersects) {
 			// min dist to see detailed.***
 			if(this.isLastFrustum)
@@ -5345,6 +5294,7 @@ CesiumManager.prototype.selectedObjectNotice = function(neoBuilding) {
 	var dividedName = neoBuilding.buildingId.split("_");
 	
 	if(MagoConfig.getPolicy().geo_callback_enable == "true") {
+		if(this.objMarkerSC == undefined) return;
 		var objectId = null;
 		if(this.objectSelected != undefined) objectId = this.objectSelected.objectId;
 		

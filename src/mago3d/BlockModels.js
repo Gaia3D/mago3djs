@@ -108,215 +108,67 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
 };
 
-/**
- * 블록리스트 버퍼를 파싱
- * @param idx 변수
- * @returns block
- */
-BlocksList.prototype.parseArrayBuffer = function(gl, arrayBuffer, readWriter) {
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	var bytesReaded = 0;
-	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
-	bytesReaded += 4;
-
-	for (var i = 0; i < blocksCount; i++ ) {
-		var block = this.newBlock();
-
-		// 1rst, read bbox.***
-		var bbox = new BoundingBox();
-		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-
-		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded + 4));
-		bytesReaded += 4;
-
-		var maxLength = bbox.getMaxLength();
-		if(maxLength < 1.0) block.isSmallObj = true;
-		else block.isSmallObj = false;
-
-		block.radius = maxLength/2.0;
-
-		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
-		bytesReaded += 4;
-		for ( var j = 0; j < vboDatasCount; j++ ) {
-
-			// 1) Positions array.***************************************************************************************
-			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
-			bytesReaded += 4;
-			var verticesFloatValuesCount = vertexCount * 3;
-
-			block.vertexCount = vertexCount;
-
-			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-
-			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vboViCacheKey.pos_vboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-
-			/*
-			vboViCacheKey.MESH_VERTEX_cacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshVertexCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  */
-			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-
-			// 2) Normals.************************************************************************************************
-			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			var normalByteValuesCount = vertexCount * 3;
-			//Test.***********************
-			//for(var j=0; j<normalByteValues_count; j++)
-			//{
-			//	var value_x = readWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-			//}
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1 * normalByteValuesCount;
-
-			vboViCacheKey.nor_vboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-			/*
-			vboViCacheKey.meshNormalCacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshNormalCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  */
-			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-
-			// 3) Indices.*************************************************************************************************
-			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
-
-			vboViCacheKey.idx_vboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
-			/*
-			vboViCacheKey.MESH_FACES_cacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.meshFacesCacheKey);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			 */
-			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-			vboViCacheKey.indicesCount = shortIndicesValuesCount;
-
-			// TEST.***
-			//****************************************************************************************************AAA
-			/*
-			this.vboViCacheKey_aux = vboViCacheKey;
-			if(this.vboViCacheKeyvboViCacheKey_aux.meshVertexCacheKey == undefined)
-			{
-				this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.posVboDataArray = undefined;
-				this.vboViCacheKey_aux.posVboDataArray = null;
-
-			}
-
-			if(this.vboViCacheKey_aux.meshNormalCacheKey == undefined)
-			{
-				this.vboViCacheKey_aux.meshNormalCacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.meshNormalCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, this.vboViCacheKey_aux.norVboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.norVboDataArray = undefined;
-				this.vboViCacheKey_aux.norVboDataArray = null;
-
-			}
-
-			if(this.vboViCacheKey_aux.meshFacesCacheKey == undefined)
-			{
-				this.vboViCacheKey_aux.meshFacesCacheKey = gl.createBuffer ();
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.meshFacesCacheKey);
-				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vboViCacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-				//this.vboViCacheKey_aux.idxVboDataArray = undefined;
-				this.vboViCacheKey_aux.idxVboDataArray = null;
-
-			}
-			*/
-		}
-	}
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-};
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
- * @param idx 변수
- * @returns block
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {array} motherBlocksArray Global blocks array.
  */
-BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer, readWriter, motherBlocksArray) {
+BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
 	bytesReaded += 4;
+	var startBuff, endBuff;
 
 	for ( var i = 0; i< blocksCount; i++ ) {
-		//var block = this.newBlock(); // old.***
-		var block = new Block();
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		block.idx = blockIdx;
 
-		// check if block exist.***
+		// Check if block exist.
 		if(motherBlocksArray[blockIdx]) {
-			bytesReaded += 4 * 6; // boundingBox.***
-			// New for read multiple vbo datas (indices cannot superate 65535 value).***
+			// The block exists, then read data but no create a new block.
+			bytesReaded += 4 * 6; // boundingBox.
+			// Read vbo datas (indices cannot superate 65535 value).
 			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			for ( var j = 0; j < vboDatasCount; j++ ) {
-				// 1) Positions array.***************************************************************************************
+				// 1) Positions array.
 				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				var verticesFloatValuesCount = vertexCount * 3;
-
-				block.vertexCount = vertexCount;
-
-				var startBuff = bytesReaded;
-				var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+				startBuff = bytesReaded;
+				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 				bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
-				// 2) Normals.************************************************************************************************
+				// 2) Normals.
 				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				var normalByteValuesCount = vertexCount * 3;
 				bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 
-				// 3) Indices.*************************************************************************************************
+				// 3) Indices.
 				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
 				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 				bytesReaded += 1;
 				bytesReaded = bytesReaded + sizeLevels * 4;
 				bytesReaded = bytesReaded + sizeLevels * 4;
-				/* khj(20170331)
-				var bigTrianglesshortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-				bytesReaded += 4;
-				*/
 				bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
 			}
-
-			// in asimetricVersion must load the block's lego.***
-			/* khj(20170331)
-			if(block.lego == undefined) block.lego = new Lego();
-
-			block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
-
-			// provisionally delete lego.***
-			block.lego.vbo_vicks_container.deleteGlObjects(gl);
-			block.lego.vbo_vicks_container = undefined;
-			block.lego = undefined;
-			*/
-
+			// Pendent to load the block's lego.***
 			continue;
 		}
+		
+		// The block doesn't exist, so creates a new block and read data.
+		var block = new Block();
+		block.idx = blockIdx;
 		motherBlocksArray[blockIdx] = block;
 
-		// 1rst, read bbox.***
+		// 1rst, read bbox.
 		var bbox = new BoundingBox();
 		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
 		bytesReaded += 4;
@@ -345,47 +197,27 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		for ( var j = 0; j < vboDatasCount; j++ ) {
-			// 1) Positions array.***************************************************************************************
+			// 1) Positions array.
 			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var verticesFloatValuesCount = vertexCount * 3;
-
 			block.vertexCount = vertexCount;
-
-			var startBuff = bytesReaded;
-			var endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vboViCacheKey.posVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-
-			/*
-			vboViCacheKey.meshVertexCacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshVertexCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  */
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
-			// 2) Normals.************************************************************************************************
+			// 2) Normals.
 			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var normalByteValuesCount = vertexCount * 3;
-			//Test.***********************vertexCount
-			//for(var j=0; j<normalByteValuesCount; j++)
-			//{
-			//	var value_x = readWriter.readInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-			//}
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1 * normalByteValuesCount;
-
 			vboViCacheKey.norVboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-			/*
-			vboViCacheKey.meshNormalCacheKey = gl.createBuffer ();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboViCacheKey.meshNormalCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			  */
 			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 
-			// 3) Indices.*************************************************************************************************
+			// 3) Indices.
 			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
@@ -399,39 +231,20 @@ BlocksList.prototype.parseArrayBufferAsimetricVersion = function(gl, arrayBuffer
 			var indexMarkers = [];
 			for ( var k = 0; k < sizeLevels; k++ )
 			{
-				//indexMarkers.push(readWriter.readUInt16(arrayBuffer, bytesReaded, bytesReaded + 4)); // original with 16bits reading that is error.***
 				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
 				bytesReaded += 4;
 			}
 			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-2];
-			//var bigTrianglesShortIndicesValues_count = indexMarkers[0];
-
 			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
 
 			vboViCacheKey.idxVboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
-			/*
-			vboViCacheKey.meshFacesCacheKey= gl.createBuffer ();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboViCacheKey.meshFacesCacheKey);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-			 */
 			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
 			vboViCacheKey.indicesCount = shortIndicesValuesCount;
 		}
 
-		// in asimetricVersion must load the block's lego.***
-		/* khj(20170331)
-		if(block.lego == undefined) block.lego = new Lego();
-
-		block.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		bytesReaded = block.lego.parseArrayBuffer(gl, readWriter, arrayBuffer, bytesReaded);
-
-		// provisionally delete lego.***
-		block.lego.vbo_vicks_container.deleteGlObjects(gl);
-		block.lego.vbo_vicks_container = undefined;
-		block.lego = undefined;
-		*/
+		// Pendent to load the block's lego.***
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
