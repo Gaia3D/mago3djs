@@ -744,6 +744,11 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 			neoBuilding.buildingType = "basicBuilding";
 		}
 		
+		if(neoBuilding.buildingId == "Sample_MEP")
+		{
+			var hola = 0;
+		}
+		
 		/* khj(20170331) : before converted jt data path has been changed.
 		var buildingNameDivided = buildingName.split("-");
 		var tempBuildingId = buildingNameDivided[2].split("_");

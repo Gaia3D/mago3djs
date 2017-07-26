@@ -243,7 +243,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			{
 				var hola = 0;
 			}
-			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -642,7 +642,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 
 		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
-			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -898,7 +898,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion_CURRENT = function(gl, neoR
 
 		if(myBlocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
-			myBlocksList.parseArrayBufferAsimetricVersion(gl, myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
