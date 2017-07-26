@@ -1474,7 +1474,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.objMarkerSC = new ObjectMarker();
 			
 			var pixelPos = new Point3D();
-			pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
+			pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -1487,7 +1487,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.objMarkerSC = new ObjectMarker();
 			
 			var pixelPos = new Point3D();
-			pixelPos = this.calculatePixelPositionWorldCoord(gl, scene, pixelPos);
+			pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -1499,7 +1499,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	if(this.bPicking == true && isLastFrustum)
 	{
 		this.arrayAuxSC.length = 0;
-		this.objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
+		this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
 		this.buildingSelected = this.arrayAuxSC[0];
 		this.octreeSelected = this.arrayAuxSC[1];
 		this.arrayAuxSC.length = 0;
@@ -1565,119 +1565,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 };
 
 /**
- * 선택된 object를 취득
- * @param gl 변수
- * @param scene 변수
- * @param renderables_neoRefLists_array 변수
- * @returns selectionCandidateObjectsArray[idx]
- */
-MagoManager.prototype.getSelectedObjectPicking = function(gl, scene, renderables_neoRefLists_array) {
-	// Picking render.***
-	// Picking render.***
-	// Picking render.***
-
-	this.bPicking = false;
-
-	var cameraPosition = scene.context._us._cameraPosition;
-
-	if(this.selectionFbo == undefined) this.selectionFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-
-	// selection render.*******************************************************************************************************************
-	// selection render.*******************************************************************************************************************
-	// selection render.*******************************************************************************************************************
-
-	// do frustum culling.***
-	if(!this.isCameraMoving) {
-		var frustumVolume = scene._frameState.cullingVolume;
-		this.currentVisibleNeoBuildings_array.length = 0;
-		this.doFrustumCullingNeoBuildings(frustumVolume, cameraPosition);
-	}
-
-	if(this.detailed_neoBuilding) // original.***
-	//if(this.currentVisibleNeoBuildings_array.length > 0)
-	{
-		// Calculate "modelViewProjectionRelativeToEye".*********************************************************
-		Cesium.Matrix4.toArray(scene._context._us._modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix);
-		Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.***
-		Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix);
-		Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix);
-		//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
-
-		// Calculate encodedCamPosMC high and low values.********************************************************
-		this.calculateEncodedCameraPositionMCHighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
-
-		// Normal matrix.********************************************************************
-		var mvMat = scene._context._us._modelView; // original.***
-		var mvMat_inv = new Cesium.Matrix4();
-		mvMat_inv = Cesium.Matrix4.inverse(mvMat, mvMat_inv);
-		//var normalMat = new Cesium.Matrix4();
-		this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
-		//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
-		this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
-
-		Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array);
-		Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array);
-
-		var camera = scene._camera;
-//		var frustum = camera.frustum;
-//		var current_frustum_near = scene._context._us._currentFrustum.x;
-//		var current_frustum_far = scene._context._us._currentFrustum.y;
-
-		gl.enable(gl.CULL_FACE); // option.***
-
-		// colorSelection render.************************************************************************************************************
-		// colorSelection render.************************************************************************************************************
-		// colorSelection render.************************************************************************************************************
-
-		//scene._context._currentFramebuffer._bind();// no.***
-		this.selectionFbo.bind(); // framebuffer for color selection.***
-		//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.selectionFbo.colorBuffer, 0);
-
-		var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
-
-		gl.clearColor(1, 1, 1, 1); // white background.***
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
-		//gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
-
-		var shaderProgram = currentShader.program;
-		gl.useProgram(shaderProgram);
-		gl.enableVertexAttribArray(currentShader.position3_loc);
-		//gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-		gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.detailed_neoBuilding.move_matrix);
-		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.detailed_neoBuilding.buildingPositionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.detailed_neoBuilding.buildingPositionLOW);
-
-		var ssao_idx = -1; // selection code.***
-		//ssao_idx = 1; // test.***
-		var renderTexture = false;
-		cameraPosition = null;
-		this.renderDetailedNeoBuilding(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, renderables_neoRefLists_array);
-
-		gl.disableVertexAttribArray(currentShader.position3_loc);
-		//gl.disableVertexAttribArray(currentShader.normal3_loc);
-
-		// Now, read the picked pixel and find the object.*********************************************************
-
-		var pixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
-		gl.readPixels(this.mouse_x, scene.drawingBufferHeight - this.mouse_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-		// now, select the object.***
-		var idx = 64516*pixels[0] + 254*pixels[1] + pixels[2];
-		//this.objectSelected = this.selectionCandidateObjectsArray[idx];
-
-		return this.selectionCandidateObjectsArray[idx];
-	} else {
-		return undefined;
-	}
-};
-
-/**
  * Selects an object of the current visible objects that's under mouse.
  * @param {GL} gl.
  * @param {int} mouseX Screen x position of the mouse.
@@ -1685,7 +1572,7 @@ MagoManager.prototype.getSelectedObjectPicking = function(gl, scene, renderables
  * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
  * @returns {Array} resultSelectedArray 
  */
-MagoManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, mouseX, mouseY, visibleObjControlerBuildings, resultSelectedArray) {
+MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleObjControlerBuildings, resultSelectedArray) {
 	// Picking render.***
 	this.bPicking = false;
 	var cameraPosition = this.sceneState.camera.position;
@@ -1946,13 +1833,7 @@ MagoManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, mouse
 	}
 
 	if(currentShader.position3_loc != -1)gl.disableVertexAttribArray(currentShader.position3_loc);
-
-	// ssao_idx = -1 -> pickingMode.***
-	// ssao_idx = 0 -> depth.***
-	// ssao_idx = 1 -> ssao.***
-
 	gl.disableVertexAttribArray(currentShader.position3_loc);
-	//gl.disableVertexAttribArray(currentShader.normal3_loc);
 
 	// Now, read the picked pixel and find the object.*********************************************************
 	var pixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
@@ -1983,18 +1864,19 @@ MagoManager.prototype.getSelectedObjectPickingAsimetricMode = function(gl, mouse
 };
 
 /**
- * 카메라 공간의 ray를 취득
- * @param gl 변수
- * @param scene 변수
- * @param resultRay 변수
- * @returns resultRay
+ * Calculates the direction vector of a ray that starts in the camera position and
+ * continues to the pixel position in world space.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @returns {Line} resultRay
  */
-MagoManager.prototype.getRayWorldSpace = function(gl, scene, pixelX, pixelY, resultRay) {
+MagoManager.prototype.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay) {
 	// in this function the "ray" is a line.***
 	if(resultRay == undefined) 
 		resultRay = new Line();
 	
-	// world ray = camPos + lambda*camDir.***
+	// world ray = camPos + lambda*camDir.
 	var camPos = this.sceneState.camera.position;
 	var rayCamSpace = new Float32Array(3);
 	rayCamSpace = this.getRayCamSpace(gl, pixelX, pixelY, rayCamSpace);
@@ -2013,10 +1895,12 @@ MagoManager.prototype.getRayWorldSpace = function(gl, scene, pixelX, pixelY, res
 };
 
 /**
- * 카메라 공간의 ray를 취득
- * @param gl 변수
- * @param resultRay 변수
- * @returns resultRay
+ * Calculates the direction vector of a ray that starts in the camera position and
+ * continues to the pixel position in camera space.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @returns {Float32Array(3)} resultRay Result of the calculation.
  */
 MagoManager.prototype.getRayCamSpace = function(gl, pixelX, pixelY, resultRay) {
 	// in this function "ray" is a vector.***
@@ -2033,125 +1917,99 @@ MagoManager.prototype.getRayCamSpace = function(gl, pixelX, pixelY, resultRay) {
 	resultRay[0] = wfar*((mouseX/this.sceneState.drawingBufferWidth) - 0.5);
 	resultRay[1] = hfar*((mouseY/this.sceneState.drawingBufferHeight) - 0.5);
 	resultRay[2] = - frustum_far;
-
 	return resultRay;
 };
 
 /**
- * 선택된 object의 움직임 plane를 계산하여 asimetric mode 로 취득
- * @param gl 변수
- * @param cameraPosition 변수
- * @param scene 변수
- * @param renderables_neoRefLists_array 변수
+ * Calculates the plane on move a project(a building). This plane is tangent to world in pixel position.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @return {Plane} resultSelObjMovePlane Calculated plane.
  */
-MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, cameraPosition, scene, neoBuilding) {
+MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixelX, pixelY, resultSelObjMovePlane) {
 	if(this.pointSC == undefined)
 		this.pointSC = new Point3D();
 	
 	if(this.pointSC2 == undefined)
 		this.pointSC2 = new Point3D();
 	
-	this.calculatePixelPositionWorldCoord(gl, scene, this.pointSC2);
+	this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, this.pointSC2);
 	var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
 	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
 
-	this.selObjMovePlane = new Plane();
-	// provisionally make an XY plane.***
+	if(resultSelObjMovePlane == undefined)
+		resultSelObjMovePlane = new Plane();
 	// the plane is in world coord.***
-	this.selObjMovePlane.setPointAndNormal(this.pointSC.x, this.pointSC.y, this.pointSC.z, 0.0, 0.0, 1.0);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	resultSelObjMovePlane.setPointAndNormal(this.pointSC.x, this.pointSC.y, this.pointSC.z, 0.0, 0.0, 1.0);
+	return resultSelObjMovePlane;
 };
 
 /**
- * 선택된 object의 움직임 plane를 계산하여 asimetric mode 로 취득
- * @param gl 변수
- * @param cameraPosition 변수
- * @param scene 변수
- * @param renderables_neoRefLists_array 변수
+ * Calculates the pixel position in camera coordinates.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @return {Point3D} resultPixelPos The result of the calculation.
  */
-MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, scene, resultPixelPos) {
-
-	// depth render.************************************************************************************************************
-	// depth render.************************************************************************************************************
-	// depth render.************************************************************************************************************
+MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos) {
+	// depth render.
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.depthRange(0, 1);
-	
 	gl.frontFace(gl.CCW);
-	//gl.depthFunc(gl.GREATER);
-	//gl.enable(gl.CULL_FACE);
 
 	var current_frustum_near = this.sceneState.camera.frustum.near;
 	var current_frustum_far = this.sceneState.camera.frustum.far;
 
+	// framebuffer for color selection.
 	if(this.selectionFbo == undefined) 
 		this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-	this.selectionFbo.bind(); // framebuffer for color selection.***
-	
-	//this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
+	this.selectionFbo.bind(); 
+
 	gl.clearColor(1, 1, 1, 1); // white background.***
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 	gl.disable(gl.BLEND);
 	var ssao_idx = 0;
 	this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, this.visibleObjControlerBuildings);
-	//-------------------------------------------------------------------------------------------------------------------------------------------------------
-	// Now, read the picked pixel and find the pixel position.*********************************************************
+
+	// Now, read the pixel and find the pixel position.
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
-	gl.readPixels(this.mouse_x, this.sceneState.drawingBufferHeight - this.mouse_y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	gl.readPixels(pixelX, this.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
 	zDepth /= 256.0; // convert to 0 to 1.0 range depth.***
 	var realZDepth = zDepth*current_frustum_far;
 
 	// now, find the 3d position of the pixel in camCoord.****
-	this.resultRaySC = this.getRayCamSpace(gl, this.mouse_x, this.mouse_y, this.resultRaySC);
+	this.resultRaySC = this.getRayCamSpace(gl, pixelX, pixelY, this.resultRaySC);
+	if(resultPixelPos == undefined)
+		resultPixelPos = new Point3D();
+	
+	resultPixelPos.set(this.resultRaySC[0] * realZDepth, this.resultRaySC[1] * realZDepth, this.resultRaySC[2] * realZDepth);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	return resultPixelPos;
+};
 
-	var pixelPosCamCoord = new Float32Array(3);
-	pixelPosCamCoord[0] = this.resultRaySC[0] * realZDepth;
-	pixelPosCamCoord[1] = this.resultRaySC[1] * realZDepth;
-	pixelPosCamCoord[2] = this.resultRaySC[2] * realZDepth;
+/**
+ * Calculates the pixel position in world coordinates.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos) {
+	var pixelPosCamCoord = new Point3D();
+	pixelPosCamCoord = this.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord);
 
 	// now, must transform this pixelCamCoord to world coord.***
 	var mv_inv = this.sceneState.modelViewMatrixInv;
-	var pixelPosCamCoordCartesian = new Point3D();
-	pixelPosCamCoordCartesian.set(pixelPosCamCoord[0], pixelPosCamCoord[1], pixelPosCamCoord[2]);
 	if(resultPixelPos == undefined)
 		var resultPixelPos = new Point3D();
-	resultPixelPos = mv_inv.transformPoint3D(pixelPosCamCoordCartesian, resultPixelPos);
-	
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	
+	resultPixelPos = mv_inv.transformPoint3D(pixelPosCamCoord, resultPixelPos);
 	return resultPixelPos;
 };
-	/*
-	// camera function.***
-	function getPickRayPerspective(camera, windowPosition, result) {
-        var canvas = camera._scene.canvas;
-        var width = canvas.clientWidth;
-        var height = canvas.clientHeight;
-
-        var tanPhi = Math.tan(camera.frustum.fovy * 0.5);
-        var tanTheta = camera.frustum.aspectRatio * tanPhi;
-        var near = camera.frustum.near;
-
-        var x = (2.0 / width) * windowPosition.x - 1.0;
-        var y = (2.0 / height) * (height - windowPosition.y) - 1.0;
-
-        var position = camera.positionWC;
-        Cartesian3.clone(position, result.origin);
-
-        var nearCenter = Cartesian3.multiplyByScalar(camera.directionWC, near, pickPerspCenter);
-        Cartesian3.add(position, nearCenter, nearCenter);
-        var xDir = Cartesian3.multiplyByScalar(camera.rightWC, x * near * tanTheta, pickPerspXDir);
-        var yDir = Cartesian3.multiplyByScalar(camera.upWC, y * near * tanPhi, pickPerspYDir);
-        var direction = Cartesian3.add(nearCenter, xDir, result.direction);
-        Cartesian3.add(direction, yDir, direction);
-        Cartesian3.subtract(direction, position, direction);
-        Cartesian3.normalize(direction, direction);
-
-        return result;
-    }
-	*/
 
 /**
  * 카메라 motion 활성화
@@ -2178,7 +2036,7 @@ MagoManager.prototype.isDragging = function(scene) {
 	if(this.magoPolicy.mouseMoveMode == 0) // buildings move.***
 	{
 		this.arrayAuxSC.length = 0;
-		var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
+		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
 		var currentBuildingSelected = this.arrayAuxSC[0];
 		this.arrayAuxSC.length = 0;
 
@@ -2192,7 +2050,7 @@ MagoManager.prototype.isDragging = function(scene) {
 	{
 		//var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array); // original.***
 		this.arrayAuxSC.length = 0;
-		var current_objectSelected = this.getSelectedObjectPickingAsimetricMode(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
+		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
 		this.arrayAuxSC.length = 0;
 
 		if(current_objectSelected == this.objectSelected) {
@@ -2276,7 +2134,7 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY) {
 		//---------------------------------------------------------------------------------
 		this.isCameraMoving = true; // test.***
 		if(this.mouseDragging) {
-			this.moveSelectedObjectAsimetricMode(this.scene, this.currentRenderablesNeoRefListsArray);
+			this.moveSelectedObjectAsimetricMode(this.sceneState.gl);
 		}
 
 	}
@@ -2288,16 +2146,10 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY) {
 
 
 /**
- * 선택 객체를 asimetric mode 로 이동
- * @param gl 변수
- * @param scene 변수
- * @param renderables_neoRefLists_array 변수
+ * Moves an object.
+ * @param {GL} gl 변수
  */
-MagoManager.prototype.moveSelectedObjectAsimetricMode = function(scene, renderables_neoRefLists_array) {
-
-	var gl = this.sceneState.gl;
-
-	//var cameraPosition = scene.context._us._cameraPosition;
+MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) {
 	var cameraPosition = this.sceneState.camera.position;
 	if(this.magoPolicy.mouseMoveMode == 0) // buildings move.***
 	{
@@ -2308,14 +2160,14 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(scene, renderab
 		if(this.selObjMovePlane == undefined) {
 			var currentRenderingFase = this.renderingFase;
 			this.renderingFase = -1;
-			this.calculateSelObjMovePlaneAsimetricMode(gl, cameraPosition, scene, renderables_neoRefLists_array);
+			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
 			this.renderingFase = currentRenderingFase;
 		}
 
 		if(this.lineSC == undefined)
 			this.lineSC = new Line();
 		
-		this.getRayWorldSpace(gl, scene, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+		this.lineSC = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
 
 		// transform world_ray to building_ray.***
 		var camPosBuilding = new Point3D();
@@ -2380,7 +2232,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(scene, renderab
 		if(this.selObjMovePlane == undefined) {
 			var currentRenderingFase = this.renderingFase;
 			this.renderingFase = -1;
-			this.calculateSelObjMovePlaneAsimetricMode(gl, cameraPosition, scene, renderables_neoRefLists_array);
+			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
 			this.renderingFase = currentRenderingFase;
 		}
 
@@ -2388,7 +2240,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(scene, renderab
 		if(this.lineSC == undefined)
 			this.lineSC = new Line();
 		
-		this.getRayWorldSpace(gl, scene, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+		this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
 		var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
