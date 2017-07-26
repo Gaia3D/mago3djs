@@ -115,7 +115,7 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
  * 
  * @param {arrayBuffer} arrayBuffer Binary data to parse.
  * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {array} motherBlocksArray Global blocks array.
+ * @param {Array} motherBlocksArray Global blocks array.
  */
 BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray) {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;

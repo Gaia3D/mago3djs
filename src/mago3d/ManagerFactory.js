@@ -34,7 +34,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		// 기본 지도 설정
 		setDefaultDataset();
 
-		viewer.scene.magoManager = new CesiumManager();
+		viewer.scene.magoManager = new MagoManager();
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 
@@ -81,7 +81,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
         // Now set up to handle highlighting.
         //var highlightController = new WorldWind.HighlightController(wwd);
 
-		magoManager = new CesiumManager();
+		magoManager = new MagoManager();
 		magoManager.wwd = wwd;
 		magoManager.sceneState.textureFlipYAxis = true;
 		
