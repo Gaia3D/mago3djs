@@ -5993,43 +5993,40 @@ CesiumManager.prototype.objectColorChanged = function(projectAndBlockId, objectI
 	{
 		var neoReference;
 		var neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
-		var found = false;
-		var i = 0;
-		while(!found && i<neoReferencesCount)
+		var targetNeoReferencesArray = [];
+		for(var i=0; i<neoReferencesCount; i++)
 		{
 			if(neoBuilding.motherNeoReferencesArray[i])
 			{
 				if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
 				{
 					neoReference = neoBuilding.motherNeoReferencesArray[i];
-					found = true;
+					targetNeoReferencesArray.push(neoReference);
 				}
 			}
-			i++;
 		}
 		
-		if(neoReference == undefined)
+		if(targetNeoReferencesArray.length == 0)
 		{
 			neoBuilding = this.getNeoBuildingById("outfitting", projectAndBlockId);
 			neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
-			found = false;
-			i = 0;
-			while(!found && i<neoReferencesCount)
+			for(var i=0; i<neoReferencesCount; i++)
 			{
 				if(neoBuilding.motherNeoReferencesArray[i])
 				{
 					if(neoBuilding.motherNeoReferencesArray[i].objectId == objectId)
 					{
 						neoReference = neoBuilding.motherNeoReferencesArray[i];
-						found = true;
+						targetNeoReferencesArray.push(neoReference);
 					}
 				}
-				i++;
 			}
 		}
 		
-		if(neoReference)
+		var targetNeoRefCount = targetNeoReferencesArray.length;
+		for(var i=0; i<targetNeoRefCount; i++)
 		{
+			neoReference = targetNeoReferencesArray[i];
 			if(neoReference.aditionalColor == undefined)
 			{
 				neoReference.aditionalColor = new Color();
