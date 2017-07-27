@@ -1,3 +1,5 @@
+@charset "utf-8";
+
 /* RESET CSS */
 * { margin:0; padding:0; outline:0; vertical-align:top; }
 article, aside, details, figcaption, figure, footer, header, hgroup, menu nav, section { display:block; }
