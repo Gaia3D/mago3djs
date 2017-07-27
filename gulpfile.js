@@ -1,4 +1,14 @@
+// jshint node:true
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
 var gulp = require('gulp');
+
+var globby = require('globby');
+var rimraf = require('rimraf');
+var glslStripComments = require('glsl-strip-comments');
+
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var minify = require('gulp-minify');
@@ -15,8 +25,10 @@ var watch = require('gulp-watch');
 var del = require('del');
 //var fileInclude = require('gulp-file-include');
 var eslint = require('gulp-eslint');
+var jshint = require('gulp-jshint');
 var jsdoc = require('gulp-jsdoc3');
 var Server = require('karma').Server;
+var yargs = require('yargs');
 
 var paths = {
 	data : './data',
@@ -109,6 +121,19 @@ gulp.task('lint', function() {
 		.pipe(eslint.failAfterError());
 });
 
+// jsHint
+gulp.task('jsHint', function() {
+    var stream = gulp.src(paths.source_js)
+        .pipe(jshint.extract('auto'))
+        .pipe(jshint())
+        .pipe(jshint.reporter('jshint-stylish'));
+
+    if (yargs.argv.failTaskOnError) {
+        stream = stream.pipe(jshint.reporter('fail'));
+    }
+    return stream;
+});
+
 gulp.task('doc', function (cb) {
 	var config = require('./jsdoc.json');
 	gulp.src(['README.md', './src/mago3d/*.js'], {read: false})
@@ -117,3 +142,72 @@ gulp.task('doc', function (cb) {
 
 gulp.task('default', [ 'clean', 'combine-js', 'lint', 'doc' ]);
 //gulp.task('default', [ 'uglify', 'doc' ]);
+
+gulp.task('buildShader', function() {
+	glslToJavaScript(false, 'Build/minifyShaders.state');
+})
+function glslToJavaScript(minify, minifyStateFilePath) {
+    fs.writeFileSync(minifyStateFilePath, minify);
+    var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
+
+// collect all currently existing JS files into a set, later we will remove the ones
+// we still are using from the set, then delete any files remaining in the set.
+    var leftOverJsFiles = {};
+    var shaderContents = "'use strict';\nvar ShaderSource = ShaderSource || {};\n";
+
+    globby.sync(['src/mago3d/Shaders/**/*.js']).forEach(function(file) {
+        leftOverJsFiles[path.normalize(file)] = true;
+    });
+
+    var glslFiles = globby.sync(['src/mago3d/Shaders/**/*.glsl']);
+    glslFiles.forEach(function(glslFile) {
+        glslFile = path.normalize(glslFile);
+        var baseName = path.basename(glslFile, '.glsl');
+        var jsFile = path.join(path.dirname(glslFile), baseName) + '.js';
+
+        delete leftOverJsFiles[jsFile];
+
+        var jsFileExists = fs.existsSync(jsFile);
+        var jsFileModified = jsFileExists ? fs.statSync(jsFile).mtime.getTime() : 0;
+        var glslFileModified = fs.statSync(glslFile).mtime.getTime();
+
+        if (jsFileExists && jsFileModified > glslFileModified && jsFileModified > minifyStateFileLastModified) {
+            return;
+        }
+
+        var contents = fs.readFileSync(glslFile, 'utf8');
+        contents = contents.replace(/\r\n/gm, '\n');
+
+        var copyrightComments = '';
+        var extractedCopyrightComments = contents.match(/\/\*\*(?:[^*\/]|\*(?!\/)|\n)*?@license(?:.|\n)*?\*\//gm);
+        if (extractedCopyrightComments) {
+            copyrightComments = extractedCopyrightComments.join('\n') + '\n';
+        }
+
+        if (minify) {
+            contents = glslStripComments(contents);
+            contents = contents.replace(/\s+$/gm, '').replace(/^\s+/gm, '').replace(/\n+/gm, '\n');
+            contents += '\n';
+        }
+
+        contents = contents.split('"').join('\\"').replace(/\n/gm, '\\n\\\n');
+
+        shaderContents += 'ShaderSource' + "['" + baseName + "']" + ' = "' + contents + '";\n';
+
+        contents = copyrightComments + '\
+/*global define*/\n\
+define(function() {\n\
+    \'use strict\';\n\
+    return "' + contents + '";\n\
+});';
+
+        //fs.writeFileSync(jsFile, contents);
+    });
+
+    fs.writeFileSync('src/mago3d/ShaderSource.js', shaderContents);
+
+    // delete any left over JS files from old shaders
+    Object.keys(leftOverJsFiles).forEach(function(filepath) {
+        rimraf.sync(filepath);
+    });
+}

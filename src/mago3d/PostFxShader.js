@@ -355,8 +355,8 @@ PostFxShadersManager.prototype.createBlurShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var blur_vs_source = ShaderSource.blurVsSource;
-	var blur_fs_source = ShaderSource.blurFsSource;
+	var blur_vs_source = ShaderSource['BlurVS'];
+	var blur_fs_source = ShaderSource['BlurFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -386,8 +386,8 @@ PostFxShadersManager.prototype.createSsaoShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.ssaoVsSource;
-	var ssao_fs_source = ShaderSource.ssaoFsSource;
+	var ssao_vs_source = ShaderSource['SsaoVS'];
+	var ssao_fs_source = ShaderSource['SsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -441,8 +441,8 @@ PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.showDepthVsSource;
-	var showDepth_fs_source = ShaderSource.showDepthFsSource;
+	var showDepth_vs_source = ShaderSource['ShowDepthVS'];
+	var showDepth_fs_source = ShaderSource['ShowDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -480,8 +480,8 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.modelRefSsaoVsSource;
-	var ssao_fs_source = ShaderSource.modelRefSsaoFsSource;
+	var ssao_vs_source = ShaderSource['ModelRefSsaoVS'];
+	var ssao_fs_source = ShaderSource['ModelRefSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -546,8 +546,8 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.renderShowDepthVsSource; // 
-	var showDepth_fs_source = ShaderSource.renderShowDepthFsSource;
+	var showDepth_vs_source = ShaderSource['RenderShowDepthVS'];
+	var showDepth_fs_source = ShaderSource['RenderShowDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -594,8 +594,8 @@ PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl)
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.colorSelectionSsaoVsSource;
-	var ssao_fs_source = ShaderSource.colorSelectionSsaoFsSource;
+	var ssao_vs_source = ShaderSource['ColorSelectionSsaoVS'];
+	var ssao_fs_source = ShaderSource['ColorSelectionSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -633,8 +633,8 @@ PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.simpleDepthSsaoVsSource;
-	var ssao_fs_source = ShaderSource.simpleDepthSsaoFsSource;
+	var ssao_vs_source = ShaderSource['SimpleDepthSsaoVS'];
+	var ssao_fs_source = ShaderSource['SimpleDepthSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -672,8 +672,8 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.LodBuildingSsaoVsSource;
-	var ssao_fs_source = ShaderSource.LodBuildingSsaoFsSource;
+	var ssao_vs_source = ShaderSource['LodBuildingSsaoVS'];
+	var ssao_fs_source = ShaderSource['LodBuildingSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -747,8 +747,8 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.lodBuildingDepthVsSource;
-	var showDepth_fs_source = ShaderSource.lodBuildingDepthFsSource;
+	var showDepth_vs_source = ShaderSource['LodBuildingDepthVS'];
+	var showDepth_fs_source = ShaderSource['LodBuildingDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -788,8 +788,8 @@ PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.LegoSsaoVsSource;
-	var ssao_fs_source = ShaderSource.LegoSsaoFsSource;
+	var ssao_vs_source = ShaderSource['LegoSsaoVS'];
+	var ssao_fs_source = ShaderSource['LegoSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -858,8 +858,8 @@ PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.LegoDepthVsSource;
-	var showDepth_fs_source = ShaderSource.LegoDepthFsSource;
+	var showDepth_vs_source = ShaderSource['LegoDepthVS'];
+	var showDepth_fs_source = ShaderSource['LegoDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -900,8 +900,8 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.lodBuildingDepthVsSource;
-	var showDepth_fs_source = ShaderSource.lodBuildingDepthFsSource;
+	var showDepth_vs_source = ShaderSource['LodBuildingDepthVS'];
+	var showDepth_fs_source = ShaderSource['LodBuildingDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -941,8 +941,8 @@ PostFxShadersManager.prototype.createDepthShaderBox = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource.boxDepthVsSource;
-	var showDepth_fs_source = ShaderSource.boxDepthFsSource;
+	var showDepth_vs_source = ShaderSource['BoxDepthVS'];
+	var showDepth_fs_source = ShaderSource['BoxDepthFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -982,8 +982,8 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.boxSsaoVsSource;
-	var ssao_fs_source = ShaderSource.boxSsaoFsSource;
+	var ssao_vs_source = ShaderSource['BoxSsaoVS'];
+	var ssao_fs_source = ShaderSource['BoxSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -1061,8 +1061,8 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl) {
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource.pngImageVsSource;
-	var ssao_fs_source = ShaderSource.pngImageFsSource;
+	var ssao_vs_source = ShaderSource['PngImageVS'];
+	var ssao_fs_source = ShaderSource['PngImageFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
