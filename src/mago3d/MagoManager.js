@@ -1936,7 +1936,8 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	
 	this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, this.pointSC2);
 	var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
-	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
+	//this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
+	this.pointSC = buildingGeoLocation.geoLocMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingCartographicPositionSpacePoint.***
 
 	if(resultSelObjMovePlane == undefined)
 		resultSelObjMovePlane = new Plane();
@@ -2187,7 +2188,151 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) {
 		var intersectionPoint = new Point3D();
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
 		intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
+		
+		if(this.pointSC == undefined)
+			this.pointSC = new Point3D();
+		this.pointSC = buildingGeoLocation.geoLocMatrix.transformPoint3D(intersectionPoint, this.pointSC);
+		intersectionPoint.set(this.pointSC.x, this.pointSC.y, this.pointSC.z);
 
+		// register the movement.***
+		if(this.buildingSelected.moveVector == undefined)
+			this.buildingSelected.moveVector = new Point3D();
+
+		if(!this.thereAreStartMovePoint) {
+			var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z));
+			this.startMovPoint.x = cartographic.longitude * (180.0/Math.PI);
+			this.startMovPoint.y = cartographic.latitude * (180.0/Math.PI);
+			this.thereAreStartMovePoint = true;
+		} else {
+			var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z));
+			this.pointSC.x = cartographic.longitude * (180.0/Math.PI);
+			this.pointSC.y = cartographic.latitude * (180.0/Math.PI);
+			var difX = this.pointSC.x - this.startMovPoint.x;
+			var difY = this.pointSC.y - this.startMovPoint.y;
+
+			//this.buildingSelected.moveVector.set(difX, difY, difZ);
+			
+			var geoLocationData;
+			geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
+			/*
+			// test.*** see the cartographic values of the intersected point.***
+			var newPosition = new Point3D();
+
+			newPosition.add(difX, difY, difZ);
+			newPosition.add(geoLocationData.pivotPoint.x, geoLocationData.pivotPoint.y, geoLocationData.pivotPoint.z);
+			*/
+
+			//var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(newPosition.x, newPosition.y, newPosition.z));
+			var newLongitude = geoLocationData.geographicCoord.longitude - difX;
+			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
+			var newHeight = cartographic.height;
+
+			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+			this.displayLocationAndRotation(this.buildingSelected);
+			//this.selectedObjectNotice(this.buildingSelected);
+			
+			this.startMovPoint.x -= difX;
+			this.startMovPoint.y -= difY;
+		}
+	}
+	else if(this.magoPolicy.mouseMoveMode == 1) // objects move.***
+	{
+		if(this.objectSelected == undefined)
+			return;
+
+		// create a XY_plane in the selected_pixel_position.***
+		if(this.selObjMovePlane == undefined) {
+			var currentRenderingFase = this.renderingFase;
+			this.renderingFase = -1;
+			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
+			this.renderingFase = currentRenderingFase;
+		}
+
+		// world ray = camPos + lambda*camDir.***
+		if(this.lineSC == undefined)
+			this.lineSC = new Line();
+		
+		this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+		var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
+		var camPosBuilding = new Point3D();
+		var camDirBuilding = new Point3D();
+		camPosBuilding = buildingGeoLocation.tMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
+		camDirBuilding = buildingGeoLocation.rotMatrixInv.transformPoint3D(this.lineSC.direction, camDirBuilding);
+	
+		// now, intersect building_ray with the selObjMovePlane.***
+		var line = new Line();
+		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);// original.***
+
+		var intersectionPoint = new Point3D();
+		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
+
+		//the movement of an object must multiply by buildingRotMatrix.***
+		var transformedIntersectPoint = new Point3D();
+		transformedIntersectPoint = buildingGeoLocation.rotMatrix.transformPoint3D(intersectionPoint, transformedIntersectPoint); 
+		intersectionPoint.x = transformedIntersectPoint.x;
+		intersectionPoint.y = transformedIntersectPoint.y;
+		intersectionPoint.z = transformedIntersectPoint.z;
+
+		// register the movement.***
+		if(this.objectSelected.moveVector == undefined)
+			this.objectSelected.moveVector = new Point3D();
+
+		if(!this.thereAreStartMovePoint) {
+			this.startMovPoint = intersectionPoint;
+			this.startMovPoint.add(-this.objectSelected.moveVector.x, -this.objectSelected.moveVector.y, -this.objectSelected.moveVector.z);
+			this.thereAreStartMovePoint = true;
+		} else {
+			var difX = intersectionPoint.x - this.startMovPoint.x;
+			var difY = intersectionPoint.y - this.startMovPoint.y;
+			var difZ = intersectionPoint.z - this.startMovPoint.z;
+
+			this.objectSelected.moveVector.set(difX, difY, difZ);
+		}
+	}
+};
+
+/**
+ * Moves an object.
+ * @param {GL} gl 변수
+ */
+MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl) {
+	var cameraPosition = this.sceneState.camera.position;
+	if(this.magoPolicy.mouseMoveMode == 0) // buildings move.***
+	{
+		if(this.buildingSelected == undefined)
+			return;
+
+		// create a XY_plane in the selected_pixel_position.***
+		if(this.selObjMovePlane == undefined) {
+			var currentRenderingFase = this.renderingFase;
+			this.renderingFase = -1;
+			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
+			this.renderingFase = currentRenderingFase;
+		}
+
+		if(this.lineSC == undefined)
+			this.lineSC = new Line();
+		
+		this.lineSC = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+
+		// transform world_ray to building_ray.***
+		var camPosBuilding = new Point3D();
+		var camDirBuilding = new Point3D();
+		
+		var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
+		camPosBuilding = buildingGeoLocation.geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
+		this.pointSC = buildingGeoLocation.geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
+		camDirBuilding.x = this.pointSC.x;
+		camDirBuilding.y = this.pointSC.y;
+		camDirBuilding.z = this.pointSC.z;
+
+		// now, intersect building_ray with the selObjMovePlane.***
+		var line = new Line();
+		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
+
+		var intersectionPoint = new Point3D();
+		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
+		intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
 
 		// register the movement.***
 		if(this.buildingSelected.moveVector == undefined)
@@ -2202,14 +2347,14 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) {
 			var difZ = intersectionPoint.z - this.startMovPoint.z;
 
 			this.buildingSelected.moveVector.set(difX, difY, difZ);
+			
+			var geoLocationData;
+			geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
 
 			// test.*** see the cartographic values of the intersected point.***
 			var newPosition = new Point3D();
 
 			newPosition.add(difX, difY, difZ);
-			var geoLocationData;
-			geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
-			
 			newPosition.add(geoLocationData.pivotPoint.x, geoLocationData.pivotPoint.y, geoLocationData.pivotPoint.z);
 
 			//var cartographic = Cesium.Ellipsoid.cartesianToCartographic(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
