@@ -4616,7 +4616,7 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		}
 		*/
 
-		if(neoBuilding.buildingId == "ctships")
+		if(neoBuilding.buildingId == "buggy")
 		{
 			var hola = 0;
 		}
