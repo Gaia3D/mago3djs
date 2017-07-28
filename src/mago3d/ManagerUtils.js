@@ -64,6 +64,61 @@ ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) {
 
 	return true;
 };
+/*
+ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
+	if(resultGeographicCoords == undefined)
+		resultGeographicCoords = new GeographicCoord();
+	
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(absolutePoint.x, absolutePoint.y, absolutePoint.z));
+		resultGeographicCoords.longitude = cartographic.longitude * (180.0/Math.PI);
+		resultGeographicCoords.latitude = cartographic.latitude * (180.0/Math.PI);
+		resultGeographicCoords.altitude = cartographic.height;
+	}
+};
+*/
+
+ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) {
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
+		if(resultGeographicCoord == undefined)
+			resultGeographicCoord = new GeographicCoord();
+		resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
+	}
+	
+	return resultGeographicCoord;
+};
+
+ManagerUtils.getTransformationMatrixInPoint = function(point, resultTMatrix, resultMatrixInv, magoManager) {
+	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+
+	}
+	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		if(resultTMatrix == undefined)
+			resultTMatrix = new Matrix4();
+		
+		Cesium.Transforms.eastNorthUpToFixedFrame(new Cesium.Cartesian3(point.x, point.y, point.z), undefined, resultTMatrix._floatArrays);
+		
+		if(resultMatrixInv)
+		{
+			Cesium.Matrix4.inverseTransformation(resultTMatrix._floatArrays, resultMatrixInv._floatArrays);
+		}
+	}
+	
+	return resultTMatrix;
+};
 
 ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) {
 	// this function NO modifies the geographic coords.***
@@ -96,23 +151,6 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 		geoLocationData.pivotPoint = new Point3D();
 
 	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-};
-
-ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
-	if(resultGeographicCoords == undefined)
-		resultGeographicCoords = new GeographicCoord();
-	
-	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-
-	}
-	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(absolutePoint.x, absolutePoint.y, absolutePoint.z));
-		resultGeographicCoords.longitude = cartographic.longitude * (180.0/Math.PI);
-		resultGeographicCoords.latitude = cartographic.latitude * (180.0/Math.PI);
-		resultGeographicCoords.altitude = cartographic.height;
-	}
 };
 
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) {

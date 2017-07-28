@@ -555,11 +555,16 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					var indicesCount;
 					if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 					{
-						indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-						if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+						if(magoManager.objectSelected == neoReference)
 							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-						//if(indicesCount == 0)
-						//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						else{
+							indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
+							if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+								indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+							
+							//if(indicesCount == 0)
+							//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						}
 					}
 					else
 					{
@@ -811,11 +816,16 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 					var indicesCount;
 					if(magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 					{
-						indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-						if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+						if(magoManager.objectSelected == neoReference)
 							indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-						//if(indicesCount == 0)
-						//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						else{
+							indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
+							if(indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+								indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+							
+							//if(indicesCount == 0)
+							//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+						}
 					}
 					else
 					{
