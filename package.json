@@ -4,7 +4,8 @@
   "description": "Generated with Eclipse npm Tools",
   "main": "mago3d.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "start": "node server.js"
   },
   "author": "Gaia3d",
   "license": "Apache-2.0",
@@ -15,6 +16,8 @@
     "del": "^2.2.2",
     "eslint": "^3.13.1",
     "express": "^4.15.3",
+    "globby": "^6.1.0",
+    "glsl-strip-comments": "^1.0.0",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^2.4.0",
     "gulp-coffee": "^2.3.3",
@@ -40,6 +43,8 @@
     "gulp-util": "^3.0.8",
     "gulp-watch": "^4.3.11",
     "gulp-webserver": "^0.9.1",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.2.1",
     "jasmine-core": "^2.5.2",
     "karma": "^1.7.0",
     "karma-browserify": "^5.1.0",
@@ -56,6 +61,8 @@
     "mocha": "^3.2.0",
     "request": "^2.81.0",
     "requirejs": "^2.3.2",
-    "watchify": "^3.8.0"
+    "watchify": "^3.8.0",
+    "rimraf": "^2.6.1",
+    "yargs": "^7.0.1"
   }
 }

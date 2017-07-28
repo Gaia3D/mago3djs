@@ -3816,8 +3816,8 @@ MagoManager.prototype.createDefaultShaders = function(gl) {
 	// 1) ModelReferences ssaoShader.******************************************************************************
 	var shaderName = "modelReferencesSsao";
 	var shader = this.postFxShadersManager.newShader(shaderName);
-	var ssao_vs_source = ShaderSource.modelRefSsaoVsSource;
-	var ssao_fs_source = ShaderSource.modelRefSsaoFsSource;
+	var ssao_vs_source = ShaderSource['ModelRefSsaoVS'];
+	var ssao_fs_source = ShaderSource['ModelRefSsaoFS'];
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
