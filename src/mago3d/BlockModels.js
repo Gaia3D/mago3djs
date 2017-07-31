@@ -234,7 +234,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
 				bytesReaded += 4;
 			}
-			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-2];
+			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
 			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2 * shortIndicesValuesCount;

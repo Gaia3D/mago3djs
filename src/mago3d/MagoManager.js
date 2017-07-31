@@ -1617,6 +1617,9 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
 		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
 		
+		if(currentVisibleOctreesControler == undefined)
+			continue;
+		
 		// LOD0.***
 		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles0.length;
 		for(var j=0; j<currentVisibleLowestOctCount; j++)
@@ -1745,6 +1748,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		
 		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
+		if(currentVisibleOctreesControler == undefined)
+			continue;
 		
 		// LOD0.***
 		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles0.length;
@@ -1940,7 +1945,6 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 		this.pointSC2 = new Point3D();
 	
 	this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, this.pointSC2);
-	//ManagerUtils.getTransformationMatrixInPoint = function(point, resultTMatrix, resultMatrixInv, magoManager);
 	var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
 	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
 
@@ -2253,7 +2257,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) {
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
 		camPosBuilding = buildingGeoLocation.tMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-		//camDirBuilding = buildingGeoLocation.rotMatrixInv.transformPoint3D(this.lineSC.direction, camDirBuilding);
 		camDirBuilding = buildingGeoLocation.tMatrixInv.rotatePoint3D(this.lineSC.direction, camDirBuilding);
 	
 		// now, intersect building_ray with the selObjMovePlane.***
@@ -2265,7 +2268,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) {
 
 		//the movement of an object must multiply by buildingRotMatrix.***
 		var transformedIntersectPoint = new Point3D();
-		//transformedIntersectPoint = buildingGeoLocation.rotMatrix.transformPoint3D(intersectionPoint, transformedIntersectPoint); 
 		transformedIntersectPoint = buildingGeoLocation.tMatrix.rotatePoint3D(intersectionPoint, transformedIntersectPoint); 
 		intersectionPoint.x = transformedIntersectPoint.x;
 		intersectionPoint.y = transformedIntersectPoint.y;
