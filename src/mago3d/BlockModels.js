@@ -4,8 +4,10 @@
  * 블럭 모델
  * @class Block
  */
-var Block = function() {
-	if(!(this instanceof Block)) {
+var Block = function() 
+{
+	if (!(this instanceof Block)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -23,7 +25,8 @@ var Block = function() {
  * 블럭이 가지는 데이터 삭제
  * @returns block
  */
-Block.prototype.deleteObjects = function(gl) {
+Block.prototype.deleteObjects = function(gl) 
+{
 
 	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
 	this.vBOVertexIdxCacheKeysContainer = undefined;
@@ -32,7 +35,7 @@ Block.prototype.deleteObjects = function(gl) {
 	this.radius = undefined;
 	this.vertexCount = undefined; // only for test.*** delete this.***
 
-	if(this.lego) this.lego.deleteGlObjects(gl);
+	if (this.lego) { this.lego.deleteGlObjects(gl); }
 
 	this.lego = undefined;
 };
@@ -41,8 +44,10 @@ Block.prototype.deleteObjects = function(gl) {
  * 블록 목록
  * @class BlocksList
  */
-var BlocksList = function() {
-	if(!(this instanceof BlocksList)) {
+var BlocksList = function() 
+{
+	if (!(this instanceof BlocksList)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -57,8 +62,9 @@ var BlocksList = function() {
  * 새 블록 생성
  * @returns block
  */
-BlocksList.prototype.newBlock = function() {
-	if(this.blocksArray == undefined) this.blocksArray = [];
+BlocksList.prototype.newBlock = function() 
+{
+	if (this.blocksArray == undefined) { this.blocksArray = []; }
 
 	var block = new Block();
 	this.blocksArray.push(block);
@@ -70,10 +76,12 @@ BlocksList.prototype.newBlock = function() {
  * @param idx 변수
  * @returns block
  */
-BlocksList.prototype.getBlock = function(idx) {
-	if(this.blocksArray == undefined) return null;
+BlocksList.prototype.getBlock = function(idx) 
+{
+	if (this.blocksArray == undefined) { return null; }
 
-	if(idx >= 0 && idx < this.blocksArray.length) {
+	if (idx >= 0 && idx < this.blocksArray.length) 
+	{
 		return this.blocksArray[idx];
 	}
 	return null;
@@ -84,10 +92,12 @@ BlocksList.prototype.getBlock = function(idx) {
  * @param idx 변수
  * @returns block
  */
-BlocksList.prototype.deleteGlObjects = function(gl) {
-	if(this.blocksArray == undefined) return;
+BlocksList.prototype.deleteGlObjects = function(gl) 
+{
+	if (this.blocksArray == undefined) { return; }
 
-	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) {
+	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) 
+	{
 		var block = this.blocksArray[i];
 		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl);
 		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
@@ -95,7 +105,8 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
 		block.isSmallObj = undefined;
 		block.radius = undefined;
 		block.vertexCount = undefined; // only for test.*** delete this.***
-		if(block.lego) {
+		if (block.lego) 
+		{
 			block.lego.vbo_vicks_container.deleteGlObjects(gl);
 			block.lego.vbo_vicks_container = undefined;
 		}
@@ -117,25 +128,29 @@ BlocksList.prototype.deleteGlObjects = function(gl) {
  * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
  * @param {Array} motherBlocksArray Global blocks array.
  */
-BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray) {
+BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray) 
+{
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
 	bytesReaded += 4;
 	var startBuff, endBuff;
 
-	for ( var i = 0; i< blocksCount; i++ ) {
+	for ( var i = 0; i< blocksCount; i++ ) 
+	{
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 
 		// Check if block exist.
-		if(motherBlocksArray[blockIdx]) {
+		if (motherBlocksArray[blockIdx]) 
+		{
 			// The block exists, then read data but no create a new block.
 			bytesReaded += 4 * 6; // boundingBox.
 			// Read vbo datas (indices cannot superate 65535 value).
 			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
-			for ( var j = 0; j < vboDatasCount; j++ ) {
+			for ( var j = 0; j < vboDatasCount; j++ ) 
+			{
 				// 1) Positions array.
 				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 				bytesReaded += 4;
@@ -185,8 +200,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		bytesReaded += 4;
 
 		var maxLength = bbox.getMaxLength();
-		if(maxLength < 0.5) block.isSmallObj = true;
-		else block.isSmallObj = false;
+		if (maxLength < 0.5) { block.isSmallObj = true; }
+		else { block.isSmallObj = false; }
 
 		block.radius = maxLength/2.0;
 
@@ -196,7 +211,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		// New for read multiple vbo datas (indices cannot superate 65535 value).***
 		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
-		for ( var j = 0; j < vboDatasCount; j++ ) {
+		for ( var j = 0; j < vboDatasCount; j++ ) 
+		{
 			// 1) Positions array.
 			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
@@ -253,8 +269,10 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
  * 블록 컨테이너
  * @class BlocksListsContainer
  */
-var BlocksListsContainer = function() {
-	if(!(this instanceof BlocksListsContainer)) {
+var BlocksListsContainer = function() 
+{
+	if (!(this instanceof BlocksListsContainer)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.blocksListsArray = [];
@@ -265,7 +283,8 @@ var BlocksListsContainer = function() {
  * @param blocksListName 변수
  * @returns blocksList
  */
-BlocksListsContainer.prototype.newBlocksList = function(blocksListName) {
+BlocksListsContainer.prototype.newBlocksList = function(blocksListName) 
+{
 	var blocksList = new BlocksList();
 	blocksList.name = blocksListName;
 	this.blocksListsArray.push(blocksList);
@@ -277,14 +296,17 @@ BlocksListsContainer.prototype.newBlocksList = function(blocksListName) {
  * @param blockList_name 변수
  * @returns blocksList
  */
-BlocksListsContainer.prototype.getBlockList = function(blockList_name) {
+BlocksListsContainer.prototype.getBlockList = function(blockList_name) 
+{
 	var blocksListsCount = this.blocksListsArray.length;
 	var found = false;
 	var i=0;
 	var blocksList = null;
-	while(!found && i<blocksListsCount) {
+	while (!found && i<blocksListsCount) 
+	{
 		var currentBlocksList = this.blocksListsArray[i];
-		if(currentBlocksList.name == blockList_name) {
+		if (currentBlocksList.name == blockList_name) 
+		{
 			found = true;
 			blocksList = currentBlocksList;
 		}

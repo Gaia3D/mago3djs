@@ -4,8 +4,10 @@
  * 카메라
  * @class Camera
  */
-var Camera = function() {
-	if(!(this instanceof Camera)) {
+var Camera = function() 
+{
+	if (!(this instanceof Camera)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 

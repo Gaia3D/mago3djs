@@ -8,8 +8,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Vertex
  */
-var Vertex = function() {
-	if(!(this instanceof Vertex)) {
+var Vertex = function() 
+{
+	if (!(this instanceof Vertex)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -25,7 +27,8 @@ var Vertex = function() {
  * @param y 변수
  * @param z 변수
  */
-Vertex.prototype.setPosition = function(x, y, z) {
+Vertex.prototype.setPosition = function(x, y, z) 
+{
 	this.point3d.set(x, y, z);
 };
 
@@ -35,8 +38,9 @@ Vertex.prototype.setPosition = function(x, y, z) {
  * @param g 변수
  * @param b 변수
  */
-Vertex.prototype.setColorRGB = function(r, g, b) {
-	if(this.color4 == undefined) this.color4 = new Color();
+Vertex.prototype.setColorRGB = function(r, g, b) 
+{
+	if (this.color4 == undefined) { this.color4 = new Color(); }
 	
 	this.color4.setRGB(r, g, b);
 };
@@ -48,8 +52,9 @@ Vertex.prototype.setColorRGB = function(r, g, b) {
  * @param b 변수
  * @param alpha 변수
  */
-Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
-	if(this.color4 == undefined) this.color4 = new Color();
+Vertex.prototype.setColorRGBA = function(r, g, b, alpha) 
+{
+	if (this.color4 == undefined) { this.color4 = new Color(); }
 	
 	this.color4.setRGBA(r, g, b, alpha);
 };
@@ -61,6 +66,7 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha) {
  * @param dirZ 변수
  * @param distance 변수
  */
-Vertex.prototype.translate = function(dirX, dirY, dirZ, distance) {
+Vertex.prototype.translate = function(dirX, dirY, dirZ, distance) 
+{
 	this.point3d.add(dirX * distance, dirY * distance, dirZ * distance);
 };

@@ -6,11 +6,13 @@
  */
 var MagoConfig = MagoConfig || {};
 
-MagoConfig.getPolicy = function() {
+MagoConfig.getPolicy = function() 
+{
 	return this.serverPolicy;
 };
 
-MagoConfig.getData = function() {
+MagoConfig.getData = function() 
+{
 	return this.serverData;
 };
 
@@ -20,7 +22,8 @@ MagoConfig.getData = function() {
  * @param serverPolicy mago3d policy(json)
  * @param serverData data 정보(json)
  */
-MagoConfig.init = function(serverPolicy, serverData) {
+MagoConfig.init = function(serverPolicy, serverData) 
+{
 	this.serverPolicy = serverPolicy;
 	this.serverData = serverData;
 };

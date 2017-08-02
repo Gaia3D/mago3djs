@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Selection
  */
-var Selection = function() {
-	if(!(this instanceof Selection)) {
+var Selection = function() 
+{
+	if (!(this instanceof Selection)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -25,7 +27,8 @@ var Selection = function() {
  * @param drawingBufferWidth 변수
  * @param drawingBufferHeight 변수
  */
-Selection.prototype.init = function(gl, drawingBufferWidth, drawingBufferHeight) {
+Selection.prototype.init = function(gl, drawingBufferWidth, drawingBufferHeight) 
+{
 	// http://www.webglacademy.com/courses.php?courses=0|1|20|2|3|4|23|5|6|7|10#10
 	this.drawing_height = drawingBufferHeight;
 	this.drawing_width = drawingBufferWidth;
@@ -35,7 +38,7 @@ Selection.prototype.init = function(gl, drawingBufferWidth, drawingBufferHeight)
 	
 	this.GAIA_selectRenderBuffer = gl.createRenderbuffer();
 	gl.bindRenderbuffer(gl.RENDERBUFFER, this.GAIA_selectRenderBuffer);
-	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16 , this.drawing_width, this.drawing_height);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.drawing_width, this.drawing_height);
 
 	this.GAIA_selectRttTexture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, this.GAIA_selectRttTexture);

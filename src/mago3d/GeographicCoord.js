@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class GeographicCoord
  */
-var GeographicCoord = function() {
-	if(!(this instanceof GeographicCoord)) {
+var GeographicCoord = function() 
+{
+	if (!(this instanceof GeographicCoord)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -20,7 +22,8 @@ var GeographicCoord = function() {
  * @param latitude 위도
  * @param altitude 고도
  */
-GeographicCoord.prototype.copyFrom = function(geographicCoord) {
+GeographicCoord.prototype.copyFrom = function(geographicCoord) 
+{
 	this.longitude = geographicCoord.longitude;
 	this.latitude = geographicCoord.latitude;
 	this.altitude = geographicCoord.altitude;
@@ -32,7 +35,8 @@ GeographicCoord.prototype.copyFrom = function(geographicCoord) {
  * @param latitude 위도
  * @param altitude 고도
  */
-GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude) {
+GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude) 
+{
 	this.longitude = longitude;
 	this.latitude = latitude;
 	this.altitude = altitude;

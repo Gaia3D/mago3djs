@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class VBOManager
  */
-var VBOManager = function() {
-	if(!(this instanceof VBOManager)) {
+var VBOManager = function() 
+{
+	if (!(this instanceof VBOManager)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 };
@@ -14,8 +16,10 @@ var VBOManager = function() {
  * 어떤 일을 하고 있습니까?
  * @class Buffer
  */
-var Buffer = function() {
-	if(!(this instanceof Buffer)) {
+var Buffer = function() 
+{
+	if (!(this instanceof Buffer)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -27,8 +31,10 @@ var Buffer = function() {
  * 어떤 일을 하고 있습니까?
  * @class VBOVertexIdxCacheKey
  */
-var VBOVertexIdxCacheKey = function() {
-	if(!(this instanceof VBOVertexIdxCacheKey)) {
+var VBOVertexIdxCacheKey = function() 
+{
+	if (!(this instanceof VBOVertexIdxCacheKey)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -55,33 +61,39 @@ var VBOVertexIdxCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vboViCacheKey
  */
-VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
+VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) 
+{
 
-	if(this.meshVertexCacheKey) {
+	if (this.meshVertexCacheKey) 
+	{
 		gl.deleteBuffer(this.meshVertexCacheKey);
 		this.meshVertexCacheKey = undefined;
 	}
 	this.posVboDataArray = undefined;
 
-	if(this.meshNormalCacheKey) {
+	if (this.meshNormalCacheKey) 
+	{
 		gl.deleteBuffer(this.meshNormalCacheKey);
 		this.meshNormalCacheKey = undefined;
 	}
 	this.norVboDataArray = undefined;
 
-	if(this.meshColorCacheKey) {
+	if (this.meshColorCacheKey) 
+	{
 		gl.deleteBuffer(this.meshColorCacheKey);
 		this.meshColorCacheKey = undefined;
 	}
 	this.colVboDataArray = undefined;
 
-	if(this.meshTexcoordsCacheKey) {
+	if (this.meshTexcoordsCacheKey) 
+	{
 		gl.deleteBuffer(this.meshTexcoordsCacheKey);
 		this.meshTexcoordsCacheKey = undefined;
 	}
 	this.tcoordVboDataArray = undefined;
 
-	if(this.meshFacesCacheKey) {
+	if (this.meshFacesCacheKey) 
+	{
 		gl.deleteBuffer(this.meshFacesCacheKey);
 		this.meshFacesCacheKey = undefined;
 	}
@@ -94,8 +106,10 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @class VBOVertexIdxCacheKeysContainer
  */
-var VBOVertexIdxCacheKeysContainer = function() {
-	if(!(this instanceof VBOVertexIdxCacheKeysContainer)) {
+var VBOVertexIdxCacheKeysContainer = function() 
+{
+	if (!(this instanceof VBOVertexIdxCacheKeysContainer)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -106,7 +120,8 @@ var VBOVertexIdxCacheKeysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vboViCacheKey
  */
-VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
+VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() 
+{
 	var vboViCacheKey = new VBOVertexIdxCacheKey();
 	this.vboCacheKeysArray.push(vboViCacheKey);
 	return vboViCacheKey;
@@ -116,9 +131,11 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vboViCacheKey
  */
-VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
+VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) 
+{
 	var vboDatasCount = this.vboCacheKeysArray.length;
-	for(var j = 0; j < vboDatasCount; j++) {
+	for (var j = 0; j < vboDatasCount; j++) 
+	{
 
 		this.vboCacheKeysArray[j].deleteGlObjects(gl);
 		this.vboCacheKeysArray[j] = undefined;
@@ -131,8 +148,10 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @class VBOByteColorCacheKey
  */
-var VBOByteColorCacheKey = function() {
-	if(!(this instanceof VBOByteColorCacheKey)) {
+var VBOByteColorCacheKey = function() 
+{
+	if (!(this instanceof VBOByteColorCacheKey)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -144,8 +163,10 @@ var VBOByteColorCacheKey = function() {
  * 어떤 일을 하고 있습니까?
  * @class VBOByteColorCacheKeysContainer
  */
-var VBOByteColorCacheKeysContainer = function() {
-	if(!(this instanceof VBOByteColorCacheKeysContainer)) {
+var VBOByteColorCacheKeysContainer = function() 
+{
+	if (!(this instanceof VBOByteColorCacheKeysContainer)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -156,7 +177,8 @@ var VBOByteColorCacheKeysContainer = function() {
  * 어떤 일을 하고 있습니까?
  * @return vboByteColCacheKey
  */
-VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function() {
+VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function() 
+{
 	var vboByteColCacheKey = new VBOByteColorCacheKey();
 	this.vboByteColorsCacheKeysArray.push(vboByteColCacheKey);
 	return vboByteColCacheKey;

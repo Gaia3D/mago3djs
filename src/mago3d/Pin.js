@@ -5,8 +5,10 @@
  * @class Pin
  *
  */
-var Pin = function() {
-	if(!(this instanceof Pin)) {
+var Pin = function() 
+{
+	if (!(this instanceof Pin)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.texture; // default.***
@@ -23,12 +25,12 @@ Pin.prototype.createPin = function(gl)
 
 	// Put a unit quad in the buffer
 	var positionsPinQuad = [
-		0, 0,0,
-		1, 0,0,
-		0, 1,0,
-		0, 1,0,
-		1, 0,0,
-		1, 1,0
+		0, 0, 0,
+		1, 0, 0,
+		0, 1, 0,
+		0, 1, 0,
+		1, 0, 0,
+		1, 1, 0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionsPinQuad), gl.STATIC_DRAW);
 
@@ -53,12 +55,12 @@ Pin.prototype.createPinCenterBottom = function(gl)
 
 	// Put a unit quad in the buffer
 	var positionsPinQuad = [
-		-0.5, 0,0,
-		0.5, 0,0,
-		-0.5, 1,0,
-		-0.5, 1,0,
-		0.5, 0,0,
-		0.5, 1,0
+		-0.5, 0, 0,
+		0.5, 0, 0,
+		-0.5, 1, 0,
+		-0.5, 1, 0,
+		0.5, 0, 0,
+		0.5, 1, 0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionsPinQuad), gl.STATIC_DRAW);
 

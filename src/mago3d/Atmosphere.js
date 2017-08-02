@@ -5,8 +5,10 @@
  *
  * @class Atmosphere
  */
-var Atmosphere = function() {
-	if (!(this instanceof Atmosphere)) {
+var Atmosphere = function() 
+{
+	if (!(this instanceof Atmosphere)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -19,8 +21,10 @@ var Atmosphere = function() {
  *
  * @class ShadowBlendingCube
  */
-var ShadowBlendingCube = function() {
-	if (!(this instanceof ShadowBlendingCube)) {
+var ShadowBlendingCube = function() 
+{
+	if (!(this instanceof ShadowBlendingCube)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -39,7 +43,8 @@ var ShadowBlendingCube = function() {
  * @param vtxMat 변수
  * @param tTriMat 변수
  */
-ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
+ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) 
+{
 	// create a blending cube, with faces inverted.***
 	var cubeSideSemiLength = 150.5;
 
@@ -70,44 +75,44 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
 	vertexList = vtxMat.newVertexList();
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength,
-			-cubeSideSemiLength);
+		-cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(cubeSideSemiLength, -cubeSideSemiLength,
-			-cubeSideSemiLength);
+		-cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(cubeSideSemiLength, cubeSideSemiLength,
-			-cubeSideSemiLength);
+		-cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, cubeSideSemiLength,
-			-cubeSideSemiLength);
+		-cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	// Top of the cube.***
 	vertexList = vtxMat.newVertexList();
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength,
-			cubeSideSemiLength);
+		cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(cubeSideSemiLength, -cubeSideSemiLength,
-			cubeSideSemiLength);
+		cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(cubeSideSemiLength, cubeSideSemiLength,
-			cubeSideSemiLength);
+		cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, cubeSideSemiLength,
-			cubeSideSemiLength);
+		cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
 	// Center Top of the cube.***
@@ -138,9 +143,10 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) {
  *
  * @returns floatArray
  */
-ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
+ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() 
+{
 	var floatArray = this.vertexMatrix
-			.getVBOVertexColorRGBAFloatArray(floatArray);
+		.getVBOVertexColorRGBAFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -149,7 +155,8 @@ ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() {
  *
  * @returns shortArray
  */
-ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
+ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() 
+{
 	this.vertexMatrix.setVertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
 	this.indicesCount = shortArray.length;
@@ -162,8 +169,10 @@ ShadowBlendingCube.prototype.getVBOIndicesShortArray = function() {
  *
  * @class CloudsManager
  */
-var CloudsManager = function() {
-	if (!(this instanceof CloudsManager)) {
+var CloudsManager = function() 
+{
+	if (!(this instanceof CloudsManager)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.circularCloudsArray = [];
@@ -174,7 +183,8 @@ var CloudsManager = function() {
  *
  * @returns circularCloud
  */
-CloudsManager.prototype.newCircularCloud = function() {
+CloudsManager.prototype.newCircularCloud = function() 
+{
 	var circularCloud = new CircularCloud();
 	this.circularCloudsArray.push(circularCloud);
 	return circularCloud;
@@ -185,8 +195,10 @@ CloudsManager.prototype.newCircularCloud = function() {
  *
  * @class CircularCloud
  */
-var CircularCloud = function() {
-	if (!(this instanceof CircularCloud)) {
+var CircularCloud = function() 
+{
+	if (!(this instanceof CircularCloud)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -233,7 +245,8 @@ var CircularCloud = function() {
  *
  * @returns floatArray
  */
-CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
+CircularCloud.prototype.getVBOVertexColorFloatArray = function() 
+{
 	var floatArray = this.vertexMatrix.getVBOVertexColorFloatArray(floatArray);
 	return floatArray;
 };
@@ -243,7 +256,8 @@ CircularCloud.prototype.getVBOVertexColorFloatArray = function() {
  *
  * @returns floatArray
  */
-CircularCloud.prototype.getVBOIndicesShortArray = function() {
+CircularCloud.prototype.getVBOIndicesShortArray = function() 
+{
 	this.vertexMatrix.setVertexIdxInList();
 	var shortArray = this.tTrianglesMatrix.getVBOIndicesShortArray();
 	this.indicesCount = shortArray.length;
@@ -256,7 +270,8 @@ CircularCloud.prototype.getVBOIndicesShortArray = function() {
  *
  * @returns floatArray
  */
-CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
+CircularCloud.prototype.getVBOShadowVertexFloatArray = function() 
+{
 	var floatArray = this.shadowVertexMatrix.getVBOVertexFloatArray(floatArray);
 	return floatArray;
 };
@@ -266,7 +281,8 @@ CircularCloud.prototype.getVBOShadowVertexFloatArray = function() {
  *
  * @returns shortArray
  */
-CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
+CircularCloud.prototype.getVBOShadowIndicesShortArray = function() 
+{
 	this.shadowVertexMatrix.setVertexIdxInList();
 	var shortArray = this.shadowTTrianglesMatrix.getVBOIndicesShortArray();
 	this.indicesCount = shortArray.length;
@@ -280,7 +296,8 @@ CircularCloud.prototype.getVBOShadowIndicesShortArray = function() {
  * @param vtxMat
  *            변수
  */
-CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
+CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) 
+{
 	// we rotate the cloud mesh by longitude, latitude.***
 	var matrix = new Matrix4();
 
@@ -302,29 +319,30 @@ CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) {
 	// matrix.rotationAxisAngDeg(90.0-this.latitude, Math.cos(longitudeRad-90),
 	// -Math.sin(longitudeRad-90), 0.0);
 	matrix.rotationAxisAngDeg(90.0 - this.latitude, pitchAxis.x, pitchAxis.y,
-			0.0);
+		0.0);
 	vtxMat.transformPointsByMatrix4(matrix);
 };
 
 /**
  * 햇빛 방향으로 시작
  */
-CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
+CircularCloud.prototype.doShadowMeshWithSunDirection = function() 
+{
 	var distance = 3000.0;
 	var vertexList = this.shadowVertexMatrix.getVertexList(5); // Bottom radius
 	// zero ring.***
 	vertexList.translateVertices(this.sunLightDirection.x,
-			this.sunLightDirection.y, this.sunLightDirection.z, distance);
+		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 
 	vertexList = this.shadowVertexMatrix.getVertexList(4); // Bottom minor
 	// ring.***
 	vertexList.translateVertices(this.sunLightDirection.x,
-			this.sunLightDirection.y, this.sunLightDirection.z, distance);
+		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 
 	vertexList = this.shadowVertexMatrix.getVertexList(3); // Bottom major
 	// ring.***
 	vertexList.translateVertices(this.sunLightDirection.x,
-			this.sunLightDirection.y, this.sunLightDirection.z, distance);
+		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 };
 
 /**
@@ -342,7 +360,8 @@ CircularCloud.prototype.doShadowMeshWithSunDirection = function() {
  *            동그라미 하나당 점의 갯수
  */
 CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
-		radius, depth, numPointsForCircle) {
+	radius, depth, numPointsForCircle) 
+{
 	this.longitude = longitude;
 	this.latitude = latitude;
 	this.altitude = altitude;
@@ -351,7 +370,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 	this.numPointsForCicle = numPointsForCircle;
 
 	this.makeMesh(this.vertexMatrix, this.tTrianglesMatrix,
-			this.shadowVertexMatrix, this.shadowTTrianglesMatrix);
+		this.shadowVertexMatrix, this.shadowTTrianglesMatrix);
 	// this.makeMesh(this.shadowVertexMatrix, this.shadowTTrianglesMatrix,
 	// true);
 	// this.shadowTTrianglesMatrix.invertTrianglesSense();// TEST!!!!!!
@@ -361,7 +380,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 	this.rotateMeshByLocation(this.shadowVertexMatrix);
 
 	var position = Cesium.Cartesian3.fromDegrees(this.longitude, this.latitude,
-			this.altitude);
+		this.altitude);
 	this.position = position;
 
 	// var splitValue = Cesium.EncodedCartesian3.encode(position);
@@ -395,7 +414,8 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
  *            변수
  */
 CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
-		shadowTTriMat) {
+	shadowTTriMat) 
+{
 	// use vertex_matrix.***
 	// our cloud has 6 rings. Top ring and the bottom ring has radius zero.***
 	var numPointsForRing = 16;
@@ -413,7 +433,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	var vertexList = vtxMat.newVertexList();
 	var shadowVertexList = shadowVtxMat.newVertexList();
 	randomValue = 0.9 + 0.3 * Math.random();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for (var i = 0; i < numPointsForRing; i++) 
+	{
 		vertex = vertexList.newVertex();
 		vertex.setPosition(x, y, semiDepth);
 		shadowVertex = shadowVertexList.newVertex();
@@ -426,7 +447,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	var menorRingRadius = this.radius * 0.7;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for (var i = 0; i < numPointsForRing; i++) 
+	{
 		// Math.random(); // returns from 0.0 to 1.0.***
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
@@ -444,7 +466,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	angRad = 0.0;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for (var i = 0; i < numPointsForRing; i++) {
+	for (var i = 0; i < numPointsForRing; i++) 
+	{
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -462,7 +485,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	angRad = 0.0;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for ( var i = 0; i < numPointsForRing; i++ ) {
+	for ( var i = 0; i < numPointsForRing; i++ ) 
+	{
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -480,7 +504,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	menorRingRadius = this.radius * 0.7;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
-	for (var i = 0; i < numPointsForRing; i++ ) {
+	for (var i = 0; i < numPointsForRing; i++ ) 
+	{
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -499,7 +524,8 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
 	randomValue = 0.6 + 0.3 * Math.random();
-	for ( var i = 0; i < numPointsForRing; i++ ) {
+	for ( var i = 0; i < numPointsForRing; i++ ) 
+	{
 		// randomValue = (2+Math.random())/2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();

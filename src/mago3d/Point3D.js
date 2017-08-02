@@ -4,8 +4,10 @@
  * 3차원 정보
  * @class Point3D
  */
-var Point3D = function() {
-	if(!(this instanceof Point3D)) {
+var Point3D = function() 
+{
+	if (!(this instanceof Point3D)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -18,7 +20,8 @@ var Point3D = function() {
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
-Point3D.prototype.destroy = function() {
+Point3D.prototype.destroy = function() 
+{
 	this.x = null;
 	this.y = null;
 	this.z = null;
@@ -28,7 +31,8 @@ Point3D.prototype.destroy = function() {
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
-Point3D.prototype.copyFrom = function(point3d) {
+Point3D.prototype.copyFrom = function(point3d) 
+{
 	this.x = point3d.x;
 	this.y = point3d.y;
 	this.z = point3d.z;
@@ -38,7 +42,8 @@ Point3D.prototype.copyFrom = function(point3d) {
  * 어떤 일을 하고 있습니까?
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  */
-Point3D.prototype.getModul = function() {
+Point3D.prototype.getModul = function() 
+{
 	return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
 };
 
@@ -46,7 +51,8 @@ Point3D.prototype.getModul = function() {
  * 
  * 어떤 일을 하고 있습니까?
  */
-Point3D.prototype.unitary = function() {
+Point3D.prototype.unitary = function() 
+{
 	var modul = this.getModul();
 	this.x /= modul;
 	this.y /= modul;
@@ -59,8 +65,9 @@ Point3D.prototype.unitary = function() {
  * @param resultPoint 변수
  * @returns resultPoint
  */
-Point3D.prototype.crossProduct = function(point, resultPoint) {
-	if(resultPoint == undefined) resultPoint = new Point3D();
+Point3D.prototype.crossProduct = function(point, resultPoint) 
+{
+	if (resultPoint == undefined) { resultPoint = new Point3D(); }
 
 	resultPoint.x = this.y * point.z - point.y * this.z;
 	resultPoint.y = point.x * this.z - this.x * point.z;
@@ -76,7 +83,8 @@ Point3D.prototype.crossProduct = function(point, resultPoint) {
  * @param pz 변수
  * @returns dx*dx + dy*dy + dz*dz
  */
-Point3D.prototype.squareDistTo = function(x, y, z) {
+Point3D.prototype.squareDistTo = function(x, y, z) 
+{
 	var dx = this.x - x;
 	var dy = this.y - y;
 	var dz = this.z - z;
@@ -90,7 +98,8 @@ Point3D.prototype.squareDistTo = function(x, y, z) {
  * @param y 변수
  * @param z 변수
  */
-Point3D.prototype.set = function(x, y, z) {
+Point3D.prototype.set = function(x, y, z) 
+{
 	this.x = x; this.y = y; this.z = z;
 };
 
@@ -100,6 +109,7 @@ Point3D.prototype.set = function(x, y, z) {
  * @param y 변수
  * @param z 변수
  */
-Point3D.prototype.add = function(x, y, z) {
+Point3D.prototype.add = function(x, y, z) 
+{
 	this.x += x; this.y += y; this.z += z;
 };

@@ -6,8 +6,10 @@
  * @class UniformMatrix4fvDataPair
  * @param gl 변수
  */
-var UniformMatrix4fvDataPair = function(gl, uniformName) {
-	if(!(this instanceof UniformMatrix4fvDataPair)) {
+var UniformMatrix4fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformMatrix4fvDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -20,7 +22,8 @@ var UniformMatrix4fvDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-UniformMatrix4fvDataPair.prototype.bindUniform = function() {
+UniformMatrix4fvDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniformMatrix4fv(this.uniformLocation, false, this.matrix4fv);
 };
 
@@ -29,8 +32,10 @@ UniformMatrix4fvDataPair.prototype.bindUniform = function() {
  * @class UniformVec2fvDataPair
  * @param gl 변수
  */
-var UniformVec2fvDataPair = function(gl, uniformName) {
-	if(!(this instanceof UniformVec2fvDataPair)) {
+var UniformVec2fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec2fvDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -43,7 +48,8 @@ var UniformVec2fvDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-UniformVec2fvDataPair.prototype.bindUniform = function() {
+UniformVec2fvDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniform2fv(this.uniformLocation, false, this.vec2fv);
 };
 
@@ -52,8 +58,10 @@ UniformVec2fvDataPair.prototype.bindUniform = function() {
  * @class UniformVec3fvDataPair
  * @param gl 변수
  */
-var UniformVec3fvDataPair = function(gl, uniformName) {
-	if(!(this instanceof UniformVec3fvDataPair)) {
+var UniformVec3fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec3fvDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -66,7 +74,8 @@ var UniformVec3fvDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-UniformVec3fvDataPair.prototype.bindUniform = function() {
+UniformVec3fvDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniform3fv(this.uniformLocation, false, this.vec3fv);
 };
 
@@ -75,8 +84,10 @@ UniformVec3fvDataPair.prototype.bindUniform = function() {
  * @class UniformVec4fvDataPair
  * @param gl 변수
  */
-var UniformVec4fvDataPair = function(gl, uniformName) {
-	if(!(this instanceof UniformVec4fvDataPair)) {
+var UniformVec4fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec4fvDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -89,7 +100,8 @@ var UniformVec4fvDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-UniformVec4fvDataPair.prototype.bindUniform = function() {
+UniformVec4fvDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniform4fv(this.uniformLocation, false, this.vec4fv);
 };
 
@@ -98,8 +110,10 @@ UniformVec4fvDataPair.prototype.bindUniform = function() {
  * @class Uniform1fDataPair
  * @param gl 변수
  */
-var Uniform1fDataPair = function(gl, uniformName) {
-	if(!(this instanceof Uniform1fDataPair)) {
+var Uniform1fDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof Uniform1fDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -112,7 +126,8 @@ var Uniform1fDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Uniform1fDataPair.prototype.bindUniform = function() {
+Uniform1fDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniform1f(this.uniformLocation, false, this.floatValue);
 };
 
@@ -121,8 +136,10 @@ Uniform1fDataPair.prototype.bindUniform = function() {
  * @class Uniform1iDataPair
  * @param gl 변수
  */
-var Uniform1iDataPair = function(gl, uniformName) {
-	if(!(this instanceof Uniform1iDataPair)) {
+var Uniform1iDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof Uniform1iDataPair)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -135,7 +152,8 @@ var Uniform1iDataPair = function(gl, uniformName) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Uniform1iDataPair.prototype.bindUniform = function() {
+Uniform1iDataPair.prototype.bindUniform = function() 
+{
 	this.gl.uniform1i(this.uniformLocation, false, this.intValue);
 };
 
@@ -146,8 +164,10 @@ Uniform1iDataPair.prototype.bindUniform = function() {
  * @class PostFxShader
  * @param gl 변수
  */
-var PostFxShader = function(gl) {
-	if(!(this instanceof PostFxShader)) {
+var PostFxShader = function(gl) 
+{
+	if (!(this instanceof PostFxShader)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl = gl;
@@ -216,7 +236,7 @@ var PostFxShader = function(gl) {
 PostFxShader.prototype.bindUniforms = function()
 {
 	var uniformsDataPairsCount = this.uniformsArray.length;
-	for(var i=0; i<uniformsDataPairsCount; i++)
+	for (var i=0; i<uniformsDataPairsCount; i++)
 	{
 		this.uniformsArray[i].bindUniform();
 	}
@@ -230,37 +250,37 @@ PostFxShader.prototype.bindUniforms = function()
 PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
 {
 	var uniformDataPair;//
-	if(uniformType == "Matrix4fv")
+	if (uniformType == "Matrix4fv")
 	{
 		uniformDataPair = new UniformMatrix4fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if(uniformType == "Vec4fv")
+	else if (uniformType == "Vec4fv")
 	{
 		uniformDataPair = new UniformVec4fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if(uniformType == "Vec3fv")
+	else if (uniformType == "Vec3fv")
 	{
 		uniformDataPair = new UniformVec3fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if(uniformType == "Vec2fv")
+	else if (uniformType == "Vec2fv")
 	{
 		uniformDataPair = new UniformVec2fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if(uniformType == "1f")
+	else if (uniformType == "1f")
 	{
 		uniformDataPair = new Uniform1fDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if(uniformType == "1i")
+	else if (uniformType == "1i")
 	{
 		uniformDataPair = new Uniform1iDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
@@ -276,8 +296,10 @@ PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
  * 어떤 일을 하고 있습니까?
  * @class PostFxShadersManager
  */
-var PostFxShadersManager = function() {
-	if(!(this instanceof PostFxShadersManager)) {
+var PostFxShadersManager = function() 
+{
+	if (!(this instanceof PostFxShadersManager)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl;
@@ -306,12 +328,14 @@ PostFxShadersManager.prototype.newShader = function(shaderName)
  * @param typeString 변수
  * @returns shader
  */
-PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString) {
+PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString) 
+{
 	// Source from internet.***
 	var shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+	{
 		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
 		return false;
 	}
@@ -322,7 +346,8 @@ PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createDefaultShaders = function(gl) {
+PostFxShadersManager.prototype.createDefaultShaders = function(gl) 
+{
 	this.createRenderDepthShader(gl); // 0.***
 	this.createSsaoShader(gl); // 1.***
 	this.createBlurShader(gl); // 2.***
@@ -352,12 +377,13 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createBlurShader = function(gl) {
+PostFxShadersManager.prototype.createBlurShader = function(gl) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var blur_vs_source = ShaderSource['BlurVS'];
-	var blur_fs_source = ShaderSource['BlurFS'];
+	var blur_vs_source = ShaderSource.BlurVS;
+	var blur_fs_source = ShaderSource.BlurFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -372,8 +398,8 @@ PostFxShadersManager.prototype.createBlurShader = function(gl) {
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
 
 	shader.texelSize_loc = gl.getUniformLocation(shader.program, "texelSize");
 	shader.colorTex_loc = gl.getUniformLocation(shader.program, "colorTex");
@@ -383,12 +409,13 @@ PostFxShadersManager.prototype.createBlurShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSsaoShader = function(gl) {
+PostFxShadersManager.prototype.createSsaoShader = function(gl) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['SsaoVS'];
-	var ssao_fs_source = ShaderSource['SsaoFS'];
+	var ssao_vs_source = ShaderSource.SsaoVS;
+	var ssao_fs_source = ShaderSource.SsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -412,9 +439,9 @@ PostFxShadersManager.prototype.createSsaoShader = function(gl) {
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
 	// ssao uniforms.**********************************************************************
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
@@ -438,12 +465,13 @@ PostFxShadersManager.prototype.createSsaoShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShader = function(gl) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['ShowDepthVS'];
-	var showDepth_fs_source = ShaderSource['ShowDepthFS'];
+	var showDepth_vs_source = ShaderSource.ShowDepthVS;
+	var showDepth_fs_source = ShaderSource.ShowDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -463,8 +491,8 @@ PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");
@@ -477,12 +505,13 @@ PostFxShadersManager.prototype.createRenderDepthShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
+PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['ModelRefSsaoVS'];
-	var ssao_fs_source = ShaderSource['ModelRefSsaoFS'];
+	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
+	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -507,9 +536,9 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
 	//*********************************************************************************
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
@@ -543,12 +572,13 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sceneState) {
+PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sceneState) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['RenderShowDepthVS'];
-	var showDepth_fs_source = ShaderSource['RenderShowDepthFS'];
+	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
+	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -568,7 +598,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	//shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
 	//shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
 	//*********************************************************************************
@@ -591,12 +621,13 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) {
+PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) 
+{
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['ColorSelectionSsaoVS'];
-	var ssao_fs_source = ShaderSource['ColorSelectionSsaoFS'];
+	var ssao_vs_source = ShaderSource.ColorSelectionSsaoVS;
+	var ssao_fs_source = ShaderSource.ColorSelectionSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -615,7 +646,7 @@ PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl)
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
@@ -629,13 +660,14 @@ PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {
+PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) 
+{
 	// no used.!!!!!!!!!!!!!!!
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['SimpleDepthSsaoVS'];
-	var ssao_fs_source = ShaderSource['SimpleDepthSsaoFS'];
+	var ssao_vs_source = ShaderSource.SimpleDepthSsaoVS;
+	var ssao_fs_source = ShaderSource.SimpleDepthSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -655,7 +687,7 @@ PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {
 	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 
 	//shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");
@@ -668,13 +700,14 @@ PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
+PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) 
+{
 	// 8.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['LodBuildingSsaoVS'];
-	var ssao_fs_source = ShaderSource['LodBuildingSsaoFS'];
+	var ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
+	var ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -705,9 +738,9 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["color4"] = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
 
 	//*********************************************************************************
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -743,13 +776,14 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
+{
 	// 7.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['LodBuildingDepthVS'];
-	var showDepth_fs_source = ShaderSource['LodBuildingDepthFS'];
+	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
+	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -770,7 +804,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
@@ -784,13 +818,14 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) {
+PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) 
+{
 	// 10.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['LegoSsaoVS'];
-	var ssao_fs_source = ShaderSource['LegoSsaoFS'];
+	var ssao_vs_source = ShaderSource.LegoSsaoVS;
+	var ssao_fs_source = ShaderSource.LegoSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -817,9 +852,9 @@ PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) {
 	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["color4"] = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
 
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
@@ -854,13 +889,14 @@ PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) 
+{
 	// 9.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['LegoDepthVS'];
-	var showDepth_fs_source = ShaderSource['LegoDepthFS'];
+	var showDepth_vs_source = ShaderSource.LegoDepthVS;
+	var showDepth_fs_source = ShaderSource.LegoDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -881,7 +917,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) {
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
@@ -896,13 +932,14 @@ PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) {
+PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
+{
 	// 7.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['LodBuildingDepthVS'];
-	var showDepth_fs_source = ShaderSource['LodBuildingDepthFS'];
+	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
+	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -923,7 +960,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
@@ -937,13 +974,14 @@ PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createDepthShaderBox = function(gl) {
+PostFxShadersManager.prototype.createDepthShaderBox = function(gl) 
+{
 	// 7.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var showDepth_vs_source = ShaderSource['BoxDepthVS'];
-	var showDepth_fs_source = ShaderSource['BoxDepthFS'];
+	var showDepth_vs_source = ShaderSource.BoxDepthVS;
+	var showDepth_fs_source = ShaderSource.BoxDepthFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -964,7 +1002,7 @@ PostFxShadersManager.prototype.createDepthShaderBox = function(gl) {
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
@@ -978,13 +1016,14 @@ PostFxShadersManager.prototype.createDepthShaderBox = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) {
+PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) 
+{
 	// 8.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['BoxSsaoVS'];
-	var ssao_fs_source = ShaderSource['BoxSsaoFS'];
+	var ssao_vs_source = ShaderSource.BoxSsaoVS;
+	var ssao_fs_source = ShaderSource.BoxSsaoFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -1016,9 +1055,9 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) {
 	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj["color4"] = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
 
 	//*********************************************************************************
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
@@ -1057,13 +1096,14 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createPngImageShader = function(gl) {
+PostFxShadersManager.prototype.createPngImageShader = function(gl) 
+{
 	// 13.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['PngImageVS'];
-	var ssao_fs_source = ShaderSource['PngImageFS'];
+	var ssao_vs_source = ShaderSource.PngImageVS;
+	var ssao_fs_source = ShaderSource.PngImageFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -1095,13 +1135,14 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) {
+PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) 
+{
 	// 14.***
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
-	var ssao_vs_source = ShaderSource['SilhouetteVS'];
-	var ssao_fs_source = ShaderSource['SilhouetteFS'];
+	var ssao_vs_source = ShaderSource.SilhouetteVS;
+	var ssao_fs_source = ShaderSource.SilhouetteFS;
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -1120,7 +1161,7 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) {
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj["position"] = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 

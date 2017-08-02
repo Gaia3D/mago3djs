@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class NeoReference
  */
-var NeoReference = function() {
-	if(!(this instanceof NeoReference)) {
+var NeoReference = function() 
+{
+	if (!(this instanceof NeoReference)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -51,17 +53,19 @@ var NeoReference = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.multiplyTransformMatrix = function(matrix) {
+NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
+{
 	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
+NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
+{
 	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
-	if(this.tMatrixAuxArray == undefined)
-		this.tMatrixAuxArray = [];
+	if (this.tMatrixAuxArray == undefined)
+	{ this.tMatrixAuxArray = []; }
 
 	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
 };
@@ -69,20 +73,22 @@ NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.hasKeyMatrix = function(idxKey) {
-	if(this.tMatrixAuxArray == undefined)
-		return false;
+NeoReference.prototype.hasKeyMatrix = function(idxKey) 
+{
+	if (this.tMatrixAuxArray == undefined)
+	{ return false; }
 
-	if(this.tMatrixAuxArray[idxKey] == undefined)
-		return false;
+	if (this.tMatrixAuxArray[idxKey] == undefined)
+	{ return false; }
 	else
-		return true;
+	{ return true; }
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.deleteGlObjects = function(gl) {
+NeoReference.prototype.deleteGlObjects = function(gl) 
+{
 	// 1) Object ID.***
 	this._id = undefined;
 
@@ -96,7 +102,8 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
 	this._originalMatrix4 = undefined; //
 	
 	// 4) Tex coords cache_key.*** // old.***
-	if(this.MESH_TEXCOORD_cacheKey) { // old.***
+	if (this.MESH_TEXCOORD_cacheKey) 
+	{ // old.***
 		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey); // old.***
 		this.MESH_TEXCOORD_cacheKey = undefined; // old.***
 	} // old.***
@@ -126,8 +133,10 @@ NeoReference.prototype.deleteGlObjects = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesMotherAndIndices
  */
-var NeoReferencesMotherAndIndices = function() {
-	if(!(this instanceof NeoReferencesMotherAndIndices)) {
+var NeoReferencesMotherAndIndices = function() 
+{
+	if (!(this instanceof NeoReferencesMotherAndIndices)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***
@@ -148,39 +157,44 @@ var NeoReferencesMotherAndIndices = function() {
  * 어떤 일을 하고 있습니까?
  * @param matrix 변수
  */
-NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) {
+NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
+{
 	var refIndicesCount = this.neoRefsIndices.length;
-	for(var i=0; i<refIndicesCount; i++)
+	for (var i=0; i<refIndicesCount; i++)
 	{
 		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
 	}
 };
 
-NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z) {
-	if(isExterior)
+NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z) 
+{
+	if (isExterior)
 	{
-		if(this.exterior_ocCullOctree != undefined)
+		if (this.exterior_ocCullOctree != undefined)
 		{
-			if(this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
+			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
 			{
 				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
 				
 			}
-			else{
+			else
+			{
 				this.currentVisibleIndices = this.neoRefsIndices;
 			}
 			
 		}
 	}
-	else{
-		if(this.interior_ocCullOctree != undefined)
+	else 
+	{
+		if (this.interior_ocCullOctree != undefined)
 		{
-			if(this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
+			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
 			{
 				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
 				
 			}
-			else{
+			else 
+			{
 				this.currentVisibleIndices = this.neoRefsIndices;
 			}
 		}
@@ -191,7 +205,8 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
  * Returns the neoReference
  * @param matrix 변수
  */
-NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) {
+NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) 
+{
 	return this.motherNeoRefsList[this.neoRefsIndices[idx]];
 };
 
@@ -199,11 +214,12 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) {
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) {
+NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) 
+{
 
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
-	if(this.blocksList)
-		this.blocksList.deleteGlObjects(gl);
+	if (this.blocksList)
+	{ this.blocksList.deleteGlObjects(gl); }
 
 	this.blocksList = undefined;
 	this.neoRefsIndices = undefined;
@@ -219,10 +235,11 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) {
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() {
+NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() 
+{
 
 	var refIndicesCount = this.neoRefsIndices.length;
-	for(var i=0; i<refIndicesCount; i++)
+	for (var i=0; i<refIndicesCount; i++)
 	{
 		this.motherNeoRefsList[this.neoRefsIndices[i]].bRendered = false;
 	}
@@ -235,7 +252,8 @@ NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = functi
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4) {
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4) 
+{
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
 	var startBuff;
@@ -244,7 +262,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	var testIdentityMatsCount = 0;
 
-	for(var i = 0; i < neoRefsCount; i++) {
+	for (var i = 0; i < neoRefsCount; i++) 
+	{
 		var neoRef = new NeoReference();
 
 		// 1) Id.***
@@ -252,7 +271,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		neoRef._id = ref_ID;
 
 		this.motherNeoRefsList = motherNeoReferencesArray;
-		if(motherNeoReferencesArray[neoRef._id] != undefined)
+		if (motherNeoReferencesArray[neoRef._id] != undefined)
 		{
 			// pass this neoReference because exist in the motherNeoReferencesArray.***
 			neoRef = motherNeoReferencesArray[neoRef._id];
@@ -291,21 +310,23 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Float mode.**************************************************************
 			// New modifications for xxxx 20161013.*****************************
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if(has_1_color) {
+			if (has_1_color) 
+			{
 				// "type" : one of following
 				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
 				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 				var daya_bytes;
-				if(data_type == 5121) daya_bytes = 1;
+				if (data_type == 5121) { daya_bytes = 1; }
 
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var alfa = 255;
 
-				if(dim == 4) {
+				if (dim == 4) 
+				{
 					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
 			}
@@ -313,21 +334,21 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			
-			if(has_colors || has_texCoords)
+			if (has_colors || has_texCoords)
 			{
 				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				
-				for(var j=0; j<vboDatasCount; j++)
+				for (var j=0; j<vboDatasCount; j++)
 				{
-					if(has_colors)
+					if (has_colors)
 					{
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
-						else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
-						else if(data_type == 5126) daya_bytes = 4;
+						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
+						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
+						else if (data_type == 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
@@ -336,14 +357,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
 					}
 					
-					if(has_texCoords)
+					if (has_texCoords)
 					{
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
-						else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
-						else if(data_type == 5126) daya_bytes = 4;
+						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
+						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
+						else if (data_type == 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
@@ -356,16 +377,19 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			
 			// 4) short texcoords. OLD. Change this for Materials.***
 			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
-			if(textures_count > 0) {
+			if (textures_count > 0) 
+			{
 
 				// Now, read the texture_type and texture_file_name.***
 				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<texture_type_nameLegth; j++) {
+				for (var j=0; j<texture_type_nameLegth; j++) 
+				{
 					bytes_readed += 1; // for example "diffuse".***
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<texture_fileName_Legth; j++) {
+				for (var j=0; j<texture_fileName_Legth; j++) 
+				{
 					bytes_readed += 1;
 				}
 			} 
@@ -418,21 +442,23 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Float mode.**************************************************************
 			// New modifications for xxxx 20161013.*****************************
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if(has_1_color) {
+			if (has_1_color) 
+			{
 				// "type" : one of following
 				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
 				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 				var daya_bytes;
-				if(data_type == 5121) daya_bytes = 1;
+				if (data_type == 5121) { daya_bytes = 1; }
 
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var alfa = 255;
 
-				if(dim == 4) {
+				if (dim == 4) 
+				{
 					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
 
@@ -443,29 +469,29 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			
-			if(has_colors || has_texCoords)
+			if (has_colors || has_texCoords)
 			{
 				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				
-				if(vboDatasCount > 0)
+				if (vboDatasCount > 0)
 				{
-					if(neoRef.vBOVertexIdxCacheKeysContainer == undefined)
-						neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
+					if (neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 				}
 				
-				for(var j=0; j<vboDatasCount; j++)
+				for (var j=0; j<vboDatasCount; j++)
 				{
 					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 					
-					if(has_colors)
+					if (has_colors)
 					{
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
-						else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
-						else if(data_type == 5126) daya_bytes = 4;
+						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
+						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
+						else if (data_type == 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
@@ -477,14 +503,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
 					}
 					
-					if(has_texCoords)
+					if (has_texCoords)
 					{
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if(data_type == 5120 || data_type == 5121) daya_bytes = 1;
-						else if(data_type == 5122 || data_type == 5123) daya_bytes = 2;
-						else if(data_type == 5126) daya_bytes = 4;
+						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
+						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
+						else if (data_type == 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
@@ -500,19 +526,22 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			
 			// 4) short texcoords. OLD. Change this for Materials.***
 			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
-			if(textures_count > 0) {
+			if (textures_count > 0) 
+			{
 
 				neoRef.texture = new Texture();
 				neoRef.hasTexture = true;
 
 				// Now, read the texture_type and texture_file_name.***
 				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<texture_type_nameLegth; j++) {
+				for (var j=0; j<texture_type_nameLegth; j++) 
+				{
 					neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for(var j=0; j<texture_fileName_Legth; j++) {
+				for (var j=0; j<texture_fileName_Legth; j++) 
+				{
 					neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 				}
 
@@ -524,11 +553,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
 				gl.bindTexture(gl.TEXTURE_2D, null);
 				*/
-			} else {
+			}
+			else 
+			{
 				neoRef.hasTexture = false;
 			}
 
-			if(tMatrix4)
+			if (tMatrix4)
 			{
 				neoRef.multiplyTransformMatrix(tMatrix4);
 			}
@@ -539,8 +570,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	// Now occlusion cullings.***
 
 	// Occlusion culling octree data.*****
-	if(this.exterior_ocCullOctree == undefined)
-		this.exterior_ocCullOctree = new OcclusionCullingOctreeCell();
+	if (this.exterior_ocCullOctree == undefined)
+	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
@@ -548,8 +579,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
 
-	if(this.interior_ocCullOctree == undefined)
-		this.interior_ocCullOctree = new OcclusionCullingOctreeCell();
+	if (this.interior_ocCullOctree == undefined)
+	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var ocCullBox = this.interior_ocCullOctree;
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***

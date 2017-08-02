@@ -5,8 +5,10 @@
  * @class ObjectMarker
  *
  */
-var ObjectMarker = function() {
-	if(!(this instanceof ObjectMarker)) {
+var ObjectMarker = function() 
+{
+	if (!(this instanceof ObjectMarker)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.geoLocationData = new GeoLocationData();
@@ -17,10 +19,12 @@ var ObjectMarker = function() {
 	//this.height = 0;
 };
 
-ObjectMarker.prototype.copyFrom = function(objMarker) {
-	if(objMarker == undefined) return;
+ObjectMarker.prototype.copyFrom = function(objMarker) 
+{
+	if (objMarker == undefined) { return; }
 		
-	if(objMarker.geoLocationData) {
+	if (objMarker.geoLocationData) 
+	{
 		this.geoLocationData.copyFrom(objMarker.geoLocationData);
 	}
 	
@@ -33,8 +37,10 @@ ObjectMarker.prototype.copyFrom = function(objMarker) {
  * @class ObjectMarkerManager
  *
  */
-var ObjectMarkerManager = function() {
-	if(!(this instanceof ObjectMarkerManager)) {
+var ObjectMarkerManager = function() 
+{
+	if (!(this instanceof ObjectMarkerManager)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.objectMarkerArray = [];
@@ -51,4 +57,4 @@ ObjectMarkerManager.prototype.newObjectMarker = function()
 	var objMarker = new ObjectMarker();
 	this.objectMarkerArray.push(objMarker);
 	return objMarker;
-}
+};

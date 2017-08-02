@@ -22,7 +22,8 @@ var compRefList_array_background;
 var geoModifier = new GeometryModifier();
 // End test son.-------------------------------------------------
 
-onmessage = function(e) {
+onmessage = function(e) 
+{
 	console.log('Message received from main script');
 	var workerResult = 'Result: sonete';
 
@@ -36,7 +37,8 @@ onmessage = function(e) {
  * 어떤 일을 하고 있습니까?
  * @param value 변수
  */
-function setTest(value) {
+function setTest(value) 
+{
 	squareDistUmbral = value;
 }
 
@@ -103,7 +105,8 @@ function getFrustumIntersectedProjectBuildings(projectsList, cullingVolume)
  * 어떤 일을 하고 있습니까?
  * @param e 변수
  */
-function possibleCameraPositionChanged(e) {
+function possibleCameraPositionChanged(e) 
+{
 	var compRefList_Container = e.data[0];
 	var interiorCompRefList_Container = e.data[1];
 	var camPos = e.data[2];

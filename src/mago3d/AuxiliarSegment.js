@@ -4,8 +4,10 @@
  * 영역 박스
  * @class AuxiliarSegment
  */
-var AuxiliarSegment = function() {
-	if(!(this instanceof AuxiliarSegment)) {
+var AuxiliarSegment = function() 
+{
+	if (!(this instanceof AuxiliarSegment)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.point1; //auxSegment.point1 = new WorldWind.Vec3();

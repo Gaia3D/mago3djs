@@ -6,8 +6,10 @@
  * 오브제의 표면의 기본 색상 (알베도) 외에도 텍스쳐는 반사율이나 거칠기와 같은 재질 표면의 많은 다른면을 나타낼 수 있습니다.
  * @class Texture
  */
-var Texture = function() {
-	if(!(this instanceof Texture)) {
+var Texture = function() 
+{
+	if (!(this instanceof Texture)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 

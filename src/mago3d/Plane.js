@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Plane
  */
-var Plane = function() {
-	if(!(this instanceof Plane)) {
+var Plane = function() 
+{
+	if (!(this instanceof Plane)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -25,7 +27,8 @@ var Plane = function() {
  * @param ny 변수
  * @param nz 변수p
  */
-Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
+Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) 
+{
 	this.a = nx;
 	this.b = ny;
 	this.c = nz;
@@ -39,7 +42,8 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) {
  * @param ny 변수
  * @param nz 변수p
  */
-Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) {
+Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) 
+{
 	this.a = nx;
 	this.b = ny;
 	this.c = nz;
@@ -51,7 +55,8 @@ Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) {
  * @param line 변수
  * @param intersectionPoint 변수
  */
-Plane.prototype.intersectionLine = function(line, intersectionPoint) {
+Plane.prototype.intersectionLine = function(line, intersectionPoint) 
+{
 	
 	var r = line.point.x;
 	var s = line.point.y;
@@ -63,14 +68,16 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint) {
 	
 	var den = this.a*u + this.b*v + this.c*w;
 	
-	if(Math.abs(den) > 10E-8) {
+	if (Math.abs(den) > 10E-8) 
+	{
 		var alfa = -((this.a*r + this.b*s + this.c*t + this.d)/(den));
 		
-		if(intersectionPoint == undefined) intersectionPoint = new Point3D();
+		if (intersectionPoint == undefined) { intersectionPoint = new Point3D(); }
 		
 		intersectionPoint.set(r+alfa*u, s+alfa*v, t+alfa*w);
 		return intersectionPoint;
-	} else return undefined;
+	}
+	else { return undefined; }
 };
 
 /**
@@ -78,17 +85,18 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint) {
  * @param line 변수
  * @param intersectionPoint 변수
  */
-Plane.prototype.intersectionSphere = function(sphere) {
+Plane.prototype.intersectionSphere = function(sphere) 
+{
 	var sphereCenter = sphere.centerPoint;
 	
 	// calculate the distance by dotProduct.***
 	var distance = sphereCenter.x * this.a + sphereCenter.y * this.b + sphereCenter.z * this.c + this.d;
 
-	if(distance < -sphere.r)
+	if (distance < -sphere.r)
 	{
 		return Constant.INTERSECTION_OUTSIDE;
 	}
-	else if(distance < sphere.r)
+	else if (distance < sphere.r)
 	{
 		return Constant.INTERSECTION_INTERSECT;
 	}

@@ -7,8 +7,10 @@
  * @param width 변수
  * @param height 변수
  */
-var FBO = function(gl, width, height) {
-	if(!(this instanceof FBO)) {
+var FBO = function(gl, width, height) 
+{
+	if (!(this instanceof FBO)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -34,7 +36,8 @@ var FBO = function(gl, width, height) {
 	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorBuffer, 0);
-	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
+	{
 		throw "Incomplete frame buffer object.";
 	}
 
@@ -44,14 +47,16 @@ var FBO = function(gl, width, height) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-FBO.prototype.bind = function() {
+FBO.prototype.bind = function() 
+{
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-FBO.prototype.unbind = function() {
+FBO.prototype.unbind = function() 
+{
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 };
 
@@ -275,7 +280,7 @@ SimpleMesh.buildSphere = function(gl, r, nsides, nsegments) {
 			mesh.indices.push((segment  )*(nsides+1) + side + 1);
 			*/
 			
-			/*
+/*
 		}
 	}
 	

@@ -4,8 +4,10 @@
  * 영역 박스
  * @class Box
  */
-var Box = function() {
-	if(!(this instanceof Box)) {
+var Box = function() 
+{
+	if (!(this instanceof Box)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	

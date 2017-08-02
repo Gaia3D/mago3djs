@@ -15,9 +15,11 @@
  * 
  * @copyright https://github.com/AnalyticalGraphicsInc/cesium
  */
-function defaultValue(a, b) {
-    if (a !== undefined) {
-        return a;
-    }
-    return b;
+function defaultValue(a, b) 
+{
+	if (a !== undefined) 
+	{
+		return a;
+	}
+	return b;
 }

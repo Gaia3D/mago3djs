@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Lego
  */
-var Lego = function() {
-	if(!(this instanceof Lego)) {
+var Lego = function() 
+{
+	if (!(this instanceof Lego)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -16,8 +18,10 @@ var Lego = function() {
 	this.selColor4;
 };
 
-Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, bytesReaded) {
-	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) {
+Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, bytesReaded) 
+{
+	if (this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) 
+	{
 		// file loaded.***
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
@@ -45,7 +49,8 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasNormals) {
+		if (hasNormals) 
+		{
 			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var normalsByteValuesCount = vertexCount * 3;
 			startBuff = bytesReaded;
@@ -56,7 +61,8 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasColors) {
+		if (hasColors) 
+		{
 			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
@@ -67,7 +73,7 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
 
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoords = readWriter.readUInt8(dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasTexCoords)
+		if (hasTexCoords)
 		{
 			var dataType = readWriter.readUInt16(dataArraybuffer, bytesReaded, bytesReaded+2); bytesReaded += 2;
 			vertexCount = readWriter.readUInt32(dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;

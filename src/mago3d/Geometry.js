@@ -7,8 +7,10 @@
  * 어떤 일을 하고 있습니까?
  * @class NeoSimpleBuilding
  */
-var NeoSimpleBuilding = function() {
-	if(!(this instanceof NeoSimpleBuilding)) {
+var NeoSimpleBuilding = function() 
+{
+	if (!(this instanceof NeoSimpleBuilding)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -21,7 +23,8 @@ var NeoSimpleBuilding = function() {
  * 어떤 일을 하고 있습니까?
  * @returns accesor
  */
-NeoSimpleBuilding.prototype.newAccesor = function() {
+NeoSimpleBuilding.prototype.newAccesor = function() 
+{
 	var accesor = new Accessor();
 	this.accesorsArray.push(accesor);
 	return accesor;
@@ -31,7 +34,8 @@ NeoSimpleBuilding.prototype.newAccesor = function() {
  * 어떤 일을 하고 있습니까?
  * @returns texture
  */
-NeoSimpleBuilding.prototype.newTexture = function() {
+NeoSimpleBuilding.prototype.newTexture = function() 
+{
 	var texture = new NeoTexture();
 	this.texturesArray.push(texture);
 	return texture;
@@ -41,8 +45,10 @@ NeoSimpleBuilding.prototype.newTexture = function() {
  * 어떤 일을 하고 있습니까?
  * @class LodBuilding
  */
-var LodBuilding = function() {
-	if(!(this instanceof LodBuilding)) {
+var LodBuilding = function() 
+{
+	if (!(this instanceof LodBuilding)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// this class is for use for LOD2 and LOD3 buildings.***
@@ -52,8 +58,9 @@ var LodBuilding = function() {
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
-LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
-	if(this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
+LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) 
+{
+	if (this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
 	{
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 		var bytesReaded = 0;
@@ -82,7 +89,8 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 
 		// 2) Normals.*****************************************************************************************************
 		var hasNormals = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded + 1); bytesReaded += 1;
-		if(hasNormals) {
+		if (hasNormals) 
+		{
 			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 			var normalsByteValuesCount = vertexCount * 3;
 			var startBuff = bytesReaded;
@@ -93,7 +101,8 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 
 		// 3) Colors.*******************************************************************************************************
 		var hasColors = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if(hasColors) {
+		if (hasColors) 
+		{
 			vertexCount = readWriter.readUInt32(this.dataArraybuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 			var colorsByteValuesCount = vertexCount * 4;
 			var startBuff = bytesReaded;
@@ -104,9 +113,9 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
 
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoord = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-//		if(hasTexCoord) {
-//			// TODO:
-//		}
+		//		if(hasTexCoord) {
+		//			// TODO:
+		//		}
 
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}	
@@ -116,8 +125,10 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) {
  * 어떤 일을 하고 있습니까?
  * @class NeoBuilding
  */
-var NeoBuilding = function() {
-	if(!(this instanceof NeoBuilding)) {
+var NeoBuilding = function() 
+{
+	if (!(this instanceof NeoBuilding)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -181,13 +192,16 @@ var NeoBuilding = function() {
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.getTextureId = function(texture) {
+NeoBuilding.prototype.getTextureId = function(texture) 
+{
 	var texId;
 	var texturesLoadedCount = this.texturesLoaded.length;
 	var find = false;
 	var i=0;
-	while(!find && i < texturesLoadedCount ) {
-		if(this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) {
+	while (!find && i < texturesLoadedCount ) 
+	{
+		if (this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) 
+		{
 			find = true;
 			texId = this.texturesLoaded[i].texId;
 		}
@@ -202,13 +216,16 @@ NeoBuilding.prototype.getTextureId = function(texture) {
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.getSameTexture = function(texture) {
+NeoBuilding.prototype.getSameTexture = function(texture) 
+{
 	var sameTexture;
 	var texturesLoadedCount = this.texturesLoaded.length;
 	var find = false;
 	var i=0;
-	while(!find && i < texturesLoadedCount ) {
-		if(this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) {
+	while (!find && i < texturesLoadedCount ) 
+	{
+		if (this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) 
+		{
 			find = true;
 			sameTexture = this.texturesLoaded[i];
 		}
@@ -224,14 +241,16 @@ NeoBuilding.prototype.getSameTexture = function(texture) {
  * @param eyeY 변수
  * @param eyeZ 변수
  */
-NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eyeX, eyeY, eyeZ) {
+NeoBuilding.prototype.updateCurrentVisibleIndicesExterior = function(eyeX, eyeY, eyeZ) 
+{
 	this._neoRefLists_Container.updateCurrentVisibleIndicesOfLists(eyeX, eyeY, eyeZ);
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
+NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() 
+{
 	this._neoRefLists_Container.updateCurrentAllIndicesOfLists();
 };
 
@@ -239,7 +258,8 @@ NeoBuilding.prototype.updateCurrentAllIndicesExterior = function() {
  * 어떤 일을 하고 있습니까?
  * @returns metaData.bbox.isPoint3dInside(eyeX, eyeY, eyeZ);
  */
-NeoBuilding.prototype.isCameraInsideOfBuilding = function(eyeX, eyeY, eyeZ) {
+NeoBuilding.prototype.isCameraInsideOfBuilding = function(eyeX, eyeY, eyeZ) 
+{
 	return this.metaData.bbox.isPoint3dInside(eyeX, eyeY, eyeZ);
 };
 
@@ -250,14 +270,16 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eyeX, eyeY, eyeZ) {
  * @param absoluteEyeZ 변수
  * @returns point3dScrath2
  */
-NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absoluteEyeX, absoluteEyeY, absoluteEyeZ) {
+NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absoluteEyeX, absoluteEyeY, absoluteEyeZ) 
+{
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
 	var relativeEyePosX = absoluteEyeX - buildingPosition.x;
 	var relativeEyePosY = absoluteEyeY - buildingPosition.y;
 	var relativeEyePosZ = absoluteEyeZ - buildingPosition.z;
 
-	if(this.buildingPosMatInv == undefined) {
+	if (this.buildingPosMatInv == undefined) 
+	{
 		this.buildingPosMatInv = new Matrix4();
 		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
 	}
@@ -272,17 +294,19 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
-NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) {
+NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
+{
 	//neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED
-	if(neoReference.texture.texId == undefined) {
+	if (neoReference.texture.texId == undefined) 
+	{
 		// 1rst, check if the texture is loaded.
 		var sameTexture = this.getSameTexture(neoReference.texture);
-		if(sameTexture == undefined)
+		if (sameTexture == undefined)
 		{
-			if(magoManager.backGround_fileReadings_count > 10) 
-				return;
+			if (magoManager.backGround_fileReadings_count > 10) 
+			{ return; }
 		
-			if(neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
+			if (neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
 			{
 				var gl = magoManager.sceneState.gl;
 				neoReference.texture.texId = gl.createTexture();
@@ -294,8 +318,10 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 				magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
 				magoManager.backGround_fileReadings_count ++;
 			}
-		} else {
-			if(sameTexture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+		}
+		else 
+		{
+			if (sameTexture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
 			{
 				neoReference.texture = sameTexture;
 			}
@@ -309,8 +335,10 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
  * 어떤 일을 하고 있습니까?
  * @class NeoBuildingsList
  */
-var NeoBuildingsList = function() {
-	if(!(this instanceof NeoBuildingsList)) {
+var NeoBuildingsList = function() 
+{
+	if (!(this instanceof NeoBuildingsList)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -321,7 +349,8 @@ var NeoBuildingsList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoBuilding
  */
-NeoBuildingsList.prototype.newNeoBuilding = function() {
+NeoBuildingsList.prototype.newNeoBuilding = function() 
+{
 	var neoBuilding = new NeoBuilding();
 	this.neoBuildingsArray.push(neoBuilding);
 	return neoBuilding;
@@ -331,14 +360,15 @@ NeoBuildingsList.prototype.newNeoBuilding = function() {
  * 어떤 일을 하고 있습니까?
  * @returns neoBuilding
  */
-NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId) {
+NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId) 
+{
 	var resultBuilding;
 	var buildingsCount = this.neoBuildingsArray.length;
 	var found = false;
 	var i=0;
-	while(!found && i < buildingsCount)
+	while (!found && i < buildingsCount)
 	{
-		if(this.neoBuildingsArray[i].buildingType == buildingType && this.neoBuildingsArray[i].buildingId == buildingId)
+		if (this.neoBuildingsArray[i].buildingType == buildingType && this.neoBuildingsArray[i].buildingId == buildingId)
 		{
 			found = true;
 			resultBuilding = this.neoBuildingsArray[i];
@@ -353,10 +383,11 @@ NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, build
  * 어떤 일을 하고 있습니까?
  * @returns neoBuilding
  */
-NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulled) {
+NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulled) 
+{
 	var buildingsCount = this.neoBuildingsArray.length;
 
-	for(var i = 0; i < buildingsCount; i++)
+	for (var i = 0; i < buildingsCount; i++)
 	{
 		this.neoBuildingsArray[i].frustumCulled = bFrustumCulled;
 	}

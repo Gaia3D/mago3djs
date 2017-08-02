@@ -24,7 +24,7 @@
 // End example.-----------------------------------------------------------------
 
 // http://learningwebgl.com/blog/?p=507
-		/*
+/*
 		http://blogs.agi.com/insight3d/index.php/2008/09/03/precisions-precisions/ // GPU RTE HighValue-LowValue
 		uniform vec3 uViewerHigh;
 		uniform vec3 uViewerLow;
@@ -55,7 +55,7 @@
 		}
 		//-----------------------------------------------
 		*/
-		/*
+/*
 		vec4 czm_translateRelativeToEye(vec3 high, vec3 low)\n\
 		{\n\
 			vec3 highDifference = high - czm_encodedCameraPositionMCHigh;\n\
@@ -69,8 +69,10 @@
  * 조명 입력 및 재질 구성을 기반으로 렌더링 된 각 픽셀의 색상을 계산하기위한 수학적 계산 및 알고리즘을 포함하는 작은 스크립트
  * @class Shader
  */
-var Shader = function() {
-	if(!(this instanceof Shader)) {
+var Shader = function() 
+{
+	if (!(this instanceof Shader)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -105,8 +107,10 @@ var Shader = function() {
  * 어떤 일을 하고 있습니까?
  * @class ShadersManager
  */
-var ShadersManager = function() {
-	if(!(this instanceof ShadersManager)) {
+var ShadersManager = function() 
+{
+	if (!(this instanceof ShadersManager)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -121,10 +125,12 @@ var ShadersManager = function() {
  * @param idx = 변수
  * returns shader
  */
-ShadersManager.prototype.getMagoShader = function(idx) {
+ShadersManager.prototype.getMagoShader = function(idx) 
+{
 	var shader;
 
-	if(idx >= 0 && idx < this.shaders_array.length) {
+	if (idx >= 0 && idx < this.shaders_array.length) 
+	{
 		shader = this.shaders_array[idx];
 	}
 
@@ -134,12 +140,14 @@ ShadersManager.prototype.getMagoShader = function(idx) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.getShader = function(gl, source, type, typeString) {
+ShadersManager.prototype.getShader = function(gl, source, type, typeString) 
+{
 	// Source from internet.***
 	var shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+	{
 		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
 		return false;
 	}
@@ -149,7 +157,8 @@ ShadersManager.prototype.getShader = function(gl, source, type, typeString) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createDefaultShader = function(gl) {
+ShadersManager.prototype.createDefaultShader = function(gl) 
+{
 	this.createStandardShader(gl);                // 0.***
 	this.createTextureSimpleObjectShader(gl);     // 1.***
 	this.createColorSelectionShader(gl);          // 2.***
@@ -163,14 +172,15 @@ ShadersManager.prototype.createDefaultShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createColorSelectionShader = function(gl) {
+ShadersManager.prototype.createColorSelectionShader = function(gl) 
+{
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 
-	shader.shader_vertex_source = ShaderSource['ColorVS'];
+	shader.shader_vertex_source = ShaderSource.ColorVS;
 	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
 
-	shader.shader_fragment_source = ShaderSource['ColorFS'];
+	shader.shader_fragment_source = ShaderSource.ColorFS;
 
 	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
 	shader.SHADER_PROGRAM = gl.createProgram();
@@ -193,12 +203,13 @@ ShadersManager.prototype.createColorSelectionShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) {
+ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) 
+{
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 
-	shader.shader_vertex_source = ShaderSource['TextureVS'];
-	shader.shader_fragment_source = ShaderSource['TextureFS'];
+	shader.shader_vertex_source = ShaderSource.TextureVS;
+	shader.shader_fragment_source = ShaderSource.TextureFS;
 
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
@@ -224,12 +235,13 @@ ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) {
+ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) 
+{
 	var shader = new Shader();
 	this.shaders_array.push(shader);
 
-	shader.shader_vertex_source = ShaderSource['TextureA1VS'];
-	shader.shader_fragment_source = ShaderSource['TextureA1FS'];
+	shader.shader_vertex_source = ShaderSource.TextureA1VS;
+	shader.shader_fragment_source = ShaderSource.TextureA1FS;
 
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979
@@ -254,13 +266,14 @@ ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createStandardShader = function(gl) {
+ShadersManager.prototype.createStandardShader = function(gl) 
+{
 	// This shader renders the normal f4d geometry.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-	standard_shader.shader_vertex_source = ShaderSource['StandardVS'];
-	standard_shader.shader_fragment_source = ShaderSource['StandardFS'];
+	standard_shader.shader_vertex_source = ShaderSource.StandardVS;
+	standard_shader.shader_fragment_source = ShaderSource.StandardFS;
 
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
@@ -285,13 +298,14 @@ ShadersManager.prototype.createStandardShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createCloudShader = function(gl) {
+ShadersManager.prototype.createCloudShader = function(gl) 
+{
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-	standard_shader.shader_vertex_source = ShaderSource['CloudVS'];
-	standard_shader.shader_fragment_source = ShaderSource['CloudFS'];
+	standard_shader.shader_vertex_source = ShaderSource.CloudVS;
+	standard_shader.shader_fragment_source = ShaderSource.CloudFS;
 
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
@@ -315,13 +329,14 @@ ShadersManager.prototype.createCloudShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createBlendingCubeShader = function(gl) {
+ShadersManager.prototype.createBlendingCubeShader = function(gl) 
+{
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-	standard_shader.shader_vertex_source = ShaderSource['BlendingCubeVS'];
-	standard_shader.shader_fragment_source = ShaderSource['BlendingCubeFS'];
+	standard_shader.shader_vertex_source = ShaderSource.BlendingCubeVS;
+	standard_shader.shader_fragment_source = ShaderSource.BlendingCubeFS;
 
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
@@ -343,13 +358,14 @@ ShadersManager.prototype.createBlendingCubeShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createPCloudShader = function(gl) {
+ShadersManager.prototype.createPCloudShader = function(gl) 
+{
 	// This shader renders the f4d clouds.***
 	var standard_shader = new Shader();
 	this.shaders_array.push(standard_shader);
 
-	standard_shader.shader_vertex_source = ShaderSource['PointCloudVS'];
-	standard_shader.shader_fragment_source = ShaderSource['PointCloudFS'];
+	standard_shader.shader_vertex_source = ShaderSource.PointCloudVS;
+	standard_shader.shader_fragment_source = ShaderSource.PointCloudFS;
 
 	// Default ShaderProgram.********************************************************************
 	standard_shader.SHADER_PROGRAM = gl.createProgram();
@@ -373,11 +389,12 @@ ShadersManager.prototype.createPCloudShader = function(gl) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) {
+ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) 
+{
 	var shader = new Shader();
 	this.shaders_array.push(shader);
-	shader.shader_vertex_source = ShaderSource['TextureNormalVS'];
-	shader.shader_fragment_source = ShaderSource['TextureNormalFS'];
+	shader.shader_vertex_source = ShaderSource.TextureNormalVS;
+	shader.shader_fragment_source = ShaderSource.TextureNormalFS;
 
 	//http://learningwebgl.com/blog/?p=507
 	//https://gist.github.com/elnaqah/5070979

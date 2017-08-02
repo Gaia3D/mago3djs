@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Triangle
  */
-var Triangle= function() {
-	if(!(this instanceof Triangle)) {
+var Triangle= function() 
+{
+	if (!(this instanceof Triangle)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -18,7 +20,8 @@ var Triangle= function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-Triangle.prototype.destroy = function() {
+Triangle.prototype.destroy = function() 
+{
 	this.vertex0 = undefined;
 	this.vertex1 = undefined;
 	this.vertex2 = undefined;
@@ -31,7 +34,8 @@ Triangle.prototype.destroy = function() {
  * @param vertex1 변수
  * @param vertex2 변수
  */
-Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2) {
+Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2) 
+{
 	this.vertex0 = vertex0;
 	this.vertex1 = vertex1;
 	this.vertex2 = vertex2;
@@ -40,9 +44,10 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-Triangle.prototype.calculatePlaneNormal = function() {
-	if(this.normal == undefined)
-		this.normal = new Point3D();
+Triangle.prototype.calculatePlaneNormal = function() 
+{
+	if (this.normal == undefined)
+	{ this.normal = new Point3D(); }
 
 	this.getCrossProduct(0, this.normal);
 	this.normal.unitary();
@@ -54,25 +59,26 @@ Triangle.prototype.calculatePlaneNormal = function() {
  * @param resultCrossProduct 변수
  * @returns resultCrossProduct
  */
-Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct) {
-	if(resultCrossProduct == undefined)
-		resultCrossProduct = new Point3D();
+Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct) 
+{
+	if (resultCrossProduct == undefined)
+	{ resultCrossProduct = new Point3D(); }
 
 	var currentPoint, prevPoint, nextPoint;
 
-	if(idxVertex == 0)
+	if (idxVertex == 0)
 	{
 		currentPoint = this.vertex0.point3d;
 		prevPoint = this.vertex2.point3d;
 		nextPoint = this.vertex1.point3d;
 	}
-	else if(idxVertex == 1)
+	else if (idxVertex == 1)
 	{
 		currentPoint = this.vertex1.point3d;
 		prevPoint = this.vertex0.point3d;
 		nextPoint = this.vertex2.point3d;
 	}
-	else if(idxVertex == 2)
+	else if (idxVertex == 2)
 	{
 		currentPoint = this.vertex2.point3d;
 		prevPoint = this.vertex1.point3d;

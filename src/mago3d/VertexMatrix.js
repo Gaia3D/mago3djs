@@ -6,8 +6,10 @@
  * 어떤 일을 하고 있습니까?
  * @class VertexMatrix
  */
-var VertexMatrix = function() {
-	if(!(this instanceof VertexMatrix)) {
+var VertexMatrix = function() 
+{
+	if (!(this instanceof VertexMatrix)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -20,7 +22,8 @@ var VertexMatrix = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-VertexMatrix.prototype.newVertexList = function() {
+VertexMatrix.prototype.newVertexList = function() 
+{
 	var vertexList = new VertexList();
 	this.vertexListsArray.push(vertexList);
 	return vertexList;
@@ -31,10 +34,14 @@ VertexMatrix.prototype.newVertexList = function() {
  * @param idx 변수
  * @returns vertexListArray[idx]
  */
-VertexMatrix.prototype.getVertexList = function(idx) {
-	if(idx >= 0 && idx < this.vertexListsArray.length) {
+VertexMatrix.prototype.getVertexList = function(idx) 
+{
+	if (idx >= 0 && idx < this.vertexListsArray.length) 
+	{
 		return this.vertexListsArray[idx];
-	} else {
+	}
+	else 
+	{
 		return undefined;
 	}
 };
@@ -44,14 +51,16 @@ VertexMatrix.prototype.getVertexList = function(idx) {
  * @param resultBox
  * @returns resultBox
  */
-VertexMatrix.prototype.getBoundingBox = function(resultBox) {
-	if(resultBox == undefined) resultBox = new BoundingBox();
+VertexMatrix.prototype.getBoundingBox = function(resultBox) 
+{
+	if (resultBox == undefined) { resultBox = new BoundingBox(); }
 	
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
-	for(var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) {
-		if(i == 0) resultBox.setInit (this.totalVertexArraySC[i].point3d);
-		else resultBox.addPoint3D(this.totalVertexArraySC[i].point3d);
+	for (var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) 
+	{
+		if (i == 0) { resultBox.setInit(this.totalVertexArraySC[i].point3d); }
+		else { resultBox.addPoint3D(this.totalVertexArraySC[i].point3d); }
 	}
 	return resultBox;
 };
@@ -59,11 +68,14 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-VertexMatrix.prototype.setVertexIdxInList = function() {
+VertexMatrix.prototype.setVertexIdxInList = function() 
+{
 	var idxInList = 0;
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
 		var vtxList = this.vertexListsArray[i];
-		for(var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) {
+		for (var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) 
+		{
 			var vertex = vtxList.getVertex(j);
 			vertex.mIdxInList = idxInList;
 			idxInList++;
@@ -75,9 +87,11 @@ VertexMatrix.prototype.setVertexIdxInList = function() {
  * 어떤 일을 하고 있습니까?
  * @returns vertexCount
  */
-VertexMatrix.prototype.getVertexCount = function() {
+VertexMatrix.prototype.getVertexCount = function() 
+{
 	var vertexCount = 0;
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
 		vertexCount += this.vertexListsArray[i].getVertexCount();
 	}
 	
@@ -89,10 +103,13 @@ VertexMatrix.prototype.getVertexCount = function() {
  * @param resultTotalVertexArray 변수
  * @returns resultTotalVertexArray
  */
-VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) 
+{
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
 		var vtxList = this.vertexListsArray[i];
-		for(var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) {
+		for (var j = 0, vertexCount = vtxList.vertexArray.length; j < vertexCount; j++) 
+		{
 			var vertex = vtxList.getVertex(j);
 			resultTotalVertexArray.push(vertex);
 		}
@@ -106,14 +123,16 @@ VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) {
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
+{
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 6);
+	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 6); }
 	
-	for(var i = 0; i < totalVertexCount; i++) {
+	for (var i = 0; i < totalVertexCount; i++) 
+	{
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*6] = vertex.point3d.x;
 		resultFloatArray[i*6+1] = vertex.point3d.y;
@@ -132,14 +151,16 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArray) 
+{
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 7);
+	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 7); }
 	
-	for(var i = 0; i < totalVertexCount; i++) {
+	for (var i = 0; i < totalVertexCount; i++) 
+	{
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*7] = vertex.point3d.x;
 		resultFloatArray[i*7+1] = vertex.point3d.y;
@@ -159,14 +180,16 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
  * @param resultFloatArray 변수
  * @returns resultFloatArray
  */
-VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
+VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) 
+{
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if(resultFloatArray == undefined) resultFloatArray = new Float32Array(totalVertexCount * 3);
+	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 3); }
 	
-	for(var i = 0; i < totalVertexCount; i++) {
+	for (var i = 0; i < totalVertexCount; i++) 
+	{
 		var vertex = this.totalVertexArraySC[i];
 		resultFloatArray[i*3] = vertex.point3d.x;
 		resultFloatArray[i*3+1] = vertex.point3d.y;
@@ -183,8 +206,10 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) {
  * @param dirZ 변수
  * @param distance 변수
  */
-VertexMatrix.prototype.translateVertices = function(dirX, dirY, dirZ, distance) {
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+VertexMatrix.prototype.translateVertices = function(dirX, dirY, dirZ, distance) 
+{
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
 		this.vertexListsArray[i].translateVertices(dirX, dirY, dirZ, distance);
 	}
 };
@@ -193,7 +218,8 @@ VertexMatrix.prototype.translateVertices = function(dirX, dirY, dirZ, distance) 
  * 어떤 일을 하고 있습니까?
  * @param tTrianglesMatrix 변수
  */
-VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) {
+VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) 
+{
 	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;
 	var vtxList2;
@@ -201,20 +227,25 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 	var tTriangle1;
 	var tTriangle2;
 	var vertexCount = 0;
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount-1; i++) {
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount-1; i++) 
+	{
 		vtxList1 = this.vertexListsArray[i];
 		vtxList2 = this.vertexListsArray[i+1];
 		tTrianglesList = tTrianglesMatrix.newTTrianglesList();
 		
 		vertexCount = vtxList1.vertexArray.length;
-		for(var j = 0; j < vertexCount; j++) {
+		for (var j = 0; j < vertexCount; j++) 
+		{
 			tTriangle1 = tTrianglesList.newTTriangle();
 			tTriangle2 = tTrianglesList.newTTriangle();
 			
-			if(j == vertexCount-1) {
+			if (j == vertexCount-1) 
+			{
 				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(0)); 
 				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(0), vtxList1.getVertex(0)); 
-			} else {
+			}
+			else 
+			{
 				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(j+1)); 
 				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j+1), vtxList1.getVertex(j+1)); 
 			}
@@ -226,8 +257,10 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
  * 어떤 일을 하고 있습니까?
  * @param transformMatrix
  */
-VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) {
-	for(var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) {
+VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) 
+{
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
 		var vtxList = this.vertexListsArray[i];
 		vtxList.transformPointsByMatrix4(transformMatrix);
 	}

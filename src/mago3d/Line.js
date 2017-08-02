@@ -4,8 +4,10 @@
  * 선
  * @class Line
  */
-var Line = function() {
-	if(!(this instanceof Line)) {
+var Line = function() 
+{
+	if (!(this instanceof Line)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -23,7 +25,8 @@ var Line = function() {
  * @param dy 변수
  * @param dz 변수
  */
-Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz) {
+Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz) 
+{
 	this.point.set(px, py, pz);
 	this.direction.set(dx, dy, dz);
 	this.direction.unitary();

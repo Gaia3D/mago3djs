@@ -4,8 +4,10 @@
  * Policy
  * @class API
  */
-var Policy = function() {
-	if(!(this instanceof Policy)) {
+var Policy = function() 
+{
+	if (!(this instanceof Policy)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -47,98 +49,126 @@ var Policy = function() {
 	this.colorChangedObjectId;
 };
 
-Policy.prototype.getMagoEnable = function() {
+Policy.prototype.getMagoEnable = function() 
+{
 	return this.magoEnable;
 };
-Policy.prototype.setMagoEnable = function(magoEnable) {
+Policy.prototype.setMagoEnable = function(magoEnable) 
+{
 	this.magoEnable = magoEnable;
 };
 
-Policy.prototype.getShowOutFitting = function() {
+Policy.prototype.getShowOutFitting = function() 
+{
 	return this.showOutFitting;
 };
-Policy.prototype.setShowOutFitting = function(showOutFitting) {
+Policy.prototype.setShowOutFitting = function(showOutFitting) 
+{
 	this.showOutFitting = showOutFitting;
 };
 
-Policy.prototype.getShowBoundingBox = function() {
+Policy.prototype.getShowBoundingBox = function() 
+{
 	return this.showBoundingBox;
 };
-Policy.prototype.setShowBoundingBox = function(showBoundingBox) {
+Policy.prototype.setShowBoundingBox = function(showBoundingBox) 
+{
 	this.showBoundingBox = showBoundingBox;
 };
 
-Policy.prototype.getShowShadow = function() {
+Policy.prototype.getShowShadow = function() 
+{
 	return this.showShadow;
 };
-Policy.prototype.setShowShadow = function(showShadow) {
+Policy.prototype.setShowShadow = function(showShadow) 
+{
 	this.showShadow = showShadow;
 };
 
-Policy.prototype.getFrustumFarSquaredDistance = function() {
+Policy.prototype.getFrustumFarSquaredDistance = function() 
+{
 	return this.frustumFarSquaredDistance;
 };
-Policy.prototype.setFrustumFarSquaredDistance = function(frustumFarSquaredDistance) {
+Policy.prototype.setFrustumFarSquaredDistance = function(frustumFarSquaredDistance) 
+{
 	this.frustumFarSquaredDistance = frustumFarSquaredDistance;
 };
 
-Policy.prototype.getHighLightedBuildings = function() {
+Policy.prototype.getHighLightedBuildings = function() 
+{
 	return this.highLightedBuildings;
 };
-Policy.prototype.setHighLightedBuildings = function(highLightedBuildings) {
+Policy.prototype.setHighLightedBuildings = function(highLightedBuildings) 
+{
 	this.highLightedBuildings = highLightedBuildings;
 };
 
-Policy.prototype.getColorBuildings = function() {
+Policy.prototype.getColorBuildings = function() 
+{
 	return this.colorBuildings;
 };
-Policy.prototype.setColorBuildings = function(colorBuildings) {
+Policy.prototype.setColorBuildings = function(colorBuildings) 
+{
 	this.colorBuildings = colorBuildings;
 };
 
-Policy.prototype.getColor = function() {
+Policy.prototype.getColor = function() 
+{
 	return this.color;
 };
-Policy.prototype.setColor = function(color) {
+Policy.prototype.setColor = function(color) 
+{
 	this.color = color;
 };
 
-Policy.prototype.getHideBuildings = function() {
+Policy.prototype.getHideBuildings = function() 
+{
 	return this.hideBuildings;
 };
-Policy.prototype.setHideBuildings = function(hideBuildings) {
+Policy.prototype.setHideBuildings = function(hideBuildings) 
+{
 	this.hideBuildings = hideBuildings;
 };
 
-Policy.prototype.getMouseMoveMode = function() {
+Policy.prototype.getMouseMoveMode = function() 
+{
 	return this.mouseMoveMode;
 };
-Policy.prototype.setMouseMoveMode = function(mouseMoveMode) {
+Policy.prototype.setMouseMoveMode = function(mouseMoveMode) 
+{
 	this.mouseMoveMode = mouseMoveMode;
 };
 
-Policy.prototype.getIssueInsertEnable = function() {
+Policy.prototype.getIssueInsertEnable = function() 
+{
 	return this.issueInsertEnable;
 };
-Policy.prototype.setIssueInsertEnable = function(issueInsertEnable) {
+Policy.prototype.setIssueInsertEnable = function(issueInsertEnable) 
+{
 	this.issueInsertEnable = issueInsertEnable;
 };
-Policy.prototype.getObjectInfoViewEnable = function() {
+Policy.prototype.getObjectInfoViewEnable = function() 
+{
 	return this.objectInfoViewEnable;
 };
-Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) {
+Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
+{
 	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-Policy.prototype.getIssueListEnable = function() {
+Policy.prototype.getIssueListEnable = function() 
+{
 	return this.issueListEnable;
 };
-Policy.prototype.setIssueListEnable = function(issueListEnable) {
+Policy.prototype.setIssueListEnable = function(issueListEnable) 
+{
 	this.issueListEnable = issueListEnable;
 };
 
-Policy.prototype.getImagePath = function() {
+Policy.prototype.getImagePath = function() 
+{
 	return this.imagePath;
 };
-Policy.prototype.setImagePath = function(imagePath) {
+Policy.prototype.setImagePath = function(imagePath) 
+{
 	this.imagePath = imagePath;
 };

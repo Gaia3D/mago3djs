@@ -4,8 +4,10 @@
  * 어떤 일을 하고 있습니까?
  * @class TerranTile
  */
-var TerranTile = function() {
-	if(!(this instanceof TerranTile)) {
+var TerranTile = function() 
+{
+	if (!(this instanceof TerranTile)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
@@ -65,7 +67,8 @@ var TerranTile = function() {
  * 어떤 일을 하고 있습니까?
  * @returns br_buildingProject
  */
-TerranTile.prototype.newBRProject = function() {
+TerranTile.prototype.newBRProject = function() 
+{
 	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	// dont use this. delete this.***
 	var br_buildingProject = new BRBuildingProject();
@@ -77,7 +80,8 @@ TerranTile.prototype.newBRProject = function() {
  * 어떤 일을 하고 있습니까?
  * @returns subTile
  */
-TerranTile.prototype.newSubTerranTile = function() {
+TerranTile.prototype.newSubTerranTile = function() 
+{
 	var subTiles_count = this.subTiles_array.length;
 	var subTile = new TerranTile();
 	subTile._depth = this._depth + 1;
@@ -89,8 +93,10 @@ TerranTile.prototype.newSubTerranTile = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.make4subTiles = function() {
-	for(var i = 0; i < 4; i++) {
+TerranTile.prototype.make4subTiles = function() 
+{
+	for (var i = 0; i < 4; i++) 
+	{
 		var subTile = this.newSubTerranTile();
 	}
 };
@@ -102,7 +108,8 @@ TerranTile.prototype.make4subTiles = function() {
  * @param latMin 변수
  * @param latMax 변수
  */
-TerranTile.prototype.setDimensions = function(lonMin, lonMax, latMin, latMax) {
+TerranTile.prototype.setDimensions = function(lonMin, lonMax, latMin, latMax) 
+{
 	this.longitudeMin = lonMin;
 	this.longitudeMax = lonMax;
 	this.latitudeMin = latMin;
@@ -113,11 +120,12 @@ TerranTile.prototype.setDimensions = function(lonMin, lonMax, latMin, latMax) {
  * 어떤 일을 하고 있습니까?
  * @param maxDepth 변수
  */
-TerranTile.prototype.makeTree = function(maxDepth) {
-	if(this._depth < maxDepth)
+TerranTile.prototype.makeTree = function(maxDepth) 
+{
+	if (this._depth < maxDepth)
 	{
 		var subTileAux;
-		for(var i = 0; i < 4; i++)
+		for (var i = 0; i < 4; i++)
 		{
 			subTileAux = this.newSubTerranTile();
 			subTileAux.makeTree(maxDepth);
@@ -128,7 +136,8 @@ TerranTile.prototype.makeTree = function(maxDepth) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.calculatePositionByLonLat = function() {
+TerranTile.prototype.calculatePositionByLonLat = function() 
+{
 	var lon_mid = (this.longitudeMax + this.longitudeMin)/2.0;
 	var lat_mid = (this.latitudeMax + this.latitudeMin)/2.0;
 
@@ -145,13 +154,14 @@ TerranTile.prototype.calculatePositionByLonLat = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
+TerranTile.prototype.calculatePositionByLonLatSubTiles = function() 
+{
 	this.calculatePositionByLonLat();
 
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
 
-	for(var i=0; i<subTiles_count; i++)
+	for (var i=0; i<subTiles_count; i++)
 	{
 		this.subTiles_array[i].calculatePositionByLonLatSubTiles();
 	}
@@ -161,10 +171,11 @@ TerranTile.prototype.calculatePositionByLonLatSubTiles = function() {
  * 어떤 일을 하고 있습니까?
  * @param BR_Project 변수
  */
-TerranTile.prototype.parseFileHeader = function(BR_Project) {
+TerranTile.prototype.parseFileHeader = function(BR_Project) 
+{
 	var fileLegth = this.fileArrayBuffer.byteLength;
-	if(this.fileBytesReaded >= fileLegth)
-		return;
+	if (this.fileBytesReaded >= fileLegth)
+	{ return; }
 
 	var version_string_length = 5;
 	var intAux_scratch = 0;
@@ -173,11 +184,12 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	var arrayBuffer = this.fileArrayBuffer;
 	var bytes_readed = this.fileBytesReaded;
 
-	if(this.readWriter == undefined)
-		this.readWriter = new ReaderWriter();
+	if (this.readWriter == undefined)
+	{ this.readWriter = new ReaderWriter(); }
 
 	// 1) Version(5 chars).***********
-	for(var j=0; j<version_string_length; j++){
+	for (var j=0; j<version_string_length; j++)
+	{
 		header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
 
@@ -185,7 +197,8 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 
 	// 3) Global unique ID.*********************
 	intAux_scratch = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	for(var j=0; j<intAux_scratch; j++){
+	for (var j=0; j<intAux_scratch; j++)
+	{
 		header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
 
@@ -208,12 +221,12 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
 	header._elevation = 45.0 + semiHeight-0.5;
 
 	var isLarge = false;
-	if(header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
+	if (header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0)
 	{
 		isLarge = true;
 	}
 
-	if(!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
+	if (!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0)
 	{
 		header.isSmall = true;
 	}
@@ -257,27 +270,28 @@ TerranTile.prototype.parseFileHeader = function(BR_Project) {
  * 어떤 일을 하고 있습니까?
  * @param BR_Project 변수
  */
-TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
+TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) 
+{
 	var fileLegth = this.fileArrayBuffer.byteLength;
-	if(this.fileBytesReaded >= fileLegth)
-		return;
+	if (this.fileBytesReaded >= fileLegth)
+	{ return; }
 
-	if(this.readWriter == undefined)
-		this.readWriter = new ReaderWriter();
+	if (this.readWriter == undefined)
+	{ this.readWriter = new ReaderWriter(); }
 
 	var bytes_readed = this.fileBytesReaded;
 	var startBuff;
 	var endBuff;
 	var arrayBuffer = this.fileArrayBuffer;
 
-	if(BR_Project._simpleBuilding_v1 == undefined)
-		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
+	if (BR_Project._simpleBuilding_v1 == undefined)
+	{ BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 	var vbo_objects_count = this.readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
 
 	// single interleaved buffer mode.*********************************************************************************
-	for(var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
+	for (var i=0; i<vbo_objects_count; i++) // Almost allways is 1.***
 	{
 		var simpObj = simpBuildingV1.newSimpleObject();
 		var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
@@ -297,9 +311,9 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
 	var color_4byte_temp = this.readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
 	//var b = color_4byte_temp & 0xFF;
-    //var g = (color_4byte_temp & 0xFF00) >>> 8;
-    //var r = (color_4byte_temp & 0xFF0000) >>> 16;
-    //var a = ( (color_4byte_temp & 0xFF000000) >>> 24 ) / 255 ;
+	//var g = (color_4byte_temp & 0xFF00) >>> 8;
+	//var r = (color_4byte_temp & 0xFF0000) >>> 16;
+	//var a = ( (color_4byte_temp & 0xFF000000) >>> 24 ) / 255 ;
 
 	this.fileBytesReaded = bytes_readed;
 };
@@ -309,14 +323,15 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project) {
  * @param BR_Project 변수
  * @param magoManager 변수
  */
-TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
+TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) 
+{
 	//BR_Project._f4d_nailImage_readed = true;
 
-	if(BR_Project._simpleBuilding_v1 == undefined)
-		BR_Project._simpleBuilding_v1 = new SimpleBuildingV1();
+	if (BR_Project._simpleBuilding_v1 == undefined)
+	{ BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
 
-	if(this.readWriter == undefined)
-		this.readWriter = new ReaderWriter();
+	if (this.readWriter == undefined)
+	{ this.readWriter = new ReaderWriter(); }
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 
@@ -338,24 +353,25 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager) {
  * 어떤 일을 하고 있습니까?
  * @param magoManager 변수
  */
-TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
+TerranTile.prototype.parseFileAllBuildings = function(magoManager) 
+{
 	var fileLegth = this.fileArrayBuffer.byteLength;
-	if(this.fileBytesReaded >= fileLegth)
+	if (this.fileBytesReaded >= fileLegth)
 	{
 		this.fileParsingFinished = true;
 		return;
 	}
 
-	if(this.readWriter == undefined)
-		this.readWriter = new ReaderWriter();
+	if (this.readWriter == undefined)
+	{ this.readWriter = new ReaderWriter(); }
 
 	var arrayBuffer = this.fileArrayBuffer;
 	var projects_count = this.readWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
 
-	if(projects_count == 0)
-		this.empty_tile = true;
+	if (projects_count == 0)
+	{ this.empty_tile = true; }
 
-	for(var i=0; i<projects_count; i++)
+	for (var i=0; i<projects_count; i++)
 	{
 		/*
 		// 1rst, read the relative rawFile_path.***
@@ -385,30 +401,31 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager) {
  * @param gl 변수
  * @param magoManager 변수
  */
-TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
+TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) 
+{
 	var fileLegth = this.fileArrayBuffer.byteLength;
-	if(this.fileBytesReaded >= fileLegth)
+	if (this.fileBytesReaded >= fileLegth)
 	{
 		this.fileParsingFinished = true;
 		return;
 	}
 
-	if(this.readWriter == undefined)
-		this.readWriter = new ReaderWriter();
+	if (this.readWriter == undefined)
+	{ this.readWriter = new ReaderWriter(); }
 
 	var projects_count = this.readWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
 
-	if(this.projectsParsed_count >= projects_count)
+	if (this.projectsParsed_count >= projects_count)
 	{
 		this.fileParsingFinished = true;
 		this.fileBytesReaded = null;
 		return;
 	}
 
-	if(this.current_BRProject_parsing_state == 0)
+	if (this.current_BRProject_parsing_state == 0)
 	{
-		if(this.projectsParsed_count == 0)
-			this.fileBytesReaded = 4;
+		if (this.projectsParsed_count == 0)
+		{ this.fileBytesReaded = 4; }
 
 		this.current_BRProject_parsing = this.newBRProject();
 	}
@@ -416,16 +433,23 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
 	var BR_Project = this.current_BRProject_parsing;
 
 	// Read header, simpleBuilding, and the nailImage.***
-	if(this.current_BRProject_parsing_state == 0) {
+	if (this.current_BRProject_parsing_state == 0) 
+	{
 		this.parseFileHeader(BR_Project);
 		this.current_BRProject_parsing_state=1;
-	} else if(this.current_BRProject_parsing_state == 1) {
-		if(magoManager.backGround_imageReadings_count < 1) {
+	}
+	else if (this.current_BRProject_parsing_state == 1) 
+	{
+		if (magoManager.backGround_imageReadings_count < 1) 
+		{
 			this.parseFile_simpleBuilding_old(gl, BR_Project);
 			this.current_BRProject_parsing_state=2;
 		}
-	} else if(this.current_BRProject_parsing_state == 2) {
-		if(magoManager.backGround_imageReadings_count < 1) {
+	}
+	else if (this.current_BRProject_parsing_state == 2) 
+	{
+		if (magoManager.backGround_imageReadings_count < 1) 
+		{
 			this.parseFile_nailImage_old(gl, BR_Project, magoManager);
 			this.current_BRProject_parsing_state=0;
 			this.projectsParsed_count++;
@@ -437,10 +461,12 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager) {
 /**
  * 어떤 일을 하고 있습니까?
  */
-TerranTile.prototype.setDimensionsSubTiles = function() {
+TerranTile.prototype.setDimensionsSubTiles = function() 
+{
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
-	if(subTiles_count == 4) {
+	if (subTiles_count == 4) 
+	{
 		var lon_mid = (this.longitudeMax + this.longitudeMin)/2.0;
 		var lat_mid = (this.latitudeMax + this.latitudeMin)/2.0;
 
@@ -456,7 +482,8 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
 		subTile = this.subTiles_array[3];
 		subTile.setDimensions(this.longitudeMin, lon_mid, lat_mid, this.latitudeMax);
 
-		for(var i=0; i<subTiles_count; i++) {
+		for (var i=0; i<subTiles_count; i++) 
+		{
 			this.subTiles_array[i].setDimensionsSubTiles();
 		}
 	}
@@ -466,15 +493,20 @@ TerranTile.prototype.setDimensionsSubTiles = function() {
  * 어떤 일을 하고 있습니까?
  * @param smallefstTiles_array 변수
  */
-TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
+TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) 
+{
 	// this returns smallestTiles, if the smallestTile has buildingd inside.***
-	if(this.subTiles_array.length > 0) {
-		for(var i=0; i<this.subTiles_array.length; i++) {
+	if (this.subTiles_array.length > 0) 
+	{
+		for (var i=0; i<this.subTiles_array.length; i++) 
+		{
 			this.subTiles_array[i].visibilityType = this.visibilityType;
 			this.subTiles_array[i].getSmallestTiles(smallestTiles_array);
 		}
-	} else {
-		if(!this.empty_tile.length) smallestTiles_array.push(this);
+	}
+	else 
+	{
+		if (!this.empty_tile.length) { smallestTiles_array.push(this); }
 	}
 };
 
@@ -484,12 +516,14 @@ TerranTile.prototype.getSmallestTiles = function(smallestTiles_array) {
  * @param intersectedSmallestTiles_array 변수
  * @param boundingSphere_Aux 변수
  */
-TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux) {
+TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, intersectedSmallestTiles_array, boundingSphere_Aux) 
+{
 	var intersectedTiles_array = [];
 	this.getIntersectedTiles(frustumVolume, intersectedTiles_array, boundingSphere_Aux);
 
 	var intersectedTiles_count = intersectedTiles_array.length;
-	for(var i=0; i<intersectedTiles_count; i++) {
+	for (var i=0; i<intersectedTiles_count; i++) 
+	{
 		intersectedTiles_array[i].getSmallestTiles(intersectedSmallestTiles_array);
 	}
 	intersectedTiles_array.length = 0;
@@ -501,11 +535,12 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
  * @param intersectedTiles_array 변수
  * @param boundingSphere_Aux 변수
  */
-TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) {
+TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) 
+{
 	// Cesium dependency.***
-	if(this.position == undefined) return;
+	if (this.position == undefined) { return; }
 
-	if(boundingSphere_Aux == undefined) boundingSphere_Aux = new Cesium.BoundingSphere();
+	if (boundingSphere_Aux == undefined) { boundingSphere_Aux = new Cesium.BoundingSphere(); }
 
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
@@ -531,19 +566,28 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 		intersectedPoints_count++;
 	*/
 
-	if(this.visibilityType == Cesium.Intersect.OUTSIDE) {
+	if (this.visibilityType == Cesium.Intersect.OUTSIDE) 
+	{
 		// OUTSIDE.***
 		// do nothing.***
-	} else if(this.visibilityType == Cesium.Intersect.INSIDE) {
+	}
+	else if (this.visibilityType == Cesium.Intersect.INSIDE) 
+	{
 		// INSIDE.***
 		intersectedTiles_array.push(this);
-	} else {
+	}
+	else 
+	{
 		// INTERSECTED.***
-		if(this.subTiles_array.length > 0) {
-			for(var i=0; i<this.subTiles_array.length; i++) {
+		if (this.subTiles_array.length > 0) 
+		{
+			for (var i=0; i<this.subTiles_array.length; i++) 
+			{
 				this.subTiles_array[i].getIntersectedTiles(frustumVolume, intersectedTiles_array);
 			}
-		} else {
+		}
+		else 
+		{
 			intersectedTiles_array.push(this);
 		}
 	}

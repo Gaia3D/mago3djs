@@ -4,8 +4,10 @@
  * ??
  * @class SceneState
  */
-var SceneState = function() {
-	if(!(this instanceof SceneState)) {
+var SceneState = function() 
+{
+	if (!(this instanceof SceneState)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	

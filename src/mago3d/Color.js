@@ -7,8 +7,10 @@
  * 어떤 일을 하고 있습니까?
  * @class Color
  */
-var Color = function() {
-	if(!(this instanceof Color)) {
+var Color = function() 
+{
+	if (!(this instanceof Color)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	//this[0] = 0.0;
@@ -29,7 +31,8 @@ var Color = function() {
  * @param blue 변수
  * @param alpha 변수
  */
-Color.prototype.set = function(red, green, blue, alpha) {
+Color.prototype.set = function(red, green, blue, alpha) 
+{
 	//this[0] = red;
 	//this[1] = green;
 	//this[2] = blue;
@@ -43,7 +46,8 @@ Color.prototype.set = function(red, green, blue, alpha) {
  * @param green 변수
  * @param blue 변수
  */
-Color.prototype.setRGB = function(red, green, blue) {
+Color.prototype.setRGB = function(red, green, blue) 
+{
 	//this[0] = red;
 	//this[1] = green;
 	//this[2] = blue;
@@ -57,7 +61,8 @@ Color.prototype.setRGB = function(red, green, blue) {
  * @param blue 변수
  * @param alpha 변수
  */
-Color.prototype.setRGBA = function(red, green, blue, alpha) {
+Color.prototype.setRGBA = function(red, green, blue, alpha) 
+{
 	//this[0] = red;
 	//this[1] = green;
 	//this[2] = blue;
@@ -69,8 +74,10 @@ Color.prototype.setRGBA = function(red, green, blue, alpha) {
  * 어떤 일을 하고 있습니까?
  * @class SelectionColor
  */
-var SelectionColor = function() {
-	if(!(this instanceof SelectionColor)) {
+var SelectionColor = function() 
+{
+	if (!(this instanceof SelectionColor)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
@@ -80,7 +87,8 @@ var SelectionColor = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-SelectionColor.prototype.init = function() {
+SelectionColor.prototype.init = function() 
+{
 	this.color.r = 0;
 	this.color.g = 0;
 	this.color.b = 0;
@@ -90,22 +98,23 @@ SelectionColor.prototype.init = function() {
 /**
  * 어떤 일을 하고 있습니까?
  */
-SelectionColor.prototype.getAvailableColor = function(resultColor) {
-	if(resultColor == undefined)
-		resultColor = new Color();
+SelectionColor.prototype.getAvailableColor = function(resultColor) 
+{
+	if (resultColor == undefined)
+	{ resultColor = new Color(); }
 	
 	resultColor.setRGB(this.color.r, this.color.g, this.color.b);
 	
 	this.color.b += 1;
-	if(this.color.b >= 254)
+	if (this.color.b >= 254)
 	{
 		this.color.b = 0;
 		this.color.g += 1;
-		if(this.color.g >= 254)
+		if (this.color.g >= 254)
 		{
 			this.color.g = 0;
 			this.color.r += 1;
-			if(this.color.r >= 254)
+			if (this.color.r >= 254)
 			{
 				this.color.r = 0;
 				this.cycle += 1;

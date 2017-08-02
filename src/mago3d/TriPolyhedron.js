@@ -4,8 +4,10 @@
  * 영역 박스
  * @class TriPolyhedron
  */
-var TriPolyhedron = function() {
-	if(!(this instanceof TriPolyhedron)) {
+var TriPolyhedron = function() 
+{
+	if (!(this instanceof TriPolyhedron)) 
+	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.vertexMatrix = new VertexMatrix();
@@ -13,25 +15,27 @@ var TriPolyhedron = function() {
 	this.triSurfacesArray = [];
 };
 
-TriPolyhedron.prototype.newTriSurface = function() {
+TriPolyhedron.prototype.newTriSurface = function() 
+{
 	var triSurface = new TriSurface();
 	this.triSurfacesArray.push(triSurface);
 	return triSurface;
 };
 
-TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey) {
+TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey) 
+{
 	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
-	if(resultVBOVertexIdxCacheKey == undefined)
-		resultVBOVertexIdxCacheKey = new VBOVertexIdxCacheKey();
+	if (resultVBOVertexIdxCacheKey == undefined)
+	{ resultVBOVertexIdxCacheKey = new VBOVertexIdxCacheKey(); }
 
-	if(resultVBOVertexIdxCacheKey.posVboDataArray == undefined)
-		resultVBOVertexIdxCacheKey.posVboDataArray = [];
+	if (resultVBOVertexIdxCacheKey.posVboDataArray == undefined)
+	{ resultVBOVertexIdxCacheKey.posVboDataArray = []; }
 
-	if(resultVBOVertexIdxCacheKey.norVboDataArray == undefined)
-		resultVBOVertexIdxCacheKey.norVboDataArray = [];
+	if (resultVBOVertexIdxCacheKey.norVboDataArray == undefined)
+	{ resultVBOVertexIdxCacheKey.norVboDataArray = []; }
 
-	if(resultVBOVertexIdxCacheKey.colVboDataArray == undefined)
-		resultVBOVertexIdxCacheKey.colVboDataArray = [];
+	if (resultVBOVertexIdxCacheKey.colVboDataArray == undefined)
+	{ resultVBOVertexIdxCacheKey.colVboDataArray = []; }
 
 	var positionArray = [];
 	var normalsArray = [];
@@ -45,13 +49,15 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 	var trianglesCount;
 	var triSurface;
 	var triSurfacesCount = this.triSurfacesArray.length;
-	for(var i = 0; i < triSurfacesCount; i++) {
+	for (var i = 0; i < triSurfacesCount; i++) 
+	{
 		triSurface = this.triSurfacesArray[i];
 		trianglesCount = triSurface.trianglesArray.length;
-		for(var j = 0; j < trianglesCount; j++) {
+		for (var j = 0; j < trianglesCount; j++) 
+		{
 			triangle = triSurface.trianglesArray[j];
-			if(triangle.normal == undefined)
-				triangle.calculatePlaneNormal();
+			if (triangle.normal == undefined)
+			{ triangle.calculatePlaneNormal(); }
 
 			// position.***
 			vertex0 = triangle.vertex0;
@@ -84,7 +90,8 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			normalsArray.push(triangle.normal.z);
 
 			// colors.***
-			if(vertex0.color4 == undefined) {
+			if (vertex0.color4 == undefined) 
+			{
 				colorsArray.push(255);
 				colorsArray.push(255);
 				colorsArray.push(255);
@@ -100,7 +107,8 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 				colorsArray.push(255);
 				colorsArray.push(255);
 			}
-			else {
+			else 
+			{
 				colorsArray.push(vertex0.color4.r);
 				colorsArray.push(vertex0.color4.g);
 				colorsArray.push(vertex0.color4.b);
@@ -126,12 +134,14 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 	resultVBOVertexIdxCacheKey.colVboDataArray = new Uint8Array(vertexCount*4);
 	resultVBOVertexIdxCacheKey.posVboDataArray = new Float32Array(vertexCount*3);
 	
-	for(var i = 0; i < vertexCount * 3; i++) {
+	for (var i = 0; i < vertexCount * 3; i++) 
+	{
 		resultVBOVertexIdxCacheKey.posVboDataArray[i] = positionArray[i];
 		resultVBOVertexIdxCacheKey.norVboDataArray[i] = normalsArray[i];
 	}
 	
-	for(var i = 0; i < vertexCount * 4; i++) {
+	for (var i = 0; i < vertexCount * 4; i++) 
+	{
 		resultVBOVertexIdxCacheKey.colVboDataArray[i] = colorsArray[i];
 	}
 
