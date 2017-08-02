@@ -43,7 +43,8 @@ var paths = {
 	build     : './build'
 };
 
-function glslToJavaScript(minify, minifyStateFilePath) {
+function glslToJavaScript(minify, minifyStateFilePath) 
+{
 	fs.writeFileSync(minifyStateFilePath, minify);
 	var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
 
@@ -52,12 +53,14 @@ function glslToJavaScript(minify, minifyStateFilePath) {
 	var leftOverJsFiles = {};
 	var shaderContents = "'use strict';\nvar ShaderSource = ShaderSource || {};\n";
 
-	globby.sync(['src/mago3d/Shaders/**/*.js']).forEach(function(file) {
+	globby.sync(['src/mago3d/Shaders/**/*.js']).forEach(function(file) 
+	{
 		leftOverJsFiles[path.normalize(file)] = true;
 	});
 
 	var glslFiles = globby.sync(['src/mago3d/Shaders/**/*.glsl']);
-	glslFiles.forEach(function(glslFile) {
+	glslFiles.forEach(function(glslFile) 
+	{
 		glslFile = path.normalize(glslFile);
 		var baseName = path.basename(glslFile, '.glsl');
 		var jsFile = path.join(path.dirname(glslFile), baseName) + '.js';
@@ -68,7 +71,8 @@ function glslToJavaScript(minify, minifyStateFilePath) {
 		var jsFileModified = jsFileExists ? fs.statSync(jsFile).mtime.getTime() : 0;
 		var glslFileModified = fs.statSync(glslFile).mtime.getTime();
 
-		if (jsFileExists && jsFileModified > glslFileModified && jsFileModified > minifyStateFileLastModified) {
+		if (jsFileExists && jsFileModified > glslFileModified && jsFileModified > minifyStateFileLastModified) 
+		{
 			return;
 		}
 
@@ -77,11 +81,13 @@ function glslToJavaScript(minify, minifyStateFilePath) {
 
 		var copyrightComments = '';
 		var extractedCopyrightComments = contents.match(/\/\*\*(?:[^*\/]|\*(?!\/)|\n)*?@license(?:.|\n)*?\*\//gm);
-		if (extractedCopyrightComments) {
+		if (extractedCopyrightComments) 
+		{
 			copyrightComments = extractedCopyrightComments.join('\n') + '\n';
 		}
 
-		if (minify) {
+		if (minify) 
+		{
 			contents = glslStripComments(contents);
 			contents = contents.replace(/\s+$/gm, '').replace(/^\s+/gm, '').replace(/\n+/gm, '\n');
 			contents += '\n';
@@ -104,13 +110,15 @@ define(function() {\n\
 	fs.writeFileSync('src/mago3d/ShaderSource.js', shaderContents);
 
 	// delete any left over JS files from old shaders
-	Object.keys(leftOverJsFiles).forEach(function(filepath) {
+	Object.keys(leftOverJsFiles).forEach(function(filepath) 
+	{
 		rimraf.sync(filepath);
 	});
 }
 
 // 삭제가 필요한 디렉토리가 있는 경우
-gulp.task('clean', function() {
+gulp.task('clean', function() 
+{
 	return del([ paths.build ]);
 });
 
@@ -139,14 +147,16 @@ gulp.task('clean', function() {
 //    .pipe(notify({ message: 'Scripts task complete' }));
 //});
 
-gulp.task('uglify:js', [ 'combine:js' ], function () {
+gulp.task('uglify:js', [ 'combine:js' ], function () 
+{
 	return gulp.src(path.join(path.normalize(paths.dest_js), 'mago3d.js'))
 		.pipe(uglify())
 		.pipe(rename({extname: '.min.js'}))
 		.pipe(gulp.dest(paths.dest_js));
 });
 
-gulp.task('combine:js', [ 'clean', 'build' ], function() {
+gulp.task('combine:js', [ 'clean', 'build' ], function() 
+{
 	return gulp.src(paths.source_js)
 		.pipe(concat('mago3d.js'))
 		.pipe(gulp.dest(paths.dest_js));
@@ -166,15 +176,18 @@ gulp.task('combine:js', [ 'clean', 'build' ], function() {
 //		.pipe(gulp.dest('./public/dist/image'));
 //});
 
-function isFixed(file) {
+function isFixed(file) 
+{
 	return file.eslint !== null && file.eslint.fixed;
 }
-gulp.task('watch', function() {
+gulp.task('watch', function() 
+{
 	//gulp.watch( paths.source_js, ['uglify']);
 	gulp.watch('**/*.{js,jsx}', ['lint']);
 });
 
-gulp.task('karma', function (done) {
+gulp.task('karma', function (done) 
+{
 	new Server({
 		configFile : __dirname + '/karma.conf.js',
 		singleRun  : true
@@ -182,31 +195,35 @@ gulp.task('karma', function (done) {
 });
 
 // eslint
-gulp.task('lint', function() {
+gulp.task('lint', function() 
+{
 	return gulp.src(paths.source_js)
 		.pipe(eslint({fix: true}))
 		.pipe(eslint.format())
-	//.pipe(rename({suffix: '.fixed'}))
-		.pipe(gulpIf(isFixed, gulp.dest(function(file){
+		.pipe(gulpIf(isFixed, gulp.dest(function(file)
+		{
 			return file.base;
 		})))
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('doc', function (cb) {
+gulp.task('doc', function (cb) 
+{
 	var config = require('./jsdoc.json');
 	gulp.src(['README.md', './src/mago3d/*.js'], {read: false})
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('build', function() {
+gulp.task('build', function() 
+{
 	mkdirp.sync(paths.build);
 	mkdirp.sync(paths.dest_js);
 	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
 });
 
-gulp.task('default', [ 'clean', 'combine:js', 'lint', 'doc' ]);
+gulp.task('default', [ 'clean', 'uglify:js',  'doc' ]);
 
-gulp.task('buildShader', function() {
+gulp.task('buildShader', function() 
+{
 	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
 });
