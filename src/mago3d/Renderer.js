@@ -163,7 +163,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 						lastExtureId = neoBuilding.simpleBuilding3x3Texture.texId;
 					}
 				}
-				else 
+				else
 				{
 					gl.uniform1i(standardShader.hasTexture_loc, false);
 					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
@@ -782,7 +782,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 				// Must applicate the transformMatrix of the reference object.***
 				if (refMatrixIdxKey == undefined)
 				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
-				else 
+				else
 				{
 					if (refMatrixIdxKey == -1)
 					{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
@@ -1044,13 +1044,13 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion_CURRENT = function(gl, neoR
 								neoReference.texture = sameTexture;
 								//continue;
 							}
-							else 
+							else
 							{
 								continue;
 							}
 						}
 					}
-					else
+					else 
 					{
 						if (neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
 						{
@@ -1073,7 +1073,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion_CURRENT = function(gl, neoR
 				{
 					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 				}
-				else 
+				else
 				{
 					gl.uniform4fv(standardShader.color4Aux_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a] );
 				}
@@ -1085,7 +1085,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion_CURRENT = function(gl, neoR
 				{
 					gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 				}
-				else 
+				else
 				{
 					gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.aditionalColor.r, neoReference.aditionalColor.g, neoReference.aditionalColor.b, neoReference.aditionalColor.a] );
 				}

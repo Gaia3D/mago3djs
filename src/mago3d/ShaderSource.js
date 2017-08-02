@@ -1,13 +1,13 @@
 'use strict';
 var ShaderSource = ShaderSource || {};
-ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
+ShaderSource['BlendingCubeFS'] = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
 	void main()\n\
     {\n\
 		gl_FragColor = vColor;\n\
 	}";
-ShaderSource.BlendingCubeVS = "attribute vec3 position;\n\
+ShaderSource['BlendingCubeVS'] = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
@@ -24,7 +24,7 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
-ShaderSource.BlurFS = "#ifdef GL_ES\n\
+ShaderSource['BlurFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
     #endif\n\
 uniform sampler2D colorTex;\n\
@@ -45,7 +45,7 @@ void main()\n\
     gl_FragColor.a = 1.0;\n\
 }\n\
 ";
-ShaderSource.BlurVS = "attribute vec4 position;\n\
+ShaderSource['BlurVS'] = "attribute vec4 position;\n\
 attribute vec2 texCoord;\n\
 \n\
 uniform mat4 projectionMatrix;\n\
@@ -60,7 +60,7 @@ void main()\n\
     gl_Position = projectionMatrix * modelViewMatrix * position;\n\
 }\n\
 ";
-ShaderSource.BoxDepthFS = "#ifdef GL_ES\n\
+ShaderSource['BoxDepthFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform float near;\n\
@@ -82,7 +82,7 @@ void main()\n\
     gl_FragData[0] = packDepth(-depth);\n\
 }\n\
 ";
-ShaderSource.BoxDepthVS = "attribute vec3 position;\n\
+ShaderSource['BoxDepthVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -111,7 +111,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.BoxSsaoFS = "#ifdef GL_ES\n\
+ShaderSource['BoxSsaoFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform sampler2D depthTex;\n\
@@ -203,7 +203,7 @@ void main()\n\
     gl_FragColor.a = 1.0;   \n\
 }\n\
 ";
-ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
+ShaderSource['BoxSsaoVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec4 color4;\n\
 \n\
@@ -265,14 +265,14 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.CloudFS = "precision lowp float;\n\
+ShaderSource['CloudFS'] = "precision lowp float;\n\
 varying vec3 vColor;\n\
 \n\
 void main()\n\
 {\n\
     gl_FragColor = vec4(vColor, 1.);\n\
 }";
-ShaderSource.CloudVS = "attribute vec3 position;\n\
+ShaderSource['CloudVS'] = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 cloudPosHIGH;\n\
 uniform vec3 cloudPosLOW;\n\
@@ -293,7 +293,7 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
-ShaderSource.ColorFS = "precision mediump float;\n\
+ShaderSource['ColorFS'] = "precision mediump float;\n\
 uniform int byteColor_r;\n\
 uniform int byteColor_g;\n\
 uniform int byteColor_b;\n\
@@ -305,7 +305,7 @@ void main()\n\
     gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
 }\n\
 ";
-ShaderSource.ColorSelectionSsaoFS = "precision highp float;\n\
+ShaderSource['ColorSelectionSsaoFS'] = "precision highp float;\n\
 uniform vec4 vColor4Aux;\n\
 \n\
 void main()\n\
@@ -313,7 +313,7 @@ void main()\n\
     gl_FragColor = vColor4Aux;\n\
 }\n\
 ";
-ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
+ShaderSource['ColorSelectionSsaoVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 RefTransfMatrix;\n\
@@ -336,7 +336,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.ColorVS = "attribute vec3 position;\n\
+ShaderSource['ColorVS'] = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
@@ -356,7 +356,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
-ShaderSource.LegoDepthFS = "#ifdef GL_ES\n\
+ShaderSource['LegoDepthFS'] = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
 uniform float near;\n\
@@ -378,7 +378,7 @@ void main()\n\
     gl_FragData[0] = packDepth(-depth);\n\
 }\n\
 ";
-ShaderSource.LegoDepthVS = "attribute vec3 position;\n\
+ShaderSource['LegoDepthVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
 \n\
@@ -408,7 +408,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.LegoSsaoFS = "#ifdef GL_ES\n\
+ShaderSource['LegoSsaoFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform sampler2D depthTex;\n\
@@ -500,7 +500,7 @@ void main()\n\
     gl_FragColor.a = 1.0;   \n\
 }\n\
 ";
-ShaderSource.LegoSsaoVS = "attribute vec3 position;\n\
+ShaderSource['LegoSsaoVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec4 color4;\n\
 attribute vec2 texCoord;\n\
@@ -546,7 +546,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.LodBuildingDepthFS = "#ifdef GL_ES\n\
+ShaderSource['LodBuildingDepthFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform float near;\n\
@@ -568,7 +568,7 @@ void main()\n\
     gl_FragData[0] = packDepth(-depth);\n\
 }\n\
 ";
-ShaderSource.LodBuildingDepthVS = "attribute vec3 position;\n\
+ShaderSource['LodBuildingDepthVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -596,7 +596,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.LodBuildingSsaoFS = "#ifdef GL_ES\n\
+ShaderSource['LodBuildingSsaoFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform sampler2D depthTex;\n\
@@ -704,7 +704,7 @@ void main()\n\
     gl_FragColor.a = 1.0;   \n\
 }\n\
 ";
-ShaderSource.LodBuildingSsaoVS = "attribute vec3 position;\n\
+ShaderSource['LodBuildingSsaoVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec4 color4;\n\
 attribute vec2 texCoord;\n\
@@ -762,7 +762,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
+ShaderSource['ModelRefSsaoFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
@@ -891,7 +891,7 @@ void main()\n\
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
 }\n\
 ";
-ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
+ShaderSource['ModelRefSsaoVS'] = "	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
 	attribute vec2 texCoord;\n\
 	\n\
@@ -936,7 +936,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}\n\
 ";
-ShaderSource.PngImageFS = "precision mediump float;\n\
+ShaderSource['PngImageFS'] = "precision mediump float;\n\
 varying vec2 v_texcoord;\n\
 uniform bool textureFlipYAxis;\n\
 uniform sampler2D u_texture;\n\
@@ -959,7 +959,7 @@ void main()\n\
 \n\
     gl_FragColor = textureColor;\n\
 }";
-ShaderSource.PngImageVS = "attribute vec3 a_position;\n\
+ShaderSource['PngImageVS'] = "attribute vec3 a_position;\n\
 attribute vec2 a_texcoord;\n\
 uniform mat4 buildingRotMatrix;  \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
@@ -984,14 +984,14 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.PointCloudFS = "	precision lowp float;\n\
+ShaderSource['PointCloudFS'] = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
 	void main()\n\
     {\n\
 		gl_FragColor = vColor;\n\
 	}";
-ShaderSource.PointCloudVS = "attribute vec3 position;\n\
+ShaderSource['PointCloudVS'] = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
@@ -1012,7 +1012,7 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
-ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
+ShaderSource['RenderShowDepthFS'] = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
 uniform float near;\n\
@@ -1034,7 +1034,7 @@ void main()\n\
     gl_FragData[0] = packDepth(-depth);\n\
 }\n\
 ";
-ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
+ShaderSource['RenderShowDepthVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 RefTransfMatrix;\n\
@@ -1064,7 +1064,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.ShowDepthFS = "#ifdef GL_ES\n\
+ShaderSource['ShowDepthFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform float near;\n\
@@ -1091,7 +1091,7 @@ void main()\n\
     gl_FragData[0].r = -depth/far;\n\
 }\n\
 ";
-ShaderSource.ShowDepthVS = "attribute vec3 position;\n\
+ShaderSource['ShowDepthVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
@@ -1126,14 +1126,14 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.SilhouetteFS = "precision highp float;\n\
+ShaderSource['SilhouetteFS'] = "precision highp float;\n\
 uniform vec4 vColor4Aux;\n\
 \n\
 void main()\n\
 {          \n\
     gl_FragColor = vColor4Aux;\n\
 }";
-ShaderSource.SilhouetteVS = "attribute vec3 position;\n\
+ShaderSource['SilhouetteVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 ModelViewMatrixRelToEye;\n\
@@ -1162,7 +1162,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
     gl_Position += translationVec;  \n\
 }";
-ShaderSource.SimpleDepthSsaoFS = "precision highp float;\n\
+ShaderSource['SimpleDepthSsaoFS'] = "precision highp float;\n\
 const vec4 bitEnc = vec4(1.0,255.0,65025.0,16581375.0);\n\
 const vec4 bitDec = 1.0/bitEnc;\n\
 varying float zDepth;\n\
@@ -1181,7 +1181,7 @@ void main()\n\
     gl_FragData[0] = encodedZ;\n\
 }\n\
 ";
-ShaderSource.SimpleDepthSsaoVS = "attribute vec3 position;\n\
+ShaderSource['SimpleDepthSsaoVS'] = "attribute vec3 position;\n\
 \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -1207,7 +1207,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.SsaoFS = "#ifdef GL_ES\n\
+ShaderSource['SsaoFS'] = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 uniform sampler2D depthTex;\n\
@@ -1295,7 +1295,7 @@ void main()\n\
     gl_FragColor.a = 1.0;   \n\
 }\n\
 ";
-ShaderSource.SsaoVS = "attribute vec3 position;\n\
+ShaderSource['SsaoVS'] = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
 \n\
@@ -1325,14 +1325,14 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }";
-ShaderSource.StandardFS = "precision lowp float;\n\
+ShaderSource['StandardFS'] = "precision lowp float;\n\
 varying vec3 vColor;\n\
 \n\
 void main()\n\
 {\n\
     gl_FragColor = vec4(vColor, 1.);\n\
 }";
-ShaderSource.StandardVS = "attribute vec3 position;\n\
+ShaderSource['StandardVS'] = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
@@ -1355,7 +1355,7 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
-ShaderSource.TextureA1FS = "precision mediump float;\n\
+ShaderSource['TextureA1FS'] = "precision mediump float;\n\
 varying vec4 vColor;\n\
 varying vec2 vTextureCoord;\n\
 uniform sampler2D uSampler;\n\
@@ -1365,7 +1365,7 @@ void main()\n\
     gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 }\n\
 ";
-ShaderSource.TextureA1VS = "attribute vec3 position;\n\
+ShaderSource['TextureA1VS'] = "attribute vec3 position;\n\
 attribute vec4 aVertexColor;\n\
 attribute vec2 aTextureCoord;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -1389,7 +1389,7 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
-ShaderSource.TextureFS = "precision mediump float;\n\
+ShaderSource['TextureFS'] = "precision mediump float;\n\
 varying vec4 vColor;\n\
 varying vec2 vTextureCoord;\n\
 uniform sampler2D uSampler;\n\
@@ -1398,7 +1398,7 @@ void main()\n\
 {\n\
     gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 }";
-ShaderSource.TextureNormalFS = "	precision mediump float;\n\
+ShaderSource['TextureNormalFS'] = "	precision mediump float;\n\
 	varying vec4 vColor;\n\
 	varying vec2 vTextureCoord;\n\
 	uniform sampler2D uSampler;\n\
@@ -1411,7 +1411,7 @@ ShaderSource.TextureNormalFS = "	precision mediump float;\n\
 		gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
 	}\n\
 ";
-ShaderSource.TextureNormalVS = "attribute vec3 position;\n\
+ShaderSource['TextureNormalVS'] = "attribute vec3 position;\n\
 attribute vec4 aVertexColor;\n\
 attribute vec2 aTextureCoord;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -1448,7 +1448,7 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
-ShaderSource.TextureVS = "attribute vec3 position;\n\
+ShaderSource['TextureVS'] = "attribute vec3 position;\n\
 attribute vec4 aVertexColor;\n\
 attribute vec2 aTextureCoord;\n\
 uniform mat4 Mmatrix;\n\

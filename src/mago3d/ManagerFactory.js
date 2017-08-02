@@ -261,7 +261,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					magoManager.manageMouseMove(movement.startPosition.x, movement.startPosition.y);
 				}
 			}
-			else 
+			else
 			{
 				magoManager.mouseDragging = false;
 				disableCameraMotion(true);

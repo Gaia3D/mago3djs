@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * 프로젝트(ship, weather등)의 구성 요소

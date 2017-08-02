@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Returns the first parameter if not undefined, otherwise the second parameter.

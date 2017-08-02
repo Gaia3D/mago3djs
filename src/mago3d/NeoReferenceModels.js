@@ -177,14 +177,14 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
 				
 			}
-			else
+			else 
 			{
 				this.currentVisibleIndices = this.neoRefsIndices;
 			}
 			
 		}
 	}
-	else 
+	else
 	{
 		if (this.interior_ocCullOctree != undefined)
 		{
@@ -193,7 +193,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
 				
 			}
-			else 
+			else
 			{
 				this.currentVisibleIndices = this.neoRefsIndices;
 			}
