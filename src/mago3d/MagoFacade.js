@@ -218,7 +218,7 @@ function showLocationAndRotationAPI(projectId, blockId, objectId, latitude, long
 /**
  * 마우스 클릭 객체 이동 대상 변경
  * 
- * @param mouseMoveMode 0 = All, 1 = object
+ * @param mouseMoveMode 0 = All, 1 = object, 2 = None
  * @return
  */
 function changeMouseMoveAPI(mouseMoveMode) {
