@@ -252,6 +252,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			// if picked
 			//vm.pickedPolygon = false;
 			//disableCameraMotion(true)
+			if(magoManager.isCameraMoving)
+			{
+				//magoManager.sceneState.bMust = true;
+			}
 			magoManager.isCameraMoving = false;
 			magoManager.mouseLeftDown = false;
 			magoManager.mouseDragging = false;

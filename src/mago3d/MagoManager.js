@@ -1165,9 +1165,8 @@ MagoManager.prototype.loadBuildingOctree = function(neoBuilding) {
 };
 
 /**
- * ??
- * @param scene 변수
- * @param isLastFrustum 변수
+ * Here updates the modelView matrices.
+ * @param {SceneState} sceneState
  */
 MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 	// here updates the modelView and modelViewProjection matrices of the scene.***
@@ -1302,6 +1301,33 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) {
 	
 };
 
+/**
+ * Here updates the camera's parameters and frustum planes.
+ * @param {Camera} camera
+ */
+MagoManager.prototype.upDateCamera = function(resultCamera) {
+	if(this.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		var wwwFrustumVolume = this.sceneState.dc.navigatorState.frustumInModelCoordinates;
+		for(var i=0; i<6; i++)
+		{
+			var plane = wwwFrustumVolume._planes[i];
+			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], plane.distance);
+		}
+	}
+	else if(this.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		var camera = this.scene.frameState.camera;
+		var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
+
+		for(var i=0; i<6; i++)
+		{
+			var plane = cesiumFrustum.planes[i];
+			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
+		}
+	}
+};
+
 
 /**
  * object index 파일을 읽어서 Frustum Culling으로 화면에 rendering
@@ -1336,40 +1362,29 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	if(this.pin.texture == undefined)
 	{
 		this.pin.texture = new Texture();
-		var filePath_inServer = this.magoPolicy.imagePath + "/PinImage.png";
+		var filePath_inServer = this.magoPolicy.imagePath + "/bugger.png";
 		this.pin.texture.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, this.pin.texture, undefined, this);
 		this.pin.texturesArray.push(this.pin.texture);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/PinCabreado.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/improve.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/PinTijeras.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/etc.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
 		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/PinDislike.png";
+		filePath_inServer = this.magoPolicy.imagePath + "/new.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
-		
-		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/PinLikeGreen.png";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
-		
-		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/PinCarcajadas.png";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
+	
 	}
 	
 	//scene
@@ -1378,57 +1393,30 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	{
 		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	}
-	
-	
+
 	var cameraPosition = this.sceneState.camera.position;
 
-	// do frustum culling.***
-	//if(this.isCameraMoving)
-	//{
-	//	var hola = 0;
-	//}
-	
 	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		if(this.isLastFrustum)
 		{
-			if(this.myCameraSCX == undefined) 
-			this.myCameraSCX = new Camera();
-				
-			var frustumVolume;
-			if(this.configInformation.geo_view_library === Constant.WORLDWIND)
+			//if(this.sceneState.bMust)
 			{
-				var wwwFrustumVolume = this.sceneState.dc.navigatorState.frustumInModelCoordinates;
-				for(var i=0; i<6; i++)
-				{
-					var plane = wwwFrustumVolume._planes[i];
-					this.myCameraSCX.frustum.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], plane.distance);
-				}
-			}
-			else if(this.configInformation.geo_view_library === Constant.CESIUM)
-			{
-				var camera = scene.frameState.camera;
-				var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
+				if(this.myCameraSCX == undefined) 
+					this.myCameraSCX = new Camera();
 
-				for(var i=0; i<6; i++)
-				{
-					var plane = cesiumFrustum.planes[i];
-					this.myCameraSCX.frustum.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
-				}
+				this.upDateCamera(this.myCameraSCX);
+				this.currentVisibleNeoBuildings_array.length = 0;
+				this.doFrustumCullingNeoBuildings(this.myCameraSCX.frustum, cameraPosition);
+				this.prepareNeoBuildingsAsimetricVersion(gl);
+				//this.sceneState.bMust = false;
 			}
-
-			this.currentVisibleNeoBuildings_array.length = 0;
-			this.doFrustumCullingNeoBuildings(this.myCameraSCX.frustum, cameraPosition);
-			this.prepareNeoBuildingsAsimetricVersion(gl);
 		}
-	}
-	else{
-		var hola = 0;
 	}
 
 	var currentShader = undefined;
 
-	// renderDepth for all buildings.***
+	// prepare data if camera is no moving.***
 	// 1) LOD 0.*********************************************************************************************************************
 	if(!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown && this.isLastFrustum) {
 		this.visibleObjControlerOctrees.initArrays(); // init.******
@@ -1460,10 +1448,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
 			}
 		}
-		
-	}
-	else{
-		var hola = 0;
 	}
 	
 	if(this.bPicking == true && isLastFrustum)
@@ -1528,7 +1512,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
+	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
 	this.depthFboNeo.unbind();
 	
 	this.renderingFase = !this.renderingFase;
@@ -1554,7 +1538,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels);
 
 	ssao_idx = 1;
-	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, scene, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
+	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
 	
 	this.renderingFase = !this.renderingFase;
 	
@@ -3229,7 +3213,7 @@ MagoManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition, s
  * @param neoRefLists_array 변수
  */
 
-MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPosition, scene, shader, renderTexture, ssao_idx, visibleObjControlerBuildings) {
+MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPosition, shader, renderTexture, ssao_idx, visibleObjControlerBuildings) {
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
@@ -3267,8 +3251,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		if(ssao_idx == 1) {
 			
 			// 2) ssao render.************************************************************************************************************
-			// 2) ssao render.************************************************************************************************************
-			// 2) ssao render.************************************************************************************************************
 			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
 			if(neoBuildingsCount > 0)
 			{
@@ -3296,7 +3278,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 
 				gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
 				gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
 				gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
 				gl.uniform1f(currentShader.shininessValue_loc, 40.0);
 
@@ -3318,8 +3300,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				this.visibleObjControlerOctreesAux.initArrays();
 				
 				// 1) LOD0 & LOD1.*********************************************************************************************************************
-				// 1) LOD0 & LOD1.*********************************************************************************************************************
-				// 1) LOD0 & LOD1.*********************************************************************************************************************
 				var refTMatrixIdxKey = 0;
 				var minSize = 0.0;
 				var renderTexture;
@@ -3338,9 +3318,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 
 			}
 			// 2) LOD 2 & 3.************************************************************************************************************************************
-			// 2) LOD 2 & 3.************************************************************************************************************************************
-			// 2) LOD 2 & 3.************************************************************************************************************************************
-			
 			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
 			if(neoBuildingsCount > 0)
 			{
@@ -3373,7 +3350,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
 				gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
 				gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
 				gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
 
 				gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
@@ -3398,10 +3375,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			}
 			
 			// If there are an object selected, then there are a stencilBuffer.******************************************
-			
 			if(this.buildingSelected && this.objectSelected) // if there are an object selected then there are a building selected.***
 			{
-				/*
 				neoBuilding = this.buildingSelected;
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				var neoReferencesMotherAndIndices = this.octreeSelected.neoReferencesMotherAndIndices;
@@ -3411,13 +3386,14 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				var refMatrixIdxKey = 0;
 				
 				// do as the "getSelectedObjectPicking".**********************************************************
-				currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
+				currentShader = this.postFxShadersManager.pFx_shaders_array[14]; // silhouette shader.***
 				var shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
 				
 				gl.enableVertexAttribArray(currentShader.position3_loc);
 				
 				gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+				gl.uniformMatrix4fv(currentShader.ModelViewMatrixRelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays);
 				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
 				gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 				
@@ -3425,37 +3401,37 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				// position uniforms.***
 				gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 				gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-				//gl.uniform4fv(currentShader.color4Aux_loc, [1.0, 0.0, 0.0, 1.0]);
-				
-				// Active stencil if the object selected.****************************************************************************************************************
-				//gl.enable(gl.STENCIL_TEST);
-				//gl.clearStencil(0);
-				//gl.clear(gl.STENCIL_BUFFER_BIT);
-				//gl.stencilFunc(gl.ALWAYS, 1, 1);
-				//gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
-				//gl.disable(gl.CULL_FACE);
-				//this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
-				//-------------------------------------------------------------------
 				
 				gl.uniform4fv(currentShader.color4Aux_loc, [0.0, 1.0, 0.0, 1.0]);
+				gl.uniform2fv(currentShader.screenSize_loc, [this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight]);
+				gl.uniformMatrix4fv(currentShader.ProjectionMatrix_loc, false, this.sceneState.projectionMatrix._floatArrays);
+				
 				gl.enable(gl.STENCIL_TEST);
 				gl.disable(gl.POLYGON_OFFSET_FILL);
 				gl.disable(gl.CULL_FACE);
-				//gl.colorMask(true, true, true, true);
-				//gl.depthMask(true);
+				gl.disable(gl.DEPTH_TEST);
 				gl.depthRange(0, 0);
 				
-				//gl.stencilFunc(gl.NOTEQUAL, 1, 0xff);
 				gl.stencilFunc(gl.EQUAL, 0, 1);
 				gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
 					
-				glPrimitive = gl.POINTS;
+				//glPrimitive = gl.POINTS;
+				glPrimitive = gl.TRIANGLES;
 				//gl.polygonMode( gl.FRONT_AND_BACK, gl.LINE );
+				
+				var offsetSize = 5/1000;
+				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, offsetSize]);
+				this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
+				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [-offsetSize, offsetSize]);
+				this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
+				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, -offsetSize]);
+				this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
+				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [-offsetSize, -offsetSize]);
 				this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
 				gl.enable(gl.DEPTH_TEST);// return to the normal state.***
 				gl.disable(gl.STENCIL_TEST);
 				gl.depthRange(0, 1);// return to the normal value.***
-				//gl.disableVertexAttribArray(currentShader.position3_loc);
+				gl.disableVertexAttribArray(currentShader.position3_loc);
 				
 				if(currentShader)
 				{
@@ -3464,14 +3440,10 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					if(currentShader.normal3_loc != -1)gl.disableVertexAttribArray(currentShader.normal3_loc);
 					if(currentShader.color4_loc != -1)gl.disableVertexAttribArray(currentShader.color4_loc);
 				}
-				*/
+				
 			}
 			
-			
 			// 3) now render bboxes.*******************************************************************************************************************
-			// 3) now render bboxes.*******************************************************************************************************************
-			// 3) now render bboxes.*******************************************************************************************************************
-			
 			if(this.magoPolicy.getShowBoundingBox())
 			{
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
@@ -3506,7 +3478,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
 				gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
 				gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
 				gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
 
 
@@ -3599,7 +3571,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
 				gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
 				gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
+				gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
 				gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
 
 
@@ -3640,7 +3612,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				// now repeat the objects markers for png images.***
 				// Png for pin image 128x128.********************************************************************
 				if(this.pin.positionBuffer == undefined)
-					this.pin.createPin(gl);
+					this.pin.createPinCenterBottom(gl);
 				
 				currentShader = this.postFxShadersManager.pFx_shaders_array[13]; // png image shader.***
 				
