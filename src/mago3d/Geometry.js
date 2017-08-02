@@ -2,21 +2,6 @@
 
 
 // F4D ReferenceObject.************************************************************************************************************************* //
-/**
- * 맵 이미지. 머티리얼에는 텍스처에 대한 참조가 포함될 수 있으므로 머티리얼의 셰이더는 객체의 표면색을 계산하는 동안 텍스처를 사용할 수 있습니다.
- * 오브제의 표면의 기본 색상 (알베도) 외에도 텍스쳐는 반사율이나 거칠기와 같은 재질 표면의 많은 다른면을 나타낼 수 있습니다.
- * @class Texture
- */
-var Texture = function() {
-	if(!(this instanceof Texture)) {
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.textureTypeName = "";
-	this.textureImageFileName = "";
-	this.texId;
-	this.fileLoadState = CODE.fileLoadState.READY;
-};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -51,20 +36,6 @@ NeoSimpleBuilding.prototype.newTexture = function() {
 	this.texturesArray.push(texture);
 	return texture;
 };
-
-/*
-NeoSimpleBuilding.prototype {
-	neoRefsLists_Array: [],
-	new_accesor: function() {},
-	updateCurrentAllIndicesOfLists:  function() {
-			var neoRefLists_count = this.neoRefsLists_Array.length;
-			for(var i=0; i<neoRefLists_count; i++)
-			{
-				this.neoRefsLists_Array[i].updateCurrentAllIndicesInterior();
-			}
-		},
-}
-*/
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -207,19 +178,6 @@ var NeoBuilding = function() {
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns neoRef
- */
-NeoBuilding.prototype.setRenderedFalseToAllReferences = function() {
-	var neoRefsCount = this.motherNeoReferencesArray.length;
-	for(var i = 0; i < neoRefsCount; i++)
-	{
-		var neoRef = this.motherNeoReferencesArray[i];
-		neoRef.bRendered = false;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
  * @param texture 변수
  * @returns texId
  */
@@ -312,32 +270,39 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param absoluteCamera 변수
- * @param resultCamera 변수
- * @returns resultCamera
+ * @param neoReference 변수
  */
-NeoBuilding.prototype.getTransformedRelativeCameraToBuilding = function(absoluteCamera, resultCamera) {
-	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
-	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
-	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
-	// 1rst, calculate the relative eye position.***
-	var buildingPosition = this.buildingPosition;
+NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) {
+	//neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED
+	if(neoReference.texture.texId == undefined) {
+		// 1rst, check if the texture is loaded.
+		var sameTexture = this.getSameTexture(neoReference.texture);
+		if(sameTexture == undefined)
+		{
+			if(magoManager.backGround_fileReadings_count > 10) 
+				return;
+		
+			if(neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
+			{
+				var gl = magoManager.sceneState.gl;
+				neoReference.texture.texId = gl.createTexture();
+				// Load the texture.***
+				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+				var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 
-	if(this.buildingPosMatInv == undefined) {
-		this.buildingPosMatInv = new Matrix4();
-		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv); // this is rotationMatrixInverse.***
+				this.texturesLoaded.push(neoReference.texture);
+				magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
+				magoManager.backGround_fileReadings_count ++;
+			}
+		} else {
+			if(sameTexture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+			{
+				neoReference.texture = sameTexture;
+			}
+		}
 	}
-
-	this.point3dScratch.set(absoluteCamera.position.x - buildingPosition.x, absoluteCamera.position.y - buildingPosition.y, absoluteCamera.position.z - buildingPosition.z);
-	resultCamera.position = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.position);
-
-	this.point3dScratch.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
-	resultCamera.direction = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.direction);
-
-	this.point3dScratch.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
-	resultCamera.up = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, resultCamera.up);
-
-	return resultCamera;
+	
+	return neoReference.texture.fileLoadState;
 };
 
 /**
