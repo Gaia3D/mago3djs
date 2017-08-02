@@ -28,6 +28,8 @@ var SceneState = function() {
 	this.drawingBufferWidth = new Int32Array([1000]);
 	this.drawingBufferHeight = new Int32Array([1000]);
 	
+	this.bMust = false;
+	
 	// webWorldWind vars.***
 	this.dc;
 	

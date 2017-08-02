@@ -221,6 +221,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	var ifc_entity;
 	var vbo_ByteColorsCacheKeys_Container;
 	var current_tex_id;
+	var current_vbo_id;
 
 	gl.activeTexture(gl.TEXTURE2); // ...***
 	if(renderTexture) {
@@ -1406,9 +1407,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 				this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer ();
 				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
 				gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-				//this.vbo_vi_cacheKey_aux.posVboDataArray = [];
 				this.vbo_vi_cacheKey_aux.posVboDataArray = null;
-
 				return;
 			}
 
@@ -1419,9 +1418,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 				this.vbo_vi_cacheKey_aux.meshFacesCacheKey = gl.createBuffer ();
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
 				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-				//this.vbo_vi_cacheKey_aux.idxVboDataArray = [];
 				this.vbo_vi_cacheKey_aux.idxVboDataArray = null;
-
 				return;
 			}
 
@@ -1434,8 +1431,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 
 			// Indices.***
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-			gl.drawElements(glPrimitive, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-			//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+			gl.drawElements(glPrimitive, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); 
 		}
 	}
 };
