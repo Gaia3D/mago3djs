@@ -262,11 +262,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				continue;
 			}
 
-			if(neoReference.bRendered == magoManager.renderingFase)
-			{
+			if(neoReference.bRendered == magoManager.renderingFase){
 				continue;
 			}
-
 
 			block_idx = neoReference._block_idx;
 			block = neoBuilding.motherBlocksArray[block_idx];
@@ -285,51 +283,17 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				}
 			}
 
-			// Check if the texture is loaded.********************************************************************************
+			// Check if the texture is loaded.
 			//if(renderTexture)
 			{
 				if(neoReference.texture != undefined){
-					if(neoReference.texture.texId == undefined) {
-						// 1rst, check if the texture is loaded.***
-						var sameTexture = neoBuilding.getSameTexture(neoReference.texture);
-						if(sameTexture == undefined)
-						{
-							if(magoManager.backGround_fileReadings_count > 10) 
-							continue;
-						
-							if(neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
-							{
-								neoReference.texture.texId = gl.createTexture();
-								// Load the texture.***
-								var filePath_inServer = geometryDataPath + "/" + neoBuilding.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
-								//***********************************************************************
-								neoBuilding.texturesLoaded.push(neoReference.texture);
-								//neoBuilding.texturesLoadedCache[texture.texId] = neoReference.texture;
-								//-----------------------------------------------------------------------
-								magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, neoBuilding, magoManager);
-								magoManager.backGround_fileReadings_count ++;
-							}
-							continue;
-						} else {
-							if(sameTexture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
-							{
-								neoReference.texture = sameTexture;
-								//continue;
-							}
-							else{
-								continue;
-							}
-						}
-					}
-					else{
-						if(neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
-						{
-							continue;
-						}
+					if(neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) != CODE.fileLoadState.LOADING_FINISHED){
+						continue;
 					}
 				}
 			}
-			// End checking textures loaded.------------------------------------------------------------------------------------
+			
+			// Check the color or texture of reference object.
 			if(ssao_idx == 0)
 			{
 				
@@ -367,14 +331,13 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 						gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 						
-						// Active stencil if the object selected.****************************
+						// Active stencil if the object is selected.
 						gl.enable(gl.STENCIL_TEST);
 						gl.clearStencil(0);
 						gl.clear(gl.STENCIL_BUFFER_BIT);
 						gl.stencilFunc(gl.ALWAYS, 1, 1);
 						gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
 						gl.disable(gl.CULL_FACE);
-						//-------------------------------------------------------------------
 					}
 					else if(magoManager.magoPolicy.colorChangedObjectId == neoReference.objectId)
 					{
@@ -417,7 +380,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 								}
 							}
 						} else {
-							// if there are no texture, then use a color.***
+							// if no render texture, then use a color.***
 							if(neoReference.color4) {
 								gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 								gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);

@@ -231,3 +231,97 @@ Matrix4.prototype.copyFromFloatArray = function(floatArrays) {
 		this._floatArrays[i] = floatArrays[i];
 	}
 };
+
+/**
+ * Returns if the matrix is identity.
+ * @returns {boolean} matrixIsIdentity.
+ */
+Matrix4.prototype.isIdentity = function() {
+	if(this._floatArrays[0] == 1)
+	{
+		if(this._floatArrays[1] == 0)
+		{
+			if(this._floatArrays[2] == 0)
+			{
+				if(this._floatArrays[3] == 0)
+				{
+					if(this._floatArrays[4] == 0)
+					{
+						if(this._floatArrays[5] == 1)
+						{
+							if(this._floatArrays[6] == 0)
+							{
+								if(this._floatArrays[7] == 0)
+								{
+									if(this._floatArrays[8] == 0)
+									{
+										if(this._floatArrays[9] == 0)
+										{
+											if(this._floatArrays[10] == 1)
+											{
+												if(this._floatArrays[11] == 0)
+												{
+													if(this._floatArrays[12] == 0)
+													{
+														if(this._floatArrays[13] == 0)
+														{
+															if(this._floatArrays[14] == 0)
+															{
+																if(this._floatArrays[15] == 1)
+																{
+																	return true;
+																}
+																else return false;
+															}
+															else return false;
+														}
+														else return false;
+													}
+													else return false;
+												}
+												else return false;
+											}
+											else return false;
+										}
+										else return false;
+									}
+									else return false;
+								}
+								else return false;
+							}
+							else return false;
+						}
+						else return false;
+					}
+					else return false;
+				}
+				else return false;
+			}
+			else return false;
+		}
+		else return false;
+	}
+	else return false;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
