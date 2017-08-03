@@ -2,11 +2,11 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class VisibleObjectsControler
+ * @class VisibleObjectsController
  */
-var VisibleObjectsControler = function() 
+var VisibleObjectsController = function() 
 {
-	if (!(this instanceof VisibleObjectsControler)) 
+	if (!(this instanceof VisibleObjectsController)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -24,7 +24,7 @@ var VisibleObjectsControler = function()
 	this.currentRenderableRefArray = [];
 };
 
-VisibleObjectsControler.prototype.initArrays = function() 
+VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
 	this.currentVisibles1 = [];

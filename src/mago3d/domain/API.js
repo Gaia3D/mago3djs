@@ -1,20 +1,23 @@
 'use strict';
 
 /**
- * API
+ * mago3djs API
+ * 
+ * @alias API
  * @class API
- * @param apiName api이름
+ * 
+ * @param {any} apiName api이름
  */
-var API = function(apiName) 
+function API(apiName)
 {
 	if (!(this instanceof API)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+
 	// mago3d 활성화/비활성화 여부
 	this.magoEnable = true;
-	
+
 	// api 이름
 	this.apiName = apiName;
 	// project id
@@ -33,7 +36,7 @@ var API = function(apiName)
 	this.issueType = null;
 	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
 	this.drawType = 0;
-	
+
 	// fullship = 0, deploy = 1
 	this.renderMode = 0;
 	// 위도
@@ -48,7 +51,7 @@ var API = function(apiName)
 	this.pitch = 0;
 	// roll
 	this.roll = 0;
-	
+
 	// 색깔
 	this.color = 0;
 	// structs = MSP, outfitting = MOP
@@ -67,10 +70,10 @@ var API = function(apiName)
 	//	this.colorBuildings = [];
 	//	// show/hide
 	//	this.hideBuildings = [];
-	
+
 	// 0 = block mode, 1 = object mode
 	this.mouseMoveMode = 0;
-	
+
 	// 이슈 등록 표시
 	this.issueInsertEnable = false;
 	// object 정보 표시

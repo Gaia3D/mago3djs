@@ -111,9 +111,9 @@ var MagoManager = function()
 	this.currentVisibleBuildingsPost_array = [];
 
 	this.fileRequestControler = new FileRequestControler();
-	this.visibleObjControlerBuildings = new VisibleObjectsControler();
-	this.visibleObjControlerOctrees = new VisibleObjectsControler(); // delete this.***
-	this.visibleObjControlerOctreesAux = new VisibleObjectsControler(); // delete this.***
+	this.visibleObjControlerBuildings = new VisibleObjectsController();
+	this.visibleObjControlerOctrees = new VisibleObjectsController(); // delete this.***
+	this.visibleObjControlerOctreesAux = new VisibleObjectsController(); // delete this.***
 	
 	this.currentVisibleNeoBuildings_array = []; // delete this.***
 	this.currentVisibleClouds_array = [];
@@ -1637,7 +1637,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
  * @param {GL} gl.
  * @param {int} mouseX Screen x position of the mouse.
  * @param {int} mouseY Screen y position of the mouse.
- * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
+ * @param {VisibleObjectsController} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
  * @returns {Array} resultSelectedArray 
  */
 MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleObjControlerBuildings, resultSelectedArray) 
@@ -2758,7 +2758,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding.octree != undefined) 
 	{
 		if (neoBuilding.currentVisibleOctreesControler == undefined)
-		{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsControler(); }	
+		{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController(); }	
 			
 		if (lod == 0 || lod == 1)
 		{

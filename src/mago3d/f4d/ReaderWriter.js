@@ -823,44 +823,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
-		var lat_ref = 41.204997;
-		var lon_ref = 30.265340;
-		var a=6356752.3142451793;
-		var b=6378137.0;
-		var toRad = Math.PI/180.0;
-		var angle = lat_ref*toRad;
-	
-		var tmpPP = new Point3D();
-		neoBuilding.bbox.getCenterPoint3d(tmpPP);
-		tmpPP.add(-52.82048416137695,-44.571495056152344,-10.690006971359253);
-		var dlat = tmpPP.y/(Math.sqrt(a*a*Math.pow(Math.cos(angle),2)+b*b*Math.pow(Math.sin(angle),2)))/toRad;
-		var dlon = tmpPP.x/(b*Math.cos(angle))/toRad;
-		var lat = lat_ref + dlat;
-		var lon = lon_ref + dlon;
-		var str = '		"'+buildingName+'": {\
-"list_counter": 10,\
-"data_id": 1000,\
-"data_group_id": 9,\
-"data_group_name": "IFC",\
-"data_key": "'+buildingName+'",\
-"data_name": "'+buildingName+'",\
-"latitude": "'+lat+'",\
-"longitude": "'+lon+'",\
-"height": "164",\
-"heading": "0",\
-"pitch": "0",\
-"roll": "0",\
-"status": "0",\
-"data_insert_type": "SELF",\
-"insert_date": "2017-06-26 21:06:29.159998"\
-},';
-
-		num++;
-		//str ="INSERT INTO data_info (data_id, data_group_id, data_key, data_name, location, latitude, longitude, height, heading, pitch, roll, status, data_insert_type, update_date, insert_date) VALUES (\"+num+", 5, '"+buildingName+"', '"+buildingName+"', NULL, '"+lat+"', '"+lon+"', '19', '0.0', '0.0', '0.0', '0', 'SELF', NULL, '2017-06-28 19:32:53.439129');"
-
-		console.log(str);
-		//console.log(buildingName, tmpPP, lat, lon);
-
 		// create a building and set the location.***
 		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
 		var buildingNameDivided = buildingName.split("_");

@@ -156,7 +156,7 @@ var NeoBuilding = function()
 	this.motherBlocksArray = []; // asimetric mode.***
 	
 	// Current visible objects.*******************************************
-	this.currentVisibleOctreesControler; //  = new VisibleObjectsControler();
+	this.currentVisibleOctreesControler; //  = new VisibleObjectsController();
 	
 	// Aditional Color.***************************************************
 	this.aditionalColor; // use for colorChanged.***
