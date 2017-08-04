@@ -1092,10 +1092,89 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 			var arrayBuffer = response;
 			if(arrayBuffer) {
 				// decode tga.***
-				var tga = magoManager.readerWriter.decodeTGA(arrayBuffer);
+				// Test with tga decoder from https://github.com/schmittl/tgajs
+				var tga = new TGA();
+				tga.load(arrayBuffer);
+				// End decoding.---------------------------------------------------
+				
+				//var tga = magoManager.readerWriter.decodeTGA(arrayBuffer); // old code.
+				//if(tga) {
+                //    gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+               //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tga.width, tga.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tga.data);
+                //    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				//	gl.generateMipmap(gl.TEXTURE_2D);
+				//	texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+                //}
+				
+				// example values of tga.header
+				// alphaBits 0
+				// bytePerPixel 3
+				// colorMapDepth 0
+				// colorMapIndex 0
+				// colorMapLength 0
+				// colorMapType 0
+				// flags 32
+				// hasColorMap false
+				// hasEncoding false
+				// height 2048
+				// idLength 0
+				// imageType 2
+				// isGreyColor false
+				// offsetX 0
+				// offsetY 0
+				// origin 2
+				// pixelDepth 24
+				// width 2048
+				
 				if(tga) {
+					var rgbType;
+					if(tga.header.bytePerPixel == 3)
+					{
+						rgbType = gl.RGB;
+						
+						// test change rgb to bgr.***
+						/*
+						var imageDataLength = tga.imageData.length;
+						var pixelsCount = imageDataLength/3;
+						var r, g, b;
+						for(var i=0; i<pixelsCount; i++)
+						{
+							r = tga.imageData[i*3];
+							g = tga.imageData[i*3+1];
+							b = tga.imageData[i*3+2];
+							
+							tga.imageData[i*3] = b;
+							tga.imageData[i*3+1] = g;
+							tga.imageData[i*3+2] = r;
+						}
+						*/
+					}
+					else if(tga.header.bytePerPixel == 4)
+					{
+						rgbType = gl.RGBA;
+						
+						// test change rgb to bgr.***
+						var imageDataLength = tga.imageData.length;
+						var pixelsCount = imageDataLength/4;
+						var r, g, b, a;
+						for(var i=0; i<pixelsCount; i++)
+						{
+							r = tga.imageData[i*4];
+							g = tga.imageData[i*4+1];
+							b = tga.imageData[i*4+2];
+							a = tga.imageData[i*4+3];
+							
+							tga.imageData[i*4] = b;
+							tga.imageData[i*4+1] = g;
+							tga.imageData[i*4+2] = r;
+							tga.imageData[i*4+3] = a;
+						}
+					}
+					
+					
+					
                     gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tga.width, tga.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tga.data);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 					gl.generateMipmap(gl.TEXTURE_2D);
 					texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
@@ -1108,8 +1187,8 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 				else neoBuilding.metaData.fileLoadState = status;
 			}
 		}).always(function() {
-			//magoManager.fileRequestControler.filesRequestedCount -= 1;
-			//if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+			magoManager.backGround_fileReadings_count -= 1;
+			if(magoManager.backGround_fileReadings_count < 0) magoManager.backGround_fileReadings_count = 0;
 		});
 	}
 	else{

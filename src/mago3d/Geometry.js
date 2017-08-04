@@ -274,6 +274,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) {
 	//neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED
+	
 	if(neoReference.texture.texId == undefined) {
 		// 1rst, check if the texture is loaded.
 		var sameTexture = this.getSameTexture(neoReference.texture);
@@ -281,6 +282,9 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		{
 			if(magoManager.backGround_fileReadings_count > 10) 
 				return;
+			
+			if(neoReference.objectId == "2112")
+				var hola = 0;
 		
 			if(neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
 			{

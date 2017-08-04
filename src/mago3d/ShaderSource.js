@@ -857,6 +857,7 @@ void main()\n\
     vec3 L = normalize(lightPos - vertexPos);\n\
     float lambertian = max(dot(normal2, L), 0.0);\n\
     float specular = 0.0;\n\
+	//lambertian = 1.0;\n\
     if(lambertian > 0.0)\n\
     {\n\
         vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
@@ -886,7 +887,7 @@ void main()\n\
         textureColor = vColor4Aux;\n\
     }\n\
     vec3 specularColor = vec3(0.7);\n\
-    vec3 ambientColor = vec3(textureColor.x * 0.4, textureColor.y * 0.4, textureColor.z * 0.4);\n\
+    vec3 ambientColor = vec3(textureColor.x * 0.7, textureColor.y * 0.7, textureColor.z * 0.7);\n\
 \n\
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
 }\n\
