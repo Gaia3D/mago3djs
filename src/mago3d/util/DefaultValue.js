@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Returns the first parameter if not undefined, otherwise the second parameter.
@@ -15,9 +15,11 @@
  * 
  * @copyright https://github.com/AnalyticalGraphicsInc/cesium
  */
-function defaultValue(a, b) {
-    if (a !== undefined) {
-        return a;
-    }
-    return b;
+function defaultValue(a, b) 
+{
+	if (a !== undefined) 
+	{
+		return a;
+	}
+	return b;
 }
