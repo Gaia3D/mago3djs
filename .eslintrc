@@ -3,7 +3,8 @@
     "browser": true,
     "node" : true,
     "jasmine": true,
-    "mocha": true
+    "mocha": true,
+    "amd": true
   },
   "globals": {},
   "parserOptions": {
