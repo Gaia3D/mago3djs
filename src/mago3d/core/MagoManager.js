@@ -4537,9 +4537,7 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) {
 /**
  * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
  * @param frustumVolume 변수
- * @param neoVisibleBuildingsArray 변수
  * @param cameraPosition 변수
- * @returns neoVisibleBuildingsArray
  */
 MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cameraPosition) {
 	// This makes the visible buildings array.***
@@ -4550,7 +4548,7 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 	var squaredDistToCamera;
 	this.detailed_neoBuilding;
 
-	var lod0_minSquaredDist = 10000;
+	var lod0_minSquaredDist = 100000;
 	var lod1_minSquaredDist = 1;
 	var lod2_minSquaredDist = 100000*10000;
 	var lod3_minSquaredDist = 100000*9;
@@ -4559,11 +4557,6 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
 	this.visibleObjControlerBuildings.currentVisibles2.length = 0;
 	this.visibleObjControlerBuildings.currentVisibles3.length = 0;
-
-	//this.visibleObjControlerBuildings.initArrays();
-	var heading = 0.0;
-	var pitch = 0.0;
-	var roll = 0.0;
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
@@ -4589,7 +4582,7 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		}
 		*/
 
-		if(neoBuilding.buildingId == "buggy")
+		if(neoBuilding.buildingId == "KSJ_100")
 		{
 			var hola = 0;
 		}
@@ -5361,7 +5354,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 		if(structureTypedBuilding.bbox == undefined)
 			continue;
 		
-		if(neoBuilding.buildingId == "KICT_main")
+		if(neoBuilding.buildingId == "KSJ_100")
 		{
 			var hola = 0;
 		}
