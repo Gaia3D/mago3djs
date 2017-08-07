@@ -223,7 +223,13 @@
 	        		<th>
 	        			<label for="data_key">Data Key</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
 	        		</th>
-	        		<td><input id="data_key" name="data_key" class="ml" type="text" value=""/><input id="latitude" name="latitude" type="hidden" value=""/><input id="longitude" name="longitude" type="hidden" value=""/><input id="height" name="height" type="hidden" value=""/></td>
+	        		<td>
+	        			<input id="data_key" name="data_key" class="ml" type="text" value=""/>
+	        			<input id="object_key" name="object_key" type="hidden" value=""/>
+	        			<input id="latitude" name="latitude" type="hidden" value=""/>
+	        			<input id="longitude" name="longitude" type="hidden" value=""/>
+	        			<input id="height" name="height" type="hidden" value=""/>
+	        		</td>
 	        	</tr>
 	        	<tr>
 	        		<th>
@@ -498,12 +504,13 @@
 	});
 	
 	// issue input layer call back function
-	function showInsertIssueLayer(data_name, data_key, latitude, longitude, height) {
+	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
 		if(insertIssueFlag) {
 			if($("#inputIssueLayer").css("display") == "none") {
 				$("#inputIssueLayer").show();
 				
-				$("#data_key").val(data_name);
+				$("#data_key").val(data_key);
+				$("#object_key").val(object_key);
 				$("#latitude").val(latitude);
 				$("#longitude").val(longitude);
 				$("#height").val(height);
