@@ -1127,6 +1127,42 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
+ShaderSource['SilhouetteFS'] = "precision highp float;\n\
+uniform vec4 vColor4Aux;\n\
+\n\
+void main()\n\
+{          \n\
+    gl_FragColor = vColor4Aux;\n\
+}";
+ShaderSource['SilhouetteVS'] = "attribute vec3 position;\n\
+\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 ModelViewMatrixRelToEye;\n\
+uniform mat4 ProjectionMatrix;\n\
+uniform mat4 RefTransfMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec2 camSpacePixelTranslation;\n\
+uniform vec2 screenSize;    \n\
+varying vec2 camSpaceTranslation;\n\
+\n\
+void main()\n\
+{    \n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    vec4 camSpacePos = ModelViewMatrixRelToEye * pos4;\n\
+    vec4 translationVec = ProjectionMatrix * vec4(camSpacePixelTranslation.x*(-camSpacePos.z), camSpacePixelTranslation.y*(-camSpacePos.z), 0.0, 1.0);\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+    gl_Position += translationVec;  \n\
+}";
 ShaderSource['SimpleDepthSsaoFS'] = "precision highp float;\n\
 const vec4 bitEnc = vec4(1.0,255.0,65025.0,16581375.0);\n\
 const vec4 bitDec = 1.0/bitEnc;\n\
@@ -1440,64 +1476,3 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
     \n\
 }";
-ShaderSource['SilhouetteFS'] = "precision highp float;\n\
-uniform vec4 vColor4Aux;\n\
-\n\
-void main()\n\
-{          \n\
-    gl_FragColor = vColor4Aux;\n\
-}\n\
-";
-ShaderSource['SilhouetteVS'] = "attribute vec3 position;\n\
-\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 ModelViewMatrixRelToEye;\n\
-uniform mat4 ProjectionMatrix;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec2 camSpacePixelTranslation;\n\
-uniform vec2 screenSize;    \n\
-varying vec2 camSpaceTranslation;\n\
-\n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-	vec4 camSpacePos = ModelViewMatrixRelToEye * pos4;\n\
-    \n\
-    //gl_PointSize = 10.0;\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	vec4 translationVec = ProjectionMatrix * vec4(camSpacePixelTranslation.x*(-camSpacePos.z), camSpacePixelTranslation.y*(-camSpacePos.z), 0.0, 1.0);\n\
-	gl_Position += translationVec;\n\
-	//gl_Position.z -= 2.0;\n\
-	\n\
-}\n\
-";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

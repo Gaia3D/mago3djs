@@ -183,8 +183,8 @@
 		</ul>
 	</div>	
 
-	<div>
-	    <canvas id="magoContainer" style="width: 100%; height: auto">
+	<div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
+		<canvas id="magoContainer" style="width:100%; height:100%">
 	        Your browser does not support HTML5 Canvas.
 	    </canvas>
 	</div>
@@ -279,69 +279,71 @@
 	</div>
 	</form>
 
-<script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script> 
-<script type="text/javascript" src="/src/mago3d/Code.js"></script>
-<script type="text/javascript" src="/src/mago3d/API.js"></script>
-<script type="text/javascript" src="/src/mago3d/Config.js"></script>
-<script type="text/javascript" src="/src/mago3d/Callback.js"></script>
-<script type="text/javascript" src="/src/mago3d/Constant.js"></script>
-<script type="text/javascript" src="/src/mago3d/Message.js"></script>
-<script type="text/javascript" src="/src/mago3d/ManagerFactory.js"></script>
-<script type="text/javascript" src="/src/mago3d/Atmosphere.js"></script>
-<script type="text/javascript" src="/src/mago3d/GeometryUtil.js"></script>
-<script type="text/javascript" src="/src/mago3d/GeometryModifier.js"></script>
-<script type="text/javascript" src="/src/mago3d/Line.js"></script>
-<script type="text/javascript" src="/src/mago3d/Plane.js"></script>
-<script type="text/javascript" src="/src/mago3d/Point3D.js"></script>
-<script type="text/javascript" src="/src/mago3d/Shader.js"></script>
-<script type="text/javascript" src="/src/mago3d/ShaderSource.js"></script>
-<script type="text/javascript" src="/src/mago3d/ReaderWriter.js"></script>
-<script type="text/javascript" src="/src/mago3d/Renderer.js"></script>
-<script type="text/javascript" src="/src/mago3d/Selection.js"></script>
-<script type="text/javascript" src="/src/mago3d/VBOManager.js"></script>
-<script type="text/javascript" src="/src/mago3d/MagoManager.js"></script>
-<script type="text/javascript" src="/src/mago3d/PostFxShader.js"></script>
-<script type="text/javascript" src="/src/mago3d/FBO.js"></script>
-<script type="text/javascript" src="/src/mago3d/Geometry.js"></script>
-<script type="text/javascript" src="/src/mago3d/Accessor.js"></script>
-<script type="text/javascript" src="/src/mago3d/NeoTexture.js"></script>
-<script type="text/javascript" src="/src/mago3d/BoundingBox.js"></script>
-<script type="text/javascript" src="/src/mago3d/BlockModels.js"></script>
-<script type="text/javascript" src="/src/mago3d/FileRequestControler.js"></script>
-<script type="text/javascript" src="/src/mago3d/ManagerUtils.js"></script>
-<script type="text/javascript" src="/src/mago3d/NeoReferenceModels.js"></script>
-<script type="text/javascript" src="/src/mago3d/OcclusionCullOctree.js"></script>
-<script type="text/javascript" src="/src/mago3d/Octree.js"></script>
-<script type="text/javascript" src="/src/mago3d/VisibleObjectsControler.js"></script>
-<script type="text/javascript" src="/src/mago3d/Matrix4.js"></script>
-<script type="text/javascript" src="/src/mago3d/Lego.js"></script>
-<script type="text/javascript" src="/src/mago3d/Camera.js"></script>
-<script type="text/javascript" src="/src/mago3d/GeoLocationData.js"></script>
-<script type="text/javascript" src="/src/mago3d/MagoFacade.js"></script>
-<script type="text/javascript" src="/src/mago3d/Policy.js"></script>
-<script type="text/javascript" src="/src/mago3d/Box.js"></script>
-<script type="text/javascript" src="/src/mago3d/Vertex.js"></script>
-<script type="text/javascript" src="/src/mago3d/Triangle.js"></script>
-<script type="text/javascript" src="/src/mago3d/TriSurface.js"></script>
-<script type="text/javascript" src="/src/mago3d/TriPolyhedron.js"></script>
-<script type="text/javascript" src="/src/mago3d/VertexList.js"></script>
-<script type="text/javascript" src="/src/mago3d/VertexMatrix.js"></script>
-<script type="text/javascript" src="/src/mago3d/Color.js"></script>
-<script type="text/javascript" src="/src/mago3d/Quaternion.js"></script>
+<script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
+<!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->
+<script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/AuxiliarSegment.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/BoundingBox.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/BoundingSphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Box.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Camera.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Code.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Color.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Constant.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Frustum.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/GeographicCoord.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/GeoLocationData.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Geometry.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/GeometryModifier.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/GlobeTile.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Line.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/MagoManager.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/ManagerFactory.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Matrix4.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Message.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/ObjectMarker.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/OcclusionCullOctree.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Pin.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Plane.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Point3D.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Quaternion.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Sphere.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/SplitValue.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/TerranTile.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Texture.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Triangle.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/TriPolyhedron.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/TriSurface.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/VBOManager.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/Vertex.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/VertexList.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/VertexMatrix.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/VisibleObjectsController.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/API.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/Callback.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/Config.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/MagoFacade.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/Policy.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/ProjectLayer.js"></script>
-<script type="text/javascript" src="/src/mago3d/MetaData.js"></script>
-<script type="text/javascript" src="/src/mago3d/SceneState.js"></script>
-<script type="text/javascript" src="/src/mago3d/SplitValue.js"></script>
-<script type="text/javascript" src="/src/mago3d/Frustum.js"></script>
-<script type="text/javascript" src="/src/mago3d/GeographicCoord.js"></script>
-<script type="text/javascript" src="/src/mago3d/TerranTile.js"></script>
-<script type="text/javascript" src="/src/mago3d/GlobeTile.js"></script>
-<script type="text/javascript" src="/src/mago3d/BoundingSphere.js"></script>
-<script type="text/javascript" src="/src/mago3d/AuxiliarSegment.js"></script>
-<script type="text/javascript" src="/src/mago3d/Sphere.js"></script>
-<script type="text/javascript" src="/src/mago3d/ObjectMarker.js"></script>
-<script type="text/javascript" src="/src/mago3d/Pin.js"></script>
-<script type="text/javascript" src="/src/mago3d/Texture.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/Accessor.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/BlockModels.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/Lego.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/MetaData.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/NeoReferenceModels.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/NeoTexture.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/Octree.js"></script>
+<script type="text/javascript" src="/src/mago3d/f4d/ReaderWriter.js"></script>
+<script type="text/javascript" src="/src/mago3d/renderer/Renderer.js"></script>
+<script type="text/javascript" src="/src/mago3d/renderer/SceneState.js"></script>
+<script type="text/javascript" src="/src/mago3d/renderer/Selection.js"></script>
+<script type="text/javascript" src="/src/mago3d/shader/PostFxShader.js"></script>
+<script type="text/javascript" src="/src/mago3d/shader/Shader.js"></script>
+<script type="text/javascript" src="/src/mago3d/shader/ShaderSource.js"></script>
+<script type="text/javascript" src="/src/mago3d/util/DefaultValue.js"></script>
+<script type="text/javascript" src="/src/mago3d/util/GeometryUtil.js"></script>
+<script type="text/javascript" src="/src/mago3d/util/ManagerUtils.js"></script>
 <script>
 	var agent = navigator.userAgent.toLowerCase();
 	if(agent.indexOf('chrome') < 0) { 
