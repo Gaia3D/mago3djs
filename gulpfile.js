@@ -95,7 +95,7 @@ function glslToJavaScript(minify, minifyStateFilePath)
 
 		contents = contents.split('"').join('\\"').replace(/\n/gm, '\\n\\\n');
 
-		shaderContents += 'ShaderSource' + "['" + baseName + "']" + ' = "' + contents + '";\n';
+		shaderContents += 'ShaderSource.' + baseName + ' = "' + contents + '";\n';
 
 		contents = copyrightComments + '\
 /*global define*/\n\
@@ -198,7 +198,9 @@ gulp.task('karma', function (done)
 // eslint
 gulp.task('lint', function() 
 {
-	return gulp.src(paths.source_js)
+	var list = paths.source_js;
+	list.push('!./src/mago3d/extern/*.js');
+	return gulp.src(list)
 		.pipe(eslint({fix: true}))
 		.pipe(eslint.format())
 		.pipe(gulpIf(isFixed, gulp.dest(function(file)
