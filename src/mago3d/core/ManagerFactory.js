@@ -345,6 +345,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		if (event.key === "q" || event.key === "Q") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;	
 			if (selectedBuilding != undefined) 
 			{
@@ -361,6 +363,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		else if (event.key === "a" || event.key === "A") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;
 			if (selectedBuilding != undefined) 
 			{
@@ -377,6 +381,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		else if (event.key === "w" || event.key === "W") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;
 			if (selectedBuilding != undefined) 
 			{
@@ -393,6 +399,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		else if (event.key === "s" || event.key === "S") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;
 			if (selectedBuilding != undefined) 
 			{
@@ -409,6 +417,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		else if (event.key === "e" || event.key === "E") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;
 			if (selectedBuilding != undefined) 
 			{		
@@ -425,6 +435,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		else if (event.key === "d" || event.key === "D") 
 		{  // right arrow
 			// get current building selected.***
+			if(magoManager.magoPolicy.issueInsertEnable)
+				return;
 			var selectedBuilding = magoManager.buildingSelected;
 			if (selectedBuilding != undefined) 
 			{
