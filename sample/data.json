@@ -1206,6 +1206,40 @@
 			"status": "0",
 			"data_insert_type": "SELF",
 			"insert_date": "2017-06-26 21:06:29.159998"
+		},
+		"Factory Kitbash": {
+			"list_counter": 10,
+			"data_id": 999,
+			"data_group_id": 77,
+			"data_group_name": "JT",
+			"data_key": "Sea_Port",
+			"data_name": "Sea_Port",
+			"latitude": "37.5804305308201",
+			"longitude": "126.60932432621343",
+			"height": "68",
+			"heading": "90.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-26 21:06:29.159998"
+		},
+		"Factory 03": {
+			"list_counter": 10,
+			"data_id": 999,
+			"data_group_id": 77,
+			"data_group_name": "JT",
+			"data_key": "Sea_Port",
+			"data_name": "Sea_Port",
+			"latitude": "37.5804305308201",
+			"longitude": "126.60832432621343",
+			"height": "68",
+			"heading": "90.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-26 21:06:29.159998"
 		}
 	}
 }
