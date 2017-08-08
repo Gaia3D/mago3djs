@@ -2,9 +2,11 @@
 
 /**
  * 버퍼 안의 데이터를 어떻게 읽어야 할지 키가 되는 객체
+ * 
+ * @alias Accessor
  * @class Accessor
  */
-var Accessor = function() 
+var Accessor = function () 
 {
 
 	if (!(this instanceof Accessor)) 

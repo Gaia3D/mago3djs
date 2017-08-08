@@ -302,8 +302,8 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	for (var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) 
 	{
-		if (i == 0) { resultBox.setInit(this.totalVertexArraySC[i].point3d); }
-		else { resultBox.addPoint3D(this.totalVertexArraySC[i].point3d); }
+		if (i == 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
+		else { resultBox.addPoint(this.totalVertexArraySC[i].point3d); }
 	}
 	return resultBox;
 };
@@ -816,12 +816,12 @@ TrianglesSurface.prototype.getBoundingBox = function()
 
 	var bb = new BoundingBox();
 	var firstPoint3d = this.mPoint3DArray[0];
-	bb.setInit(firstPoint3d);
+	bb.init(firstPoint3d);
 
 	for (var i = 1; i < pointsCount; i++) 
 	{
 		var point3d = this.mPoint3DArray[i];
-		bb.addPoint3D(point3d);
+		bb.addPoint(point3d);
 	}
 
 	return bb;

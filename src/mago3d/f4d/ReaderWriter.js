@@ -208,11 +208,11 @@ ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, r
 
 		if (i==0) 
 		{
-			resultBbox.setInit(this.point3dSC);
+			resultBbox.init(this.point3dSC);
 		}
 		else 
 		{
-			resultBbox.addPoint3D(this.point3dSC);
+			resultBbox.addPoint(this.point3dSC);
 		}
 	}
 
@@ -788,33 +788,28 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 	{
 		// read the building location data.***
 		var neoBuilding = neoBuildingsList.newNeoBuilding();
+		if (neoBuilding.metaData === undefined) 
+		{
+			neoBuilding.metaData = new MetaData();
+		}
+
+		if (neoBuilding.metaData.geographicCoord === undefined)
+		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+		if (neoBuilding.metaData.bbox === undefined) 
+		{
+			neoBuilding.metaData.bbox = new BoundingBox();
+		}
 
 		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 		bytesReaded += 4;
 		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
 		bytesReaded += buildingNameLength;
-		/* khj(20170331)
-		var buildingName = "";
-		for(var j=0; j<buildingNameLength; j++) {
-			buildingName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
-		}
-		*/
 
 		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
 		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
-		//longitude = 128.594998;
-		//latitude = 34.904209;
-		//altitude = 50.0;
-		// sangamdong 37.577984, 126.894383
-
-		heading = 0.0;
-		pitch = 0.0;
-		roll = 0.0;
-
-		// TEST.*********
-		altitude = 50.0;
 		neoBuilding.bbox = new BoundingBox();
 		neoBuilding.bbox.minX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.minY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -822,55 +817,8 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-		// create a building and set the location.***
-		//var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
-		var buildingNameDivided = buildingName.split("_");
-		if (buildingNameDivided[2] != undefined)
-		{
-			neoBuilding.buildingId = buildingNameDivided[1] + "_" + buildingNameDivided[2];
-			neoBuilding.buildingType = buildingNameDivided[3];
-		}
-		else
-		{
-			neoBuilding.buildingId = buildingNameDivided[1];
-			neoBuilding.buildingType = buildingNameDivided[3];
-		}
 		
-		if (neoBuilding.buildingType == undefined)
-		{
-			neoBuilding.buildingType = "basicBuilding";
-		}
-		
-		if (neoBuilding.buildingId == "Sample_MEP")
-		{
-			var hola = 0;
-		}
-		
-		/* khj(20170331) : before converted jt data path has been changed.
-		var buildingNameDivided = buildingName.split("-");
-		var tempBuildingId = buildingNameDivided[2].split("_");
-		neoBuilding.buildingId = tempBuildingId[0];
-		neoBuilding.buildingType = buildingNameDivided[1];
-		*/
-
-		neoBuilding.buildingFileName = buildingName;
-		if (neoBuilding.metaData == undefined) 
-		{
-			neoBuilding.metaData = new MetaData();
-		}
-		if (neoBuilding.metaData.geographicCoord == undefined)
-		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-
-		if (neoBuilding.metaData.bbox == undefined) 
-		{
-			neoBuilding.metaData.bbox = new BoundingBox();
-		}
-
 		var bbox = neoBuilding.metaData.bbox;
-
 		bbox.minX = neoBuilding.bbox.minX;
 		bbox.minY = neoBuilding.bbox.minY;
 		bbox.minZ = neoBuilding.bbox.minZ;
@@ -878,6 +826,14 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		bbox.maxX = neoBuilding.bbox.maxX;
 		bbox.maxY = neoBuilding.bbox.maxY;
 		bbox.maxZ = neoBuilding.bbox.maxZ;
+
+		// create a building and set the location.***
+		neoBuilding.buildingId = buildingName.substr(4, buildingNameLength-4);
+		neoBuilding.buildingType = "basicBuilding";
+		neoBuilding.buildingFileName = buildingName;
+		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+
+		// console.log("Building Name = " + buildingName);
 	}
 
 	neoBuildingsList.neoBuildingsArray.reverse();
