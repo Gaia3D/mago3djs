@@ -1189,6 +1189,23 @@
 	      "status": "0",
 	      "data_insert_type": "SELF",
 	      "insert_date": "2017-06-26 21:06:29.159998"
-	    }
+	    },
+	    "Sea_Port": {
+			"list_counter": 10,
+			"data_id": 1080,
+			"data_group_id": 3,
+			"data_group_name": "3DS",
+			"data_key": "Sea_Port",
+			"data_name": "Sea_Port",
+			"latitude": "37.438778",
+			"longitude": "126.599426",
+			"height": "48",
+			"heading": "90.0",
+			"pitch": "0.0",
+			"roll": "0.0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-26 21:06:29.159998"
+		}
 	}
 }
