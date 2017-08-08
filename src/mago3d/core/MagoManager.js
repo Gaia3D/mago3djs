@@ -2766,7 +2766,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			var squaredDistLod1 = 15000;
 			var squaredDistLod2 = 500000*1000;
 			
-			
+			if(neoBuilding.buildingId == "Sea_Port")
+			{
+				squaredDistLod0 = 120000;
+				squaredDistLod1 = 285000;
+				squaredDistLod2 = 500000*1000;
+			}
 			//squaredDistLod0 = 45000;
 			//squaredDistLod1 = 85000;
 			//squaredDistLod2 = 500000*1000;
