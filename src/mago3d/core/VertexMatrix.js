@@ -59,8 +59,8 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	for (var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) 
 	{
-		if (i == 0) { resultBox.setInit(this.totalVertexArraySC[i].point3d); }
-		else { resultBox.addPoint3D(this.totalVertexArraySC[i].point3d); }
+		if (i == 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
+		else { resultBox.addPoint(this.totalVertexArraySC[i].point3d); }
 	}
 	return resultBox;
 };

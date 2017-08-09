@@ -633,27 +633,27 @@ ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding)
 			{
 				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, neoBuilding.geoLocationDataAux);
 
-				//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+				//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 				neoBuilding.point3dScratch.set(0.0, 0.0, 50.0);
 				realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(neoBuilding.point3dScratch, realBuildingPos );
 			}
 			else 
 			{
 				// use the normal data.***
-				neoBuilding.point3dScratch = neoBuilding.bbox.getCenterPoint3d(neoBuilding.point3dScratch);
+				neoBuilding.point3dScratch = neoBuilding.bbox.getCenterPoint(neoBuilding.point3dScratch);
 				realBuildingPos = neoBuilding.transfMat.transformPoint3D(neoBuilding.point3dScratch, realBuildingPos );
 			}
 		}
 		else 
 		{
-			//this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+			//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 			neoBuilding.point3dScratch.set(0.0, 0.0, 50.0);
 			realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(neoBuilding.point3dScratch, realBuildingPos );
 		}
 	}
 	else 
 	{
-		neoBuilding.point3dScratch = neoBuilding.bbox.getCenterPoint3d(neoBuilding.point3dScratch);
+		neoBuilding.point3dScratch = neoBuilding.bbox.getCenterPoint(neoBuilding.point3dScratch);
 		realBuildingPos = neoBuilding.transfMat.transformPoint3D(neoBuilding.point3dScratch, realBuildingPos );
 	}
 

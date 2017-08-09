@@ -71,8 +71,8 @@ VertexList.prototype.getBoundingBox = function(resultBox)
 
 	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
 	{
-		if (i == 0) { resultBox.setInit(this.vertexArray[i].point3d); }
-		else { resultBox.addPoint3D(this.vertexArray[i].point3d); }
+		if (i == 0) { resultBox.init(this.vertexArray[i].point3d); }
+		else { resultBox.addPoint(this.vertexArray[i].point3d); }
 	}
 	return resultBox;
 };
