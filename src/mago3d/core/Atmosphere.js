@@ -394,7 +394,7 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 		splitVelueZ.low ]);
 
 	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
-	var cloudPoint3d = this.bbox.getCenterPoint3d(cloudPoint3d);
+	var cloudPoint3d = this.bbox.getCenterPoint(cloudPoint3d);
 	this.cullingPosition = new Cesium.Cartesian3(cloudPoint3d.x
 			+ this.position.x, cloudPoint3d.y + this.position.y, cloudPoint3d.z
 			+ this.position.z);

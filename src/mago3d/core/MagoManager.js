@@ -2766,7 +2766,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			var squaredDistLod1 = 15000;
 			var squaredDistLod2 = 500000*1000;
 			
-			if(neoBuilding.buildingId == "Sea_Port")
+			if (neoBuilding.buildingId == "Sea_Port")
 			{
 				squaredDistLod0 = 120000;
 				squaredDistLod1 = 285000;
@@ -3693,7 +3693,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
-					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
 				}
@@ -3712,7 +3712,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
-					this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, neoBuilding.isHighLighted);
 				}
@@ -4859,7 +4859,7 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 			continue;
 		}
 
-		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 		var realBuildingPos = undefined; // necesary init to undefined.***
 		
 		var geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0); // the idx = 0 -> is the 1rst (default).***
@@ -4987,20 +4987,20 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 			if (newLocation) 
 			{
 				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, heading, pitch, roll, neoBuilding.geoLocationDataAux, this);
-				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 				//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 				realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
 			}
 			else 
 			{
 				// use the normal data.***
-				this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 				realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
 			}
 		}
 		else 
 		{
-			this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+			this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 			//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 			realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
 		}
@@ -5008,7 +5008,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	else 
 	{
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 		realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
 	}
 	// end calculating realPosition of the building.------------------------------------------------------------------------
@@ -5667,7 +5667,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	if (geoLocationData == undefined)
 	{ return; }
 
-	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC);
+	this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
@@ -5691,7 +5691,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	if (geoLocationData == undefined)
 	{ return; }
 
-	this.pointSC = neoBuilding.bbox.getCenterPoint3d(this.pointSC); // the centerpoint is taken from structure block.***
+	this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC); // the centerpoint is taken from structure block.***
 	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
@@ -5766,7 +5766,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
 			
-			this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
+			this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
 			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
 			////currentCalculatingPositionsCount ++;
@@ -5787,7 +5787,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
 				
-				this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
+				this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
 				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			}
 			
@@ -5800,7 +5800,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
 				
-				this.pointSC = structureTypedBuilding.bbox.getCenterPoint3d(this.pointSC);
+				this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
 				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			}
 			
