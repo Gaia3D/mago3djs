@@ -13,10 +13,9 @@ var FileRequestControler = function()
 	
 	this.maxFilesRequestedCount = 6;
 	this.filesRequestedCount = 0;
-	
-	//this.maxNeoBuildingHeaderRequestedCount = 50;
-	//this.neoBuildingHeaderRequestedCount = 0;
-	
-	//this.maxNeoBuildingBlocksListsRequestedCount = 10;
-	//this.neoBuildingBlocksListsRequestedCount = 0;
+};
+
+FileRequestControler.prototype.isFull = function ()
+{
+	return this.filesRequestedCount >= this.maxFilesRequestedCount; 
 };

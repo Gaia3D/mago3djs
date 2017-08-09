@@ -64,7 +64,7 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix)
 NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
 {
 	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
-	if (this.tMatrixAuxArray == undefined)
+	if (this.tMatrixAuxArray === undefined)
 	{ this.tMatrixAuxArray = []; }
 
 	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
@@ -75,10 +75,10 @@ NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
  */
 NeoReference.prototype.hasKeyMatrix = function(idxKey) 
 {
-	if (this.tMatrixAuxArray == undefined)
+	if (this.tMatrixAuxArray === undefined)
 	{ return false; }
 
-	if (this.tMatrixAuxArray[idxKey] == undefined)
+	if (this.tMatrixAuxArray[idxKey] === undefined)
 	{ return false; }
 	else
 	{ return true; }
@@ -170,7 +170,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 {
 	if (isExterior)
 	{
-		if (this.exterior_ocCullOctree != undefined)
+		if (this.exterior_ocCullOctree !== undefined)
 		{
 			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
 			{
@@ -186,7 +186,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 	}
 	else
 	{
-		if (this.interior_ocCullOctree != undefined)
+		if (this.interior_ocCullOctree !== undefined)
 		{
 			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
 			{
@@ -271,7 +271,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		neoRef._id = ref_ID;
 
 		this.motherNeoRefsList = motherNeoReferencesArray;
-		if (motherNeoReferencesArray[neoRef._id] != undefined)
+		if (motherNeoReferencesArray[neoRef._id] !== undefined)
 		{
 			// pass this neoReference because exist in the motherNeoReferencesArray.***
 			neoRef = motherNeoReferencesArray[neoRef._id];
@@ -318,14 +318,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 				var daya_bytes;
-				if (data_type == 5121) { daya_bytes = 1; }
+				if (data_type === 5121) { daya_bytes = 1; }
 
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var alfa = 255;
 
-				if (dim == 4) 
+				if (dim === 4) 
 				{
 					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
@@ -346,9 +346,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
-						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
-						else if (data_type == 5126) { daya_bytes = 4; }
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
@@ -362,9 +362,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
-						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
-						else if (data_type == 5126) { daya_bytes = 4; }
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
@@ -450,14 +450,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 				var daya_bytes;
-				if (data_type == 5121) { daya_bytes = 1; }
+				if (data_type === 5121) { daya_bytes = 1; }
 
 				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				var alfa = 255;
 
-				if (dim == 4) 
+				if (dim === 4) 
 				{
 					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
 				}
@@ -475,7 +475,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				
 				if (vboDatasCount > 0)
 				{
-					if (neoRef.vBOVertexIdxCacheKeysContainer == undefined)
+					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
 					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 				}
 				
@@ -489,9 +489,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
-						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
-						else if (data_type == 5126) { daya_bytes = 4; }
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
@@ -508,9 +508,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 						
 						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type == 5120 || data_type == 5121) { daya_bytes = 1; }
-						else if (data_type == 5122 || data_type == 5123) { daya_bytes = 2; }
-						else if (data_type == 5126) { daya_bytes = 4; }
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
@@ -547,7 +547,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 				/*
 				// 1pixel texture, wait for texture to load.********************************************
-				if(neoRef.texture.texId == undefined)
+				if(neoRef.texture.texId === undefined)
 					neoRef.texture.texId = gl.createTexture();
 				gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
 				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
@@ -570,7 +570,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	// Now occlusion cullings.***
 
 	// Occlusion culling octree data.*****
-	if (this.exterior_ocCullOctree == undefined)
+	if (this.exterior_ocCullOctree === undefined)
 	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
@@ -579,7 +579,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
 
-	if (this.interior_ocCullOctree == undefined)
+	if (this.interior_ocCullOctree === undefined)
 	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var ocCullBox = this.interior_ocCullOctree;

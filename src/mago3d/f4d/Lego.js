@@ -132,7 +132,7 @@ Lego.prototype.parseLegoData = function(buffer)
 	// VBO(Position Buffer) - x,y,z
 	var numPositions = stream.readUint32();
 	var positionBuffer = stream.readFloat32Array(numPositions * 3);
-	//console.log(numPositions + " Positions = " + positionBuffer);
+	console.log(numPositions + " Positions = " + positionBuffer);
 
 	vboCacheKey.vertexCount = numPositions;
 	vboCacheKey.posVboDataArray = positionBuffer;
@@ -143,7 +143,7 @@ Lego.prototype.parseLegoData = function(buffer)
 	{
 		var numNormals = stream.readUint32();
 		var normalBuffer = stream.readInt8Array(numNormals * 3);
-		//console.log(numNormals + " Normals = " + normalBuffer);
+		console.log(numNormals + " Normals = " + normalBuffer);
 
 		vboCacheKey.norVboDataArray = normalBuffer;
 	}
@@ -154,7 +154,7 @@ Lego.prototype.parseLegoData = function(buffer)
 	{
 		var numColors = stream.readUint32();
 		var colorBuffer = stream.readUint8Array(numColors * 4);
-		//console.log(numColors + " Colors = " + colorBuffer);
+		console.log(numColors + " Colors = " + colorBuffer);
 
 		vboCacheKey.colVboDataArray = colorBuffer;
 	}
@@ -166,7 +166,7 @@ Lego.prototype.parseLegoData = function(buffer)
 		var dataType = stream.readUint16();
 		var numCoords = stream.readUint32();
 		var coordBuffer = stream.readFloat32Array(numCoords * 2);
-		//console.log(numCoords + " Coords = " + coordBuffer);
+		console.log(numCoords + " Coords = " + coordBuffer);
 
 		vboCacheKey.tcoordVboDataArray = coordBuffer;
 	}

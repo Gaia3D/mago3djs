@@ -139,7 +139,7 @@ OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z)
  */
 OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z) 
 {
-	if (this._ocCulling_Cell_owner == null) 
+	if (this._ocCulling_Cell_owner === null) 
 	{
 		// This is the mother_cell.***
 		if (!this.intersectsWithPoint3D(x, y, z)) 
@@ -215,7 +215,7 @@ OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, 
 {
 	var intersectedSubBox = this.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
 	
-	if (intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0) 
+	if (intersectedSubBox !== null && intersectedSubBox._indicesArray.length > 0) 
 	{
 		result_visibleIndicesArray = intersectedSubBox._indicesArray;
 	}
@@ -265,7 +265,7 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 	
 	var subBoxes_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	
-	if (subBoxes_count == 0) 
+	if (subBoxes_count === 0) 
 	{
 		var objects_count = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		for (var i=0; i<objects_count; i++) 

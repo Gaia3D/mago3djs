@@ -100,7 +100,7 @@ SelectionColor.prototype.init = function()
  */
 SelectionColor.prototype.getAvailableColor = function(resultColor) 
 {
-	if (resultColor == undefined)
+	if (resultColor === undefined)
 	{ resultColor = new Color(); }
 	
 	resultColor.setRGB(this.color.r, this.color.g, this.color.b);

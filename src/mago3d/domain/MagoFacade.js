@@ -14,7 +14,7 @@ function changeMagoStateAPI(isShow)
 {
 	var api = new API("changeMagoState");
 	api.setMagoEnable(isShow);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -29,7 +29,7 @@ function changeRenderAPI(renderMode)
 {
 	var api = new API("changeRender");
 	api.setRenderMode(renderMode);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -44,7 +44,7 @@ function changeOutFittingAPI(isShow)
 {
 	var api = new API("changeOutFitting");
 	api.setShowOutFitting(isShow);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -59,7 +59,7 @@ function changeBoundingBoxAPI(isShow)
 {
 	var api = new API("changeBoundingBox");
 	api.setShowBoundingBox(isShow);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -74,7 +74,7 @@ function changeShadowAPI(isShow)
 {
 	var api = new API("changeShadow");
 	api.setShowShadow(isShow);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -89,7 +89,7 @@ function changeFrustumFarDistanceAPI(frustumFarDistance)
 {
 	var api = new API("changefrustumFarDistance");
 	api.setFrustumFarDistance(frustumFarDistance);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -104,7 +104,7 @@ function searchDataAPI(dataKey)
 {
 	var api = new API("searchData");
 	api.setDataKey(dataKey);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -123,7 +123,7 @@ function changeHighLightingAPI(projectId, blockIds, objectIds)
 	api.setProjectId(projectId);
 	api.setBlockIds(blockIds);
 	api.setObjectIds(objectIds);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -144,7 +144,7 @@ function changeColorAPI(projectId, blockIds, objectIds, color)
 	api.setBlockIds(blockIds);
 	api.setObjectIds(objectIds);
 	api.setColor(color);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -171,7 +171,7 @@ function changeLocationAndRotationAPI(data_key, latitude, longitude, height, hea
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -190,7 +190,7 @@ function getLocationAndRotationAPI(projectId, blockId)
 	var api = new API("getLocationAndRotation");
 	api.setProjectId(projectId);
 	api.setBlockId(blockId);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		var building = managerFactory.callAPI(api);
 		return building;
@@ -236,7 +236,7 @@ function changeMouseMoveAPI(mouseMoveMode)
 {
 	var api = new API("changeMouseMove");
 	api.setMouseMoveMode(mouseMoveMode);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -251,7 +251,7 @@ function changeInsertIssueModeAPI(flag)
 {
 	var api = new API("changeInsertIssueMode");
 	api.setIssueInsertEnable(flag);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -266,7 +266,7 @@ function changeObjectInfoViewModeAPI(flag)
 {
 	var api = new API("changeObjectInfoViewMode");
 	api.setObjectInfoViewEnable(flag);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -281,7 +281,7 @@ function changeListIssueViewModeAPI(flag)
 {
 	var api = new API("changeListIssueViewMode");
 	api.setIssueListEnable(flag);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -308,7 +308,7 @@ function drawInsertIssueImageAPI(drawType, issue_id, issue_type, data_key, latit
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);
 	api.setElevation(height);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -323,7 +323,7 @@ function changeInsertIssueStateAPI(insertIssueState)
 {
 	var api = new API("changeInsertIssueState");
 	api.setInsertIssueState(insertIssueState);
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
 	}
@@ -335,7 +335,7 @@ function changeInsertIssueStateAPI(insertIssueState)
  */
 function mouseMoveAPI(eventType) 
 {
-	if (managerFactory != null) 
+	if (managerFactory !== null) 
 	{
 		managerFactory.mouseMove(eventType);
 	}

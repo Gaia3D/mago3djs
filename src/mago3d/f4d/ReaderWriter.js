@@ -189,66 +189,6 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end)
 	return int8_value;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param float32Array 변수
- * @param resultBbox 변수
- * @returns resultBbox
- */
-ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, resultBbox) 
-{
-	if (resultBbox == undefined) { resultBbox = new BoundingBox(); }
-
-	var values_count = float32Array.length;
-	for (var i=0; i<values_count; i+=3) 
-	{
-		this.point3dSC.x = float32Array[i];
-		this.point3dSC.y = float32Array[i+1];
-		this.point3dSC.z = float32Array[i+2];
-
-		if (i==0) 
-		{
-			resultBbox.init(this.point3dSC);
-		}
-		else 
-		{
-			resultBbox.addPoint(this.point3dSC);
-		}
-	}
-
-	return resultBbox;
-};
-
-ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			blocksList.dataArraybuffer = arrayBuffer;
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("Invalid XMLHttpRequest status = " + status);
-		if (status == 0) { blocksList.fileLoadState = 500; }
-		else { blocksList.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
 function loadWithXhr(fileName) 
 {
 	// 1) 사용될 jQuery Deferred 객체를 생성한다.
@@ -292,6 +232,66 @@ function loadWithXhr(fileName)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param float32Array 변수
+ * @param resultBbox 변수
+ * @returns resultBbox
+ */
+ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, resultBbox) 
+{
+	if (resultBbox === undefined) { resultBbox = new BoundingBox(); }
+
+	var values_count = float32Array.length;
+	for (var i=0; i<values_count; i+=3) 
+	{
+		this.point3dSC.x = float32Array[i];
+		this.point3dSC.y = float32Array[i+1];
+		this.point3dSC.z = float32Array[i+2];
+
+		if (i===0) 
+		{
+			resultBbox.init(this.point3dSC);
+		}
+		else 
+		{
+			resultBbox.addPoint(this.point3dSC);
+		}
+	}
+
+	return resultBbox;
+};
+
+ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) 
+{
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			blocksList.dataArraybuffer = arrayBuffer;
+			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("Invalid XMLHttpRequest status = " + status);
+		if (status === 0) { blocksList.fileLoadState = 500; }
+		else { blocksList.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param fileName 변수
  * @param blocksList 변수
@@ -319,7 +319,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { blocksList.fileLoadState = 500; }
+		if (status === 0) { blocksList.fileLoadState = 500; }
 		else { blocksList.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -355,7 +355,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsL
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { neoRefsList.fileLoadState = 500; }
+		if (status === 0) { neoRefsList.fileLoadState = 500; }
 		else { neoRefsList.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -398,7 +398,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { lowestOctree.lego.fileLoadState = 500; }
+		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
 		else { lowestOctree.lego.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -434,7 +434,7 @@ ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuildin
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { lodBuilding.fileLoadState = 500; }
+		if (status === 0) { lodBuilding.fileLoadState = 500; }
 		else { lodBuilding.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -462,7 +462,7 @@ ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_i
 //	var subTile;
 
 	terranTile._depth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	if (terranTile._depth == 0) 
+	if (terranTile._depth === 0) 
 	{
 		// Read dimensions.***
 		terranTile.longitudeMin = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
@@ -516,7 +516,7 @@ ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, re
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + xhr.status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -582,7 +582,7 @@ ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsLi
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -716,7 +716,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -754,7 +754,7 @@ ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neo
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -775,12 +775,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 	var longitude;
 	var latitude;
 	var altitude;
-	var bbLengthX;
-	var bbLengthY;
-	var bbLengthZ;
-	var heading;
-	var pitch;
-	var roll;
 
 	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
@@ -833,7 +827,9 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.buildingFileName = buildingName;
 		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
 
-		// console.log("Building Name = " + buildingName);
+		console.log("Building Name = " + buildingName);
+		console.log("Building ID = " + neoBuilding.buildingId);
+		console.log("Building Type = " + neoBuilding.buildingType);
 	}
 
 	neoBuildingsList.neoBuildingsArray.reverse();
@@ -858,14 +854,14 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			if (neoBuilding.metaData == undefined) 
+			if (neoBuilding.metaData === undefined) 
 			{
 				neoBuilding.metaData = new MetaData();
 			}
 			neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
 
 			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree == undefined) { neoBuilding.octree = new Octree(undefined); }
+			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 
 			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
 				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
@@ -887,7 +883,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { neoBuilding.metaData.fileLoadState = 500; }
+		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
 		else { neoBuilding.metaData.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -915,14 +911,14 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			if (neoBuilding.metaData == undefined) 
+			if (neoBuilding.metaData === undefined) 
 			{
 				neoBuilding.metaData = new MetaData();
 			}
 			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
 
 			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree == undefined) { neoBuilding.octree = new Octree(undefined); }
+			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 
 			// now, parse octreeAsimetric.***
 			neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
@@ -938,7 +934,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 
 			// test for 1500 blocks.***
 			/*
-			if(neoBuilding.bbox == undefined)
+			if(neoBuilding.bbox === undefined)
 				neoBuilding.bbox = new BoundingBox();
 			neoBuilding.bbox.minX = neoBuilding.metaData.oct_min_x;
 			neoBuilding.bbox.minY = neoBuilding.metaData.oct_min_y;
@@ -960,7 +956,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status == 0) { neoBuilding.metaData.fileLoadState = 500; }
+		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
 		else { neoBuilding.metaData.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -989,7 +985,7 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffe
 	simpleBuildingImage.onload = function () 
 	{
 		//console.log("Image Onload");
-		if (simpBuildingV1._simpleBuildingTexture == undefined)
+		if (simpBuildingV1._simpleBuildingTexture === undefined)
 		{ simpBuildingV1._simpleBuildingTexture = gl.createTexture(); }
 		handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
 		BR_Project._f4d_nailImage_readed_finished = true;
@@ -1028,12 +1024,12 @@ ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffe
  */
 ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, magoManager, imageLod) 
 {
-	if (imageLod == undefined) { imageLod = 3; } // The lowest lod.***
+	if (imageLod === undefined) { imageLod = 3; } // The lowest lod.***
 
-	if (imageLod == 3) { BR_Project._f4d_nailImage_readed = true; }
-	else if (imageLod == 0) { BR_Project._f4d_lod0Image_readed  = true; }
+	if (imageLod === 3) { BR_Project._f4d_nailImage_readed = true; }
+	else if (imageLod === 0) { BR_Project._f4d_lod0Image_readed  = true; }
 
-	if (BR_Project._simpleBuilding_v1 == undefined) { BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
+	if (BR_Project._simpleBuilding_v1 === undefined) { BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
 
@@ -1043,9 +1039,9 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
 	/*
 		if(magoManager.render_time > 20)// for the moment is a test.***
 		{
-			if(imageLod == 3)
+			if(imageLod === 3)
 				BR_Project._f4d_nailImage_readed = false;
-			else if(imageLod == 0)
+			else if(imageLod === 0)
 				BR_Project._f4d_lod0Image_readed  = false;
 
 			if(magoManager.backGround_fileReadings_count > 0 )
@@ -1055,14 +1051,14 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
 		}
 		*/
 
-		if (imageLod == 3) 
+		if (imageLod === 3) 
 		{
 			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
 			BR_Project._f4d_nailImage_readed_finished = true;
 		}
-		else if (imageLod == 0) 
+		else if (imageLod === 0) 
 		{
-			if (simpBuildingV1._texture_0 == undefined) { simpBuildingV1._texture_0 = gl.createTexture(); }
+			if (simpBuildingV1._texture_0 === undefined) { simpBuildingV1._texture_0 = gl.createTexture(); }
 
 			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._texture_0);
 			BR_Project._f4d_lod0Image_readed_finished = true;
@@ -1133,7 +1129,7 @@ ReaderWriter.prototype.decodeTGA = function(arrayBuffer)
 		return null;
 	}
 
-	if (imagetype != 2) 
+	if (imagetype !== 2) 
 	{
 		console.error("Unsupported TGA format:", imagetype);
 		return null;
@@ -1175,7 +1171,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	// Must know the fileExtension.***
 	var extension = filePath_inServer.split('.').pop();
 	
-	if (extension == "tga" || extension == "TGA" || extension == "Tga")
+	if (extension === "tga" || extension === "TGA" || extension === "Tga")
 	{
 		//texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		loadWithXhr(filePath_inServer).done(function(response) 
@@ -1221,7 +1217,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 				if (tga) 
 				{
 					var rgbType;
-					if (tga.header.bytePerPixel == 3)
+					if (tga.header.bytePerPixel === 3)
 					{
 						rgbType = gl.RGB;
 						
@@ -1242,7 +1238,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						}
 						*/
 					}
-					else if (tga.header.bytePerPixel == 4)
+					else if (tga.header.bytePerPixel === 4)
 					{
 						rgbType = gl.RGBA;
 						
@@ -1278,7 +1274,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 			if (neoBuilding)
 			{
 				console.log("xhr status = " + status);
-				if (status == 0) { neoBuilding.metaData.fileLoadState = 500; }
+				if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
 				else { neoBuilding.metaData.fileLoadState = status; }
 			}
 		}).always(function() 
@@ -1325,7 +1321,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 	//magoManager.backGround_fileReadings_count ++;
 	neoRefImage.onload = function() 
 	{
-		if (texture.texId == undefined) 
+		if (texture.texId === undefined) 
 		{ texture.texId = gl.createTexture(); }
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
@@ -1390,7 +1386,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -1492,7 +1488,7 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		//		if(status == 0) blocksList.fileLoadState = 500;
+		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
 	}).always(function() 
 	{
@@ -1523,7 +1519,7 @@ ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude
 
 	neoBuilding.buildingFileName = buildingFileName;
 
-	if (neoBuilding.octree == undefined) { neoBuilding.octree = new Octree(undefined); }
+	if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 
 	readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, readerWriter, magoManager); // Here makes the tree of octree.***
 

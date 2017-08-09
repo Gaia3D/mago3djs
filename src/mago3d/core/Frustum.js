@@ -35,9 +35,9 @@ Frustum.prototype.intersectionSphere = function(sphere)
 	for (var i=0; i<6; i++)
 	{
 		var intersectionType = this.planesArray[i].intersectionSphere(sphere);
-		if (intersectionType == Constant.INTERSECTION_OUTSIDE)
+		if (intersectionType === Constant.INTERSECTION_OUTSIDE)
 		{ return Constant.INTERSECTION_OUTSIDE; }
-		else if (intersectionType == Constant.INTERSECTION_INTERSECT)
+		else if (intersectionType === Constant.INTERSECTION_INTERSECT)
 		{ intersects = true; }
 	}
 	

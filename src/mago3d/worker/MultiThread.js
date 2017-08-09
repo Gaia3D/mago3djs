@@ -50,7 +50,7 @@
 				{
 					data = JSON.stringify(value);
 				}
-				catch (e) 
+				catch (ex) 
 				{
 					throw new Error('Parallel function must return JSON serializable response');
 				}

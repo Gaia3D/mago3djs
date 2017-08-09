@@ -163,7 +163,7 @@ Matrix4.prototype.get = function(col, row)
  */
 Matrix4.prototype.transformPoint3D = function(point3d, result_point3d) 
 {
-	if (result_point3d == undefined) { result_point3d = new Point3D(); }
+	if (result_point3d === undefined) { result_point3d = new Point3D(); }
 
 	var x = point3d.x;
 	var y = point3d.y;
@@ -184,7 +184,7 @@ Matrix4.prototype.transformPoint3D = function(point3d, result_point3d)
  */
 Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d) 
 {
-	if (result_point3d == undefined) { result_point3d = new Point3D(); }
+	if (result_point3d === undefined) { result_point3d = new Point3D(); }
 
 	var x = point3d.x;
 	var y = point3d.y;
@@ -206,7 +206,7 @@ Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d)
 Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) 
 {
 
-	if (resultMat == undefined) { resultMat = new Matrix4(); }
+	if (resultMat === undefined) { resultMat = new Matrix4(); }
 
 	for (var i=0; i<4; i++) 
 	{
@@ -257,37 +257,37 @@ Matrix4.prototype.copyFromFloatArray = function(floatArrays)
  */
 Matrix4.prototype.isIdentity = function() 
 {
-	if (this._floatArrays[0] == 1)
+	if (this._floatArrays[0] === 1)
 	{
-		if (this._floatArrays[1] == 0)
+		if (this._floatArrays[1] === 0)
 		{
-			if (this._floatArrays[2] == 0)
+			if (this._floatArrays[2] === 0)
 			{
-				if (this._floatArrays[3] == 0)
+				if (this._floatArrays[3] === 0)
 				{
-					if (this._floatArrays[4] == 0)
+					if (this._floatArrays[4] === 0)
 					{
-						if (this._floatArrays[5] == 1)
+						if (this._floatArrays[5] === 1)
 						{
-							if (this._floatArrays[6] == 0)
+							if (this._floatArrays[6] === 0)
 							{
-								if (this._floatArrays[7] == 0)
+								if (this._floatArrays[7] === 0)
 								{
-									if (this._floatArrays[8] == 0)
+									if (this._floatArrays[8] === 0)
 									{
-										if (this._floatArrays[9] == 0)
+										if (this._floatArrays[9] === 0)
 										{
-											if (this._floatArrays[10] == 1)
+											if (this._floatArrays[10] === 1)
 											{
-												if (this._floatArrays[11] == 0)
+												if (this._floatArrays[11] === 0)
 												{
-													if (this._floatArrays[12] == 0)
+													if (this._floatArrays[12] === 0)
 													{
-														if (this._floatArrays[13] == 0)
+														if (this._floatArrays[13] === 0)
 														{
-															if (this._floatArrays[14] == 0)
+															if (this._floatArrays[14] === 0)
 															{
-																if (this._floatArrays[15] == 1)
+																if (this._floatArrays[15] === 1)
 																{
 																	return true;
 																}
