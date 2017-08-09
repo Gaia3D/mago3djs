@@ -885,8 +885,8 @@ void main()\n\
     else{\n\
         textureColor = vColor4Aux;\n\
     }\n\
-    vec3 specularColor = vec3(0.7);\n\
-    vec3 ambientColor = vec3(textureColor.x * 0.4, textureColor.y * 0.4, textureColor.z * 0.4);\n\
+    vec3 specularColor = vec3(0.9);\n\
+    vec3 ambientColor = vec3(textureColor.x * 0.9, textureColor.y * 0.9, textureColor.z * 0.9);\n\
 \n\
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
 }\n\
