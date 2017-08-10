@@ -51,7 +51,7 @@ function glslToJavaScript(minify, minifyStateFilePath)
 	// collect all currently existing JS files into a set, later we will remove the ones
 	// we still are using from the set, then delete any files remaining in the set.
 	var leftOverJsFiles = {};
-	var shaderContents = "'use strict';\nvar ShaderSource = ShaderSource || {};\n";
+	var shaderContents = "'use strict';\nvar ShaderSource = {};\n";
 
 	globby.sync(['src/mago3d/shader/glsl/**/*.js']).forEach(function(file) 
 	{

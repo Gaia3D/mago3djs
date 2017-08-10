@@ -110,7 +110,6 @@ Lego.prototype.parseArrayBuffer = function(gl, readWriter, dataArraybuffer, byte
  * F4D Lego 자료를 읽는다
  * 
  * @param {ArrayBuffer} buffer 
- * @returns 
  */
 Lego.prototype.parseLegoData = function(buffer)
 {
