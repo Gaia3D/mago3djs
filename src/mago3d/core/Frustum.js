@@ -17,6 +17,7 @@ var Frustum = function()
 	this.fovRad = new Float32Array([1.047]);
 	this.aspectRatio = new Float32Array([1.3584]);
 	this.planesArray = [];
+	this.dirty = true;
 	
 	for (var i=0; i<6; i++)
 	{
