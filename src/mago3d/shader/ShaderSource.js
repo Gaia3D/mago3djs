@@ -1,5 +1,5 @@
 'use strict';
-var ShaderSource = ShaderSource || {};
+var ShaderSource = {};
 ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
