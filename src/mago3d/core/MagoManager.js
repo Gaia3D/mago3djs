@@ -1321,9 +1321,17 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.camera.frustum.far = 1000.0;
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
-		sceneState.camera.frustum.fovRad = 56.1 * Math.PI/180; // pendent to know the real fov in webwroldwind.***
-		sceneState.camera.frustum.fovyRad = sceneState.camera.frustum.fovRad/sceneState.camera.frustum.aspectRatio;
-		//sceneState.camera.frustum.fovyRad = 45 * Math.PI/180;
+		// Calculate FOV & FOVY.***
+		if(sceneState.camera.frustum.dirty)
+		{
+			var projectionMatrix = dc.navigatorState.projection;
+			var aspectRat = sceneState.camera.frustum.aspectRatio;
+			var angleAlfa = 2*Math.atan(1/(aspectRat*projectionMatrix[0]));
+			//sceneState.camera.frustum.fovRad = 56.1 * Math.PI/180; // pendent to know the real fov in webwroldwind.***
+			sceneState.camera.frustum.fovyRad = angleAlfa; // pendent to know the real fov in webwroldwind.***
+			sceneState.camera.frustum.fovRad = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
+			sceneState.camera.frustum.dirty = false;
+		}
 
 		// screen size.***
 		sceneState.drawingBufferWidth = viewport.width;
