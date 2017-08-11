@@ -3004,8 +3004,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 		
 		// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
-		// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
-		// LOD0.*** check if the lod0lowestOctrees must load and parse data.************************************************************
 		var geometryDataPath = this.readerWriter.geometryDataPath;
 		var buildingFolderName = neoBuilding.buildingFileName;
 		var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
@@ -3015,7 +3013,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 		for (var i=0; i<lowestOctreesCount; i++) 
 		{
-
 			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles0[i];
 			if (lowestOctree.triPolyhedronsCount == 0) 
 			{ continue; }
@@ -3040,15 +3037,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 
 		// LOD 1.****************************************************************************************************************
-		// LOD 1.****************************************************************************************************************
-		// LOD 1.****************************************************************************************************************
 		if (neoBuilding.buildingType == "outfitting")
 		{ return; }
 
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles1.length;
 		for (var i=0; i<lowestOctreesCount; i++) 
 		{
-
 			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles1[i];
 			if (lowestOctree.triPolyhedronsCount == 0) 
 			{ continue; }
