@@ -143,7 +143,7 @@ var NeoReferencesMotherAndIndices = function()
 	// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
 	this.blocksList; // local blocks list. used only for parse data.***
-	this.neoRefsIndices = [];
+	this.neoRefsIndices = []; // All objects(references) of this class.
 
 	this.fileLoadState = 0;
 	this.dataArraybuffer;
@@ -182,7 +182,6 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 			{
 				this.currentVisibleIndices = this.neoRefsIndices;
 			}
-			
 		}
 	}
 	else
@@ -217,7 +216,6 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx)
  */
 NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) 
 {
-
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	if (this.blocksList)
 	{ this.blocksList.deleteGlObjects(gl); }
@@ -238,12 +236,22 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl)
  */
 NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() 
 {
-
 	var refIndicesCount = this.neoRefsIndices.length;
 	for (var i=0; i<refIndicesCount; i++)
 	{
 		this.motherNeoRefsList[this.neoRefsIndices[i]].bRendered = false;
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function() 
+{
+	// Group all the references that has the same model.
+	
+	
 };
 
 /**
@@ -434,7 +442,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			
-			// Test. check if the originalMatrix is indentity.
+			// Compute the references matrix type.
 			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
 			
 			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
