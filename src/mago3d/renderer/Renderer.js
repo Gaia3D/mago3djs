@@ -443,16 +443,25 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			// ifc_space = 27, ifc_window = 26, ifc_plate = 14
 			if (block != null) 
 			{
-
-				//ifc_entity = block.mIFCEntityType;
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
+				gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 				if (refMatrixIdxKey == undefined)
-				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
+				{ // never enter here...
+					if(neoReference.refMatrixType == 1)
+						gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+					else if(neoReference.refMatrixType == 2)
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+				}
 				else 
 				{
 					if (refMatrixIdxKey == -1)
-					{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
+					{ // never enter here...
+						if(neoReference.refMatrixType == 1)
+							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+						else if(neoReference.refMatrixType == 2)
+							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+					}
 					else 
 					{
 						if (neoReference.tMatrixAuxArray == undefined)
@@ -461,8 +470,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 							// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 							continue;
 						}
-
-						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+						
+						if(neoReference.refMatrixType == 1)
+							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+						else if(neoReference.refMatrixType == 2)
+							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 					}
 				}
 
@@ -476,6 +488,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					gl.uniform1i(standardShader.hasAditionalMov_loc, false);
 					gl.uniform3fv(standardShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 				}
+				
+				
 
 				for (var n=0; n<cacheKeys_count; n++) // Original.***
 				{
@@ -780,12 +794,24 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			{
 				cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 				// Must applicate the transformMatrix of the reference object.***
+				// Must applicate the transformMatrix of the reference object.***
+				gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 				if (refMatrixIdxKey == undefined)
-				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
+				{ // never enter here...
+					if(neoReference.refMatrixType == 1)
+						gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+					else if(neoReference.refMatrixType == 2)
+						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+				}
 				else 
 				{
 					if (refMatrixIdxKey == -1)
-					{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
+					{ // never enter here...
+						if(neoReference.refMatrixType == 1)
+							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+						else if(neoReference.refMatrixType == 2)
+							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+					}
 					else 
 					{
 						if (neoReference.tMatrixAuxArray == undefined)
@@ -794,8 +820,11 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 							// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 							continue;
 						}
-
-						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+						
+						if(neoReference.refMatrixType == 1)
+							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+						else if(neoReference.refMatrixType == 2)
+							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 					}
 				}
 
@@ -1491,18 +1520,36 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 		// Must applicate the transformMatrix of the reference object.***
 
+		gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 		if (refMatrixIdxKey == undefined)
-		{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
+		{ // never enter here...
+			if(neoReference.refMatrixType == 1)
+				gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+			else if(neoReference.refMatrixType == 2)
+				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+		}
 		else 
 		{
 			if (refMatrixIdxKey == -1)
-			{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); }
-			else
+			{ // never enter here...
+				if(neoReference.refMatrixType == 1)
+					gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+				else if(neoReference.refMatrixType == 2)
+					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+			}
+			else 
 			{
 				if (neoReference.tMatrixAuxArray == undefined)
-				{ return; }
-
-				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+				{
+					//neoReference.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);
+					// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
+					return;
+				}
+				
+				if(neoReference.refMatrixType == 1)
+					gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
+				else if(neoReference.refMatrixType == 2)
+					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
 			}
 		}
 
