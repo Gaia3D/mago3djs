@@ -1282,7 +1282,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
 		// Calculate FOV & FOVY.***
-		if(sceneState.camera.frustum.dirty)
+		if (sceneState.camera.frustum.dirty)
 		{
 			var projectionMatrix = dc.navigatorState.projection;
 			var aspectRat = sceneState.camera.frustum.aspectRatio;
@@ -2707,7 +2707,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		var squaredDistLod1 = 15000;
 		var squaredDistLod2 = 500000*1000;
 		
-		if (neoBuilding.buildingId === "Sea_Port")
+		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
 			squaredDistLod0 = 120000;
 			squaredDistLod1 = 285000;
@@ -2725,197 +2725,15 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			if (this.myCameraSC === undefined) 
 			{ this.myCameraSC = new Camera(); }
 			
-			if (neoBuilding.buildingId == "Sea_Port" || neoBuilding.buildingId == "ctships")
-			{
-				squaredDistLod0 = 120000;
-				squaredDistLod1 = 285000;
-				squaredDistLod2 = 500000*1000;
-			}
-			//squaredDistLod0 = 45000;
-			//squaredDistLod1 = 85000;
-			//squaredDistLod2 = 500000*1000;
-				
-			var frustumVolume;
-			var find = false;
-			if (this.myFrustumSC == undefined) 
-			{ this.myFrustumSC = new Frustum(); }
-				
-			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-			{
-				if (this.myCameraSC == undefined) 
-				{ this.myCameraSC = new Camera(); }
-				
-				if (this.myCameraSC2 == undefined) 
-				{ this.myCameraSC2 = new Camera(); }
-				
-				var dc = this.sceneState.dc;
-				
-				if (neoBuilding.buildingId == "gangnam_del")
-				{
-					var hola = 0;
-				}
-				
-				var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
-				this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
-				//this.myCameraSC.frustum.near = 0.1;
-				//this.myCameraSC.frustum.far = 5000000.0;
-				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
-				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-				
-				if(dc.frustumVolume)
-				{
-					var hola = 0;
-				}
-				
-				if(dc.fov)
-				{
-					var hola = 0;
-				}
-				
-				//dc.navigatorState.frustumInModelCoordinates.
-				//_bottom
-				//Plane {normal: Vec3, distance: -4397963.348575926}
-				//_far
-				//Plane {normal: Vec3, distance: -3353936.320089183}
-				//_left
-				//Plane {normal: Vec3, distance: 1498218.105685316}
-				//_near
-				//Plane {normal: Vec3, distance: 3385764.070363424}
-				//_planes
-				//(6) [Plane, Plane, Plane, Plane, Plane, Plane]
-				//_right
-				//Plane {normal: Vec3, distance: 1530106.7410236418}
-				//_top
-				/*
-				for (var i=0; i<6; i++)
-				{
-					var plane = dc.navigatorState.frustumInModelCoordinates._planes[i];
-					this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], -plane.distance);
-				}
-
-				neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
-				
-				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
-																						this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-																						squaredDistLod0, squaredDistLod1, squaredDistLod2);
-				*/	
-
-				
-				/*
-				var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
-				modelViewRelToEye.copy(dc.navigatorState.modelview);
-				modelViewRelToEye[3] = 0.0;
-				modelViewRelToEye[7] = 0.0;
-				modelViewRelToEye[11] = 0.0;
-				
-				var modelviewTranspose = WorldWind.Matrix.fromIdentity();
-				modelviewTranspose.setToTransposeOfMatrix(modelViewRelToEye);
-				
-				var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(dc.navigatorState.projection);
-				frustumRelToEye.transformByMatrix(modelviewTranspose); // original.***
-				frustumRelToEye.normalize(); // original.***
-
-				//var buildingRotInv = WorldWind.Matrix.fromIdentity();
-				//buildingRotInv.columnMajorComponents(buildingGeoLocation.rotMatrix._floatArrays);
-				if(this.matrixSC == undefined)
-					this.matrixSC = new Float32Array(16);
-				
-				for(var i=0; i<16; i++)
-					this.matrixSC[i] = buildingGeoLocation.tMatrix._floatArrays[i];
-
-				this.matrixSC[12] = (buildingGeoLocation.tMatrix._floatArrays[12] - cameraPosition[0]);
-				this.matrixSC[13] = (buildingGeoLocation.tMatrix._floatArrays[13] - cameraPosition[1]);
-				this.matrixSC[14] = (buildingGeoLocation.tMatrix._floatArrays[14] - cameraPosition[2]);
-				
-				var matrixInv = WorldWind.Matrix.fromIdentity();
-				matrixInv.invertMatrix(this.matrixSC);
-				
-				var matInvTranspose = WorldWind.Matrix.fromIdentity();
-				matInvTranspose.setToTransposeOfMatrix(matrixInv);
-				
-				//this.matrixSC[12] = buildingGeoLocation.tMatrixInv._floatArrays[12];
-				//this.matrixSC[13] = buildingGeoLocation.tMatrixInv._floatArrays[13];
-				//this.matrixSC[14] = buildingGeoLocation.tMatrixInv._floatArrays[14];
-				
-				frustumRelToEye.transformByMatrix(matrixInv);
-				frustumRelToEye.normalize();
-				
-				//var frustumRelToEye = WorldWind.Frustum.fromProjectionMatrix(matrixInv);
-				//****************************************************************************************************************************************
-				for(var i=0; i<6; i++)
-				{
-					var plane = frustumRelToEye._planes[i];
-					this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], plane.distance);
-				}
-				
-				*/
-				
-				// Provisional.**********************************************************
-				
-				if (this.myBboxSC == undefined)
-				{ this.myBboxSC = new BoundingBox(); }
-				
-				if (this.myCullingVolumeBBoxSC == undefined)
-				{ this.myCullingVolumeBBoxSC = new BoundingBox(); }
-				
-				// Provisionally use a bbox to frustumCulling.***
-				var radiusAprox = 4000.0;
-				this.myCullingVolumeBBoxSC.minX = this.myCameraSC.position.x - radiusAprox;
-				this.myCullingVolumeBBoxSC.maxX = this.myCameraSC.position.x + radiusAprox;
-				this.myCullingVolumeBBoxSC.minY = this.myCameraSC.position.y - radiusAprox;
-				this.myCullingVolumeBBoxSC.maxY = this.myCameraSC.position.y + radiusAprox;
-				this.myCullingVolumeBBoxSC.minZ = this.myCameraSC.position.z - radiusAprox;
-				this.myCullingVolumeBBoxSC.maxZ = this.myCameraSC.position.z + radiusAprox;
-				
-				
-				// get frustumCulled lowestOctrees classified by distances.************************************************************************************
-				var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
-				var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;	
-				
-				neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-				neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
-				find = neoBuilding.octree.getBBoxIntersectedLowestOctreesByLOD(	this.myCullingVolumeBBoxSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.myBboxSC,
-					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-					squaredDistLod0, squaredDistLod1, squaredDistLod2);
-					
-				// End provisional.----------------------------------------------------------------
-				
-																						
-																						
-			}
-			else if (this.configInformation.geo_view_library === Constant.CESIUM)
-			{
-				
-				if (this.myCameraSC == undefined) 
-				{ this.myCameraSC = new Cesium.Camera(scene); }
-				
-				var camera = scene.frameState.camera;
-				var near = scene._frustumCommandsList[this.frustumIdx].near;
-				var far = scene._frustumCommandsList[this.frustumIdx].far;
-				var fov = scene.frameState.camera.frustum.fov;
-				this.myCameraSC.frustum.fov = fov; // fov = fovx.***
-				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
-				
-				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-
-				//this.myCameraSC.frustum.fovy = 0.3;
-				//camera.frustum.far = 2.0;
-				this.myCameraSC.near = near;
-				this.myCameraSC.far = far;
-				var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
-				var advancedDist = 3.0;
-
-			//buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+			if (this.myCameraSC2 === undefined) 
+			{ this.myCameraSC2 = new Camera(); }
+			
+			var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
+			this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
+			buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
 			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-	
+
 			if (this.myBboxSC === undefined)
 			{ this.myBboxSC = new BoundingBox(); }
 			
@@ -2923,13 +2741,18 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			{ this.myCullingVolumeBBoxSC = new BoundingBox(); }
 			
 			// Provisionally use a bbox to frustumCulling.***
-			var radiusAprox = 2000.0;
+			var radiusAprox = 4000.0;
 			this.myCullingVolumeBBoxSC.minX = this.myCameraSC.position.x - radiusAprox;
 			this.myCullingVolumeBBoxSC.maxX = this.myCameraSC.position.x + radiusAprox;
 			this.myCullingVolumeBBoxSC.minY = this.myCameraSC.position.y - radiusAprox;
 			this.myCullingVolumeBBoxSC.maxY = this.myCameraSC.position.y + radiusAprox;
 			this.myCullingVolumeBBoxSC.minZ = this.myCameraSC.position.z - radiusAprox;
 			this.myCullingVolumeBBoxSC.maxZ = this.myCameraSC.position.z + radiusAprox;
+			
+			
+			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
+			var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+			var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;	
 			
 			neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
 			neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
@@ -2938,6 +2761,11 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			find = neoBuilding.octree.getBBoxIntersectedLowestOctreesByLOD(	this.myCullingVolumeBBoxSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.myBboxSC,
 				this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 				squaredDistLod0, squaredDistLod1, squaredDistLod2);
+				
+			// End provisional.----------------------------------------------------------------
+			
+																					
+																					
 		}
 		else if (this.configInformation.geo_view_library === Constant.CESIUM)
 		{
@@ -2950,8 +2778,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			var far = scene._frustumCommandsList[this.frustumIdx].far;
 			var fov = scene.frameState.camera.frustum.fov;
 			this.myCameraSC.frustum.fov = fov; // fov = fovx.***
-			//buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);			
+			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
+			
 			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 
 			//this.myCameraSC.frustum.fovy = 0.3;
@@ -4724,15 +4552,10 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		var realBuildingPos = geoLoc.pivotPoint;
 		if (neoBuilding.buildingType === "basicBuilding")
 		{
-<<<<<<< HEAD
-			lod0_minSquaredDist = 50000.0;
-=======
-			//lod0_minSquaredDist = 50000.0;
-			var hola = 0;
->>>>>>> d87d1563e637da6e2bb142191180fb58a0ea5e1c
+			;//lod0_minSquaredDist = 50000.0;
 		}
 		
-		if (neoBuilding.buildingId == "ctships")
+		if (neoBuilding.buildingId === "ctships")
 		{
 			lod0_minSquaredDist = 100000000;
 			lod1_minSquaredDist = 1;
@@ -5567,13 +5390,8 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 	for (var i=0; i<neoBuildingsCount; i++) 
 	{
 		neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
-<<<<<<< HEAD
 		
 		if (neoBuilding.buildingType === "outfitting")
-=======
-
-		if (neoBuilding.buildingType == "outfitting")
->>>>>>> d87d1563e637da6e2bb142191180fb58a0ea5e1c
 		{
 			structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("structure", neoBuilding.buildingId);
 		}
@@ -5585,20 +5403,15 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 
 		if (structureTypedBuilding.bbox === undefined)
 		{ continue; }
-<<<<<<< HEAD
-		
-		if (neoBuilding.buildingId === "KSJ_100")
-=======
 	
 		// Test son.****************************************************************************
 		var buildingNameDivided = neoBuilding.buildingId.split("_");
-		if(buildingNameDivided.length > 0)
->>>>>>> d87d1563e637da6e2bb142191180fb58a0ea5e1c
+		if (buildingNameDivided.length > 0)
 		{
 			var firstName = buildingNameDivided[0];
-			if(firstName == "testId")
+			if (firstName === "testId")
 			{
-				if(buildingNameDivided[2] != undefined)
+				if (buildingNameDivided[2] !== undefined)
 				{
 					neoBuilding.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
 					neoBuilding.buildingType = buildingNameDivided[2];
@@ -5633,7 +5446,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			
 			this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
 			
-			if (neoBuilding.buildingId == "ctships")
+			if (neoBuilding.buildingId === "ctships")
 			{
 				// Test:
 				// for this building dont translate the pivot point to the bbox center.***
