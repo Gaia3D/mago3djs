@@ -22,7 +22,7 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner)
 	this._indicesArray = []; // Visible objects indices.***
 	this._subBoxesArray = [];
 
-	this._indicesUInt32Array = [];
+	this._indicesUInt32Array = []; // delete this.***
 };
 
 /**
