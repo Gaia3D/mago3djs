@@ -48,7 +48,7 @@ server를 실행하기 전에 Dependencies를 설치해줍니다.
 
 #### node Setup ####
 ```
-npm install --save-dev yargs express url compression request
+npm install, npm install -g gulp
 ```
 
 ####  서버 실행

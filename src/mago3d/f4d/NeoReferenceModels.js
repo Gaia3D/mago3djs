@@ -11,7 +11,7 @@ var NeoReference = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// 1) Object ID.***
+	// 1) Object IDX.***
 	this._id = 0;
 
 	this.objectId = "";
@@ -23,7 +23,8 @@ var NeoReference = function()
 	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
 	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
 	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
-
+	this.refMatrixType = 2; // 0 = identity matrix, 1 = translate matrix, 2 = transformation matrix.
+	this.refTranslationVec; // use this if "refMatrixType" == 1.
 	// 4) VBO datas container.***
 	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
 	
@@ -261,6 +262,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	var bytes_readed = 0;
 	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	var testIdentityMatsCount = 0;
+	var stadistic_refMat_Identities_count = 0;
+	var stadistic_refMat_Translates_count = 0;
+	var stadistic_refMat_Transforms_count = 0;
 
 	for (var i = 0; i < neoRefsCount; i++) 
 	{
@@ -431,13 +435,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			
 			// Test. check if the originalMatrix is indentity.
-			/*
-			if(neoRef._originalMatrix4.isIdentity())
+			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
+			
+			if(neoRef.refMatrixType == 0)stadistic_refMat_Identities_count +=1;
+			if(neoRef.refMatrixType == 1)
 			{
-				var hola = 0;
-				testIdentityMatsCount++;
+				neoRef.refTranslationVec = new Float32Array([neoRef._originalMatrix4._floatArrays[12], neoRef._originalMatrix4._floatArrays[13], neoRef._originalMatrix4._floatArrays[14]]);
+				stadistic_refMat_Translates_count +=1;
 			}
-			*/
+			if(neoRef.refMatrixType == 2)stadistic_refMat_Transforms_count +=1;
 
 			// Float mode.**************************************************************
 			// New modifications for xxxx 20161013.*****************************
@@ -566,9 +572,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		}
 
 	}
+	
+	// stadistics vars only for debug.
+	//stadistic_refMat_Identities_count;
+	//stadistic_refMat_Translates_count;
+	//stadistic_refMat_Transforms_count;
+	
 
 	// Now occlusion cullings.***
-
 	// Occlusion culling octree data.*****
 	if (this.exterior_ocCullOctree === undefined)
 	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }

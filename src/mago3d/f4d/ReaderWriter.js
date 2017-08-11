@@ -1243,6 +1243,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						rgbType = gl.RGBA;
 						
 						// test change rgb to bgr.***
+						
 						var imageDataLength = tga.imageData.length;
 						var pixelsCount = imageDataLength/4;
 						var r, g, b, a;
@@ -1258,6 +1259,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 							tga.imageData[i*4+2] = r;
 							tga.imageData[i*4+3] = a;
 						}
+						
 					}
 					
 					

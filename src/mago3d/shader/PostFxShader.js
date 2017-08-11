@@ -531,6 +531,10 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl)
 	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.***
 	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.***
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
@@ -596,22 +600,16 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	//shader.attribLocationCacheObj["normal"] = gl.getAttribLocation(shader.program, "normal");
-	//shader.attribLocationCacheObj["texCoord"] = gl.getAttribLocation(shader.program, "texCoord");
-	//*********************************************************************************
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-
-	// ModelReference.****
-	//shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	//shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	//shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-
 };
 
 // Selection shader.***********************************************************************************************************************
@@ -644,6 +642,9 @@ PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl)
 
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
@@ -1159,6 +1160,9 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 
 	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
 
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
