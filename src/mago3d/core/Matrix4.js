@@ -307,10 +307,10 @@ Matrix4.prototype.computeMatrixType = function()
  */
 Matrix4.prototype.aproxEqual = function(value, valueToCompare, error) 
 {
-	if (error == undefined)
+	if (error === undefined)
 	{ error = 10E-8; }
 	
-	if (value == valueToCompare)
+	if (value === valueToCompare)
 	{
 		return true;
 	}
