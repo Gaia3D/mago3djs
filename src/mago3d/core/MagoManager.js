@@ -988,7 +988,7 @@ MagoManager.prototype.prepareNeoBuildings = function(gl)
 			metaData = neoBuilding.metaData;
 			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+				if (!this.fileRequestControler.isFull())
 				{
 					// must read metadata file.***
 					var neoBuildingHeaderPath = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
@@ -1006,7 +1006,7 @@ MagoManager.prototype.prepareNeoBuildings = function(gl)
 				blocksList = neoBuilding._blocksList_Container.blocksListsArray[j];
 				if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 				{
-					if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+					if (!this.fileRequestControler.isFull())
 					{
 						// must read blocksList.***
 						var fileName = geometryDataPath + "/" + buildingFolderName + "/" + blocksList.name;
@@ -1040,17 +1040,11 @@ MagoManager.prototype.prepareNeoBuildings = function(gl)
 				neoReferencesList = neoBuilding._neoRefLists_Container.neoRefsLists_Array[j];
 				if (neoReferencesList.fileLoadState === CODE.fileLoadState.READY) 
 				{
-					if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+					if (!this.fileRequestControler.isFull())
 					{
 						var fileName = geometryDataPath + "/" + buildingFolderName + "/" + neoReferencesList.name;
 						this.readerWriter.getNeoReferencesArraybuffer(fileName, neoReferencesList, this);
-						// remember multiply reference matrices by the building transform matrix.***
-						//var transformMat = new Matrix4();
-						//transformMat.setByFloat32Array(neoBuilding.move_matrix);
-						//if(transformMat)
-						//{
-						//neoRefsList.multiplyReferencesMatrices(transformMat);
-						//}
+
 						continue;
 					}
 				}
@@ -1069,7 +1063,7 @@ MagoManager.prototype.prepareNeoBuildings = function(gl)
 		metaData = neoBuilding.metaData;
 		if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 		{
-			if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+			if (!this.fileRequestControler.isFull())
 			{
 				// must read metadata file.***
 				var neoBuildingHeaderPath = geometryDataPath + "/" + buildingFolderName + "/Header.hed";
@@ -1087,7 +1081,7 @@ MagoManager.prototype.prepareNeoBuildings = function(gl)
 		// file no requested.***
 		if (neoBuilding.lod2Building.fileLoadState === CODE.fileLoadState.READY) 
 		{
-			if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+			if (!this.fileRequestControler.isFull())
 			{
 				var fileName = geometryDataPath + "/" + buildingFolderName + "/" + "simpleBuilding_LOD2";
 				this.readerWriter.getLodBuildingArraybuffer(fileName, neoBuilding.lod2Building, this);
@@ -1166,7 +1160,7 @@ MagoManager.prototype.loadBuildingOctree = function(neoBuilding)
 
 					if (subOctree.neoRefsList_Array.length === 0) 
 					{
-						if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+						if (!this.fileRequestControler.isFull())
 						{
 							neoReferencesList = new NeoReferencesList();
 							//if(transformMat)
@@ -2068,30 +2062,16 @@ MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pi
 };
 
 /**
- * 카메라 motion 활성화
- * @param state 변수
- * @param scene 변수
+ * 드래그 여부 판단
+ * 
+ * @returns {Boolean} 드래그 여부
  */
-MagoManager.prototype.enableCameraMotion = function(state, scene) 
-{
-	scene.screenSpaceCameraController.enableRotate = state;
-	scene.screenSpaceCameraController.enableZoom = state;
-	scene.screenSpaceCameraController.enableLook = state;
-	scene.screenSpaceCameraController.enableTilt = state;
-	scene.screenSpaceCameraController.enableTranslate = state;
-};
-
-/**
- * dragging 중인지 아닌지를 판단
- * @param gl 변수
- * @param scene 변수
- */
-MagoManager.prototype.isDragging = function(scene) 
+MagoManager.prototype.isDragging = function() 
 {
 	// test function.***
 	var gl = this.sceneState.gl;
 
-	if (this.magoPolicy.mouseMoveMode === 0) // buildings move.***
+	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL)	// Moving all
 	{
 		this.arrayAuxSC.length = 0;
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
@@ -2107,9 +2087,8 @@ MagoManager.prototype.isDragging = function(scene)
 			return false;
 		}
 	}
-	else if (this.magoPolicy.mouseMoveMode === 1) // objects move.***
+	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // Moving object
 	{
-		//var current_objectSelected = this.getSelectedObjectPicking(gl, scene, this.currentRenderables_neoRefLists_array); // original.***
 		this.arrayAuxSC.length = 0;
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerBuildings, this.arrayAuxSC);
 		this.arrayAuxSC.length = 0;
@@ -2124,16 +2103,22 @@ MagoManager.prototype.isDragging = function(scene)
 		}
 	}
 	else
-	{ return false; }
+	{
+		return false;
+	}
 
 };
 
-// 뭐하는 메서드 인가?
-MagoManager.prototype.disableCameraMotion = function(state)
+/**
+ * 카메라 motion 활성 또는 비활성
+ * 
+ * @param {Boolean} state 카메라 모션 활성화 여부
+ */
+MagoManager.prototype.setCameraMotion = function(state)
 {
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		this.wwd.navigator.panRecognizer.enable = false;
+		this.wwd.navigator.panRecognizer.enable = state;
 	}
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
@@ -2143,9 +2128,7 @@ MagoManager.prototype.disableCameraMotion = function(state)
 		this.scene.screenSpaceCameraController.enableTilt = state;
 		this.scene.screenSpaceCameraController.enableTranslate = state;
 	}
-	
 };
-
 
 /**
  * 선택 객체를 asimetric mode 로 이동
@@ -2159,7 +2142,7 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY)
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// distinguish 2 modes.******************************************************
-		if (this.magoPolicy.mouseMoveMode === 0) // blocks move.***
+		if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // blocks move.***
 		{
 			if (this.buildingSelected !== undefined) 
 			{
@@ -2170,10 +2153,10 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY)
 				// 1rst, check if there are objects to move.***
 				if (this.mustCheckIfDragging) 
 				{
-					if (this.isDragging(this.scene)) 
+					if (this.isDragging()) 
 					{
 						this.mouseDragging = true;
-						this.disableCameraMotion(false);
+						this.setCameraMotion(false);
 					}
 					this.mustCheckIfDragging = false;
 				}
@@ -2183,7 +2166,7 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY)
 				this.isCameraMoving = true; // if no object is selected.***
 			}
 		}
-		else if (this.magoPolicy.mouseMoveMode === 1) // objects move.***
+		else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 		{
 			if (this.objectSelected !== undefined) 
 			{
@@ -2194,10 +2177,10 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY)
 				// 1rst, check if there are objects to move.***
 				if (this.mustCheckIfDragging) 
 				{
-					if (this.isDragging(this.scene)) 
+					if (this.isDragging()) 
 					{
 						this.mouseDragging = true;
-						this.disableCameraMotion(false);
+						this.setCameraMotion(false);
 					}
 					this.mustCheckIfDragging = false;
 				}
@@ -2229,7 +2212,7 @@ MagoManager.prototype.manageMouseMove = function(mouseX, mouseY)
 MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
 {
 	var cameraPosition = this.sceneState.camera.position;
-	if (this.magoPolicy.mouseMoveMode === 0) // buildings move.***
+	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
 		if (this.buildingSelected === undefined)
 		{ return; }
@@ -2307,7 +2290,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.y -= difY;
 		}
 	}
-	else if (this.magoPolicy.mouseMoveMode === 1) // objects move.***
+	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
 		if (this.objectSelected === undefined)
 		{ return; }
@@ -2375,7 +2358,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl) 
 {
 	var cameraPosition = this.sceneState.camera.position;
-	if (this.magoPolicy.mouseMoveMode === 0) // buildings move.***
+	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
 		if (this.buildingSelected === undefined)
 		{ return; }
@@ -2450,7 +2433,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl)
 			//this.selectedObjectNotice(this.buildingSelected);
 		}
 	}
-	else if (this.magoPolicy.mouseMoveMode === 1) // objects move.***
+	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
 		if (this.objectSelected === undefined)
 		{ return; }
@@ -2613,7 +2596,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, ne
 				var blocksList = refList.blocksList;
 				if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 				{
-					if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+					if (!this.fileRequestControler.isFull())
 					{
 						// must read blocksList.***
 						var geometryDataPath = this.readerWriter.geometryDataPath;
@@ -2679,15 +2662,15 @@ MagoManager.prototype.getRenderablesDetailedNeoBuilding = function(gl, scene, ne
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param scene 변수
- * @param neoBuilding 변수
- * @param visibleObjControlerOctrees 변수
- * @param visibleObjControlerOctreesAux 변수
- * @returns result_neoRefLists_array
+ * Frustum 안의 VisibleOctree 를 검색하여 currentVisibleOctreesControler 를 준비
+ * 
+ * @param {any} gl 
+ * @param {any} scene 
+ * @param {any} neoBuilding 
+ * @param {VisibleObjectsController} visibleObjControlerOctrees 
+ * @param {any} visibleObjControlerOctreesAux 
+ * @param {any} lod 
  */
-
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux, lod) 
 {
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
@@ -3036,36 +3019,34 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param scene 변수
- * @param neoBuilding 변수
- * @param visibleObjControlerOctrees 변수
- * @param visibleObjControlerOctreesAux 변수
- * @returns result_neoRefLists_array
+ * LOD0, LOD1 에 대한 F4D ModelData, ReferenceData 를 요청
+ * 
+ * @param {any} gl 
+ * @param {any} scene 
+ * @param {any} neoBuilding 
  */
-
 MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene, neoBuilding) 
 {
-	if (this.fileRequestControler.filesRequestedCount >= this.fileRequestControler.maxFilesRequestedCount)
-	{ return; }
-	
-	var refList;
-	var maxRefListParsingCount = 30;
-	var refListsParsingCount = 0;
-	
+	if (this.fileRequestControler.isFull())	{ return; }
+
 	var visibleObjControlerOctrees = neoBuilding.currentVisibleOctreesControler;
 	if (visibleObjControlerOctrees === undefined)
 	{ return; }
 
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
+	var refListsParsingCount = 0;
+	var maxRefListParsingCount = 30;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
-	var lowestOctree;
-	var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
+	var buildingFolderName = neoBuilding.buildingFileName;
 
-	for (var i=0; i<lowestOctreesCount; i++) 
+	// LOD0 & LOD1
+	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
+	var lowestOctree;
+	var currentVisibleOctrees = [].concat(visibleObjControlerOctrees.currentVisibles0, visibleObjControlerOctrees.currentVisibles1);
+
+	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
-		lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+		lowestOctree = currentVisibleOctrees[i];
+		
 		if (lowestOctree.triPolyhedronsCount === 0) 
 		{ continue; }
 		
@@ -3080,22 +3061,16 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === 0)
 		{
-			if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-			{
-				if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
-				{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
+			if (this.fileRequestControler.isFull())	{ return; }
 
-				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-				var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-				this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
-			}
-			else
-			{ return; }
+			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
+			{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
 
-			// test
-			//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
+			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+			var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
+			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
+			
 			continue;
 		}
 
@@ -3121,109 +3096,14 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
-				{
-					// must read blocksList.***
-					var geometryDataPath = this.readerWriter.geometryDataPath;
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
-					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
-					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-				}
-				else
-				{ return; }
+				if (this.fileRequestControler.isFull())	{ return; }
 
-				// test
-				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
-				continue;
-			}
-		}
-		
-		// if the lowest octree is not ready to render, then:
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED )
-		{
-			visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
-		}
-		
-	}
-
-	// LOD 1.*************************************************************************************************************************************************
-	// LOD 1.*************************************************************************************************************************************************
-	// LOD 1.*************************************************************************************************************************************************
-	lowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;
-	for (var i=0; i<lowestOctreesCount; i++) 
-	{
-		lowestOctree = visibleObjControlerOctrees.currentVisibles1[i];
-		if (lowestOctree.octree_number_name === undefined)
-		{ continue; }
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{
-			lowestOctree.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
-			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
-		}
-
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === 0)
-		{
-			if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount)
-			{
-				if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
-				{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
-
+				// must read blocksList.***
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
-				var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-				this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
+				var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+				var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
-			}
-			else
-			{ return; }
-			// test
-			//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
-
-			continue;
-		}
-		// 2 = file loading finished.***
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
-		{
-			if (refListsParsingCount < maxRefListParsingCount) 
-			{
-				// must parse the arraybuffer data.***
-				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC);
-				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-				refListsParsingCount += 1;
-			}
-			// test
-			//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
-
-		}
-		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.PARSE_FINISHED ) 
-		{
-			// 4 = parsed.***
-			// now, check if the blocksList is loaded & parsed.***
-			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-			// 0 = file loading NO started.***
-			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
-			{
-				if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
-				{
-					var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
-					var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
-					this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-				}
-				else
-				{ return; }
-				// test
-				//visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 				continue;
 			}
 		}
@@ -3234,46 +3114,37 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 			visibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 		}
 	}
+
+	currentVisibleOctrees.length = 0;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param scene 변수
- * @param neoBuilding 변수
- * @param visibleObjControlerOctrees 변수
- * @param visibleObjControlerOctreesAux 변수
- * @returns result_neoRefLists_array
+ * LOD2 에 대한 F4D LegoData 를 요청
+ * 
+ * @param {any} gl 
+ * @param {any} scene 
+ * @param {any} neoBuilding 
  */
-
 MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, scene, neoBuilding) 
 {
+	if (this.fileRequestControler.isFull())	{ return; }
 
-	if (this.fileRequestControler.filesRequestedCount >= this.fileRequestControler.maxFilesRequestedCount)
-	{ return; }
-	
-	var refList;
-	var maxRefListParsingCount = 30;
-	var refListsParsingCount = 0;
-	
 	var visibleObjControlerOctrees = neoBuilding.currentVisibleOctreesControler;
 	if (visibleObjControlerOctrees === undefined)
 	{ return; }
 
-	//if(this.isCameraInsideNeoBuilding && neoBuilding.octree !== undefined) // original.***
-
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
-	var geometryDataPath = this.readerWriter.geometryDataPath;
-	var lowestOctree;
-	var lowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
 	var lowestOctreeLegosParsingCount = 0;
+	var maxLowestOctreeLegosParsingCount = 100;
+	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var buildingFolderName = neoBuilding.buildingFileName;
 
-	lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
-	for (var j=0; j<lowestOctreesCount; j++) 
+	// LOD2
+	// Check if the lod2lowestOctrees must load and parse data
+	var lowestOctree;
+
+	for (var i=0, length = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length; i<length; i++) 
 	{
-		lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[j];
+		lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[i];
 		
 		if (lowestOctree.octree_number_name === undefined)
 		{ continue; }
@@ -3294,21 +3165,19 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY && !this.isCameraMoving) 
 		{
 			// must load the legoStructure of the lowestOctree.***
-			if (this.fileRequestControler.filesRequestedCount < this.fileRequestControler.maxFilesRequestedCount) 
+			if (!this.fileRequestControler.isFull())
 			{
-				
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var bricks_folderPath = this.readerWriter.geometryDataPath + "/" + buildingFolderName + "/Bricks";
-				var lego_filePath = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-				this.readerWriter.getOctreeLegoArraybuffer(lego_filePath, lowestOctree, this);
+				var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
+				var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
+				this.readerWriter.getOctreeLegoArraybuffer(filePathInServer, lowestOctree, this);
 			}
 			continue;
 		}
 
 		if (lowestOctree.lego.fileLoadState === 2 && !this.isCameraMoving) 
 		{
-			if (lowestOctreeLegosParsingCount < 100) 
+			if (lowestOctreeLegosParsingCount < maxLowestOctreeLegosParsingCount) 
 			{
 				var bytesReaded = 0;
 				lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.lego.dataArrayBuffer, bytesReaded);

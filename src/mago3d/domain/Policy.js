@@ -31,10 +31,8 @@ var Policy = function()
 	this.color = [];
 	// show/hide
 	this.hideBuildings = [];
-
-	// 0 = block mode, 1 = object mode
-	this.mouseMoveMode = 1;
-	
+	// move mode
+	this.mouseMoveMode = CODE.moveMode.NONE;
 	// 이슈 등록 표시
 	this.issueInsertEnable = false;
 	// object 정보 표시

@@ -437,13 +437,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Test. check if the originalMatrix is indentity.
 			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
 			
-			if(neoRef.refMatrixType == 0)stadistic_refMat_Identities_count +=1;
-			if(neoRef.refMatrixType == 1)
+			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType == 1)
 			{
 				neoRef.refTranslationVec = new Float32Array([neoRef._originalMatrix4._floatArrays[12], neoRef._originalMatrix4._floatArrays[13], neoRef._originalMatrix4._floatArrays[14]]);
 				stadistic_refMat_Translates_count +=1;
 			}
-			if(neoRef.refMatrixType == 2)stadistic_refMat_Transforms_count +=1;
+			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
 
 			// Float mode.**************************************************************
 			// New modifications for xxxx 20161013.*****************************
