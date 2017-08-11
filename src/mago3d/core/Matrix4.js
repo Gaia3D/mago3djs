@@ -252,58 +252,144 @@ Matrix4.prototype.copyFromFloatArray = function(floatArrays)
 };
 
 /**
+ * Returns if the value is aproximately equal to the valueToCompare with error.
+ * @returns {boolean} are equal.
+ */
+Matrix4.prototype.computeMatrixType = function() 
+{
+	// matrixType = 0 -> identity matrix.
+	// matrixType = 1 -> translate matrix.
+	// matrixType = 2 -> transform matrix.
+	
+	var error = 10E-8;
+	if(this.isRotationIdentity())
+	{
+		// check if there are translation.
+		if (this.aproxEqual(this._floatArrays[3], 0, error))
+		{
+			if (this.aproxEqual(this._floatArrays[7], 0, error))
+			{
+				if (this.aproxEqual(this._floatArrays[11], 0, error))
+				{
+					if (this.aproxEqual(this._floatArrays[12], 0, error))
+					{
+						if (this.aproxEqual(this._floatArrays[13], 0, error))
+						{
+							if (this.aproxEqual(this._floatArrays[14], 0, error))
+							{
+								if (this.aproxEqual(this._floatArrays[15], 1, error))
+								{
+									return 0;
+								}
+								else { return 1; }
+							}
+							else { return 1; }
+						}
+						else { return 1; }
+					}
+					else { return 1; }
+				}
+				else { return 1; }
+			}
+			else { return 1; }
+		}
+		else { return 1; }
+	}
+	else
+	{
+		return 2;
+	}
+};
+
+/**
+ * Returns if the value is aproximately equal to the valueToCompare with error.
+ * @returns {boolean} are equal.
+ */
+Matrix4.prototype.aproxEqual = function(value, valueToCompare, error) 
+{
+	if(error == undefined)
+		error = 10E-8;
+	
+	if(value == valueToCompare)
+	{
+		return true;
+	}
+	else
+	{
+		if(value > (valueToCompare - error) && value < (valueToCompare + error))
+			return true;
+		else
+			return false;
+	}
+}
+
+/**
  * Returns if the matrix is identity.
  * @returns {boolean} matrixIsIdentity.
  */
-Matrix4.prototype.isIdentity = function() 
-{
-	if (this._floatArrays[0] == 1)
+Matrix4.prototype.isIdentity = function(error) 
+{	
+	if(this.isRotationIdentity())
 	{
-		if (this._floatArrays[1] == 0)
+		if (this.aproxEqual(this._floatArrays[3], 0, error))
 		{
-			if (this._floatArrays[2] == 0)
+			if (this.aproxEqual(this._floatArrays[7], 0, error))
 			{
-				if (this._floatArrays[3] == 0)
+				if (this.aproxEqual(this._floatArrays[11], 0, error))
 				{
-					if (this._floatArrays[4] == 0)
+					if (this.aproxEqual(this._floatArrays[12], 0, error))
 					{
-						if (this._floatArrays[5] == 1)
+						if (this.aproxEqual(this._floatArrays[13], 0, error))
 						{
-							if (this._floatArrays[6] == 0)
+							if (this.aproxEqual(this._floatArrays[14], 0, error))
 							{
-								if (this._floatArrays[7] == 0)
+								if (this.aproxEqual(this._floatArrays[15], 1, error))
 								{
-									if (this._floatArrays[8] == 0)
+									return true;
+								}
+								else { return false; }
+							}
+							else { return false; }
+						}
+						else { return false; }
+					}
+					else { return false; }
+				}
+				else { return false; }
+			}
+			else { return false; }
+		}
+		else { return false; }
+	}
+	else
+		return false;
+};
+
+/**
+ * Returns if the matrix is identity.
+ * @returns {boolean} matrixIsIdentity.
+ */
+Matrix4.prototype.isRotationIdentity = function(error) 
+{
+	if (this.aproxEqual(this._floatArrays[0], 1, error))
+	{
+		if (this.aproxEqual(this._floatArrays[1], 0, error))
+		{
+			if (this.aproxEqual(this._floatArrays[2], 0, error))
+			{
+				if (this.aproxEqual(this._floatArrays[4], 0, error))
+				{
+					if (this.aproxEqual(this._floatArrays[5], 1, error))
+					{
+						if (this.aproxEqual(this._floatArrays[6], 0, error))
+						{
+							if (this.aproxEqual(this._floatArrays[8], 0, error))
+							{
+								if (this.aproxEqual(this._floatArrays[9], 0, error))
+								{
+									if (this.aproxEqual(this._floatArrays[10], 1, error))
 									{
-										if (this._floatArrays[9] == 0)
-										{
-											if (this._floatArrays[10] == 1)
-											{
-												if (this._floatArrays[11] == 0)
-												{
-													if (this._floatArrays[12] == 0)
-													{
-														if (this._floatArrays[13] == 0)
-														{
-															if (this._floatArrays[14] == 0)
-															{
-																if (this._floatArrays[15] == 1)
-																{
-																	return true;
-																}
-																else { return false; }
-															}
-															else { return false; }
-														}
-														else { return false; }
-													}
-													else { return false; }
-												}
-												else { return false; }
-											}
-											else { return false; }
-										}
-										else { return false; }
+										return true;
 									}
 									else { return false; }
 								}

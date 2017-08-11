@@ -1473,6 +1473,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	if (this.sceneState.drawingBufferWidth != this.depthFboNeo.width || this.sceneState.drawingBufferHeight != this.depthFboNeo.height)
 	{
 		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
 	}
 
 	var cameraPosition = this.sceneState.camera.position;
@@ -1816,6 +1817,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
 		
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		
@@ -2774,7 +2776,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			var squaredDistLod1 = 15000;
 			var squaredDistLod2 = 500000*1000;
 			
-			if (neoBuilding.buildingId == "Sea_Port")
+			if (neoBuilding.buildingId == "Sea_Port" || neoBuilding.buildingId == "ctships")
 			{
 				squaredDistLod0 = 120000;
 				squaredDistLod1 = 285000;
@@ -2811,6 +2813,49 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
 				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
+				
+				if(dc.frustumVolume)
+				{
+					var hola = 0;
+				}
+				
+				if(dc.fov)
+				{
+					var hola = 0;
+				}
+				
+				//dc.navigatorState.frustumInModelCoordinates.
+				//_bottom
+				//Plane {normal: Vec3, distance: -4397963.348575926}
+				//_far
+				//Plane {normal: Vec3, distance: -3353936.320089183}
+				//_left
+				//Plane {normal: Vec3, distance: 1498218.105685316}
+				//_near
+				//Plane {normal: Vec3, distance: 3385764.070363424}
+				//_planes
+				//(6) [Plane, Plane, Plane, Plane, Plane, Plane]
+				//_right
+				//Plane {normal: Vec3, distance: 1530106.7410236418}
+				//_top
+				/*
+				for (var i=0; i<6; i++)
+				{
+					var plane = dc.navigatorState.frustumInModelCoordinates._planes[i];
+					this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], -plane.distance);
+				}
+
+				neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
+				neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
+				
+				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
+																						this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
+																						squaredDistLod0, squaredDistLod1, squaredDistLod2);
+				*/	
+
+				
 				/*
 				var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
 				modelViewRelToEye.copy(dc.navigatorState.modelview);
@@ -2859,6 +2904,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				}
 				
 				*/
+				
+				// Provisional.**********************************************************
+				
 				if (this.myBboxSC == undefined)
 				{ this.myBboxSC = new BoundingBox(); }
 				
@@ -2866,7 +2914,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				{ this.myCullingVolumeBBoxSC = new BoundingBox(); }
 				
 				// Provisionally use a bbox to frustumCulling.***
-				var radiusAprox = 2000.0;
+				var radiusAprox = 4000.0;
 				this.myCullingVolumeBBoxSC.minX = this.myCameraSC.position.x - radiusAprox;
 				this.myCullingVolumeBBoxSC.maxX = this.myCameraSC.position.x + radiusAprox;
 				this.myCullingVolumeBBoxSC.minY = this.myCameraSC.position.y - radiusAprox;
@@ -2886,10 +2934,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				find = neoBuilding.octree.getBBoxIntersectedLowestOctreesByLOD(	this.myCullingVolumeBBoxSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.myBboxSC,
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					
+				// End provisional.----------------------------------------------------------------
 				
-				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctreesAux, this.boundingSphere_Aux,
-				//																		this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-				//																		squaredDistLod0, squaredDistLod1, squaredDistLod2);
+																						
 																						
 			}
 			else if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -3039,7 +3087,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene, neoBuilding) 
 {
-
 	if (this.fileRequestControler.filesRequestedCount >= this.fileRequestControler.maxFilesRequestedCount)
 	{ return; }
 	
@@ -3051,10 +3098,6 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 	if (visibleObjControlerOctrees == undefined)
 	{ return; }
 
-	
-
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
-	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
 	// LOD0.*** check if the lod0lowestOctrees must load and parse data.***********************************************************************************
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var lowestOctree;
@@ -3062,7 +3105,6 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 
 	for (var i=0; i<lowestOctreesCount; i++) 
 	{
-
 		lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
 		if (lowestOctree.triPolyhedronsCount == 0) 
 		{ continue; }
@@ -3100,7 +3142,6 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 		// 2 = file loading finished.***
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED) 
 		{
-
 			if (refListsParsingCount < maxRefListParsingCount) 
 			{
 				// must parse the arraybuffer data.***
@@ -3111,7 +3152,6 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				refListsParsingCount += 1;
 			}
-
 		}
 		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.PARSE_FINISHED ) 
 		{
@@ -3594,6 +3634,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				
 				gl.enableVertexAttribArray(currentShader.position3_loc);
 				
+				gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 				gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 				gl.uniformMatrix4fv(currentShader.ModelViewMatrixRelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays);
 				gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
@@ -3621,7 +3662,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				glPrimitive = gl.TRIANGLES;
 				//gl.polygonMode( gl.FRONT_AND_BACK, gl.LINE );
 				
-				var offsetSize = 5/1000;
+				var offsetSize = 3/1000;
 				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, offsetSize]);
 				this.renderer.renderNeoReferenceAsimetricVersionColorSelection(gl, this.objectSelected, neoReferencesMotherAndIndices, neoBuilding, this, currentShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
 				gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [-offsetSize, offsetSize]);
@@ -3897,7 +3938,6 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
-	
 
 	var isInterior = false; // no used.***
 
@@ -3934,8 +3974,6 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 
 		// renderDepth for all buildings.***
 		// 1) LOD 0 & LOD1.*********************************************************************************************************************
-		// 1) LOD 0 & LOD1.*********************************************************************************************************************
-		// 1) LOD 0 & LOD1.*********************************************************************************************************************
 		var refTMatrixIdxKey = 0;
 		var minSize = 0.0;
 		if (this.isLastFrustum)
@@ -3949,9 +3987,6 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 	}
 	
 	// 2) LOD 2 & 3.************************************************************************************************************************************
-	// 2) LOD 2 & 3.************************************************************************************************************************************
-	// 2) LOD 2 & 3.************************************************************************************************************************************
-	
 	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
 	if (neoBuildingsCount > 0)
 	{
@@ -4881,8 +4916,16 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		
 		if (neoBuilding.buildingType == "basicBuilding")
 		{
-			lod0_minSquaredDist = 50000.0;
+			//lod0_minSquaredDist = 50000.0;
 			var hola = 0;
+		}
+		
+		if (neoBuilding.buildingId == "ctships")
+		{
+			lod0_minSquaredDist = 100000000;
+			lod1_minSquaredDist = 1;
+			lod2_minSquaredDist = 10000000*10000;
+			lod3_minSquaredDist = 100000*9;
 		}
 
 		this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
@@ -5724,11 +5767,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 	for (var i=0; i<neoBuildingsCount; i++) 
 	{
 		neoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
-		if (i == 526)
-		{
-			var hola = 0;
-		}
-		
+
 		if (neoBuilding.buildingType == "outfitting")
 		{
 			structureTypedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId("structure", neoBuilding.buildingId);
@@ -5741,29 +5780,37 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 
 		if (structureTypedBuilding.bbox == undefined)
 		{ continue; }
-		
-		if (neoBuilding.buildingId == "KSJ_100")
-		{
-			var hola = 0;
-		}
 	
+		// Test son.****************************************************************************
+		var buildingNameDivided = neoBuilding.buildingId.split("_");
+		if(buildingNameDivided.length > 0)
+		{
+			var firstName = buildingNameDivided[0];
+			if(firstName == "testId")
+			{
+				if(buildingNameDivided[2] != undefined)
+				{
+					neoBuilding.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
+					neoBuilding.buildingType = buildingNameDivided[2];
+				}
+				else
+				{
+					neoBuilding.buildingId = buildingNameDivided[1];
+					neoBuilding.buildingType = buildingNameDivided[3];
+				}
+			}
+		}
+		// End Test son.------------------------------------------------------------------------
+		
 		newLocation = realTimeLocBlocksList[neoBuilding.buildingId];
 		// must calculate the realBuildingPosition (bbox_center_position).***
 		var longitude;
 		var latitude;
 		var altitude;
 		var heading, pitch, roll;
-		
-		if (neoBuilding.buildingId == "gangnam_del")
-		{
-			var hola = 0;
-		}
-		
-		//KICT_main_Arc_v3_with_spaces
 			
 		if (newLocation) 
 		{
-
 			longitude = parseFloat(newLocation.longitude);
 			latitude = parseFloat(newLocation.latitude);
 			altitude = parseFloat(newLocation.height);
@@ -5775,6 +5822,13 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
 			
 			this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
+			
+			if (neoBuilding.buildingId == "ctships")
+			{
+				// Test:
+				// for this building dont translate the pivot point to the bbox center.***
+				return;
+			}
 			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
 			////currentCalculatingPositionsCount ++;
@@ -5782,38 +5836,6 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 		else
 		{
 			// use the normal data. never enter here.***
-			var hola = 0;
-			var increLon = 0.001;
-			var increLat = 0.001;
-			/*
-			if(neoBuilding.buildingType == "basicBuilding")
-			{
-				longitude = 128.594998;
-				latitude = 34.904209;
-				altitude = 40.0;
-		
-				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
-				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
-				
-				this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
-				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
-			}
-			
-			if(neoBuilding.buildingId == "gangbuk_cultur")
-			{
-				longitude = 128.596;
-				latitude = 34.904;
-				altitude = 40.0;
-		
-				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
-				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, buildingGeoLocation);
-				
-				this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
-				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
-			}
-			
-			else continue;
-			*/
 		}
 	}
 };

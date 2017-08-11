@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Plane on 3D space. Plane equation ax+by+cz+d = 0.
  * @class Plane
  */
 var Plane = function() 
