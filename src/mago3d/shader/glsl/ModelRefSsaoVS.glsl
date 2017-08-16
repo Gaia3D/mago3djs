@@ -2,6 +2,7 @@
 	attribute vec3 normal;
 	attribute vec2 texCoord;
 	
+	uniform mat4 buildingRotMatrix; 
 	uniform mat4 projectionMatrix;  
 	uniform mat4 modelViewMatrix;
 	uniform mat4 modelViewMatrixRelToEye; 
@@ -14,8 +15,8 @@
 	uniform vec3 encodedCameraPositionMCLow;
 	uniform vec3 aditionalPosition;
 	uniform vec3 refTranslationVec;
-	uniform int refMatrixType;
-	
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
+
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
 	varying vec3 uAmbientColor;
@@ -41,6 +42,7 @@
 			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 			currentTMat = mat3(RefTransfMatrix);
 		}
+
 		vec3 objPosHigh = buildingPosHIGH;
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
@@ -48,7 +50,7 @@
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 
 		vertexPos = vec3(modelViewMatrixRelToEye * pos4);
-		vec3 rotatedNormal = mat3(RefTransfMatrix) * normal;
+		vec3 rotatedNormal = currentTMat * normal;
 		vLightWeighting = vec3(1.0, 1.0, 1.0);
 		uAmbientColor = vec3(0.8);
 		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);

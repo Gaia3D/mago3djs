@@ -72,7 +72,7 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint)
 	{
 		var alfa = -((this.a*r + this.b*s + this.c*t + this.d)/(den));
 		
-		if (intersectionPoint == undefined) { intersectionPoint = new Point3D(); }
+		if (intersectionPoint === undefined) { intersectionPoint = new Point3D(); }
 		
 		intersectionPoint.set(r+alfa*u, s+alfa*v, t+alfa*w);
 		return intersectionPoint;

@@ -250,37 +250,37 @@ PostFxShader.prototype.bindUniforms = function()
 PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
 {
 	var uniformDataPair;//
-	if (uniformType == "Matrix4fv")
+	if (uniformType === "Matrix4fv")
 	{
 		uniformDataPair = new UniformMatrix4fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if (uniformType == "Vec4fv")
+	else if (uniformType === "Vec4fv")
 	{
 		uniformDataPair = new UniformVec4fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if (uniformType == "Vec3fv")
+	else if (uniformType === "Vec3fv")
 	{
 		uniformDataPair = new UniformVec3fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if (uniformType == "Vec2fv")
+	else if (uniformType === "Vec2fv")
 	{
 		uniformDataPair = new UniformVec2fvDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if (uniformType == "1f")
+	else if (uniformType === "1f")
 	{
 		uniformDataPair = new Uniform1fDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);
 		this.uniformsCacheObj[uniformName] = uniformDataPair;
 	}
-	else if (uniformType == "1i")
+	else if (uniformType === "1i")
 	{
 		uniformDataPair = new Uniform1iDataPair(this.gl, uniformName);
 		this.uniformsArray.push(uniformDataPair);

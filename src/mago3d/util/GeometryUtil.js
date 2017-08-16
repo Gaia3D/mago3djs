@@ -233,8 +233,9 @@ TTrianglesMatrix.prototype.getVBOIndicesShortArray = function()
 	this.totalTTrianglesArraySC = this.getTotalTTrianglesArray(this.totalTTrianglesArraySC);
 
 	var tTriangle;
+	var tTrianglesCount = this.totalTTrianglesArraySC.length;
 	var shortArray = new Uint16Array(tTrianglesCount * 3);
-	for (var i = 0, tTrianglesCount = this.totalTTrianglesArraySC.length; i < tTrianglesCount; i++) 
+	for (var i = 0; i < tTrianglesCount; i++) 
 	{
 		tTriangle = this.totalTTrianglesArraySC[i];
 		shortArray[i*3] = tTriangle.mVertex1.mIdxInList;
@@ -296,13 +297,13 @@ VertexMatrix.prototype.getVertexList = function(idx)
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) 
 {
-	if (resultBox == undefined) { resultBox = new BoundingBox(); }
+	if (resultBox === undefined) { resultBox = new BoundingBox(); }
 
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	for (var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) 
 	{
-		if (i == 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
+		if (i === 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
 		else { resultBox.addPoint(this.totalVertexArraySC[i].point3d); }
 	}
 	return resultBox;
@@ -372,7 +373,7 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount*6); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount*6); }
 
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -400,7 +401,7 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 7); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount * 7); }
 
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -429,7 +430,7 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 3); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount * 3); }
 
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -482,7 +483,7 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 			tTriangle1 = tTrianglesList.newTTriangle();
 			tTriangle2 = tTrianglesList.newTTriangle();
 
-			if (j == vertexCount -1) 
+			if (j === vertexCount -1) 
 			{
 				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(0));
 				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(0), vtxList1.getVertex(0));
@@ -567,7 +568,7 @@ TrianglesSurface.prototype.destroy = function()
 	for (var i = 0, ftrianglesCount = this.mTrianglesArray.length; i < ftrianglesCount; i++) 
 	{
 		var ftriangle = this.mTrianglesArray[i];
-		if (ftriangle!=null){ ftriangle.destroy(); }
+		if (ftriangle!==null){ ftriangle.destroy(); }
 		ftriangle = null;
 	}
 	this.mTrianglesArray = null;
@@ -576,7 +577,7 @@ TrianglesSurface.prototype.destroy = function()
 	for (var i = 0, pointsCount = this.mPoint3DArray.length; i < pointsCount; i++) 
 	{
 		var point = this.mPoint3DArray[i];
-		if (point!=null) { point.destroy(); }
+		if (point!==null) { point.destroy(); }
 		point = null;
 	}
 	this.mPoint3DArray = null;
@@ -590,7 +591,7 @@ TrianglesSurface.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 {
 	var currentMeshArrays = null;
 	var meshArraysCount = generalVBOArraysContainer.meshArrays.length;
-	if (meshArraysCount == 0) 
+	if (meshArraysCount === 0) 
 	{
 		currentMeshArrays = generalVBOArraysContainer.newVertexColorIdxArray();
 	}
@@ -659,7 +660,7 @@ TrianglesSurface.prototype.getVertexIndicesArrays = function(generalVertexIdxVBO
 {
 	var currentMeshArrays = null;
 	var meshArraysCount = generalVertexIdxVBOArraysContainer._meshArrays.length;
-	if (meshArraysCount == 0) 
+	if (meshArraysCount === 0) 
 	{
 		currentMeshArrays = generalVertexIdxVBOArraysContainer.newVertexIdxArray();
 	}
@@ -708,7 +709,7 @@ TrianglesSurface.prototype.getVertexIndicesArraysOriginal = function(generalVert
 {
 	var currentMeshArrays = null;
 	var meshArraysCount = generalVertexIdxVBOArraysContainer._meshArrays.length;
-	if (meshArraysCount == 0) 
+	if (meshArraysCount === 0) 
 	{
 		currentMeshArrays = generalVertexIdxVBOArraysContainer.newVertexIdxArray();
 	}
@@ -812,7 +813,7 @@ TrianglesSurface.prototype.getTransformedTrianglesSurface = function(matrix4)
 TrianglesSurface.prototype.getBoundingBox = function() 
 {
 	var pointsCount = this.mPoint3DArray.length;
-	if (pointsCount == 0) { return null; }
+	if (pointsCount === 0) { return null; }
 
 	var bb = new BoundingBox();
 	var firstPoint3d = this.mPoint3DArray[0];
@@ -850,7 +851,7 @@ Fpolyhedron.prototype.destroy = function()
 	for (var i = 0, ftriSurfacesCount = this.mFTrianglesSurfacesArray.length; i < ftriSurfacesCount; i++) 
 	{
 		var ftrianglesSurface = this.mFTrianglesSurfacesArray[i];
-		if (ftrianglesSurface!=null){ ftrianglesSurface.destroy(); }
+		if (ftrianglesSurface!==null){ ftrianglesSurface.destroy(); }
 		ftrianglesSurface = null;
 	}
 	this.mFTrianglesSurfacesArray = null;
@@ -919,20 +920,20 @@ Fpolyhedron.prototype.getTransformedFPolyhedron = function(matrix4)
 Fpolyhedron.prototype.getBoundingBox = function() 
 {
 	var ftriSurfacesCount = this.mFTrianglesSurfacesArray.length;
-	if (ftriSurfacesCount == 0) { return null; }
+	if (ftriSurfacesCount === 0) { return null; }
 
 	var bb = null;
 	for (var i = 0; i < ftriSurfacesCount; i++) 
 	{
 		var ftrianglesSurface = this.mFTrianglesSurfacesArray[i];
 		var currentBb = ftrianglesSurface.getBoundingBox();
-		if (bb == null) 
+		if (bb === null) 
 		{
-			if (currentBb != null) { bb = currentBb; }
+			if (currentBb !== null) { bb = currentBb; }
 		}
 		else 
 		{
-			if (currentBb != null) { bb.addBox(currentBb); }
+			if (currentBb !== null) { bb.addBox(currentBb); }
 		}
 	}
 
@@ -962,7 +963,7 @@ FpolyhedronsList.prototype.getVertexColorsIndicesArrays = function(generalVBOArr
 	for (var i = 0, fpolyhedronsCount = this.mFPolyhedronsArray.length; i < fpolyhedronsCount; i++) 
 	{
 		var fpolyhedron = this.mFPolyhedronsArray[i];
-		if (fpolyhedron.mIFCEntityType != 27 && fpolyhedron.mIFCEntityType != 26) // 27 = ifc_space, 26 = ifc_windows.***
+		if (fpolyhedron.mIFCEntityType !== 27 && fpolyhedron.mIFCEntityType !== 26) // 27 = ifc_space, 26 = ifc_windows.***
 		{ fpolyhedron.getVertexColorsIndicesArrays(generalVBOArraysContainer); }
 	}
 };
@@ -1026,23 +1027,12 @@ Reference.prototype.multiplyTransformMatrix = function(matrix)
 Reference.prototype.getBoundingBox = function(blocksList) 
 {
 	var block = blocksList.getBlock(this._block_idx);
-	if (block == null) { return null; }
+	if (block === null) { return null; }
 
 	var block_fpolyhedron = block._fpolyhedron;
 	var transformed_fpolyhedron = block_fpolyhedron.getTransformedFPolyhedron(this._matrix4);
 	var bb = transformed_fpolyhedron.getBoundingBox();
 	return bb;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns byteColorsSurface
- */
-Reference.prototype.newByteColorsSurface = function() 
-{
-	var byteColorsSurface = new f4d_ByteColorsSurface();
-	this._ByteColorsSurfacesList.push(byteColorsSurface);
-	return byteColorsSurface;
 };
 
 /**
@@ -1071,13 +1061,13 @@ CompoundReference.prototype.getBoundingBox = function(blocksList)
 	{
 		var reference = this._referencesList[i];
 		var currentBb = reference.getBoundingBox(blocksList);
-		if (bb == null) 
+		if (bb === null) 
 		{
-			if (currentBb != null) { bb = currentBb; }
+			if (currentBb !== null) { bb = currentBb; }
 		}
 		else 
 		{
-			if (currentBb != null) { bb.addBox(currentBb); }
+			if (currentBb !== null) { bb.addBox(currentBb); }
 		}
 	}
 
@@ -1151,13 +1141,13 @@ CompoundReferencesList.prototype.getBoundingBox = function(blocksList)
 	{
 		var compRef = this._compoundRefsArray[i];
 		var currentBb = compRef.getBoundingBox(blocksList);
-		if (bb == null) 
+		if (bb === null) 
 		{
-			if (currentBb != null) { bb = currentBb; }
+			if (currentBb !== null) { bb = currentBb; }
 		}
 		else 
 		{
-			if (currentBb != null) { bb.addBox(currentBb); }
+			if (currentBb !== null) { bb.addBox(currentBb); }
 		}
 	}
 	return bb;
@@ -1248,7 +1238,7 @@ CompoundReferencesListContainer.prototype.getCompRefListByName = function(compRe
 	var i=0;
 	while (!found && i < compRefListsCount) 
 	{
-		if (this.compRefsListArray[i].name == compRefListsName) 
+		if (this.compRefsListArray[i].name === compRefListsName) 
 		{
 			result_compRefList = this.compRefsListArray[i];
 		}
@@ -1691,10 +1681,6 @@ BRBuildingProject.prototype.calculateTotalTrianglesCount = function()
 	{
 		compRefList = _interiorCompRefList_Container.compRefsListArray[i];
 		compRefsCount = compRefList._compoundRefsArray.length;
-		for (var j = 0; j < compRefsCount; j++) 
-		{
-
-		}
 	}
 };
 
@@ -1713,7 +1699,7 @@ BRBuildingProject.prototype.getTransformedRelativeEyePositionToBuilding = functi
 	var relative_eye_pos_y = absolute_eye_y - buildingPosition.y;
 	var relative_eye_pos_z = absolute_eye_z - buildingPosition.z;
 
-	if (this.buildingPosMatInv == undefined)
+	if (this.buildingPosMatInv === undefined)
 	{
 		this.buildingPosMatInv = new Matrix4();
 		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
@@ -1791,7 +1777,7 @@ BRBuildingProject.prototype.getAllCompRefLists = function()
  */
 BRBuildingProject.prototype.getRadiusAprox = function() 
 {
-	if (this._boundingBox == undefined) 
+	if (this._boundingBox === undefined) 
 	{
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if (compRefList) 
@@ -1818,7 +1804,7 @@ BRBuildingProject.prototype.getRadiusAprox = function()
 BRBuildingProject.prototype.getBoundingBox = function() 
 {
 	/*
-	  if(this._boundingBox == undefined)
+	  if(this._boundingBox === undefined)
 	  {
 		  var boundingBox = null;
 
@@ -1828,14 +1814,14 @@ BRBuildingProject.prototype.getBoundingBox = function()
 			  var compRefList = this._compRefList_Container.compRefsListArray[i];
 			  var blocksList = this._blocksList_Container.blocksListsArray[i];
 			  var bb = compRefList.getBoundingBox(blocksList);
-			  if(this._boundingBox == undefined)
+			  if(this._boundingBox === undefined)
 			  {
-				  if(bb != null)
+				  if(bb !== null)
 				  this._boundingBox = bb;// malament. s'ha de multiplicar per el matrix de transformacio.***
 			  }
 			  else
 			  {
-				  if(bb != null)
+				  if(bb !== null)
 					  this._boundingBox.addBox(bb);
 			  }
 
@@ -1844,7 +1830,7 @@ BRBuildingProject.prototype.getBoundingBox = function()
 	  */
 
 	// Return the compReflList's occlussionCullingMotherBox.***
-	if (this._boundingBox == undefined) 
+	if (this._boundingBox === undefined) 
 	{
 		var compRefList = this._compRefList_Container.getCompRefListByName("Ref_Skin1");
 		if (compRefList) 
@@ -1948,21 +1934,21 @@ BRBuildingProjectsList.prototype.newBRProject = function()
  */
 BRBuildingProjectsList.prototype.getBoundingBox = function() 
 {
-	if (this._boundingBox == undefined) 
+	if (this._boundingBox === undefined) 
 	{
 		var buildingProjects_count = this._BR_buildingsArray.length;
 		for (var i=0; i<buildingProjects_count; i++) 
 		{
 			var buildingProject = this._BR_buildingsArray[i];
 			var currentBb = buildingProject.getBoundingBox();
-			if (this._boundingBox == undefined) 
+			if (this._boundingBox === undefined) 
 			{
-				if (currentBb != null)
+				if (currentBb !== null)
 				{ this._boundingBox = currentBb; }
 			}
 			else
 			{
-				if (currentBb != null)
+				if (currentBb !== null)
 				{ this._boundingBox.addBox(currentBb); }
 			}
 		}

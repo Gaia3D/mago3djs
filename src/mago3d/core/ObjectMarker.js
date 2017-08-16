@@ -21,7 +21,7 @@ var ObjectMarker = function()
 
 ObjectMarker.prototype.copyFrom = function(objMarker) 
 {
-	if (objMarker == undefined) { return; }
+	if (objMarker === undefined) { return; }
 		
 	if (objMarker.geoLocationData) 
 	{

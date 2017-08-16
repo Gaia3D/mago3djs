@@ -35,14 +35,14 @@
     "no-extend-native": 2,  // 네이티브 객체의 확장 금지(Object.prototype)
     "wrap-iife": [2, "inside"], // 즉시 호출된 함수식(IIFE)을 생성하는 괄호를 요구함
     "no-use-before-define": 2,  // 선언 전에 식별자 사용 금지
-    "new-cap": 2, // 생성자 이름은 대문자로 시작
+    "new-cap": [2, { "newIsCap": true, "capIsNew": false }], // 생성자 이름은 대문자로 시작
     "no-caller": 2, // arguments.caller, arguments.callee 사용 금지
     "no-empty": 2,  // 빈 블럭 구문을 허용하지 않음
     "no-irregular-whitespace": 2, // 유효하지 않거나 불규칙한 공백을 허용하지 않음
     "no-new": 2,  // new 생성자 단독 사용 금지(생성된 객체를 저장하는 변수를 선언해야 함)
     "no-plusplus": 0, // 단항 연산자(+++, --) 사용을 허용하지 않음
     "quotes": 0,  // 인용부호(", ', `)의 일관된 사용을 강제
-    "no-undef": 2,  // 선언되지 않은 변수 허용하지 않음
+    "no-undef": 0,  // 선언되지 않은 변수 허용하지 않음
     "no-unused-vars": 1,  // 사용되지 않는 변수 허용하지 않음
     "strict": 2,  // 엄격모드 사용
     "semi": 2,  // 세미콜론 요구

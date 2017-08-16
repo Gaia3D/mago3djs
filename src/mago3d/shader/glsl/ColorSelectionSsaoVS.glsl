@@ -1,5 +1,6 @@
 attribute vec3 position;
 
+uniform mat4 buildingRotMatrix;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform mat4 RefTransfMatrix;
 uniform vec3 buildingPosHIGH;
@@ -8,10 +9,10 @@ uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform vec3 aditionalPosition;
 uniform vec3 refTranslationVec;
-uniform int refMatrixType;
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 
 void main()
-{	
+{
     vec4 rotatedPos;
 	if(refMatrixType == 0)
 	{
@@ -25,6 +26,7 @@ void main()
 	{
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 	}
+
     vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;

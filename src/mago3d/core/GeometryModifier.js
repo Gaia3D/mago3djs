@@ -222,7 +222,7 @@ GeometryModifier.prototype.compoundReferencesListGetVisibleCompRefObjectsList = 
 		}
 	}
 
-	if (visibleCompRefObjectsArray && visibleCompRefObjectsArray.length == 0) { return null; }
+	if (visibleCompRefObjectsArray && visibleCompRefObjectsArray.length === 0) { return null; }
 
 	return visibleCompRefObjectsArray;
 };
@@ -246,7 +246,7 @@ GeometryModifier.prototype.compoundReferencesListContainerGetVisibleCompRefObjec
 	{
 		compRefList = compRefListContainer.compRefsListArray[i];
 		var visibleCompRefObjectsArray = this.compoundReferencesListGetVisibleCompRefObjectsList(compRefList, eyeX, eyeY, eyeZ);
-		if (visibleCompRefObjectsArray != null)
+		if (visibleCompRefObjectsArray !== null)
 		{ visibleCompRefObjectsArrayTotal.push(visibleCompRefObjectsArray); }
 	}
 	return visibleCompRefObjectsArrayTotal;
@@ -396,7 +396,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint
 {
 	var intersectedSubBox = null;
 
-	if (ocCullOctreeCell._ocCulling_Cell_owner == null)
+	if (ocCullOctreeCell._ocCulling_Cell_owner === null)
 	{
 		// This is the mother_cell.***
 		if (!this.occlusionCullingOctreeCellIntersectsWithPoint3D(ocCullOctreeCell, x, y, z))
@@ -475,7 +475,7 @@ GeometryModifier.prototype.occlusionCullingOctreeCellGetIndicesVisiblesForEye = 
 	var indicesVisiblesArray = null;
 	var intersectedSubBox = this.occlusionCullingOctreeCellGetIntersectedSubBoxByPoint3D(ocCullOctreeCell, eyeX, eyeY, eyeZ);
 
-	if (intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
+	if (intersectedSubBox !== null && intersectedSubBox._indicesArray.length > 0)
 	{
 		indicesVisiblesArray = intersectedSubBox._indicesArray;
 	}
@@ -566,7 +566,7 @@ GeometryModifier.prototype.blocksListsContainerGetBlockList = function(blockList
 	while (!found && i < blocksListsCount)
 	{
 		var currentBlocksList = blockListContainer.blocksListsArray[i];
-		if (currentBlocksList.name == blocksListName)
+		if (currentBlocksList.name === blocksListName)
 		{
 			found = true;
 			blocksList = currentBlocksList;

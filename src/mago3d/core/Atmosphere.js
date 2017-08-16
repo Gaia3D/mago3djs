@@ -145,8 +145,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
  */
 ShadowBlendingCube.prototype.getVBOVertexColorRGBAFloatArray = function() 
 {
-	var floatArray = this.vertexMatrix
-		.getVBOVertexColorRGBAFloatArray(floatArray);
+	var floatArray = this.vertexMatrix.getVBOVertexColorRGBAFloatArray();
 	return floatArray;
 };
 

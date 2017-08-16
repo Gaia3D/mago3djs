@@ -25,16 +25,16 @@ TriPolyhedron.prototype.newTriSurface = function()
 TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey) 
 {
 	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
-	if (resultVBOVertexIdxCacheKey == undefined)
+	if (resultVBOVertexIdxCacheKey === undefined)
 	{ resultVBOVertexIdxCacheKey = new VBOVertexIdxCacheKey(); }
 
-	if (resultVBOVertexIdxCacheKey.posVboDataArray == undefined)
+	if (resultVBOVertexIdxCacheKey.posVboDataArray === undefined)
 	{ resultVBOVertexIdxCacheKey.posVboDataArray = []; }
 
-	if (resultVBOVertexIdxCacheKey.norVboDataArray == undefined)
+	if (resultVBOVertexIdxCacheKey.norVboDataArray === undefined)
 	{ resultVBOVertexIdxCacheKey.norVboDataArray = []; }
 
-	if (resultVBOVertexIdxCacheKey.colVboDataArray == undefined)
+	if (resultVBOVertexIdxCacheKey.colVboDataArray === undefined)
 	{ resultVBOVertexIdxCacheKey.colVboDataArray = []; }
 
 	var positionArray = [];
@@ -56,7 +56,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 		for (var j = 0; j < trianglesCount; j++) 
 		{
 			triangle = triSurface.trianglesArray[j];
-			if (triangle.normal == undefined)
+			if (triangle.normal === undefined)
 			{ triangle.calculatePlaneNormal(); }
 
 			// position.***
@@ -90,7 +90,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			normalsArray.push(triangle.normal.z);
 
 			// colors.***
-			if (vertex0.color4 == undefined) 
+			if (vertex0.color4 === undefined) 
 			{
 				colorsArray.push(255);
 				colorsArray.push(255);

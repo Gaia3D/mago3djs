@@ -184,7 +184,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project)
 	var arrayBuffer = this.fileArrayBuffer;
 	var bytes_readed = this.fileBytesReaded;
 
-	if (this.readWriter == undefined)
+	if (this.readWriter === undefined)
 	{ this.readWriter = new ReaderWriter(); }
 
 	// 1) Version(5 chars).***********
@@ -276,7 +276,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project)
 	if (this.fileBytesReaded >= fileLegth)
 	{ return; }
 
-	if (this.readWriter == undefined)
+	if (this.readWriter === undefined)
 	{ this.readWriter = new ReaderWriter(); }
 
 	var bytes_readed = this.fileBytesReaded;
@@ -284,7 +284,7 @@ TerranTile.prototype.parseFileSimpleBuilding = function(BR_Project)
 	var endBuff;
 	var arrayBuffer = this.fileArrayBuffer;
 
-	if (BR_Project._simpleBuilding_v1 == undefined)
+	if (BR_Project._simpleBuilding_v1 === undefined)
 	{ BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
@@ -327,10 +327,10 @@ TerranTile.prototype.parseFileNailImage = function(BR_Project, magoManager)
 {
 	//BR_Project._f4d_nailImage_readed = true;
 
-	if (BR_Project._simpleBuilding_v1 == undefined)
+	if (BR_Project._simpleBuilding_v1 === undefined)
 	{ BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
 
-	if (this.readWriter == undefined)
+	if (this.readWriter === undefined)
 	{ this.readWriter = new ReaderWriter(); }
 
 	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
@@ -362,13 +362,13 @@ TerranTile.prototype.parseFileAllBuildings = function(magoManager)
 		return;
 	}
 
-	if (this.readWriter == undefined)
+	if (this.readWriter === undefined)
 	{ this.readWriter = new ReaderWriter(); }
 
 	var arrayBuffer = this.fileArrayBuffer;
 	var projects_count = this.readWriter.readInt32(arrayBuffer, 0, 4); this.fileBytesReaded += 4;
 
-	if (projects_count == 0)
+	if (projects_count === 0)
 	{ this.empty_tile = true; }
 
 	for (var i=0; i<projects_count; i++)
@@ -410,7 +410,7 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager)
 		return;
 	}
 
-	if (this.readWriter == undefined)
+	if (this.readWriter === undefined)
 	{ this.readWriter = new ReaderWriter(); }
 
 	var projects_count = this.readWriter.readInt32(this.fileArrayBuffer, 0, 4); // only debug test.***
@@ -422,9 +422,9 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager)
 		return;
 	}
 
-	if (this.current_BRProject_parsing_state == 0)
+	if (this.current_BRProject_parsing_state === 0)
 	{
-		if (this.projectsParsed_count == 0)
+		if (this.projectsParsed_count === 0)
 		{ this.fileBytesReaded = 4; }
 
 		this.current_BRProject_parsing = this.newBRProject();
@@ -433,12 +433,12 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager)
 	var BR_Project = this.current_BRProject_parsing;
 
 	// Read header, simpleBuilding, and the nailImage.***
-	if (this.current_BRProject_parsing_state == 0) 
+	if (this.current_BRProject_parsing_state === 0) 
 	{
 		this.parseFileHeader(BR_Project);
 		this.current_BRProject_parsing_state=1;
 	}
-	else if (this.current_BRProject_parsing_state == 1) 
+	else if (this.current_BRProject_parsing_state === 1) 
 	{
 		if (magoManager.backGround_imageReadings_count < 1) 
 		{
@@ -446,7 +446,7 @@ TerranTile.prototype.parseFileOneBuilding = function(gl, magoManager)
 			this.current_BRProject_parsing_state=2;
 		}
 	}
-	else if (this.current_BRProject_parsing_state == 2) 
+	else if (this.current_BRProject_parsing_state === 2) 
 	{
 		if (magoManager.backGround_imageReadings_count < 1) 
 		{
@@ -465,7 +465,7 @@ TerranTile.prototype.setDimensionsSubTiles = function()
 {
 	var subTile;
 	var subTiles_count = this.subTiles_array.length; // subTiles_count must be 4.***
-	if (subTiles_count == 4) 
+	if (subTiles_count === 4) 
 	{
 		var lon_mid = (this.longitudeMax + this.longitudeMin)/2.0;
 		var lat_mid = (this.latitudeMax + this.latitudeMin)/2.0;
@@ -538,9 +538,9 @@ TerranTile.prototype.getIntersectedSmallestTiles = function(frustumVolume, inter
 TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux) 
 {
 	// Cesium dependency.***
-	if (this.position == undefined) { return; }
+	if (this.position === undefined) { return; }
 
-	if (boundingSphere_Aux == undefined) { boundingSphere_Aux = new Cesium.BoundingSphere(); }
+	if (boundingSphere_Aux === undefined) { boundingSphere_Aux = new Cesium.BoundingSphere(); }
 
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
@@ -550,28 +550,28 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 	this.visibilityType = frustumVolume.computeVisibility(boundingSphere_Aux);
 	/*
 	boundingSphere_Aux.center = this.leftDown_position;
-	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
+	if(frustumVolume.computeVisibility(boundingSphere_Aux) !== Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
 
 	boundingSphere_Aux.center = this.rightDown_position;
-	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
+	if(frustumVolume.computeVisibility(boundingSphere_Aux) !== Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
 
 	boundingSphere_Aux.center = this.rightUp_position;
-	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
+	if(frustumVolume.computeVisibility(boundingSphere_Aux) !== Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
 
 	boundingSphere_Aux.center = this.leftUp_position;
-	if(frustumVolume.computeVisibility(boundingSphere_Aux) != Cesium.Intersect.OUTSIDE)
+	if(frustumVolume.computeVisibility(boundingSphere_Aux) !== Cesium.Intersect.OUTSIDE)
 		intersectedPoints_count++;
 	*/
 
-	if (this.visibilityType == Cesium.Intersect.OUTSIDE) 
+	if (this.visibilityType === Cesium.Intersect.OUTSIDE) 
 	{
 		// OUTSIDE.***
 		// do nothing.***
 	}
-	else if (this.visibilityType == Cesium.Intersect.INSIDE) 
+	else if (this.visibilityType === Cesium.Intersect.INSIDE) 
 	{
 		// INSIDE.***
 		intersectedTiles_array.push(this);

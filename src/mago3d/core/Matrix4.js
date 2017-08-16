@@ -163,7 +163,7 @@ Matrix4.prototype.get = function(col, row)
  */
 Matrix4.prototype.transformPoint3D = function(point3d, result_point3d) 
 {
-	if (result_point3d == undefined) { result_point3d = new Point3D(); }
+	if (result_point3d === undefined) { result_point3d = new Point3D(); }
 
 	var x = point3d.x;
 	var y = point3d.y;
@@ -184,7 +184,7 @@ Matrix4.prototype.transformPoint3D = function(point3d, result_point3d)
  */
 Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d) 
 {
-	if (result_point3d == undefined) { result_point3d = new Point3D(); }
+	if (result_point3d === undefined) { result_point3d = new Point3D(); }
 
 	var x = point3d.x;
 	var y = point3d.y;
@@ -206,7 +206,7 @@ Matrix4.prototype.rotatePoint3D = function(point3d, result_point3d)
 Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat) 
 {
 
-	if (resultMat == undefined) { resultMat = new Matrix4(); }
+	if (resultMat === undefined) { resultMat = new Matrix4(); }
 
 	for (var i=0; i<4; i++) 
 	{
@@ -307,10 +307,10 @@ Matrix4.prototype.computeMatrixType = function()
  */
 Matrix4.prototype.aproxEqual = function(value, valueToCompare, error) 
 {
-	if (error == undefined)
+	if (error === undefined)
 	{ error = 10E-8; }
 	
-	if (value == valueToCompare)
+	if (value === valueToCompare)
 	{
 		return true;
 	}

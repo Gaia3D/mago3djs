@@ -42,11 +42,11 @@ var VBOVertexIdxCacheKey = function()
 	this.vertexCount = -1;
 	this.bigTrianglesIndicesCount = -1;
 
-	this.meshVertexCacheKey = null;
-	this.meshFacesCacheKey = null;
-	this.meshNormalCacheKey = null;
-	this.meshColorCacheKey = null;
-	this.meshTexcoordsCacheKey = null;
+	this.meshVertexCacheKey;
+	this.meshFacesCacheKey;
+	this.meshNormalCacheKey;
+	this.meshColorCacheKey;
+	this.meshTexcoordsCacheKey;
 
 	this.posVboDataArray; // to store data here, and when necessary bind to gl.***
 	this.norVboDataArray; // to store data here, and when necessary bind to gl.***

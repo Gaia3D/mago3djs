@@ -315,6 +315,7 @@ void main()\n\
 ";
 ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
 \n\
+uniform mat4 buildingRotMatrix;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 RefTransfMatrix;\n\
 uniform vec3 buildingPosHIGH;\n\
@@ -326,7 +327,7 @@ uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType;\n\
 \n\
 void main()\n\
-{	\n\
+{\n\
     vec4 rotatedPos;\n\
 	if(refMatrixType == 0)\n\
 	{\n\
@@ -340,6 +341,7 @@ void main()\n\
 	{\n\
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 	}\n\
+\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -921,8 +923,8 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
 	uniform vec3 refTranslationVec;\n\
-	uniform int refMatrixType;\n\
-	\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 uAmbientColor;\n\
@@ -948,6 +950,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 			currentTMat = mat3(RefTransfMatrix);\n\
 		}\n\
+		\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -1098,6 +1101,7 @@ void main()\n\
 	{\n\
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 	}\n\
+\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -1211,6 +1215,7 @@ void main()\n\
 	{\n\
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 	}\n\
+     \n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
