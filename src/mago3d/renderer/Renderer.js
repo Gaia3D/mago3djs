@@ -443,6 +443,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 					continue;
 				}
+				
 				if (neoReference.refMatrixType === 1)
 				{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 				else if (neoReference.refMatrixType === 2)
@@ -1424,6 +1425,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		gl.uniform1i(standardShader.hasAditionalMov_loc, false);
 		gl.uniform3fv(standardShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 	}
+
 	for (var n=0; n<cacheKeys_count; n++) // Original.***
 	{
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
