@@ -951,7 +951,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 			currentTMat = mat3(RefTransfMatrix);\n\
 		}\n\
-		\n\
+\n\
 		vec3 objPosHigh = buildingPosHIGH;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -1091,6 +1091,7 @@ varying float depth;\n\
 void main()\n\
 {	\n\
 	vec4 rotatedPos;\n\
+\n\
 	if(refMatrixType == 0)\n\
 	{\n\
 		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
@@ -1218,7 +1219,7 @@ void main()\n\
 	{\n\
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 	}\n\
-     \n\
+\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
