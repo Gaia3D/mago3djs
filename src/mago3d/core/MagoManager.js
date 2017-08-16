@@ -376,6 +376,9 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
  */
 MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
 {
+	// Calculate FPS.
+	//var start = new Date().getTime();
+	
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
 	if (!this.magoPolicy.getMagoEnable()) { return; }
@@ -406,6 +409,12 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		//this.renderNeoBuildings(scene, isLastFrustum); // original.****
 		//this.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
+	
+	// print FPS to console.
+	//var end = new Date().getTime();
+	//var time = (end - start)/1000;
+	//var fps = 1/time;
+	//console.log('FPS :  ' + fps);
 };
 
 MagoManager.prototype.render = function(dc)

@@ -31,7 +31,7 @@ void main()
 	{
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 	}
-     
+
     vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;

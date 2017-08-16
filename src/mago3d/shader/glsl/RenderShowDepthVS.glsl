@@ -19,6 +19,7 @@ varying float depth;
 void main()
 {	
 	vec4 rotatedPos;
+
 	if(refMatrixType == 0)
 	{
 		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
