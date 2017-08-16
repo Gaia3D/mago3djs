@@ -10,3 +10,9 @@ CODE.fileLoadState = {
 	"PARSE_STARTED"    : 3,
 	"PARSE_FINISHED"   : 4
 };
+
+CODE.moveMode = {
+	"ALL"    : "0",
+	"OBJECT" : "1",
+	"NONE"   : "2"
+};

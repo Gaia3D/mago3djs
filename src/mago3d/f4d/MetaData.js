@@ -1,7 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * F4D MetaData 클래스
+ * 
+ * @alias MetaData
  * @class MetaData
  */
 var MetaData = function() 
@@ -49,7 +51,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter)
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 
-	if (readWriter == undefined) { readWriter = new ReaderWriter(); }
+	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
 
 	// 1) Version(5 chars).***********
 	for (var j=0; j<version_string_length; j++)
@@ -58,7 +60,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter)
 	}
 
 	// 3) Global unique ID.*********************
-	if (this.guid == undefined) { this.guid =""; }
+	if (this.guid === undefined) { this.guid =""; }
 
 	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for (var j=0; j<intAux_scratch; j++)
@@ -67,19 +69,19 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter)
 	}
 
 	// 4) Location.*************************
-	if (this.longitude == undefined) 
+	if (this.longitude === undefined) 
 	{
 		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else { bytes_readed += 8; }
 
-	if (this.latitude == undefined) 
+	if (this.latitude === undefined) 
 	{
 		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else { bytes_readed += 8; }
 
-	if (this.altitude == undefined) 
+	if (this.altitude === undefined) 
 	{
 		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	}
@@ -88,7 +90,7 @@ MetaData.prototype.parseFileHeader = function(arrayBuffer, readWriter)
 	//this.altitude += 20.0; // TEST.***
 
 	//header._elevation += 70.0; // delete this. TEST.!!!
-	if (this.bbox == undefined) { this.bbox = new BoundingBox(); }
+	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
 
 	// 6) BoundingBox.************************
 	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
@@ -139,7 +141,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 
-	if (readWriter == undefined) { readWriter = new ReaderWriter(); }
+	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
 
 	// 1) Version(5 chars).***********
 	for (var j=0; j<version_string_length; j++)
@@ -148,7 +150,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	}
 
 	// 3) Global unique ID.*********************
-	if (this.guid == undefined) { this.guid =""; }
+	if (this.guid === undefined) { this.guid =""; }
 
 	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for (var j=0; j<intAux_scratch; j++)
@@ -157,19 +159,19 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	}
 
 	// 4) Location.*************************
-	if (this.longitude == undefined) 
+	if (this.longitude === undefined) 
 	{
 		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else { bytes_readed += 8; }
 
-	if (this.latitude == undefined) 
+	if (this.latitude === undefined) 
 	{
 		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 	else { bytes_readed += 8; }
 
-	if (this.altitude == undefined) 
+	if (this.altitude === undefined) 
 	{
 		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	}
@@ -178,7 +180,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	//this.altitude -= 140.0; // TEST.***
 
 	//header._elevation += 70.0; // delete this. TEST.!!!
-	if (this.bbox == undefined) { this.bbox = new BoundingBox(); }
+	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
 
 	// 6) BoundingBox.************************
 	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;

@@ -53,13 +53,13 @@ VertexMatrix.prototype.getVertexList = function(idx)
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) 
 {
-	if (resultBox == undefined) { resultBox = new BoundingBox(); }
+	if (resultBox === undefined) { resultBox = new BoundingBox(); }
 	
 	this.totalVertexArraySC.length = 0;
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	for (var i = 0, totalVertexCount = this.totalVertexArraySC.length; i < totalVertexCount; i++) 
 	{
-		if (i == 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
+		if (i === 0) { resultBox.init(this.totalVertexArraySC[i].point3d); }
 		else { resultBox.addPoint(this.totalVertexArraySC[i].point3d); }
 	}
 	return resultBox;
@@ -129,7 +129,7 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 6); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount * 6); }
 	
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -157,7 +157,7 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 7); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount * 7); }
 	
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -186,7 +186,7 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray)
 	this.totalVertexArraySC = this.getTotalVertexArray(this.totalVertexArraySC);
 	
 	var totalVertexCount = this.totalVertexArraySC.length;
-	if (resultFloatArray == undefined) { resultFloatArray = new Float32Array(totalVertexCount * 3); }
+	if (resultFloatArray === undefined) { resultFloatArray = new Float32Array(totalVertexCount * 3); }
 	
 	for (var i = 0; i < totalVertexCount; i++) 
 	{
@@ -239,7 +239,7 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 			tTriangle1 = tTrianglesList.newTTriangle();
 			tTriangle2 = tTrianglesList.newTTriangle();
 			
-			if (j == vertexCount-1) 
+			if (j === vertexCount-1) 
 			{
 				tTriangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(0)); 
 				tTriangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(0), vtxList1.getVertex(0)); 

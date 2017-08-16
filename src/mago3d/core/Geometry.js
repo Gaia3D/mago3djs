@@ -60,7 +60,7 @@ var LodBuilding = function()
 
 LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter) 
 {
-	if (this.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
+	if (this.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)// file loaded.***
 	{
 		this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 		var bytesReaded = 0;
@@ -113,9 +113,10 @@ LodBuilding.prototype.parseArrayBuffer = function(gl, readWriter)
 
 		// 4) TexCoord.****************************************************************************************************
 		var hasTexCoord = readWriter.readUInt8(this.dataArraybuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		//		if(hasTexCoord) {
-		//			// TODO:
-		//		}
+		if (hasTexCoord) 
+		{
+			;// TODO:
+		}
 
 		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	}	
@@ -200,7 +201,7 @@ NeoBuilding.prototype.getTextureId = function(texture)
 	var i=0;
 	while (!find && i < texturesLoadedCount ) 
 	{
-		if (this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) 
+		if (this.texturesLoaded[i].textureImageFileName === texture.textureImageFileName) 
 		{
 			find = true;
 			texId = this.texturesLoaded[i].texId;
@@ -224,7 +225,7 @@ NeoBuilding.prototype.getSameTexture = function(texture)
 	var i=0;
 	while (!find && i < texturesLoadedCount ) 
 	{
-		if (this.texturesLoaded[i].textureImageFileName == texture.textureImageFileName) 
+		if (this.texturesLoaded[i].textureImageFileName === texture.textureImageFileName) 
 		{
 			find = true;
 			sameTexture = this.texturesLoaded[i];
@@ -278,7 +279,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 	var relativeEyePosY = absoluteEyeY - buildingPosition.y;
 	var relativeEyePosZ = absoluteEyeZ - buildingPosition.z;
 
-	if (this.buildingPosMatInv == undefined) 
+	if (this.buildingPosMatInv === undefined) 
 	{
 		this.buildingPosMatInv = new Matrix4();
 		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
@@ -298,19 +299,16 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 {
 	//neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED
 	
-	if (neoReference.texture.texId == undefined) 
+	if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
 	{
 		// 1rst, check if the texture is loaded.
 		var sameTexture = this.getSameTexture(neoReference.texture);
-		if (sameTexture == undefined)
+		if (sameTexture === undefined)
 		{
 			if (magoManager.backGround_fileReadings_count > 10) 
 			{ return; }
-			
-			if (neoReference.objectId == "2112")
-			{ var hola = 0; }
 		
-			if (neoReference.texture.fileLoadState == CODE.fileLoadState.READY) 
+			if (neoReference.texture.fileLoadState === CODE.fileLoadState.READY) 
 			{
 				var gl = magoManager.sceneState.gl;
 				neoReference.texture.texId = gl.createTexture();
@@ -325,7 +323,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		}
 		else 
 		{
-			if (sameTexture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+			if (sameTexture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				neoReference.texture = sameTexture;
 			}
@@ -345,9 +343,11 @@ var NeoBuildingsList = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	//Array.apply(this, arguments);
 
 	this.neoBuildingsArray = [];
 };
+//NeoBuildingsList.prototype = Object.create(Array.prototype);
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -372,7 +372,7 @@ NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, build
 	var i=0;
 	while (!found && i < buildingsCount)
 	{
-		if (this.neoBuildingsArray[i].buildingType == buildingType && this.neoBuildingsArray[i].buildingId == buildingId)
+		if (this.neoBuildingsArray[i].buildingType === buildingType && this.neoBuildingsArray[i].buildingId === buildingId)
 		{
 			found = true;
 			resultBuilding = this.neoBuildingsArray[i];
@@ -396,4 +396,14 @@ NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulle
 		this.neoBuildingsArray[i].frustumCulled = bFrustumCulled;
 	}
 
+};
+
+NeoBuildingsList.prototype.get = function (index)
+{
+	return this.neoBuildingsArray[index];
+};
+
+NeoBuildingsList.prototype.add = function (item)
+{
+	if (item !== undefined)	{ this.neoBuildingsArray.push(item); }
 };

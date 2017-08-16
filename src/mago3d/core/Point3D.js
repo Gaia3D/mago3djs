@@ -67,7 +67,7 @@ Point3D.prototype.unitary = function()
  */
 Point3D.prototype.crossProduct = function(point, resultPoint) 
 {
-	if (resultPoint == undefined) { resultPoint = new Point3D(); }
+	if (resultPoint === undefined) { resultPoint = new Point3D(); }
 
 	resultPoint.x = this.y * point.z - point.y * this.z;
 	resultPoint.y = point.x * this.z - this.x * point.z;

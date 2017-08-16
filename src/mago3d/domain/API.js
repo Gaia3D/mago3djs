@@ -64,16 +64,8 @@ function API(apiName)
 	this.showShadow = false;
 	// frustum culling 가시 거리(M단위)
 	this.frustumFarDistance = 0;
-	//	// highlighting
-	//	this.highLightedBuildings = [];
-	//	// color
-	//	this.colorBuildings = [];
-	//	// show/hide
-	//	this.hideBuildings = [];
-
-	// 0 = block mode, 1 = object mode
-	this.mouseMoveMode = 0;
-
+	// move mode 
+	this.mouseMoveMode = CODE.moveMode.NONE;
 	// 이슈 등록 표시
 	this.issueInsertEnable = false;
 	// object 정보 표시

@@ -61,7 +61,7 @@ Octree.prototype.new_subOctree = function()
  */
 Octree.prototype.deleteGlObjects = function(gl) 
 {
-	if (this.lego != undefined) 
+	if (this.lego !== undefined) 
 	{
 		this.lego.vbo_vicks_container.deleteGlObjects(gl);
 		this.legoDataArrayBuffer = undefined;
@@ -91,7 +91,7 @@ Octree.prototype.deleteGlObjects = function(gl)
 	this.lego = undefined;
 
 	// delete the blocksList.***
-	if (this.neoRefsList_Array != undefined) 
+	if (this.neoRefsList_Array !== undefined) 
 	{
 		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
 		{
@@ -104,7 +104,7 @@ Octree.prototype.deleteGlObjects = function(gl)
 		this.neoRefsList_Array = undefined;
 	}
 
-	if (this.subOctrees_array != undefined) 
+	if (this.subOctrees_array !== undefined) 
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
 		{
@@ -136,7 +136,7 @@ Octree.prototype.deleteLod0GlObjects = function(gl)
 		this.neoRefsList_Array.legnth = 0;
 	}
 
-	if (this.subOctrees_array != undefined) 
+	if (this.subOctrees_array !== undefined) 
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
 		{
@@ -212,7 +212,7 @@ Octree.prototype.getNumberOfDigits = function(intNumber)
  */
 Octree.prototype.getMotherOctree = function() 
 {
-	if (this.octree_owner == undefined) { return this; }
+	if (this.octree_owner === undefined) { return this; }
 
 	return this.octree_owner.getMotherOctree();
 };
@@ -225,9 +225,9 @@ Octree.prototype.getMotherOctree = function()
  */
 Octree.prototype.getOctree = function(octreeNumberName, numDigits) 
 {
-	if (numDigits == 1) 
+	if (numDigits === 1) 
 	{
-		if (octreeNumberName == 0) { return this.getMotherOctree(); }
+		if (octreeNumberName === 0) { return this.getMotherOctree(); }
 		else { return this.subOctrees_array[octreeNumberName-1]; }
 	}
 
@@ -248,13 +248,13 @@ Octree.prototype.getOctreeByNumberName = function(octreeNumberName)
 {
 	var motherOctree = this.getMotherOctree();
 	var numDigits = this.getNumberOfDigits(octreeNumberName);
-	if (numDigits == 1) 
+	if (numDigits === 1) 
 	{
-		if (octreeNumberName == 0) { return motherOctree; }
+		if (octreeNumberName === 0) { return motherOctree; }
 		else { return motherOctree.subOctrees_array[octreeNumberName-1]; }
 	}
 
-	if (motherOctree.subOctrees_array.length == 0) { return undefined; }
+	if (motherOctree.subOctrees_array.length === 0) { return undefined; }
 
 	// determine the next level octree.***
 	var exp = numDigits-1;
@@ -357,7 +357,7 @@ Octree.prototype.getRadiusAprox = function()
  */
 Octree.prototype.getCRefListArray = function(result_CRefListsArray) 
 {
-	if (result_CRefListsArray == undefined) { result_CRefListsArray = []; }
+	if (result_CRefListsArray === undefined) { result_CRefListsArray = []; }
 
 	if (this.subOctrees_array.length > 0) 
 	{
@@ -381,7 +381,7 @@ Octree.prototype.getCRefListArray = function(result_CRefListsArray)
  */
 Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) 
 {
-	if (result_NeoRefListsArray == undefined) { result_NeoRefListsArray = []; }
+	if (result_NeoRefListsArray === undefined) { result_NeoRefListsArray = []; }
 
 	var subOctreesArrayLength = this.subOctrees_array.length;
 	if (subOctreesArrayLength > 0) 
@@ -503,9 +503,9 @@ Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleOb
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 
-	//if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
-	//if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
-	//if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
+	//if(squaredDistLod0 === undefined) squaredDistLod0 = 300;
+	//if(squaredDistLod1 === undefined) squaredDistLod1 = 2200;
+	//if(squaredDistLod2 === undefined) squaredDistLod2 = 500000*1000;
 
 	//squaredDistLod0 = 400;
 	//squaredDistLod1 = 2000;
@@ -591,9 +591,9 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 		//this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 	}
 
-	//if(squaredDistLod0 == undefined) squaredDistLod0 = 300;
-	//if(squaredDistLod1 == undefined) squaredDistLod1 = 2200;
-	//if(squaredDistLod2 == undefined) squaredDistLod2 = 500000*1000;
+	//if(squaredDistLod0 === undefined) squaredDistLod0 = 300;
+	//if(squaredDistLod1 === undefined) squaredDistLod1 = 2200;
+	//if(squaredDistLod2 === undefined) squaredDistLod2 = 500000*1000;
 
 	//squaredDistLod0 = 400;
 	//squaredDistLod1 = 2000;
@@ -659,21 +659,21 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
 {
-	if (this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
-	//if(this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
-	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
+	if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	//if(this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
 	{ return; }
 
 	// this function has Cesium dependence.***
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 
-	if (cesium_boundingSphere_scratch == undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
+	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
 
 	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
 	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
 	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
 
-	if (this.subOctrees_array.length == 0) 
+	if (this.subOctrees_array.length === 0) 
 	{
 	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
 		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
@@ -684,14 +684,14 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 	}
 
 	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if (frustumCull == Cesium.Intersect.INSIDE ) 
+	if (frustumCull === Cesium.Intersect.INSIDE ) 
 	{
 		//result_octreesArray.push(this);
 		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
 	}
-	else if (frustumCull == Cesium.Intersect.INTERSECTING  ) 
+	else if (frustumCull === Cesium.Intersect.INTERSECTING  ) 
 	{
-		if (this.subOctrees_array.length == 0) 
+		if (this.subOctrees_array.length === 0) 
 		{
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
@@ -705,7 +705,7 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
 			}
 		}
 	}
-	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
+	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
 };
 
 /**
@@ -716,16 +716,16 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVo
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cullingVolume, result_octreesArray, boundingSphere_scratch) 
 {
-	//if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
-	if (this.subOctrees_array == undefined) { return; }
+	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	if (this.subOctrees_array === undefined) { return; }
 
-	if (this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
-	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
+	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
 	{ return; }
 
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 	
-	if (boundingSphere_scratch == undefined) 
+	if (boundingSphere_scratch === undefined) 
 	{ boundingSphere_scratch = new Sphere(); } 
 
 	boundingSphere_scratch.centerPoint.x = this.centerPos.x;
@@ -734,14 +734,14 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
 	boundingSphere_scratch.r = this.getRadiusAprox();
 
 	var frustumCull = cullingVolume.intersectionSphere(boundingSphere_scratch);
-	if (frustumCull == Constant.INTERSECTION_INSIDE ) 
+	if (frustumCull === Constant.INTERSECTION_INSIDE ) 
 	{
 		//result_octreesArray.push(this);
 		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
 	}
-	else if (frustumCull == Constant.INTERSECTION_INTERSECT  ) 
+	else if (frustumCull === Constant.INTERSECTION_INTERSECT  ) 
 	{
-		if (this.subOctrees_array.length == 0) 
+		if (this.subOctrees_array.length === 0) 
 		{
 			//if(this.neoRefsList_Array.length > 0) // original.***
 			//if(this.triPolyhedronsCount > 0)
@@ -765,16 +765,16 @@ Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(
  */
 Octree.prototype.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion = function(bbox, result_octreesArray, bbox_scratch) 
 {
-	//if(this.subOctrees_array.length == 0 && this.neoRefsList_Array.length == 0) // original.***
-	if (this.subOctrees_array == undefined) { return; }
+	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	if (this.subOctrees_array === undefined) { return; }
 
-	if (this.subOctrees_array.length == 0 && this.triPolyhedronsCount == 0)
-	//if(this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
+	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
 	{ return; }
 
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 	
-	if (bbox_scratch == undefined) 
+	if (bbox_scratch === undefined) 
 	{ bbox_scratch = new BoundingBox(); } 
 	
 
@@ -800,19 +800,19 @@ Octree.prototype.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion = function
  */
 Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
 {
-	if (this.subOctrees_array.length == 0 && this.compRefsListArray.length == 0) // For use with ifc buildings.***
+	if (this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
 	{ return; }
 	// old. delete this.***
 	// this function has Cesium dependence.***
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 
-	if (cesium_boundingSphere_scratch == undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
+	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
 
 	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
 	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
 	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
 
-	if (this.subOctrees_array.length == 0) 
+	if (this.subOctrees_array.length === 0) 
 	{
 	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
 		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
@@ -823,14 +823,14 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 	}
 
 	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if (frustumCull == Cesium.Intersect.INSIDE ) 
+	if (frustumCull === Cesium.Intersect.INSIDE ) 
 	{
 		//result_octreesArray.push(this);
 		this.getAllSubOctrees(result_octreesArray);
 	}
-	else if (frustumCull == Cesium.Intersect.INTERSECTING ) 
+	else if (frustumCull === Cesium.Intersect.INTERSECTING ) 
 	{
-		if (this.subOctrees_array.length == 0 && this.neoRefsList_Array.length > 0) 
+		if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length > 0) 
 		{
 			result_octreesArray.push(this);
 		}
@@ -842,7 +842,7 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 			}
 		}
 	}
-	// else if(frustumCull == Cesium.Intersect.OUTSIDE) => do nothing.***
+	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
 };
 
 /**
@@ -913,9 +913,9 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
  */
 Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) 
 {
-	if (this.subOctrees_array == undefined) { return; }
+	if (this.subOctrees_array === undefined) { return; }
 
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 
 	if (this.subOctrees_array.length > 0) 
 	{
@@ -937,7 +937,7 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray)
  */
 Octree.prototype.getAllSubOctrees = function(result_octreesArray) 
 {
-	if (result_octreesArray == undefined) { result_octreesArray = []; }
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
 
 	if (this.subOctrees_array.length > 0) 
 	{
@@ -960,7 +960,7 @@ Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctree
 {
 	var subOctreesCount = this.subOctrees_array.length;
 
-	if (subOctreesCount == 0 && this.triPolyhedronsCount > 0) 
+	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
 	{
 		lowestOctreesArray.push(this);
 	}
@@ -981,7 +981,7 @@ Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
 {
 	var subOctreesCount = this.subOctrees_array.length;
 
-	if (subOctreesCount == 0 && this.triPolyhedronsCount > 0) 
+	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
 	{
 		if (this.neoReferencesMotherAndIndices)
 		{ this.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(idxKey, matrix); }
@@ -1003,7 +1003,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 {
 	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
-	if (octreeLevel == 0) 
+	if (octreeLevel === 0) 
 	{
 		// this is the mother octree, so read the mother octree's size.***
 		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;

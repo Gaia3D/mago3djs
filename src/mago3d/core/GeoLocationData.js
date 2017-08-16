@@ -13,7 +13,7 @@ var GeoLocationData = function(geoLocationDataName)
 	}
 	this.name;
 	
-	if (geoLocationDataName == undefined) { this.name = "noName"; }
+	if (geoLocationDataName === undefined) { this.name = "noName"; }
 	else { this.name = geoLocationDataName; }
 	
 	this.geographicCoord; // longitude, latitude, altitude.***
@@ -49,13 +49,13 @@ var GeoLocationData = function(geoLocationDataName)
  */
 GeoLocationData.prototype.copyFrom = function(geoLocData) 
 {
-	if (geoLocData == undefined)
+	if (geoLocData === undefined)
 	{ return; }
 	
 	this.name = geoLocData.name;
 	if (geoLocData.geographicCoord)
 	{
-		if (this.geographicCoord == undefined)
+		if (this.geographicCoord === undefined)
 		{ this.geographicCoord = new GeographicCoord(); }
 		
 		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.***
@@ -69,13 +69,13 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 	
 	if (geoLocData.position)
 	{
-		if (this.position == undefined)
+		if (this.position === undefined)
 		{ this.position = new Point3D(); }
 		this.position.copyFrom(geoLocData.position);
 	}
 	if (geoLocData.positionHIGH)
 	{
-		if (this.positionHIGH == undefined)
+		if (this.positionHIGH === undefined)
 		{ this.positionHIGH = new Float32Array(3); }
 		
 		this.positionHIGH[0]= geoLocData.positionHIGH[0];
@@ -84,7 +84,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 	}
 	if (geoLocData.positionLOW)
 	{
-		if (this.positionLOW == undefined)
+		if (this.positionLOW === undefined)
 		{ this.positionLOW = new Float32Array(3); }
 		
 		this.positionLOW[0]= geoLocData.positionLOW[0];
@@ -93,7 +93,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 	}
 	if (geoLocData.pivotPoint)
 	{
-		if (this.pivotPoint == undefined)
+		if (this.pivotPoint === undefined)
 		{ this.pivotPoint = new Point3D(); }
 		
 		this.pivotPoint.copyFrom(geoLocData.pivotPoint);
@@ -102,42 +102,42 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 	// F4D Matrix4.****
 	if (geoLocData.geoLocMatrix)
 	{
-		if (this.geoLocMatrix == undefined)
+		if (this.geoLocMatrix === undefined)
 		{ this.geoLocMatrix = new Matrix4(); }
 		
 		this.geoLocMatrix.copyFromMatrix4(geoLocData.geoLocMatrix);
 	}
 	if (geoLocData.geoLocMatrixInv)
 	{
-		if (this.geoLocMatrixInv == undefined)
+		if (this.geoLocMatrixInv === undefined)
 		{ this.geoLocMatrixInv = new Matrix4(); }
 		
 		this.geoLocMatrixInv.copyFromMatrix4(geoLocData.geoLocMatrixInv);
 	}
 	if (geoLocData.tMatrix)
 	{
-		if (this.tMatrix == undefined)
+		if (this.tMatrix === undefined)
 		{ this.tMatrix = new Matrix4(); }
 		
 		this.tMatrix.copyFromMatrix4(geoLocData.tMatrix);
 	}
 	if (geoLocData.tMatrixInv)
 	{
-		if (this.tMatrixInv == undefined)
+		if (this.tMatrixInv === undefined)
 		{ this.tMatrixInv = new Matrix4(); }
 		
 		this.tMatrixInv.copyFromMatrix4(geoLocData.tMatrixInv);
 	}
 	if (geoLocData.rotMatrix)
 	{
-		if (this.rotMatrix == undefined)
+		if (this.rotMatrix === undefined)
 		{ this.rotMatrix = new Matrix4(); }
 		
 		this.rotMatrix.copyFromMatrix4(geoLocData.rotMatrix);
 	}
 	if (geoLocData.rotMatrixInv)
 	{
-		if (this.rotMatrixInv == undefined)
+		if (this.rotMatrixInv === undefined)
 		{ this.rotMatrixInv = new Matrix4(); }
 		
 		this.rotMatrixInv.copyFromMatrix4(geoLocData.rotMatrixInv);
@@ -145,7 +145,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 	
 	if (geoLocData.aditionalTraslation)
 	{
-		if (this.aditionalTraslation == undefined)
+		if (this.aditionalTraslation === undefined)
 		{ this.aditionalTraslation = new Point3D(); }
 		
 		this.aditionalTraslation.copyFrom(geoLocData.aditionalTraslation);
@@ -211,7 +211,7 @@ var GeoLocationDataManager = function()
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 {
-	if (geoLocationName == undefined)
+	if (geoLocationName === undefined)
 	{ geoLocationName = "noName" + this.geoLocationDataArray.length.toString(); }
 	var geoLocationData = new GeoLocationData(geoLocationName);
 	this.geoLocationDataArray.push(geoLocationData);

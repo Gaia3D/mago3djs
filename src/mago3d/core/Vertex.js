@@ -40,7 +40,7 @@ Vertex.prototype.setPosition = function(x, y, z)
  */
 Vertex.prototype.setColorRGB = function(r, g, b) 
 {
-	if (this.color4 == undefined) { this.color4 = new Color(); }
+	if (this.color4 === undefined) { this.color4 = new Color(); }
 	
 	this.color4.setRGB(r, g, b);
 };
@@ -54,7 +54,7 @@ Vertex.prototype.setColorRGB = function(r, g, b)
  */
 Vertex.prototype.setColorRGBA = function(r, g, b, alpha) 
 {
-	if (this.color4 == undefined) { this.color4 = new Color(); }
+	if (this.color4 === undefined) { this.color4 = new Color(); }
 	
 	this.color4.setRGBA(r, g, b, alpha);
 };

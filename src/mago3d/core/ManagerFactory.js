@@ -42,7 +42,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 
 		// background provider 적용
-		if (serverPolicy.geo_server_enable == "true") { backgroundProvider(); }
+		if (serverPolicy.geo_server_enable === "true") { backgroundProvider(); }
 		
 		draw();
 		// build을 rendering 할 위치
@@ -52,7 +52,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			initTerrain();
 		}*/
 		// 최초 로딩시 카메라 이동 여부
-		if (serverPolicy.geo_init_camera_enable == "true") { initCamera(); }
+		if (serverPolicy.geo_init_camera_enable === "true") { initCamera(); }
 		// render Mode 적용
 		initRenderMode();
 	}
@@ -118,7 +118,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 			// If only one thing is picked and it is the terrain, use a go-to animator to go to the picked location.
 			/*
-			if (pickList.objects.length == 1 && pickList.objects[0].isTerrain) {
+			if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
 				var position = pickList.objects[0].position;
 				//wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
 				//wwd.goTo(new WorldWind.Position(37.48666, 127.05618, 500));
@@ -132,7 +132,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		
 		var mouseDownEvent = function(event) 
 		{
-			if (event.button == 0) { magoManager.mouseLeftDown = true; }
+			if (event.button === 0) { magoManager.mouseLeftDown = true; }
 			magoManager.isCameraMoving = true;
 			magoManager.mouse_x = event.layerX,
 			magoManager.mouse_y = event.layerY;
@@ -141,7 +141,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		
 		var mouseUpEvent = function(event) 
 		{
-			if (event.button == 0) { magoManager.mouseLeftDown = false; }
+			if (event.button === 0) { magoManager.mouseLeftDown = false; }
 			magoManager.isCameraMoving = false;
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
@@ -256,7 +256,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		{
 			if (magoManager.mouseLeftDown) 
 			{
-				if (movement.startPosition.x != movement.endPosition.x || movement.startPosition.y != movement.endPosition.y) 
+				if (movement.startPosition.x !== movement.endPosition.x || movement.startPosition.y !== movement.endPosition.y) 
 				{
 					magoManager.manageMouseMove(movement.startPosition.x, movement.startPosition.y);
 				}
@@ -296,7 +296,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			//if(miliSecondsUsed < 500) // original.***
 			if (miliSecondsUsed < 1000) 
 			{
-				if (magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) 
+				if (magoManager.mouse_x === movement.position.x && magoManager.mouse_y === movement.position.y) 
 				{
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
@@ -323,7 +323,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
 			if (miliSecondsUsed < 500) 
 			{
-				if (magoManager.mouse_x == movement.position.x && magoManager.mouse_y == movement.position.y) 
+				if (magoManager.mouse_x === movement.position.x && magoManager.mouse_y === movement.position.y) 
 				{
 					magoManager.bPicking = true;
 					//var gl = scene.context._gl;
@@ -348,12 +348,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;	
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.heading == undefined) { geoLocationData.heading = 0; } 
+					if (geoLocationData.heading === undefined) { geoLocationData.heading = 0; } 
 					var currentHeading = geoLocationData.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						currentHeading+increDeg, geoLocationData.pitch, geoLocationData.roll);
@@ -366,12 +366,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.heading == undefined) { geoLocationData.heading = 0; } 
+					if (geoLocationData.heading === undefined) { geoLocationData.heading = 0; } 
 					var currentHeading = geoLocationData.heading;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						currentHeading-increDeg, geoLocationData.pitch, geoLocationData.roll);
@@ -384,12 +384,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.pitch == undefined) { geoLocationData.pitch = 0; } 
+					if (geoLocationData.pitch === undefined) { geoLocationData.pitch = 0; } 
 					var currentPitch = geoLocationData.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						geoLocationData.heading, currentPitch+increDeg, geoLocationData.roll);
@@ -402,12 +402,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.pitch == undefined) { geoLocationData.pitch = 0; } 
+					if (geoLocationData.pitch === undefined) { geoLocationData.pitch = 0; } 
 					var currentPitch = geoLocationData.pitch;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						geoLocationData.heading, currentPitch-increDeg, geoLocationData.roll);
@@ -420,12 +420,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{		
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.roll == undefined) { geoLocationData.roll = 0; } 
+					if (geoLocationData.roll === undefined) { geoLocationData.roll = 0; } 
 					var currentRoll = geoLocationData.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						geoLocationData.heading, geoLocationData.pitch, currentRoll+increDeg);
@@ -438,12 +438,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (magoManager.magoPolicy.issueInsertEnable)
 			{ return; }
 			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding != undefined) 
+			if (selectedBuilding !== undefined) 
 			{
 				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData != undefined) 
+				if (geoLocationData !== undefined) 
 				{
-					if (geoLocationData.roll == undefined) { geoLocationData.roll = 0; } 
+					if (geoLocationData.roll === undefined) { geoLocationData.roll = 0; } 
 					var currentRoll = geoLocationData.roll;
 					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
 						geoLocationData.heading, geoLocationData.pitch, currentRoll-increDeg);
@@ -535,7 +535,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		api.setRenderMode("1");
 		magoManager.callAPI(api);
 
-		if (MagoConfig.getPolicy().geo_time_line_enable == "false") 
+		if (MagoConfig.getPolicy().geo_time_line_enable === "false") 
 		{
 			// visible <---> hidden
 			$(viewer._animation.container).css("visibility", "hidden");
@@ -556,7 +556,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		for (var i in imageryProviderViewModels) 
 		{
 			var provider = imageryProviderViewModels[i];
-			if (provider.name == DEFALUT_IMAGE) 
+			if (provider.name === DEFALUT_IMAGE) 
 			{
 				imageryProvider = provider;
 				break;
@@ -570,7 +570,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		for (var i in terrainProviderViewModels) 
 		{
 			var provider = terrainProviderViewModels[i];
-			if (provider.name == DEFALUT_TERRAIN) 
+			if (provider.name === DEFALUT_TERRAIN) 
 			{
 				terrainProvider = provider;
 				break;
@@ -612,7 +612,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
 			}
 			// pin을 그림
-			if (issueId != null || issueType != undefined) 
+			if (issueId !== null || issueType !== undefined) 
 			{
 				var api = new API("drawInsertIssueImage");
 				api.setDrawType(0);
@@ -679,7 +679,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		    if (parseInt(moveRate) >= 300) { reviseValue = parseInt(moveRate) * 50; }
 		    else if (parseInt(moveRate) >= 20 && parseInt(moveRate) < 300) { reviseValue = parseInt(moveRate) * 30; }
 		    else { reviseValue = parseInt(moveRate) * 10; }
-		    if (reviseValue == 0) { reviseValue = 5; }
+		    if (reviseValue === 0) { reviseValue = 5; }
 		    
 		    console.log("moveRate = " + moveRate + ", reviseValue = " + reviseValue);
 		    moveRate = moveRate + reviseValue;

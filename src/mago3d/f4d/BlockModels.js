@@ -64,7 +64,7 @@ var BlocksList = function()
  */
 BlocksList.prototype.newBlock = function() 
 {
-	if (this.blocksArray == undefined) { this.blocksArray = []; }
+	if (this.blocksArray === undefined) { this.blocksArray = []; }
 
 	var block = new Block();
 	this.blocksArray.push(block);
@@ -78,7 +78,7 @@ BlocksList.prototype.newBlock = function()
  */
 BlocksList.prototype.getBlock = function(idx) 
 {
-	if (this.blocksArray == undefined) { return null; }
+	if (this.blocksArray === undefined) { return null; }
 
 	if (idx >= 0 && idx < this.blocksArray.length) 
 	{
@@ -94,7 +94,7 @@ BlocksList.prototype.getBlock = function(idx)
  */
 BlocksList.prototype.deleteGlObjects = function(gl) 
 {
-	if (this.blocksArray == undefined) { return; }
+	if (this.blocksArray === undefined) { return; }
 
 	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) 
 	{
@@ -305,7 +305,7 @@ BlocksListsContainer.prototype.getBlockList = function(blockList_name)
 	while (!found && i<blocksListsCount) 
 	{
 		var currentBlocksList = this.blocksListsArray[i];
-		if (currentBlocksList.name == blockList_name) 
+		if (currentBlocksList.name === blockList_name) 
 		{
 			found = true;
 			blocksList = currentBlocksList;

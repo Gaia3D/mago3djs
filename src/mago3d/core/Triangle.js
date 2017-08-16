@@ -46,7 +46,7 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2)
  */
 Triangle.prototype.calculatePlaneNormal = function() 
 {
-	if (this.normal == undefined)
+	if (this.normal === undefined)
 	{ this.normal = new Point3D(); }
 
 	this.getCrossProduct(0, this.normal);
@@ -61,24 +61,24 @@ Triangle.prototype.calculatePlaneNormal = function()
  */
 Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct) 
 {
-	if (resultCrossProduct == undefined)
+	if (resultCrossProduct === undefined)
 	{ resultCrossProduct = new Point3D(); }
 
 	var currentPoint, prevPoint, nextPoint;
 
-	if (idxVertex == 0)
+	if (idxVertex === 0)
 	{
 		currentPoint = this.vertex0.point3d;
 		prevPoint = this.vertex2.point3d;
 		nextPoint = this.vertex1.point3d;
 	}
-	else if (idxVertex == 1)
+	else if (idxVertex === 1)
 	{
 		currentPoint = this.vertex1.point3d;
 		prevPoint = this.vertex0.point3d;
 		nextPoint = this.vertex2.point3d;
 	}
-	else if (idxVertex == 2)
+	else if (idxVertex === 2)
 	{
 		currentPoint = this.vertex2.point3d;
 		prevPoint = this.vertex1.point3d;
