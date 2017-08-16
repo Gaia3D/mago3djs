@@ -448,19 +448,19 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 				if (refMatrixIdxKey == undefined)
 				{ // never enter here...
-					if(neoReference.refMatrixType == 1)
-						gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-					else if(neoReference.refMatrixType == 2)
-						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+					if (neoReference.refMatrixType == 1)
+					{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+					else if (neoReference.refMatrixType == 2)
+					{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 				}
 				else 
 				{
 					if (refMatrixIdxKey == -1)
 					{ // never enter here...
-						if(neoReference.refMatrixType == 1)
-							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-						else if(neoReference.refMatrixType == 2)
-							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+						if (neoReference.refMatrixType == 1)
+						{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+						else if (neoReference.refMatrixType == 2)
+						{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 					}
 					else 
 					{
@@ -471,10 +471,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 							continue;
 						}
 						
-						if(neoReference.refMatrixType == 1)
-							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-						else if(neoReference.refMatrixType == 2)
-							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+						if (neoReference.refMatrixType == 1)
+						{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+						else if (neoReference.refMatrixType == 2)
+						{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 					}
 				}
 
@@ -798,19 +798,19 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 				gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 				if (refMatrixIdxKey == undefined)
 				{ // never enter here...
-					if(neoReference.refMatrixType == 1)
-						gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-					else if(neoReference.refMatrixType == 2)
-						gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+					if (neoReference.refMatrixType == 1)
+					{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+					else if (neoReference.refMatrixType == 2)
+					{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 				}
 				else 
 				{
 					if (refMatrixIdxKey == -1)
 					{ // never enter here...
-						if(neoReference.refMatrixType == 1)
-							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-						else if(neoReference.refMatrixType == 2)
-							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+						if (neoReference.refMatrixType == 1)
+						{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+						else if (neoReference.refMatrixType == 2)
+						{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 					}
 					else 
 					{
@@ -821,10 +821,10 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 							continue;
 						}
 						
-						if(neoReference.refMatrixType == 1)
-							gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-						else if(neoReference.refMatrixType == 2)
-							gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+						if (neoReference.refMatrixType == 1)
+						{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+						else if (neoReference.refMatrixType == 2)
+						{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 					}
 				}
 
@@ -1523,19 +1523,19 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 		if (refMatrixIdxKey == undefined)
 		{ // never enter here...
-			if(neoReference.refMatrixType == 1)
-				gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-			else if(neoReference.refMatrixType == 2)
-				gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+			if (neoReference.refMatrixType == 1)
+			{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+			else if (neoReference.refMatrixType == 2)
+			{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 		}
 		else 
 		{
 			if (refMatrixIdxKey == -1)
 			{ // never enter here...
-				if(neoReference.refMatrixType == 1)
-					gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-				else if(neoReference.refMatrixType == 2)
-					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); 
+				if (neoReference.refMatrixType == 1)
+				{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+				else if (neoReference.refMatrixType == 2)
+				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
 			}
 			else 
 			{
@@ -1546,10 +1546,10 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 					return;
 				}
 				
-				if(neoReference.refMatrixType == 1)
-					gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec);
-				else if(neoReference.refMatrixType == 2)
-					gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays);
+				if (neoReference.refMatrixType == 1)
+				{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
+				else if (neoReference.refMatrixType == 2)
+				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 			}
 		}
 

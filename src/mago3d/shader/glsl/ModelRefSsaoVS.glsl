@@ -13,6 +13,8 @@
 	uniform vec3 encodedCameraPositionMCHigh;
 	uniform vec3 encodedCameraPositionMCLow;
 	uniform vec3 aditionalPosition;
+	uniform vec3 refTranslationVec;
+	uniform int refMatrixType;
 	
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
@@ -22,7 +24,23 @@
 	
 	void main()
     {	
-		vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+		vec4 rotatedPos;
+		mat3 currentTMat;
+		if(refMatrixType == 0)
+		{
+			rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			currentTMat = mat3(buildingRotMatrix);
+		}
+		else if(refMatrixType == 1)
+		{
+			rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			currentTMat = mat3(buildingRotMatrix);
+		}
+		else if(refMatrixType == 2)
+		{
+			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			currentTMat = mat3(RefTransfMatrix);
+		}
 		vec3 objPosHigh = buildingPosHIGH;
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;

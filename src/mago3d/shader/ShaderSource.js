@@ -315,7 +315,6 @@ void main()\n\
 ";
 ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
 \n\
-uniform mat4 buildingRotMatrix; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 RefTransfMatrix;\n\
 uniform vec3 buildingPosHIGH;\n\
@@ -324,7 +323,7 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform int refMatrixType;\n\
 \n\
 void main()\n\
 {	\n\
@@ -900,8 +899,8 @@ void main()\n\
     else{\n\
         textureColor = vColor4Aux;\n\
     }\n\
-    vec3 specularColor = vec3(0.7);\n\
-    vec3 ambientColor = vec3(textureColor.x * 0.7, textureColor.y * 0.7, textureColor.z * 0.7);\n\
+    vec3 specularColor = vec3(0.9);\n\
+    vec3 ambientColor = vec3(textureColor.x * 0.9, textureColor.y * 0.9, textureColor.z * 0.9);\n\
 \n\
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
 }\n\
@@ -910,7 +909,6 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
 	attribute vec2 texCoord;\n\
 	\n\
-	uniform mat4 buildingRotMatrix; \n\
 	uniform mat4 projectionMatrix;  \n\
 	uniform mat4 modelViewMatrix;\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
@@ -923,7 +921,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
 	uniform vec3 refTranslationVec;\n\
-	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+	uniform int refMatrixType;\n\
 	\n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
@@ -955,9 +953,9 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-		\n\
+\n\
 		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
-		vec3 rotatedNormal = currentTMat * normal;\n\
+		vec3 rotatedNormal = mat3(RefTransfMatrix) * normal;\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
 		uAmbientColor = vec3(0.8);\n\
 		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
@@ -966,7 +964,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-		\n\
+\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}\n\
 ";
@@ -1070,7 +1068,6 @@ void main()\n\
 ";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
-uniform mat4 buildingRotMatrix; \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 RefTransfMatrix;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -1082,13 +1079,13 @@ uniform float near;\n\
 uniform float far;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform int refMatrixType;\n\
 \n\
 varying float depth;\n\
   \n\
 void main()\n\
 {	\n\
-	vec4 rotatedPos;\n\
+    vec4 rotatedPos;\n\
 	if(refMatrixType == 0)\n\
 	{\n\
 		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
@@ -1101,7 +1098,6 @@ void main()\n\
 	{\n\
 		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 	}\n\
-    //rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
@@ -1185,7 +1181,6 @@ void main()\n\
 }";
 ShaderSource.SilhouetteVS = "attribute vec3 position;\n\
 \n\
-uniform mat4 buildingRotMatrix; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 ModelViewMatrixRelToEye;\n\
 uniform mat4 ProjectionMatrix;\n\
@@ -1196,7 +1191,7 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform int refMatrixType;\n\
 uniform vec2 camSpacePixelTranslation;\n\
 uniform vec2 screenSize;    \n\
 varying vec2 camSpaceTranslation;\n\

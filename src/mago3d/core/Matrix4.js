@@ -262,7 +262,7 @@ Matrix4.prototype.computeMatrixType = function()
 	// matrixType = 2 -> transform matrix.
 	
 	var error = 10E-8;
-	if(this.isRotationIdentity())
+	if (this.isRotationIdentity())
 	{
 		// check if there are translation.
 		if (this.aproxEqual(this._floatArrays[3], 0, error))
@@ -307,21 +307,21 @@ Matrix4.prototype.computeMatrixType = function()
  */
 Matrix4.prototype.aproxEqual = function(value, valueToCompare, error) 
 {
-	if(error == undefined)
-		error = 10E-8;
+	if (error == undefined)
+	{ error = 10E-8; }
 	
-	if(value == valueToCompare)
+	if (value == valueToCompare)
 	{
 		return true;
 	}
 	else
 	{
-		if(value > (valueToCompare - error) && value < (valueToCompare + error))
-			return true;
+		if (value > (valueToCompare - error) && value < (valueToCompare + error))
+		{ return true; }
 		else
-			return false;
+		{ return false; }
 	}
-}
+};
 
 /**
  * Returns if the matrix is identity.
@@ -329,7 +329,7 @@ Matrix4.prototype.aproxEqual = function(value, valueToCompare, error)
  */
 Matrix4.prototype.isIdentity = function(error) 
 {	
-	if(this.isRotationIdentity())
+	if (this.isRotationIdentity())
 	{
 		if (this.aproxEqual(this._floatArrays[3], 0, error))
 		{
@@ -362,7 +362,7 @@ Matrix4.prototype.isIdentity = function(error)
 		else { return false; }
 	}
 	else
-		return false;
+	{ return false; }
 };
 
 /**

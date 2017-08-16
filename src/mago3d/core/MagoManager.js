@@ -378,6 +378,9 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
  */
 MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
 {
+	// Calculate FPS.
+	var start = new Date().getTime();
+	
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
 	if (!this.magoPolicy.getMagoEnable()) { return; }
@@ -408,6 +411,11 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		//this.renderNeoBuildings(scene, isLastFrustum); // original.****
 		//this.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
+	
+	var end = new Date().getTime();
+	var time = (end - start)/1000;
+	var fps = 1/time;
+	console.log('FPS :  ' + fps);
 };
 
 MagoManager.prototype.render = function(dc)
@@ -1322,7 +1330,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
 		// Calculate FOV & FOVY.***
-		if(sceneState.camera.frustum.dirty)
+		if (sceneState.camera.frustum.dirty)
 		{
 			var projectionMatrix = dc.navigatorState.projection;
 			var aspectRat = sceneState.camera.frustum.aspectRatio;
@@ -2814,12 +2822,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
 				var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
 				
-				if(dc.frustumVolume)
+				if (dc.frustumVolume)
 				{
 					var hola = 0;
 				}
 				
-				if(dc.fov)
+				if (dc.fov)
 				{
 					var hola = 0;
 				}
@@ -5777,12 +5785,12 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 	
 		// Test son.****************************************************************************
 		var buildingNameDivided = neoBuilding.buildingId.split("_");
-		if(buildingNameDivided.length > 0)
+		if (buildingNameDivided.length > 0)
 		{
 			var firstName = buildingNameDivided[0];
-			if(firstName == "testId")
+			if (firstName == "testId")
 			{
-				if(buildingNameDivided[2] != undefined)
+				if (buildingNameDivided[2] != undefined)
 				{
 					neoBuilding.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
 					neoBuilding.buildingType = buildingNameDivided[2];

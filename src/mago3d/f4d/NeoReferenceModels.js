@@ -250,7 +250,26 @@ NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = functi
 NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function() 
 {
 	// Group all the references that has the same model.
+	if (this.neoRefsIndices == undefined)
+	{ return; }
 	
+	if (this.modelReferencedGroupsList == undefined)
+	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
+	
+	var referenceIdx;
+	var modelIdx;
+	var modelRefGroup;
+	var referencesCount = this.neoRefsIndices.length;
+	for (var i=0; i<referencesCount; i++)
+	{
+		referenceIdx = this.neoRefsIndices[i];
+		modelIdx = this.motherNeoRefsList[referenceIdx]._block_idx;
+		modelRefGroup = this.modelReferencedGroupsList.getModelReferencedGroup(modelIdx);
+		modelRefGroup.referencesIdxArray.push(referenceIdx);
+	}
+	
+	// Now, delete the "modelReferencedGroupsMap" and make a simple array.
+	this.modelReferencedGroupsList.makeModelReferencedGroupsArray();
 	
 };
 
@@ -405,6 +424,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 					bytes_readed += 1;
 				}
 			} 
+			
+			// do the stadistic recount.
+			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType == 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
 		}
 		else
 		{
@@ -445,13 +469,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			// Compute the references matrix type.
 			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
 			
-			if(neoRef.refMatrixType == 0)stadistic_refMat_Identities_count +=1;
-			if(neoRef.refMatrixType == 1)
+			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType == 1)
 			{
 				neoRef.refTranslationVec = new Float32Array([neoRef._originalMatrix4._floatArrays[12], neoRef._originalMatrix4._floatArrays[13], neoRef._originalMatrix4._floatArrays[14]]);
 				stadistic_refMat_Translates_count +=1;
 			}
-			if(neoRef.refMatrixType == 2)stadistic_refMat_Transforms_count +=1;
+			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
 
 			// Float mode.**************************************************************
 			// New modifications for xxxx 20161013.*****************************
@@ -581,10 +605,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 	}
 	
-	// stadistics vars only for debug.
-	//stadistic_refMat_Identities_count;
-	//stadistic_refMat_Translates_count;
-	//stadistic_refMat_Transforms_count;
+	this.createModelReferencedGroups(); // test for stadistics.
 	
 
 	// Now occlusion cullings.***
