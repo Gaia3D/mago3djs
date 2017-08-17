@@ -159,7 +159,6 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
 {
-
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
