@@ -63,7 +63,6 @@ var VBOVertexIdxCacheKey = function()
  */
 VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl) 
 {
-
 	if (this.meshVertexCacheKey) 
 	{
 		gl.deleteBuffer(this.meshVertexCacheKey);
@@ -100,6 +99,83 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl)
 	this.idxVboDataArray = undefined;
 
 	this.buffer = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @return boolean
+ */
+VBOVertexIdxCacheKey.prototype.isReadyPositions = function(gl) 
+{
+	if (this.meshVertexCacheKey === undefined) 
+	{
+		if (this.posVboDataArray === undefined) { return false; }
+
+		this.meshVertexCacheKey = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshVertexCacheKey);
+		gl.bufferData(gl.ARRAY_BUFFER, this.posVboDataArray, gl.STATIC_DRAW);
+		this.posVboDataArray = undefined;
+		return false;
+	}
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @return boolean
+ */
+VBOVertexIdxCacheKey.prototype.isReadyNormals = function(gl) 
+{
+	if (this.meshNormalCacheKey === undefined) 
+	{
+		if (this.norVboDataArray === undefined) { return false; }
+
+		this.meshNormalCacheKey = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshNormalCacheKey);
+		gl.bufferData(gl.ARRAY_BUFFER, this.norVboDataArray, gl.STATIC_DRAW);
+		this.norVboDataArray = undefined;
+		return false;
+	}
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @return boolean
+ */
+VBOVertexIdxCacheKey.prototype.isReadyFaces = function(gl) 
+{
+	if (this.meshFacesCacheKey === undefined) 
+	{
+		if (this.idxVboDataArray === undefined) { return false; }
+
+		this.meshFacesCacheKey = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.meshFacesCacheKey);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.idxVboDataArray, gl.STATIC_DRAW);
+		this.idxVboDataArray = undefined;
+		return false;
+	}
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @return boolean
+ */
+VBOVertexIdxCacheKey.prototype.isReadyTexCoords = function(gl) 
+{
+	if (this.meshTexcoordsCacheKey === undefined) 
+	{
+		if (this.tcoordVboDataArray === undefined) { return false; }
+
+		this.meshTexcoordsCacheKey = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshTexcoordsCacheKey);
+		gl.bufferData(gl.ARRAY_BUFFER, this.tcoordVboDataArray, gl.STATIC_DRAW);
+		this.tcoordVboDataArray = undefined;
+
+		return false;
+	}
+	return true;
 };
 
 /**
@@ -183,3 +259,13 @@ VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function()
 	this.vboByteColorsCacheKeysArray.push(vboByteColCacheKey);
 	return vboByteColCacheKey;
 };
+
+
+
+
+
+
+
+
+
+

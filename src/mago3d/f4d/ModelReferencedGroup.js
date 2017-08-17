@@ -67,3 +67,37 @@ ModelReferencedGroupsList.prototype.makeModelReferencedGroupsArray = function()
 	this.modelReferencedGroupsMap.length = 0;
 	
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+ModelReferencedGroupsList.prototype.createModelReferencedGroups = function(neoRefsIndices, motherNeoRefsList) 
+{
+	// Group all the references that has the same model.
+	if (neoRefsIndices == undefined)
+	{ return; }
+	
+	if (motherNeoRefsList == undefined)
+	{ return; }
+	
+	var referenceIdx;
+	var modelIdx;
+	var modelRefGroup;
+	var referencesCount = neoRefsIndices.length;
+	for (var i=0; i<referencesCount; i++)
+	{
+		referenceIdx = neoRefsIndices[i];
+		modelIdx = motherNeoRefsList[referenceIdx]._block_idx;
+		modelRefGroup = this.getModelReferencedGroup(modelIdx);
+		modelRefGroup.referencesIdxArray.push(referenceIdx);
+	}
+	
+	// Now, delete the "modelReferencedGroupsMap" and make a simple array.
+	this.makeModelReferencedGroupsArray();
+	
+};
+
+
+
+

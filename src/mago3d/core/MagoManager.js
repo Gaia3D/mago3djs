@@ -377,7 +377,7 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
 MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
 {
 	// Calculate FPS.
-	//var start = new Date().getTime();
+	var start = new Date().getTime();
 	
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
@@ -411,10 +411,9 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	}
 	
 	// print FPS to console.
-	//var end = new Date().getTime();
-	//var time = (end - start)/1000;
-	//var fps = 1/time;
-	//console.log('FPS :  ' + fps);
+	var end = new Date().getTime();
+	var fps = 1000/(end - start);
+	console.log('FPS :  ' + fps);
 };
 
 MagoManager.prototype.render = function(dc)
@@ -2771,10 +2770,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 				squaredDistLod0, squaredDistLod1, squaredDistLod2);
 				
-			// End provisional.----------------------------------------------------------------
-			
-																					
-																					
+			// End provisional.----------------------------------------------------------------																		
 		}
 		else if (this.configInformation.geo_view_library === Constant.CESIUM)
 		{

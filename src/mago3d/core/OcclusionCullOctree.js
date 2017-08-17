@@ -21,8 +21,34 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner)
 	this.maxZ = 0.0;
 	this._indicesArray = []; // Visible objects indices.***
 	this._subBoxesArray = [];
+	this.modelReferencedGroupsList; // undefined initially.
+};
 
-	this._indicesUInt32Array = []; // delete this.***
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param neoRefsIndices 변수
+ * @param motherNeoRefsList 변수
+ */
+OcclusionCullingOctreeCell.prototype.createModelReferencedGroups = function(motherNeoRefsList) 
+{
+	var subBoxesCount = this._subBoxesArray.length;
+	if (subBoxesCount == 0)
+	{
+		if (this._indicesArray.length == 0)
+		{ return; }
+		
+		if (this.modelReferencedGroupsList == undefined)
+		{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
+		
+		this.modelReferencedGroupsList.createModelReferencedGroups(this._indicesArray, motherNeoRefsList);
+	}
+	else
+	{
+		for (var i=0; i<subBoxesCount; i++)
+		{
+			this._subBoxesArray[i].createModelReferencedGroups(motherNeoRefsList);
+		}
+	}
 };
 
 /**
@@ -211,13 +237,17 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
  * @param result_visibleIndicesArray 변수
  * @returns result_visibleIndicesArray
  */
-OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray) 
+OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, eye_y, eye_z, result_visibleIndicesArray, result_modelReferencedGroup) 
 {
 	var intersectedSubBox = this.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
 	
 	if (intersectedSubBox !== null && intersectedSubBox._indicesArray.length > 0) 
 	{
 		result_visibleIndicesArray = intersectedSubBox._indicesArray;
+		if (result_modelReferencedGroup)
+		{
+			result_modelReferencedGroup = this.modelReferencedGroupsList;
+		}
 	}
 	
 	return result_visibleIndicesArray;

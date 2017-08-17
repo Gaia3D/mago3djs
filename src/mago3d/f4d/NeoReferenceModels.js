@@ -144,6 +144,7 @@ var NeoReferencesMotherAndIndices = function()
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
 	this.blocksList; // local blocks list. used only for parse data.***
 	this.neoRefsIndices = []; // All objects(references) of this class.
+	this.modelReferencedGroupsList;
 
 	this.fileLoadState = 0;
 	this.dataArraybuffer;
@@ -152,6 +153,7 @@ var NeoReferencesMotherAndIndices = function()
 	this.interior_ocCullOctree; // octree that contains the visible indices.
 	
 	this.currentVisibleIndices = [];
+	this.currentVisibleMRG; // MRG = ModelReferencedGroup.
 };
 
 /**
@@ -175,12 +177,15 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 		{
 			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
 			{
-				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
+				if (this.currentVisibleMRG == undefined)
+				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
 				
+				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
 			}
 			else 
 			{
 				this.currentVisibleIndices = this.neoRefsIndices;
+				this.currentVisibleMRG = this.modelReferencedGroupsList;
 			}
 		}
 	}
@@ -190,12 +195,15 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 		{
 			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
 			{
-				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices);
+				if (this.currentVisibleMRG == undefined)
+				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
 				
+				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
 			}
 			else
 			{
 				this.currentVisibleIndices = this.neoRefsIndices;
+				this.currentVisibleMRG = this.modelReferencedGroupsList;
 			}
 		}
 	}
@@ -255,22 +263,8 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
 	
 	if (this.modelReferencedGroupsList == undefined)
 	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
-	
-	var referenceIdx;
-	var modelIdx;
-	var modelRefGroup;
-	var referencesCount = this.neoRefsIndices.length;
-	for (var i=0; i<referencesCount; i++)
-	{
-		referenceIdx = this.neoRefsIndices[i];
-		modelIdx = this.motherNeoRefsList[referenceIdx]._block_idx;
-		modelRefGroup = this.modelReferencedGroupsList.getModelReferencedGroup(modelIdx);
-		modelRefGroup.referencesIdxArray.push(referenceIdx);
-	}
-	
-	// Now, delete the "modelReferencedGroupsMap" and make a simple array.
-	this.modelReferencedGroupsList.makeModelReferencedGroupsArray();
-	
+
+	this.modelReferencedGroupsList.createModelReferencedGroups(this.neoRefsIndices, this.motherNeoRefsList);
 };
 
 /**
@@ -618,6 +612,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
 	infiniteOcCullBox.setSizesSubBoxes();
+	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
 	if (this.interior_ocCullOctree === undefined)
 	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
@@ -626,7 +621,19 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	ocCullBox.setSizesSubBoxes();
+	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
+
+
+
+
+
+
+
+
+
+
+
 
