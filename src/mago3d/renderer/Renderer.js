@@ -884,7 +884,6 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 				gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 				//gl.vertexAttribPointer(standardShader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
 
-				
 				if (ssao_idx === 1)
 				{
 					// Normals.***
@@ -1110,42 +1109,14 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			{
 				//var mesh_array = block.viArraysContainer._meshArrays[n];
 				this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-
-				if (this.vbo_vi_cacheKey_aux.meshVertexCacheKey === undefined) 
-				{
-					if (this.vbo_vi_cacheKey_aux.posVboDataArray === undefined) { continue; }
-
-					this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-					gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-
-					this.vbo_vi_cacheKey_aux.posVboDataArray = undefined;
-					continue;
-				}
+				if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+				{ continue; }
 				
-				if (this.vbo_vi_cacheKey_aux.meshNormalCacheKey === undefined) 
-				{
-					if (this.vbo_vi_cacheKey_aux.norVboDataArray === undefined) { continue; }
-
-					this.vbo_vi_cacheKey_aux.meshNormalCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-					gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.norVboDataArray, gl.STATIC_DRAW);
-
-					this.vbo_vi_cacheKey_aux.norVboDataArray = undefined;
-					continue;
-				}
-
-				if (this.vbo_vi_cacheKey_aux.meshFacesCacheKey === undefined) 
-				{
-					if (this.vbo_vi_cacheKey_aux.idxVboDataArray === undefined) { continue; }
-
-					this.vbo_vi_cacheKey_aux.meshFacesCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-
-					this.vbo_vi_cacheKey_aux.idxVboDataArray = undefined;
-					continue;
-				}
+				if (!this.vbo_vi_cacheKey_aux.isReadyNormals(gl))
+				{ continue; }
+				
+				if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+				{ continue; }
 				
 				// Positions.***
 				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
@@ -1323,31 +1294,11 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
 		this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 
-		if (this.vbo_vi_cacheKey_aux.meshVertexCacheKey === undefined) 
-		{
-			if (this.vbo_vi_cacheKey_aux.posVboDataArray === undefined) { return; }
-
-			this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-			this.vbo_vi_cacheKey_aux.posVboDataArray = undefined;
-			return;
-		}
-
-
-		if (this.vbo_vi_cacheKey_aux.meshFacesCacheKey === undefined) 
-		{
-			if (this.vbo_vi_cacheKey_aux.idxVboDataArray === undefined) { return; }
-
-			this.vbo_vi_cacheKey_aux.meshFacesCacheKey = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-			this.vbo_vi_cacheKey_aux.idxVboDataArray = undefined;
-			return;
-		}
-
-		//if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey === undefined || this.vbo_vi_cacheKey_aux.meshNormalCacheKey === undefined || this.vbo_vi_cacheKey_aux.meshFacesCacheKey === undefined)
-		//	return;
+		if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+		{ continue; }
+		
+		if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+		{ continue; }
 
 		// Positions.***
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
@@ -1466,57 +1417,15 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 					//var mesh_array = block.viArraysContainer._meshArrays[n];
 					this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 
-					//****************************************************************************************************AAA
-					if (this.vbo_vi_cacheKey_aux.meshVertexCacheKey === undefined) 
-					{
-						if (this.vbo_vi_cacheKey_aux.posVboDataArray === undefined) { continue; }
+					if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+					{ continue; }
 
-						this.vbo_vi_cacheKey_aux.meshVertexCacheKey = gl.createBuffer();
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-						gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.posVboDataArray, gl.STATIC_DRAW);
-						this.vbo_vi_cacheKey_aux.posVboDataArray.length = 0;
-						continue;
-					}
-					/*
-					if(this.vbo_vi_cacheKey_aux.meshNormalCacheKey === undefined)
-					{
-						if(this.vbo_vi_cacheKey_aux.norVboDataArray === undefined)
-							continue;
-
-						this.vbo_vi_cacheKey_aux.meshNormalCacheKey = gl.createBuffer ();
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.bufferData(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.norVboDataArray, gl.STATIC_DRAW);
-						this.vbo_vi_cacheKey_aux.norVboDataArray.length = 0;
-							continue;
-					}
-					*/
-					if (this.vbo_vi_cacheKey_aux.meshFacesCacheKey === undefined) 
-					{
-						if (this.vbo_vi_cacheKey_aux.idxVboDataArray === undefined) { continue; }
-
-						this.vbo_vi_cacheKey_aux.meshFacesCacheKey = gl.createBuffer();
-						gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-						gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.idxVboDataArray, gl.STATIC_DRAW);
-						//this.vbo_vi_cacheKey_aux.indicesCount = this.vbo_vi_cacheKey_aux.idxVboDataArray.length;
-						this.vbo_vi_cacheKey_aux.idxVboDataArray = undefined;
-						continue;
-					}
-
-					//if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey === undefined || this.vbo_vi_cacheKey_aux.MESH_NORMAL_cacheKey === undefined || this.vbo_vi_cacheKey_aux.meshFacesCacheKey === undefined)
-					//	continue;
+					if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+					{ continue; }
 
 					// Positions.***
 					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
 					gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-
-					// Normals.***
-					/*
-					//if(ssao_idx !== -1)
-					{
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true,0,0);
-					}
-					*/
 
 					// Indices.***
 					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
@@ -1560,22 +1469,8 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.posVboDataArray = undefined;
-
-				//if(gl.getError() !== gl.NO_ERROR) {
-				//	alert('WebGL ERROR!!! *** XXXXXXXX***');
-				//}
-			}
-			return;
-		}	
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
@@ -1596,64 +1491,21 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		{
 			return;
 		}
-
-		// 1) Position.*********************************************
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.posVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 2) Normal.*********************************************
-		if (vbo_vicky.meshNormalCacheKey === undefined) 
-		{
-			if (vbo_vicky.norVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshNormalCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.norVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.norVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 3) Color.*********************************************
-		if (vbo_vicky.meshColorCacheKey === undefined) 
-		{
-			if (vbo_vicky.colVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshColorCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.colVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.colVboDataArray = undefined;
-			}
-			//return;
-		}
+		
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
+		
+		if (!vbo_vicky.isReadyNormals(gl))
+		{ return; }
+		
+		if (!vbo_vicky.isReadyColors(gl))
+		{ return; }
 		
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{
-			if (vbo_vicky.meshTexcoordsCacheKey === undefined && vbo_vicky.tcoordVboDataArray !== undefined) 
-			{
-				//if(vbo_vicky.tcoordVboDataArray !== undefined) //dataArrayByteLength > 0
-				{
-					vbo_vicky.meshTexcoordsCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
-					gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.tcoordVboDataArray, gl.STATIC_DRAW);
-
-					vbo_vicky.tcoordVboDataArray = undefined;
-				}
-				return;
-			}
+			if (!vbo_vicky.isReadyTexCoords(gl))
+			{ return; }
 		}
 		
 
@@ -1701,29 +1553,11 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
 		return;
 	}
 	gl.frontFace(gl.CCW);
-	// ssao_idx = -1 -> pickingMode.***
-	// ssao_idx = 0 -> depth.***
-	// ssao_idx = 1 -> ssao.***
-
 
 	// 1) Position.*********************************************
 	var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-	if (vbo_vicky.meshVertexCacheKey === undefined) 
-	{
-		if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-		{
-			vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-			gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
-
-			vbo_vicky.posVboDataArray = undefined;
-
-			//if(gl.getError() !== gl.NO_ERROR) {
-			//	alert('WebGL ERROR!!! *** XXXXXXXX***');
-			//}
-		}
-		return;
-	}
+	if (!vbo_vicky.isReadyPositions(gl))
+	{ return; }
 
 	var vertices_count = vbo_vicky.vertexCount;
 	if (vertices_count === 0) 
@@ -1731,12 +1565,9 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
 		return;
 	}
 
-
-
 	gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 	gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 	gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-
 };
 
 /**
@@ -1765,30 +1596,14 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.posVboDataArray = undefined;
-
-				//if(gl.getError() !== gl.NO_ERROR) {
-				//	alert('WebGL ERROR!!! *** XXXXXXXX***');
-				//}
-			}
-			return;
-		}
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
 		{
 			return;
 		}
-
-
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
@@ -1809,47 +1624,14 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 			var hola = 0;
 		}
 
-		// 1) Position.*********************************************
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
 
-				vbo_vicky.posVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 2) Normal.*********************************************
-		if (vbo_vicky.meshNormalCacheKey === undefined) 
-		{
-			if (vbo_vicky.norVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshNormalCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.norVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.norVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 3) Color.*********************************************
-		if (vbo_vicky.meshColorCacheKey === undefined) 
-		{
-			if (vbo_vicky.colVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshColorCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.colVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.colVboDataArray = undefined;
-			}
-			return;
-		}
+		if (!vbo_vicky.isReadyNormals(gl))
+		{ return; }
+		
+		if (!vbo_vicky.isReadyColors(gl))
+		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
@@ -1889,20 +1671,8 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 
 	if (ssao_idx === 0) // depth.***
 	{
-		// 1) Position.*********************************************
-		var vbo_vicky = lego.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.posVboDataArray = undefined;
-			}
-			return;
-		}
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
@@ -1924,47 +1694,14 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 			return;
 		}
 
-		// 1) Position.*********************************************
-		if (vbo_vicky.meshVertexCacheKey === undefined) 
-		{
-			if (vbo_vicky.posVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshVertexCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.posVboDataArray, gl.STATIC_DRAW);
+		if (!vbo_vicky.isReadyPositions(gl))
+		{ return; }
 
-				vbo_vicky.posVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 2) Normal.*********************************************
-		if (vbo_vicky.meshNormalCacheKey === undefined) 
-		{
-			if (vbo_vicky.norVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshNormalCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.norVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.norVboDataArray = undefined;
-			}
-			return;
-		}
-
-		// 3) Color.*********************************************
-		if (vbo_vicky.meshColorCacheKey === undefined) 
-		{
-			if (vbo_vicky.colVboDataArray !== undefined) //dataArrayByteLength > 0
-			{
-				vbo_vicky.meshColorCacheKey = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-				gl.bufferData(gl.ARRAY_BUFFER, vbo_vicky.colVboDataArray, gl.STATIC_DRAW);
-
-				vbo_vicky.colVboDataArray = undefined;
-			}
-			return;
-		}
+		if (!vbo_vicky.isReadyNormals(gl))
+		{ return; }
+		
+		if (!vbo_vicky.isReadyColors(gl))
+		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);

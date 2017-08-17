@@ -180,6 +180,26 @@ VBOVertexIdxCacheKey.prototype.isReadyTexCoords = function(gl)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @return boolean
+ */
+VBOVertexIdxCacheKey.prototype.isReadyColors = function(gl) 
+{
+	if (this.meshColorCacheKey === undefined) 
+	{
+		if (this.colVboDataArray === undefined) { return false; }
+		
+		this.meshColorCacheKey = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshColorCacheKey);
+		gl.bufferData(gl.ARRAY_BUFFER, this.colVboDataArray, gl.STATIC_DRAW);
+		this.colVboDataArray = undefined;
+		
+		return false;
+	}
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class VBOVertexIdxCacheKeysContainer
  */
 var VBOVertexIdxCacheKeysContainer = function() 
