@@ -377,7 +377,7 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
 MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
 {
 	// Calculate FPS.
-	var start = new Date().getTime();
+	//var start = new Date().getTime();
 	
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
@@ -411,9 +411,9 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	}
 	
 	// print FPS to console.
-	var end = new Date().getTime();
-	var fps = 1000/(end - start);
-	console.log('FPS :  ' + fps);
+	//var end = new Date().getTime();
+	//var fps = 1000/(end - start);
+	//console.log('FPS :  ' + fps);
 };
 
 MagoManager.prototype.render = function(dc)
