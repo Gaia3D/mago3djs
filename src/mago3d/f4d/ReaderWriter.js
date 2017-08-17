@@ -826,10 +826,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.buildingType = "basicBuilding";
 		neoBuilding.buildingFileName = buildingName;
 		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-
-		console.log("Building Name = " + buildingName);
-		console.log("Building ID = " + neoBuilding.buildingId);
-		console.log("Building Type = " + neoBuilding.buildingType);
 	}
 
 	neoBuildingsList.neoBuildingsArray.reverse();
