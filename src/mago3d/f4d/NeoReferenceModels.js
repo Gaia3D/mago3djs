@@ -462,7 +462,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			
 			// Compute the references matrix type.
 			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
-			
 			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
 			if (neoRef.refMatrixType === 1)
 			{
@@ -560,21 +559,28 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 			if (textures_count > 0) 
 			{
-
-				neoRef.texture = new Texture();
-				neoRef.hasTexture = true;
+				var textureTypeName = "";
+				var textureImageFileName = "";
 
 				// Now, read the texture_type and texture_file_name.***
 				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				for (var j=0; j<texture_type_nameLegth; j++) 
 				{
-					neoRef.texture.textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+					textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				for (var j=0; j<texture_fileName_Legth; j++) 
 				{
-					neoRef.texture.textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+					textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+				
+				if (texture_fileName_Legth > 0)
+				{
+					neoRef.texture = new Texture();
+					neoRef.hasTexture = true;
+					neoRef.texture.textureTypeName = textureTypeName;
+					neoRef.texture.textureImageFileName = textureImageFileName;
 				}
 
 				/*

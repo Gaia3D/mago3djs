@@ -409,11 +409,15 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		//this.renderNeoBuildings(scene, isLastFrustum); // original.****
 		//this.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
-	
-	// print FPS to console.
-	//var end = new Date().getTime();
-	//var fps = 1000/(end - start);
-	//console.log('FPS :  ' + fps);
+	/*
+	if(isLastFrustum)
+	{
+		// print FPS to console.
+		var end = new Date().getTime();
+		var fps = 1000/(end - start);
+		console.log('FPS :  ' + fps);
+	}
+	*/
 };
 
 MagoManager.prototype.render = function(dc)
@@ -1295,7 +1299,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			var projectionMatrix = dc.navigatorState.projection;
 			var aspectRat = sceneState.camera.frustum.aspectRatio;
 			var angleAlfa = 2*Math.atan(1/(aspectRat*projectionMatrix[0]));
-			//sceneState.camera.frustum.fovRad = 56.1 * Math.PI/180; // pendent to know the real fov in webwroldwind.***
 			sceneState.camera.frustum.fovyRad = angleAlfa; // pendent to know the real fov in webwroldwind.***
 			sceneState.camera.frustum.fovRad = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
 			sceneState.camera.frustum.dirty = false;
@@ -1341,9 +1344,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.drawingBufferWidth = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight = scene.drawingBufferHeight;
 	}
-	
 
-	
 };
 
 /**
@@ -4555,9 +4556,11 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		{ continue; }
 
 		var realBuildingPos = geoLoc.pivotPoint;
+		//var bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+		//var realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
 		if (neoBuilding.buildingType === "basicBuilding")
 		{
-			;//lod0_minSquaredDist = 50000.0;
+			//lod0_minSquaredDist = 50000.0;
 		}
 		
 		if (neoBuilding.buildingId === "ctships")
@@ -5445,6 +5448,16 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			heading = parseFloat(newLocation.heading);
 			pitch = parseFloat(newLocation.pitch);
 			roll = parseFloat(newLocation.roll);
+			
+			if (firstName === "testId")
+			{
+				longitude = 128.5894;
+				latitude = 34.90167;
+				altitude = -400.0;
+				heading = 0;
+				pitch = 0;
+				roll = 0;
+			}
 
 			buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
@@ -5457,7 +5470,10 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 				// for this building dont translate the pivot point to the bbox center.***
 				return;
 			}
-			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
+			if (firstName !== "testId")
+			{
+				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
+			}
 			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
 			////currentCalculatingPositionsCount ++;
 		}
@@ -5466,6 +5482,8 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			// use the normal data. never enter here.***
 		}
 	}
+	
+	
 };
 
 /**
