@@ -48,13 +48,19 @@ var VBOVertexIdxCacheKey = function()
 	this.meshColorCacheKey;
 	this.meshTexcoordsCacheKey;
 
-	this.posVboDataArray; // to store data here, and when necessary bind to gl.***
-	this.norVboDataArray; // to store data here, and when necessary bind to gl.***
-	this.idxVboDataArray; // to store data here, and when necessary bind to gl.***
-	this.colVboDataArray; // to store data here, and when necessary bind to gl.***
-	this.tcoordVboDataArray; // to store data here, and when necessary bind to gl.***
+	this.posVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	this.norVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	this.idxVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	this.colVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	this.tcoordVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	
+	this.posArrayByteSize;
+	this.norArrayByteSize;
+	this.idxArrayByteSize;
+	this.colArrayByteSize;
+	this.tcoordArrayByteSize;
 
-	this.buffer;// provisionally put this here.***
+	this.buffer;// delete this. provisionally put this here.***
 };
 
 /**

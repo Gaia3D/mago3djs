@@ -606,9 +606,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 			// 15x15 = 225
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
-				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
-				//visibleObjControlerOctreesAux.currentVisibles0.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				//visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
@@ -617,9 +616,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 			// 25x25 = 625
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
-				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
-				//visibleObjControlerOctreesAux.currentVisibles1.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				//visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
@@ -628,9 +626,8 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 			// 50x50 = 2500
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
-				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
-				//visibleObjControlerOctreesAux.currentVisibles2.push(visibleOctreesArray[i]);
+				this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+				//visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
@@ -640,7 +637,6 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 			{
 				//this.putOctreeInEyeDistanceSortedArray(visibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z);
 				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
-				//visibleObjControlerOctreesAux.currentVisibles3.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}

@@ -135,6 +135,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
 	bytesReaded += 4;
 	var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
 
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
@@ -223,6 +224,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			vboViCacheKey.posVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+			// now padding the array to adjust to standard memory size of pool.
+			posByteSize = 4 * verticesFloatValuesCount;
 
 			// 2) Normals.
 			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
@@ -232,6 +235,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			endBuff = bytesReaded + 1 * normalByteValuesCount;
 			vboViCacheKey.norVboDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+			// now padding the array to adjust to standard memory size of pool.
+			norByteSize = 1 * normalByteValuesCount;
 
 			// 3) Indices.
 			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
@@ -258,6 +263,11 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			vboViCacheKey.idxVboDataArray = new Int16Array(arrayBuffer.slice(startBuff, endBuff));
 			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
 			vboViCacheKey.indicesCount = shortIndicesValuesCount;
+			// now padding the array to adjust to standard memory size of pool.
+			idxByteSize = 2 * shortIndicesValuesCount;
+			posByteSize;
+			norByteSize;
+			var hola = 0;
 		}
 
 		// Pendent to load the block's lego.***

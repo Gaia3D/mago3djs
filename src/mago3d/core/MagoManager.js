@@ -4555,9 +4555,9 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 		{ continue; }
 
-		var realBuildingPos = geoLoc.pivotPoint;
-		//var bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-		//var realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
+		//var realBuildingPos = geoLoc.pivotPoint;
+		var bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+		var realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
 		if (neoBuilding.buildingType === "basicBuilding")
 		{
 			//lod0_minSquaredDist = 50000.0;
@@ -5448,16 +5448,6 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 			heading = parseFloat(newLocation.heading);
 			pitch = parseFloat(newLocation.pitch);
 			roll = parseFloat(newLocation.roll);
-			
-			if (firstName === "testId")
-			{
-				longitude = 128.5894;
-				latitude = 34.90167;
-				altitude = -400.0;
-				heading = 0;
-				pitch = 0;
-				roll = 0;
-			}
 
 			buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
@@ -5470,16 +5460,26 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 				// for this building dont translate the pivot point to the bbox center.***
 				return;
 			}
-			if (firstName !== "testId")
-			{
-				ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
-			}
+			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
 			////currentCalculatingPositionsCount ++;
 		}
 		else
 		{
-			// use the normal data. never enter here.***
+			if (firstName === "testId")
+			{
+				longitude = 128.5894;
+				latitude = 34.90167;
+				altitude = -400.0;
+				heading = 0;
+				pitch = 0;
+				roll = 0;
+				
+				buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
+				ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, buildingGeoLocation, this);
+				
+				this.pointSC = structureTypedBuilding.bbox.getCenterPoint(this.pointSC);
+			}
 		}
 	}
 	
