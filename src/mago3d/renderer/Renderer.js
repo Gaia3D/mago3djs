@@ -190,7 +190,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				}
 			}
 
-			this.renderLodBuilding(gl, lowestOctree.lego, this, standardShader, ssao_idx, renderTexture);
+			this.renderLodBuilding(gl, lowestOctree.lego, magoManager, standardShader, ssao_idx, renderTexture);
 		}
 	}
 };
@@ -254,7 +254,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 
 		if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
-			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -429,7 +429,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			{
 				//var mesh_array = block.viArraysContainer._meshArrays[n];
 				this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-				if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl) || !this.vbo_vi_cacheKey_aux.isReadyNormals(gl) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+				if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyNormals(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 				{ continue; }
 				
 				// Positions.***
@@ -450,7 +450,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if (block.vertexCount <= neoReference.vertexCount) 
 					{
 						var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-						if (!refVboData.isReadyTexCoords(gl))
+						if (!refVboData.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 						{ continue; }
 
 						gl.enableVertexAttribArray(standardShader.texCoord2_loc);
@@ -576,7 +576,7 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 
 	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 	{
-		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 		myBlocksList.dataArraybuffer = undefined;
 		return;
 	}
@@ -612,7 +612,7 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 		{
 			//var mesh_array = block.viArraysContainer._meshArrays[n];
 			this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl) || !this.vbo_vi_cacheKey_aux.isReadyNormals(gl) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyNormals(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 			{ continue; }
 
 			// Positions.***
@@ -806,7 +806,7 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 					if (block.vertexCount <= neoReference.vertexCount) 
 					{
 						var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-						if (!refVboData.isReadyTexCoords(gl))
+						if (!refVboData.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 						{ continue; }
 
 						gl.enableVertexAttribArray(standardShader.texCoord2_loc);
@@ -880,7 +880,7 @@ Renderer.prototype.depthRenderNeoRefListsGroupedVersion = function(gl, neoRefere
 
 	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 	{
-		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 		myBlocksList.dataArraybuffer = undefined;
 		return;
 	}
@@ -916,7 +916,7 @@ Renderer.prototype.depthRenderNeoRefListsGroupedVersion = function(gl, neoRefere
 		{
 			//var mesh_array = block.viArraysContainer._meshArrays[n];
 			this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 			{ continue; }
 
 			// Positions.***
@@ -1055,7 +1055,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 
 		if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
-			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray);
+			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
@@ -1137,10 +1137,10 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			{
 				//var mesh_array = block.viArraysContainer._meshArrays[n];
 				this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-				if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+				if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager))
 				{ continue; }
 
-				if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+				if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 				{ continue; }
 				
 				// Positions.***
@@ -1319,10 +1319,10 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
 		this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 
-		if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+		if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ continue; }
 		
-		if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+		if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 		{ continue; }
 
 		// Positions.***
@@ -1442,10 +1442,10 @@ Renderer.prototype.renderNeoRefListsColorSelection = function(gl, neoRefList_arr
 					//var mesh_array = block.viArraysContainer._meshArrays[n];
 					this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 
-					if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl))
+					if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager))
 					{ continue; }
 
-					if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl))
+					if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 					{ continue; }
 
 					// Positions.***
@@ -1494,7 +1494,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
@@ -1517,19 +1517,19 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			return;
 		}
 		
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
-		if (!vbo_vicky.isReadyNormals(gl))
+		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
-		if (!vbo_vicky.isReadyColors(gl))
+		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{
-			if (!vbo_vicky.isReadyTexCoords(gl))
+			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ return; }
 		}
 		
@@ -1581,7 +1581,7 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
 
 	// 1) Position.*********************************************
 	var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-	if (!vbo_vicky.isReadyPositions(gl))
+	if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 	{ return; }
 
 	var vertices_count = vbo_vicky.vertexCount;
@@ -1621,7 +1621,7 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
@@ -1649,13 +1649,13 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 			var hola = 0;
 		}
 
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
-		if (!vbo_vicky.isReadyNormals(gl))
+		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
-		if (!vbo_vicky.isReadyColors(gl))
+		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
 		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
@@ -1696,7 +1696,7 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 
 	if (ssao_idx === 0) // depth.***
 	{
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
@@ -1719,13 +1719,13 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 			return;
 		}
 
-		if (!vbo_vicky.isReadyPositions(gl))
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
-		if (!vbo_vicky.isReadyNormals(gl))
+		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
-		if (!vbo_vicky.isReadyColors(gl))
+		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
 		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);

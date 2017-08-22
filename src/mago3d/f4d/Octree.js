@@ -59,12 +59,12 @@ Octree.prototype.new_subOctree = function()
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-Octree.prototype.deleteGlObjects = function(gl) 
+Octree.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
 	if (this.lego !== undefined) 
 	{
-		this.lego.vbo_vicks_container.deleteGlObjects(gl);
-		this.legoDataArrayBuffer = undefined;
+		this.lego.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
+		this.lego.vbo_vicks_container = undefined;
 	}
 
 	this.centerPos = undefined;
@@ -82,7 +82,7 @@ Octree.prototype.deleteGlObjects = function(gl)
 	this.neoBuildingOwner = undefined;
 
 	if (this.neoReferencesMotherAndIndices)
-	{ this.neoReferencesMotherAndIndices.deleteObjects(gl); }
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	this.neoReferencesMotherAndIndices = undefined;
 
@@ -97,7 +97,7 @@ Octree.prototype.deleteGlObjects = function(gl)
 		{
 			if (this.neoRefsList_Array[i]) 
 			{
-				this.neoRefsList_Array[i].deleteGlObjects(gl);
+				this.neoRefsList_Array[i].deleteGlObjects(gl, vboMemManager);
 			}
 			this.neoRefsList_Array[i] = undefined;
 		}
@@ -108,7 +108,7 @@ Octree.prototype.deleteGlObjects = function(gl)
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
 		{
-			this.subOctrees_array[i].deleteGlObjects(gl);
+			this.subOctrees_array[i].deleteGlObjects(gl, vboMemManager);
 			this.subOctrees_array[i] = undefined;
 		}
 		this.subOctrees_array = undefined;
@@ -119,28 +119,16 @@ Octree.prototype.deleteGlObjects = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-Octree.prototype.deleteLod0GlObjects = function(gl) 
+Octree.prototype.deleteLod0GlObjects = function(gl, vboMemManager) 
 {
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteGlObjects(gl);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array.legnth = 0;
-	}
+	if (this.neoReferencesMotherAndIndices)
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	if (this.subOctrees_array !== undefined) 
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
 		{
-			this.subOctrees_array[i].deleteLod0GlObjects(gl);
+			this.subOctrees_array[i].deleteLod0GlObjects(gl, vboMemManager);
 		}
 	}
 };
