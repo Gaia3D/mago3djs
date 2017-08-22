@@ -22,6 +22,7 @@ var MagoManager = function()
 	this.vBOManager = new VBOManager();
 	this.readerWriter = new ReaderWriter();
 	this.magoPolicy = new Policy();
+	this.smartTileManager = new SmartTileManager();
 
 	// SSAO.***************************************************
 	this.noiseTexture;
@@ -102,6 +103,7 @@ var MagoManager = function()
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
 	this.selectionColor = new SelectionColor();
+	this.vboMemoryManager = new VBOMemoryManager();
 
 	this.currentVisible_terranTiles_array = [];
 	this.currentVisibleBuildings_array = []; // delete this.***
@@ -152,6 +154,7 @@ var MagoManager = function()
 	this.render_time = 0;
 	this.bPicking = false;
 	this.bObjectMarker = true;
+	this.framesCounter = 0;
 
 	this.scene;
 
@@ -2722,9 +2725,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			squaredDistLod1 = 285000;
 			squaredDistLod2 = 500000*1000;
 		}
-		//squaredDistLod0 = 45000;
-		//squaredDistLod1 = 85000;
-		//squaredDistLod2 = 500000*1000;
+		squaredDistLod0 = 500;
+		squaredDistLod1 = 2000;
+		squaredDistLod2 = 500000*1000;
 			
 		var frustumVolume;
 		var find = false;
@@ -2916,7 +2919,7 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
 				// must parse the arraybuffer data.***
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC);
+				lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				refListsParsingCount += 1;
@@ -3014,7 +3017,7 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 			if (lowestOctreeLegosParsingCount < maxLowestOctreeLegosParsingCount) 
 			{
 				var bytesReaded = 0;
-				lowestOctree.lego.parseArrayBuffer(gl, this.readerWriter, lowestOctree.lego.dataArrayBuffer, bytesReaded);
+				lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
 				lowestOctree.lego.dataArrayBuffer = undefined;
 				lowestOctreeLegosParsingCount++;
 			}
@@ -4435,7 +4438,7 @@ MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene
 MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding) 
 {
 	// check if the neoBuilding id the selected building.***
-
+	var vboMemoryManager = this.vboMemoryManager;
 	if (neoBuilding === this.buildingSelected)
 	{
 		this.buildingSelected = undefined;
@@ -4445,25 +4448,11 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
 
-	// create the default blocks_lists.*****************************
-	if (neoBuilding._blocksList_Container && neoBuilding._blocksList_Container.blocksListsArray.length > 0) 
-	{
-		neoBuilding._blocksList_Container.blocksListsArray[0].deleteGlObjects(gl);
-		neoBuilding._blocksList_Container.blocksListsArray[0] = undefined;
-		neoBuilding._blocksList_Container.blocksListsArray = undefined;
-	}
-	neoBuilding._blocksList_Container = undefined;
-
-	// create the references lists.*********************************
-	//neoBuilding._neoRefLists_Container = new NeoReferencesListsContainer(); // in asimetric version there are no references in exterior.***
-	//neoBuilding.currentRenderablesNeoRefLists = [];
-	//neoBuilding.preExtractedLowestOctreesArray = [];
-	//neoBuilding.motherNeoReferencesArray = [];
 	var blocksCount = neoBuilding.motherBlocksArray.length;
 	for (var i=0; i<blocksCount; i++)
 	{
 		if (neoBuilding.motherBlocksArray[i])
-		{ neoBuilding.motherBlocksArray[i].deleteObjects(gl); }
+		{ neoBuilding.motherBlocksArray[i].deleteObjects(gl, vboMemoryManager); }
 		neoBuilding.motherBlocksArray[i] = undefined;
 	}
 	neoBuilding.motherBlocksArray = [];
@@ -4472,17 +4461,17 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	for (var i=0; i<referencesCount; i++)
 	{
 		if (neoBuilding.motherNeoReferencesArray[i])
-		{ neoBuilding.motherNeoReferencesArray[i].deleteGlObjects(gl); }
+		{ neoBuilding.motherNeoReferencesArray[i].deleteGlObjects(gl, vboMemoryManager); }
 		neoBuilding.motherNeoReferencesArray[i] = undefined;
 	}
 	neoBuilding.motherNeoReferencesArray = [];
 
 	// Textures loaded.***************************************************
 	//neoBuilding.textures_loaded = [];
-
+	
 	// The octree.********************************************************
 	if (neoBuilding.octree !== undefined)
-	{ neoBuilding.octree.deleteGlObjects(gl); }
+	{ neoBuilding.octree.deleteGlObjects(gl, vboMemoryManager); }
 	neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
 	neoBuilding.octreeLoadedAllFiles = false;
 
@@ -4512,6 +4501,13 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
 	//---------------------------------------------------------------------------------------------------------
 	// Note: in this function, we do frustum culling and determine the detailedBuilding in same time.***
+	var deleteBuildings = false;
+	this.framesCounter += 1;
+	if (this.framesCounter > 1000)
+	{
+		deleteBuildings = true;
+		this.framesCounter = 0;
+	}
 
 	var squaredDistToCamera;
 	var lod0_minSquaredDist = 100000;
@@ -4576,7 +4572,8 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		squaredDistToCamera -= (this.radiusAprox_aux*this.radiusAprox_aux)*2;
 		if (squaredDistToCamera > this.magoPolicy.getFrustumFarSquaredDistance())
 		{
-			this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
+			if (deleteBuildings)
+			{ this.deleteNeoBuilding(this.sceneState.gl, neoBuilding); }
 			continue;
 		}
 			
@@ -4640,7 +4637,8 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 		}
 		else
 		{
-			this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
+			if (deleteBuildings)
+			{ this.deleteNeoBuilding(this.sceneState.gl, neoBuilding); }
 		}
 	}
 };

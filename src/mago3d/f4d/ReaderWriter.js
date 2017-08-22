@@ -27,8 +27,7 @@ var ReaderWriter = function()
 	this.GAIA3D__offset_longitude = -0.001;
 	this.GAIA3D__counter = 0;
 
-	// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
-	// Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***Var for reading files.***
+	// Var for reading files.
 	this.uint32;
 	this.uint16;
 	this.int16;
@@ -43,7 +42,7 @@ var ReaderWriter = function()
 
 	this.filesReadings_count = 0;
 
-	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
+	// SCRATCH.*** 
 	this.temp_var_to_waste;
 	this.countSC;
 	this.xSC;
@@ -811,15 +810,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
 		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		
-		var bbox = neoBuilding.metaData.bbox;
-		bbox.minX = neoBuilding.bbox.minX;
-		bbox.minY = neoBuilding.bbox.minY;
-		bbox.minZ = neoBuilding.bbox.minZ;
-
-		bbox.maxX = neoBuilding.bbox.maxX;
-		bbox.maxY = neoBuilding.bbox.maxY;
-		bbox.maxZ = neoBuilding.bbox.maxZ;
 
 		// create a building and set the location.***
 		neoBuilding.buildingId = buildingName.substr(4, buildingNameLength-4);

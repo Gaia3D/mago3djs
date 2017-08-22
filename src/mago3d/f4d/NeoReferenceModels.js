@@ -88,7 +88,7 @@ NeoReference.prototype.hasKeyMatrix = function(idxKey)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.deleteGlObjects = function(gl) 
+NeoReference.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
 	// 1) Object ID.***
 	this._id = undefined;
@@ -222,11 +222,11 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx)
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl) 
+NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
 {
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	if (this.blocksList)
-	{ this.blocksList.deleteGlObjects(gl); }
+	{ this.blocksList.deleteGlObjects(gl, vboMemManager); }
 
 	this.blocksList = undefined;
 	this.neoRefsIndices = undefined;
@@ -274,7 +274,7 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4) 
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
@@ -286,6 +286,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	var stadistic_refMat_Identities_count = 0;
 	var stadistic_refMat_Translates_count = 0;
 	var stadistic_refMat_Transforms_count = 0;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
+	var colByteSize, tCoordByteSize;
 
 	for (var i = 0; i < neoRefsCount; i++) 
 	{
@@ -526,11 +529,17 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
+						colByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+						
 						neoRef.vertexCount = vertexCount; // no necessary.***
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-						
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						// TODO: Float32Array or UintArray depending of dataType.***
+						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
+						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
 					}
 					
@@ -545,11 +554,17 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						// example: posByteSize = 4 * verticesFloatValuesCount;
+						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+						
 						neoRef.vertexCount = vertexCount; // no necessary.***
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-						
+						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
 					}
 				}

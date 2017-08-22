@@ -12,13 +12,9 @@ var TerranTile = function()
 	}
 
 	//           +-----+-----+
-	//           |     |     |
 	//           |  3  |  2  |
-	//           |     |     |
 	//           +-----+-----+
-	//           |     |     |
 	//           |  0  |  1  |
-	//           |     |     |
 	//           +-----+-----+
 
 	this._depth = 0; // qudtree depth. 0 => mother_quadtree.***
@@ -39,11 +35,6 @@ var TerranTile = function()
 	this.rightUp_position;
 	this.leftUp_position;
 	this.visibilityType;
-
-	//this.longitudeMin; // delete this.***
-	//this.longitudeMax; // delete this.***
-	//this.latitudeMin; // delete this.***
-	//this.latitudeMax; // delete this.***
 
 	this.subTiles_array = [];
 	this.terranIndexFile_readed = false;
