@@ -94,6 +94,18 @@ Point3D.prototype.squareDistTo = function(x, y, z)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.distTo = function(x, y, z) 
+{
+	return Math.sqrt(this.squareDistTo(x, y, z));
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param x 변수
  * @param y 변수
  * @param z 변수

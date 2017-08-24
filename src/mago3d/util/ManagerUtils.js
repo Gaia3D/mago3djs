@@ -101,6 +101,32 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
 	return resultGeographicCoord;
 };
 
+ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitude, resultWorldPoint, magoManager) 
+{
+	if (resultWorldPoint === undefined)
+	{ resultWorldPoint = new Point3D(); }
+
+	
+	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		var globe = magoManager.wwd.globe;
+		var origin = new WorldWind.Vec3(0, 0, 0);
+		origin = globe.computePointFromPosition(latitude, longitude, altitude, origin);
+		
+		resultWorldPoint.set(origin[0], origin[1], origin[2]);
+		origin = undefined;
+	}
+	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// *if this in Cesium:
+		var position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
+		resultWorldPoint.set(position.x, position.y, position.z);
+		position = undefined;
+	}
+	
+	return resultWorldPoint;
+};
+
 ManagerUtils.getTransformationMatrixInPoint = function(point, resultTMatrix, resultMatrixInv, magoManager) 
 {
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
@@ -189,26 +215,8 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	
 	if (magoManager.configInformation === undefined)
 	{ return; }
-	
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		//var origin = new WorldWind.Vec3(latitude, longitude, height);
-		var globe = magoManager.wwd.globe;
-		var origin = new WorldWind.Vec3(0, 0, 0);
-		//var result = new WorldWind.Vec3(0, 0, 0);
-		origin = globe.computePointFromPosition(resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.altitude, origin);
-		if (resultGeoLocationData.position === undefined)
-		{ resultGeoLocationData.position = new Point3D(); }
-		
-		resultGeoLocationData.position.x = origin[0];
-		resultGeoLocationData.position.y = origin[1];
-		resultGeoLocationData.position.z = origin[2];
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		// *if this in Cesium:
-		resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
-	}
+
+	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position, magoManager);
 
 	// High and Low values of the position.********************************************************************
 	if (resultGeoLocationData.positionHIGH === undefined)

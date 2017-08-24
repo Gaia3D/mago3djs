@@ -87,12 +87,12 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			//this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
-			this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
 		}
 		
 		// LOD1.***
-		minSize = 2.0;
+		minSize = 1.0;
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles1.length;
 		for (var j=0; j<lowestOctreesCount; j++) 
 		{
@@ -100,8 +100,8 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			//this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
-			this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
+			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
 		}
 	}
 };
