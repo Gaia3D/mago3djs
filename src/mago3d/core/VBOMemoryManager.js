@@ -168,6 +168,8 @@ var VBOKeysWorld = function()
 	this.vboKeysNationsArray.push(this.vboKeyNation60000to150000);
 	this.vboKeyNation200000to1100000 = new VBOKeysNation(new Uint32Array([200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 1100000]), 150001);
 	this.vboKeysNationsArray.push(this.vboKeyNation200000to1100000);
+	this.vboKeyNation1500000to3000000 = new VBOKeysNation(new Uint32Array([1500000, 2000000, 2500000, 3000000]), 1100001);
+	this.vboKeysNationsArray.push(this.vboKeyNation1500000to3000000);
 };
 
 /**
@@ -235,7 +237,10 @@ VBOKeysWorld.prototype.getClassifiedBufferSize = function(currentBufferSize)
 	// 1rst, find the Nation for this bufferSize.
 	var keyNation = this.getKeyNationBySize(currentBufferSize);
 	var classifiedSize = -1;
-	if (keyNation)
+	if (keyNation == -1)
+	{ var hola =0; }
+	
+	if (keyNation != -1)
 	{ classifiedSize = keyNation.getClosestBufferSize(currentBufferSize); }
 	return classifiedSize;
 };
