@@ -251,14 +251,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		var myBlocksList = neoReferencesMotherAndIndices.blocksList;
 		if (myBlocksList === undefined)
 		{ continue; }
-
+		/*
 		if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
 			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
-
+		*/
 		if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) { continue; }
 			
 		// New version. Use occlussion indices.***
@@ -573,14 +573,14 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 	var myBlocksList = neoReferencesMotherAndIndices.blocksList;
 	if (myBlocksList === undefined)
 	{ return; }
-
+	/*
 	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 	{
 		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 		myBlocksList.dataArraybuffer = undefined;
 		return;
 	}
-
+	*/
 	if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) { return; }
 		
 	// New version. Use occlussion indices.***
@@ -877,14 +877,14 @@ Renderer.prototype.depthRenderNeoRefListsGroupedVersion = function(gl, neoRefere
 	var myBlocksList = neoReferencesMotherAndIndices.blocksList;
 	if (myBlocksList === undefined)
 	{ return; }
-
+	/*
 	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 	{
 		myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 		myBlocksList.dataArraybuffer = undefined;
 		return;
 	}
-
+	*/
 	if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) { return; }
 		
 	// New version. Use occlussion indices.***
@@ -1052,14 +1052,14 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 		var myBlocksList = neoReferencesMotherAndIndices.blocksList;
 		if (myBlocksList === undefined)
 		{ continue; }
-
+		/*
 		if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
 		{
 			myBlocksList.parseBlocksList(myBlocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 			myBlocksList.dataArraybuffer = undefined;
 			continue;
 		}
-
+		*/
 		if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) { continue; }
 			
 		// New version. Use occlussion indices.***
