@@ -2666,10 +2666,10 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersion = function(gl, scene
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene, globalVisibleObjControlerOctrees) 
 {
-	if (this.fileRequestControler.isFull())	{ return; }
+	if (this.fileRequestControler.isFullPlus())	{ return; }
 
 	var refListsParsingCount = 0;
-	var maxRefListParsingCount = 10;
+	var maxRefListParsingCount = 2;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var buildingFolderName;
 	var neoBuilding;
@@ -2679,6 +2679,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 	var lowestOctree;
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
+		if (refListsParsingCount > maxRefListParsingCount && this.fileRequestControler.isFullPlus()) 
+		{ return; }
+			
 		lowestOctree = currentVisibleOctrees[i];
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		
@@ -2701,7 +2704,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === 0)
 		{
-			if (this.fileRequestControler.isFull())	{ return; }
+			if (this.fileRequestControler.isFullPlus())	{ return; }
 
 			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
 			{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
@@ -2736,7 +2739,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				if (this.fileRequestControler.isFull())	{ return; }
+				if (this.fileRequestControler.isFullPlus())	{ return; }
 
 				// must read blocksList.***
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
@@ -2752,6 +2755,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				{
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
 					blocksList.dataArraybuffer = undefined;
+					refListsParsingCount += 1;
 				}
 				continue;
 			}
@@ -2864,7 +2868,7 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 	{ return; }
 
 	var lowestOctreeLegosParsingCount = 0;
-	var maxLowestOctreeLegosParsingCount = 100;
+	var maxLowestOctreeLegosParsingCount = 10;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var buildingFolderName = neoBuilding.buildingFileName;
 
@@ -2922,6 +2926,7 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 		{
 			if (neoBuilding.simpleBuilding3x3Texture === undefined)
 			{
+				if (this.fileRequestControler.isFull())	{ continue; }
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
 				var buildingFolderName = neoBuilding.buildingFileName;
 				var filePath_inServer = this.readerWriter.geometryDataPath + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
