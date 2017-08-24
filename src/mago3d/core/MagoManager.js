@@ -2668,12 +2668,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 {
 	if (this.fileRequestControler.isFull())	{ return; }
 
-	//var visibleObjControlerOctrees = neoBuilding.currentVisibleOctreesControler;
-	//if (visibleObjControlerOctrees === undefined)
-	//{ return; }
-
 	var refListsParsingCount = 0;
-	var maxRefListParsingCount = 30;
+	var maxRefListParsingCount = 10;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var buildingFolderName;
 	var neoBuilding;
@@ -2748,6 +2744,15 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
 
+				continue;
+			}
+			else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			{
+				if (refListsParsingCount < maxRefListParsingCount) 
+				{
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					blocksList.dataArraybuffer = undefined;
+				}
 				continue;
 			}
 		}
