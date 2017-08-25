@@ -19,3 +19,8 @@ FileRequestControler.prototype.isFull = function ()
 {
 	return this.filesRequestedCount >= this.maxFilesRequestedCount; 
 };
+
+FileRequestControler.prototype.isFullPlus = function ()
+{
+	return this.filesRequestedCount >= (this.maxFilesRequestedCount + 2); 
+};

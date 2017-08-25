@@ -12,13 +12,9 @@ var TerranTile = function()
 	}
 
 	//           +-----+-----+
-	//           |     |     |
 	//           |  3  |  2  |
-	//           |     |     |
 	//           +-----+-----+
-	//           |     |     |
 	//           |  0  |  1  |
-	//           |     |     |
 	//           +-----+-----+
 
 	this._depth = 0; // qudtree depth. 0 => mother_quadtree.***
@@ -39,11 +35,6 @@ var TerranTile = function()
 	this.rightUp_position;
 	this.leftUp_position;
 	this.visibilityType;
-
-	//this.longitudeMin; // delete this.***
-	//this.longitudeMax; // delete this.***
-	//this.latitudeMin; // delete this.***
-	//this.latitudeMax; // delete this.***
 
 	this.subTiles_array = [];
 	this.terranIndexFile_readed = false;
@@ -547,7 +538,7 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 	boundingSphere_Aux.center.x = this.position.x;
 	boundingSphere_Aux.center.y = this.position.y;
 	boundingSphere_Aux.center.z = this.position.z;
-	this.visibilityType = frustumVolume.computeVisibility(boundingSphere_Aux);
+	this.visibilityType = frustumVolume.computeVisibility(boundingSphere_Aux); // old. change for intersectionSphere.
 	/*
 	boundingSphere_Aux.center = this.leftDown_position;
 	if(frustumVolume.computeVisibility(boundingSphere_Aux) !== Cesium.Intersect.OUTSIDE)
