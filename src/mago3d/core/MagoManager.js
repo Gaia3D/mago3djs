@@ -5278,15 +5278,6 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 	roll = geoLocationData.roll;
 	
 	var dividedName = neoBuilding.buildingId.split("_");
-	showLocationAndRotationAPI(	dividedName[0],
-		dividedName[1],
-		null,
-		geoLocationData.geographicCoord.latitude,
-		geoLocationData.geographicCoord.longitude,
-		geoLocationData.geographicCoord.altitude,
-		geoLocationData.heading,
-		geoLocationData.pitch,
-		geoLocationData.roll);
 };
 
 /**
@@ -5662,11 +5653,11 @@ MagoManager.prototype.callAPI = function(api)
 		// object info 표시
 		this.magoPolicy.setObjectInfoViewEnable(api.getObjectInfoViewEnable());
 	}
-	else if (apiName === "changeListIssueViewMode") 
+	else if (apiName === "changeNearGeoIssueListViewMode") 
 	{
 		// issue list 표시
-		this.magoPolicy.setIssueListEnable(api.getIssueListEnable());
-		if (!api.getIssueListEnable()) 
+		this.magoPolicy.setNearGeoIssueListEnable(api.getNearGeoIssueListEnable());
+		if (!api.getNearGeoIssueListEnable()) 
 		{
 			// clear objMarkerManager objectmakersarrays 사이즈를 0 으로 하면... .됨
 			this.objMarkerManager.objectMarkerArray = [];

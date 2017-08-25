@@ -71,7 +71,7 @@ function API(apiName)
 	// object 정보 표시
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
-	this.issueListEnable = false;
+	this.nearGeoIssueListEnable = false;
 	//
 	this.insertIssueState = 0;
 };
@@ -294,13 +294,13 @@ API.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable)
 {
 	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-API.prototype.getIssueListEnable = function() 
+API.prototype.getNearGeoIssueListEnable = function() 
 {
-	return this.issueListEnable;
+	return this.nearGeoIssueListEnable;
 };
-API.prototype.setIssueListEnable = function(issueListEnable) 
+API.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
 {
-	this.issueListEnable = issueListEnable;
+	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
 };
 
 API.prototype.getInsertIssueState = function() 
