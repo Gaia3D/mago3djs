@@ -148,6 +148,7 @@ var NeoReferencesMotherAndIndices = function()
 
 	this.fileLoadState = 0;
 	this.dataArraybuffer;
+	this.succesfullyGpuDataBinded;
 
 	this.exterior_ocCullOctree; // octree that contains the visible indices.
 	this.interior_ocCullOctree; // octree that contains the visible indices.
@@ -289,6 +290,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	var vboMemManager = magoManager.vboMemoryManager;
 	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
 	var colByteSize, tCoordByteSize;
+	this.succesfullyGpuDataBinded = true;
 
 	for (var i = 0; i < neoRefsCount; i++) 
 	{
@@ -303,6 +305,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		{
 			// pass this neoReference because exist in the motherNeoReferencesArray.***
 			neoRef = motherNeoReferencesArray[neoRef._id];
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
 			this.neoRefsIndices.push(neoRef._id);
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
@@ -431,6 +436,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		{
 
 			motherNeoReferencesArray[neoRef._id] = neoRef;
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
 			this.neoRefsIndices.push(neoRef._id);
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
@@ -541,6 +549,12 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
 						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
 					}
 					
 					if (has_texCoords)
@@ -567,8 +581,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
 						
-						// test.
-						vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager);
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
 					}
 				}
 			}
@@ -648,6 +665,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return this.succesfullyGpuDataBinded;
 };
 
 
