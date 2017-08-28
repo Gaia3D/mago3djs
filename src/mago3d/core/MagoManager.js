@@ -2718,6 +2718,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
 					blocksList.dataArraybuffer = undefined;
 					refListsParsingCount += 1;
+					
 				}
 				continue;
 			}
@@ -2884,7 +2885,7 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 		}
 		
 		// finally check if there are legoSimpleBuildingTexture.***
-		if (lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].tcoordVboDataArray)
+		if (lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
 		{
 			if (neoBuilding.simpleBuilding3x3Texture === undefined)
 			{
@@ -4679,7 +4680,9 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
 				neoBuilding.metaData.bbox = buildingSeed.bBox;
-				neoBuilding.bbox = buildingSeed.bBox;
+				if (neoBuilding.bbox == undefined)
+				{ neoBuilding.bbox = new BoundingBox(); }
+				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
 				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
