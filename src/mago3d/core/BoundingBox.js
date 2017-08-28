@@ -46,13 +46,13 @@ BoundingBox.prototype.init = function(point)
  */
 BoundingBox.prototype.deleteObjects = function() 
 {
-	delete this.minX;
-	delete this.minY;
-	delete this.minZ;
+	this.minX = undefined;
+	this.minY = undefined;
+	this.minZ = undefined;
 
-	delete this.maxX;
-	delete this.maxY;
-	delete this.maxZ;
+	this.maxX = undefined;
+	this.maxY = undefined;
+	this.maxZ = undefined;
 };
 
 /**

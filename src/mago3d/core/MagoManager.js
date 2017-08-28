@@ -58,7 +58,6 @@ var MagoManager = function()
 	
 	this.configInformation;
 
-	//this.ssaoFSQuad;// No use this.***
 	this.kernel = [ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,
 		0.1, 0.3, 0.85,
@@ -105,36 +104,17 @@ var MagoManager = function()
 	this.selectionColor = new SelectionColor();
 	this.vboMemoryManager = new VBOMemoryManager();
 
-	this.currentVisible_terranTiles_array = [];
-	this.currentVisibleBuildings_array = []; // delete this.***
-	this.currentVisibleBuildings_LOD0_array = []; // delete this.***
-	this.currentVisibleBuildingsPost_array = [];
-
 	this.fileRequestControler = new FileRequestControler();
 	this.visibleObjControlerBuildings = new VisibleObjectsController();
 	this.visibleObjControlerOctrees = new VisibleObjectsController(); // delete this.***
 	this.visibleObjControlerOctreesAux = new VisibleObjectsController(); // delete this.***
 	
-	this.currentVisibleNeoBuildings_array = []; // delete this.***
-	this.currentVisibleClouds_array = [];
-	this.detailed_building; // old.***
-	this.detailed_neoBuilding; // old.***
+	this.currentVisibleNeoBuildings_array = []; 
 	this.boundingSphere_Aux; 
 	this.radiusAprox_aux;
 
-	this.currentRenderables_neoRefLists_array = []; // dont use this.***
-
-	this.filteredVisibleTiles_array = [];
-	this.detailedVisibleTiles_array = [];
-	this.LOD0VisibleTiles_array = [];
-
 	this.lastCamPos = new Point3D();
 	this.squareDistUmbral = 22.0;
-
-	this.compRefList_array;
-	this.compRefList_array_background;
-	this.intCRefList_array = [];
-	this.intNeoRefList_array = [];
 
 	this.lowestOctreeArray = [];
 
@@ -145,11 +125,6 @@ var MagoManager = function()
 	this.isCameraInsideNeoBuilding = false;
 	this.renderingFase = 0;
 
-	this.min_squaredDist_to_see_detailed = 100000; // 200m.***
-	this.min_squaredDist_to_see_LOD0 = 100000; // Original.***
-	//this.min_squaredDist_to_see_LOD0 = 1000000; // 600m.***
-	this.min_squaredDist_to_see = 15000000;
-	this.min_squaredDist_to_see_smallBuildings = 700000;
 	this.renders_counter = 0;
 	this.render_time = 0;
 	this.bPicking = false;
@@ -409,8 +384,6 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		}
 		this.sceneState.gl = scene.context._gl;
 		this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum, frustumIdx, numFrustums);
-		//this.renderNeoBuildings(scene, isLastFrustum); // original.****
-		//this.renderTerranTileServiceFormatPostFxShader(scene, isLastFrustum);
 	}
 	/*
 	if(isLastFrustum)
@@ -1265,14 +1238,12 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	this.upDateSceneStateMatrices(this.sceneState);
 
 	var gl = this.sceneState.gl;
-	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 	if (this.textureAux_1x1 === undefined) 
 	{
 		this.textureAux_1x1 = gl.createTexture();
 		// Test wait for texture to load.********************************************
 		gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-		//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
@@ -1329,11 +1300,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				//this.doFrustumCullingNeoBuildings(this.myCameraSCX.frustum, cameraPosition); // old.
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
 				this.prepareNeoBuildingsAsimetricVersion(gl);
-				//this.sceneState.bMust = false;
 			}
 		}
 	}
-
+	
 	var currentShader = undefined;
 
 	// prepare data if camera is no moving.***
@@ -1350,6 +1320,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0);
 			this.prepareVisibleOctreesAsimetricVersionLOD2(gl, scene, neoBuilding);
 		}
+		
 		this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees); 
 		
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
@@ -1373,6 +1344,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
 			}
 		}
+		
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -2389,20 +2361,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	neoBuilding.currentRenderablesNeoRefLists.length = 0;
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-	/*
-	if (buildingGeoLocation === undefined && neoBuilding.metaData !== undefined)
-	{
-		buildingGeoLocation = neoBuilding.geoLocDataManager.newGeoLocationData("defaultLoc");
-		var longitude = neoBuilding.metaData.geographicCoord.longitude;
-		var latitude = neoBuilding.metaData.geographicCoord.latitude;
-		var altitude = neoBuilding.metaData.geographicCoord.altitude;
-		var heading = neoBuilding.metaData.heading;
-		var pitch = neoBuilding.metaData.pitch;
-		var roll = neoBuilding.metaData.roll;
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude-500.0, heading, pitch, roll, buildingGeoLocation, this);
-		return;
-	}
-	*/
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
 	{
@@ -2420,15 +2378,17 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		var squaredDistLod1 = 12000;
 		var squaredDistLod2 = 500000*1000;
 		
+		squaredDistLod0 = 500;
+		squaredDistLod1 = 15000;
+		squaredDistLod2 = 500000*1000;
+		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
 			squaredDistLod0 = 120000;
 			squaredDistLod1 = 285000;
 			squaredDistLod2 = 500000*1000;
 		}
-		//squaredDistLod0 = 500;
-		//squaredDistLod1 = 2000;
-		//squaredDistLod2 = 500000*1000;
+		
 			
 		var frustumVolume;
 		var find = false;
@@ -2464,9 +2424,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			
 			
 			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
-			var lastLOD0LowestOctreesCount = visibleObjControlerOctrees.currentVisibles0.length;
-			var lastLOD1LowestOctreesCount = visibleObjControlerOctrees.currentVisibles1.length;	
-			
 			neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
 			neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
 			neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
@@ -2479,7 +2436,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 		else if (this.configInformation.geo_view_library === Constant.CESIUM)
 		{
-			
 			if (this.myCameraSC === undefined) 
 			{ this.myCameraSC = new Cesium.Camera(scene); }
 			
@@ -2504,10 +2460,15 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 				this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
 			}
 		
-			neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
+			//neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
+			//neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
+			//neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
+			//neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
+			
+			neoBuilding.currentVisibleOctreesControler.currentVisibles0 = [];
+			neoBuilding.currentVisibleOctreesControler.currentVisibles1 = [];
+			neoBuilding.currentVisibleOctreesControler.currentVisibles2 = [];
+			neoBuilding.currentVisibleOctreesControler.currentVisibles3 = [];
 	
 			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 				this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
@@ -2516,6 +2477,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 		if (!find) 
 		{
+			this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
 			return;
 		}
 	}
@@ -4344,6 +4306,7 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 		this.objectSelected = undefined;
 	}
 
+	neoBuilding.metaData.deleteObjects();
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
 
 	var blocksCount = neoBuilding.motherBlocksArray.length;
@@ -4372,18 +4335,18 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	{ neoBuilding.octree.deleteGlObjects(gl, vboMemoryManager); }
 	neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
 	neoBuilding.octreeLoadedAllFiles = false;
-
+	
 	//neoBuilding.buildingFileName = "";
 
 	neoBuilding.allFilesLoaded = false;
 	neoBuilding.isReadyToRender = false;
 
 	// The simple building.***********************************************
-	neoBuilding.neoSimpleBuilding = undefined; // this is a simpleBuilding for Buildings with texture.***
+	//neoBuilding.neoSimpleBuilding = undefined; // this is a simpleBuilding for Buildings with texture.***
 
 	// The lodBuildings.***
-	neoBuilding.lod2Building = undefined;
-	neoBuilding.lod3Building = undefined;
+	//neoBuilding.lod2Building = undefined;
+	//neoBuilding.lod3Building = undefined;
 
 };
 
@@ -4822,6 +4785,8 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
  */
 MagoManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
+	/*
+	// old.
 	var buildingCount = this.neoBuildingsList.neoBuildingsArray.length;
 	var find = false;
 	var i=0;
@@ -4846,7 +4811,8 @@ MagoManager.prototype.getNeoBuildingById = function(buildingType, buildingId)
 		}
 		i++;
 	}
-
+	*/
+	var resultNeoBuilding = this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
 	return resultNeoBuilding;
 };
 

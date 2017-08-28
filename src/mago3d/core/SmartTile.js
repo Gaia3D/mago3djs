@@ -47,6 +47,39 @@ SmartTile.prototype.newSubTile = function(parentTile)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
+{
+	var buildingCount = this.buildingsArray.length;
+	var find = false;
+	var i=0;
+	var resultNeoBuilding;
+	while (!find && i<buildingCount) 
+	{
+		if (buildingType)
+		{
+			if (this.buildingsArray[i].buildingId === buildingId && this.buildingsArray[i].buildingType === buildingType) 
+			{
+				find = true;
+				resultNeoBuilding = this.buildingsArray[i];
+			}
+		}
+		else 
+		{
+			if (this.buildingsArray[i].buildingId === buildingId) 
+			{
+				find = true;
+				resultNeoBuilding = this.buildingsArray[i];
+			}
+		}
+		i++;
+	}
+
+	return resultNeoBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
@@ -389,7 +422,22 @@ SmartTileManager.prototype.newSmartTile = function(smartTileName)
 	return smartTile;
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
+{
+	var resultNeoBuilding;
+	
+	var smartTilesCount = this.tilesArray.length;
+	while (resultNeoBuilding == undefined && i<smartTilesCount)
+	{
+		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId);
+		i++;
+	}
+	
+	return resultNeoBuilding;
+};
 
 
 
