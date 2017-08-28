@@ -258,13 +258,24 @@ var VBOMemoryManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// if "enableMemoryManagement" == false -> no management of the gpu memory.
-	this.enableMemoryManagement = false;
+	this.enableMemoryManagement = true;
 	
 	this.buffersKeyWorld = new VBOKeysWorld();
 	this.elementKeyWorld = new VBOKeysWorld();
 	
-	this.buffersKeyWorld.bytesLimit = 500000000;
-	this.elementKeyWorld.bytesLimit = 200000000;
+	this.buffersKeyWorld.bytesLimit = 800000000;
+	this.elementKeyWorld.bytesLimit = 300000000;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vboBufferCacheKey
+ */
+VBOMemoryManager.prototype.isGpuMemFull = function() 
+{
+	if (this.buffersKeyWorld.totalBytesUsed > this.buffersKeyWorld.bytesLimit || this.elementKeyWorld.totalBytesUsed > this.elementKeyWorld.bytesLimit)
+	{ return true; }
+	else { return false; }
 };
 
 /**

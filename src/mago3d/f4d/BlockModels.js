@@ -139,6 +139,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var vboMemManager = magoManager.vboMemoryManager;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
 	var gl = magoManager.sceneState.gl;
+	var succesfullyGpuDataBinded = true;
 
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
@@ -292,9 +293,12 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			var hola = 0;
 			
 			// test.
-			vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager);
-			vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager);
-			vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager);
+			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
 		}
 		
 		
@@ -302,6 +306,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		// Pendent to load the block's lego.***
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return succesfullyGpuDataBinded;
 };
 
 /**

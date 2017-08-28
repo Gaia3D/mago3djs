@@ -2641,6 +2641,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 	var lowestOctree;
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
+		if (this.vboMemoryManager.isGpuMemFull())
+		{ return; }
+		
 		if (refListsParsingCount > maxRefListParsingCount && this.fileRequestControler.isFullPlus()) 
 		{ return; }
 			
@@ -2664,7 +2667,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 		}
 
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === 0)
+		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 		{
 			if (this.fileRequestControler.isFullPlus())	{ return; }
 
@@ -2675,7 +2678,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree.neoReferencesMotherAndIndices, this);
-			
 			continue;
 		}
 
@@ -2687,9 +2689,16 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				// must parse the arraybuffer data.***
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				if (lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this))
+				{
+					lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				}
+				else 
+				{
+					//lowestOctree.neoReferencesMotherAndIndices.deleteObjects(gl, this.vboMemManager);
+					//lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.READY;
+				}
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				refListsParsingCount += 1;
 			}
 		}
@@ -2708,14 +2717,17 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
 				var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, blocksList, this);
-
 				continue;
 			}
 			else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				if (refListsParsingCount < maxRefListParsingCount) 
 				{
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					if (!blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this))
+					{
+						//blocksList.deleteGlObjects(gl, this.vboMemManager);
+						//blocksList.fileLoadState = CODE.fileLoadState.READY;
+					}
 					blocksList.dataArraybuffer = undefined;
 					refListsParsingCount += 1;
 					
@@ -2841,6 +2853,9 @@ MagoManager.prototype.prepareVisibleOctreesAsimetricVersionLOD2 = function(gl, s
 
 	for (var i=0, length = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length; i<length; i++) 
 	{
+		//if(this.vboMemoryManager.isGpuMemFull())
+		//	return;
+		
 		lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[i];
 		
 		if (lowestOctree.octree_number_name === undefined)

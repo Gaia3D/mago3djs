@@ -210,6 +210,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
 	// render_neoRef
+	if (neoReferencesMotherAndIndices.neoRefsIndices == undefined)
+	{ return; }
+	
 	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
 	if (neoRefsCount === 0) 
 	{ return; }
