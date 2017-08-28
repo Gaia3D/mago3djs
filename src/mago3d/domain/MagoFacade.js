@@ -178,56 +178,6 @@ function changeLocationAndRotationAPI(data_key, latitude, longitude, height, hea
 }
 
 /**
- * 블럭의 location and rotation 정보를 취득
- * TODO 기능 정의가 명확히 되지 않아 return 값을 현재의 계층 구조를 임시로 유지
- * 
- * @param  {Property} projectId 프로젝트 아이디
- * @param  {Property} blockId block id
- * @returns {Building} building
- */
-function getLocationAndRotationAPI(projectId, blockId) 
-{
-	var api = new API("getLocationAndRotation");
-	api.setProjectId(projectId);
-	api.setBlockId(blockId);
-	if (managerFactory !== null) 
-	{
-		var building = managerFactory.callAPI(api);
-		return building;
-	}
-}
-
-/**
- * block 이동된 후 location and rotation 알림
- * 
- * @param {Property} projectId 프로젝트 아이디
- * @param {Property} blockId block id
- * @param {Property} objectId object id
- * @param {Property} latitude 위도
- * @param {Property} longitude 경도
- * @param {Property} elevation 높이
- * @param {Property} heading 좌, 우
- * @param {Property} pitch 위, 아래
- * @param {Property} roll 좌, 우 기울기
- */
-function showLocationAndRotationAPI(projectId, blockId, objectId, latitude, longitude, elevation, heading, pitch, roll) 
-{
-	$("#projectId").val(projectId);
-	$("#moveBlockId").val(blockId);
-	if (objectId !== undefined && objectId !== null) { $("#moveObjectId").val(objectId); }
-	$("#latitude").val(latitude);
-	$("#longitude").val(longitude);
-	if (elevation === undefined) { elevation = 0; }
-	$("#elevation").val(elevation);
-	if (heading === undefined) { heading = 0; }
-	$("#heading").val(heading);
-	if (pitch === undefined) { pitch = 0; }
-	$("#pitch").val(pitch);
-	if (roll === undefined) { roll = 0; }
-	$("#roll").val(roll);
-}
-
-/**
  * 마우스 클릭 객체 이동 대상 변경
  * 
  * @param {Property} mouseMoveMode 0 = All, 1 = object, 2 = None
@@ -273,14 +223,14 @@ function changeObjectInfoViewModeAPI(flag)
 }
 
 /**
- * 이슈 목록 활성화 유무
+ * 현재 위치 근처 issue list. false인 경우 clear
  * 
  * @param {Property} flag true = 활성화, false = 비활성화
  */
-function changeListIssueViewModeAPI(flag) 
+function changeNearGeoIssueListViewModeAPI(flag) 
 {
-	var api = new API("changeListIssueViewMode");
-	api.setIssueListEnable(flag);
+	var api = new API("changeNearGeoIssueListViewMode");
+	api.setNearGeoIssueListEnable(flag);
 	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
@@ -315,6 +265,7 @@ function drawInsertIssueImageAPI(drawType, issue_id, issue_type, data_key, latit
 }
 
 /**
+ * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
  * issue 등록 geo 정보 관련 상태 변경
  * 
  * @param {Property} insertIssueState 이슈 등록 좌표 상태

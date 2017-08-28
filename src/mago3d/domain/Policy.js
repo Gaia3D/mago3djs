@@ -38,7 +38,7 @@ var Policy = function()
 	// object 정보 표시
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
-	this.issueListEnable = false;
+	this.nearGeoIssueListEnable = false;
 	
 	// 이미지 경로
 	this.imagePath = "";
@@ -153,13 +153,13 @@ Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable)
 {
 	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-Policy.prototype.getIssueListEnable = function() 
+Policy.prototype.getNearGeoIssueListEnable = function() 
 {
-	return this.issueListEnable;
+	return this.nearGeoIssueListEnable;
 };
-Policy.prototype.setIssueListEnable = function(issueListEnable) 
+Policy.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
 {
-	this.issueListEnable = issueListEnable;
+	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
 };
 
 Policy.prototype.getImagePath = function() 
