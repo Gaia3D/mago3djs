@@ -177,11 +177,11 @@ var NeoBuilding = function()
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
-	this.neoSimpleBuilding; // no used. this is a simpleBuilding for Buildings with texture.***
+	//this.neoSimpleBuilding; // no used. this is a simpleBuilding for Buildings with texture.***
 
 	// The lodBuildings.***
-	this.lod2Building;
-	this.lod3Building;
+	//this.lod2Building;
+	//this.lod3Building;
 
 	// SCRATCH.*********************************
 	this.point3dScratch = new Point3D();

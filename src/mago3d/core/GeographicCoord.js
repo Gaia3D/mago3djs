@@ -22,6 +22,19 @@ var GeographicCoord = function()
  * @param latitude 위도
  * @param altitude 고도
  */
+GeographicCoord.prototype.deleteObjects = function() 
+{
+	this.longitude = undefined;
+	this.latitude = undefined;
+	this.altitude = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param longitude 경도
+ * @param latitude 위도
+ * @param altitude 고도
+ */
 GeographicCoord.prototype.copyFrom = function(geographicCoord) 
 {
 	this.longitude = geographicCoord.longitude;

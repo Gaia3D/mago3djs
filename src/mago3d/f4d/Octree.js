@@ -66,7 +66,11 @@ Octree.prototype.deleteGlObjects = function(gl, vboMemManager)
 		this.lego.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
 		this.lego.vbo_vicks_container = undefined;
 	}
+	
+	this.legoDataArrayBuffer = undefined;
+	this.lego = undefined;
 
+	this.centerPos.deleteObjects();
 	this.centerPos = undefined;
 	this.half_dx = undefined; // half width.***
 	this.half_dy = undefined; // half length.***
@@ -85,10 +89,6 @@ Octree.prototype.deleteGlObjects = function(gl, vboMemManager)
 	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	this.neoReferencesMotherAndIndices = undefined;
-
-	// now, for legoStructure.***
-	this.legoDataArrayBuffer = undefined;
-	this.lego = undefined;
 
 	// delete the blocksList.***
 	if (this.neoRefsList_Array !== undefined) 
