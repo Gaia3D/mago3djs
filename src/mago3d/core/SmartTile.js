@@ -428,7 +428,7 @@ SmartTileManager.prototype.newSmartTile = function(smartTileName)
 SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
 	var resultNeoBuilding;
-	
+	var i = 0;
 	var smartTilesCount = this.tilesArray.length;
 	while (resultNeoBuilding == undefined && i<smartTilesCount)
 	{
