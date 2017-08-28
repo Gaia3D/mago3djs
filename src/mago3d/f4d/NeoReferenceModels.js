@@ -566,10 +566,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
 						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
+						
+						// test.
+						vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager);
 					}
 				}
 			}
-			
+
 			// 4) short texcoords. OLD. Change this for Materials.***
 			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
 			if (textures_count > 0) 

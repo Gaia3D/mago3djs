@@ -45,7 +45,8 @@ MetaData.prototype.deleteObjects = function()
 {
 	this.guid = undefined; // must be undefined initially.***
 	this.version = undefined;
-	this.geographicCoord.deleteObjects();
+	if (this.geographicCoord)
+	{ this.geographicCoord.deleteObjects(); }
 	this.geographicCoord = undefined; // longitude, latitude, altitude.***
 
 	this.heading = undefined;

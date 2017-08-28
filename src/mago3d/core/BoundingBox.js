@@ -60,6 +60,22 @@ BoundingBox.prototype.deleteObjects = function()
  * 
  * @param {Number} distance
  */
+BoundingBox.prototype.copyFrom = function(bbox) 
+{
+	this.minX = bbox.minX;
+	this.minY = bbox.minY;
+	this.minZ = bbox.minZ;
+
+	this.maxX = bbox.maxX;
+	this.maxY = bbox.maxY;
+	this.maxZ = bbox.maxZ;
+};
+
+/**
+ * 영역박스 확대
+ * 
+ * @param {Number} distance
+ */
 BoundingBox.prototype.expand = function(distance) 
 {
 	distance = distance || 0.0;

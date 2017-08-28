@@ -121,4 +121,34 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	}
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	
+	vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager);
+	vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager);
+	vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager);
+
+	// 4) Texcoord.*********************************************
+	if (hasTexCoords)
+	{
+		vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager);
+	}	
+	
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
