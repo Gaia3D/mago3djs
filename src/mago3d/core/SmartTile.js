@@ -50,6 +50,9 @@ SmartTile.prototype.newSubTile = function(parentTile)
  */
 SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
+	if (this.buildingsArray == undefined)
+	{ return undefined; }
+	
 	var buildingCount = this.buildingsArray.length;
 	var find = false;
 	var i=0;
