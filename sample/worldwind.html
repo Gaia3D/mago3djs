@@ -7,9 +7,7 @@
 	<meta http-equiv="Expires" content="-1"/>
 	<meta http-equiv="Pragma" content="no-cache"/> -->
 	<title>worldwin</title>
-	<link rel="stylesheet" href="/sample/style.css" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans"> 
-	<link rel="stylesheet" href="/sample/homepage-demo.css?version=1" />
+	<link rel="stylesheet" href="/sample/homepage-demo.css?version=7" />
 	
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
@@ -19,267 +17,388 @@
 </head>
 
 <body>
-	<div class="trigger" >
-		<button type="button"></button>
-		<ul>
-			<li><a href="/homepage/index.do">Home</a></li>
-			<li><a href="/homepage/about.do">Mago3D</a></li>	
-			<li><a href="/homepage/download.do">Download</a></li>
-			<li><a href="/homepage/tutorials.do">Tutorials</a></li>
-		</ul>
+<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+
+<ul class="nav">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;"/>
+	</li>
+	<li id="myIssueMenu" class="issue" data-tooltip-text="전체 Issue 리스트 중에서 최신 Issue 10개를 시간 순으로 정렬하여 보여 줍니다.">Issue<span id="issueListCount">10</span></li>
+	<li id="searchMenu" class="search" data-tooltip-text="Issue, Object, 공간 정보 등을 활용한 검색 기능을 제공 합니다.">검색</li>
+	<li id="apiMenu" class="api" data-tooltip-text="mago3D 여러 기능을 Control 할 수 있는 다양한 API들을 제공 합니다.">API</li>	
+	<li id="insertIssueMenu" class="regist" data-tooltip-text="Object에 대한 Issue 등록 기능을 제공 합니다.">등록</li>
+	<li id="configMenu" class="config" data-tooltip-text="Rendering 관련 각종 설정이 가능 합니다.">설정</li>	
+</ul>
+
+<div id="menuContent" class="navContents">
+	<div class="alignRight">
+		<button type="button" id="menuContentClose" class="navClose">닫기</button>
 	</div>
-	<div class="ctrl">
-		<div>
-			<button id="issueEnable">Issue 등록</button>
-			<button id="objectInfoEnable">Object 정보</button>	
-			<button id="issuesEnable">Issues 표시</button>
-			<input type="hidden" id="now_latitude" name="now_latitude" value="37.58070994202406" />
-			<input type="hidden" id="now_longitude" name="now_longitude" value="126.88996581264895"  />
+	
+	<ul id="homeMenuContent" class="menuList">
+		<li><a href="/homepage/index.do">Home</a></li>
+		<li><a href="/homepage/about.do">mago3D</a></li>
+		<li>Demo
+			<ul>
+				<li>Cesium</li>
+				<li><a href="/homepage/demo.do?viewLibrary=worldwind">World Wind</a></li>
+			</ul>
+		</li>
+		<li><a href="/homepage/download.do">Download</a></li>
+		<li> <a href="/homepage/docs.do">Documentation</a></li>
+		<li> <a href="/homepage/faq.do">FAQ</a></li>
+	</ul>
+	
+	<ul id="myIssueMenuContent" class="issueList">
+		<li style="margin-bottom: 8px; font-size: 1em; font-weight: normal; color: #2955a6;">
+			최신 Issue 10개 표시
+		</li>
+		<li>
+			<button type="button" title="바로가기" onclick="flyTo('133', 'ISSUE_TYPE_MODIFY', '126.60660443089857', '37.582788710510506', '30.075205419163662', '2')">바로가기</button>
+			<div class="info">
+				<p class="title">
+					<span>3DS 통합 가시화</span>
+					aaaaaaa
+				</p>
+				<ul class="tag">
+					<li><span class="i3"></span>수정</li>
+					<li><span class="t4"></span>낮음</li>
+					<li class="date">2017-08-25 15:02:44</li>
+				</ul>
+			</div>
+		</li>
+		<li>
+			<button type="button" title="바로가기" onclick="flyTo('129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2')">바로가기</button>
+			<div class="info">
+				<p class="title">
+					<span>3DS 통합 가시화</span>
+					test
+				</p>
+				<ul class="tag">
+					<li><span class="i1"></span>버그</li>
+					<li><span class="t1"></span>매우중요</li>
+					<li class="date">2017-08-25 14:27:42</li>
+				</ul>
+			</div>
+		</li>
+		<li>
+			<button type="button" title="바로가기" onclick="flyTo('128', 'ISSUE_TYPE_BUGGER', '126.60860404195267', '37.58308164273416', '39.60458358315561', '2')">바로가기</button>
+			<div class="info">
+				<p class="title">
+					<span>IFC(MEP)</span>
+					test8
+				</p>
+				<ul class="tag">
+					<li><span class="i1"></span>버그</li>
+					<li><span class="t4"></span>낮음</li>
+					<li class="date">2017-08-21 14:49:50</li>
+				</ul>
+			</div>
+		</li>
+		<li>
+			<button type="button" title="바로가기" onclick="flyTo('127', 'ISSUE_TYPE_ETC', '126.60828025652438', '37.58302423952313', '39.61857390681989', '2')">바로가기</button>
+			<div class="info">
+				<p class="title">
+					<span>Sea Port</span>
+					test7
+				</p>
+				<ul class="tag">
+					<li><span class="i4"></span>기타</li>
+					<li><span class="t3"></span>보통</li>
+					<li class="date">2017-08-21 14:43:54</li>
+				</ul>
+			</div>
+		</li>
+	</ul>
+		
+	<form id="searchForm" action="/homepage/demo.do" method="post" onsubmit="return false;">
+	<div id="searchMenuContent" class="searchWrap">
+		<table>
+			<tr style="height: 35px;">
+				<td style="width: 80px;"><label for="data_group_id">데이터 그룹</label></td>
+				<td><select id="data_group_id" name="data_group_id" class="select">
+					<option value=""> 전체 </option>
+
+					<option value="1">3DS 통합 가시화</option>
+
+					<option value="2">Collada 통합 가시화</option>
+
+					<option value="3">IFC</option>
+
+					<option value="4">IFC(MEP)</option>
+
+					<option value="5">Sea Port</option>
+
+				</select></td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="search_word">분류</label></td>
+				<td>
+					<select id="search_word" name="search_word" class="select">
+						<option value="data_name">Data 명</option>
+						<option value="title">Issue 명</option>
+					</select>
+					<select id="search_option" name="search_option" class="select">
+						<option value="1">포함</option>
+						<option value="0">일치</option>
+					</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+				<label for="search_value">검색어</label></td>
+				<td><input type="text" id="search_value" name="search_value" size="31" /></td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="start_date">날짜</label></td>
+				<td><input type="text" class="s date" id="start_date" name="start_date" size="12" />
+				<span class="delimeter tilde">~</span>
+				<input type="text" class="s date" id="end_date" name="end_date" size="12" /></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td><label for="order_word">표시순서</label></td>
+				<td><select id="order_word" name="order_word" class="select">
+					<option value=""> 기본 </option>
+			       	<option value="register_date"> 등록일 </option>
+				</select>
+				<select id="order_value" name="order_value" class="select">
+					<option value=""> 기본 </option>
+				   	<option value="ASC"> 오름차순 </option>
+					<option value="DESC"> 내림차순 </option>
+				</select>
+				<select id="list_counter" name="list_counter" class="select">
+					<option value="5"> 5 개씩 </option>
+				 	<option value="10"> 10 개씩 </option>
+					<option value="50"> 50 개씩 </option>
+				</select>
+				</td>
+			</tr>
+		</table>
+		<div class="btns">
+			<button type="button" id="searchData" class="full">검색</button>
 		</div>
-		<ul class="tab">
-			<li id="issueMoreImage">My Issue</li>
-			<li id="apiMoreImage">API목록</li>
-		</ul>
-		<ul id="recentIssueListContent" class="issue" style="display: none">
-			<li>
-				<p class="title">
-					2</p>
-				<p class="info">
-					<span class="tag i2">개선</span>
-					<span class="tag t2">보통</span>
-					<span>[3DS]</span>
-					<button type="button" title="바로가기" onclick="flyTo('92', 'IMPROVE', '126.89222787907022', '37.579201027091806', '59.942467783873596', '2')">바로가기</button>
-					<span class="date">2017-07-14 16:25:40</span>
-				</p>
-			</li>
-			<li>
-				<p class="title">
-					1</p>
-				<p class="info">
-					<span class="tag i1">버그</span>
-					<span class="tag t1">긴급</span>
-					<span>[3DS]</span>
-					<button type="button" title="바로가기" onclick="flyTo('91', 'BUGGER', '126.89223584621833', '37.57919616044298', '51.50571434478714', '2')">바로가기</button>
-					<span class="date">2017-07-14 16:03:45</span>
-				</p>
-			</li>
-			<li>
-				<p class="title">
-					1</p>
-				<p class="info">
-					<span class="tag i1">버그</span>
-					<span class="tag t1">긴급</span>
-					<span>[3DS]</span>
-					<button type="button" title="바로가기" onclick="flyTo('90', 'BUGGER', '126.88985686761893', '37.581318740521496', '49.24999164742479', '2')">바로가기</button>
-					<span class="date">2017-07-14 15:31:10</span>
-				</p>
-			</li>
-			<li>
-				<p class="title">
-					a</p>
-				<p class="info">
-					<span class="tag i1">버그</span>
-					<span class="tag t1">긴급</span>
-					<span>[IFC]</span>
-					<button type="button" title="바로가기" onclick="flyTo('89', 'BUGGER', '126.92742586024636', '37.52079763302676', '66.06677612119135', '2')">바로가기</button>
-					<span class="date">2017-07-14 15:21:00</span>
-				</p>
-			</li>
-			<li>
-				<p class="title">
-					555</p>
-				<p class="info">
-					<span class="tag i1">버그</span>
-					<span class="tag t1">긴급</span>
-					<span>[3DS]</span>
-					<button type="button" title="바로가기" onclick="flyTo('88', 'BUGGER', '126.8890364749291', '37.57994153741642', '52.95577447262039', '2')">바로가기</button>
-					<span class="date">2017-07-14 11:19:44</span>
-				</p>
-			</li>
-		</ul>
-
-		<div id="apiListContent" style="display: none">
-			<div style="height: 20px;"></div>
-			<div>
-				<span style="padding-left: 10px; padding-right: 100px;">Data Key</span>
-				<input type="text" id="search_data_key" name="search_data_key" size="15" />
-				<button type="button" id="searchData" style="width: 50px; background: #727272; font-size: 1.2rem;">검색</button>
-			</div>
-			<div style="margin-top: 15px;">
-				<span style="padding-left: 10px; padding-right: 70px;">Bounding Box</span>
-				<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
-				<label for="showBoundingBox"> 표시 </label>
-				<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
-				<label for="hideBoundingBox"> 비표시 </label>
-			</div>
-			<div style="margin-top: 15px;">
-				<span style="padding-left: 10px; padding-right: 16px;">Selecting And Moving</span>
-				<input type="radio" id="mouseNoneMove" name="mouseMoveMode" value="2" onclick="changeMouseMove('2');"/>
-				<label for="mouseNoneMove"> None </label>
-				<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
-				<label for="mouseAllMove"> ALL </label>
-				<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
-				<label for="mouseObjectMove"> Object </label>
-			</div>
-			<div style="margin-top: 15px;">
-				<div style="padding-left: 10px;">
-					Location And Rotation
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 102px; padding-right: 12px;">
-						<label for="move_data_key">Data Key</label>
-						<input type="text" id="move_data_key" name="move_data_key" size="15" />
-					</span>
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 110px; padding-right: 12px;">
-						<label for="move_latitude">위도 </label>
-						<input type="text" id="move_latitude" name="move_latitude" size="15"/> 
-					</span> 
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 110px; padding-right: 12px;">
-						<label for="move_longitude">경도 </label>
-						<input type="text" id="move_longitude" name="move_longitude" size="15"/>
-					</span> 
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 110px; padding-right: 12px;">
-						<label for="move_height">높이 </label>
-						<input type="text" id="move_height" name="move_height" size="15" />
-					</span> 
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 97px; padding-right: 12px;">
-						<label for="move_heading">HEADING </label>
-						<input type="text" id="move_heading" name="move_heading" size="15" />
-					</span> 
-				</div>
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 110px; padding-right: 12px;">
-						<label for="move_pitch">PITCH </label>
-						<input type="text" id="move_pitch" name="move_pitch" size="15" />
-					</span>
-				</div> 
-				<div style="margin-top: 5px;">
-					<span style="padding-left: 110px; padding-right: 12px;">
-						<label for="move_roll">ROLL </label>
-						<input type="text" id="move_roll" name="move_roll" size="15" /> 
-						<button type="button" id="changeLocationAndRotationAPI">변환</button>
-					</span>
-				</div>
-			</div>
-			<div style="height: 20px;"></div>
-		</div>
-	</div>
-
-	<div class="shortcut" style="top:60px;">
-		<p>바로가기</p>
-		<ul>
-			<li onclick="flyTo(null, null, '126.60856869381428', '37.58156267183209', '550', '3')">3DS 통합 가시화</li>
-			<li onclick="flyTo(null, null, '126.599996', '37.438778', '650', '3')">Sea Port</li>
-			<li onclick="flyTo(null, null, '126.738134', '37.663559', '150', '3')">IFC 통합 가시화</li>
-			<li onclick="flyTo(null, null, '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
-			<li onclick="flyTo(null, null, '-58.787', '-62.224', '200', '5')">KSJ 통합 가시화</li>
-		</ul>
-	</div>	
-
-	<div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
-		<canvas id="magoContainer" style="width:100%; height:100%">
-	        Your browser does not support HTML5 Canvas.
-	    </canvas>
-	</div>
-
-	<form id="issue" action="/homepage/demo.do" method="post" onsubmit="return false;">
-	<div id="inputIssueLayer" style="display: none; top:40%; left:45%; width:450px; margin:-250px 0 0 -150px; " class="layer">
-	    <div class="layerHeader">
-	        <h2>Issue Register</h2>
-	        <div>
-	            <button id="inputIssueClose" type="button" title="닫기">닫기</button>
-	        </div>
-	    </div>
-	    <div class="layerContents">
-	        <table>
-	        	<tr>
-	        		<th style="width: 120px;">
-	        			<label for="data_group_id">데이터 그룹</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
-	        		</th>
-	        		<td>
-	        			<select id="data_group_id" name="data_group_id" class="select"><option value="3">3DS</option>
-						<option value="9">IFC</option>
-						<option value="10">COLLADA</option>
-						</select>
-					</td>
-	        	</tr>
-	        	<tr>
-	        		<th>
-	        			<label for="issue_type">Issue Type</label></th>
-	        		<td>
-	        			<select id="issue_type" name="issue_type" class="select"><option value="BUGGER">버그</option>
-							<option value="IMPROVE">개선</option>
-							<option value="NEW">신규</option>
-							<option value="ETC">기타</option>
-							</select>
-					</td>
-	        	</tr>
-	        	<tr>
-	        		<th>
-	        			<label for="data_key">Data Key</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
-	        		</th>
-	        		<td>
-	        			<input id="data_key" name="data_key" class="ml" type="text" value=""/>
-	        			<input id="object_key" name="object_key" type="hidden" value=""/>
-	        			<input id="latitude" name="latitude" type="hidden" value=""/>
-	        			<input id="longitude" name="longitude" type="hidden" value=""/>
-	        			<input id="height" name="height" type="hidden" value=""/>
-	        		</td>
-	        	</tr>
-	        	<tr>
-	        		<th>
-	        			<label for="title">제목</label><span class="icon-glyph glyph-emark-dot color-warning"></span>
-	        		</th>
-	        		<td><input id="title" name="title" class="ml" type="text" value=""/></td>
-	        	</tr>
-	        	<tr>
-	        		<th><label for="priority">Issue Priority</label></th>
-	        		<td>
-	        			<select id="priority" name="priority" class="select"><option value="CRITICAL">긴급</option>
-							<option value="MUST">보통</option>
-							<option value="MINOR">낮음</option>
-							<option value="TRIVIAL">매우낮음</option>
-							</select>
-					</td>
-	        	</tr>
-	        	<tr>
-	        		<th><label for="due_date">마감일</label></th>
-	        		<td><input id="start_date" name="start_date" type="hidden" value=""/><input type="text" id="start_day" name="start_day" placeholder="날짜" size="7" maxlength="4" />
-						<input type="text" id="start_hour" name="start_hour" placeholder="시간" size="3" maxlength="2" />
-						<span class="delimeter">:</span>
-						<input type="text" id="start_minute" name="start_minute" placeholder="분" size="3" maxlength="2" />
-	        		</td>
-	        	</tr>
-	        	<tr>
-	        		<th><label for="assignee">Assignee</label></th>
-	        		<td><input id="assignee" name="assignee" class="m" placeholder="대리자" type="text" value=""/></td>
-	        	</tr>
-	        	<tr>
-	        		<th><label for="reporter">reporter</label></th>
-	        		<td><input id="reporter" name="reporter" class="m" placeholder="보고 해야 하는 사람" type="text" value=""/></td>
-	        	</tr>
-	        	<tr style="height: 50px;">
-	        		<th><label for="contents">내용</label></th>
-	        		<td>
-	        			<textarea id="contents" name="contents"></textarea></td>
-				</tr>
-	        </table>
-	        
-	      	<div class="btns">
-	 			<button id="issueInsertButton">Save</button>
-			</div>
-	    </div>
+		<ul id="searchList" class="searchList"></ul>
 	</div>
 	</form>
+	
+	<div id="apiMenuContent" class="apiWrap">
+		<div>
+			<h3>Location and Rotation</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="move_data_key">Data Key</label>
+					<input type="text" id="move_data_key" name="move_data_key" size="15" />
+				</li>
+				<li>
+					<label for="move_latitude">위도 </label>
+					<input type="text" id="move_latitude" name="move_latitude" size="15"/>
+				</li>
+				<li>
+					<label for="move_longitude">경도 </label>
+					<input type="text" id="move_longitude" name="move_longitude" size="15"/>
+				</li>
+				<li>
+					<label for="move_height">높이 </label>
+					<input type="text" id="move_height" name="move_height" size="15" />
+				</li>
+				<li>
+					<label for="move_heading">HEADING </label>
+					<input type="text" id="move_heading" name="move_heading" size="15" />
+				</li>
+				<li>
+					<label for="move_pitch">PITCH </label>
+					<input type="text" id="move_pitch" name="move_pitch" size="15" />
+				</li>
+				<li>
+					<label for="move_roll">ROLL </label>
+					<input type="text" id="move_roll" name="move_roll" size="15" />
+					<button type="button" id="changeLocationAndRotationAPI" class="btn">변환</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
+			<h3>현재 위치 근처 Issue List(100개)</h3>
+			<input type="radio" id="showNearGeoIssueList" name="nearGeoIssueList" value="true" onclick="changeNearGeoIssueList(true);" />
+			<label for="showNearGeoIssueList"> 표시 </label>
+			<input type="radio" id="hideNearGeoIssueList" name="nearGeoIssueList" value="false" onclick="changeNearGeoIssueList(false);"/>
+			<label for="hideNearGeoIssueList"> 비표시 </label>
+		</div>
+	</div>
+	
+	<form id="issue" action="/homepage/demo.do" method="post" onsubmit="return false;">
+	<div id="insertIssueMenuContent" class="insertIssueWrap">
+		<table>
+			<tr style="height: 35px;">
+				<td style="width: 100px;" nowrap="nowrap">
+					<label for="data_group_id">데이터 그룹</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<select id="data_group_id" name="data_group_id" class="select">
+						<option value="1">3DS 통합 가시화</option>
+						<option value="2">Collada 통합 가시화</option>
+						<option value="3">IFC</option>
+						<option value="4">IFC(MEP)</option>
+						<option value="5">Sea Port</option>
+					</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					<label for="issue_type">Type</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<select id="issue_type" name="issue_type" class="select">
+						<option value="ISSUE_TYPE_BUGGER">버그</option>
+						<option value="ISSUE_TYPE_IMPROVE">개선</option>
+						<option value="ISSUE_TYPE_MODIFY">수정</option>
+						<option value="ISSUE_TYPE_ETC">기타</option>
+					</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					Issue 위치
+				</td>
+				<td>
+					<button type="button" id="insertIssueEnableButton" class="btn">클릭 후 객체를 선택해 주세요.</button> 
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					<label for="data_key">데이터명</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<input id="data_key" name="data_key" style="background-color: #CBCBCB;" readonly="readonly" type="text" value="" size="25"/>
+					<input id="object_key" name="object_key" type="hidden" value=""/>
+					<input id="height" name="height" type="hidden" value=""/>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					<label for="latitude">위도</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<input id="latitude" name="latitude" style="background-color: #CBCBCB;" readonly="readonly" type="text" value="" size="25"/>
+					
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					<label for="longitude">경도</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<input id="longitude" name="longitude" style="background-color: #CBCBCB;" readonly="readonly" type="text" value="" size="25"/>
+					
+				</td>
+			</tr>
+			<tr style="height: 60px;">
+				<td><label for="title">제목</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<textarea id="title" name="title" rows="2" cols="32">
+					</textarea>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="priority">Priority</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td>
+					<select id="priority" name="priority" class="select">
+						<option value="ISSUE_PRIORITY_LEVEL1">매우중요</option>
+						<option value="ISSUE_PRIORITY_LEVEL2">중요</option>
+						<option value="ISSUE_PRIORITY_LEVEL3">보통</option>
+						<option value="ISSUE_PRIORITY_LEVEL4">낮음</option>
+					</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="due_day">마감일</label></td>
+				<td><input id="due_date" name="due_date" type="hidden" value=""/>
+					<input type="text" id="due_day" name="due_day" class="date" size="10" maxlength="10" />
+					일&nbsp;&nbsp;
+					<input type="text" id="due_hour" name="due_hour" placeholder=" 00" size="2" maxlength="2" /> :
+					<input type="text" id="due_minute" name="due_minute" placeholder=" 00" size="2" maxlength="2" />
+					분
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="assignee">Assignee</label></td>
+				<td><input id="assignee" name="assignee" class="m" placeholder=" 대리자" type="text" value="" size="24"/>
+					<button type="button" class="btn" onclick="alert('준비중입니다.');">선택</button> 
+				</td>
+			</tr>
+			
+			<tr style="height: 35px;">
+				<td><label for="reporter">reporter</label></td>
+				<td><input id="reporter" name="reporter" class="m" placeholder=" 보고 해야 하는 사람" type="text" value="" size="24"/>
+					<button type="button" class="btn" onclick="alert('준비중입니다.');">선택</button> 
+				</td>
+			</tr>
+			
+			<tr>
+				<td><label for="contents">내용</label>
+					<span class="icon-glyph glyph-emark-dot color-warning"></span>
+				</td>
+				<td><textarea id="contents" name="contents" rows="5" cols="32">
+					</textarea>
+				</td>
+			</tr>
+		</table>
+		
+		<div class="btns">
+			<button type="button" id="issueSaveButton" class="full">저장</button>
+		</div>
+	</div>
+	</form>
+	
+	<div id="configMenuContent" class="configWrap">
+		<div>
+			<h3>Object 정보</h3>
+			<input type="radio" id="showObjectInfo" name="objectInfo" value="true" onclick="changeObjectInfoViewMode(true);" />
+			<label for="showObjectInfo"> 표시 </label>
+			<input type="radio" id="hideObjectInfo" name="objectInfo" value="false" onclick="changeObjectInfoViewMode(false);"/>
+			<label for="hideObjectInfo"> 비표시 </label>
+		</div>
+		<div>
+			<h3>Bounding Box</h3>
+			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
+			<label for="showBoundingBox"> 표시 </label>
+			<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
+			<label for="hideBoundingBox"> 비표시 </label>
+		</div>
+		<div>
+			<h3>Selecting And Moving</h3>
+			<input type="radio" id="mouseNoneMove" name="mouseMoveMode" value="2" onclick="changeMouseMove('2');"/>
+			<label for="mouseNoneMove"> None </label>
+			<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
+			<label for="mouseAllMove"> ALL </label>
+			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
+			<label for="mouseObjectMove"> Object </label>
+		</div>
+	</div>
+</div>
 
+<ul class="shortcut">
+	<li onclick="flyTo(null, null, '126.60856869381428', '37.58199267183209', '550', '3')">3DS 통합 가시화</li>
+	<li onclick="flyTo(null, null, '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
+	<li onclick="flyTo(null, null, '-58.787', '-62.224', '200', '5')">IFC</li>
+	<li onclick="flyTo(null, null, '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
+	<li onclick="flyTo(null, null, '126.599426', '37.438778', '650', '3')">Sea Port</li>
+</ul>
+
+<div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
+	<canvas id="magoContainer" style="width:100%; height:100%">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+</div>
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
 <!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
@@ -358,9 +477,14 @@
 	}
 
 	var managerFactory = null;
-	var insertIssueFlag = false;
-	var objectInfoViewFlag = false;
-	var listIssueFlag = false;
+	var menuMap = new Map();
+	menuMap.set("homeMenu", false);
+	menuMap.set("myIssueMenu", false);
+	menuMap.set("searchMenu", false);
+	menuMap.set("apiMenu", false);
+	menuMap.set("insertIssueMenu", false);
+	menuMap.set("configMenu", false);
+	var insertIssueEnable = false;
 	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
@@ -369,10 +493,14 @@
 	function startMogoUI() {
 		intervalCount++;
 		if(managerFactory != null) {
+			initJqueryCalendar();
+			// object 정보 표시
+			changeObjectInfoViewMode(false);
 			// BoundingBox
 			changeBoundingBox(false);
 			// Selecting And Moving
 			changeMouseMove("2");
+			
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
 			return;
@@ -409,29 +537,6 @@
 		});
 	}
 	
-	$("#issueMoreImage").click(function() {
-		if($("#recentIssueListContent").css("display") == "none") {
-			$("#issueMoreImage").addClass("on");
-			$("#apiMoreImage").removeClass("on");
-			$("#recentIssueListContent").show();
-			$("#apiListContent").hide();
-		} else {
-			$("#issueMoreImage").removeClass("on");
-			$("#recentIssueListContent").hide();
-		}
-	});
-	$("#apiMoreImage").click(function() {
-		if($("#apiListContent").css("display") == "none") {
-			$("#apiMoreImage").addClass("on");
-			$("#issueMoreImage").removeClass("on");
-			$("#apiListContent").show();
-			$("#recentIssueListContent").hide();
-		} else {
-			$("#apiMoreImage").removeClass("on");
-			$("#apiListContent").hide();
-		}
-	});
-	
 	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
 		managerFactory.flyTo(issueId, issueType, longitude, latitude, height, duration);
 		// 현재 좌표를 저장
@@ -439,127 +544,36 @@
 		$("#now_longitude").val(longitude);
 	}
 	
-	// 이슈 등록
-	$("#issueEnable").click(function() {
-		if(insertIssueFlag) {
-			insertIssueFlag = false;
-			$("#issueEnable").removeClass("on");
+	// issue 위치 버튼을 클릭 했을 경우
+	$("#insertIssueEnableButton").click(function() {
+		if(insertIssueEnable) {
+			$("#insertIssueEnableButton").removeClass("on");
+			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
+			insertIssueEnable = false;
 		} else {
-			insertIssueFlag = true;
-			$("#issueEnable").addClass("on");
+			$("#insertIssueEnableButton").addClass("on");
+			$("#insertIssueEnableButton").text("Issue 등록 활성화 상태");
+			insertIssueEnable = true;
 		}
-		changeInsertIssueModeAPI(insertIssueFlag);
+		changeInsertIssueModeAPI(insertIssueEnable);
 	});
-	// object info 표시
-	$("#objectInfoEnable").click(function() {
-		if(objectInfoViewFlag) {
-			objectInfoViewFlag = false;
-			$("#objectInfoEnable").removeClass("on");
-		} else {
-			objectInfoViewFlag = true;
-			$("#objectInfoEnable").addClass("on");			
-		}
-		changeObjectInfoViewModeAPI(objectInfoViewFlag);
-	});
-	// issue list 표시
-	$("#issuesEnable").click(function() {
-		if(listIssueFlag) {
-			listIssueFlag = false;
-			$("#issuesEnable").removeClass("on");
-		} else {
-			listIssueFlag = true;
-			$("#issuesEnable").addClass("on");
-			
-			// 현재 위치의 latitude, logitude를 가지고 가장 가까이에 있는 데이터 그룹에 속하는 이슈 목록을 최대 100건 받아서 표시
-			var now_latitude = $("#now_latitude").val();
-			var now_longitude = $("#now_longitude").val();
-			var info = "latitude=" + now_latitude + "&longitude=" + now_longitude;		
-			$.ajax({
-				url: "/issue/ajax-list-issue-by-geo.do",
-				type: "GET",
-				data: info,
-				dataType: "json",
-				success: function(msg){
-					if(msg.result == "success") {
-						var issueList = msg.issueList;
-						if(issueList != null && issueList.length > 0) {
-							for(i=0; i<issueList.length; i++ ) {
-								var issue = issueList[i];
-								drawInsertIssueImageAPI(0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
-							}
-						}
-					} else {
-						alert(JS_MESSAGE[msg.result]);
-					}
-				},
-				error:function(request,status,error){
-			        //alert(JS_MESSAGE["ajax.error.message"]);
-					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-				}
-			});
-		}
-		changeListIssueViewModeAPI(listIssueFlag);
-	});
-	
 	// issue input layer call back function
 	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
-		if(insertIssueFlag) {
-			if($("#inputIssueLayer").css("display") == "none") {
-				$("#inputIssueLayer").show();
-				
-				$("#data_key").val(data_key);
-				$("#object_key").val(object_key);
-				$("#latitude").val(latitude);
-				$("#longitude").val(longitude);
-				$("#height").val(height);
-				
-				// 현재 좌표를 저장
-				$("#now_latitude").val(latitude);
-				$("#now_longitude").val(longitude);
-			}
-		}
-	}
-	
-	function check() {
-		if ($("#data_key").val() == "") {
-			alert(JS_MESSAGE["issue.datakey.empty"]);
-			$("#data_key").focus();
-			return false;
-		}
-		if ($("#title").val() == "") {
-			alert(JS_MESSAGE["issue.title.empty"]);
-			$("#title").focus();
-			return false;
-		}
-		/* if ($("#assignee").val() == "") {
-			alert(JS_MESSAGE["issue.assignee.empty"]);
-			$("#assignee").focus();
-			return false;
-		}
-		if ($("#reporter").val() == "") {
-			alert(JS_MESSAGE["issue.reporter.empty"]);
-			$("#reporter").focus();
-			return false;
-		} */
-		if ($("#contents").val() == "") {
-			alert(JS_MESSAGE["issue.contents.empty"]);
-			$("#contents").focus();
-			return false;
-		}
-		if ($("#start_hour").val() > 23) {
-			alert(JS_MEESAGE["issue.start_hour.proper"]);
-			$("#start_hour").focus();
-			return false;
-		}
-		if ($("#start_minute").val() > 59) {
-			alert(JS_MESSAGE["issue.start_minute.proper"]);
-			$("#start_minute").focus();
-			return false;
+		if(insertIssueEnable) {
+			$("#data_key").val(data_key);
+			$("#object_key").val(object_key);
+			$("#latitude").val(latitude);
+			$("#longitude").val(longitude);
+			$("#height").val(height);
+			
+			// 현재 좌표를 저장
+			$("#now_latitude").val(latitude);
+			$("#now_longitude").val(longitude);
 		}
 	}
 	
 	var isInsertIssue = true;
-	$("#issueInsertButton").click(function() {
+	$("#issueSaveButton").click(function() {
 		if (check() == false) {
 			return false;
 		}
@@ -581,16 +595,20 @@
 						alert(JS_MESSAGE[msg.result]);
 					}
 					
-					$("#inputIssueLayer").hide();
 					isInsertIssue = true;
 					ajaxIssueList();
 				},
 				error:function(request,status,error){
-			        //alert(JS_MESSAGE["ajax.error.message"]);
-			        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			        alert(JS_MESSAGE["ajax.error.message"]);
+					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 			        isInsertIssue = true;
 				}
 			});
+			
+			// issue 등록 버튼, css, 상태를 변경
+			$("#insertIssueEnableButton").removeClass("on");
+			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
+			insertIssueEnable = false;
 			
 			changeInsertIssueStateAPI(0);
 		} else {
@@ -598,14 +616,205 @@
 			return;
 		}
 	});
+	function check() {
+		if ($("#data_key").val() == "") {
+			alert(JS_MESSAGE["issue.datakey.empty"]);
+			$("#data_key").focus();
+			return false;
+		}
+		if ($("#title").val() == "") {
+			alert(JS_MESSAGE["issue.title.empty"]);
+			$("#title").focus();
+			return false;
+		}
+		if ($("#contents").val() == "") {
+			alert(JS_MESSAGE["issue.contents.empty"]);
+			$("#contents").focus();
+			return false;
+		}
+	}
 	
-	$("#inputIssueClose").click(function() {
-		$("#inputIssueLayer").hide();
+	// TODO issue url 밑에 있어야 할지도 모르겠다.
+	function ajaxIssueList() {
+		var info = "";		
+		$.ajax({
+			url: "/homepage/ajax-list-issue.do",
+			type: "GET",
+			data: info,
+			dataType: "json",
+			success: function(msg){
+				if(msg.result == "success") {
+					var issueList = msg.issueList;
+					var content = "";
+					var issueListCount = 0;
+					content = content 
+						+	"<li style=\"margin-bottom: 8px; font-size: 1em; font-weight: normal; color: #2955a6;\">"
+						+ 		"최신 Issue 10개 표시"
+						+	"</li>";
+					if(issueList == null || issueList.length == 0) {
+						content = content	
+							+ 	"<li style=\"text-align: center; padding-top:20px; height: 50px;\">"
+							+	"	Issue가 존재하지 않습니다."
+							+	"</li>";
+					} else {
+						issueListCount = issueList.length;
+						for(i=0; i<issueListCount; i++ ) {
+							var issue = issueList[i];
+							content = content 
+								+ 	"<li>"
+								+ 	"	<button type=\"button\" title=\"바로가기\""
+								+			"onclick=\"flyTo('" + issue.issue_id + "', '" + issue.issue_type + "', '" 
+								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
+								+ 	"	<div class=\"info\">"
+								+ 	"		<p class=\"title\">"
+								+ 	"			<span>" + issue.data_group_name + "</span>"
+								+ 				issue.title
+								+ 	"		</p>"
+								+ 	"		<ul class=\"tag\">"
+								+ 	"			<li><span class=\"" + issue.issue_type_css_class + "\"></span>" + issue.issue_type_name + "</li>"
+								+ 	"			<li><span class=\"" + issue.priority_css_class + "\"></span>" + issue.priority_name + "</li>"
+								+ 	"			<li class=\"date\">" + issue.insert_date.substring(0,19) + "</li>"
+								+ 	"		</ul>"
+								+ 	"	</div>"
+								+ 	"</li>";
+						}
+					}
+					$("#issueListCount").empty();
+					$("#issueListCount").html(msg.totalCount);
+					$("#myIssueMenuContent").empty();
+					$("#myIssueMenuContent").html(content);
+				} else {
+					alert(JS_MESSAGE[msg.result]);
+				}
+			},
+			error:function(request,status,error){
+		        //alert(JS_MESSAGE["ajax.error.message"]);
+				console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			}
+		});
+	}
+
+	// 왼쪽 메뉴 클릭시 ui 처리
+	$("#homeMenu").click(function() {
+		menuSlideControl("homeMenu");
+	});
+	$("#myIssueMenu").click(function() {
+		menuSlideControl("myIssueMenu");
+	});
+	$("#searchMenu").click(function() {
+		menuSlideControl("searchMenu");
+	});
+	$("#apiMenu").click(function() {
+		menuSlideControl("apiMenu");
+	});
+	$("#insertIssueMenu").click(function() {
+		menuSlideControl("insertIssueMenu");
+	});
+	$("#configMenu").click(function() {
+		menuSlideControl("configMenu");
+	});
+	function menuSlideControl(menuName) {
+		var compareMenuState = menuMap.get(menuName);
+		for(var [key, value] of menuMap) {
+			// state 값 변경하고, css 변경
+			if(key === menuName) {
+				if(value) {
+					$("#" + menuName).removeClass("on");
+					$("#menuContent").hide();
+					$("#" + menuName + "Content").hide();
+				} else {
+					$("#" + menuName).addClass("on");
+					$("#menuContent").show();
+					$("#" + menuName + "Content").show();
+				}
+				menuMap.set(menuName, !compareMenuState);
+			} else {
+				$("#" + key).removeClass("on");
+				$("#" + key + "Content").hide();
+			}
+		}
+	}
+	
+	// menu content close 버튼
+	$("#menuContentClose").click(function() {
+		for(var [key, value] of menuMap) {
+			if(value) {
+				$("#menuContent").hide();
+				$("#" + key + "Content").hide();
+				$("#" + key).removeClass("on");
+				menuMap.set(key, !value);
+			}
+		}
+		// 이슈 등록 비활성화 상태
 		changeInsertIssueStateAPI(0);
 	});
 	
+	// 검색 메뉴 시작
+	// Data 검색
+	var searchDataFlag = true;
+	$("#searchData").click(function() {
+		if ($.trim($("#search_value").val()) === ""){
+			alert("검색어를 입력해 주세요.");
+			$("#search_value").focus();
+			return false;
+		}
+		
+		if(searchDataFlag) {
+			searchDataFlag = false;
+			var info = $("#searchForm").serialize();		
+			
+			var searchType = $("#search_word").val();
+			var content = "";
+			if(searchType === "data_name") {
+				content = content 
+				+ 	"<li>"
+				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('kangbukSport_del');\">바로가기</button>"
+				+ 	"	<div class=\"info\">"		
+				+ 	"		<p class=\"title\">"			
+				+ 	"			<span>3DS 통합 가시화</span>kangbukSport_del"
+				+ 	"		</p>"
+				+ 	"		<ul class=\"tag\">"
+				+ 	"			<li><span class=\"t3\"></span>37.58198979</li>"
+				+ 	"			<li><span class=\"t3\"></span>126.6082096</li>"
+				+ 	"			<li class=\"date\">2017-08-10 15:30:51</li>"
+				+ 	"		</ul>"
+				+ 	"	</div>"
+				+ 	"</li>";
+			} else {
+				content = content 
+				+ 	"<li>"
+				+ 	"	<button type=\"button\" title=\"바로가기\"" 
+				+ 	"	onclick=\"flyTo('129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2');\">바로가기</button>"
+				+ 	"	<div class=\"info\">"
+				+ 	"		<p class=\"title\">"
+				+ 	"			<span>3DS 통합 가시화</span>test"
+				+ 	"		</p>"
+				+ 	"		<ul class=\"tag\">"
+				+ 	"			<li><span class=\"i1\"></span>버그</li>"
+				+ 	"			<li><span class=\"t1\"></span>매우중요</li>"
+				+ 	"			<li class=\"date\">2017-08-25 14:27:42</li>"
+				+ 	"		</ul>"
+				+ 	"	</div>"
+				+ 	"</li>";
+			}
+			
+			$("#searchList").empty();
+			$("#searchList").html(content);
+			searchDataFlag = true;
+		} else {
+			alert(JS_MESSAGE["button.dobule.click"]);
+			return;
+		}
+	});
+	
+	function flyToBounding(dataKey) {
+		searchDataAPI(dataKey);
+	}
+	
+	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(projectId, blockId, objectId, latitude, longitude, height, heading, pitch, roll){
+	function showSelectedObject(projectId, blockId, objectId, latitude, longitude, height, heading, pitch, roll) {
+		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
 			$("#move_data_key").val(projectId + "_" + blockId);
 			$("#move_latitude").val(latitude);
@@ -628,35 +837,16 @@
 			        'pitch : ' + pitch,
 			        'roll : ' + roll
 			    ],
-				//bgColor : 'blue',
+				bgColor : '#393946',
 				hideAfter: 5000,
-				icon: 'info'
+				icon: 'info',
+				position : 'bottom-right'
 			});
 			
 			// 현재 좌표를 저장
 			$("#now_latitude").val(latitude);
 			$("#now_longitude").val(longitude);
 		}
-	}
-	
-	// Data 검색
-	$("#searchData").click(function() {
-		if ($.trim($("#search_data_key").val()) === ""){
-			alert("Data Key를 입력해 주세요.");
-			$("#search_data_key").focus();
-			return false;
-		}
-		searchDataAPI($("#search_data_key").val());
-	});
-	// boundingBox 표시/비표시
-	function changeBoundingBox(isShow) {
-		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
-		changeBoundingBoxAPI(isShow);
-	}
-	// 마우스 클릭 객체 이동 모드 변경
-	function changeMouseMove(mouseMoveMode) {
-		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
-		changeMouseMoveAPI(mouseMoveMode);
 	}
 	// 변환행렬
 	$("#changeLocationAndRotationAPI").click(function() {
@@ -703,73 +893,70 @@
 		return true;
 	}
 	
-	// TODO issue url 밑에 있어야 할지도 모르겠다.
-	function ajaxIssueList() {
-		var info = "";		
-		$.ajax({
-			url: "/homepage/ajax-list-issue.do",
-			type: "GET",
-			data: info,
-			dataType: "json",
-			success: function(msg){
-				if(msg.result == "success") {
-					var issueList = msg.issueList;
-					var content = "";
-					
-					if(issueList == null || issueList.length == 0) {
-						content += 	"<li style=\"text-align: center; padding-top:20px; height: 50px;\">"
-								+	"	Issue가 존재하지 않습니다."
-								+	"</li>";
-					} else {
-						for(i=0; i<issueList.length; i++ ) {
-							var issue = issueList[i];
-							var issueTypeCss = "i1";
-							var issuePriorityCss = "t1";
-							if(issue.issue_type == "BUGGER") {
-								issueTypeCss = "i1";
-							} else if(issue.issue_type == "IMPROVE") {
-								issueTypeCss = "i2";
-							} else if(issue.issue_type == "NEW") {
-								issueTypeCss = "i3";
-							} else if(issue.issue_type == "ETC") {
-								issueTypeCss = "i4";
+	// 인접 지역 이슈 표시
+	function changeNearGeoIssueList(isShow) {
+		$("input:radio[name='nearGeoIssueList']:radio[value='" + isShow + "']").prop("checked", true);
+		if(isShow) {
+			// 현재 위치의 latitude, logitude를 가지고 가장 가까이에 있는 데이터 그룹에 속하는 이슈 목록을 최대 100건 받아서 표시
+			var now_latitude = $("#now_latitude").val();
+			var now_longitude = $("#now_longitude").val();
+			var info = "latitude=" + now_latitude + "&longitude=" + now_longitude;		
+			$.ajax({
+				url: "/issue/ajax-list-issue-by-geo.do",
+				type: "GET",
+				data: info,
+				dataType: "json",
+				success: function(msg){
+					if(msg.result == "success") {
+						var issueList = msg.issueList;
+						if(issueList != null && issueList.length > 0) {
+							for(i=0; i<issueList.length; i++ ) {
+								var issue = issueList[i];
+								drawInsertIssueImageAPI(0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
 							}
-							
-							if(issue.priority == "CRITICAL") {
-								issuePriorityCss = "t1";
-							} else if(issue.priority == "MUST") {
-								issuePriorityCss = "t2";
-							} else if(issue.priority == "MINOR") {
-								issuePriorityCss = "t3";
-							} else if(issue.priority == "TRIVIAL") {
-								issuePriorityCss = "t4";
-							}
-							
-							content = content 
-								+ 	"<li>"
-								+ 	"	<p class=\"title\">" + issue.title  + "</p>"
-								+ 	"	<p class=\"info\">"
-								+ 	"		<span class=\"tag " + issueTypeCss + "\">" + issue.issue_type_name + "</span>"
-								+ 	"		<span class=\"tag " + issuePriorityCss + "\">" + issue.priority_name + "</span>"
-								+ 	"		<span>[" + issue.data_group_name + "]</span>"
-								+ 	"		<button type=\"button\" title=\"바로가기\""
-								+				"onclick=\"flyTo('" + issue.issue_id + "', '" + issue.issue_type + "', '" 
-								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
-								+ 	"		<span class=\"date\">" + issue.insert_date.substring(0,19) + "</span>"
-								+	"	</p>"
-								+ 	"</li>";
 						}
+					} else {
+						alert(JS_MESSAGE[msg.result]);
 					}
-					$("#recentIssueListContent").empty();
-					$("#recentIssueListContent").html(content);
-				} else {
-					alert(JS_MESSAGE[msg.result]);
+				},
+				error:function(request,status,error){
+			        //alert(JS_MESSAGE["ajax.error.message"]);
+					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 				}
-			},
-			error:function(request,status,error){
-		        //alert(JS_MESSAGE["ajax.error.message"]);
-				console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-			}
+			});
+		}
+		changeNearGeoIssueListViewModeAPI(isShow);
+	}
+	
+	// 설정 메뉴 시작
+	// object info 표시
+	function changeObjectInfoViewMode(isShow) {
+		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);
+		changeObjectInfoViewModeAPI(isShow);
+	}
+	// boundingBox 표시/비표시
+	function changeBoundingBox(isShow) {
+		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
+		changeBoundingBoxAPI(isShow);
+	}
+	// 마우스 클릭 객체 이동 모드 변경
+	function changeMouseMove(mouseMoveMode) {
+		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
+		changeMouseMoveAPI(mouseMoveMode);
+	}
+	
+	function initJqueryCalendar() {
+		$( ".date" ).datepicker({ 
+			dateFormat : "yymmdd",
+			dayNames : [ "일", "월", "화", "수", "목", "금", "토" ],
+			dayNamesShort : [ "일", "월", "화", "수", "목", "금", "토" ],
+			dayNamesMin : [ "일", "월", "화", "수", "목", "금", "토" ],
+			monthNames : [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+			monthNamesShort : [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+			prevText : "",
+			nextText : "",
+			showMonthAfterYear : true,
+			yearSuffix : "년"
 		});
 	}
 </script>
