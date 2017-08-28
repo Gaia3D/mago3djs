@@ -2691,13 +2691,14 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this))
 				{
-					lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+					
 				}
 				else 
 				{
 					//lowestOctree.neoReferencesMotherAndIndices.deleteObjects(gl, this.vboMemManager);
 					//lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.READY;
 				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
 				refListsParsingCount += 1;
 			}
