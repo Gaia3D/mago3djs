@@ -20,11 +20,11 @@ var Point3D = function()
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
-Point3D.prototype.destroy = function() 
+Point3D.prototype.deleteObjects = function() 
 {
-	this.x = null;
-	this.y = null;
-	this.z = null;
+	this.x = undefined;
+	this.y = undefined;
+	this.z = undefined;
 };
 
 /**

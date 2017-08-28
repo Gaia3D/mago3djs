@@ -103,6 +103,12 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl, vboMemManager)
 		this.meshFacesCacheKey = undefined;
 	}
 	this.idxVboDataArray = undefined;
+	
+	this.posArrayByteSize = undefined;
+	this.norArrayByteSize = undefined;
+	this.idxArrayByteSize = undefined;
+	this.colArrayByteSize = undefined;
+	this.tcoordArrayByteSize = undefined;
 
 	this.buffer = undefined;
 };
