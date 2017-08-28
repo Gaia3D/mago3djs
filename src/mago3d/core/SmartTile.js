@@ -50,34 +50,55 @@ SmartTile.prototype.newSubTile = function(parentTile)
  */
 SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
-	if (this.buildingsArray == undefined)
-	{ return undefined; }
-	
-	var buildingCount = this.buildingsArray.length;
-	var find = false;
-	var i=0;
 	var resultNeoBuilding;
-	while (!find && i<buildingCount) 
+	var hasSubTiles = true;
+	if (this.subTiles == undefined)
+	{ hasSubTiles = false; }
+	
+	if (this.subTiles && this.subTiles.length == 0)
+	{ hasSubTiles = false; }
+		
+	if (!hasSubTiles)
 	{
-		if (buildingType)
+		if (this.buildingsArray)
 		{
-			if (this.buildingsArray[i].buildingId === buildingId && this.buildingsArray[i].buildingType === buildingType) 
+			var buildingCount = this.buildingsArray.length;
+			var find = false;
+			var i=0;
+			while (!find && i<buildingCount) 
 			{
-				find = true;
-				resultNeoBuilding = this.buildingsArray[i];
+				if (buildingType)
+				{
+					if (this.buildingsArray[i].buildingId === buildingId && this.buildingsArray[i].buildingType === buildingType) 
+					{
+						find = true;
+						resultNeoBuilding = this.buildingsArray[i];
+						return resultNeoBuilding;
+					}
+				}
+				else 
+				{
+					if (this.buildingsArray[i].buildingId === buildingId) 
+					{
+						find = true;
+						resultNeoBuilding = this.buildingsArray[i];
+						return resultNeoBuilding;
+					}
+				}
+				i++;
 			}
-		}
-		else 
-		{
-			if (this.buildingsArray[i].buildingId === buildingId) 
-			{
-				find = true;
-				resultNeoBuilding = this.buildingsArray[i];
-			}
-		}
-		i++;
+		}	
 	}
-
+	else 
+	{
+		for (var i=0; i<this.subTiles.length; i++)
+		{
+			resultNeoBuilding = this.subTiles[i].getNeoBuildingById(buildingType, buildingId);
+			if (resultNeoBuilding)
+			{ return resultNeoBuilding; }
+		}
+	}
+	
 	return resultNeoBuilding;
 };
 

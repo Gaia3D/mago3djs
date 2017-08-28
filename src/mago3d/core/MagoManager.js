@@ -4778,6 +4778,9 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (this.renderingModeTemp === 2)
 	{ this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0; }
 
+	if (this.boundingSphere_Aux == undefined)
+	{ this.boundingSphere_Aux = new Sphere(); }
+	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
 
 	//var position = new Cesium.Cartesian3(this.pointSC.x, this.pointSC.y, this.pointSC.z);
