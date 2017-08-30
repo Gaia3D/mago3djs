@@ -53,3 +53,20 @@ SelectionCandidates.prototype.selectObjects = function(idxKey)
 	this.currentOctreeSelected = this.octreesMap.get(idxKey);
 	this.currentBuildingSelected = this.buildingsMap.get(idxKey);
 };
+
+SelectionCandidates.prototype.clearCurrents = function(idxKey)
+{
+	this.currentReferenceSelected = undefined;
+	this.currentOctreeSelected = undefined;
+	this.currentBuildingSelected = undefined;
+};
+
+
+
+
+
+
+
+
+
+
