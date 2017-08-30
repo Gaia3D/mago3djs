@@ -2,7 +2,7 @@
 
 /**
  * Policy
- * @class API
+ * @class Policy
  */
 var Policy = function() 
 {
@@ -45,6 +45,21 @@ var Policy = function()
 	
 	// provisional.***
 	this.colorChangedObjectId;
+	
+	// LOD1
+	this.lod0 = null;
+	this.lod1 = null;
+	this.lod2 = null;
+	this.lod3 = null;
+	
+	// Lighting
+	this.ambientReflectionCoef = null;
+	this.diffuseReflectionCoef = null;
+	this.specularReflectionCoef = null;
+	this.ambientColor = null;
+	this.specularColor = null;
+	
+	this.ssaoRadius = null;
 };
 
 Policy.prototype.getMagoEnable = function() 
@@ -169,4 +184,86 @@ Policy.prototype.getImagePath = function()
 Policy.prototype.setImagePath = function(imagePath) 
 {
 	this.imagePath = imagePath;
+};
+
+Policy.prototype.getLod0 = function() 
+{
+	return this.lod0;
+};
+Policy.prototype.setLod0 = function(lod0) 
+{
+	this.lod0 = lod0;
+};
+Policy.prototype.getLod1 = function() 
+{
+	return this.lod1;
+};
+Policy.prototype.setLod1 = function(lod1) 
+{
+	this.lod1 = lod1;
+};
+Policy.prototype.getLod2 = function() 
+{
+	return this.lod2;
+};
+Policy.prototype.setLod2 = function(lod2) 
+{
+	this.lod2 = lod2;
+};
+Policy.prototype.getLod3 = function() 
+{
+	return this.lod3;
+};
+Policy.prototype.setLod3 = function(lod3) 
+{
+	this.lod3 = lod3;
+};
+
+Policy.prototype.getAmbientReflectionCoef = function() 
+{
+	return this.ambientReflectionCoef;
+};
+Policy.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
+{
+	this.ambientReflectionCoef = ambientReflectionCoef;
+};
+Policy.prototype.getDiffuseReflectionCoef = function() 
+{
+	return this.diffuseReflectionCoef;
+};
+Policy.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
+{
+	this.diffuseReflectionCoef = diffuseReflectionCoef;
+};
+Policy.prototype.getSpecularReflectionCoef = function() 
+{
+	return this.specularReflectionCoef;
+};
+Policy.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
+{
+	this.specularReflectionCoef = specularReflectionCoef;
+};
+Policy.prototype.getAmbientColor = function() 
+{
+	return this.ambientColor;
+};
+Policy.prototype.setAmbientColor = function(ambientColor) 
+{
+	this.ambientColor = ambientColor;
+};
+Policy.prototype.getSpecularColor = function() 
+{
+	return this.specularColor;
+};
+Policy.prototype.setSpecularColor = function(specularColor) 
+{
+	this.specularColor = specularColor;
+};
+Policy.prototype.getSsaoRadius = function() 
+{
+	return this.ssaoRadius;
+};
+Policy.prototype.setSsaoRadius = function(ssaoRadius) 
+{
+	this.ssaoRadius = ssaoRadius;
 };

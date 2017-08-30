@@ -5780,7 +5780,6 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "move") 
 	{
-		;//
 	}
 	else if (apiName === "changeOutFitting") 
 	{
@@ -5863,8 +5862,20 @@ MagoManager.prototype.callAPI = function(api)
 		objMarker.copyFrom(this.objMarkerSC);
 		this.objMarkerSC = undefined;
 	}
-	else if (apiName === "changeInsertIssueState") 
+	else if (apiName === "changeInsertIssueState")
 	{
 		this.sceneState.insertIssueState = 0;
+	}
+	else if (apiName === "changeLod")
+	{
+		
+	}
+	else if (apiName === "changeLighting")
+	{
+	
+	}
+	else if (apiName === "changeSsadRadius")
+	{
+		
 	}
 };

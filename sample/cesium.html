@@ -5,14 +5,17 @@
 	<meta name="viewport" content="width=device-width">
 	<title>Cesium</title>
 	
-	<link rel="stylesheet" href="/sample/homepage-demo.css?version=7" />
+	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
 	
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
+	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" />
+	
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
+	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script>
 </head>
 
 <body>
@@ -382,6 +385,63 @@
 			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
 			<label for="mouseObjectMove"> Object </label>
 		</div>
+		<div>
+			<h3>LOD</h3>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD0</div>
+				<input type="text" id="geo_lod0" name="geo_lod0" value="22" size="15" />&nbsp;M
+			</div>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD1</div>
+				<input type="text" id="geo_lod1" name="geo_lod1" value="70" size="15" />&nbsp;M
+			</div>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD2</div>
+				<input type="text" id="geo_lod2" name="geo_lod2" value="22360" size="15" />&nbsp;M&nbsp;&nbsp;
+				<button type="button" id="changeLodButton" class="btn">변경</button>
+			</div>
+		</div>
+		<div>
+			<h3>Lighting</h3>
+			<div style="height: 30px;"><label for="geo_ambient_reflection_coef">AmbientReflectionCoeficient</label></div>
+			<div id="geo_ambient_reflection_coef" style="display: inline-block; width: 310px;">
+				<div id="geo_ambient_reflection_coef_view" class="ui-slider-handle"></div>
+				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" />
+			</div>
+			<div style="height: 30px;"><label for="geo_diffuse_reflection_coef">DiffuseReflectionCoeficient</label></div>
+			<div id="geo_diffuse_reflection_coef" style="display: inline-block; width: 310px;">
+				<div id="geo_diffuse_reflection_coef_view" class="ui-slider-handle"></div>
+				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" />
+			</div>
+			<div style="height: 30px;"><label for="geo_specular_reflection_coef">SpecularReflectionCoeficient</label></div>
+			<div id="geo_specular_reflection_coef" style="display: inline-block; width: 310px;">
+				<div id="geo_specular_reflection_coef_view" class="ui-slider-handle"></div>
+				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" />
+			</div>
+			<div style="height: 30px;">
+				<label for="geo_ambient_color">AmbientColor</label>
+				<input type="text" id="geo_ambient_color" name="geo_ambient_color" class="m" size="15"
+					data-palette='["#D50000","#304FFE","#00B8D4","#00C853","#FFD600","#FF6D00","#FF1744","#3D5AFE","#00E5FF","#00E676","#FFEA00",
+			       "#FF9100","#FF5252","#536DFE","#18FFFF","#69F0AE","#FFFF00","#FFAB40"]' />
+			</div>
+			<div style="height: 30px;">
+				<label for="geo_specular_color">SpecularColor</label>
+				<input type="text" id="geo_specular_color" name="geo_specular_color" class="m" size="15"
+					data-palette='["#D50000","#304FFE","#00B8D4","#00C853","#FFD600","#FF6D00","#FF1744","#3D5AFE","#00E5FF","#00E676","#FFEA00",
+			       "#FF9100","#FF5252","#536DFE","#18FFFF","#69F0AE","#FFFF00","#FFAB40"]' />
+				&nbsp;<button type="button" id="changeLightingButton" class="btn">변경</button>
+			</div>
+			
+			
+			<div style="text-align: center">
+			</div>
+		</div>
+		
+		<div>
+			<h3><label for="geo_ssao_radius">SSAO Radius</label></h3>
+			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
+			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
+		</div>
 	</div>
 </div>
 
@@ -498,6 +558,8 @@
 			changeBoundingBox(false);
 			// Selecting And Moving
 			changeMouseMove("2");
+			// slider, color-picker
+			initRendering();
 			
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
@@ -957,6 +1019,80 @@
 			yearSuffix : "년"
 		});
 	}
+	
+	// rendering 설정
+	function initRendering() {
+		var ambient = $( "#geo_ambient_reflection_coef_view" );
+		$( "#geo_ambient_reflection_coef" ).slider({
+			range: "max",
+			min: 0, // min value
+			max: 1, // max value
+			step: 0.01,
+			value: '0.5', // default value of slider
+			create: function() {
+				ambient.text( $( this ).slider( "value" ) );
+			},
+			slide: function( event, ui ) {
+				ambient.text( ui.value);
+				$("#geo_ambient_reflection_coef" ).val(ui.value);
+			}
+		});
+		var diffuse = $( "#geo_diffuse_reflection_coef_view" );
+		$( "#geo_diffuse_reflection_coef" ).slider({
+			range: "max",
+			min: 0, // min value
+			max: 1, // max value
+			step: 0.01,
+			value: '1.0', // default value of slider
+			create: function() {
+				diffuse.text( $( this ).slider( "value" ) );
+			},
+			slide: function( event, ui ) {
+				diffuse.text( ui.value);
+				$("#geo_diffuse_reflection_coef" ).val(ui.value);
+			}
+		});
+		var specular = $( "#geo_specular_reflection_coef_view" );
+		$( "#geo_specular_reflection_coef" ).slider({
+			range: "max",
+			min: 0, // min value
+			max: 1, // max value
+			step: 0.01,
+			value: '1.0', // default value of slider
+			create: function() {
+				specular.text( $( this ).slider( "value" ) );
+			},
+			slide: function( event, ui ) {
+				specular.text( ui.value);
+				$("#geo_specular_reflection_coef" ).val(ui.value);
+			}
+		});
+		
+		$('[name="geo_ambient_color"]').paletteColorPicker({
+			clear_btn: 'last',
+			//position: 'downside',
+			close_all_but_this: true // Default is false
+		});
+		$('[name="geo_specular_color"]').paletteColorPicker({
+			clear_btn: 'last',
+			//position: 'downside',
+			close_all_but_this: true // Default is false
+		});
+	}
+	
+	// LOD 설정
+	$("#changeLodButton").click(function() {
+		changeLodAPI($("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
+	});
+	// Lighting 설정
+	$("#changeLightingButton").click(function() {
+		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(),
+							$("#geo_specular_color").val(), $("#geo_ambient_color").val());
+	});
+	// Ssadradius 설정
+	$("#changeSsadRadiusButton").click(function() {
+		changeSsadRadiusAPI($("#geo_ssao_radius").val());
+	});
 </script>
 </body>
 </html>
