@@ -4966,8 +4966,8 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	if (geoLocationData === undefined)
 	{ return; }
 
-	this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
+	//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+	//ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
 	if (neoBuilding.octree)
@@ -4990,8 +4990,8 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	if (geoLocationData === undefined)
 	{ return; }
 
-	this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC); // the centerpoint is taken from structure block.***
-	ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
+	//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC); // the centerpoint is taken from structure block.***
+	//ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
 
 	// now, must change the keyMatrix of the references of the octrees.***
 	if (neoBuildingOutffiting.octree)
@@ -5077,7 +5077,7 @@ MagoManager.prototype.createDeploymentGeoLocationsForHeavyIndustries = function(
 				// for this building dont translate the pivot point to the bbox center.***
 				return;
 			}
-			ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
+			//ManagerUtils.translatePivotPointGeoLocationData(buildingGeoLocation, this.pointSC );
 			////this.changeLocationAndRotation(neoBuilding.buildingId, latitude, longitude, altitude, heading, pitch, roll);
 			////currentCalculatingPositionsCount ++;
 		}
