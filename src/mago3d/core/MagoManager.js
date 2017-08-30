@@ -48,12 +48,10 @@ var MagoManager = function()
 	this.mouseDragging = false;
 	this.selObjMovePlane;
 
-	this.selectionCandidateObjectsArray = [];
-	this.selectionCandidateLowestOctreesArray = [];
-	this.selectionCandidateBuildingsArray = [];
 	this.objectSelected;
 	this.buildingSelected;
 	this.octreeSelected;
+	
 	this.objMovState = 0; // 0 = no started. 1 = mov started.
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
@@ -1470,315 +1468,14 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 	this.selectionCandidates.selectObjects(idx);
 	
 	var selectedObject = this.selectionCandidates.currentReferenceSelected;
-	this.selectionCandidateObjectsArray.length = 0;
 
-	var currentOctreeSelected = this.selectionCandidates.currentOctreeSelected;
-	var currentSelectedBuilding = this.selectionCandidates.currentBuildingSelected;
-
-	resultSelectedArray[0] = currentSelectedBuilding;
-	resultSelectedArray[1] = currentOctreeSelected;
-	resultSelectedArray[2] = selectedObject;
+	resultSelectedArray[0] = this.selectionCandidates.currentBuildingSelected;
+	resultSelectedArray[1] = this.selectionCandidates.currentOctreeSelected;
+	resultSelectedArray[2] = this.selectionCandidates.currentReferenceSelected;
 	
 	return selectedObject;
 };
 
-/**
- * Selects an object of the current visible objects that's under mouse.
- * @param {GL} gl.
- * @param {int} mouseX Screen x position of the mouse.
- * @param {int} mouseY Screen y position of the mouse.
- * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
- * @returns {Array} resultSelectedArray 
- */
-MagoManager.prototype.getSelectedObjects_current = function(gl, mouseX, mouseY, visibleObjControlerBuildings, resultSelectedArray) 
-{
-	// Picking render.***
-	this.bPicking = false;
-	var cameraPosition = this.sceneState.camera.position;
-
-	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-
-	// selection render.
-	this.selectionColor.init(); // selection colors manager.***
-	
-	// picking mode.
-	this.selectionCandidateObjectsArray.length = 0; // init.***
-	this.selectionCandidateLowestOctreesArray.length = 0; // init.***
-	this.selectionCandidateBuildingsArray.length = 0; // init.***
-	
-	// set byteColor codes for references objects.***
-	var alfa = 255;
-	var neoBuilding;
-	var currentVisibleOctreesControler;
-	var currentVisibleLowestOctCount;
-	var lowestOctree;
-	var availableColor;
-	var refsCount;
-	var neoRef;
-	
-	var isInterior = false;
-	var renderTexture = false;
-	var ssao_idx = -1;
-	var minSize = 0.0;
-	var refTMatrixIdxKey = 0;
-	var glPrimitive = gl.TRIANGLES;
-	
-	// LOD0 & LOD1 & LOD2.***
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
-	for (var i=0; i<neoBuildingsCount; i++)
-	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
-		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-		
-		if (currentVisibleOctreesControler === undefined)
-		{ continue; }
-		
-		// LOD0.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles0.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles0[j];
-			if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-			{ continue; }
-			refsCount = lowestOctree.neoReferencesMotherAndIndices.currentVisibleIndices.length;
-			for (var k=0; k<refsCount; k++)
-			{
-				neoRef = neoBuilding.motherNeoReferencesArray[lowestOctree.neoReferencesMotherAndIndices.currentVisibleIndices[k]];
-				if (neoRef.selColor4 === undefined)
-				{ neoRef.selColor4 = new Color(); }
-				
-				availableColor = this.selectionColor.getAvailableColor(availableColor);
-
-				neoRef.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
-				this.selectionCandidateObjectsArray.push(neoRef);
-				this.selectionCandidateLowestOctreesArray.push(lowestOctree);
-				this.selectionCandidateBuildingsArray.push(neoBuilding);
-			}
-		}
-		
-		// LOD1.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles1.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles1[j];
-			if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-			{ continue; }
-			refsCount = lowestOctree.neoReferencesMotherAndIndices.currentVisibleIndices.length;
-			for (var k=0; k<refsCount; k++)
-			{
-				neoRef = neoBuilding.motherNeoReferencesArray[lowestOctree.neoReferencesMotherAndIndices.currentVisibleIndices[k]];
-				if (neoRef.selColor4 === undefined)
-				{ neoRef.selColor4 = new Color(); }
-				
-				availableColor = this.selectionColor.getAvailableColor(availableColor);
-
-				neoRef.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
-				this.selectionCandidateObjectsArray.push(neoRef);
-				this.selectionCandidateLowestOctreesArray.push(lowestOctree);
-				this.selectionCandidateBuildingsArray.push(neoBuilding);
-			}
-		}
-		
-		// LOD2.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
-
-			if (lowestOctree.lego === undefined)
-			{ continue; }
-
-			if (lowestOctree.lego.selColor4 === undefined)
-			{ lowestOctree.lego.selColor4 = new Color(); }
-			
-			availableColor = this.selectionColor.getAvailableColor(availableColor);
-
-			lowestOctree.lego.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
-			this.selectionCandidateObjectsArray.push(undefined);
-			this.selectionCandidateLowestOctreesArray.push(lowestOctree);
-			this.selectionCandidateBuildingsArray.push(neoBuilding);
-		}
-	}
-	
-	neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
-	for (var i=0; i<neoBuildingsCount; i++)
-	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
-		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-		if (currentVisibleOctreesControler)
-		{
-			// LOD2.***
-			currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-			for (var j=0; j<currentVisibleLowestOctCount; j++)
-			{
-				lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
-
-				if (lowestOctree.lego === undefined)
-				{ continue; }
-
-				if (lowestOctree.lego.selColor4 === undefined)
-				{ lowestOctree.lego.selColor4 = new Color(); }
-				
-				availableColor = this.selectionColor.getAvailableColor(availableColor);
-
-				lowestOctree.lego.selColor4.set(availableColor.r, availableColor.g, availableColor.b, alfa);
-				this.selectionCandidateObjectsArray.push(undefined);
-				this.selectionCandidateLowestOctreesArray.push(lowestOctree);
-				this.selectionCandidateBuildingsArray.push(neoBuilding);
-			}
-		}
-	}
-
-	// colorSelection render.
-	this.selectionFbo.bind(); // framebuffer for color selection.***
-
-	// Set uniforms.***************
-	var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-	gl.clearColor(1, 1, 1, 1); // white background.***
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
-	
-	gl.disable(gl.CULL_FACE);
-
-	var shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-	
-	// do the colorCoding render.***
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
-	for (var i=0; i<neoBuildingsCount; i++)
-	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
-		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-		
-		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-		if (currentVisibleOctreesControler === undefined)
-		{ continue; }
-		
-		// LOD0.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles0.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles0[j];
-			minSize = 0.0;
-			this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, neoBuilding, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
-		}
-		
-		// LOD1.***
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles1.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles1[j];
-			minSize = 0.0;
-			this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, neoBuilding, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
-		}
-		
-		// LOD2.***
-		if (this.colorAux == undefined)
-		{ this.colorAux = new Color(); }
-		
-		gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
-		currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-		for (var j=0; j<currentVisibleLowestOctCount; j++)
-		{
-			lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
-
-			if (lowestOctree.lego === undefined) 
-			{ continue; }
-
-			if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY) 
-			{ continue; }
-
-			if (lowestOctree.lego.fileLoadState === 2) 
-			{ continue; }
-			
-			gl.uniform1i(currentShader.hasTexture_loc, false); //.***
-			gl.uniform4fv(currentShader.color4Aux_loc, [lowestOctree.lego.selColor4.r/255.0, lowestOctree.lego.selColor4.g/255.0, lowestOctree.lego.selColor4.b/255.0, 1.0]); // old.
-
-			gl.uniform1i(currentShader.hasAditionalMov_loc, false);
-			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-
-			this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader, ssao_idx);
-		}
-		
-	}
-	
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
-	for (var i=0; i<neoBuildingsCount; i++)
-	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
-		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-		
-		currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
-		if (currentVisibleOctreesControler)
-		{
-
-			// LOD2.***
-			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
-			currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
-			for (var j=0; j<currentVisibleLowestOctCount; j++)
-			{
-				lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
-
-				if (lowestOctree.lego === undefined) 
-				{ continue; }
-
-				if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY) 
-				{ continue; }
-
-				if (lowestOctree.lego.fileLoadState === 2) 
-				{ continue; }
-
-				gl.uniform1i(currentShader.hasTexture_loc, false); //.***
-				gl.uniform4fv(currentShader.color4Aux_loc, [lowestOctree.lego.selColor4.r/255.0, lowestOctree.lego.selColor4.g/255.0, lowestOctree.lego.selColor4.b/255.0, 1.0]); // old.
-
-				gl.uniform1i(currentShader.hasAditionalMov_loc, false);
-				gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-
-				this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader, ssao_idx);
-			}
-		}
-	}
-
-	if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-
-	// Now, read the picked pixel and find the object.*********************************************************
-	var pixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
-	gl.readPixels(mouseX, this.sceneState.drawingBufferHeight - mouseY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
-
-	// now, select the object.***
-	var idx = 64516*pixels[0] + 254*pixels[1] + pixels[2];
-
-	var selectedObject = this.selectionCandidateObjectsArray[idx];
-	this.selectionCandidateObjectsArray.length = 0;
-
-	var currentOctreeSelected = this.selectionCandidateLowestOctreesArray[idx];
-	var currentSelectedBuilding = this.selectionCandidateBuildingsArray[idx];
-	this.selectionCandidateLowestOctreesArray.length = 0;
-	this.selectionCandidateBuildingsArray.length = 0;
-
-	resultSelectedArray[0] = currentSelectedBuilding;
-	resultSelectedArray[1] = currentOctreeSelected;
-	resultSelectedArray[2] = selectedObject;
-	
-	return selectedObject;
-};
 
 /**
  * Calculates the direction vector of a ray that starts in the camera position and
@@ -2398,13 +2095,13 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
-		var squaredDistLod0 = 500;
-		var squaredDistLod1 = 12000;
+		var squaredDistLod0 = 450;
+		var squaredDistLod1 = 11000;
 		var squaredDistLod2 = 500000*1000;
 		
-		squaredDistLod0 = 300;
-		squaredDistLod1 = 1000;
-		squaredDistLod2 = 500000*1000;
+		//squaredDistLod0 = 300;
+		//squaredDistLod1 = 1000;
+		//squaredDistLod2 = 500000*1000;
 		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
@@ -2558,7 +2255,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 MagoManager.prototype.manageQueue = function() 
 {
 	// first, delete buildings.
-	var maxDeleteBuildingsCount = 20;
+	var maxDeleteBuildingsCount = 10;
 	var buildingsToDeleteCount = this.processQueue.buildingsToDelete.length;
 	if (buildingsToDeleteCount < maxDeleteBuildingsCount)
 	{ maxDeleteBuildingsCount = buildingsToDeleteCount; }
@@ -2572,7 +2269,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse pendent data.
-	var maxParsesCount = 10;
+	var maxParsesCount = 5;
 	
 	// references lod0 & lod 1.
 	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
@@ -2604,7 +2301,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// models lod0 & lod1.
-	maxParsesCount = 10;
+	maxParsesCount = 5;
 	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -2707,30 +2404,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			continue;
 		}
 
-		// 2 = file loading finished.***
-		/*
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
-		{
-			//if (refListsParsingCount < maxRefListParsingCount) 
-			{
-				// must parse the arraybuffer data.***
-				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this))
-				{
-					
-				}
-				else 
-				{
-					//lowestOctree.neoReferencesMotherAndIndices.deleteObjects(gl, this.vboMemManager);
-					//lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.READY;
-				}
-				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-				refListsParsingCount += 1;
-			}
-		}
-		*/
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.PARSE_FINISHED ) 
 		{
 			// 4 = parsed.***
@@ -2748,23 +2421,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, this);
 				continue;
 			}
-			/*
-			else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-			{
-				//if (refListsParsingCount < maxRefListParsingCount) 
-				{
-					if (!blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this))
-					{
-						//blocksList.deleteGlObjects(gl, this.vboMemManager);
-						//blocksList.fileLoadState = CODE.fileLoadState.READY;
-					}
-					blocksList.dataArraybuffer = undefined;
-					refListsParsingCount += 1;
-					
-				}
-				continue;
-			}
-			*/
 		}
 		
 		// if the lowest octree is not ready to render, then:
@@ -2863,73 +2519,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 			}
 		}
-	}
-};
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
- * @param scene 변수
- * @param shader 변수
- * @param renderTexture 변수
- * @param ssao_idx 변수
- * @param neoRefLists_array 변수
- */
-MagoManager.prototype.renderDetailedNeoBuilding = function(gl, cameraPosition, scene, shader, renderTexture, ssao_idx, neoRefLists_array) 
-{
-
-	// picking mode.***********************************************************************************
-	if (ssao_idx === -1) 
-	{
-		// picking mode.***
-		this.selectionCandidateObjectsArray.length = 0; // init.***
-
-		// set byteColor codes for references objects.***
-		var red = 0, green = 0, blue = 0, alfa = 255;
-
-		// 1) Exterior objects.***
-		var neoRefListsArray = neoRefLists_array;
-		//var neoRefListsArray = this.detailed_neoBuilding._neoRefLists_Container.neoRefsLists_Array;
-		var neoRefLists_count = neoRefListsArray.length;
-		for (var i = 0; i<neoRefLists_count; i++) 
-		{
-			var neoRefList = neoRefListsArray[i];
-			var neoRefsCount = neoRefList.neoRefs_Array.length;
-			for (var j = 0; j < neoRefsCount; j++) 
-			{
-				var neoRef = neoRefList.neoRefs_Array[j];
-				if (neoRef.selColor4 === undefined) { neoRef.selColor4 = new Color(); }
-
-				neoRef.selColor4.set(red, green, blue, alfa);
-				this.selectionCandidateObjectsArray.push(neoRef);
-				blue++;
-				if (blue >= 254) 
-				{
-					blue = 0;
-					green++;
-					if (green >= 254) 
-					{
-						red++;
-					}
-				}
-			}
-		}
-	}
-
-	// ssao_idx = -1 -> pickingMode.***
-	// ssao_idx = 0 -> depth.***
-	// ssao_idx = 1 -> ssao.***
-
-	var isInterior = false;
-	if (ssao_idx === -1) 
-	{
-		this.renderer.renderNeoRefListsColorSelection(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
-	}
-	else 
-	{
-		this.renderer.renderNeoRefLists(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
 	}
 };
 
@@ -3612,49 +3201,6 @@ MagoManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, sh
 	}
 
 	this.renderer.renderLodBuilding(gl, lodBuilding, this, shader, ssao_idx);
-	/*
-	// picking mode.***********************************************************************************
-	if(ssao_idx === -1) {
-		// picking mode.***
-		this.selectionCandidateObjectsArray.length = 0; // init.***
-
-		// set byteColor codes for references objects.***
-		var red = 0, green = 0, blue = 0, alfa = 255;
-
-		// 1) Exterior objects.***
-		var neoRefListsArray = neoRefLists_array;
-		//var neoRefListsArray = this.detailed_neoBuilding._neoRefLists_Container.neoRefsLists_Array;
-		var neoRefLists_count = neoRefListsArray.length;
-		for(var i = 0; i<neoRefLists_count; i++) {
-			var neoRefList = neoRefListsArray[i];
-			var neoRefsCount = neoRefList.neoRefs_Array.length;
-			for(var j=0; j<neoRefsCount; j++) {
-				var neoRef = neoRefList.neoRefs_Array[j];
-				if(neoRef.selColor4 === undefined) neoRef.selColor4 = new Color();
-
-				neoRef.selColor4.set(red, green, blue, alfa);
-				this.selectionCandidateObjectsArray.push(neoRef);
-				blue++;
-				if(blue >= 254) {
-					blue = 0;
-					green++;
-					if(green >= 254) {
-						red++;
-					}
-				}
-			}
-		}
-	}
-
-	if(ssao_idx === -1) {
-		var isInterior = false; // no used.***
-
-		this.renderer.renderNeoRefListsColorSelection(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
-	} else {
-		var isInterior = false; // no used.***
-		this.renderer.renderNeoRefLists(gl, neoRefLists_array, this.detailed_neoBuilding, this, isInterior, shader, renderTexture, ssao_idx);
-	}
-	*/
 };
 
 /**
