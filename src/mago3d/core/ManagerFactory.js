@@ -179,7 +179,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	function initWwwMago(magoManager, gl) 
 	{
 		var viewport = magoManager.wwd.viewport;
-		magoManager.selection.init(gl, viewport.width, viewport.height);
+		//magoManager.selection.init(gl, viewport.width, viewport.height);
 		magoManager.shadersManager.createDefaultShader(gl);
 		magoManager.postFxShadersManager.gl = gl;
 		magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
@@ -196,7 +196,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	function drawCesium() 
 	{
 		var gl = viewer.scene.context._gl;
-		viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+		//viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
 		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
 		viewer.scene.magoManager.postFxShadersManager.gl = gl;
 		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***

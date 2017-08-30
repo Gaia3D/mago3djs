@@ -264,14 +264,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]]; // no occludeCulling mode.***
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
 		if (neoReference === undefined) 
-		{
-			continue;
-		}
+		{ continue; }
 
 		if (neoReference.bRendered === magoManager.renderingFase)
-		{
-			continue;
-		}
+		{ continue; }
 		
 		if (neoReference.tMatrixAuxArray === undefined)
 		{
@@ -1159,9 +1155,10 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
  * @param isInterior 변수
  * @param standardShader 변수
  */
-Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive) 
+Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, lowestOctree, neoBuilding, magoManager, isInterior, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive) 
 {
 	// render_neoRef
+	var neoReferencesMotherAndIndices = lowestOctree.neoReferencesMotherAndIndices;
 	if (neoReferencesMotherAndIndices === undefined)
 	{ return; }
 	
@@ -1182,10 +1179,15 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 
 	// New version. Use occlussion indices.***
 	var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
+	var selCandidates = magoManager.selectionCandidates;
+	var idxKey;
 
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
+		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
+		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
+		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
 		if (neoReference.selColor4) 
 		{
 			//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***

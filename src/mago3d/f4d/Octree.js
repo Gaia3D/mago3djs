@@ -63,13 +63,11 @@ Octree.prototype.deleteGlObjects = function(gl, vboMemManager)
 {
 	if (this.lego !== undefined) 
 	{
-		this.lego.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
-		this.lego.vbo_vicks_container = undefined;
+		this.lego.deleteObjects(gl, vboMemManager);
+		this.lego = undefined;
 	}
 	
 	this.legoDataArrayBuffer = undefined;
-	this.lego = undefined;
-
 	this.centerPos.deleteObjects();
 	this.centerPos = undefined;
 	this.half_dx = undefined; // half width.***
@@ -613,6 +611,78 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
+	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+{
+	var lowestOctreesArray = [];
+	var distAux = 0.0;
+	var find = false;
+
+	this.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = lowestOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		lowestOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		if (lowestOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles0.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles1.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles2.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ globalVisibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]); }
+				visibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+	}
+
+	return find;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param cesium_cullingVolume 변수
  * @param result_octreesArray 변수
  * @param cesium_boundingSphere_scratch 변수
@@ -918,6 +988,9 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray)
  */
 Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray) 
 {
+	if (this.subOctrees_array == undefined)
+	{ return; }
+	
 	var subOctreesCount = this.subOctrees_array.length;
 
 	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 

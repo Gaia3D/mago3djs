@@ -53,7 +53,8 @@ MetaData.prototype.deleteObjects = function()
 	this.pitch = undefined;
 	this.roll = undefined;
 
-	this.bbox.deleteObjects();
+	if (this.bbox)
+	{ this.bbox.deleteObjects(); }
 	this.bbox = undefined; // BoundingBox.***
 	this.imageLodCount = undefined;
 

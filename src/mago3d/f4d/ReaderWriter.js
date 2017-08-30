@@ -259,9 +259,10 @@ ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, r
 	return resultBbox;
 };
 
-ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, magoManager) 
+ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
+	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
@@ -272,6 +273,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, blocksList, 
 			blocksList.dataArraybuffer = arrayBuffer;
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
+			magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
 		}
 		else 
 		{
@@ -333,29 +335,35 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
  * @param fileName 파일명
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, neoRefsList, magoManager) 
+ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			neoRefsList.dataArraybuffer = arrayBuffer;
-			neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			var neoRefsList = lowestOctree.neoReferencesMotherAndIndices;
+			if (neoRefsList)
+			{
+				neoRefsList.dataArraybuffer = arrayBuffer;
+				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
+			}
 			arrayBuffer = null;
+			
 		}
 		else 
 		{
-			neoRefsList.fileLoadState = 500;
+			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500;
 		}
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status === 0) { neoRefsList.fileLoadState = 500; }
-		else { neoRefsList.fileLoadState = status; }
+		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
+		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
 	}).always(function() 
 	{
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -383,6 +391,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 			{
 				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
 				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
 			}
 			else 
 			{
@@ -951,19 +960,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 
 			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 
-			// test for 1500 blocks.***
-			/*
-			if(neoBuilding.bbox === undefined)
-				neoBuilding.bbox = new BoundingBox();
-			neoBuilding.bbox.minX = neoBuilding.metaData.oct_min_x;
-			neoBuilding.bbox.minY = neoBuilding.metaData.oct_min_y;
-			neoBuilding.bbox.minZ = neoBuilding.metaData.oct_min_z;
-			neoBuilding.bbox.maxX = neoBuilding.metaData.oct_max_x;
-			neoBuilding.bbox.maxY = neoBuilding.metaData.oct_max_y;
-			neoBuilding.bbox.maxZ = neoBuilding.metaData.oct_max_z;
-			*/
-			// end // test for 1500 blocks.***
-
 			//BR_Project._f4d_header_readed_finished = true;
 			arrayBuffer = undefined;
 		}
@@ -1518,149 +1514,6 @@ ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, reader
 	});
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param buildingFileName 변수
- * @param latitude 변수
- * @param longitude 변수
- * @param height 변수
- * @param readerWriter 변수
- * @param NeoBuildingsList 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.openNeoBuilding = function(gl, buildingFileName, latitude, longitude, height, readerWriter, NeoBuildingsList, magoManager) 
-{
-	// This is a test function to read the new f4d format.***
-	// The location(latitude, longitude, height) is provisional.***
-
-	// Read the header.***
-	var neoBuilding_header_path = this.geometryDataPath + "/"+buildingFileName+"/Header.hed";
-	var neoBuilding = NeoBuildingsList.newNeoBuilding();
-
-	neoBuilding.buildingFileName = buildingFileName;
-
-	if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
-
-	readerWriter.getNeoHeader(gl, neoBuilding_header_path, neoBuilding, readerWriter, magoManager); // Here makes the tree of octree.***
-
-	// 0) PositionMatrix.************************************************************************
-	//var height = elevation;
-	var position = Cesium.Cartesian3.fromDegrees(longitude, latitude, height); // Old.***
-	//var position = absolutePosition;
-	neoBuilding.buildingPosition = position;
-
-	// High and Low values of the position.****************************************************
-	var splitValue = Cesium.EncodedCartesian3.encode(position); // no works.***
-	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-
-	neoBuilding.buildingPositionHIGH = new Float32Array(3);
-	neoBuilding.buildingPositionHIGH[0] = splitVelue_X.high;
-	neoBuilding.buildingPositionHIGH[1] = splitVelue_Y.high;
-	neoBuilding.buildingPositionHIGH[2] = splitVelue_Z.high;
-
-	neoBuilding.buildingPositionLOW = new Float32Array(3);
-	neoBuilding.buildingPositionLOW[0] = splitVelue_X.low;
-	neoBuilding.buildingPositionLOW[1] = splitVelue_Y.low;
-	neoBuilding.buildingPositionLOW[2] = splitVelue_Z.low;
-	// End.-----------------------------------------------------------------------------------
-
-	// Determine the elevation of the position.***********************************************************
-	var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-	var height = cartographic.height;
-	// End Determine the elevation of the position.-------------------------------------------------------
-	neoBuilding.move_matrix = new Float32Array(16); // PositionMatrix.***
-	neoBuilding.moveMatrixInv = new Float32Array(16); // Inverse of PositionMatrix.***
-
-	Cesium.Transforms.eastNorthUpToFixedFrame(position, undefined, neoBuilding.move_matrix);
-	neoBuilding.transfMat_inv = new Float32Array(16);
-	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.transfMat_inv);
-
-	neoBuilding.move_matrix[12] = 0;
-	neoBuilding.move_matrix[13] = 0;
-	neoBuilding.move_matrix[14] = 0;
-	neoBuilding.buildingPosition = position;
-	// note: "neoBuilding.move_matrix" is only rotation matrix.***
-
-	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.moveMatrixInv);
-
-	// 1) Blocks.*******************************************************************************************************************************
-	var blocksListContainer = neoBuilding._blocksList_Container;
-	var filePath_inServer = "";
-
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/Blocks1";
-	var blocksList = blocksListContainer.getBlockList("Blocks1");
-	readerWriter.getNeoBlocks(gl, filePath_inServer, blocksList, readerWriter);
-
-	var filePath_inServer_2 = this.geometryDataPath + "/"+buildingFileName+"/Blocks2";
-	var blocksList_2 = blocksListContainer.getBlockList("Blocks2");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_2, blocksList_2, readerWriter);
-
-	var filePath_inServer_3 = this.geometryDataPath + "/"+buildingFileName+"/Blocks3";
-	var blocksList_3 = blocksListContainer.getBlockList("Blocks3");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_3, blocksList_3, readerWriter);
-
-	var filePath_inServer_bone = this.geometryDataPath + "/"+buildingFileName+"/BlocksBone";
-	var blocksList_bone = blocksListContainer.getBlockList("BlocksBone");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_bone, blocksList_bone, readerWriter);
-
-	var filePath_inServer_4 = this.geometryDataPath + "/"+buildingFileName+"/Blocks4"; // Interior Objects.***
-	var blocksList_4 = blocksListContainer.getBlockList("Blocks4");
-	readerWriter.getNeoBlocks(gl, filePath_inServer_4, blocksList_4, readerWriter);
-
-	// 2) References.****************************************************************************************************************************
-	var moveMatrix = new Matrix4();
-	moveMatrix.setByFloat32Array(neoBuilding.move_matrix);
-	var lod_level = 0;
-
-	var neoRefList_container = neoBuilding._neoRefLists_Container;
-
-	lod_level = 0;
-	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin1";
-	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin1", lod_level, blocksList, moveMatrix, neoBuilding, readerWriter, undefined);
-
-	lod_level = 1;
-	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin2";
-	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin2", lod_level, blocksList_2, moveMatrix, neoBuilding, readerWriter, undefined);
-
-	lod_level = 2;
-	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Skin3";
-	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Skin3", lod_level, blocksList_3, moveMatrix, neoBuilding, readerWriter, undefined);
-
-	lod_level = 3;
-	filePath_inServer = this.geometryDataPath + "/" + buildingFileName + "/Ref_Bone";
-	readerWriter.getNeoReferences(gl, filePath_inServer, neoRefList_container, "Ref_Bone", lod_level, blocksList_bone, moveMatrix, neoBuilding, readerWriter, undefined);
-
-	// Now, read the interior objects in octree format.**********************************************************************************************
-	var interiorCRef_folderPath = this.geometryDataPath + "/" + buildingFileName + "/inLOD4";
-	lod_level = 4;
-	//var interior_base_name = "Ref_NodeData";
-	var subOctreeName_counter = -1;
-
-	for (var i=1; i<9; i++) 
-	{
-		for (var j=1; j<9; j++) 
-		{
-			for (var k=1; k<9; k++) 
-			{
-				subOctreeName_counter = i*100 + j*10 + k;
-				var interiorCRef_fileName = subOctreeName_counter.toString();
-
-				// Create a "compoundRefList".************************************************
-				var intCompRef_filePath = interiorCRef_folderPath + "/" + interiorCRef_fileName;
-				//readerWriter.readF4D_CompoundReferences_inServer(gl, intCompRef_filePath, null, interiorCRef_fileName, 4, blocksList_4, moveMatrix, BR_buildingProject, readerWriter, subOctreeName_counter);
-				readerWriter.getNeoReferences(gl, intCompRef_filePath, null, interiorCRef_fileName, lod_level, blocksList_4, moveMatrix, neoBuilding, readerWriter, subOctreeName_counter);
-			}
-		}
-	}
-
-	// Now, read the simple building.************************
-	neoBuilding.neoSimpleBuilding = new NeoSimpleBuilding();
-	filePath_inServer = this.geometryDataPath + "/"+buildingFileName+"/SimpleBuilding";
-	readerWriter.getNeoSimpleBuilding(gl, filePath_inServer, neoBuilding.neoSimpleBuilding, readerWriter);
-};
 
 //load neoTextures
 ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
