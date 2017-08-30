@@ -37,6 +37,20 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @param nx 변수
+ * @param ny 변수
+ * @param nz 변수p
+ */
+Plane.prototype.setPoint = function(px, py, pz) 
+{
+	this.d = -this.a*px -this.b*py - this.c*pz;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param dist
  * @param nx 변수
  * @param ny 변수
