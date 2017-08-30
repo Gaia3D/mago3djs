@@ -35,6 +35,27 @@ Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 /**
  * F4D Lego 자료를 읽는다
  * 
+ * @param {any} gl 
+ * @param {any} readWriter 
+ * @param {any} dataArraybuffer 
+ * @param {any} bytesReaded 
+ */
+Lego.prototype.deleteObjects = function(gl, vboMemManager)
+{
+	this.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
+	this.vbo_vicks_container = undefined;
+	this.fileLoadState = undefined;
+	this.dataArrayBuffer = undefined;
+	if (this.selColor4 != undefined)
+	{
+		this.selColor4.deleteObjects();
+		this.selColor4 = undefined;
+	}
+};
+
+/**
+ * F4D Lego 자료를 읽는다
+ * 
  * @param {ArrayBuffer} buffer 
  */
 Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
@@ -122,16 +143,21 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	
-	vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager);
-	vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager);
-	vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager);
+	var succesfullyGpuDataBinded = true;
+	if (!vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
+	if (!vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
+	if (!vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
 
 	// 4) Texcoord.*********************************************
 	if (hasTexCoords)
 	{
-		vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager);
+		if (!vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+		{ succesfullyGpuDataBinded = false; }
 	}	
-	
+	return succesfullyGpuDataBinded;
 };
 
 

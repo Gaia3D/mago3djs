@@ -258,7 +258,7 @@ var VBOMemoryManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// if "enableMemoryManagement" == false -> no management of the gpu memory.
-	this.enableMemoryManagement = true;
+	this.enableMemoryManagement = false;
 	
 	this.buffersKeyWorld = new VBOKeysWorld();
 	this.elementKeyWorld = new VBOKeysWorld();

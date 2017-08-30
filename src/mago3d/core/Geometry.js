@@ -174,6 +174,7 @@ var NeoBuilding = function()
 	this.isReadyToRender = false; // no used yet...
 
 	this.moveVector; 
+	this.squaredDistToCam;
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
