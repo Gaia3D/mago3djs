@@ -194,12 +194,24 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 
 	if (longitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.longitude = longitude; }
+	else 
+	{
+		longitude = resultGeoLocationData.geographicCoord.longitude;
+	}
 
 	if (latitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.latitude = latitude; }
+	else 
+	{
+		latitude = resultGeoLocationData.geographicCoord.latitude;
+	}
 
 	if (altitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.altitude = altitude; }
+	else 
+	{
+		altitude = resultGeoLocationData.geographicCoord.altitude;
+	}
 
 	if (heading !== undefined)
 	{ resultGeoLocationData.heading = heading; }

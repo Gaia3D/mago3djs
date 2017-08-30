@@ -140,6 +140,14 @@ SelectionColor.prototype.getAvailableColor = function(resultColor)
 	return resultColor;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SelectionColor.prototype.decodeColor3 = function(r, g, b) 
+{
+	return 64516*r + 254*g + b;
+};
+
 
 
 
