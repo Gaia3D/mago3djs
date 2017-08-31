@@ -18,3 +18,11 @@ var Texture = function()
 	this.texId;
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
+
+Texture.prototype.deleteObjects = function()
+{
+	this.textureTypeName = undefined;
+	this.textureImageFileName = undefined;
+	this.texId = undefined;
+	this.fileLoadState = undefined;
+};
