@@ -13,5 +13,5 @@ var ProcessQueue = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.buildingsToDelete = [];
+	this.buildingsToDeleteMap = new Map();
 };

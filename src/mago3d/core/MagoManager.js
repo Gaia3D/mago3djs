@@ -12,9 +12,9 @@ var MagoManager = function()
 	}
 
 	// F4D Data structure & objects.*****************************************
-	this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
+	//this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
 	this.terranTile = new TerranTile();// use this.***
-	this.neoBuildingsList = new NeoBuildingsList();
+	//this.neoBuildingsList = new NeoBuildingsList();
 	this.renderer = new Renderer();
 	//this.selection = new Selection();
 	this.selectionCandidates = new SelectionCandidates();
@@ -51,7 +51,7 @@ var MagoManager = function()
 	this.objectSelected;
 	this.buildingSelected;
 	this.octreeSelected;
-	
+
 	this.objMovState = 0; // 0 = no started. 1 = mov started.
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
@@ -1212,8 +1212,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 			this.renderingFase = !this.renderingFase;
 		}
 	}
-	
-	
+
 	if (this.bPicking === true && isLastFrustum)
 	{
 		this.arrayAuxSC.length = 0;
@@ -2202,7 +2201,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		if (!find) 
 		{
 			//this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
-			this.processQueue.buildingsToDelete.push(neoBuilding);
+			this.processQueue.buildingsToDeleteMap.set(neoBuilding, 0);
 			return;
 		}
 	}
@@ -2255,30 +2254,45 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 MagoManager.prototype.manageQueue = function() 
 {
 	// first, delete buildings.
-	var maxDeleteBuildingsCount = 10;
-	var buildingsToDeleteCount = this.processQueue.buildingsToDelete.length;
+	var gl = this.sceneState.gl;
+	var maxDeleteBuildingsCount = 8;
+	var buildingsToDeleteCount = this.processQueue.buildingsToDeleteMap.size;
 	if (buildingsToDeleteCount < maxDeleteBuildingsCount)
 	{ maxDeleteBuildingsCount = buildingsToDeleteCount; }
 	
 	var neoBuilding;
-	
+	/*
+	// incompatibility gulp.
+	for (var key of this.processQueue.buildingsToDeleteMap.keys())
+	{
+		this.deleteNeoBuilding(gl, key);
+		this.processQueue.buildingsToDeleteMap.delete(key);
+		deletedCount += 1;
+		if (deletedCount > maxDeleteBuildingsCount)
+		{ break; }
+	}
+	*/
+	var buildingsToDeleteArray = Array.from(this.processQueue.buildingsToDeleteMap.keys());
 	for (var i=0; i<maxDeleteBuildingsCount; i++)
 	{
-		neoBuilding = this.processQueue.buildingsToDelete.shift();
-		this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
+		neoBuilding = buildingsToDeleteArray[i];
+		this.deleteNeoBuilding(gl, neoBuilding);
+		this.processQueue.buildingsToDeleteMap.delete(neoBuilding);
 	}
+	buildingsToDeleteArray = [];
+	buildingsToDeleteArray = undefined;
 	
 	// parse pendent data.
-	var maxParsesCount = 5;
+	var maxParsesCount = 3;
 	
-	// references lod0 & lod 1.
+	// parse references lod0 & lod 1.
 	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
 	
 	var lowestOctree;
 	var neoBuilding;
-	var gl = this.sceneState.gl;
+	
 	if (this.matrix4SC == undefined)
 	{ this.matrix4SC = new Matrix4(); }
 	
@@ -2300,8 +2314,8 @@ MagoManager.prototype.manageQueue = function()
 		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
 	}
 	
-	// models lod0 & lod1.
-	maxParsesCount = 5;
+	// parse models lod0 & lod1.
+	maxParsesCount = 3;
 	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -2322,8 +2336,8 @@ MagoManager.prototype.manageQueue = function()
 		blocksList.dataArraybuffer = undefined;
 	}
 	
-	// lego lod2.
-	maxParsesCount = 10;
+	// parse lego lod2.
+	maxParsesCount = 5;
 	var toParseCount = this.parseQueue.octreesLod2LegosToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -3842,10 +3856,7 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	}
 	neoBuilding.motherNeoReferencesArray = [];
 
-	// Textures loaded.***************************************************
-	//neoBuilding.textures_loaded = [];
-	
-	// The octree.********************************************************
+	// The octree.
 	if (neoBuilding.octree !== undefined)
 	{ neoBuilding.octree.deleteGlObjects(gl, vboMemoryManager); }
 	neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
@@ -3856,13 +3867,23 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	neoBuilding.allFilesLoaded = false;
 	neoBuilding.isReadyToRender = false;
 
-	// The simple building.***********************************************
-	//neoBuilding.neoSimpleBuilding = undefined; // this is a simpleBuilding for Buildings with texture.***
-
-	// The lodBuildings.***
-	//neoBuilding.lod2Building = undefined;
-	//neoBuilding.lod3Building = undefined;
-
+	// delete textures.
+	/*
+	//if(neoBuilding.texturesLoaded)
+	{
+		var texturesCount = neoBuilding.texturesLoaded.length;
+		for(var i=0; i<texturesCount; i++)
+		{
+			if(neoBuilding.texturesLoaded[i])
+			{
+				gl.deleteTexture(neoBuilding.texturesLoaded[i].texId);
+				neoBuilding.texturesLoaded[i].deleteObjects();
+			}
+			neoBuilding.texturesLoaded[i] = undefined;
+		}
+	}
+	//neoBuilding.texturesLoaded = undefined;
+	*/
 };
 
 /**
@@ -4974,8 +4995,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	{
 		neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 	}
-
-
+	/*
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
 	// repeat this for outfitting building.*********************************************************************************************************************
@@ -4998,6 +5018,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	{
 		neoBuildingOutffiting.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 	}
+	*/
 };
 
 /**
