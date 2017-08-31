@@ -58,6 +58,8 @@ function API(apiName)
 	this.blockType = null;
 	// outfitting 표시/비표시
 	this.showOutFitting = false;
+	// label 표시/비표시
+	this.showLabelInfo = true;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
@@ -74,6 +76,21 @@ function API(apiName)
 	this.nearGeoIssueListEnable = false;
 	//
 	this.insertIssueState = 0;
+	
+	// LOD1
+	this.lod0 = null;
+	this.lod1 = null;
+	this.lod2 = null;
+	this.lod3 = null;
+	
+	// Lighting
+	this.ambientReflectionCoef = null;
+	this.diffuseReflectionCoef = null;
+	this.specularReflectionCoef = null;
+	this.ambientColor = null;
+	this.specularColor = null;
+	
+	this.ssaoRadius = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -242,6 +259,15 @@ API.prototype.setShowOutFitting = function(showOutFitting)
 	this.showOutFitting = showOutFitting;
 };
 
+
+API.prototype.getShowLabelInfo = function() 
+{
+	return this.showLabelInfo;
+};
+API.prototype.setShowLabelInfo = function(showLabelInfo) 
+{
+	this.showLabelInfo = showLabelInfo;
+};
 API.prototype.getShowBoundingBox = function() 
 {
 	return this.showBoundingBox;
@@ -319,4 +345,86 @@ API.prototype.getDrawType = function()
 API.prototype.setDrawType = function(drawType) 
 {
 	this.drawType = drawType;
+};
+
+API.prototype.getLod0 = function() 
+{
+	return this.lod0;
+};
+API.prototype.setLod0 = function(lod0) 
+{
+	this.lod0 = lod0;
+};
+API.prototype.getLod1 = function() 
+{
+	return this.lod1;
+};
+API.prototype.setLod1 = function(lod1) 
+{
+	this.lod1 = lod1;
+};
+API.prototype.getLod2 = function() 
+{
+	return this.lod2;
+};
+API.prototype.setLod2 = function(lod2) 
+{
+	this.lod2 = lod2;
+};
+API.prototype.getLod3 = function() 
+{
+	return this.lod3;
+};
+API.prototype.setLod3 = function(lod3) 
+{
+	this.lod3 = lod3;
+};
+
+API.prototype.getAmbientReflectionCoef = function() 
+{
+	return this.ambientReflectionCoef;
+};
+API.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
+{
+	this.ambientReflectionCoef = ambientReflectionCoef;
+};
+API.prototype.getDiffuseReflectionCoef = function() 
+{
+	return this.diffuseReflectionCoef;
+};
+API.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
+{
+	this.diffuseReflectionCoef = diffuseReflectionCoef;
+};
+API.prototype.getSpecularReflectionCoef = function() 
+{
+	return this.specularReflectionCoef;
+};
+API.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
+{
+	this.specularReflectionCoef = specularReflectionCoef;
+};
+API.prototype.getAmbientColor = function() 
+{
+	return this.ambientColor;
+};
+API.prototype.setAmbientColor = function(ambientColor) 
+{
+	this.ambientColor = ambientColor;
+};
+API.prototype.getSpecularColor = function() 
+{
+	return this.specularColor;
+};
+API.prototype.setSpecularColor = function(specularColor) 
+{
+	this.specularColor = specularColor;
+};
+API.prototype.getSsaoRadius = function() 
+{
+	return this.ssaoRadius;
+};
+API.prototype.setSsaoRadius = function(ssaoRadius) 
+{
+	this.ssaoRadius = ssaoRadius;
 };

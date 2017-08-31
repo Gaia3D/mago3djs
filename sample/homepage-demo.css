@@ -538,8 +538,6 @@ button.btn.on {
     width: 6px;
 }
 
-
-
 /*
 	css-only-tooltip version 1.0.0
 	ⓒ 2015 AHN JAE-HA http://github.com/eu81273
@@ -586,4 +584,30 @@ button.btn.on {
 	top: 50%;
 	left: 45px;
 	opacity: 1;
+}
+
+
+#geo_ambient_reflection_coef_view {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
+}
+#geo_diffuse_reflection_coef_view {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
+}
+#geo_specular_reflection_coef_view {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
 }

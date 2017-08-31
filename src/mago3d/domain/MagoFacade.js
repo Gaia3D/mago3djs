@@ -51,6 +51,21 @@ function changeOutFittingAPI(isShow)
 }
 
 /**
+ * Label 표시/비표시
+ * 
+ * @param {Property} isShow true = 표시, false = 비표시
+ */
+function changeLabelAPI(isShow) 
+{
+	var api = new API("changeLabel");
+	api.setShowLabelInfo(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
  * boundingBox 표시/비표시
  * 
  * @param {Property} isShow true = 활성화, false = 비활성화
@@ -289,5 +304,61 @@ function mouseMoveAPI(eventType)
 	if (managerFactory !== null) 
 	{
 		managerFactory.mouseMove(eventType);
+	}
+}
+
+/**
+ * LOD 설정을 변경
+ * @param {Property} lod0
+ * @param {Property} lod1
+ * @param {Property} lod2
+ * @param {Property} lod3
+ */
+function changeLodAPI(lod0, lod1, lod2, lod3)
+{
+	var api = new API("changeLod");
+	api.setLod0(lod0);
+	api.setLod1(lod1);
+	api.setLod2(lod2);
+	api.setLod3(lod3);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * Lighting 설정
+ * @param {Property} ambientReflectionCoef
+ * @param {Property} diffuseReflectionCoef
+ * @param {Property} specularReflectionCoef
+ * @param {Property} ambientColor
+ * @param {Property} specularColor
+ */
+function changeLightingAPI(ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
+{
+	var api = new API("changeLighting");
+	api.setAmbientReflectionCoef(ambientReflectionCoef);
+	api.setDiffuseReflectionCoef(diffuseReflectionCoef);
+	api.setSpecularReflectionCoef(specularReflectionCoef);
+	api.setAmbientColor(ambientColor);
+	api.setSpecularColor(specularColor);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * SSAD Radius 설정
+ * @param {Property} ssaoRadius
+ */
+function changeSsadRadiusAPI(ssaoRadius)
+{
+	var api = new API("changeSsadRadius");
+	api.setSsaoRadius(ssaoRadius);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
 	}
 }
