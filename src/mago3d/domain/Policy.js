@@ -81,13 +81,13 @@ Policy.prototype.setShowOutFitting = function(showOutFitting)
 {
 	this.showOutFitting = showOutFitting;
 };
-Policy.prototype.getLabelInfo = function() 
+Policy.prototype.getShowLabelInfo = function() 
 {
-	return this.labelInfo;
+	return this.showLabelInfo;
 };
-Policy.prototype.setLabelInfo = function(labelInfo) 
+Policy.prototype.setShowLabelInfo = function(showLabelInfo) 
 {
-	this.labelInfo = labelInfo;
+	this.showLabelInfo = showLabelInfo;
 };
 Policy.prototype.getShowBoundingBox = function() 
 {
