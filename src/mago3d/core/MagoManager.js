@@ -5333,6 +5333,9 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeOutFitting") 
 	{
 		this.magoPolicy.setShowOutFitting(api.getShowOutFitting());
+	} 
+	else if (apiName === "changeLabel") {
+		
 	}
 	else if (apiName === "changeBoundingBox") 
 	{

@@ -51,6 +51,21 @@ function changeOutFittingAPI(isShow)
 }
 
 /**
+ * Label 표시/비표시
+ * 
+ * @param {Property} isShow true = 표시, false = 비표시
+ */
+function changeLabelAPI(isShow) 
+{
+	var api = new API("changeLabel");
+	api.setShowLabelInfo(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
  * boundingBox 표시/비표시
  * 
  * @param {Property} isShow true = 활성화, false = 비활성화

@@ -363,6 +363,13 @@
 	
 	<div id="configMenuContent" class="configWrap">
 		<div>
+			<h3>Label</h3>
+			<input type="radio" id="showLabel" name="labelInfo" value="true" onclick="changeLabel(true);" />
+			<label for="showLabel"> 표시 </label>
+			<input type="radio" id="hideLabel" name="labelInfo" value="false" onclick="changeLabel(false);"/>
+			<label for="hideLabel"> 비표시 </label>
+		</div>
+		<div>
 			<h3>Object 정보</h3>
 			<input type="radio" id="showObjectInfo" name="objectInfo" value="true" onclick="changeObjectInfoViewMode(true);" />
 			<label for="showObjectInfo"> 표시 </label>
@@ -575,6 +582,8 @@
 		intervalCount++;
 		if(managerFactory != null) {
 			initJqueryCalendar();
+			// Label 표시
+			changeLabel(true);
 			// object 정보 표시
 			changeObjectInfoViewMode(false);
 			// BoundingBox
@@ -1012,6 +1021,11 @@
 	}
 	
 	// 설정 메뉴 시작
+	// Label 표시
+	function changeLabel(isShow) {
+		$("input:radio[name='labelInfo']:radio[value='" + isShow + "']").prop("checked", true);
+		changeLabelAPI(isShow);
+	}
 	// object info 표시
 	function changeObjectInfoViewMode(isShow) {
 		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);

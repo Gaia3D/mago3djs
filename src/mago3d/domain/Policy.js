@@ -16,6 +16,8 @@ var Policy = function()
 
 	// outfitting 표시 여부
 	this.showOutFitting = false;
+	// label 표시/비표시
+	this.showLabelInfo = true;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
@@ -79,7 +81,14 @@ Policy.prototype.setShowOutFitting = function(showOutFitting)
 {
 	this.showOutFitting = showOutFitting;
 };
-
+Policy.prototype.getLabelInfo = function() 
+{
+	return this.labelInfo;
+};
+Policy.prototype.setLabelInfo = function(labelInfo) 
+{
+	this.labelInfo = labelInfo;
+};
 Policy.prototype.getShowBoundingBox = function() 
 {
 	return this.showBoundingBox;

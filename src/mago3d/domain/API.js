@@ -58,6 +58,8 @@ function API(apiName)
 	this.blockType = null;
 	// outfitting 표시/비표시
 	this.showOutFitting = false;
+	// label 표시/비표시
+	this.showLabelInfo = true;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
@@ -257,6 +259,15 @@ API.prototype.setShowOutFitting = function(showOutFitting)
 	this.showOutFitting = showOutFitting;
 };
 
+
+API.prototype.getShowLabelInfo = function() 
+{
+	return this.showLabelInfo;
+};
+API.prototype.setShowLabelInfo = function(showLabelInfo) 
+{
+	this.showLabelInfo = showLabelInfo;
+};
 API.prototype.getShowBoundingBox = function() 
 {
 	return this.showBoundingBox;
