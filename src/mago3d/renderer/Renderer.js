@@ -263,12 +263,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	{
 		//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]]; // no occludeCulling mode.***
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
-		if (neoReference === undefined) 
+		if (neoReference === undefined)
 		{ continue; }
-
 		if (neoReference.bRendered === magoManager.renderingFase)
 		{ continue; }
-		
 		if (neoReference.tMatrixAuxArray === undefined)
 		{
 			//neoReference.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);

@@ -22,6 +22,12 @@ var SelectionCandidates = function()
 	this.currentBuildingSelected;
 };
 
+/**
+ * SelectionCandidates
+ * 
+ * @alias SelectionCandidates
+ * @class SelectionCandidates
+ */
 SelectionCandidates.prototype.setCandidates = function(idxKey, reference, octree, building)
 {
 	if (reference)
@@ -40,6 +46,12 @@ SelectionCandidates.prototype.setCandidates = function(idxKey, reference, octree
 	}
 };
 
+/**
+ * SelectionCandidates
+ * 
+ * @alias SelectionCandidates
+ * @class SelectionCandidates
+ */
 SelectionCandidates.prototype.clearCandidates = function()
 {
 	this.referencesMap.clear();
@@ -47,6 +59,12 @@ SelectionCandidates.prototype.clearCandidates = function()
 	this.buildingsMap.clear();
 };
 
+/**
+ * SelectionCandidates
+ * 
+ * @alias SelectionCandidates
+ * @class SelectionCandidates
+ */
 SelectionCandidates.prototype.selectObjects = function(idxKey)
 {
 	this.currentReferenceSelected = this.referencesMap.get(idxKey);
@@ -54,19 +72,15 @@ SelectionCandidates.prototype.selectObjects = function(idxKey)
 	this.currentBuildingSelected = this.buildingsMap.get(idxKey);
 };
 
+/**
+ * SelectionCandidates
+ * 
+ * @alias SelectionCandidates
+ * @class SelectionCandidates
+ */
 SelectionCandidates.prototype.clearCurrents = function(idxKey)
 {
 	this.currentReferenceSelected = undefined;
 	this.currentOctreeSelected = undefined;
 	this.currentBuildingSelected = undefined;
 };
-
-
-
-
-
-
-
-
-
-
