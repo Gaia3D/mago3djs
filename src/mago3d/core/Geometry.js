@@ -143,28 +143,20 @@ var NeoBuilding = function()
 
 	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
 	this.geoLocDataManager = new GeoLocationDataManager();
-	this.geoLocationDataAux; // old. created for HeavyIndustries.***
-	this.isDemoBlock = false; // test.***
-	//this.isHighLighted;
-
-	// create the references lists.*********************************
-	//this._neoRefLists_Container = new NeoReferencesListsContainer(); // Exterior and bone objects.***
-	this.currentRenderablesNeoRefLists = []; // test. no used. waiting for background process.***
-	this.preExtractedLowestOctreesArray = []; // test. no used. waiting for background process.***
 	
 	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; // asimetric mode.***
 	this.motherBlocksArray = []; // asimetric mode.***
 	
 	// Current visible objects.*******************************************
-	this.currentVisibleOctreesControler; //  = new VisibleObjectsControler();
+	this.currentVisibleOctreesControler; //  class VisibleObjectsControler;
 	
 	// Aditional Color.***************************************************
 	this.aditionalColor; // use for colorChanged.***
 
 	// Textures loaded.***************************************************
 	this.texturesLoaded = []; // material textures.***
-	this.texturesLoadedCache = {};
+	this.texturesLoadedCache = {}; // no udes yet...
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -178,15 +170,37 @@ var NeoBuilding = function()
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
-	//this.neoSimpleBuilding; // no used. this is a simpleBuilding for Buildings with texture.***
-
-	// The lodBuildings.***
-	//this.lod2Building;
-	//this.lod3Building;
 
 	// SCRATCH.*********************************
-	this.point3dScratch = new Point3D();
-	this.point3dScratch2 = new Point3D();
+	this.point3dScratch = new Point3D(); // delete this.
+	this.point3dScratch2 = new Point3D(); // delete this.
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function() 
+{
+	if (this.bboxAbsoluteCenterPos == undefined)
+	{
+		this.calculateBBoxCenterPositionWorldCoord();
+	}
+	
+	return this.bboxAbsoluteCenterPos;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function() 
+{
+	var geoLoc = this.geoLocDataManager.geoLocationDataArray[0]; // take the 1rst.
+	var bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
 };
 
 /**

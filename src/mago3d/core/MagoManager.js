@@ -933,6 +933,14 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var columnMajorArray = modelViewProjectionRelToEye_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
 		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
 		
+		// ModelViewProjectionMatrix.***
+		var modelViewProjection_aux = WorldWind.Matrix.fromIdentity();
+		modelViewProjection_aux.copy(projection);
+		modelViewProjection_aux.multiplyMatrix(modelView);
+		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
+		var columnMajorArray = modelViewProjection_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
+		sceneState.modelViewProjMatrix.copyFromFloatArray(columnMajorArray);
+		
 		/*
 		// ModelViewProjectionRelToEyeMatrix.***
 		columnMajorArray = WorldWind.Matrix.fromIdentity();
@@ -967,6 +975,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			sceneState.camera.frustum.fovyRad = angleAlfa; // pendent to know the real fov in webwroldwind.***
 			sceneState.camera.frustum.fovRad = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
 			sceneState.camera.frustum.dirty = false;
+			sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
 		}
 
 		// screen size.***
@@ -980,6 +989,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var uniformState = scene._context.uniformState;
 		//var uniformState = scene._context._us;
 		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
 		Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
 		
 		sceneState.modelViewRelToEyeMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewRelToEyeMatrixInv._floatArrays);// original.***
@@ -988,6 +998,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.multiply(uniformState.model, uniformState.view, sceneState.modelViewMatrix._floatArrays);
 		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays);
+		
+		//calculate modelViewProjection.
+		//sceneState.modelViewProjMatrix = sceneState.modelViewMatrix.getMultipliedByMatrix(sceneState.projectionMatrix, sceneState.modelViewProjMatrix);
 
 		var cameraPosition = scene.context._us._cameraPosition;
 		ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
@@ -1001,6 +1014,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
 		sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
 		sceneState.camera.frustum.aspectRatio = scene._camera.frustum._aspectRatio;
+		sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
 
 		sceneState.camera.position.set(scene.context._us._cameraPosition.x, scene.context._us._cameraPosition.y, scene.context._us._cameraPosition.z);
 		sceneState.camera.direction.set(scene._camera.direction.x, scene._camera.direction.y, scene._camera.direction.z);
@@ -1270,6 +1284,12 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	ssao_idx = 1;
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
 	
+	// test. Draw the buildingNames.***
+	if (this.magoPolicy.getShowLabelInfo())
+	{
+		this.drawBuildingNames(this.visibleObjControlerBuildings) ;
+	}
+	
 	this.renderingFase = !this.renderingFase;
 	
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
@@ -1281,6 +1301,47 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		this.wwd.drawContext.redrawRequested = true;
 	}
 	
+	
+};
+
+/**
+ * Draw building names on scene.
+ */
+MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
+{
+	var canvas = document.getElementById("text");
+	canvas.style.opacity = 1.0;
+	canvas.width = this.sceneState.drawingBufferWidth;
+	canvas.height = this.sceneState.drawingBufferHeight;
+	var ctx = canvas.getContext("2d");
+	ctx.strokeStyle = 'black';
+	ctx.fillStyle= "white";
+	ctx.lineWidth = 4;
+	ctx.font = "20px Arial";
+	ctx.textAlign = 'center';
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	ctx.save();
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	// lod2.
+	var gl = this.sceneState.gl;
+	var neoBuilding;
+	var geoLocation;
+	var worldPosition;
+	var screenCoord;
+	var buildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
+	for (var i=0; i<buildingsCount; i++)
+	{
+		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
+		//geoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		//worldPosition = geoLocation.position;
+		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
+		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
+
+		ctx.strokeText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+		ctx.fillText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+	}
+	ctx.restore();
 };
 
 /**
@@ -1630,6 +1691,52 @@ MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pi
 };
 
 /**
+ * Calculates the pixel position in world coordinates.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+MagoManager.prototype.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord, neoBuilding) // arg "neoBuilding" is test.
+{
+	if (resultScreenCoord == undefined)
+	{ resultScreenCoord = new Point3D(); }
+	
+	if (this.pointSC == undefined)
+	{ this.pointSC = new Point3D(); }
+	
+	if (this.pointSC2 == undefined)
+	{ this.pointSC2 = new Point3D(); }
+	
+	this.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
+	
+	// calculate the position in camera coords.
+	this.pointSC2 = this.sceneState.modelViewMatrix.transformPoint3D(this.pointSC, this.pointSC2);
+	
+	// now calculate the position in screen coords.
+	var zDist = this.pointSC2.z;
+	
+	// now calculate the width and height of the plane in zDist.
+	var fovyRad = this.sceneState.camera.frustum.fovyRad;
+	
+	var planeHeight = this.sceneState.camera.frustum.tangentOfHalfFovy*zDist*2;
+	var planeWidth = planeHeight * this.sceneState.camera.frustum.aspectRatio; // aspectRatio(w/h).
+	
+	var pixelX = -this.pointSC2.x * this.sceneState.drawingBufferWidth / planeWidth;
+	var pixelY = -(this.pointSC2.y) * this.sceneState.drawingBufferHeight / planeHeight;
+
+	pixelX += this.sceneState.drawingBufferWidth / 2;
+	pixelY += this.sceneState.drawingBufferHeight / 2;
+	
+	pixelY = this.sceneState.drawingBufferHeight - pixelY;
+	
+	resultScreenCoord.set(pixelX, pixelY, 0);
+	
+	return resultScreenCoord;
+};
+
+/**
  * 드래그 여부 판단
  * 
  * @returns {Boolean} 드래그 여부
@@ -1857,6 +1964,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.x -= difX;
 			this.startMovPoint.y -= difY;
 		}
+		
+		this.buildingSelected.calculateBBoxCenterPositionWorldCoord();
 	}
 	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
@@ -2074,11 +2183,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl)
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux, lod) 
 {
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
-	
-	if (neoBuilding.buildingId == "U310T")
-	{ var hola = 0; }
-
-	neoBuilding.currentRenderablesNeoRefLists.length = 0;
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 
@@ -2094,13 +2198,13 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
-		var squaredDistLod0 = 450;
-		var squaredDistLod1 = 11000;
-		var squaredDistLod2 = 500000*1000;
+		var squaredDistLod0 = this.magoPolicy.getLod0DistInMeters();
+		var squaredDistLod1 = this.magoPolicy.getLod1DistInMeters();
+		var squaredDistLod2 = this.magoPolicy.getLod2DistInMeters();
 		
-		//squaredDistLod0 = 300;
-		//squaredDistLod1 = 1000;
-		//squaredDistLod2 = 500000*1000;
+		squaredDistLod0 *= squaredDistLod0;
+		squaredDistLod1 *= squaredDistLod1;
+		squaredDistLod2 *= squaredDistLod2;
 		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
@@ -2283,7 +2387,7 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = undefined;
 	
 	// parse pendent data.
-	var maxParsesCount = 3;
+	var maxParsesCount = 2;
 	
 	// parse references lod0 & lod 1.
 	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
@@ -2315,7 +2419,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse models lod0 & lod1.
-	maxParsesCount = 3;
+	maxParsesCount = 2;
 	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -2337,7 +2441,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse lego lod2.
-	maxParsesCount = 5;
+	maxParsesCount = 3;
 	var toParseCount = this.parseQueue.octreesLod2LegosToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -2631,10 +2735,21 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				
 				gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
 				
+				// lighting.
+				//this.magoPolicy.setSpecularColor(api.getSpecularColor());
+				gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
+				gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius());  
+
+				gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
+				gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
+				gl.uniform1f(currentShader.specularReflectionCoef_loc, this.magoPolicy.getSpecularReflectionCoef());
+				
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+				
+	
 				
 				//gl.clearStencil(0);
 				this.visibleObjControlerOctreesAux.initArrays();
@@ -4169,8 +4284,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				}
 				
 				//realBuildingPos = geoLoc.pivotPoint;
-				bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-				realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
+				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord();
 				
 				if (neoBuilding.buildingId === "ctships")
 				{
@@ -5355,8 +5469,15 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.magoPolicy.setShowOutFitting(api.getShowOutFitting());
 	} 
-	else if (apiName === "changeLabel") {
+	else if (apiName === "changeLabel") 
+	{
+		this.magoPolicy.setShowLabelInfo(api.getShowLabelInfo());
 		
+		// clear the text canvas.
+		var canvas = document.getElementById("text");
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
 	}
 	else if (apiName === "changeBoundingBox") 
 	{
@@ -5365,6 +5486,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeShadow") 
 	{
 		this.magoPolicy.setShowShadow(api.getShowShadow());
+		
 	}
 	else if (apiName === "changefrustumFarDistance") 
 	{
@@ -5441,14 +5563,21 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLod")
 	{
-		
+		this.magoPolicy.setLod0DistInMeters(api.getLod0DistInMeters());
+		this.magoPolicy.setLod1DistInMeters(api.getLod1DistInMeters());
+		this.magoPolicy.setLod2DistInMeters(api.getLod2DistInMeters());
+		this.magoPolicy.setLod3DistInMeters(api.getLod3DistInMeters());
 	}
 	else if (apiName === "changeLighting")
 	{
-	
+		this.magoPolicy.setAmbientReflectionCoef(api.getAmbientReflectionCoef());
+		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
+		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
+		this.magoPolicy.setSpecularColor(api.getSpecularColor());
+		
 	}
 	else if (apiName === "changeSsadRadius")
 	{
-		
+		this.magoPolicy.setSsaoRadius(api.getSsaoRadius());
 	}
 };

@@ -24,17 +24,16 @@ uniform vec4 vColor4Aux;
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
 
-varying vec3 ambientColor;
 varying vec3 diffuseColor;
-varying vec3 specularColor;
+uniform vec3 specularColor;
 varying vec3 vertexPos;
 
 const int kernelSize = 16;  
-const float radius = 0.15;      
+uniform float radius;      
 
-const float ambientReflectionCoef = 0.5;
-const float diffuseReflectionCoef = 1.0;  
-const float specularReflectionCoef = 1.0; 
+uniform float ambientReflectionCoef;
+uniform float diffuseReflectionCoef;  
+uniform float specularReflectionCoef; 
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -84,7 +83,6 @@ void main()
         {
             occlusion +=  1.0;
         }
-        
     }   
         
     occlusion = 1.0 - occlusion / float(kernelSize);
@@ -102,6 +100,11 @@ void main()
         float specAngle = max(dot(R, V), 0.0);
         specular = pow(specAngle, shininessValue);
     }
+	
+	if(lambertian < 0.5)
+    {
+		lambertian = 0.5;
+	}
 
     vec4 textureColor;
     if(hasTexture)
@@ -121,8 +124,8 @@ void main()
     else{
         textureColor = vColor4Aux;
     }
-    vec3 specularColor = vec3(0.7);
-    vec3 ambientColor = vec3(textureColor.x * 0.7, textureColor.y * 0.7, textureColor.z * 0.7);
+	
+	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
 }

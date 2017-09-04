@@ -49,19 +49,19 @@ var Policy = function()
 	this.colorChangedObjectId;
 	
 	// LOD1
-	this.lod0 = null;
-	this.lod1 = null;
-	this.lod2 = null;
-	this.lod3 = null;
+	this.lod0DistInMeters = 22;
+	this.lod1DistInMeters = 70;
+	this.lod2DistInMeters = 22360;
+	this.lod3DistInMeters = 60000;
 	
 	// Lighting
-	this.ambientReflectionCoef = null;
-	this.diffuseReflectionCoef = null;
-	this.specularReflectionCoef = null;
+	this.ambientReflectionCoef = 0.2;
+	this.diffuseReflectionCoef = 1.0;
+	this.specularReflectionCoef = 0.7;
 	this.ambientColor = null;
-	this.specularColor = null;
+	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	
-	this.ssaoRadius = null;
+	this.ssaoRadius = 0.15;
 };
 
 Policy.prototype.getMagoEnable = function() 
@@ -195,37 +195,37 @@ Policy.prototype.setImagePath = function(imagePath)
 	this.imagePath = imagePath;
 };
 
-Policy.prototype.getLod0 = function() 
+Policy.prototype.getLod0DistInMeters = function() 
 {
-	return this.lod0;
+	return this.lod0DistInMeters;
 };
-Policy.prototype.setLod0 = function(lod0) 
+Policy.prototype.setLod0DistInMeters = function(lod0DistInMeters) 
 {
-	this.lod0 = lod0;
+	this.lod0DistInMeters = lod0DistInMeters;
 };
-Policy.prototype.getLod1 = function() 
+Policy.prototype.getLod1DistInMeters = function() 
 {
-	return this.lod1;
+	return this.lod1DistInMeters;
 };
-Policy.prototype.setLod1 = function(lod1) 
+Policy.prototype.setLod1DistInMeters = function(lod1DistInMeters) 
 {
-	this.lod1 = lod1;
+	this.lod1DistInMeters = lod1DistInMeters;
 };
-Policy.prototype.getLod2 = function() 
+Policy.prototype.getLod2DistInMeters = function() 
 {
-	return this.lod2;
+	return this.lod2DistInMeters;
 };
-Policy.prototype.setLod2 = function(lod2) 
+Policy.prototype.setLod2DistInMeters = function(lod2DistInMeters) 
 {
-	this.lod2 = lod2;
+	this.lod2DistInMeters = lod2DistInMeters;
 };
-Policy.prototype.getLod3 = function() 
+Policy.prototype.getLod3DistInMeters = function() 
 {
-	return this.lod3;
+	return this.lod3DistInMeters;
 };
-Policy.prototype.setLod3 = function(lod3) 
+Policy.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
 {
-	this.lod3 = lod3;
+	this.lod3DistInMeters = lod3DistInMeters;
 };
 
 Policy.prototype.getAmbientReflectionCoef = function() 
