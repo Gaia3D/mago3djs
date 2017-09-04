@@ -125,7 +125,7 @@ void main()
         textureColor = vColor4Aux;
     }
 	
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
+	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 
     gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
 }

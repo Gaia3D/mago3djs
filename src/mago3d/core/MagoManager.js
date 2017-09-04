@@ -2749,8 +2749,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 				
-	
-				
 				//gl.clearStencil(0);
 				this.visibleObjControlerOctreesAux.initArrays();
 				
