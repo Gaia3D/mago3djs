@@ -25,7 +25,6 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 # 적용 사례
 - 남극과학기지 웹기반 3차원 시설ㆍ기장비 관리시스템
 - LiveDroneMap
-- 삼성중공업 시설물 관리시스템
 
 ## Development Environment ##
  - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
