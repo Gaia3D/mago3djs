@@ -482,7 +482,28 @@
 <div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
 	<canvas id="magoContainer" style="width:100%; height:100%">
         Your browser does not support HTML5 Canvas.
+		
     </canvas>
+	<canvas id="text"></canvas>
+	<style>
+	* {
+	  box-sizing: border-box;
+	}
+	#ui {
+		width: 200px;
+	}
+	.container {
+		position: relative;
+	}
+	#text {
+		background-color: transparent;  /* needed because webgl-tutoraisl.css sets canvas bg color to white */
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		z-index: 10;
+		pointer-events:none;
+	}
+	</style>
 </div>
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
 <!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->

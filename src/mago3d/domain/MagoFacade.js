@@ -309,18 +309,18 @@ function mouseMoveAPI(eventType)
 
 /**
  * LOD 설정을 변경
- * @param {Property} lod0
- * @param {Property} lod1
- * @param {Property} lod2
- * @param {Property} lod3
+ * @param {Property} lod0DistInMeters
+ * @param {Property} lod1DistInMeters
+ * @param {Property} lod2DistInMeters
+ * @param {Property} lod3DistInMeters
  */
-function changeLodAPI(lod0, lod1, lod2, lod3)
+function changeLodAPI(lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
 {
 	var api = new API("changeLod");
-	api.setLod0(lod0);
-	api.setLod1(lod1);
-	api.setLod2(lod2);
-	api.setLod3(lod3);
+	api.setLod0DistInMeters(lod0DistInMeters);
+	api.setLod1DistInMeters(lod1DistInMeters);
+	api.setLod2DistInMeters(lod2DistInMeters);
+	api.setLod3DistInMeters(lod3DistInMeters);
 	if (managerFactory !== null) 
 	{
 		managerFactory.callAPI(api);
