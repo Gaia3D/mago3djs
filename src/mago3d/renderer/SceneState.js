@@ -20,6 +20,7 @@ var SceneState = function()
 	this.modelViewMatrix = new Matrix4(); // created as identity matrix.***
 	this.modelViewMatrixInv = new Matrix4(); // created as identity matrix.***
 	this.projectionMatrix = new Matrix4(); // created as identity matrix.***
+	this.modelViewProjMatrix = new Matrix4(); // created as identity matrix.***
 	this.normalMatrix4 = new Matrix4(); // created as identity matrix.***
 	this.identityMatrix4 = new Matrix4(); // created as identity matrix.***
 

@@ -933,6 +933,14 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var columnMajorArray = modelViewProjectionRelToEye_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
 		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
 		
+		// ModelViewProjectionMatrix.***
+		var modelViewProjection_aux = WorldWind.Matrix.fromIdentity();
+		modelViewProjection_aux.copy(projection);
+		modelViewProjection_aux.multiplyMatrix(modelView);
+		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
+		var columnMajorArray = modelViewProjection_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
+		sceneState.modelViewProjMatrix.copyFromFloatArray(columnMajorArray);
+		
 		/*
 		// ModelViewProjectionRelToEyeMatrix.***
 		columnMajorArray = WorldWind.Matrix.fromIdentity();
@@ -967,6 +975,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			sceneState.camera.frustum.fovyRad = angleAlfa; // pendent to know the real fov in webwroldwind.***
 			sceneState.camera.frustum.fovRad = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
 			sceneState.camera.frustum.dirty = false;
+			sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
 		}
 
 		// screen size.***
@@ -980,6 +989,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var uniformState = scene._context.uniformState;
 		//var uniformState = scene._context._us;
 		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
 		Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
 		
 		sceneState.modelViewRelToEyeMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewRelToEyeMatrixInv._floatArrays);// original.***
@@ -988,6 +998,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.multiply(uniformState.model, uniformState.view, sceneState.modelViewMatrix._floatArrays);
 		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays);
+		
+		//calculate modelViewProjection.
+		//sceneState.modelViewProjMatrix = sceneState.modelViewMatrix.getMultipliedByMatrix(sceneState.projectionMatrix, sceneState.modelViewProjMatrix);
 
 		var cameraPosition = scene.context._us._cameraPosition;
 		ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
@@ -1001,6 +1014,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
 		sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
 		sceneState.camera.frustum.aspectRatio = scene._camera.frustum._aspectRatio;
+		sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
 
 		sceneState.camera.position.set(scene.context._us._cameraPosition.x, scene.context._us._cameraPosition.y, scene.context._us._cameraPosition.z);
 		sceneState.camera.direction.set(scene._camera.direction.x, scene._camera.direction.y, scene._camera.direction.z);
@@ -1270,6 +1284,9 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	ssao_idx = 1;
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
 	
+	// test. Draw the buildingNames.***
+	this.drawBuildingNames(this.visibleObjControlerBuildings) ;
+	
 	this.renderingFase = !this.renderingFase;
 	
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
@@ -1281,6 +1298,46 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		this.wwd.drawContext.redrawRequested = true;
 	}
 	
+	
+};
+
+/**
+ * Draw building names on scene.
+ */
+MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
+{
+	var canvas = document.getElementById("text");
+	canvas.style.opacity = 1.0;
+	canvas.width = this.sceneState.drawingBufferWidth;
+	canvas.height = this.sceneState.drawingBufferHeight;
+	var ctx = canvas.getContext("2d");
+	ctx.strokeStyle = 'black';
+	ctx.fillStyle= "white";
+	ctx.lineWidth = 4;
+	ctx.font = "20px Arial";
+	ctx.textAlign = 'center';
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	ctx.save();
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	// lod2.
+	var gl = this.sceneState.gl;
+	var neoBuilding;
+	var geoLocation;
+	var worldPosition;
+	var screenCoord;
+	var buildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
+	for (var i=0; i<buildingsCount; i++)
+	{
+		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
+		geoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		worldPosition = geoLocation.position;
+		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
+
+		ctx.strokeText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+		ctx.fillText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+	}
+	ctx.restore();
 };
 
 /**
@@ -1627,6 +1684,52 @@ MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pi
 	{ var resultPixelPos = new Point3D(); }
 	resultPixelPos = mv_inv.transformPoint3D(pixelPosCamCoord, resultPixelPos);
 	return resultPixelPos;
+};
+
+/**
+ * Calculates the pixel position in world coordinates.
+ * @param {GL} gl 변수
+ * @param {int} pixelX Screen x position of the pixel.
+ * @param {int} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+MagoManager.prototype.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord, neoBuilding) // arg "neoBuilding" is test.
+{
+	if (resultScreenCoord == undefined)
+	{ resultScreenCoord = new Point3D(); }
+	
+	if (this.pointSC == undefined)
+	{ this.pointSC = new Point3D(); }
+	
+	if (this.pointSC2 == undefined)
+	{ this.pointSC2 = new Point3D(); }
+	
+	this.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
+	
+	// calculate the position in camera coords.
+	this.pointSC2 = this.sceneState.modelViewMatrix.transformPoint3D(this.pointSC, this.pointSC2);
+	
+	// now calculate the position in screen coords.
+	var zDist = this.pointSC2.z;
+	
+	// now calculate the width and height of the plane in zDist.
+	var fovyRad = this.sceneState.camera.frustum.fovyRad;
+	
+	var planeHeight = this.sceneState.camera.frustum.tangentOfHalfFovy*zDist*2;
+	var planeWidth = planeHeight * this.sceneState.camera.frustum.aspectRatio; // aspectRatio(w/h).
+	
+	var pixelX = -this.pointSC2.x * this.sceneState.drawingBufferWidth / planeWidth;
+	var pixelY = -(this.pointSC2.y) * this.sceneState.drawingBufferHeight / planeHeight;
+
+	pixelX += this.sceneState.drawingBufferWidth / 2;
+	pixelY += this.sceneState.drawingBufferHeight / 2;
+	
+	pixelY = this.sceneState.drawingBufferHeight - pixelY;
+	
+	resultScreenCoord.set(pixelX, pixelY, 0);
+	
+	return resultScreenCoord;
 };
 
 /**
@@ -2635,6 +2738,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+				
+	
 				
 				//gl.clearStencil(0);
 				this.visibleObjControlerOctreesAux.initArrays();
@@ -5355,7 +5460,8 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.magoPolicy.setShowOutFitting(api.getShowOutFitting());
 	} 
-	else if (apiName === "changeLabel") {
+	else if (apiName === "changeLabel") 
+	{
 		
 	}
 	else if (apiName === "changeBoundingBox") 
