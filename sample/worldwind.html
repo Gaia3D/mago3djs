@@ -225,6 +225,23 @@
 			<input type="radio" id="hideNearGeoIssueList" name="nearGeoIssueList" value="false" onclick="changeNearGeoIssueList(false);"/>
 			<label for="hideNearGeoIssueList"> 비표시 </label>
 		</div>
+		<div>
+			<h3>클릭 지점의 위치 정보</h3>
+			<ul>
+				<li>
+					<label for="positionLat"> 위도 </label>
+					<input type="text" id="positionLat" name="positionLat" size="15" />
+				</li>
+				<li>
+					<label for="positionLat"> 경도 </label>
+					<input type="text" id="positionLon" name="positionLon" size="15" />
+				</li>
+				<li>
+					<label for="positionAlt"> 높이 </label>
+					<input type="text" id="positionAlt" name="positionAlt" size="15" />
+				</li>
+			</ul>
+		</div>
 	</div>
 	
 	<form id="issue" action="/homepage/demo.do" method="post" onsubmit="return false;">
@@ -468,6 +485,14 @@
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
 			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
 		</div>
+		
+		<div>
+			<h3>View Mode</h3>
+			<input type="radio" id="mode3PV" name="viewMode" value ="false" onclick="changeViewMode(false);"/>
+			<label for="mode3PV"> 3인칭 모드 </label>
+			<input type="radio" id="mode1PV" name="viewMode" value ="true" onclick="changeViewMode(true);"/>
+			<label for="mode1PV"> 1인칭 모드 </label>
+		</div>
 	</div>
 </div>
 
@@ -505,6 +530,7 @@
 	}
 	</style>
 </div>
+
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
 <!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
@@ -519,6 +545,7 @@
 <script type="text/javascript" src="/src/mago3d/core/Constant.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/FirstPersonView.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Frustum.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeographicCoord.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeoLocationData.js"></script>
@@ -581,6 +608,7 @@
 <script type="text/javascript" src="/src/mago3d/worker/WebWorker.js"></script>
 <script type="text/javascript" src="/src/mago3d/extern/tga.js"></script>
 <script type="text/javascript" src="/src/mago3d/extern/DataStream.js"></script>
+<script type="text/javascript" src="/src/mago3d/extern/gl-matrix.js"></script>
 <script>
 	var agent = navigator.userAgent.toLowerCase();
 	if(agent.indexOf('chrome') < 0) { 
@@ -596,6 +624,8 @@
 	menuMap.set("insertIssueMenu", false);
 	menuMap.set("configMenu", false);
 	var insertIssueEnable = false;
+	var FPVModeFlag = false;
+
 	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
@@ -616,6 +646,9 @@
 			// slider, color-picker
 			initRendering();
 			
+			// 3PView Mode
+			changeViewMode(false);
+
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
 			return;
@@ -672,6 +705,7 @@
 		}
 		changeInsertIssueModeAPI(insertIssueEnable);
 	});
+	
 	// issue input layer call back function
 	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
 		if(insertIssueEnable) {
@@ -1064,7 +1098,11 @@
 		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
 		changeMouseMoveAPI(mouseMoveMode);
 	}
-	
+	// 카메라 모드 전환
+	function changeViewMode(isFPVMode) {
+		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);
+		changeFPVModeAPI(isFPVMode);
+	}
 	function initJqueryCalendar() {
 		$( ".date" ).datepicker({ 
 			dateFormat : "yymmdd",
@@ -1153,6 +1191,15 @@
 	$("#changeSsadRadiusButton").click(function() {
 		changeSsadRadiusAPI($("#geo_ssao_radius").val());
 	});
+
+	function updatePosition(position)
+	{
+		console.log(position);
+
+		$("#positionLat").val(position.lat);
+		$("#positionLon").val(position.lon);
+		$("#positionAlt").val(position.alt);
+	}
 </script>
 </body>
 </html>

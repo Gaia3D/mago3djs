@@ -57,6 +57,7 @@ Frustum.prototype.calculateFrustumPlanes = function(sphere)
 {
 	// 1rst, calculate the center points of near and far.
 	// todo:
+	console.log(sphere);
 };
 
 

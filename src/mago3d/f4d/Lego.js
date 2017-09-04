@@ -46,7 +46,7 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
 	this.vbo_vicks_container = undefined;
 	this.fileLoadState = undefined;
 	this.dataArrayBuffer = undefined;
-	if (this.selColor4 != undefined)
+	if (this.selColor4 !== undefined)
 	{
 		this.selColor4.deleteObjects();
 		this.selColor4 = undefined;

@@ -40,7 +40,7 @@ ModelReferencedGroupsList.prototype.getModelReferencedGroup = function(modelIdx)
 {
 	var modelReferencedGroup = this.modelReferencedGroupsMap[modelIdx];
 	
-	if (modelReferencedGroup == undefined)
+	if (modelReferencedGroup === undefined)
 	{
 		modelReferencedGroup = new ModelReferencedGroup();
 		modelReferencedGroup.modelIdx = modelIdx;
@@ -61,7 +61,7 @@ ModelReferencedGroupsList.prototype.makeModelReferencedGroupsArray = function()
 	var modelRefGroupsCount = this.modelReferencedGroupsMap.length;
 	for (var i=0; i<modelRefGroupsCount; i++)
 	{
-		if (this.modelReferencedGroupsMap[i] != undefined)
+		if (this.modelReferencedGroupsMap[i] !== undefined)
 		{ this.modelReferencedGroupsArray.push(this.modelReferencedGroupsMap[i]); }
 	}
 	this.modelReferencedGroupsMap.length = 0;
@@ -75,10 +75,10 @@ ModelReferencedGroupsList.prototype.makeModelReferencedGroupsArray = function()
 ModelReferencedGroupsList.prototype.createModelReferencedGroups = function(neoRefsIndices, motherNeoRefsList) 
 {
 	// Group all the references that has the same model.
-	if (neoRefsIndices == undefined)
+	if (neoRefsIndices === undefined)
 	{ return; }
 	
-	if (motherNeoRefsList == undefined)
+	if (motherNeoRefsList === undefined)
 	{ return; }
 	
 	var referenceIdx;
