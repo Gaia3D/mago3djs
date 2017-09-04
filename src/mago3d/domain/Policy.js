@@ -55,13 +55,13 @@ var Policy = function()
 	this.lod3DistInMeters = 60000;
 	
 	// Lighting
-	this.ambientReflectionCoef = null;
-	this.diffuseReflectionCoef = null;
-	this.specularReflectionCoef = null;
+	this.ambientReflectionCoef = 0.2;
+	this.diffuseReflectionCoef = 1.0;
+	this.specularReflectionCoef = 0.7;
 	this.ambientColor = null;
-	this.specularColor = null;
+	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	
-	this.ssaoRadius = null;
+	this.ssaoRadius = 0.15;
 };
 
 Policy.prototype.getMagoEnable = function() 

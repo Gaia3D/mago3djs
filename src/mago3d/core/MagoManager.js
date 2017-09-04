@@ -2735,6 +2735,15 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				
 				gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
 				
+				// lighting.
+				//this.magoPolicy.setSpecularColor(api.getSpecularColor());
+				gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
+				gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius());  
+
+				gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
+				gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
+				gl.uniform1f(currentShader.specularReflectionCoef_loc, this.magoPolicy.getSpecularReflectionCoef());
+				
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 				gl.activeTexture(gl.TEXTURE1);
@@ -5561,10 +5570,14 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLighting")
 	{
-	
+		this.magoPolicy.setAmbientReflectionCoef(api.getAmbientReflectionCoef());
+		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
+		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
+		this.magoPolicy.setSpecularColor(api.getSpecularColor());
+		
 	}
 	else if (apiName === "changeSsadRadius")
 	{
-		
+		this.magoPolicy.setSsaoRadius(api.getSsaoRadius());
 	}
 };
