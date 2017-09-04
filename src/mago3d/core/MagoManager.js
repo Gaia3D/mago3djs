@@ -1285,7 +1285,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerBuildings);
 	
 	// test. Draw the buildingNames.***
-	this.drawBuildingNames(this.visibleObjControlerBuildings) ;
+	if (this.magoPolicy.getShowLabelInfo())
+	{
+		this.drawBuildingNames(this.visibleObjControlerBuildings) ;
+	}
 	
 	this.renderingFase = !this.renderingFase;
 	
@@ -1330,8 +1333,9 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 	for (var i=0; i<buildingsCount; i++)
 	{
 		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
-		geoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		worldPosition = geoLocation.position;
+		//geoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		//worldPosition = geoLocation.position;
+		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
 
 		ctx.strokeText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
@@ -1960,6 +1964,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.x -= difX;
 			this.startMovPoint.y -= difY;
 		}
+		
+		this.buildingSelected.calculateBBoxCenterPositionWorldCoord();
 	}
 	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
@@ -2177,11 +2183,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl)
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux, lod) 
 {
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
-	
-	if (neoBuilding.buildingId == "U310T")
-	{ var hola = 0; }
-
-	neoBuilding.currentRenderablesNeoRefLists.length = 0;
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 
@@ -2197,13 +2198,13 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
-		var squaredDistLod0 = 450;
-		var squaredDistLod1 = 11000;
-		var squaredDistLod2 = 500000*1000;
+		var squaredDistLod0 = this.magoPolicy.getLod0DistInMeters();
+		var squaredDistLod1 = this.magoPolicy.getLod1DistInMeters();
+		var squaredDistLod2 = this.magoPolicy.getLod2DistInMeters();
 		
-		//squaredDistLod0 = 300;
-		//squaredDistLod1 = 1000;
-		//squaredDistLod2 = 500000*1000;
+		squaredDistLod0 *= squaredDistLod0;
+		squaredDistLod1 *= squaredDistLod1;
+		squaredDistLod2 *= squaredDistLod2;
 		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
@@ -2386,7 +2387,7 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = undefined;
 	
 	// parse pendent data.
-	var maxParsesCount = 3;
+	var maxParsesCount = 2;
 	
 	// parse references lod0 & lod 1.
 	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
@@ -2418,7 +2419,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse models lod0 & lod1.
-	maxParsesCount = 3;
+	maxParsesCount = 2;
 	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -2440,7 +2441,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse lego lod2.
-	maxParsesCount = 5;
+	maxParsesCount = 3;
 	var toParseCount = this.parseQueue.octreesLod2LegosToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -4274,8 +4275,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				}
 				
 				//realBuildingPos = geoLoc.pivotPoint;
-				bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-				realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
+				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord();
 				
 				if (neoBuilding.buildingId === "ctships")
 				{
@@ -5462,7 +5462,13 @@ MagoManager.prototype.callAPI = function(api)
 	} 
 	else if (apiName === "changeLabel") 
 	{
+		this.magoPolicy.setShowLabelInfo(api.getShowLabelInfo());
 		
+		// clear the text canvas.
+		var canvas = document.getElementById("text");
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
 	}
 	else if (apiName === "changeBoundingBox") 
 	{
@@ -5471,6 +5477,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeShadow") 
 	{
 		this.magoPolicy.setShowShadow(api.getShowShadow());
+		
 	}
 	else if (apiName === "changefrustumFarDistance") 
 	{
@@ -5547,7 +5554,10 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLod")
 	{
-		
+		this.magoPolicy.setLod0DistInMeters(api.getLod0DistInMeters());
+		this.magoPolicy.setLod1DistInMeters(api.getLod1DistInMeters());
+		this.magoPolicy.setLod2DistInMeters(api.getLod2DistInMeters());
+		this.magoPolicy.setLod3DistInMeters(api.getLod3DistInMeters());
 	}
 	else if (apiName === "changeLighting")
 	{
