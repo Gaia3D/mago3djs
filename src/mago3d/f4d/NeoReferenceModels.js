@@ -111,17 +111,24 @@ NeoReference.prototype.deleteGlObjects = function(gl, vboMemManager)
 
 	// 5) The texture image.***
 	this.hasTexture = undefined;
+	// no delete the texture, only break the referencing.
 	this.texture = undefined; // Texture
 
 	// 6) 1 color.***
+	if (this.color4)
+	{ this.color4.deleteObjects(); }
 	this.color4 = undefined; //new Color();
 
 	// 7) selection color.***
+	if (this.selColor4)
+	{ this.selColor4.deleteObjects(); }
 	this.selColor4 = undefined; //new Color(); // use for selection only.***
 
 	this.vertexCount = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
 
 	// 8) movement of the object.***
+	if (this.moveVector)
+	{ this.moveVector.deleteObjects(); }
 	this.moveVector = undefined; // Point3D.***
 
 	this.bRendered = undefined;
