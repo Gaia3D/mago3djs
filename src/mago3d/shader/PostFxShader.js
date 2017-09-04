@@ -569,6 +569,14 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl)
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 
+	
+	// lighting.
+	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
+	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius");  
+
+	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
+	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
+	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
 
 };
 
