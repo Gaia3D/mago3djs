@@ -133,6 +133,7 @@ var NeoBuilding = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this.name = "";
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***

@@ -1243,6 +1243,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 	ctx.save();
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+	var lineHeight = ctx.measureText("M").width * 1.1;
+
 	// lod2.
 	var gl = this.sceneState.gl;
 	var neoBuilding;
@@ -1258,8 +1260,13 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
 
-		ctx.strokeText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
-		ctx.fillText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+		ctx.font = "20px Arial";
+		ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
+		ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
+
+		ctx.font = "10px Arial";
+		ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+		ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 	}
 	ctx.restore();
 };
@@ -4292,6 +4299,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				{ neoBuilding.metaData.bbox = new BoundingBox(); }
 
 				// create a building and set the location.***
+				neoBuilding.name = buildingSeed.name;
 				neoBuilding.buildingId = buildingSeed.buildingId;
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
@@ -5225,6 +5233,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				
 			if (newLocation) 
 			{
+				buildingSeed.name = newLocation.data_name;
+
 				longitude = parseFloat(newLocation.longitude);
 				latitude = parseFloat(newLocation.latitude);
 				altitude = parseFloat(newLocation.height);
