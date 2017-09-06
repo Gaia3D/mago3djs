@@ -228,7 +228,7 @@
 		</div>
 		<div>
 			<h3>클릭 지점의 위치 정보</h3>
-			<ul>
+			<ul class="apiLoca">
 				<li>
 					<label for="positionLat"> 위도 </label>
 					<input type="text" id="positionLat" name="positionLat" size="15" />
@@ -652,7 +652,7 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		$.ajax({
-			url: "/sample/data.json?data=3",
+			url: "/sample/data.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverData){
