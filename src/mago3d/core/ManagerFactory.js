@@ -325,8 +325,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			if (position)
 			{
 				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
-				pickPosition.lat = Cesium.Math.toDegrees(cartographicPosition.longitude);
-				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.latitude);
+				pickPosition.lat = Cesium.Math.toDegrees(cartographicPosition.latitude);
+				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
 				pickPosition.alt = cartographicPosition.height;
 			}
 			updatePosition(pickPosition);
