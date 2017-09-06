@@ -432,20 +432,20 @@
 		</div>
 		<div>
 			<h3>Lighting</h3>
-			<div style="height: 30px;"><label for="geo_ambient_reflection_coef">AmbientReflectionCoeficient</label></div>
-			<div id="geo_ambient_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">AmbientReflectionCoeficient</div>
+			<div id="ambient_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_ambient_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" />
+				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" value="0.5" />
 			</div>
-			<div style="height: 30px;"><label for="geo_diffuse_reflection_coef">DiffuseReflectionCoeficient</label></div>
-			<div id="geo_diffuse_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">DiffuseReflectionCoeficient</div>
+			<div id="diffuse_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_diffuse_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" />
+				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" value="1" />
 			</div>
-			<div style="height: 30px;"><label for="geo_specular_reflection_coef">SpecularReflectionCoeficient</label></div>
-			<div id="geo_specular_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">SpecularReflectionCoeficient</div>
+			<div id="specular_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_specular_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" />
+				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" value="1" />
 			</div>
 			<!-- <div style="height: 30px;">
 				<label for="geo_ambient_color">AmbientColor</label>
@@ -1105,7 +1105,7 @@
 	// rendering 설정
 	function initRendering() {
 		var ambient = $( "#geo_ambient_reflection_coef_view" );
-		$( "#geo_ambient_reflection_coef" ).slider({
+		$( "#ambient_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value
@@ -1120,7 +1120,7 @@
 			}
 		});
 		var diffuse = $( "#geo_diffuse_reflection_coef_view" );
-		$( "#geo_diffuse_reflection_coef" ).slider({
+		$( "#diffuse_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value
@@ -1135,7 +1135,7 @@
 			}
 		});
 		var specular = $( "#geo_specular_reflection_coef_view" );
-		$( "#geo_specular_reflection_coef" ).slider({
+		$( "#specular_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value

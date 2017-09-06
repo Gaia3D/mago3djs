@@ -5502,7 +5502,6 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
 		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
 		this.magoPolicy.setSpecularColor(api.getSpecularColor());
-		
 	}
 	else if (apiName === "changeSsadRadius")
 	{
