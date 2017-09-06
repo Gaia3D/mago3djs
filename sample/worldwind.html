@@ -227,7 +227,7 @@
 		</div>
 		<div>
 			<h3>클릭 지점의 위치 정보</h3>
-			<ul>
+			<ul class="apiLoca">
 				<li>
 					<label for="positionLat"> 위도 </label>
 					<input type="text" id="positionLat" name="positionLat" size="15" />
@@ -1172,10 +1172,8 @@
 		changeSsadRadiusAPI($("#geo_ssao_radius").val());
 	});
 
-	function updatePosition(position)
-	{
-		console.log(position);
-
+	// click poisition call back function
+	function showClickPosition(position) {
 		$("#positionLat").val(position.lat);
 		$("#positionLon").val(position.lon);
 		$("#positionAlt").val(position.alt);

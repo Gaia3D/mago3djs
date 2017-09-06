@@ -48,8 +48,13 @@
 			</ul>
 		</li>
 		<li><a href="/homepage/download.do">Download</a></li>
-		<li> <a href="/homepage/docs.do">Documentation</a></li>
-		<li> <a href="/homepage/faq.do">FAQ</a></li>
+		<li>Documentation
+			<ul>
+				<li><a href="http://www.mago3d.com/homepage/api.do">API</a></li>
+				<li><a href="http://www.mago3d.com/homepage/spec.do">F4D Spec</a></li>
+			</ul>
+		</li>
+		<li><a href="/homepage/faq.do">FAQ</a></li>
 	</ul>
 	
 	<ul id="myIssueMenuContent" class="issueList">
@@ -1170,10 +1175,8 @@
 		changeSsadRadiusAPI($("#geo_ssao_radius").val());
 	});
 
-	function updatePosition(position)
-	{
-		console.log(position);
-
+	// click poisition call back function
+	function showClickPosition(position) {
 		$("#positionLat").val(position.lat);
 		$("#positionLon").val(position.lon);
 		$("#positionAlt").val(position.alt);

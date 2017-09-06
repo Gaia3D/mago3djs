@@ -49,6 +49,7 @@
 	"geo_callback_enable": "true",
 	"geo_callback_selectedobject": "showSelectedObject",
 	"geo_callback_insertissue": "showInsertIssueLayer",
+	"geo_callback_clickposition": "showClickPosition",
 	"notice_service_yn": "Y",
 	"notice_service_send_type": "0",
 	"notice_approval_request_yn": "N",

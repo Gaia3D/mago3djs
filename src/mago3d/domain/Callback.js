@@ -22,3 +22,13 @@ function insertIssueCallback(functionName, data_key, object_key, latitude, longi
 {
 	window[functionName](data_key, object_key, latitude, longitude, elevation);
 }
+
+/**
+ * mouse click 위치 정보를 화면에 표시
+ * @param functionName
+ * @param position
+ */
+function clickPositionCallback(functionName, position) 
+{
+	window[functionName](position);
+}
