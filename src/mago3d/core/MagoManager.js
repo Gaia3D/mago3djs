@@ -1229,7 +1229,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
  */
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
 {
-	var canvas = document.getElementById("text");
+	var canvas = document.getElementById("objectLabel");
 	canvas.style.opacity = 1.0;
 	canvas.width = this.sceneState.drawingBufferWidth;
 	canvas.height = this.sceneState.drawingBufferHeight;
@@ -5402,7 +5402,7 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setShowLabelInfo(api.getShowLabelInfo());
 		
 		// clear the text canvas.
-		var canvas = document.getElementById("text");
+		var canvas = document.getElementById("objectLabel");
 		var ctx = canvas.getContext("2d");
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 

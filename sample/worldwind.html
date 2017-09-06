@@ -9,12 +9,12 @@
 	
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
-	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" />
+<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
 	
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
-	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script>
+<!-- 	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script> -->
 </head>
 
 <body>
@@ -441,7 +441,7 @@
 				<div id="geo_specular_reflection_coef_view" class="ui-slider-handle"></div>
 				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" />
 			</div>
-			<div style="height: 30px;">
+			<!-- <div style="height: 30px;">
 				<label for="geo_ambient_color">AmbientColor</label>
 				<input type="text" id="geo_ambient_color" name="geo_ambient_color" class="m" size="15"
 					data-palette='[	"#c00000","#ff0000","#ffc000","#ffff00","#92d050",
@@ -472,9 +472,11 @@
 									"#e5e0ec","#ccc1d9","#b2a2c7","#5f497a","#3f3151",
 									"#dbeef3","#b7dde8","#92cddc","#31859b","#205867",
 									"#fdeada","#fbd5b5","#fac08f","#e36c09","#974806" ]' />
-				&nbsp;<button type="button" id="changeLightingButton" class="btn">변경</button>
+				&nbsp;
+			</div> -->
+			<div style="height: 30px; text-align: center;">
+				<button type="button" id="changeLightingButton" class="btn">변경</button>
 			</div>
-			
 			
 			<div style="text-align: center">
 			</div>
@@ -507,32 +509,11 @@
 <div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
 	<canvas id="magoContainer" style="width:100%; height:100%">
         Your browser does not support HTML5 Canvas.
-		
     </canvas>
-	<canvas id="text"></canvas>
-	<style>
-	* {
-	  box-sizing: border-box;
-	}
-	#ui {
-		width: 200px;
-	}
-	.container {
-		position: relative;
-	}
-	#text {
-		background-color: transparent;  /* needed because webgl-tutoraisl.css sets canvas bg color to white */
-		position: absolute;
-		left: 0px;
-		top: 0px;
-		z-index: 10;
-		pointer-events:none;
-	}
-	</style>
+	<canvas id="objectLabel"></canvas>
 </div>
 
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
-<!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/AuxiliarSegment.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/BoundingBox.js"></script>
@@ -1166,7 +1147,7 @@
 			}
 		});
 		
-		$('[name="geo_ambient_color"]').paletteColorPicker({
+		/* $('[name="geo_ambient_color"]').paletteColorPicker({
 			clear_btn: 'last',
 			//position: 'downside',
 			close_all_but_this: true // Default is false
@@ -1175,7 +1156,7 @@
 			clear_btn: 'last',
 			//position: 'downside',
 			close_all_but_this: true // Default is false
-		});
+		}); */
 	}
 	
 	// LOD 설정
@@ -1184,8 +1165,7 @@
 	});
 	// Lighting 설정
 	$("#changeLightingButton").click(function() {
-		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(),
-							$("#geo_specular_color").val(), $("#geo_ambient_color").val());
+		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
 	});
 	// Ssadradius 설정
 	$("#changeSsadRadiusButton").click(function() {
