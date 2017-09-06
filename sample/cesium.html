@@ -235,16 +235,16 @@
 			<h3>클릭 지점의 위치 정보</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="positionLat"> 위도 </label>
-					<input type="text" id="positionLat" name="positionLat" size="15" />
+					<label for="positionLatitude"> 위도 </label>
+					<input type="text" id="positionLatitude" name="positionLatitude" size="15" />
 				</li>
 				<li>
-					<label for="positionLon"> 경도 </label>
-					<input type="text" id="positionLon" name="positionLon" size="15" />
+					<label for="positionLongitude"> 경도 </label>
+					<input type="text" id="positionLongitude" name="positionLongitude" size="15" />
 				</li>
 				<li>
-					<label for="positionAlt"> 높이 </label>
-					<input type="text" id="positionAlt" name="positionAlt" size="15" />
+					<label for="positionAltitude"> 높이 </label>
+					<input type="text" id="positionAltitude" name="positionAltitude" size="15" />
 				</li>
 			</ul>
 		</div>
@@ -1177,9 +1177,9 @@
 
 	// click poisition call back function
 	function showClickPosition(position) {
-		$("#positionLat").val(position.lat);
-		$("#positionLon").val(position.lon);
-		$("#positionAlt").val(position.alt);
+		$("#positionLatitude").val(position.lat);
+		$("#positionLongitude").val(position.lon);
+		$("#positionAltitude").val(position.alt);
 	}
 </script>
 </body>
