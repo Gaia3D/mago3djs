@@ -1,6 +1,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Englsh](https://img.shields.io/badge/language-English-orange.svg)](#english)
-[![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](README.md)
+[![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](#korean)
+
+<a name="korean"></a>
 
 # Mago3DJs
 3차원 다중 블록 가시화를 위한 오픈소스 자바스크립트 라이브러리
@@ -75,10 +77,10 @@ C:\git\repository\mago3djs>rmdir data
 
 
 
-<br><br><br>
+<br><br>
 
 
-
+[한국어](#korean)
 # <a name="english"></a>Mago3DJs
 Open source JavaScript library for 3D multi-block visualization
 
