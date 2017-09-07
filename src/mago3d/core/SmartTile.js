@@ -104,6 +104,63 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId) 
+{
+	var resultNeoBuildingSeed;
+	var hasSubTiles = true;
+	if (this.subTiles == undefined)
+	{ hasSubTiles = false; }
+	
+	if (this.subTiles && this.subTiles.length == 0)
+	{ hasSubTiles = false; }
+		
+	if (!hasSubTiles)
+	{
+		if (this.buildingSeedsArray)
+		{
+			var buildingCount = this.buildingSeedsArray.length;
+			var find = false;
+			var i=0;
+			while (!find && i<buildingCount) 
+			{
+				if (buildingType)
+				{
+					if (this.buildingSeedsArray[i].buildingId === buildingId && this.buildingSeedsArray[i].buildingType === buildingType) 
+					{
+						find = true;
+						resultNeoBuildingSeed = this.buildingSeedsArray[i];
+						return resultNeoBuildingSeed;
+					}
+				}
+				else 
+				{
+					if (this.buildingSeedsArray[i].buildingId === buildingId) 
+					{
+						find = true;
+						resultNeoBuildingSeed = this.buildingSeedsArray[i];
+						return resultNeoBuildingSeed;
+					}
+				}
+				i++;
+			}
+		}	
+	}
+	else 
+	{
+		for (var i=0; i<this.subTiles.length; i++)
+		{
+			resultNeoBuildingSeed = this.subTiles[i].getBuildingSeedById(buildingType, buildingId);
+			if (resultNeoBuildingSeed)
+			{ return resultNeoBuildingSeed; }
+		}
+	}
+	
+	return resultNeoBuildingSeed;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
@@ -115,6 +172,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 	var midLongitude = (this.maxGeographicCoord.longitude + this.minGeographicCoord.longitude)/2;
 	var midLatitude = (this.maxGeographicCoord.latitude + this.minGeographicCoord.latitude)/2;
 	var midAltitude = (this.maxGeographicCoord.altitude + this.minGeographicCoord.altitude)/2;
+	
 	this.sphereExtent.centerPoint = ManagerUtils.geographicCoordToWorldPoint(midLongitude, midLatitude, midAltitude, this.sphereExtent.centerPoint, magoManager);
 	
 	// calculate an aproximate radius.
@@ -171,8 +229,20 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
 		buildingSeed = buildingSeedsArray[i];
-		if (this.intersectPoint(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude))
+		
+		if (buildingSeed.buildingId == "fromJapanIfcExample_2")
 		{
+			var hola = 0;
+		}
+			
+		//if (this.intersectPoint(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude)) // original.
+		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
+		{
+			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
+			{
+				var hola = 0;
+			}
+		
 			buildingSeedsArray.splice(i, 1);
 			i--;
 			buildingSeedsCount = buildingSeedsArray.length;
@@ -465,7 +535,8 @@ SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingI
 	var smartTilesCount = this.tilesArray.length;
 	while (resultNeoBuilding === undefined && i<smartTilesCount)
 	{
-		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId);
+		//resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId); // original.
+		resultNeoBuilding = this.tilesArray[i].getBuildingSeedById(buildingType, buildingId);
 		i++;
 	}
 	

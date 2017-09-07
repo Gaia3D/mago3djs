@@ -2,69 +2,7 @@
 
 function ManagerUtils() {};
 
-ManagerUtils.calculateBuildingPositionMatrix = function(neoBuilding) 
-{
-	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
-	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
-	// old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.*** old.***
-	var metaData = neoBuilding.metaData;
-	if ( metaData === undefined
-			|| metaData.geographicCoord.longitude === undefined
-			|| metaData.geographicCoord.latitude === undefined
-			|| metaData.geographicCoord.altitude === undefined ) { return false; }
 
-	// 0) PositionMatrix.************************************************************************
-	var position;
-	if (neoBuilding.buildingPosition !== undefined)
-	{
-		position = neoBuilding.buildingPosition;
-	}
-	else
-	{
-		position = Cesium.Cartesian3.fromDegrees(metaData.geographicCoord.longitude, metaData.geographicCoord.latitude, metaData.geographicCoord.altitude);
-	}
-	neoBuilding.buildingPosition = position;
-
-	// High and Low values of the position.****************************************************
-	//var splitValue = Cesium.EncodedCartesian3.encode(position); // no works.***
-	var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-	var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-	var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-
-	neoBuilding.buildingPositionHIGH = new Float32Array(3);
-	neoBuilding.buildingPositionHIGH[0] = splitVelue_X.high;
-	neoBuilding.buildingPositionHIGH[1] = splitVelue_Y.high;
-	neoBuilding.buildingPositionHIGH[2] = splitVelue_Z.high;
-
-	neoBuilding.buildingPositionLOW = new Float32Array(3);
-	neoBuilding.buildingPositionLOW[0] = splitVelue_X.low;
-	neoBuilding.buildingPositionLOW[1] = splitVelue_Y.low;
-	neoBuilding.buildingPositionLOW[2] = splitVelue_Z.low;
-
-	// Determine the elevation of the position.***********************************************************
-	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-	//var height = cartographic.height;
-	// End Determine the elevation of the position.-------------------------------------------------------
-	neoBuilding.move_matrix = new Float32Array(16); // PositionMatrix.***
-	neoBuilding.moveMatrixInv = new Float32Array(16); // Inverse of PositionMatrix.***
-	neoBuilding.transfMat = new Matrix4();
-	neoBuilding.transfMatInv = new Matrix4();
-	Cesium.Transforms.eastNorthUpToFixedFrame(position, undefined, neoBuilding.move_matrix);
-	neoBuilding.transfMat.setByFloat32Array(neoBuilding.move_matrix);
-	neoBuilding.transfMat_inv = new Float32Array(16);
-	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.transfMat_inv);
-
-	neoBuilding.move_matrix[12] = 0;
-	neoBuilding.move_matrix[13] = 0;
-	neoBuilding.move_matrix[14] = 0;
-	neoBuilding.buildingPosition = position;
-	// note: "neoBuilding.move_matrix" is only rotation matrix.***
-
-	Cesium.Matrix4.inverse(neoBuilding.move_matrix, neoBuilding.moveMatrixInv);
-	neoBuilding.transfMatInv.setByFloat32Array(neoBuilding.moveMatrixInv);
-
-	return true;
-};
 /*
 ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
 	if(resultGeographicCoords === undefined)
@@ -86,15 +24,19 @@ ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeogra
 
 ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) 
 {
+	if (resultGeographicCoord === undefined)
+	{ resultGeographicCoord = new GeographicCoord(); }
+	
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		;//
+		var globe = magoManager.wwd.globe;
+		var origin = new WorldWind.Position();
+		origin = globe.computePositionFromPoint(point.x, point.y, point.z, origin);
+		resultGeographicCoord.setLonLatAlt(origin.longitude, origin.latitude, origin.altitude);
 	}
 	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
-		if (resultGeographicCoord === undefined)
-		{ resultGeographicCoord = new GeographicCoord(); }
 		resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
 	}
 	
@@ -106,7 +48,6 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
 
-	
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		var globe = magoManager.wwd.globe;
@@ -183,8 +124,91 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 };
 
+ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
+{
+	// this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
+	if (resultGeoLocMatrix == undefined)
+	{ resultGeoLocMatrix = new Matrix4(); }
+	
+	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		// * if this in webWorldWind:
+		var xAxis = new WorldWind.Vec3(0, 0, 0),
+			yAxis = new WorldWind.Vec3(0, 0, 0),
+			zAxis = new WorldWind.Vec3(0, 0, 0);
+		var tMatrix = WorldWind.Matrix.fromIdentity();
+		
+		WorldWind.WWMath.localCoordinateAxesAtPoint([worldPosition.x, worldPosition.y, worldPosition.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
+				
+		tMatrix.set(
+			xAxis[0], yAxis[0], zAxis[0], worldPosition.x,
+			xAxis[1], yAxis[1], zAxis[1], worldPosition.y,
+			xAxis[2], yAxis[2], zAxis[2], worldPosition.z,
+			0, 0, 0, 1);
+		
+		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
+		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
+		resultGeoLocMatrix.setByFloat32Array(tMatrixColMajorArray);
+	}
+	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// *if this in Cesium:
+		Cesium.Transforms.eastNorthUpToFixedFrame(worldPosition, undefined, resultGeoLocMatrix._floatArrays);
+	}
+	
+	return resultGeoLocMatrix;
+};
+
+ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix, magoManager) 
+{
+	// this function calculates the transformation matrix for (longitude, latitude, altitude) coordinate, that has NO heading, pitch or roll rotations.
+	if (resultGeoLocMatrix == undefined)
+	{ resultGeoLocMatrix = new Matrix4(); }
+	
+	var worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
+	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
+	
+	return resultGeoLocMatrix;
+};
+
+ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading, pitch, roll, resultGeoLocMatrix, resultTransformMatrix, magoManager) 
+{
+	// This function calculates the "resultGeoLocMatrix" & "resultTransformMatrix".
+	// note: "resultGeoLocMatrix" is the transformMatrix without the heading, pitch, roll rotations.
+	// note: "resultTransformMatrix" is the transformMatrix including the heading, pitch, roll rotations.
+	var xRotMatrix = new Matrix4();  // created as identity matrix.
+	var yRotMatrix = new Matrix4();  // created as identity matrix.
+	var zRotMatrix = new Matrix4();  // created as identity matrix.
+	
+	if (heading !== undefined && heading !== 0)
+	{ zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, -1.0); }
+
+	if (pitch !== undefined && pitch !== 0)
+	{ xRotMatrix.rotationAxisAngDeg(pitch, -1.0, 0.0, 0.0); }
+
+	if (roll !== undefined && roll !== 0)
+	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, -1.0, 0.0); }
+
+	if (resultGeoLocMatrix == undefined)
+	{ resultGeoLocMatrix = new Matrix4(); }  // created as identity matrix.
+	
+	if (resultTransformMatrix == undefined)
+	{ resultTransformMatrix = new Matrix4(); }  // created as identity matrix.
+
+	// 1rst, calculate the transformation matrix for the location.
+	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
+	
+	resultTransformMatrix.copyFromMatrix4(resultGeoLocMatrix);
+	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultTransformMatrix, zRotatedTMatrix);
+	var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+	var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	resultTransformMatrix = zxyRotatedTMatrix;
+	return resultTransformMatrix;
+};
+
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
 {
+	// This function calculates all data and matrices for the location(longitude, latitude, altitude) and rotation(heading, pitch, roll).
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
@@ -195,23 +219,17 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if (longitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.longitude = longitude; }
 	else 
-	{
-		longitude = resultGeoLocationData.geographicCoord.longitude;
-	}
+	{ longitude = resultGeoLocationData.geographicCoord.longitude; }
 
 	if (latitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.latitude = latitude; }
 	else 
-	{
-		latitude = resultGeoLocationData.geographicCoord.latitude;
-	}
+	{ latitude = resultGeoLocationData.geographicCoord.latitude; }
 
 	if (altitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.altitude = altitude; }
 	else 
-	{
-		altitude = resultGeoLocationData.geographicCoord.altitude;
-	}
+	{ altitude = resultGeoLocationData.geographicCoord.altitude; }
 
 	if (heading !== undefined)
 	{ resultGeoLocationData.heading = heading; }
@@ -229,7 +247,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	{ return; }
 
 	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position, magoManager);
-
+	
 	// High and Low values of the position.********************************************************************
 	if (resultGeoLocationData.positionHIGH === undefined)
 	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
@@ -273,73 +291,18 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	else
 	{ resultGeoLocationData.rotMatrixInv.Identity(); }
 
-	var xRotMatrix = new Matrix4();  // created as identity matrix.***
-	var yRotMatrix = new Matrix4();  // created as identity matrix.***
-	var zRotMatrix = new Matrix4();  // created as identity matrix.***
-
-	if (resultGeoLocationData.heading !== undefined && resultGeoLocationData.heading !== 0)
-	{
-		zRotMatrix.rotationAxisAngDeg(resultGeoLocationData.heading, 0.0, 0.0, -1.0);
-	}
-
-	if (resultGeoLocationData.pitch !== undefined && resultGeoLocationData.pitch !== 0)
-	{
-		xRotMatrix.rotationAxisAngDeg(resultGeoLocationData.pitch, -1.0, 0.0, 0.0);
-	}
-
-	if (resultGeoLocationData.roll !== undefined && resultGeoLocationData.roll !== 0)
-	{
-		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, -1.0, 0.0);
-	}
-	
+	// 1rst, calculate the transformation matrix for the location.
+	resultGeoLocationData.tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(resultGeoLocationData.position, resultGeoLocationData.heading, resultGeoLocationData.pitch, resultGeoLocationData.roll, 
+		resultGeoLocationData.geoLocMatrix, resultGeoLocationData.tMatrix, magoManager);
+	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
+	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
+	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
+	resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
+		
+	// now calculate the inverse matrices.
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		// * if this in webWorldWind:
-		var xAxis = new WorldWind.Vec3(0, 0, 0),
-			yAxis = new WorldWind.Vec3(0, 0, 0),
-			zAxis = new WorldWind.Vec3(0, 0, 0);
-		var rotMatrix = WorldWind.Matrix.fromIdentity();
-		var tMatrix = WorldWind.Matrix.fromIdentity();
-		
-		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
-
-		rotMatrix.set(
-			xAxis[0], yAxis[0], zAxis[0], 0,
-			xAxis[1], yAxis[1], zAxis[1], 0,
-			xAxis[2], yAxis[2], zAxis[2], 0,
-			0, 0, 0, 1); 
-				
-		tMatrix.set(
-			xAxis[0], yAxis[0], zAxis[0], resultGeoLocationData.position.x,
-			xAxis[1], yAxis[1], zAxis[1], resultGeoLocationData.position.y,
-			xAxis[2], yAxis[2], zAxis[2], resultGeoLocationData.position.z,
-			0, 0, 0, 1);
-				
-		var columnMajorArray = WorldWind.Matrix.fromIdentity(); 
-		columnMajorArray = rotMatrix.columnMajorComponents(columnMajorArray); // no used.***
-			
-		var matrixInv = WorldWind.Matrix.fromIdentity();
-		matrixInv.invertMatrix(rotMatrix);
-		var columnMajorArrayAux_inv = WorldWind.Matrix.fromIdentity();
-		var columnMajorArray_inv = matrixInv.columnMajorComponents(columnMajorArrayAux_inv); 
-		
-		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
-		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
-		resultGeoLocationData.tMatrix.setByFloat32Array(tMatrixColMajorArray);
-		
-		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix); // "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
-
-		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
-		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
-		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
-		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
-
-		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
-		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
-		
-		// now calculate the inverses of the matrices.***
 		var tMatrixInv = WorldWind.Matrix.fromIdentity();
 		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
 		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
@@ -355,20 +318,6 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
-		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
-		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);// "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
-
-		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
-		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
-		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
-		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
-
-		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
-		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
-
-		// now, calculates the inverses.***
 		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
 		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
 		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
@@ -629,7 +578,7 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[1] = posSplitY.low;
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
 };
-
+/*
 ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) 
 {
 	// renderingMode = 0 => assembled.***
@@ -678,3 +627,4 @@ ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding)
 
 	return realBuildingPos;
 };
+*/

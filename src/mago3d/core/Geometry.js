@@ -312,37 +312,87 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
+NeoBuilding.prototype.getHeaderVersion = function() 
+{
+	return this.metaData.version;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param neoReference 변수
+ */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
-	//neoReference.texture.fileLoadState != CODE.fileLoadState.LOADING_FINISHED
-	
-	if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
+	if (this.metaData.version[0] == "v")
 	{
-		// 1rst, check if the texture is loaded.
-		var sameTexture = this.getSameTexture(neoReference.texture);
-		if (sameTexture === undefined)
-		{
-			if (magoManager.backGround_fileReadings_count > 10) 
-			{ return; }
+		// this is the version beta.
+		if (neoReference.texture == undefined)
+		{ return undefined; }
 		
-			if (neoReference.texture.fileLoadState === CODE.fileLoadState.READY) 
+		if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
+		{
+			// 1rst, check if the texture is loaded.
+			var sameTexture = this.getSameTexture(neoReference.texture);
+			if (sameTexture === undefined)
 			{
-				var gl = magoManager.sceneState.gl;
-				neoReference.texture.texId = gl.createTexture();
-				// Load the texture.***
-				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-				var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
+				if (magoManager.backGround_fileReadings_count > 10) 
+				{ return; }
+			
+				if (neoReference.texture.fileLoadState === CODE.fileLoadState.READY) 
+				{
+					var gl = magoManager.sceneState.gl;
+					neoReference.texture.texId = gl.createTexture();
+					// Load the texture.***
+					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+					var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 
-				this.texturesLoaded.push(neoReference.texture);
-				magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
-				magoManager.backGround_fileReadings_count ++;
+					this.texturesLoaded.push(neoReference.texture);
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
+					magoManager.backGround_fileReadings_count ++;
+				}
 			}
+			else 
+			{
+				if (sameTexture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				{
+					neoReference.texture = sameTexture;
+				}
+			}
+		}
+	}
+	else if (this.metaData.version[0] == 0 && this.metaData.version[2] == 0 && this.metaData.version[4] == 1 )
+	{
+		if (magoManager.backGround_fileReadings_count > 10) 
+		{ return; }
+			
+		// provisionally use materialId as textureId.
+		var textureId = neoReference.materialId;
+		var texture = this.texturesLoaded[textureId];
+		
+		if (texture == undefined)
+		{
+			//texture = new Texture();
+			//texture.fileLoadState = CODE.fileLoadState.READY
+			//this.texturesLoaded[textureId] = texture;
+		}
+		
+		if (texture.fileLoadState === CODE.fileLoadState.READY) 
+		{
+			var gl = magoManager.sceneState.gl;
+			neoReference.texture.texId = gl.createTexture();
+			// Load the texture.***
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
+
+			this.texturesLoaded.push(neoReference.texture);
+			magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
+			magoManager.backGround_fileReadings_count ++;
 		}
 		else 
 		{
-			if (sameTexture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			if (texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
-				neoReference.texture = sameTexture;
+				neoReference.texture = texture;
 			}
 		}
 	}

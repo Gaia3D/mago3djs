@@ -16,8 +16,8 @@ var BuildingSeed = function()
 	this.buildingFileName;
 	this.geographicCoord; // class : GeographicCoord.
 	this.rotationsDegree; // class : Point3D. (heading, pitch, roll).
-	this.bBox;
-	//this.created = false;
+	this.bBox;            // class : BoundingBox.
+	this.geographicCoordOfBBox; // class : GeographicCoord.
 };
 
 /**
@@ -95,7 +95,6 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 		buildingSeed.buildingId = buildingName.substr(4, buildingNameLength-4);
 		buildingSeed.buildingFileName = buildingName;
 		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-		
 	}
 	
 	return true;
