@@ -2396,6 +2396,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	var lowestOctree;
 	var neoBuilding;
+	var headerVersion;
 	
 	if (this.matrix4SC == undefined)
 	{ this.matrix4SC = new Matrix4(); }
@@ -2411,9 +2412,21 @@ MagoManager.prototype.manageQueue = function()
 		{ continue; }
 		
 		neoBuilding = lowestOctree.neoBuildingOwner;
+		
 		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		headerVersion = neoBuilding.getHeaderVersion();
+		//if(headerVersion == "undefinedv.0.0")
 		this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-		lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+		if (headerVersion[0] == "v")
+		{
+			// parse beta version.
+			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+		}
+		else 
+		{
+			// parse vesioned.
+			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+		}
 		lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
 	}
@@ -2436,7 +2449,17 @@ MagoManager.prototype.manageQueue = function()
 		{ continue; }
 		
 		neoBuilding = lowestOctree.neoBuildingOwner;
-		blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+		headerVersion = neoBuilding.getHeaderVersion();
+		if (headerVersion[0] == "v")
+		{
+			// parse the beta version.
+			blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+		}
+		else 
+		{
+			// parse versioned.
+			blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+		}
 		blocksList.dataArraybuffer = undefined;
 	}
 	
@@ -2669,7 +2692,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 	}
 	else 
 	{
-
 		var isInterior = false; // no used.***
 
 		var currentShader;
@@ -2687,13 +2709,11 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		// Test render in lego.***
 		if (ssao_idx === 0) 
 		{
-			
 			gl.disable(gl.BLEND);
 			this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, visibleObjControlerBuildings);
 		}
 		if (ssao_idx === 1) 
 		{
-			
 			// 2) ssao render.************************************************************************************************************
 			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
 			if (neoBuildingsCount > 0)
@@ -4196,8 +4216,8 @@ MagoManager.prototype.putBuildingToArraySortedByDist = function(buildingArray, n
 MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, cameraPosition) 
 {
 	// This makes the visible buildings array.
-	var smartTile1 = this.smartTileManager.tilesArray[0];
-	var smartTile2 = this.smartTileManager.tilesArray[1];
+	var smartTile1 = this.smartTileManager.tilesArray[0]; // America side tile.
+	var smartTile2 = this.smartTileManager.tilesArray[1]; // Asia side tile.
 	if (this.intersectedLowestTilesArray == undefined)
 	{ this.intersectedLowestTilesArray = []; }
 	
@@ -4214,7 +4234,9 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var lod0_minSquaredDist = 100000;
 	var lod1_minSquaredDist = 1;
 	var lod2_minSquaredDist = 100000*10000;
-	var lod3_minSquaredDist = 100000*10000*2;
+	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
+	
+	//lod2_minSquaredDist*= 10000000;
 
 	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
 	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
@@ -4344,9 +4366,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles3, neoBuilding);
 					}
 				}
-				
 			}
-		
 		}
 		else
 		{
@@ -4403,6 +4423,99 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
  * @param dataKey
  */
 MagoManager.prototype.flyToBuilding = function(dataKey) 
+{
+	var neoBuilding = this.getNeoBuildingById(null, dataKey);
+
+	if (neoBuilding === undefined)
+	{ return; }
+
+	// calculate realPosition of the building.****************************************************************************
+	var realBuildingPos;
+	if (this.renderingModeTemp === 1 || this.renderingModeTemp === 2) // 0 = assembled mode. 1 = dispersed mode.***
+	{
+		if (neoBuilding.geoLocationDataAux === undefined) 
+		{
+			var realTimeLocBlocksList = MagoConfig.getData().alldata;
+			var newLocation = realTimeLocBlocksList[neoBuilding.dataKey];
+			// must calculate the realBuildingPosition (bbox_center_position).***
+
+			if (newLocation) 
+			{
+				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, heading, pitch, roll, neoBuilding.geoLocationDataAux, this);
+				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+				//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+				realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
+			}
+			else 
+			{
+				// use the normal data.***
+				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+				realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
+			}
+		}
+		else 
+		{
+			this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+			//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+			realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
+		}
+	}
+	else 
+	{
+		/*
+		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+		realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
+		*/
+		
+		//var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+		realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(neoBuilding.geographicCoordOfBBox.longitude, neoBuilding.geographicCoordOfBBox.latitude, neoBuilding.geographicCoordOfBBox.altitude, realBuildingPos, this);
+	}
+	// end calculating realPosition of the building.------------------------------------------------------------------------
+
+	if (realBuildingPos === undefined)
+	{ return; }
+
+	//
+	
+	if (this.renderingModeTemp === 0)
+	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+	if (this.renderingModeTemp === 1)
+	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+	if (this.renderingModeTemp === 2)
+	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+
+	if (this.boundingSphere_Aux == undefined)
+	{ this.boundingSphere_Aux = new Sphere(); }
+	
+	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
+
+	//var position = new Cesium.Cartesian3(this.pointSC.x, this.pointSC.y, this.pointSC.z);
+	//var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
+		var viewer = this.scene.viewer;
+		var seconds = 3;
+		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
+	}
+	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		//this.boundingSphere_Aux.center = realBuildingPos;
+		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		var geographicCoord = buildingGeoLocation.geographicCoord;
+		this.wwd.goToAnimator.travelTime = 3000;
+		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
+	}
+};
+
+
+/**
+ * dataKey 이용해서 data 검색
+ * @param dataKey
+ */
+MagoManager.prototype.flyToBuilding_current = function(dataKey) 
 {
 	var neoBuilding = this.getNeoBuildingById(null, dataKey);
 
@@ -5294,6 +5407,11 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 					}
 				}
 			}
+			
+			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
+			{
+				var hola = 0;
+			}
 			// End Test son.------------------------------------------------------------------------
 			
 			newLocation = realTimeLocBlocksList[buildingSeed.buildingId];
@@ -5342,12 +5460,24 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		
 			buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
 			buildingSeed.rotationsDegree.set(pitch, roll, heading);
+			
+			// now calculate the geographic coord of the center of the bbox.
+			if (buildingSeed.geographicCoordOfBBox === undefined) 
+			{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+		
+			// calculate the transformation matrix at (longitude, latitude, altitude).
+			var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, worldCoordPosition, this);
+			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+			
+			// now calculate the geographicCoord of the center of the bBox.
+			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this);
 		}
 		
 		smartTile.buildingSeedsArray = buildingSeedList.buildingSeedArray;
 		var minDegree = 0.015; // 0.01deg = 1.105,74m.
 		smartTile.makeTree(minDegree, this);
-		
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 };

@@ -289,8 +289,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		// Check if the texture is loaded.
 		//if(renderTexture)
 		{
+			//if (neoReference.texture !== undefined || neoReference.materialId != -1)
 			if (neoReference.texture !== undefined)
 			{
+				// note: in the future use only "neoReference.materialId".
 				if (neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 			}

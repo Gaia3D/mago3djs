@@ -32,6 +32,7 @@ var NeoReference = function()
 	this.MESH_TEXCOORD_cacheKey; // old.***
 
 	// 5) The texture image.***
+	this.materialId;
 	this.hasTexture = false;
 	this.texture; // Texture
 
@@ -273,6 +274,392 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
 	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
 
 	this.modelReferencedGroupsList.createModelReferencedGroups(this.neoRefsIndices, this.motherNeoRefsList);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param arrayBuffer 변수
+ * @param neoBuilding 변수
+ * @param readWriter 변수
+ */
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+
+	var startBuff;
+	var endBuff;
+	var bytes_readed = 0;
+	var testIdentityMatsCount = 0;
+	var stadistic_refMat_Identities_count = 0;
+	var stadistic_refMat_Translates_count = 0;
+	var stadistic_refMat_Transforms_count = 0;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
+	var colByteSize, tCoordByteSize;
+	this.succesfullyGpuDataBinded = true;
+	var translationX, translationY, translationZ;
+	
+	// read the version.
+	var versionLength = 5;
+	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+versionLength)));
+	bytes_readed += versionLength;
+
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for (var i = 0; i < neoRefsCount; i++) 
+	{
+		var neoRef = new NeoReference();
+
+		// 1) Id.***
+		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._id = ref_ID;
+
+		this.motherNeoRefsList = motherNeoReferencesArray;
+		if (motherNeoReferencesArray[neoRef._id] !== undefined)
+		{
+			// pass this neoReference because exist in the motherNeoReferencesArray.***
+			neoRef = motherNeoReferencesArray[neoRef._id];
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			neoRef.objectId = objectId;
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			// in versioned mode read the matrixType first.
+			var matrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (matrixType == 0)
+			{ 
+				// do nothing.
+			}
+			else if (matrixType == 1)
+			{
+				// read the translation vector.
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			}
+			else if (matrixType == 2)
+			{
+				// read the transformation matrix.
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			}
+
+			// Float mode.**************************************************************
+			// New modifications for xxxx 20161013.*****************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+					}
+				}
+			}
+			
+			// 4) short texcoords. OLD. Change this for Materials.***
+			var materialIdAux = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			
+			// do the stadistic recount.
+			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType == 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
+		}
+		else
+		{
+
+			motherNeoReferencesArray[neoRef._id] = neoRef;
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			neoRef.objectId = objectId;
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			neoRef.refMatrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (neoRef.refMatrixType == 0)
+			{ 
+				// do nothing.
+				stadistic_refMat_Identities_count +=1;
+			}
+			else if (neoRef.refMatrixType == 1)
+			{
+				// read the translation vector.
+				translationX = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				translationY = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				translationZ = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef.refTranslationVec = new Float32Array([translationX, translationY, translationZ]);
+				
+				stadistic_refMat_Translates_count +=1;
+			}
+			else if (neoRef.refMatrixType == 2)
+			{
+				// read the transformation matrix.
+				neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				stadistic_refMat_Transforms_count +=1;
+			}
+
+			// Float mode.**************************************************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+
+				neoRef.color4 = new Color();
+				neoRef.color4.set(r, g, b, alfa);
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				if (vboDatasCount > 0)
+				{
+					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
+					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+				}
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+					
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						colByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						// TODO: Float32Array or UintArray depending of dataType.***
+						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
+						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						// example: posByteSize = 4 * verticesFloatValuesCount;
+						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+				}
+			}
+
+			// 4) read the reference material id.
+			neoRef.materialId = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			if (neoRef.materialId == -1)
+			{ neoRef.hasTexture = false; }
+			else { neoRef.hasTexture = true; }
+
+			if (tMatrix4)
+			{
+				// multiply the building transformation matrix with the reference matrix, then we save aditional multiplications inside the shader.
+				neoRef.multiplyTransformMatrix(tMatrix4);
+			}
+		}
+
+	}
+	
+	// finally read the triangles count.
+	var trianglesCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	
+	//this.createModelReferencedGroups(); // test for stadistics.
+	
+
+	// Now occlusion cullings.***
+	// Occlusion culling octree data.*****
+	if (this.exterior_ocCullOctree === undefined)
+	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var infiniteOcCullBox = this.exterior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
+	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
+	infiniteOcCullBox.setSizesSubBoxes();
+	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	if (this.interior_ocCullOctree === undefined)
+	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var ocCullBox = this.interior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
+	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	ocCullBox.setSizesSubBoxes();
+	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return this.succesfullyGpuDataBinded;
 };
 
 /**

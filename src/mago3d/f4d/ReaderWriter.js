@@ -943,7 +943,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			{
 				neoBuilding.metaData = new MetaData();
 			}
-			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
+			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter, neoBuilding);
 
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
@@ -957,6 +957,43 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
 			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
 			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
+			
+			// now parse materialsList of the neoBuilding.
+			var ver0 = neoBuilding.metaData.version[0];
+			var ver1 = neoBuilding.metaData.version[2];
+			var ver2 = neoBuilding.metaData.version[4];
+			
+			if (ver0 == 0 && ver1 == 0 && ver2 == 1)
+			{
+				// read materials list.
+				var materialsCount = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var i=0; i<materialsCount; i++)
+				{
+					var textureTypeName = "";
+					var textureImageFileName = "";
+
+					// Now, read the texture_type and texture_file_name.***
+					var texture_type_nameLegth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					for (var j=0; j<texture_type_nameLegth; j++) 
+					{
+						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
+					}
+
+					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					for (var j=0; j<texture_fileName_Legth; j++) 
+					{
+						textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
+					}
+					
+					if (texture_fileName_Legth > 0)
+					{
+						var texture = new Texture();
+						texture.textureTypeName = textureTypeName;
+						texture.textureImageFileName = textureImageFileName;
+						neoBuilding.texturesLoaded.push(texture);
+					}
+				}
+			}
 
 			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 

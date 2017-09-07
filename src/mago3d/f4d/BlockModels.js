@@ -119,6 +119,236 @@ BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager)
 	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
 };
 
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
+{
+	var vertexCount;
+	var verticesFloatValuesCount;
+	var normalByteValuesCount;
+	var shortIndicesValuesCount;
+	var sizeLevels;
+	var startBuff, endBuff;
+	
+	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	bytesReaded += 4;
+	for ( var j = 0; j < vboDatasCount; j++ ) 
+	{
+		// 1) Positions array.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		verticesFloatValuesCount = vertexCount * 3;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+
+		// 2) Normals.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		normalByteValuesCount = vertexCount * 3;
+		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+
+		// 3) Indices.
+		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
+		bytesReaded = bytesReaded + sizeLevels * 4;
+		bytesReaded = bytesReaded + sizeLevels * 4;
+		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
+{
+	var posByteSize;
+	var norByteSize;
+	var idxByteSize;
+	var classifiedPosByteSize;
+	var classifiedNorByteSize;
+	var classifiedIdxByteSize;
+	var startBuff, endBuff;
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	for ( var j = 0; j < vboDatasCount; j++ ) 
+	{
+		// 1) Positions array.
+		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var verticesFloatValuesCount = vertexCount * 3;
+		// now padding the array to adjust to standard memory size of pool.
+		posByteSize = 4 * verticesFloatValuesCount;
+		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+		
+		block.vertexCount = vertexCount;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+		vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
+		vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+		
+		// 2) Normals.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var normalByteValuesCount = vertexCount * 3;
+		// now padding the array to adjust to standard memory size of pool.
+		norByteSize = 1 * normalByteValuesCount;
+		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 1 * normalByteValuesCount;
+		vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
+		vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
+		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+		
+		// 3) Indices.
+		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		// now padding the array to adjust to standard memory size of pool.
+		idxByteSize = 2 * shortIndicesValuesCount;
+		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
+
+		var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded +=1;
+		var sizeThresholds = [];
+		for ( var k = 0; k < sizeLevels; k++ )
+		{
+			sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))); bytesReaded += 4;
+		}
+		var indexMarkers = [];
+		for ( var k = 0; k < sizeLevels; k++ )
+		{
+			indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		}
+		var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+		vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+
+		vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
+		vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
+		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+		vboViCacheKey.indicesCount = shortIndicesValuesCount;
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	var bytesReaded = 0;
+	var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
+	var gl = magoManager.sceneState.gl;
+	var succesfullyGpuDataBinded = true;
+	
+	// read the version.
+	var versionLength = 5;
+	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
+	bytesReaded += versionLength;
+	
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+	for ( var i = 0; i< blocksCount; i++ ) 
+	{
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+		// Check if block exist.
+		if (motherBlocksArray[blockIdx]) 
+		{
+			// The block exists, then read data but no create a new block.
+			bytesReaded += 4 * 6; // boundingBox.
+			// step over vbo datas of the model.
+			bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
+			
+			// read lego if exist. (note: lego is exactly same of a model, is a mesh).
+			var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+			if (existLego)
+			{
+				bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
+			}
+			
+			continue;
+		}
+		
+		// The block doesn't exist, so creates a new block and read data.
+		var block = new Block();
+		block.idx = blockIdx;
+		motherBlocksArray[blockIdx] = block;
+
+		// 1rst, read bbox.
+		var bbox = new BoundingBox();
+		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
+		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
+		var maxLength = bbox.getMaxLength();
+		if (maxLength < 0.5) { block.isSmallObj = true; }
+		else { block.isSmallObj = false; }
+
+		block.radius = maxLength/2.0;
+
+		bbox.deleteObjects();
+		bbox = undefined;
+		
+		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
+		
+		// now bind vbo buffer datas.
+		var vboDatasCount = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
+		for (var j=0; j<vboDatasCount; j++)
+		{
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[j];
+			
+			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+		}
+		
+		// parse lego if exist.
+		var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if (existLego)
+		{
+			if (block.lego == undefined)
+			{ block.lego = new Lego(); }
+			
+			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
+		}
+
+	}
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return succesfullyGpuDataBinded;
+};
+
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
@@ -132,8 +362,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4);
-	bytesReaded += 4;
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+	
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
@@ -143,38 +373,34 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
-		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-		bytesReaded += 4;
-
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
 		// Check if block exist.
 		if (motherBlocksArray[blockIdx]) 
 		{
 			// The block exists, then read data but no create a new block.
 			bytesReaded += 4 * 6; // boundingBox.
 			// Read vbo datas (indices cannot superate 65535 value).
-			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			
 			for ( var j = 0; j < vboDatasCount; j++ ) 
 			{
 				// 1) Positions array.
-				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-				bytesReaded += 4;
+				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 				var verticesFloatValuesCount = vertexCount * 3;
 				startBuff = bytesReaded;
 				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
 				bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 				// 2) Normals.
-				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-				bytesReaded += 4;
+				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 				var normalByteValuesCount = vertexCount * 3;
 				bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 
 				// 3) Indices.
-				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-				bytesReaded += 4;
-				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
-				bytesReaded += 1;
+				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+				
 				bytesReaded = bytesReaded + sizeLevels * 4;
 				bytesReaded = bytesReaded + sizeLevels * 4;
 				bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***

@@ -1,0 +1,51 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0.0.1 20170905
+
+0) Save version (char) for References, Models, Octrees.
+
+1) Reference transformation matrix type: 
+	0 = identity
+	1 = translation
+	2 = transformation
+	
+	improves 5~10 % the fps.
+	
+2) Triangles count for each octree(unsigned int).
+	with this information we can forecast automatically the lod level distances, and
+	calculate parsing time in queue.
+	
+			3) Merge in one group the multiples meshes of same Id. ( only javaScript ).
+
+4) Lego for each object ( to use as bounding box for render in lod1 ) Save in Models buffer (n = 0).
+
+5) Save the reference texture indexed (unsigned short) Save in Header the textures map.
+	
+			6) Possibility to add optional files in the project folder (spatial structure, topological data, etc.).
+
+			7) Lod3.

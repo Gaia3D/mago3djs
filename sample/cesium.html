@@ -473,6 +473,10 @@
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
 			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
 		</div>
+		
+		<div>
+			<a href="#" onclick="test();" />test</a>
+		</div>
 	</div>
 </div>
 
@@ -523,6 +527,7 @@
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Frustum.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeographicCoord.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/GeographicExtent.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeoLocationData.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Geometry.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeometryModifier.js"></script>
@@ -623,6 +628,10 @@
 			return;
 		}
 		console.log("--------- intervalCount = " + intervalCount);
+	}
+	
+	function test() {
+		searchDataAPI("fromJapanIfcExample_2");
 	}
 	
 	// mago3d 시작, 정책 데이터 파일을 로딩
