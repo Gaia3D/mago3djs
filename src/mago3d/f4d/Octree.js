@@ -988,7 +988,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray)
  */
 Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray) 
 {
-	if (this.subOctrees_array == undefined)
+	if (this.subOctrees_array === undefined)
 	{ return; }
 	
 	var subOctreesCount = this.subOctrees_array.length;

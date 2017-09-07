@@ -91,6 +91,8 @@ function API(apiName)
 	this.specularColor = null;
 	
 	this.ssaoRadius = null;
+	//
+	this.FPVMode = false;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -427,4 +429,12 @@ API.prototype.getSsaoRadius = function()
 API.prototype.setSsaoRadius = function(ssaoRadius) 
 {
 	this.ssaoRadius = ssaoRadius;
+};
+API.prototype.getFPVMode = function()
+{
+	return this.FPVMode;
+};
+API.prototype.setFPVMode = function(value)
+{
+	this.FPVMode = value;
 };

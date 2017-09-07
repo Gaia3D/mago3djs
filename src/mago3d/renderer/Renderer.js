@@ -210,7 +210,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	isInterior, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
 	// render_neoRef
-	if (neoReferencesMotherAndIndices.neoRefsIndices == undefined)
+	if (neoReferencesMotherAndIndices.neoRefsIndices === undefined)
 	{ return; }
 	
 	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
@@ -581,7 +581,7 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 		if (maxSizeToRender && (block.radius < maxSizeToRender))
 		{ continue; }
 	
-		if (lod == 1 && block.isSmallObj && magoManager.objectSelected !== neoReference)
+		if (lod === 1 && block.isSmallObj && magoManager.objectSelected !== neoReference)
 		{ continue; }
 		
 		if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)
@@ -878,7 +878,7 @@ Renderer.prototype.depthRenderNeoRefListsGroupedVersion = function(gl, neoRefere
 		if (maxSizeToRender && (block.radius < maxSizeToRender))
 		{ continue; }
 	
-		if (lod == 1 && block.isSmallObj && magoManager.objectSelected !== neoReference)
+		if (lod === 1 && block.isSmallObj && magoManager.objectSelected !== neoReference)
 		{ continue; }
 		
 		if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)

@@ -52,7 +52,7 @@ BuildingSeedList.prototype.newBuildingSeed = function()
  */
 BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function() 
 {
-	if (this.dataArrayBuffer == undefined)
+	if (this.dataArrayBuffer === undefined)
 	{ return false; }
 	
 	var arrayBuffer = this.dataArrayBuffer;
