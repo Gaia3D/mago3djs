@@ -58,6 +58,7 @@ var MagoManager = function()
 	this.startMovPoint = new Point3D();
 	
 	this.configInformation;
+	this.cameraFPV = new FirstPersonView();
 
 	this.kernel = [ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,
@@ -189,30 +190,6 @@ var MagoManager = function()
 
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
-	
-	
-
-	// Workers.****************************************************************************
-	/*
-	this.worker_sonGeometry = new Worker('../Build/CesiumUnminified/SonWebWorker.js');
-	//this.worker_sonGeometry.setTest(77.77);
-	this.worker_sonGeometry.onmessage = function (event)
-	{
-		//document.getElementById('result').textContent = event.data;
-		this.compRefList_array = event.data[0];
-	};
-	*/
-
-	/*
-	this.worker_sonGeometry = new Worker('SonWebWorker.js');
-	this.worker_sonGeometry.addEventListener('message', function(e) {
-		document.getElementById('result').innerHTML  = e.data;
-	  }, false);
-	*/
-	// End workers.------------------------------------------------------------------------
-
-//	this.createCloudsTEST();
-//	this.loadObjectIndexFile = false;
 };
 
 /**
@@ -442,51 +419,6 @@ MagoManager.prototype.renderOrdered = function(dc)
 	this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum, frustumIdx, numFrustums);
 };
 
-///**
-// * 어떤 일을 하고 있습니까?
-// */
-//MagoManager.prototype.createCloudsTEST = function() {
-////	var increLong = 0.004;
-////	var increLat = 0.004;
-//
-//	var randomLongitude = 0;
-//	var randomLatitude = 0;
-//	var randomAltitude = 0;
-//	var randomRadius = 0;
-//	var randomDepth = 0;
-//
-//	var cloud;
-//	for(var i =0; i<10; i++) {
-//		randomLongitude = 126.91+(0.05*Math.random());
-//		randomLatitude = 37.51+(0.05*Math.random());
-//		randomAltitude = 350+Math.random()*50;
-//		randomRadius = 10+Math.random()*150;
-//		randomDepth = 10+Math.random()*50;
-//		cloud = this.atmosphere.cloudsManager.newCircularCloud();
-//		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
-//	}
-//
-//	for(var i =0; i<10; i++) {
-//		randomLongitude = 127.0+(0.05*Math.random());
-//		randomLatitude = 37.45+(0.05*Math.random());
-//		randomAltitude = 350+Math.random()*50;
-//		randomRadius = 10+Math.random()*150;
-//		randomDepth = 10+Math.random()*50;
-//		cloud = this.atmosphere.cloudsManager.newCircularCloud();
-//		cloud.createCloud(randomLongitude, randomLatitude, randomAltitude, randomRadius, randomDepth, 16);
-//	}
-//	/*
-//	cloud = this.atmosphere.cloudsManager.newCircularCloud();
-//	cloud.createCloud(126.929, 37.5172076, 300.0, 100.0, 40.0, 16);
-//
-//	cloud = this.atmosphere.cloudsManager.newCircularCloud();
-//	cloud.createCloud(126.929+increLong, 37.5172076, 340.0, 50.0, 40.0, 16);
-//
-//	cloud = this.atmosphere.cloudsManager.newCircularCloud();
-//	cloud.createCloud(126.929+increLong, 37.5172076+increLat, 340.0, 80.0, 90.0, 16);
-//	*/
-//};
-
 /**
  * 카메라가 이동중인지를 확인
  * @param cameraPosition 변수
@@ -495,18 +427,6 @@ MagoManager.prototype.renderOrdered = function(dc)
  */
 MagoManager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral) 
 {
-	// if camera is interior of building -> this.squareDistUmbral = 22.0;
-	// if camera is exterior of building -> this.squareDistUmbral = 200.0;
-	/*
-	if(this.detailed_building)
-	{
-		this.squareDistUmbral = 4.5*4.5;
-	}
-	else{
-		this.squareDistUmbral = 50*50;
-	}
-	*/
-
 	var camera_was_moved = false;
 	var squareDistFromLastPos = this.lastCamPos.squareDistTo(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 	if (squareDistFromLastPos > squareDistUmbral) 
@@ -849,7 +769,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	{
 		neoBuilding = currentVisibleBlocks[i];
 		
-		if (neoBuilding.buildingId == "U310T")
+		if (neoBuilding.buildingId === "U310T")
 		{ var hola = 0; }
 
 		// check if this building is ready to render.***
@@ -1156,7 +1076,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			if (neoBuilding.buildingId == "U310T")
+			if (neoBuilding.buildingId === "U310T")
 			{ var hola = 0; }
 			
 			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0);
@@ -1309,7 +1229,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
  */
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
 {
-	var canvas = document.getElementById("text");
+	var canvas = document.getElementById("objectLabel");
 	canvas.style.opacity = 1.0;
 	canvas.width = this.sceneState.drawingBufferWidth;
 	canvas.height = this.sceneState.drawingBufferHeight;
@@ -1322,6 +1242,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.save();
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	var lineHeight = ctx.measureText("M").width * 1.1;
 
 	// lod2.
 	var gl = this.sceneState.gl;
@@ -1338,8 +1260,13 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
 
-		ctx.strokeText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
-		ctx.fillText(neoBuilding.buildingId, screenCoord.x, screenCoord.y);
+		ctx.font = "20px Arial";
+		ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
+		ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
+
+		ctx.font = "10px Arial";
+		ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+		ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 	}
 	ctx.restore();
 };
@@ -1438,7 +1365,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		}
 		
 		// LOD2.***
-		if (this.colorAux == undefined)
+		if (this.colorAux === undefined)
 		{ this.colorAux = new Color(); }
 		
 		gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
@@ -1611,7 +1538,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	if (this.pointSC2 === undefined)
 	{ this.pointSC2 = new Point3D(); }
 	
-	this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, this.pointSC2);
+	this.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2);
 	var buildingGeoLocation = this.buildingSelected.geoLocDataManager.getGeoLocationData(0);
 	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
 
@@ -1700,13 +1627,13 @@ MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pi
  */
 MagoManager.prototype.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord, neoBuilding) // arg "neoBuilding" is test.
 {
-	if (resultScreenCoord == undefined)
+	if (resultScreenCoord === undefined)
 	{ resultScreenCoord = new Point3D(); }
 	
-	if (this.pointSC == undefined)
+	if (this.pointSC === undefined)
 	{ this.pointSC = new Point3D(); }
 	
-	if (this.pointSC2 == undefined)
+	if (this.pointSC2 === undefined)
 	{ this.pointSC2 = new Point3D(); }
 	
 	this.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
@@ -2397,17 +2324,17 @@ MagoManager.prototype.manageQueue = function()
 	var lowestOctree;
 	var neoBuilding;
 	
-	if (this.matrix4SC == undefined)
+	if (this.matrix4SC === undefined)
 	{ this.matrix4SC = new Matrix4(); }
 	
 	for (var i=0; i<maxParsesCount; i++)
 	{
 		lowestOctree = this.parseQueue.octreesLod0ReferencesToParseArray.shift();
 		
-		if (lowestOctree.neoReferencesMotherAndIndices == undefined)
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 		{ continue; }
 		
-		if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer == undefined)
+		if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 		{ continue; }
 		
 		neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2428,11 +2355,11 @@ MagoManager.prototype.manageQueue = function()
 	{
 		lowestOctree = this.parseQueue.octreesLod0ModelsToParseArray.shift();
 		
-		if (lowestOctree.neoReferencesMotherAndIndices == undefined)
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 		{ continue; }
 		
 		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-		if (blocksList.dataArraybuffer == undefined)
+		if (blocksList.dataArraybuffer === undefined)
 		{ continue; }
 		
 		neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2449,7 +2376,7 @@ MagoManager.prototype.manageQueue = function()
 	for (var i=0; i<maxParsesCount; i++)
 	{
 		lowestOctree = this.parseQueue.octreesLod2LegosToParseArray.shift();
-		if (lowestOctree.lego == undefined)
+		if (lowestOctree.lego === undefined)
 		{ continue; }
 		
 		lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
@@ -2491,7 +2418,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 		lowestOctree = currentVisibleOctrees[i];
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		
-		if (neoBuilding == undefined)
+		if (neoBuilding === undefined)
 		{ continue; }
 		
 		if (lowestOctree.triPolyhedronsCount === 0) 
@@ -2592,7 +2519,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 		{ continue; }
 	
 		neoBuilding = lowestOctree.neoBuildingOwner;
-		if (neoBuilding == undefined)
+		if (neoBuilding === undefined)
 		{ continue; }
 		
 		buildingFolderName = neoBuilding.buildingFileName;
@@ -4198,7 +4125,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	// This makes the visible buildings array.
 	var smartTile1 = this.smartTileManager.tilesArray[0];
 	var smartTile2 = this.smartTileManager.tilesArray[1];
-	if (this.intersectedLowestTilesArray == undefined)
+	if (this.intersectedLowestTilesArray === undefined)
 	{ this.intersectedLowestTilesArray = []; }
 	
 	this.intersectedLowestTilesArray.length = 0; // init array.
@@ -4207,7 +4134,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	
 	var tilesCount = this.intersectedLowestTilesArray.length;
 	
-	if (tilesCount == 0)
+	if (tilesCount === 0)
 	{ return; }
 	
 	var squaredDistToCamera;
@@ -4251,7 +4178,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// determine LOD for each building.
 				neoBuilding = lowestTile.buildingsArray[j];
 				
-				if (neoBuilding.buildingId == "U310T")
+				if (neoBuilding.buildingId === "U310T")
 				{ var hola = 0; }
 	
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -4357,7 +4284,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				buildingSeed = lowestTile.buildingSeedsArray[j];
 				neoBuilding = new NeoBuilding();
 				
-				if (lowestTile.buildingsArray == undefined)
+				if (lowestTile.buildingsArray === undefined)
 				{ lowestTile.buildingsArray = []; }
 				
 				lowestTile.buildingsArray.push(neoBuilding);
@@ -4372,12 +4299,13 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				{ neoBuilding.metaData.bbox = new BoundingBox(); }
 
 				// create a building and set the location.***
+				neoBuilding.name = buildingSeed.name;
 				neoBuilding.buildingId = buildingSeed.buildingId;
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
 				neoBuilding.metaData.bbox = buildingSeed.bBox;
-				if (neoBuilding.bbox == undefined)
+				if (neoBuilding.bbox === undefined)
 				{ neoBuilding.bbox = new BoundingBox(); }
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
@@ -4460,7 +4388,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (this.renderingModeTemp === 2)
 	{ this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0; }
 
-	if (this.boundingSphere_Aux == undefined)
+	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
@@ -5305,6 +5233,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				
 			if (newLocation) 
 			{
+				buildingSeed.name = newLocation.data_name;
+
 				longitude = parseFloat(newLocation.longitude);
 				latitude = parseFloat(newLocation.latitude);
 				altitude = parseFloat(newLocation.height);
@@ -5337,7 +5267,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			if (buildingSeed.geographicCoord === undefined)
 			{ buildingSeed.geographicCoord = new GeographicCoord(); }
 		
-			if (buildingSeed.rotationsDegree == undefined)
+			if (buildingSeed.rotationsDegree === undefined)
 			{ buildingSeed.rotationsDegree = new Point3D(); }
 		
 			buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
@@ -5472,7 +5402,7 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setShowLabelInfo(api.getShowLabelInfo());
 		
 		// clear the text canvas.
-		var canvas = document.getElementById("text");
+		var canvas = document.getElementById("objectLabel");
 		var ctx = canvas.getContext("2d");
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -5572,10 +5502,104 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
 		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
 		this.magoPolicy.setSpecularColor(api.getSpecularColor());
-		
 	}
 	else if (apiName === "changeSsadRadius")
 	{
 		this.magoPolicy.setSsaoRadius(api.getSsaoRadius());
+	}	
+	else if (apiName === "changeFPVMode")
+	{
+		if (api.getFPVMode())
+		{
+			if (this.cameraFPV._camera !== undefined)	{ return; }
+			var scratchLookAtMatrix4 = new Cesium.Matrix4();
+			var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
+
+			var camera = this.scene._camera;
+			this.cameraFPV.init();
+			this.cameraFPV._camera = camera;
+			this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
+
+			var position = new Cesium.Cartesian3();
+			var direction = new Cesium.Cartesian3();
+			var up = new Cesium.Cartesian3();
+
+			var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
+			cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
+
+			this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
+			var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
+			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), direction);
+			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), up);
+
+			camera.flyTo({
+				destination : position,
+				orientation : {
+					direction : direction,
+					up        : up
+				},
+				duration: 1
+			});
+		}
+		else 
+		{
+			if (this.cameraFPV._cameraBAK === undefined)	{ return; }
+			this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+			this.cameraFPV.release();
+		}
+	}
+};
+MagoManager.prototype.checkCollision = function (position, direction)
+{
+	var gl = this.sceneState.gl;
+	if (gl === undefined)	{ return; }
+
+	var posX = this.sceneState.drawingBufferWidth * 0.5;
+	var posY = this.sceneState.drawingBufferHeight * 0.5;
+	
+	var objects = this.getSelectedObjects(gl, posX, posY, this.visibleObjControlerBuildings, this.arrayAuxSC);
+	if (objects === undefined)	{ return; }
+
+	var current_building = this.buildingSelected;
+	this.buildingSelected = this.arrayAuxSC[0];
+
+	var collisionPosition = new Point3D();
+	var height = new Point3D();
+
+	this.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition);
+	this.renderingFase = !this.renderingFase;
+	this.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight - posY * 0.5, height);
+
+	//this.calculateSelObjMovePlaneAsimetricMode(gl, posX, posY, plane);
+	//collisionPos.set(this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);
+	//plane.setPointAndNormal(this.pointSC2.x, this.pointSC2.y, this.pointSC2.z, 0.0, 0.0, 1.0);
+	//line.setPointAndDir(position.x, position.y, position.z, direction.x, direction.y, direction.z);
+
+	//var pickPosition = this.scene.camera.pickEllipsoid(position, this.scene.globe.ellipsoid);
+
+	this.buildingSelected = current_building;
+	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);
+	this.renderingFase = !this.renderingFase;
+	if (distance < 3.5)
+	{ return true; }
+	else
+	{
+		var heightCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(height);
+		var positionCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(position);
+		var tmpAlt = Math.min(positionCartographic.height, heightCartographic.height + 2.0);
+		var tmpLat = Cesium.Math.toDegrees(positionCartographic.latitude);
+		var tmpLon = Cesium.Math.toDegrees(positionCartographic.longitude);
+		if (positionCartographic.height - heightCartographic.height - 1.0 < 0)
+		{
+			tmpAlt = heightCartographic.height + 2.0;
+		}
+		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(collisionPosition));
+		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(position));
+		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(height));
+		console.log(distance);
+		
+		this.cameraFPV.camera.position = Cesium.Cartesian3.fromDegrees(tmpLon, tmpLat, tmpAlt);
+	
+		return false; 
 	}
 };

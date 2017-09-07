@@ -237,6 +237,17 @@ function changeObjectInfoViewModeAPI(flag)
 	}
 }
 
+/*
+*/
+function changeFPVModeAPI(flag)
+{
+	var api = new API("changeFPVMode");
+	api.setFPVMode(flag);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
 /**
  * 현재 위치 근처 issue list. false인 경우 clear
  * 

@@ -24,7 +24,7 @@ var NeoReference = function()
 	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
 	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
 	this.refMatrixType = 2; // 0 = identity matrix, 1 = translate matrix, 2 = transformation matrix.
-	this.refTranslationVec; // use this if "refMatrixType" == 1.
+	this.refTranslationVec; // use this if "refMatrixType" === 1.
 	// 4) VBO datas container.***
 	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
 	
@@ -185,7 +185,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 		{
 			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
 			{
-				if (this.currentVisibleMRG == undefined)
+				if (this.currentVisibleMRG === undefined)
 				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
 				
 				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
@@ -203,7 +203,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 		{
 			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
 			{
-				if (this.currentVisibleMRG == undefined)
+				if (this.currentVisibleMRG === undefined)
 				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
 				
 				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
@@ -266,10 +266,10 @@ NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = functi
 NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function() 
 {
 	// Group all the references that has the same model.
-	if (this.neoRefsIndices == undefined)
+	if (this.neoRefsIndices === undefined)
 	{ return; }
 	
-	if (this.modelReferencedGroupsList == undefined)
+	if (this.modelReferencedGroupsList === undefined)
 	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
 
 	this.modelReferencedGroupsList.createModelReferencedGroups(this.neoRefsIndices, this.motherNeoRefsList);
@@ -435,9 +435,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			} 
 			
 			// do the stadistic recount.
-			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
-			if (neoRef.refMatrixType == 1){ stadistic_refMat_Translates_count +=1; }
-			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
+			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType === 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
 		}
 		else
 		{

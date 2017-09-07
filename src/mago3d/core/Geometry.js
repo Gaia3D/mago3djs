@@ -133,6 +133,7 @@ var NeoBuilding = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this.name = "";
 	this.metaData;
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
@@ -183,7 +184,7 @@ var NeoBuilding = function()
  */
 NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function() 
 {
-	if (this.bboxAbsoluteCenterPos == undefined)
+	if (this.bboxAbsoluteCenterPos === undefined)
 	{
 		this.calculateBBoxCenterPositionWorldCoord();
 	}
@@ -198,8 +199,9 @@ NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function()
  */
 NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function() 
 {
+	var bboxCenterPoint;
 	var geoLoc = this.geoLocDataManager.geoLocationDataArray[0]; // take the 1rst.
-	var bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+	bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
 };
 

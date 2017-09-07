@@ -143,6 +143,21 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		{
 			if (event.button === 0) { magoManager.mouseLeftDown = false; }
 			magoManager.isCameraMoving = false;
+
+			// display current mouse position
+			var terrainObject;
+			var pickPosition = {lat: null, lon: null, alt: null};
+			var pickPoint = wwd.canvasCoordinates(event.layerX, event.layerY);
+			if (pickPoint[0] >= 0 && pickPoint[0] < wwd.canvas.width &&
+				pickPoint[1] >= 0 && pickPoint[1] < wwd.canvas.height)
+			{
+				terrainObject = wwd.pickTerrain(pickPoint).terrainObject();
+				var terrainPosition = terrainObject ? terrainObject.position : null;
+				pickPosition.lat = terrainPosition.latitude;
+				pickPosition.lon = terrainPosition.longitude;
+				pickPosition.alt = terrainPosition.altitude;
+			}
+			clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
@@ -176,20 +191,17 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	}
 	
 	// cesium을 구현체로서 이용
-	function initWwwMago(magoManager, gl) 
+	function initWwwMago(manager, gl) 
 	{
-		var viewport = magoManager.wwd.viewport;
-		//magoManager.selection.init(gl, viewport.width, viewport.height);
-		magoManager.shadersManager.createDefaultShader(gl);
-		magoManager.postFxShadersManager.gl = gl;
-		magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
-		magoManager.createDefaultShaders(gl);// A1-Use this.***
+		var viewport = manager.wwd.viewport;
+		//manager.selection.init(gl, viewport.width, viewport.height);
+		manager.shadersManager.createDefaultShader(gl);
+		manager.postFxShadersManager.gl = gl;
+		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
+		manager.createDefaultShaders(gl);// A1-Use this.***
 
-		// Start postRender version.***********************************************
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		magoManager.getObjectIndexFile();
-		//viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-		//addMouseAction();
+		manager.getObjectIndexFile();
 	}
 
 	// cesium을 구현체로서 이용
@@ -213,6 +225,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		viewer.scene.magoManager.getObjectIndexFile();
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
+		viewer.clock.onTick.addEventListener(function(clock) 
+		{
+			magoManager.cameraFPV.update(magoManager);
+		});
 	}
 
 	// 뭐하는 메서드 인가?
@@ -270,7 +286,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					magoManager.isCameraMoving = true;
 				}
 			}
-			//nowMousePosition = movement.endPosition;
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) 
@@ -303,6 +318,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
+
+			// display current mouse position
+			var pickPosition = {lat: null, lon: null, alt: null};
+			var position = magoManager.scene.camera.pickEllipsoid(movement.position);
+			if (position)
+			{
+				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+				pickPosition.lat = Cesium.Math.toDegrees(cartographicPosition.latitude);
+				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
+				pickPosition.alt = cartographicPosition.height;
+			}
+			clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
 		magoManager.handler.setInputAction(function(movement) 
@@ -334,123 +361,55 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	}
 
 	// KeyPressEvents.**************************************
-	document.addEventListener('keydown', function(e) 
+	document.addEventListener('keydown', function(event) 
 	{
-		setKey(e);
-	}, false);
+		// get current building selected
+		if (magoManager.magoPolicy.issueInsertEnable)	{ return; }
 
-	function setKey(event) 
-	{
+		var selectedBuilding = magoManager.buildingSelected;	
+		if (selectedBuilding === undefined) 	{ return; }
+
+		var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+		if (geoLocationData === undefined)		{ return; }
+
 		var increDeg = 3.0;
-		if (event.key === "q" || event.key === "Q") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;	
-			if (selectedBuilding !== undefined) 
-			{
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.heading === undefined) { geoLocationData.heading = 0; } 
-					var currentHeading = geoLocationData.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						currentHeading+increDeg, geoLocationData.pitch, geoLocationData.roll);
-				}
-			}
+		var currentHeading = geoLocationData.heading || 0;
+		var currentPitch = geoLocationData.pitch || 0;
+		var currentRoll = geoLocationData.roll || 0;
+
+		// For Heading
+		if (event.keyCode === 'Q'.charCodeAt(0))
+		{
+			currentHeading += increDeg;
 		}
-		else if (event.key === "a" || event.key === "A") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding !== undefined) 
-			{
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.heading === undefined) { geoLocationData.heading = 0; } 
-					var currentHeading = geoLocationData.heading;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						currentHeading-increDeg, geoLocationData.pitch, geoLocationData.roll);
-				}
-			}
+		else if (event.keyCode === 'A'.charCodeAt(0))
+		{
+			currentHeading -= increDeg;
 		}
-		else if (event.key === "w" || event.key === "W") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding !== undefined) 
-			{
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.pitch === undefined) { geoLocationData.pitch = 0; } 
-					var currentPitch = geoLocationData.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						geoLocationData.heading, currentPitch+increDeg, geoLocationData.roll);
-				}
-			}
+		
+		// For Pitch
+		if (event.keyCode === 'W'.charCodeAt(0))
+		{
+			currentPitch += increDeg;
 		}
-		else if (event.key === "s" || event.key === "S") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding !== undefined) 
-			{
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.pitch === undefined) { geoLocationData.pitch = 0; } 
-					var currentPitch = geoLocationData.pitch;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						geoLocationData.heading, currentPitch-increDeg, geoLocationData.roll);
-				}
-			}
+		else if (event.keyCode === 'S'.charCodeAt(0))
+		{
+			currentPitch -= increDeg;
 		}
-		else if (event.key === "e" || event.key === "E") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding !== undefined) 
-			{		
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.roll === undefined) { geoLocationData.roll = 0; } 
-					var currentRoll = geoLocationData.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						geoLocationData.heading, geoLocationData.pitch, currentRoll+increDeg);
-				}
-			}
+
+		// For Roll
+		if (event.keyCode === 'E'.charCodeAt(0))
+		{
+			currentRoll += increDeg;
 		}
-		else if (event.key === "d" || event.key === "D") 
-		{  // right arrow
-			// get current building selected.***
-			if (magoManager.magoPolicy.issueInsertEnable)
-			{ return; }
-			var selectedBuilding = magoManager.buildingSelected;
-			if (selectedBuilding !== undefined) 
-			{
-				var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
-				if (geoLocationData !== undefined) 
-				{
-					if (geoLocationData.roll === undefined) { geoLocationData.roll = 0; } 
-					var currentRoll = geoLocationData.roll;
-					magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation,
-						geoLocationData.heading, geoLocationData.pitch, currentRoll-increDeg);
-				}
-			}
+		else if (event.keyCode === 'D'.charCodeAt(0))
+		{
+			currentRoll -= increDeg;
 		}
-	}
+
+		magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
+
+	}, false);
 
 	// world wind 구현체를 이용
 	function drawWorldWind() 

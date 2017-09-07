@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko-KR">
+<html lang="ko">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
@@ -10,21 +10,17 @@
 	
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
-	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" />
+<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
 	
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
-	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script>
-	
-	
+<!-- 	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script> -->
 </head>
 
 <body>
 <input type="hidden" id="now_latitude" name="now_latitude" value="" />
 <input type="hidden" id="now_longitude" name="now_longitude" value=""  />
-
-
 
 <ul class="nav">
 	<li id="homeMenu" class="home">
@@ -52,8 +48,13 @@
 			</ul>
 		</li>
 		<li><a href="/homepage/download.do">Download</a></li>
-		<li> <a href="/homepage/docs.do">Documentation</a></li>
-		<li> <a href="/homepage/faq.do">FAQ</a></li>
+		<li>Documentation
+			<ul>
+				<li><a href="http://www.mago3d.com/homepage/api.do">API</a></li>
+				<li><a href="http://www.mago3d.com/homepage/spec.do">F4D Spec</a></li>
+			</ul>
+		</li>
+		<li><a href="/homepage/faq.do">FAQ</a></li>
 	</ul>
 	
 	<ul id="myIssueMenuContent" class="issueList">
@@ -229,6 +230,23 @@
 			<label for="showNearGeoIssueList"> 표시 </label>
 			<input type="radio" id="hideNearGeoIssueList" name="nearGeoIssueList" value="false" onclick="changeNearGeoIssueList(false);"/>
 			<label for="hideNearGeoIssueList"> 비표시 </label>
+		</div>
+		<div>
+			<h3>클릭 지점의 위치 정보</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="positionLatitude"> 위도 </label>
+					<input type="text" id="positionLatitude" name="positionLatitude" size="15" />
+				</li>
+				<li>
+					<label for="positionLongitude"> 경도 </label>
+					<input type="text" id="positionLongitude" name="positionLongitude" size="15" />
+				</li>
+				<li>
+					<label for="positionAltitude"> 높이 </label>
+					<input type="text" id="positionAltitude" name="positionAltitude" size="15" />
+				</li>
+			</ul>
 		</div>
 	</div>
 	
@@ -414,22 +432,22 @@
 		</div>
 		<div>
 			<h3>Lighting</h3>
-			<div style="height: 30px;"><label for="geo_ambient_reflection_coef">AmbientReflectionCoeficient</label></div>
-			<div id="geo_ambient_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">AmbientReflectionCoeficient</div>
+			<div id="ambient_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_ambient_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" />
+				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" value="0.5" />
 			</div>
-			<div style="height: 30px;"><label for="geo_diffuse_reflection_coef">DiffuseReflectionCoeficient</label></div>
-			<div id="geo_diffuse_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">DiffuseReflectionCoeficient</div>
+			<div id="diffuse_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_diffuse_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" />
+				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" value="1" />
 			</div>
-			<div style="height: 30px;"><label for="geo_specular_reflection_coef">SpecularReflectionCoeficient</label></div>
-			<div id="geo_specular_reflection_coef" style="display: inline-block; width: 310px;">
+			<div style="height: 30px;">SpecularReflectionCoeficient</div>
+			<div id="specular_reflection_coef" style="display: inline-block; width: 310px;">
 				<div id="geo_specular_reflection_coef_view" class="ui-slider-handle"></div>
-				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" />
+				<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" value="1" />
 			</div>
-			<div style="height: 30px;">
+			<!-- <div style="height: 30px;">
 				<label for="geo_ambient_color">AmbientColor</label>
 				<input type="text" id="geo_ambient_color" name="geo_ambient_color" class="m" size="15"
 					data-palette='[	"#c00000","#ff0000","#ffc000","#ffff00","#92d050",
@@ -460,9 +478,11 @@
 									"#e5e0ec","#ccc1d9","#b2a2c7","#5f497a","#3f3151",
 									"#dbeef3","#b7dde8","#92cddc","#31859b","#205867",
 									"#fdeada","#fbd5b5","#fac08f","#e36c09","#974806" ]' />
-				&nbsp;<button type="button" id="changeLightingButton" class="btn">변경</button>
+				&nbsp;
+			</div> -->
+			<div style="height: 30px; text-align: center;">
+				<button type="button" id="changeLightingButton" class="btn">변경</button>
 			</div>
-			
 			
 			<div style="text-align: center">
 			</div>
@@ -472,6 +492,14 @@
 			<h3><label for="geo_ssao_radius">SSAO Radius</label></h3>
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
 			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
+		</div>
+		
+		<div>
+			<h3>View Mode</h3>
+			<input type="radio" id="mode3PV" name="viewMode" value ="false" onclick="changeViewMode(false);"/>
+			<label for="mode3PV"> 3인칭 모드 </label>
+			<input type="radio" id="mode1PV" name="viewMode" value ="true" onclick="changeViewMode(true);"/>
+			<label for="mode1PV"> 1인칭 모드 </label>
 		</div>
 	</div>
 </div>
@@ -485,30 +513,10 @@
 </ul>
 
 <div id="magoContainer" class="mapWrap">
-	<canvas id="text"></canvas>
-	<style>
-	* {
-	  box-sizing: border-box;
-	}
-	#ui {
-		width: 200px;
-	}
-	.container {
-		position: relative;
-	}
-	#text {
-		background-color: transparent;  /* needed because webgl-tutoraisl.css sets canvas bg color to white */
-		position: absolute;
-		left: 0px;
-		top: 0px;
-		z-index: 10;
-		pointer-events:none;
-	}
-	</style>
 </div>
+<canvas id="objectLabel"></canvas>
 
 <script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
-<!-- <script type="text/javascript" src="/build/mago3d/mago3d.js"></script> -->
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/AuxiliarSegment.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/BoundingBox.js"></script>
@@ -521,6 +529,7 @@
 <script type="text/javascript" src="/src/mago3d/core/Constant.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
+<script type="text/javascript" src="/src/mago3d/core/FirstPersonView.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Frustum.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeographicCoord.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/GeoLocationData.js"></script>
@@ -583,6 +592,7 @@
 <script type="text/javascript" src="/src/mago3d/worker/WebWorker.js"></script>
 <script type="text/javascript" src="/src/mago3d/extern/tga.js"></script>
 <script type="text/javascript" src="/src/mago3d/extern/DataStream.js"></script>
+<script type="text/javascript" src="/src/mago3d/extern/gl-matrix.js"></script>
 <script>
 	var agent = navigator.userAgent.toLowerCase();
 	if(agent.indexOf('chrome') < 0) { 
@@ -598,6 +608,8 @@
 	menuMap.set("insertIssueMenu", false);
 	menuMap.set("configMenu", false);
 	var insertIssueEnable = false;
+	var FPVModeFlag = false;
+
 	var imagePath = "/images/ko";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
@@ -618,6 +630,9 @@
 			// slider, color-picker
 			initRendering();
 			
+			// 3PView Mode
+			changeViewMode(false);
+
 			clearInterval(timerId);
 			console.log(" managerFactory != null, intervalCount = " + intervalCount);
 			return;
@@ -674,6 +689,7 @@
 		}
 		changeInsertIssueModeAPI(insertIssueEnable);
 	});
+	
 	// issue input layer call back function
 	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
 		if(insertIssueEnable) {
@@ -1066,7 +1082,11 @@
 		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
 		changeMouseMoveAPI(mouseMoveMode);
 	}
-	
+	// 카메라 모드 전환
+	function changeViewMode(isFPVMode) {
+		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);
+		changeFPVModeAPI(isFPVMode);
+	}
 	function initJqueryCalendar() {
 		$( ".date" ).datepicker({ 
 			dateFormat : "yymmdd",
@@ -1085,7 +1105,7 @@
 	// rendering 설정
 	function initRendering() {
 		var ambient = $( "#geo_ambient_reflection_coef_view" );
-		$( "#geo_ambient_reflection_coef" ).slider({
+		$( "#ambient_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value
@@ -1100,7 +1120,7 @@
 			}
 		});
 		var diffuse = $( "#geo_diffuse_reflection_coef_view" );
-		$( "#geo_diffuse_reflection_coef" ).slider({
+		$( "#diffuse_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value
@@ -1115,7 +1135,7 @@
 			}
 		});
 		var specular = $( "#geo_specular_reflection_coef_view" );
-		$( "#geo_specular_reflection_coef" ).slider({
+		$( "#specular_reflection_coef" ).slider({
 			range: "max",
 			min: 0, // min value
 			max: 1, // max value
@@ -1130,7 +1150,7 @@
 			}
 		});
 		
-		$('[name="geo_ambient_color"]').paletteColorPicker({
+		/* $('[name="geo_ambient_color"]').paletteColorPicker({
 			clear_btn: 'last',
 			//position: 'downside',
 			close_all_but_this: true // Default is false
@@ -1139,7 +1159,7 @@
 			clear_btn: 'last',
 			//position: 'downside',
 			close_all_but_this: true // Default is false
-		});
+		}); */
 	}
 	
 	// LOD 설정
@@ -1148,13 +1168,19 @@
 	});
 	// Lighting 설정
 	$("#changeLightingButton").click(function() {
-		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(),
-							$("#geo_specular_color").val(), $("#geo_ambient_color").val());
+		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
 	});
 	// Ssadradius 설정
 	$("#changeSsadRadiusButton").click(function() {
 		changeSsadRadiusAPI($("#geo_ssao_radius").val());
 	});
+
+	// click poisition call back function
+	function showClickPosition(position) {
+		$("#positionLatitude").val(position.lat);
+		$("#positionLongitude").val(position.lon);
+		$("#positionAltitude").val(position.alt);
+	}
 </script>
 </body>
 </html>

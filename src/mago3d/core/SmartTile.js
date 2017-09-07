@@ -36,7 +36,7 @@ var SmartTile = function(smartTileName)
  */
 SmartTile.prototype.newSubTile = function(parentTile) 
 {
-	if (this.subTiles == undefined)
+	if (this.subTiles === undefined)
 	{ this.subTiles = []; }
 	
 	var subTile = new SmartTile();
@@ -52,10 +52,10 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 {
 	var resultNeoBuilding;
 	var hasSubTiles = true;
-	if (this.subTiles == undefined)
+	if (this.subTiles === undefined)
 	{ hasSubTiles = false; }
 	
-	if (this.subTiles && this.subTiles.length == 0)
+	if (this.subTiles && this.subTiles.length === 0)
 	{ hasSubTiles = false; }
 		
 	if (!hasSubTiles)
@@ -108,7 +108,7 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
 {
-	if (this.sphereExtent == undefined)
+	if (this.sphereExtent === undefined)
 	{ this.sphereExtent = new Sphere(); }
 	
 	// calculate worldCoord center position.
@@ -128,7 +128,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  */
 SmartTile.prototype.makeTree = function(minDegree, magoManager) 
 {
-	if (this.buildingSeedsArray == undefined || this.buildingSeedsArray.length == 0)
+	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
 	{ return; }
 	
 	// if this has "buildingSeedsArray" then make sphereExtent.
@@ -177,7 +177,7 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 			i--;
 			buildingSeedsCount = buildingSeedsArray.length;
 			
-			if (this.buildingSeedsArray == undefined)
+			if (this.buildingSeedsArray === undefined)
 			{ this.buildingSeedsArray = []; }
 			
 			this.buildingSeedsArray.push(buildingSeed);
@@ -206,7 +206,7 @@ SmartTile.prototype.intersectPoint = function(longitude, latitude)
  */
 SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray) 
 {
-	if (this.subTiles == undefined)
+	if (this.subTiles === undefined)
 	{
 		if (this.buildingSeedsArray && this.buildingSeedsArray.length > 0)
 		{
@@ -283,9 +283,9 @@ SmartTile.prototype.getSphereExtent = function()
  */
 SmartTile.prototype.setSize = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt) 
 {
-	if (this.minGeographicCoord == undefined)
+	if (this.minGeographicCoord === undefined)
 	{ this.minGeographicCoord = new GeographicCoord(); }
-	if (this.maxGeographicCoord == undefined)	
+	if (this.maxGeographicCoord === undefined)	
 	{ this.maxGeographicCoord = new GeographicCoord(); }
 		
 	this.minGeographicCoord.setLonLatAlt(minLon, minLat, minAlt);	
@@ -351,12 +351,12 @@ SmartTile.prototype.getLatitudeRangeDegree = function()
 SmartTile.prototype.calculateTileRange = function() 
 {
 	// No used function.
-	if (this.buildingSeedsArray == undefined)
+	if (this.buildingSeedsArray === undefined)
 	{ return; }
 	
-	if (this.minGeographicCoord == undefined)
+	if (this.minGeographicCoord === undefined)
 	{ this.minGeographicCoord = new GeographicCoord(); }
-	if (this.maxGeographicCoord == undefined)	
+	if (this.maxGeographicCoord === undefined)	
 	{ this.maxGeographicCoord = new GeographicCoord(); }
 	
 	var buildingSeed;
@@ -369,7 +369,7 @@ SmartTile.prototype.calculateTileRange = function()
 		latitude = buildingSeed.geographicCoord.latitude;
 		altitude = buildingSeed.geographicCoord.altitude;
 		
-		if (i == 0)
+		if (i === 0)
 		{
 			this.minGeographicCoord.setLonLatAlt(longitude, latitude, altitude);
 			this.maxGeographicCoord.setLonLatAlt(longitude, latitude, altitude);
@@ -423,9 +423,9 @@ var SmartTileManager = function()
 	// tile 2 : longitude {0, 180},  latitude {-90, 90}
 	
 	var tile1 = this.newSmartTile("AmericaSide");
-	if (tile1.minGeographicCoord == undefined)
+	if (tile1.minGeographicCoord === undefined)
 	{ tile1.minGeographicCoord = new GeographicCoord(); }
-	if (tile1.maxGeographicCoord == undefined)
+	if (tile1.maxGeographicCoord === undefined)
 	{ tile1.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile1.depth = 0; // mother tile.
@@ -433,9 +433,9 @@ var SmartTileManager = function()
 	tile1.maxGeographicCoord.setLonLatAlt(0, 90, 0);
 	
 	var tile2 = this.newSmartTile("AsiaSide");
-	if (tile2.minGeographicCoord == undefined)
+	if (tile2.minGeographicCoord === undefined)
 	{ tile2.minGeographicCoord = new GeographicCoord(); }
-	if (tile2.maxGeographicCoord == undefined)
+	if (tile2.maxGeographicCoord === undefined)
 	{ tile2.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile2.depth = 0; // mother tile.
@@ -463,7 +463,7 @@ SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingI
 	var resultNeoBuilding;
 	var i = 0;
 	var smartTilesCount = this.tilesArray.length;
-	while (resultNeoBuilding == undefined && i<smartTilesCount)
+	while (resultNeoBuilding === undefined && i<smartTilesCount)
 	{
 		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId);
 		i++;

@@ -32,12 +32,12 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner)
 OcclusionCullingOctreeCell.prototype.createModelReferencedGroups = function(motherNeoRefsList) 
 {
 	var subBoxesCount = this._subBoxesArray.length;
-	if (subBoxesCount == 0)
+	if (subBoxesCount === 0)
 	{
-		if (this._indicesArray.length == 0)
+		if (this._indicesArray.length === 0)
 		{ return; }
 		
-		if (this.modelReferencedGroupsList == undefined)
+		if (this.modelReferencedGroupsList === undefined)
 		{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
 		
 		this.modelReferencedGroupsList.createModelReferencedGroups(this._indicesArray, motherNeoRefsList);
