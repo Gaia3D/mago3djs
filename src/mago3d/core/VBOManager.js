@@ -129,7 +129,7 @@ VBOVertexIdxCacheKey.prototype.isReadyPositions = function(gl, vboMemManager)
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshVertexCacheKey);
 		gl.bufferData(gl.ARRAY_BUFFER, this.posVboDataArray, gl.STATIC_DRAW);
 		this.posVboDataArray = undefined;
-		return false;
+		return true;
 	}
 	return true;
 };
@@ -150,7 +150,7 @@ VBOVertexIdxCacheKey.prototype.isReadyNormals = function(gl, vboMemManager)
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshNormalCacheKey);
 		gl.bufferData(gl.ARRAY_BUFFER, this.norVboDataArray, gl.STATIC_DRAW);
 		this.norVboDataArray = undefined;
-		return false;
+		return true;
 	}
 	return true;
 };
@@ -171,7 +171,7 @@ VBOVertexIdxCacheKey.prototype.isReadyFaces = function(gl, vboMemManager)
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.meshFacesCacheKey);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.idxVboDataArray, gl.STATIC_DRAW);
 		this.idxVboDataArray = undefined;
-		return false;
+		return true;
 	}
 	return true;
 };
@@ -193,7 +193,7 @@ VBOVertexIdxCacheKey.prototype.isReadyTexCoords = function(gl, vboMemManager)
 		gl.bufferData(gl.ARRAY_BUFFER, this.tcoordVboDataArray, gl.STATIC_DRAW);
 		this.tcoordVboDataArray = undefined;
 
-		return false;
+		return true;
 	}
 	return true;
 };
@@ -215,7 +215,7 @@ VBOVertexIdxCacheKey.prototype.isReadyColors = function(gl, vboMemManager)
 		gl.bufferData(gl.ARRAY_BUFFER, this.colVboDataArray, gl.STATIC_DRAW);
 		this.colVboDataArray = undefined;
 		
-		return false;
+		return true;
 	}
 	return true;
 };
