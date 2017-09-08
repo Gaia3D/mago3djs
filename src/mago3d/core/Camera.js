@@ -15,5 +15,23 @@ var Camera = function()
 	this.direction = new Point3D();
 	this.up = new Point3D();
 	this.frustum = new Frustum();
+	this.dirty = true;
+};
 
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.setDirty = function(cameraIsDirty)
+{
+	this.dirty = cameraIsDirty;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.getDirty = function()
+{
+	return this.dirty;
 };
