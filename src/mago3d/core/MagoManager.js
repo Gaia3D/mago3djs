@@ -1772,7 +1772,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
 	if (miliSecondsUsed < 1500) 
 	{
-		if (this.mouse_x === movement.position.x && this.mouse_y === movement.position.y) 
+		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
 		{
 			this.bPicking = true;
 		}
