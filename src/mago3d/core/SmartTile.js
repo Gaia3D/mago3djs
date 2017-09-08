@@ -535,7 +535,23 @@ SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingI
 	var smartTilesCount = this.tilesArray.length;
 	while (resultNeoBuilding === undefined && i<smartTilesCount)
 	{
-		//resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId); // original.
+		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId); 
+		i++;
+	}
+	
+	return resultNeoBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.getBuildingSeedById = function(buildingType, buildingId) 
+{
+	var resultNeoBuilding;
+	var i = 0;
+	var smartTilesCount = this.tilesArray.length;
+	while (resultNeoBuilding === undefined && i<smartTilesCount)
+	{
 		resultNeoBuilding = this.tilesArray[i].getBuildingSeedById(buildingType, buildingId);
 		i++;
 	}
