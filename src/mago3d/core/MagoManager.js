@@ -122,7 +122,7 @@ var MagoManager = function()
 
 	this.backGround_fileReadings_count = 0; // this can be as max = 9.***
 	this.backGround_imageReadings_count = 0;
-	this.isCameraMoving = false;
+	this.isCameraMoving = false; 
 	this.isCameraInsideBuilding = false;
 	this.isCameraInsideNeoBuilding = false;
 	this.renderingFase = 0;
@@ -1219,8 +1219,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		//gl.bindTexture(gl.TEXTURE_2D, wwwCurrentTexture);
 		this.wwd.drawContext.redrawRequested = true;
 	}
-	
-	
+
 };
 
 /**
@@ -1229,6 +1228,9 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
 {
 	var canvas = document.getElementById("objectLabel");
+	if (canvas == undefined)
+	{ return; }
+	
 	canvas.style.opacity = 1.0;
 	canvas.width = this.sceneState.drawingBufferWidth;
 	canvas.height = this.sceneState.drawingBufferHeight;
@@ -1739,11 +1741,86 @@ MagoManager.prototype.setCameraMotion = function(state)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ */
+MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY) 
+{
+	this.dateSC = new Date();
+	this.startTimeSC = this.dateSC.getTime();
+
+	this.mouse_x = mouseX;
+	this.mouse_y = mouseY;
+	this.mouseLeftDown = true;
+	this.isCameraMoving = true;
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
+{
+	this.isCameraMoving = false;
+	this.mouseLeftDown = false;
+	this.mouseDragging = false;
+	this.selObjMovePlane = undefined;
+	this.mustCheckIfDragging = true;
+	this.thereAreStartMovePoint = false;
+
+	this.dateSC = new Date();
+	this.currentTimeSC = this.dateSC.getTime();
+	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
+	if (miliSecondsUsed < 1500) 
+	{
+		if (this.mouse_x === movement.position.x && this.mouse_y === movement.position.y) 
+		{
+			this.bPicking = true;
+		}
+	}
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY) 
+{
+	this.dateSC = new Date();
+	this.startTimeSC = this.dateSC.getTime();
+
+	this.mouse_x = mouseX;
+	this.mouse_y = mouseY;
+	this.mouseMiddleDown = true;
+	this.isCameraMoving = true;
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY) 
+{
+	this.dateSC = new Date();
+	this.startTimeSC = this.dateSC.getTime();
+
+	this.mouse_x = mouseX;
+	this.mouse_y = mouseY;
+	this.mouseRightDown = true;
+	this.isCameraMoving = true;
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
  * @param renderables_neoRefLists_array 변수
  */
 MagoManager.prototype.manageMouseMove = function(mouseX, mouseY) 
 {
-
+	this.sceneState.camera.setDirty(true);
+	
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// distinguish 2 modes.******************************************************

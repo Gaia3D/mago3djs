@@ -132,16 +132,29 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		
 		var mouseDownEvent = function(event) 
 		{
-			if (event.button === 0) { magoManager.mouseLeftDown = true; }
-			magoManager.isCameraMoving = true;
-			magoManager.mouse_x = event.layerX,
-			magoManager.mouse_y = event.layerY;
+			if (event.button === 0) 
+			{ magoManager.mouseActionLeftDown(event.layerX, event.layerY); }
+			else if (event.button === 1) 
+			{ magoManager.mouseActionMiddleDown(event.layerX, event.layerY); }
+			else if (event.button === 2) 
+			{ magoManager.mouseActionRightDown(event.layerX, event.layerY); }
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
 		var mouseUpEvent = function(event) 
 		{
-			if (event.button === 0) { magoManager.mouseLeftDown = false; }
+			if (event.button === 0) 
+			{ 
+				magoManager.mouseLeftDown = false; 
+			}
+			else if (event.button === 1) 
+			{ 
+				magoManager.mouseMiddleDown = false; 
+			}
+			else if (event.button === 2) 
+			{ 
+				
+			}
 			magoManager.isCameraMoving = false;
 
 			// display current mouse position
@@ -246,27 +259,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	{
 		magoManager.handler.setInputAction(function(click) 
 		{
-			magoManager.dateSC = new Date();
-			magoManager.startTimeSC = magoManager.dateSC.getTime();
-			//secondsUsed = this.currentTimeSC - this.startTimeSC;
-
-			magoManager.mouse_x = click.position.x;
-			magoManager.mouse_y = click.position.y;
-			magoManager.mouseLeftDown = true;
-			
-			//nowMousePosition = startMousePosition = Cesium.Cartesian3.clone(click.position);
+			magoManager.mouseActionLeftDown(click.position.x, click.position.y);
 		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 		magoManager.handler.setInputAction(function(click) 
 		{
-			magoManager.dateSC = new Date();
-			magoManager.startTimeSC = magoManager.dateSC.getTime();
-			//secondsUsed = this.currentTimeSC - this.startTimeSC;
-
-			magoManager.mouse_x = click.position.x;
-			magoManager.mouse_y = click.position.y;
-			magoManager.mouseMiddleDown = true;
+			magoManager.mouseActionMiddleDown(click.position.x, click.position.y);
 		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
+		
+		magoManager.handler.setInputAction(function(click) 
+		{
+			magoManager.mouseActionRightDown(click.position.x, click.position.y);
+		}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
@@ -290,21 +294,15 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
-			// if picked
-			//vm.pickedPolygon = false;
-			//disableCameraMotion(true)
-			if (magoManager.isCameraMoving)
-			{
-				//magoManager.sceneState.bMust = true;
-			}
+			magoManager.mouseActionLeftUp(click.position.x, click.position.y);
+			disableCameraMotion(true);
+			/*
 			magoManager.isCameraMoving = false;
 			magoManager.mouseLeftDown = false;
 			magoManager.mouseDragging = false;
 			magoManager.selObjMovePlane = undefined;
 			magoManager.mustCheckIfDragging = true;
 			magoManager.thereAreStartMovePoint = false;
-			disableCameraMotion(true);
-
 			magoManager.dateSC = new Date();
 			magoManager.currentTimeSC = magoManager.dateSC.getTime();
 			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
@@ -318,7 +316,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
 				}
 			}
-
+			*/
 			// display current mouse position
 			var pickPosition = {lat: null, lon: null, alt: null};
 			var position = magoManager.scene.camera.pickEllipsoid(movement.position);
