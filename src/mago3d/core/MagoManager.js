@@ -1055,7 +1055,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 
 				this.upDateCamera(this.myCameraSCX);
 				this.currentVisibleNeoBuildings_array.length = 0;
-				//this.doFrustumCullingNeoBuildings(this.myCameraSCX.frustum, cameraPosition); // old.
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
 				this.prepareNeoBuildingsAsimetricVersion(gl);
 			}
@@ -1234,8 +1233,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 	canvas.width = this.sceneState.drawingBufferWidth;
 	canvas.height = this.sceneState.drawingBufferHeight;
 	var ctx = canvas.getContext("2d");
-	ctx.strokeStyle = 'black';
-	ctx.fillStyle= "white";
+	//ctx.strokeStyle = 'SlateGrey';
+	//ctx.strokeStyle = 'MidnightBlue';
+	ctx.strokeStyle = 'DarkSlateGray'; 
+	//ctx.fillStyle= "white";
+	ctx.fillStyle= "PapayaWhip";
 	ctx.lineWidth = 4;
 	ctx.font = "20px Arial";
 	ctx.textAlign = 'center';
@@ -1260,13 +1262,14 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
 
-		ctx.font = "20px Arial";
+		ctx.font = "13px Arial";
 		ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
 		ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
 
-		ctx.font = "10px Arial";
+		ctx.font = "9px Arial";
 		ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 		ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+		
 	}
 	ctx.restore();
 };
@@ -4187,6 +4190,9 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = this.intersectedLowestTilesArray[i];
+		if (lowestTile.sphereExtent == undefined)
+		{ continue; }
+		
 		tileCenterPos = lowestTile.sphereExtent.centerPoint;
 		squaredDistToCamera = cameraPosition.squareDistTo(tileCenterPos.x, tileCenterPos.y, tileCenterPos.z);
 		if (squaredDistToCamera > lod3_minSquaredDist)
@@ -4352,7 +4358,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
  */
 MagoManager.prototype.flyToBuilding = function(dataKey) 
 {
-	var neoBuilding = this.getNeoBuildingById(null, dataKey);
+	var neoBuilding = this.getBuildingSeedById(null, dataKey);
 
 	if (neoBuilding === undefined)
 	{ return; }
@@ -4530,35 +4536,17 @@ MagoManager.prototype.flyToBuilding_current = function(dataKey)
  */
 MagoManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
-	/*
-	// old.
-	var buildingCount = this.neoBuildingsList.neoBuildingsArray.length;
-	var find = false;
-	var i=0;
-	var resultNeoBuilding;
-	while (!find && i<buildingCount) 
-	{
-		if (buildingType)
-		{
-			if (this.neoBuildingsList.neoBuildingsArray[i].buildingId === buildingId && this.neoBuildingsList.neoBuildingsArray[i].buildingType === buildingType) 
-			{
-				find = true;
-				resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
-			}
-		}
-		else 
-		{
-			if (this.neoBuildingsList.neoBuildingsArray[i].buildingId === buildingId) 
-			{
-				find = true;
-				resultNeoBuilding = this.neoBuildingsList.neoBuildingsArray[i];
-			}
-		}
-		i++;
-	}
-	*/
 	var resultNeoBuilding = this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
 	return resultNeoBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+MagoManager.prototype.getBuildingSeedById = function(buildingType, buildingId) 
+{
+	var resultNeoBuildingSeed = this.smartTileManager.getBuildingSeedById(buildingType, buildingId);
+	return resultNeoBuildingSeed;
 };
 
 /**

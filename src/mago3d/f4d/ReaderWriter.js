@@ -966,7 +966,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			if (ver0 == 0 && ver1 == 0 && ver2 == 1)
 			{
 				// read materials list.
-				var materialsCount = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 				for (var i=0; i<materialsCount; i++)
 				{
 					var textureTypeName = "";
