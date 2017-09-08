@@ -294,7 +294,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
-			//magoManager.mouseActionLeftUp(click.position.x, click.position.y);
+			magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
 			disableCameraMotion(true);
 			/*
 			magoManager.isCameraMoving = false;
