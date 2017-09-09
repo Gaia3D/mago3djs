@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Cesium</title>
+	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
+	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
+	<script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
+	<script type="text/javascript" src="/tutorials/mago3d.js"></script>
+</head>
+<body>
+	<div id="magoContainer" class="mapWrap"></div>
+<script>
+	var imagePath = "/images/ko";
+	magoStart(null, "magoContainer", null, null);
+	
+	// mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, imagePath) {
+		$.ajax({
+			url: "/tutorials/policy-tutorials.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				loadData(viewer, renderDivId, serverPolicy);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+		
+	function loadData(viewer, renderDivId, serverPolicy) {
+		$.ajax({
+			url: "/tutorials/data-tutorials.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverData){
+				managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+</script>
+</body>
+</html>
