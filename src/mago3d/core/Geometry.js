@@ -156,8 +156,8 @@ var NeoBuilding = function()
 	this.aditionalColor; // use for colorChanged.***
 
 	// Textures loaded.***************************************************
-	this.texturesLoaded = []; // material textures.***
-	this.texturesLoadedCache = {}; // no udes yet...
+	this.texturesLoaded; // material textures.***
+	//this.texturesLoadedCache = {}; // no udes yet...
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
@@ -332,6 +332,9 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
 		{
 			// 1rst, check if the texture is loaded.
+			if (this.texturesLoaded == undefined)
+			{ this.texturesLoaded = []; }
+			
 			var sameTexture = this.getSameTexture(neoReference.texture);
 			if (sameTexture === undefined)
 			{

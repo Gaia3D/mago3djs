@@ -71,7 +71,7 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
 		}
 		else if (ssao_idx === 1)
 		{
-			if (neoBuilding.texturesLoaded.length>0)
+			if (neoBuilding.texturesLoaded && neoBuilding.texturesLoaded.length>0)
 			{
 				renderTexture = true;
 			}

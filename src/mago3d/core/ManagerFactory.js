@@ -103,14 +103,14 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		var gl = wwd.drawContext.currentGlContext;
 		initWwwMago(magoManager, gl);
 
-		// Click event. Is different to anothers event handlers.******************************************************
+		// Click event. 
 		// The common gesture-handling function.
 		var handleClick = function (recognizer) 
 		{
 			// Obtain the event location.
-			magoManager.mouse_x = event.layerX,
-			magoManager.mouse_y = event.layerY;
-			magoManager.bPicking = true;
+			//magoManager.mouse_x = event.layerX,
+			//magoManager.mouse_y = event.layerY;
+			//magoManager.bPicking = true;
 			
 			// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
 			// relative to the upper left corner of the canvas rather than the upper left corner of the page.
@@ -145,17 +145,16 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		{
 			if (event.button === 0) 
 			{ 
-				magoManager.mouseLeftDown = false; 
+				magoManager.mouseActionLeftUp(event.layerX, event.layerY);
 			}
 			else if (event.button === 1) 
 			{ 
-				magoManager.mouseMiddleDown = false; 
+				magoManager.mouseActionMiddleUp(event.layerX, event.layerY);
 			}
 			else if (event.button === 2) 
 			{ 
-				
+				magoManager.mouseActionRightUp(event.layerX, event.layerY);
 			}
-			magoManager.isCameraMoving = false;
 
 			// display current mouse position
 			var terrainObject;
@@ -276,49 +275,30 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
+			//magoManager.mouseActionMove(movement.endPosition.x, movement.endPosition.y);
 			if (magoManager.mouseLeftDown) 
 			{
 				if (movement.startPosition.x !== movement.endPosition.x || movement.startPosition.y !== movement.endPosition.y) 
 				{
-					magoManager.manageMouseMove(movement.startPosition.x, movement.startPosition.y);
+					magoManager.manageMouseDragging(movement.startPosition.x, movement.startPosition.y);
 				}
 			}
 			else
 			{
 				magoManager.mouseDragging = false;
 				disableCameraMotion(true);
-				if (magoManager.mouseMiddleDown)
+				if (magoManager.mouseMiddleDown || magoManager.mouseRightDown)
 				{
 					magoManager.isCameraMoving = true;
+					magoManager.sceneState.camera.setDirty(true);
 				}
 			}
+			
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
 			magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
-			disableCameraMotion(true);
-			/*
-			magoManager.isCameraMoving = false;
-			magoManager.mouseLeftDown = false;
-			magoManager.mouseDragging = false;
-			magoManager.selObjMovePlane = undefined;
-			magoManager.mustCheckIfDragging = true;
-			magoManager.thereAreStartMovePoint = false;
-			magoManager.dateSC = new Date();
-			magoManager.currentTimeSC = magoManager.dateSC.getTime();
-			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
-			//if(miliSecondsUsed < 500) // original.***
-			if (miliSecondsUsed < 1000) 
-			{
-				if (magoManager.mouse_x === movement.position.x && magoManager.mouse_y === movement.position.y) 
-				{
-					magoManager.bPicking = true;
-					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
-				}
-			}
-			*/
 			// display current mouse position
 			var pickPosition = {lat: null, lon: null, alt: null};
 			var position = magoManager.scene.camera.pickEllipsoid(movement.position);
@@ -336,30 +316,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 		magoManager.handler.setInputAction(function(movement) 
 		{
-			// if picked
-			//vm.pickedPolygon = false;
-			//disableCameraMotion(true)
-			magoManager.isCameraMoving = false;
-			magoManager.mouseMiddleDown = false;
-			magoManager.mouseDragging = false;
-			magoManager.selObjMovePlane = undefined;
-			magoManager.mustCheckIfDragging = true;
-			magoManager.thereAreStartMovePoint = false;
-			disableCameraMotion(true);
-
-			magoManager.dateSC = new Date();
-			magoManager.currentTimeSC = magoManager.dateSC.getTime();
-			var miliSecondsUsed = magoManager.currentTimeSC - magoManager.startTimeSC;
-			if (miliSecondsUsed < 500) 
-			{
-				if (magoManager.mouse_x === movement.position.x && magoManager.mouse_y === movement.position.y) 
-				{
-					magoManager.bPicking = true;
-					//var gl = scene.context._gl;
-					//f4d_topManager.objectSelected = f4d_topManager.getSelectedObjectPicking(scene, f4d_topManager.currentRenderablesNeoRefListsArray);
-				}
-			}
+			magoManager.mouseActionMiddleUp(movement.position.x, movement.position.y);
 	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
+		
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
+	    }, Cesium.ScreenSpaceEventType.RIGHT_UP);
 	}
 
 	// KeyPressEvents.**************************************
