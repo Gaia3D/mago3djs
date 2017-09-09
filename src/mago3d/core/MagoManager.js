@@ -1048,7 +1048,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	{
 		if (this.isLastFrustum)
 		{
-			//if(this.sceneState.bMust)
+			//if(this.sceneState.camera.getDirty())
 			{
 				if (this.myCameraSCX === undefined) 
 				{ this.myCameraSCX = new Camera(); }
@@ -1056,8 +1056,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.upDateCamera(this.myCameraSCX);
 				this.currentVisibleNeoBuildings_array.length = 0;
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
-				this.prepareNeoBuildingsAsimetricVersion(gl);
+				//this.prepareNeoBuildingsAsimetricVersion(gl);
+				//this.sceneState.camera.setDirty(false);
 			}
+			this.prepareNeoBuildingsAsimetricVersion(gl);
 		}
 	}
 	
@@ -1075,9 +1077,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			if (neoBuilding.buildingId === "U310T")
-			{ var hola = 0; }
-			
 			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0);
 		}
 		var fileRequestExtraCount = 2;
@@ -1777,6 +1776,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 			this.bPicking = true;
 		}
 	}
+	
+	this.enableCameraMotion(true);
 };
 
 /**
@@ -1800,6 +1801,22 @@ MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY)
  * @param gl 변수
  * @param scene 변수
  */
+MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY) 
+{
+	this.isCameraMoving = false;
+	this.mouseMiddleDown = false;
+	this.mouseDragging = false;
+	this.selObjMovePlane = undefined;
+	this.mustCheckIfDragging = true;
+	this.thereAreStartMovePoint = false;
+	this.enableCameraMotion(false);
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
 MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY) 
 {
 	this.dateSC = new Date();
@@ -1815,9 +1832,67 @@ MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ */
+MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY) 
+{
+	this.isCameraMoving = false;
+	this.enableCameraMotion(false);
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionMove = function(mouseX, mouseY) 
+{
+	if (this.mouseLeftDown) 
+	{
+		this.manageMouseDragging(mouseX, mouseY);
+	}
+	else if (this.mouseMiddleDown) 
+	{
+		this.sceneState.camera.setDirty(true);
+	}
+	else if (this.mouseRightDown) 
+	{
+		this.sceneState.camera.setDirty(true);
+	}
+	else
+	{
+		this.mouseDragging = false;
+		this.enableCameraMotion(false);
+		if (this.mouseMiddleDown)
+		{
+			this.isCameraMoving = true;
+		}
+	}
+};
+
+// 뭐하는 메서드 인가?
+MagoManager.prototype.enableCameraMotion = function(state)
+{
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		this.scene.screenSpaceCameraController.enableRotate = state;
+		this.scene.screenSpaceCameraController.enableZoom = state;
+		this.scene.screenSpaceCameraController.enableLook = state;
+		this.scene.screenSpaceCameraController.enableTilt = state;
+		this.scene.screenSpaceCameraController.enableTranslate = state;
+	}
+	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+	{
+		;//
+	}
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
  * @param renderables_neoRefLists_array 변수
  */
-MagoManager.prototype.manageMouseMove = function(mouseX, mouseY) 
+MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY) 
 {
 	this.sceneState.camera.setDirty(true);
 	
@@ -4009,7 +4084,7 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 
 	// delete textures.
 	/*
-	//if(neoBuilding.texturesLoaded)
+	if(neoBuilding.texturesLoaded)
 	{
 		var texturesCount = neoBuilding.texturesLoaded.length;
 		for(var i=0; i<texturesCount; i++)
@@ -4022,7 +4097,7 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 			neoBuilding.texturesLoaded[i] = undefined;
 		}
 	}
-	//neoBuilding.texturesLoaded = undefined;
+	neoBuilding.texturesLoaded = undefined;
 	*/
 };
 
@@ -4334,7 +4409,6 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				}
 				//this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
 
-				
 				if (this.isLastFrustum)
 				{
 					if (squaredDistToCamera < lod0_minSquaredDist) 
@@ -4407,7 +4481,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-				neoBuilding.metaData.bbox = buildingSeed.bBox;
+				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
 				if (neoBuilding.bbox === undefined)
 				{ neoBuilding.bbox = new BoundingBox(); }
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
