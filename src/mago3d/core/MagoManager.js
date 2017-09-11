@@ -14,7 +14,7 @@ var MagoManager = function()
 	// F4D Data structure & objects.*****************************************
 	//this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
 	this.terranTile = new TerranTile();// use this.***
-	//this.neoBuildingsList = new NeoBuildingsList();
+	//this.neoBuildingsList = new NeoBuildingsList(); // old.
 	this.renderer = new Renderer();
 	//this.selection = new Selection();
 	this.selectionCandidates = new SelectionCandidates();
@@ -2043,9 +2043,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		intersectionPoint.set(this.pointSC.x, this.pointSC.y, this.pointSC.z);
 
 		// register the movement.***
-		if (this.buildingSelected.moveVector === undefined)
-		{ this.buildingSelected.moveVector = new Point3D(); }
-
 		if (!this.thereAreStartMovePoint) 
 		{
 			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPoint, cartographic, this);
@@ -2489,8 +2486,9 @@ MagoManager.prototype.manageQueue = function()
 	for (var i=0; i<maxDeleteBuildingsCount; i++)
 	{
 		neoBuilding = buildingsToDeleteArray[i];
-		this.deleteNeoBuilding(gl, neoBuilding);
 		this.processQueue.eraseBuildingToDelete(neoBuilding);
+		this.deleteNeoBuilding(gl, neoBuilding);
+		
 	}
 	buildingsToDeleteArray = [];
 	buildingsToDeleteArray = undefined;
@@ -4076,54 +4074,9 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 		this.octreeSelected = undefined;
 		this.objectSelected = undefined;
 	}
-
-	neoBuilding.metaData.deleteObjects();
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.READY;
-
-	var blocksCount = neoBuilding.motherBlocksArray.length;
-	for (var i=0; i<blocksCount; i++)
-	{
-		if (neoBuilding.motherBlocksArray[i])
-		{ neoBuilding.motherBlocksArray[i].deleteObjects(gl, vboMemoryManager); }
-		neoBuilding.motherBlocksArray[i] = undefined;
-	}
-	neoBuilding.motherBlocksArray = [];
-
-	var referencesCount = neoBuilding.motherNeoReferencesArray.length;
-	for (var i=0; i<referencesCount; i++)
-	{
-		if (neoBuilding.motherNeoReferencesArray[i])
-		{ neoBuilding.motherNeoReferencesArray[i].deleteGlObjects(gl, vboMemoryManager); }
-		neoBuilding.motherNeoReferencesArray[i] = undefined;
-	}
-	neoBuilding.motherNeoReferencesArray = [];
-
-	// The octree.
-	if (neoBuilding.octree !== undefined)
-	{ neoBuilding.octree.deleteGlObjects(gl, vboMemoryManager); }
-	neoBuilding.octree = undefined; // f4d_octree. Interior objects.***
-	neoBuilding.octreeLoadedAllFiles = false;
 	
-	//neoBuilding.buildingFileName = "";
-
-	neoBuilding.allFilesLoaded = false;
-	neoBuilding.isReadyToRender = false;
-
-	// delete textures.
-	if (neoBuilding.texturesLoaded)
-	{
-		var texturesCount = neoBuilding.texturesLoaded.length;
-		for (var i=0; i<texturesCount; i++)
-		{
-			if (neoBuilding.texturesLoaded[i])
-			{
-				gl.deleteTexture(neoBuilding.texturesLoaded[i].texId);
-				neoBuilding.texturesLoaded[i].deleteObjects();
-			}
-			neoBuilding.texturesLoaded[i] = undefined;
-		}
-	}
-	neoBuilding.texturesLoaded = undefined;
+	neoBuilding.deleteObjects(gl, vboMemoryManager);
+	
 };
 
 /**
@@ -4328,7 +4281,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	
 	if (this.intersectedLowestTilesArray == undefined)
 	{ this.intersectedLowestTilesArray = []; }
-	/*
+	
 	if (this.lastIntersectedLowestTilesArray == undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }
 
@@ -4339,22 +4292,22 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	// mark all last_tiles as "no visible".
 	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
 	var lowestTile;
-	for(var i=0; i<lastLowestTilesCount; i++)
+	for (var i=0; i<lastLowestTilesCount; i++)
 	{
 		lowestTile = this.lastIntersectedLowestTilesArray[i];
 		lowestTile.isVisible = false;
 	}
-	*/
+	
 	
 	// do frustum culling for Asia_side_tile and America_side_tile.
 	this.intersectedLowestTilesArray.length = 0; // init array.
 	smartTile1.getFrustumIntersectedLowestTiles(frustumVolume, this.intersectedLowestTilesArray);
 	smartTile2.getFrustumIntersectedLowestTiles(frustumVolume, this.intersectedLowestTilesArray);
-	/*
+	
 	// mark all current_tiles as "visible".
 	var currentLowestTilesCount = this.intersectedLowestTilesArray.length;
 	var lowestTile;
-	for(var i=0; i<currentLowestTilesCount; i++)
+	for (var i=0; i<currentLowestTilesCount; i++)
 	{
 		lowestTile = this.intersectedLowestTilesArray[i];
 		lowestTile.isVisible = true;
@@ -4363,15 +4316,15 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	// now, delete all tiles that is "no visible.
 	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
 	var lowestTile;
-	for(var i=0; i<lastLowestTilesCount; i++)
+	for (var i=0; i<lastLowestTilesCount; i++)
 	{
 		lowestTile = this.lastIntersectedLowestTilesArray[i];
-		if(!lowestTile.isVisible)
+		if (!lowestTile.isVisible)
 		{
 			this.processQueue.putBuildingsArrayToDelete(lowestTile.buildingsArray);
 		}
 	}
-	*/
+	
 	
 	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
 	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
@@ -4432,6 +4385,12 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
+					if (neoBuilding.metaData.geographicCoord == undefined)
+					{
+						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
+						continue;
+					}
+			
 					geoLoc = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
 					longitude = neoBuilding.metaData.geographicCoord.longitude;
 					latitude = neoBuilding.metaData.geographicCoord.latitude;

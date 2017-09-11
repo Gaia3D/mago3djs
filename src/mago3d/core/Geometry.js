@@ -140,14 +140,13 @@ var NeoBuilding = function()
 	this.buildingFileName = "";
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
-	this.frustumCulled = false;
 
 	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
 	this.geoLocDataManager = new GeoLocationDataManager();
 	
 	// References and Models.*********************************************
-	this.motherNeoReferencesArray = []; // asimetric mode.***
-	this.motherBlocksArray = []; // asimetric mode.***
+	this.motherNeoReferencesArray = []; 
+	this.motherBlocksArray = []; 
 	
 	// Current visible objects.*******************************************
 	this.currentVisibleOctreesControler; //  class VisibleObjectsControler;
@@ -157,24 +156,70 @@ var NeoBuilding = function()
 
 	// Textures loaded.***************************************************
 	this.texturesLoaded; // material textures.***
-	//this.texturesLoadedCache = {}; // no udes yet...
 
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
-	this.octreeLoadedAllFiles = false;
 
-	this.allFilesLoaded = false; // no used yet...
-	this.isReadyToRender = false; // no used yet...
-
-	this.moveVector; 
+	// auxiliar vars.
 	this.squaredDistToCam;
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;
+};
 
-	// SCRATCH.*********************************
-	this.point3dScratch = new Point3D(); // delete this.
-	this.point3dScratch2 = new Point3D(); // delete this.
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager) 
+{
+	this.metaData.deleteObjects();
+	this.metaData.fileLoadState = CODE.fileLoadState.READY;
+
+	var blocksCount = this.motherBlocksArray.length;
+	for (var i=0; i<blocksCount; i++)
+	{
+		if (this.motherBlocksArray[i])
+		{ this.motherBlocksArray[i].deleteObjects(gl, vboMemoryManager); }
+		this.motherBlocksArray[i] = undefined;
+	}
+	this.motherBlocksArray = [];
+
+	var referencesCount = this.motherNeoReferencesArray.length;
+	for (var i=0; i<referencesCount; i++)
+	{
+		if (this.motherNeoReferencesArray[i])
+		{ this.motherNeoReferencesArray[i].deleteGlObjects(gl, vboMemoryManager); }
+		this.motherNeoReferencesArray[i] = undefined;
+	}
+	this.motherNeoReferencesArray = [];
+
+	// The octree.
+	if (this.octree !== undefined)
+	{ this.octree.deleteGlObjects(gl, vboMemoryManager); }
+	this.octree = undefined; // f4d_octree. Interior objects.***
+	
+	//this.buildingFileName = "";
+
+	this.allFilesLoaded = false;
+	this.isReadyToRender = false;
+
+	// delete textures.
+	if (this.texturesLoaded)
+	{
+		var texturesCount = this.texturesLoaded.length;
+		for (var i=0; i<texturesCount; i++)
+		{
+			if (this.texturesLoaded[i])
+			{
+				gl.deleteTexture(this.texturesLoaded[i].texId);
+				this.texturesLoaded[i].deleteObjects();
+			}
+			this.texturesLoaded[i] = undefined;
+		}
+	}
+	this.texturesLoaded = undefined;
 };
 
 /**
@@ -288,7 +333,7 @@ NeoBuilding.prototype.isCameraInsideOfBuilding = function(eyeX, eyeY, eyeZ)
  * @param absoluteEyeZ 변수
  * @returns point3dScrath2
  */
-NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absoluteEyeX, absoluteEyeY, absoluteEyeZ) 
+NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(absoluteEyeX, absoluteEyeY, absoluteEyeZ, resultRelEyePosToBuilding) 
 {
 	// 1rst, calculate the relative eye position.***
 	var buildingPosition = this.buildingPosition;
@@ -302,10 +347,15 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 		this.buildingPosMatInv.setByFloat32Array(this.moveMatrixInv);
 	}
 
-	this.point3dScratch.set(relativeEyePosX, relativeEyePosY, relativeEyePosZ);
-	this.point3dScratch2 = this.buildingPosMatInv.transformPoint3D(this.point3dScratch, this.point3dScratch2);
+	var point3dScratch = new Point3D();
+	
+	if (resultRelEyePosToBuilding == undefined)
+	{ resultRelEyePosToBuilding = new Point3D(); }
+	
+	point3dScratch.set(relativeEyePosX, relativeEyePosY, relativeEyePosZ);
+	resultRelEyePosToBuilding = this.buildingPosMatInv.transformPoint3D(point3dScratch, resultRelEyePosToBuilding);
 
-	return this.point3dScratch2;
+	return resultRelEyePosToBuilding;
 };
 
 /**
@@ -453,20 +503,6 @@ NeoBuildingsList.prototype.getNeoBuildingByTypeId = function(buildingType, build
 	return resultBuilding;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @returns neoBuilding
- */
-NeoBuildingsList.prototype.setNeoBuildingsFrustumCulled = function(bFrustumCulled) 
-{
-	var buildingsCount = this.neoBuildingsArray.length;
-
-	for (var i = 0; i < buildingsCount; i++)
-	{
-		this.neoBuildingsArray[i].frustumCulled = bFrustumCulled;
-	}
-
-};
 
 NeoBuildingsList.prototype.get = function (index)
 {
