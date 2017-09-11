@@ -169,7 +169,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				pickPosition.lon = terrainPosition.longitude;
 				pickPosition.alt = terrainPosition.altitude;
 			}
-			clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+			if(serverPolicy.geo_callback_clickposition !== '') {
+				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+			}
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
@@ -339,7 +341,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
 				pickPosition.alt = cartographicPosition.height;
 			}
-			clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+			if(serverPolicy.geo_callback_clickposition !== '') {
+				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+			}
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
 		magoManager.handler.setInputAction(function(movement) 
