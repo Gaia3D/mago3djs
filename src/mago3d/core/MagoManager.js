@@ -5762,10 +5762,10 @@ MagoManager.prototype.callAPI = function(api)
 			this.objMarkerManager.objectMarkerArray = [];
 		}
 	}
-	else if (apiName === "changeOccusionCulling") 
+	else if (apiName === "changeOcclusionCulling") 
 	{
-		// OccusionCulling 적용 유무
-		this.magoPolicy.setOccusionCullingEnable(api.getOccusionCullingEnable());
+		// OcclusionCulling 적용 유무
+		this.magoPolicy.setOcclusionCullingEnable(api.getOcclusionCullingEnable());
 		// dataKey 는 api.getDataKey();
 	}
 	else if (apiName === "drawInsertIssueImage") 

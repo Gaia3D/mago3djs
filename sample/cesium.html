@@ -415,18 +415,18 @@
 			<label for="mouseObjectMove"> Object </label>
 		</div>
 		<div>
-			<h3>Object Occusion Culling</h3>
+			<h3>Object Occlusion Culling</h3>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">사용유무</div>
-				<input type="radio" id="useOccusionCulling" name="occusionCulling" value="true" onclick="changeOccusionCulling(true);" />
+				<input type="radio" id="useOcclusionCulling" name="occlusionCulling" value="true" />
 				<label for="useOccusionCulling"> 사용 </label>
-				<input type="radio" id="unusedOccusionCulling" name="occusionCulling" value="false" onclick="changeOccusionCulling(false);"/>
-				<label for="unusedOccusionCulling"> 미사용 </label>
+				<input type="radio" id="unusedOcclusionCulling" name="occlusionCulling" value="false" />
+				<label for="unusedOcclusionCulling"> 미사용 </label>
 			</div>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">Data Key</div>
-				<input type="text" id="occusion_culling_data_key" name="occusion_culling_data_key" size="28" />
-				<button type="button" id="changeOccusionCullingButton" class="btn">적용</button>
+				<input type="text" id="occlusion_culling_data_key" name="occlusion_culling_data_key" size="28" />
+				<button type="button" id="changeOcclusionCullingButton" class="btn">적용</button>
 			</div>
 		</div>
 		<div>
@@ -993,8 +993,8 @@
 				position : 'bottom-right'
 			});
 			
-			// occusion culling
-			$("#occusion_culling_data_key").val(data_key);
+			// occlusion culling
+			$("#occlusion_culling_data_key").val(data_key);
 			// 현재 좌표를 저장
 			$("#now_latitude").val(latitude);
 			$("#now_longitude").val(longitude);
@@ -1101,11 +1101,10 @@
 		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
 		changeMouseMoveAPI(mouseMoveMode);
 	}
-	// Object Occusion culling
-	function changeOccusionCulling(isShow) {
-		$("input:radio[name='occusionCulling']:radio[value='" + isShow + "']").prop("checked", true);
-		changeOccusionCullingAPI(isShow, $("#occusion_culling_data_key").val());
-	}
+	// Object Occlusion culling
+	$("#changeOcclusionCullingButton").click(function () {
+		changeOcclusionCullingAPI($(':radio[name="occlusionCulling"]:checked').val(), $("#occlusion_culling_data_key").val());		
+	});
 	// 카메라 모드 전환
 	function changeViewMode(isFPVMode) {
 		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);

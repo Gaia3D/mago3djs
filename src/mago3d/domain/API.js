@@ -74,8 +74,8 @@ function API(apiName)
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
 	this.nearGeoIssueListEnable = false;
-	// occusion culling
-	this.occusionCullingEnable = false;
+	// occlusion culling
+	this.occlusionCullingEnable = false;
 	//
 	this.insertIssueState = 0;
 	
@@ -324,13 +324,13 @@ API.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable)
 {
 	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-API.prototype.getOccusionCullingEnable = function() 
+API.prototype.getOcclusionCullingEnable = function() 
 {
-	return this.occusionCullingEnable;
+	return this.occlusionCullingEnable;
 };
-API.prototype.setOccusionCullingEnable = function(occusionCullingEnable) 
+API.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
 {
-	this.occusionCullingEnable = occusionCullingEnable;
+	this.occlusionCullingEnable = occlusionCullingEnable;
 };
 API.prototype.getNearGeoIssueListEnable = function() 
 {

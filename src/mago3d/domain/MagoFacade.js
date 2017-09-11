@@ -238,15 +238,15 @@ function changeObjectInfoViewModeAPI(flag)
 }
 
 /**
- * Object Occusion culling
+ * Object Occlusion culling
  * 
  * @param {Property} flag true = 활성화, false = 비활성화
  * @param {Property} dataKey
  */
-function changeOccusionCullingAPI(flag, dataKey) 
+function changeOcclusionCullingAPI(flag, dataKey) 
 {
-	var api = new API("changeOccusionCulling");
-	api.setOccusionCullingEnable(flag);
+	var api = new API("changeOcclusionCulling");
+	api.setOcclusionCullingEnable(flag);
 	api.setDataKey(dataKey);
 	if (managerFactory !== null) 
 	{
