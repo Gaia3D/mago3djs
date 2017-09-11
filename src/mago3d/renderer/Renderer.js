@@ -295,7 +295,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				// note: in the future use only "neoReference.materialId".
 				if (neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
+			
+				if (neoReference.texture.texId == undefined)
+				{ continue; }
 			}
+			
+			
 		}
 		
 		// Check the color or texture of reference object.
