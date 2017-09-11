@@ -17,7 +17,7 @@ var Policy = function()
 	// outfitting 표시 여부
 	this.showOutFitting = false;
 	// label 표시/비표시
-	this.showLabelInfo = true;
+	this.showLabelInfo = false;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
