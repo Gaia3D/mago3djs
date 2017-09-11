@@ -41,8 +41,8 @@ var Policy = function()
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
 	this.nearGeoIssueListEnable = false;
-	// occusion culling
-	this.occusionCullingEnable = false;
+	// occlusion culling
+	this.occlusionCullingEnable = false;
 	
 	// 이미지 경로
 	this.imagePath = "";
@@ -179,13 +179,13 @@ Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable)
 {
 	this.objectInfoViewEnable = objectInfoViewEnable;
 };
-Policy.prototype.getOccusionCullingEnable = function() 
+Policy.prototype.getOcclusionCullingEnable = function() 
 {
-	return this.occusionCullingEnable;
+	return this.occlusionCullingEnable;
 };
-Policy.prototype.setOccusionCullingEnable = function(occusionCullingEnable) 
+Policy.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
 {
-	this.occusionCullingEnable = occusionCullingEnable;
+	this.occlusionCullingEnable = occlusionCullingEnable;
 };
 Policy.prototype.getNearGeoIssueListEnable = function() 
 {
