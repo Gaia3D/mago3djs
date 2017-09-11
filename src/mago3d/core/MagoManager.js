@@ -2289,7 +2289,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 	if (buildingGeoLocation == undefined)
-	{ return; }
+	{ return false; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
 	{
