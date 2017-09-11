@@ -41,6 +41,8 @@ var Policy = function()
 	this.objectInfoViewEnable = false;
 	// 이슈 목록 표시
 	this.nearGeoIssueListEnable = false;
+	// occusion culling
+	this.occusionCullingEnable = false;
 	
 	// 이미지 경로
 	this.imagePath = "";
@@ -176,6 +178,14 @@ Policy.prototype.getObjectInfoViewEnable = function()
 Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
 {
 	this.objectInfoViewEnable = objectInfoViewEnable;
+};
+Policy.prototype.getOccusionCullingEnable = function() 
+{
+	return this.occusionCullingEnable;
+};
+Policy.prototype.setOccusionCullingEnable = function(occusionCullingEnable) 
+{
+	this.occusionCullingEnable = occusionCullingEnable;
 };
 Policy.prototype.getNearGeoIssueListEnable = function() 
 {

@@ -237,8 +237,28 @@ function changeObjectInfoViewModeAPI(flag)
 	}
 }
 
-/*
-*/
+/**
+ * Object Occusion culling
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {Property} dataKey
+ */
+function changeOccusionCullingAPI(flag, dataKey) 
+{
+	var api = new API("changeOccusionCulling");
+	api.setOccusionCullingEnable(flag);
+	api.setDataKey(dataKey);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 1인칭, 3인칭 모드 개발중...
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ */
 function changeFPVModeAPI(flag)
 {
 	var api = new API("changeFPVMode");
@@ -248,6 +268,7 @@ function changeFPVModeAPI(flag)
 		managerFactory.callAPI(api);
 	}
 }
+
 /**
  * 현재 위치 근처 issue list. false인 경우 clear
  * 
