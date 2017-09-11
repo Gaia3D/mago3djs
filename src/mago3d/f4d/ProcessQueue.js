@@ -15,3 +15,36 @@ var ProcessQueue = function()
 
 	this.buildingsToDeleteMap = new Map();
 };
+
+ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
+{
+	// this puts the building to the "buildingsToDeleteMap".
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	this.buildingsToDeleteMap.set(building, aValue);
+};
+
+ProcessQueue.prototype.putBuildingsArrayToDelete = function(buildingsToDeleteArray, aValue)
+{
+	if (buildingsToDeleteArray == undefined)
+	{ return; }
+	
+	// this puts the buildingsToDeleteArray to the "buildingsToDeleteMap".
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	var buildingsToDeleteCount = buildingsToDeleteArray.length;
+	for (var i=0; i<buildingsToDeleteCount; i++)
+	{
+		this.putBuildingToDelete(buildingsToDeleteArray[i], aValue);
+	}
+};
+
+ProcessQueue.prototype.eraseBuildingToDelete = function(building)
+{
+	// this erases the building from the "buildingsToDeleteMap".
+	this.buildingsToDeleteMap.delete(building);
+};
