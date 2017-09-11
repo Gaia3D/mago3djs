@@ -1325,6 +1325,23 @@
 			"status": "0",
 			"data_insert_type": "SELF",
 			"insert_date": "2017-06-26 21:06:29.159998"
+		},
+		"Tekla Training Modell": {
+			"list_counter": 10,
+			"data_id": 999,
+			"data_group_id": 77,
+			"data_group_name": "3DS",
+			"data_key": "Tekla Training Modell",
+			"data_name": "Tekla Training Modell",
+			"latitude": "37.581",
+			"longitude": "126.6128",
+			"height": "25",
+			"heading": "0",
+			"pitch": "0",
+			"roll": "0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-26 21:06:29.159998"
 		}
 	}
 }

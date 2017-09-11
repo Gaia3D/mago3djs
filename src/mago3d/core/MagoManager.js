@@ -57,6 +57,9 @@ var MagoManager = function()
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
+	this.TEST_maxWheelZoomAmount = 0;
+	this.TEST_maxZoomAmount = 0;
+	
 	this.configInformation;
 	this.cameraFPV = new FirstPersonView();
 
@@ -745,6 +748,9 @@ function handleTextureLoaded(gl, image, texture)
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
 	//var gl = viewer.scene.context._gl;
+	if (texture == undefined)
+	{ var hola = 0; }
+	
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBgl,true); // if need vertical mirror of the image.***
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
@@ -964,6 +970,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var camera = this.scene.frameState.camera;
+		var currentFrustumFar = camera.frustum.far;
+		camera.frustum.far = 10000;
 		var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
 
 		for (var i=0; i<6; i++)
@@ -971,6 +979,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 			var plane = cesiumFrustum.planes[i];
 			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
 		}
+		camera.frustum.far = currentFrustumFar;
 	}
 };
 
@@ -1077,7 +1086,12 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0);
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0))
+			{
+				this.visibleObjControlerBuildings.currentVisibles0.splice(i, 1);
+				i--;
+				buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
+			}
 		}
 		var fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
@@ -1089,7 +1103,12 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
-			this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 2);
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 2))
+			{
+				this.visibleObjControlerBuildings.currentVisibles2.splice(i, 1);
+				i--;
+				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
+			}
 		}
 		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
@@ -1262,15 +1281,17 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 		//worldPosition = geoLocation.position;
 		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, neoBuilding);
-
-		ctx.font = "13px Arial";
-		ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
-		ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
-
-		ctx.font = "9px Arial";
-		ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
-		ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 		
+		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		{
+			ctx.font = "13px Arial";
+			ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
+			ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
+
+			ctx.font = "9px Arial";
+			ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+			ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+		}
 	}
 	ctx.restore();
 };
@@ -1647,6 +1668,12 @@ MagoManager.prototype.calculateWorldPositionToScreenCoord = function(gl, worldCo
 	
 	// now calculate the position in screen coords.
 	var zDist = this.pointSC2.z;
+	if (zDist > 0)
+	{
+		// the worldPoint is rear the camera.
+		resultScreenCoord.set(-1, -1, 0);
+		return resultScreenCoord;
+	}
 	
 	// now calculate the width and height of the plane in zDist.
 	var fovyRad = this.sceneState.camera.frustum.fovyRad;
@@ -2386,9 +2413,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 		if (!find) 
 		{
-			//this.deleteNeoBuilding(this.sceneState.gl, neoBuilding);
-			this.processQueue.buildingsToDeleteMap.set(neoBuilding, 0);
-			return;
+			this.processQueue.putBuildingToDelete(neoBuilding, 0);
+			return false;
 		}
 	}
 	else
@@ -2428,6 +2454,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 	}
 	currentVisibleOctrees.length = 0;
+	return true;
 };
 
 /**
@@ -2463,13 +2490,13 @@ MagoManager.prototype.manageQueue = function()
 	{
 		neoBuilding = buildingsToDeleteArray[i];
 		this.deleteNeoBuilding(gl, neoBuilding);
-		this.processQueue.buildingsToDeleteMap.delete(neoBuilding);
+		this.processQueue.eraseBuildingToDelete(neoBuilding);
 	}
 	buildingsToDeleteArray = [];
 	buildingsToDeleteArray = undefined;
 	
 	// parse pendent data.
-	var maxParsesCount = 2;
+	var maxParsesCount = 1;
 	
 	// parse references lod0 & lod 1.
 	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
@@ -2514,7 +2541,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse models lod0 & lod1.
-	maxParsesCount = 2;
+	maxParsesCount = 1;
 	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
 	if (toParseCount < maxParsesCount)
 	{ maxParsesCount = toParseCount; }
@@ -4083,13 +4110,12 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	neoBuilding.isReadyToRender = false;
 
 	// delete textures.
-	/*
-	if(neoBuilding.texturesLoaded)
+	if (neoBuilding.texturesLoaded)
 	{
 		var texturesCount = neoBuilding.texturesLoaded.length;
-		for(var i=0; i<texturesCount; i++)
+		for (var i=0; i<texturesCount; i++)
 		{
-			if(neoBuilding.texturesLoaded[i])
+			if (neoBuilding.texturesLoaded[i])
 			{
 				gl.deleteTexture(neoBuilding.texturesLoaded[i].texId);
 				neoBuilding.texturesLoaded[i].deleteObjects();
@@ -4098,7 +4124,6 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 		}
 	}
 	neoBuilding.texturesLoaded = undefined;
-	*/
 };
 
 /**
@@ -4300,12 +4325,58 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	// This makes the visible buildings array.
 	var smartTile1 = this.smartTileManager.tilesArray[0]; // America side tile.
 	var smartTile2 = this.smartTileManager.tilesArray[1]; // Asia side tile.
+	
 	if (this.intersectedLowestTilesArray == undefined)
 	{ this.intersectedLowestTilesArray = []; }
+	/*
+	if (this.lastIntersectedLowestTilesArray == undefined)
+	{ this.lastIntersectedLowestTilesArray = []; }
+
+	// save the last frustumCulled lowestTiles to delete if necessary.
+	this.lastIntersectedLowestTilesArray.length = 0;
+	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.intersectedLowestTilesArray);
 	
+	// mark all last_tiles as "no visible".
+	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
+	var lowestTile;
+	for(var i=0; i<lastLowestTilesCount; i++)
+	{
+		lowestTile = this.lastIntersectedLowestTilesArray[i];
+		lowestTile.isVisible = false;
+	}
+	*/
+	
+	// do frustum culling for Asia_side_tile and America_side_tile.
 	this.intersectedLowestTilesArray.length = 0; // init array.
 	smartTile1.getFrustumIntersectedLowestTiles(frustumVolume, this.intersectedLowestTilesArray);
 	smartTile2.getFrustumIntersectedLowestTiles(frustumVolume, this.intersectedLowestTilesArray);
+	/*
+	// mark all current_tiles as "visible".
+	var currentLowestTilesCount = this.intersectedLowestTilesArray.length;
+	var lowestTile;
+	for(var i=0; i<currentLowestTilesCount; i++)
+	{
+		lowestTile = this.intersectedLowestTilesArray[i];
+		lowestTile.isVisible = true;
+	}
+	
+	// now, delete all tiles that is "no visible.
+	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
+	var lowestTile;
+	for(var i=0; i<lastLowestTilesCount; i++)
+	{
+		lowestTile = this.lastIntersectedLowestTilesArray[i];
+		if(!lowestTile.isVisible)
+		{
+			this.processQueue.putBuildingsArrayToDelete(lowestTile.buildingsArray);
+		}
+	}
+	*/
+	
+	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles2.length = 0;
+	this.visibleObjControlerBuildings.currentVisibles3.length = 0;
 	
 	var tilesCount = this.intersectedLowestTilesArray.length;
 	
@@ -4320,10 +4391,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	
 	//lod2_minSquaredDist*= 10000000;
 
-	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles2.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles3.length = 0;
+	
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;

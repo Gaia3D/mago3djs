@@ -1341,9 +1341,17 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	{
 		var neoRefImage = new Image();
 		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
+		
 		//magoManager.backGround_fileReadings_count ++;
 		neoRefImage.onload = function() 
 		{
+			// is possible that during loading image the building was deleted. Then return.
+			if (texture.texId == undefined)
+			{
+				return;
+			}
+			
+			// if "texture.texId" exist then bind it.
 			handleTextureLoaded(gl, neoRefImage, texture.texId);
 			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
 
