@@ -762,7 +762,7 @@ function handleTextureLoaded(gl, image, texture)
 
 /**
  * 빌딩을 준비(새버전)
- * @param gl 변수
+ * @param {gl} gl
  */
 MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl) 
 {
@@ -774,9 +774,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	for (var i=0, length = currentVisibleBlocks.length; i<length; i++) 
 	{
 		neoBuilding = currentVisibleBlocks[i];
-		
-		if (neoBuilding.buildingId === "U310T")
-		{ var hola = 0; }
 
 		// check if this building is ready to render.***
 		if (!neoBuilding.allFilesLoaded) 
@@ -2291,6 +2288,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+	if (buildingGeoLocation == undefined)
+	{ return; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
 	{
@@ -4344,8 +4343,6 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	
 	//lod2_minSquaredDist*= 10000000;
 
-	
-
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
 	
@@ -4387,6 +4384,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				{ 
 					if (neoBuilding.metaData.geographicCoord == undefined)
 					{
+						// this building was deleted, so, put this in visibleBuildingsList to load data.
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
 						continue;
 					}
@@ -4434,7 +4432,6 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				{
 					continue;
 				}
-				//this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
 
 				if (this.isLastFrustum)
 				{
