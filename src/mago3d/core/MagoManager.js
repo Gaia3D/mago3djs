@@ -5251,6 +5251,8 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
 	var dividedName = neoBuilding.buildingId.split("_");
+	var dataKey = dividedName[0];
+	if(dividedName[1] !== undefined) dataKey = dividedName[0] + "_" + dividedName[1];
 	
 	if (MagoConfig.getPolicy().geo_callback_enable === "true") 
 	{
@@ -5262,8 +5264,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 		if (this.magoPolicy.getObjectInfoViewEnable()) 
 		{
 			selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
-				dividedName[0],
-				dividedName[1],
+				dataKey,
 				objectId,
 				this.objMarkerSC.geoLocationData.geographicCoord.latitude,
 				this.objMarkerSC.geoLocationData.geographicCoord.longitude,
@@ -5279,7 +5280,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 			if (this.objMarkerSC === undefined) { return; }
 			
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
-				dividedName[0] + "_" + dividedName[1],
+				dataKey,
 				objectId,
 				this.objMarkerSC.geoLocationData.geographicCoord.latitude,
 				this.objMarkerSC.geoLocationData.geographicCoord.longitude,
@@ -5757,6 +5758,12 @@ MagoManager.prototype.callAPI = function(api)
 			// clear objMarkerManager objectmakersarrays 사이즈를 0 으로 하면... .됨
 			this.objMarkerManager.objectMarkerArray = [];
 		}
+	}
+	else if (apiName === "changeOccusionCulling") 
+	{
+		// OccusionCulling 적용 유무
+		this.magoPolicy.setOccusionCullingEnable(api.getOccusionCullingEnable());
+		// dataKey 는 api.getDataKey();
 	}
 	else if (apiName === "drawInsertIssueImage") 
 	{
