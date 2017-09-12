@@ -412,9 +412,9 @@
 			<h3>Object Occlusion Culling</h3>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">사용유무</div>
-				<input type="radio" id="useOcclusionCulling" name="occlusionCulling" value="true" onclick="changeOcclusionCulling(true);" />
+				<input type="radio" id="useOcclusionCulling" name="occlusionCulling" value="true" />
 				<label for="useOccusionCulling"> 사용 </label>
-				<input type="radio" id="unusedOcclusionCulling" name="occlusionCulling" value="false" onclick="changeOcclusionCulling(false);"/>
+				<input type="radio" id="unusedOcclusionCulling" name="occlusionCulling" value="false" />
 				<label for="unusedOcclusionCulling"> 미사용 </label>
 			</div>
 			<div style="height: 30px;">
@@ -1099,10 +1099,9 @@
 		changeMouseMoveAPI(mouseMoveMode);
 	}
 	// Object Occlusion culling
-	function changeOcclusionCulling(isShow) {
-		$("input:radio[name='occlusionCulling']:radio[value='" + isShow + "']").prop("checked", true);
-		changeOcclusionCullingAPI(isShow, $("#occlusion_culling_data_key").val());
-	}
+	$("#changeOcclusionCullingButton").click(function () {
+		changeOcclusionCullingAPI(($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
+	});
 	// 카메라 모드 전환
 	function changeViewMode(isFPVMode) {
 		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);
