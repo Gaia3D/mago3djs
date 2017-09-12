@@ -1112,6 +1112,17 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
 		
+		// in this point, put octrees of lod2 to the deletingQueue to delete the lod0 data.
+		var visibleOctreesLod2Count = this.visibleObjControlerOctrees.currentVisibles2.length;
+		var octreesLod2DeletingCount = 0;
+		for (var i=visibleOctreesLod2Count-1; i>=0; i--)
+		{
+			this.processQueue.putOctreeToDeleteLod0(this.visibleObjControlerOctrees.currentVisibles2[i], 0);
+			octreesLod2DeletingCount++;
+			if (octreesLod2DeletingCount > 10)
+			{ break; }
+		}
+		
 		// if a LOD0 building has a NO ready lowestOctree, then push this building to the LOD2BuildingsArray.***
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for (var i=0; i<buildingsCount; i++) 
@@ -2495,6 +2506,22 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = [];
 	buildingsToDeleteArray = undefined;
 	
+	// now delete lod0data of octreesLod2.
+	/*
+	var maxDeleteOctreesCount = 10;
+	var octreesDeleteCount = this.processQueue.octreesToDeleteLod0Map.size;
+	var octreesToDeleteArray = Array.from(this.processQueue.octreesToDeleteLod0Map.keys());
+	if(maxDeleteOctreesCount < maxDeleteOctreesCount)
+		maxDeleteOctreesCount = maxDeleteOctreesCount;
+	for (var i=0; i<maxDeleteOctreesCount; i++)
+	{
+		octree = octreesToDeleteArray[i];
+		this.processQueue.eraseOctreeToDeleteLod0(octree);
+		//octree.deleteGlObjects(gl, this.vboMemoryManager);
+		
+	}
+	*/
+	
 	// parse pendent data.
 	var maxParsesCount = 1;
 	
@@ -2698,7 +2725,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 	{ return; }
 
 	var lowestOctreeLegosParsingCount = 0;
-	var maxLowestOctreeLegosParsingCount = 100;
+	var maxLowestOctreeLegosParsingCount = 90;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var neoBuilding;
 	var buildingFolderName;
@@ -2769,7 +2796,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 			}
 		}
-	}
+	} 
 };
 
 /**
@@ -5771,7 +5798,8 @@ MagoManager.prototype.callAPI = function(api)
 		// OcclusionCulling 적용 유무
 		this.magoPolicy.setOcclusionCullingEnable(api.getOcclusionCullingEnable());
 		var neoBuilding = this.selectionCandidates.currentBuildingSelected;
-		neoBuilding.setRenderSettingApplyOcclusionCulling(this.magoPolicy.getOcclusionCullingEnable());
+		if (neoBuilding)
+		{ neoBuilding.setRenderSettingApplyOcclusionCulling(this.magoPolicy.getOcclusionCullingEnable()); }
 		// dataKey 는 api.getDataKey();
 	}
 	else if (apiName === "drawInsertIssueImage") 

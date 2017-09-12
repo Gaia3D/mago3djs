@@ -14,6 +14,23 @@ var ProcessQueue = function()
 	}
 
 	this.buildingsToDeleteMap = new Map();
+	this.octreesToDeleteLod0Map = new Map(); // delete the lod0 data of the octrees.
+};
+
+ProcessQueue.prototype.putOctreeToDeleteLod0 = function(octree, aValue)
+{
+	// this puts the octree to the "octreesToDeleteLod0Map".
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	this.octreesToDeleteLod0Map.set(octree, aValue);
+};
+
+ProcessQueue.prototype.eraseOctreeToDeleteLod0 = function(octree)
+{
+	// this erases the octree from the "octreesToDeleteLod0Map".
+	this.buildingsToDeleteMap.delete(octree);
 };
 
 ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
