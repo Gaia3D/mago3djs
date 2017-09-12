@@ -4,7 +4,7 @@
 
 <a name="korean"></a>
 
-# mago3DJs
+# mago3DJS
 3차원 다중 블록 가시화를 위한 오픈소스 자바스크립트 라이브러리
 
 AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공간정보(3D GIS)를 통합적으로 관리 및 가시화하는 차세대 3차원 GIS 플랫폼입니다. 실내,실 외 구별없이 AEC와 3D GIS를 웹 브라우저에서 통합해 줍니다. 대용량 BIM(Building Information Modelling), JT(Jupiter Tessellation), 3D GIS 파일 등을 별도의 프로그램 설치 없이 웹 브라우저 상에서 바로 살펴보고 협업작업을 진행할 수 있습니다.
@@ -82,7 +82,7 @@ C:\git\repository\mago3djs>rmdir data
 
 
 [한국어](#korean)
-# <a name="english"></a>mago3DJs
+# <a name="english"></a>mago3DJS
 Open source JavaScript library for 3D multi-block visualization
 
 Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Engineering, Construction) areas and traditional 3D spatial information (3D GIS). Integrate AEC and 3D GIS in a web browser, indoors, outdoors, indistinguishable. You can browse and collaborate on large-scale BIM (Building Information Modeling), JT (Jupiter Tessellation), and 3D GIS files without installing any programs on the web browser.
