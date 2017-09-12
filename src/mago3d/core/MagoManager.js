@@ -1085,6 +1085,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0))
 			{
+				// any octree is visible.
 				this.visibleObjControlerBuildings.currentVisibles0.splice(i, 1);
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
@@ -1102,6 +1103,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 2))
 			{
+				// any octree is visible.
 				this.visibleObjControlerBuildings.currentVisibles2.splice(i, 1);
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
@@ -2424,7 +2426,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
 	var lowestOctree;
 	var currentVisibleOctrees = [].concat(neoBuilding.currentVisibleOctreesControler.currentVisibles0, neoBuilding.currentVisibleOctreesControler.currentVisibles1);
-
+	var applyOcclusionCulling = neoBuilding.getRenderSettingApplyOcclusionCulling();
+	
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
 		lowestOctree = currentVisibleOctrees[i];
@@ -2439,7 +2442,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		else
 		{
 			var isExterior = !isCameraInsideOfBuilding;
-			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
+			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z, applyOcclusionCulling);
 		}
 		
 		// if the octree has no blocks list ready, then render the lego
@@ -5252,7 +5255,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 	var geoLocationData = neoBuilding.geoLocDataManager.geoLocationDataArray[0];
 	var dividedName = neoBuilding.buildingId.split("_");
 	var dataKey = dividedName[0];
-	if(dividedName[1] !== undefined) dataKey = dividedName[0] + "_" + dividedName[1];
+	if (dividedName[1] !== undefined) { dataKey = dividedName[0] + "_" + dividedName[1]; }
 	
 	if (MagoConfig.getPolicy().geo_callback_enable === "true") 
 	{
@@ -5763,6 +5766,8 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		// OcclusionCulling 적용 유무
 		this.magoPolicy.setOcclusionCullingEnable(api.getOcclusionCullingEnable());
+		var neoBuilding = this.selectionCandidates.currentBuildingSelected;
+		neoBuilding.setRenderSettingApplyOcclusionCulling(this.magoPolicy.getOcclusionCullingEnable());
 		// dataKey 는 api.getDataKey();
 	}
 	else if (apiName === "drawInsertIssueImage") 

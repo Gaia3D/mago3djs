@@ -148,11 +148,11 @@ var NeoReferencesMotherAndIndices = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***// for asimetric mode.***
+
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
 	this.blocksList; // local blocks list. used only for parse data.***
 	this.neoRefsIndices = []; // All objects(references) of this class.
-	this.modelReferencedGroupsList;
+	this.modelReferencedGroupsList; // (for new format).
 
 	this.fileLoadState = 0;
 	this.dataArraybuffer;
@@ -162,7 +162,7 @@ var NeoReferencesMotherAndIndices = function()
 	this.interior_ocCullOctree; // octree that contains the visible indices.
 	
 	this.currentVisibleIndices = [];
-	this.currentVisibleMRG; // MRG = ModelReferencedGroup.
+	this.currentVisibleMRG; // MRG = ModelReferencedGroup (for new format).
 };
 
 /**
@@ -178,13 +178,20 @@ NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(id
 	}
 };
 
-NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z) 
+NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z, applyOcclusionCulling) 
 {
+	if (applyOcclusionCulling == undefined)
+	{ applyOcclusionCulling = true; }
+	
 	if (isExterior)
 	{
 		if (this.exterior_ocCullOctree !== undefined)
 		{
+			var thisHasOcCullData = false;
 			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
+			{ thisHasOcCullData = true; }
+		
+			if (thisHasOcCullData && applyOcclusionCulling)
 			{
 				if (this.currentVisibleMRG === undefined)
 				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
@@ -193,6 +200,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 			}
 			else 
 			{
+				// In this case there are no occlusionCulling data.
 				this.currentVisibleIndices = this.neoRefsIndices;
 				this.currentVisibleMRG = this.modelReferencedGroupsList;
 			}
@@ -202,7 +210,11 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 	{
 		if (this.interior_ocCullOctree !== undefined)
 		{
+			var thisHasOcCullData = false;
 			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
+			{ thisHasOcCullData = true; }
+		
+			if (thisHasOcCullData && applyOcclusionCulling)
 			{
 				if (this.currentVisibleMRG === undefined)
 				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
@@ -211,6 +223,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 			}
 			else
 			{
+				// In this case there are no occlusionCulling data.
 				this.currentVisibleIndices = this.neoRefsIndices;
 				this.currentVisibleMRG = this.modelReferencedGroupsList;
 			}
@@ -1034,7 +1047,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 	}
 	
-	this.createModelReferencedGroups(); // test for stadistics.
+	//this.createModelReferencedGroups(); // test for new format.
 	
 
 	// Now occlusion cullings.***
