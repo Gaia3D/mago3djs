@@ -4,14 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
 	<title>Cesium</title>
-	
 	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
-	
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
 <!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
-	
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
@@ -125,19 +122,14 @@
 			<tr style="height: 35px;">
 				<td style="width: 80px;"><label for="data_group_id">데이터 그룹</label></td>
 				<td><select id="data_group_id" name="data_group_id" class="select">
-					<option value=""> 전체 </option>
-
-					<option value="1">3DS 통합 가시화</option>
-
-					<option value="2">Collada 통합 가시화</option>
-
-					<option value="3">IFC</option>
-
-					<option value="4">IFC(MEP)</option>
-
-					<option value="5">Sea Port</option>
-
-				</select></td>
+						<option value=""> 전체 </option>
+						<option value="1">3DS 통합 가시화</option>
+						<option value="2">Collada 통합 가시화</option>
+						<option value="3">IFC</option>
+						<option value="4">IFC(MEP)</option>
+						<option value="5">Sea Port</option>
+					</select>
+				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td><label for="search_word">분류</label></td>
@@ -195,31 +187,31 @@
 			<ul class="apiLoca">
 				<li>
 					<label for="move_data_key">Data Key</label>
-					<input type="text" id="move_data_key" name="move_data_key" size="15" />
+					<input type="text" id="move_data_key" name="move_data_key" size="25" />
 				</li>
 				<li>
 					<label for="move_latitude">위도 </label>
-					<input type="text" id="move_latitude" name="move_latitude" size="15"/>
+					<input type="text" id="move_latitude" name="move_latitude" size="25"/>
 				</li>
 				<li>
 					<label for="move_longitude">경도 </label>
-					<input type="text" id="move_longitude" name="move_longitude" size="15"/>
+					<input type="text" id="move_longitude" name="move_longitude" size="25"/>
 				</li>
 				<li>
 					<label for="move_height">높이 </label>
-					<input type="text" id="move_height" name="move_height" size="15" />
+					<input type="text" id="move_height" name="move_height" size="25" />
 				</li>
 				<li>
 					<label for="move_heading">HEADING </label>
-					<input type="text" id="move_heading" name="move_heading" size="15" />
+					<input type="text" id="move_heading" name="move_heading" size="25" />
 				</li>
 				<li>
 					<label for="move_pitch">PITCH </label>
-					<input type="text" id="move_pitch" name="move_pitch" size="15" />
+					<input type="text" id="move_pitch" name="move_pitch" size="25" />
 				</li>
 				<li>
 					<label for="move_roll">ROLL </label>
-					<input type="text" id="move_roll" name="move_roll" size="15" />
+					<input type="text" id="move_roll" name="move_roll" size="25" />
 					<button type="button" id="changeLocationAndRotationAPI" class="btn">변환</button> 
 				</li>
 			</ul>
@@ -236,15 +228,15 @@
 			<ul class="apiLoca">
 				<li>
 					<label for="positionLatitude"> 위도 </label>
-					<input type="text" id="positionLatitude" name="positionLatitude" size="15" />
+					<input type="text" id="positionLatitude" name="positionLatitude" size="25" />
 				</li>
 				<li>
 					<label for="positionLongitude"> 경도 </label>
-					<input type="text" id="positionLongitude" name="positionLongitude" size="15" />
+					<input type="text" id="positionLongitude" name="positionLongitude" size="25" />
 				</li>
 				<li>
 					<label for="positionAltitude"> 높이 </label>
-					<input type="text" id="positionAltitude" name="positionAltitude" size="15" />
+					<input type="text" id="positionAltitude" name="positionAltitude" size="25" />
 				</li>
 			</ul>
 		</div>
@@ -526,6 +518,7 @@
 	<li onclick="flyTo(null, null, '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
 	<li onclick="flyTo(null, null, '-58.787', '-62.224', '200', '5')">IFC</li>
 	<li onclick="flyTo(null, null, '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
+	<li onclick="flyTo(null, null, '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
 	<li onclick="flyTo(null, null, '126.599426', '37.438778', '650', '3')">Sea Port</li>
 </ul>
 
