@@ -1103,7 +1103,7 @@
 	}
 	// Object Occlusion culling
 	$("#changeOcclusionCullingButton").click(function () {
-		changeOcclusionCullingAPI($(':radio[name="occlusionCulling"]:checked').val(), $("#occlusion_culling_data_key").val());		
+		changeOcclusionCullingAPI(($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
 	});
 	// 카메라 모드 전환
 	function changeViewMode(isFPVMode) {
