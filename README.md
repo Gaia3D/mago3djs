@@ -53,6 +53,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
   - <code> C:\mago3djs> npm install</code>
   - <code> C:\mago3djs> npm install -g gulp </code>
 
+
 ####  서버 실행
 ##### Local 서버 실행
 ```
@@ -128,8 +129,9 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - [node](https://nodejs.org/en/download/) to install Window Install (.msi) 64-bit.
 - Go to the C: \ mago3djs directory.
 - node Setup
-  - <code> C: \ mago3djs> npm install </ code>
-  - <code> C: \ mago3djs> npm install -g gulp </ code>
+  - <code> C: \ mago3djs> npm install </code>
+  - <code> C: \ mago3djs> npm install -g gulp</code>
+
 
 #### Running the server
 ##### Run Local Server
