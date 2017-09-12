@@ -4300,7 +4300,6 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 		lowestTile.isVisible = false;
 	}
 	
-	
 	// do frustum culling for Asia_side_tile and America_side_tile.
 	this.intersectedLowestTilesArray.length = 0; // init array.
 	smartTile1.getFrustumIntersectedLowestTiles(frustumVolume, this.intersectedLowestTilesArray);
@@ -5579,6 +5578,11 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 };
 
+MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
+{
+	return this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
+};
+
 /**
  * api gateway
  */
@@ -5724,7 +5728,7 @@ MagoManager.prototype.callAPI = function(api)
 		// find the building.***
 		var buildingId = api.getDataKey();
 		var buildingType = "structure";
-		var building = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, buildingId);
+		var building = this.getNeoBuildingByTypeId(buildingType, buildingId);
 
 		this.changeLocationAndRotation(api.getDataKey(),
 			parseFloat(api.getLatitude()),
@@ -5736,7 +5740,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "getLocationAndRotation") 
 	{
-		return this.neoBuildingsList.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
+		return this.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
 	}
 	else if (apiName === "changeMouseMove") 
 	{
