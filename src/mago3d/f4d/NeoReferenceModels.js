@@ -27,9 +27,6 @@ var NeoReference = function()
 	this.refTranslationVec; // use this if "refMatrixType" === 1.
 	// 4) VBO datas container.***
 	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
-	
-	// 4) Tex coords cache_key.*** // old.***
-	this.MESH_TEXCOORD_cacheKey; // old.***
 
 	// 5) The texture image.***
 	this.materialId;
@@ -41,7 +38,7 @@ var NeoReference = function()
 	this.aditionalColor; // used when object color was changed.***
 
 	// 7) selection color.***
-	this.selColor4; //new Color(); // use for selection only.***
+	//this.selColor4; //new Color(); // delete this..***
 
 	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 
@@ -102,13 +99,6 @@ NeoReference.prototype.deleteGlObjects = function(gl, vboMemManager)
 	this._matrix4 = undefined;
 	this._originalMatrix4._floatArrays = undefined;
 	this._originalMatrix4 = undefined; //
-	
-	// 4) Tex coords cache_key.*** // old.***
-	if (this.MESH_TEXCOORD_cacheKey) 
-	{ // old.***
-		gl.deleteBuffer(this.MESH_TEXCOORD_cacheKey); // old.***
-		this.MESH_TEXCOORD_cacheKey = undefined; // old.***
-	} // old.***
 
 	// 5) The texture image.***
 	this.hasTexture = undefined;
@@ -150,7 +140,6 @@ var NeoReferencesMotherAndIndices = function()
 	}
 
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
-	this.blocksList; // local blocks list. used only for parse data.***
 	this.neoRefsIndices = []; // All objects(references) of this class.
 	this.modelReferencedGroupsList; // (for new format).
 
@@ -247,10 +236,6 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx)
 NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
 {
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
-	if (this.blocksList)
-	{ this.blocksList.deleteGlObjects(gl, vboMemManager); }
-
-	this.blocksList = undefined;
 	this.neoRefsIndices = undefined;
 
 	this.fileLoadState = 0;
@@ -339,6 +324,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			if (objectId == "noObjectId")
+			{ objectId = neoRef._id; }
+			
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
