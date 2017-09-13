@@ -4,7 +4,7 @@
 
 <a name="korean"></a>
 
-# Mago3DJs
+# mago3DJS
 3차원 다중 블록 가시화를 위한 오픈소스 자바스크립트 라이브러리
 
 AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공간정보(3D GIS)를 통합적으로 관리 및 가시화하는 차세대 3차원 GIS 플랫폼입니다. 실내,실 외 구별없이 AEC와 3D GIS를 웹 브라우저에서 통합해 줍니다. 대용량 BIM(Building Information Modelling), JT(Jupiter Tessellation), 3D GIS 파일 등을 별도의 프로그램 설치 없이 웹 브라우저 상에서 바로 살펴보고 협업작업을 진행할 수 있습니다.
@@ -36,21 +36,23 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
  - [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
  - [웹서버 설정](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
 
-### Getting Started ###
+## Getting Started ###
 
-#### 설치 ####
-먼저 Clone or download를 클릭하여 Mago3DJs를 받아 줍니다.
+### 설치
+#### Source Download ####
+- 우측 상단부의 Clone or download 버튼을 클릭합니다.
+- Download ZIP 링크를 클릭, C:\ 디렉토리에 저장합니다.
+  - git을 사용하는 경우 git clone https://github.com/Gaia3D/mago3djs.git
+- 압축 해제 후 확인합니다.
+  - C:\mago3djs
 
-#### 환경 설정 ####
-sample 폴더안에 database.json에서 원하는 데이터로 설정해줍니다.
+#### Node install ####
+- [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치합니다.
+- C:\mago3djs 디렉토리로 이동합니다.
+- node Setup
+  - <code> C:\mago3djs> npm install</code>
+  - <code> C:\mago3djs> npm install -g gulp </code>
 
-#### 웹 서버 설정 ####
-server를 실행하기 전에 Dependencies를 설치해줍니다.
-
-#### node Setup ####
-```
-npm install, npm install -g gulp
-```
 
 ####  서버 실행
 ##### Local 서버 실행
@@ -81,7 +83,7 @@ C:\git\repository\mago3djs>rmdir data
 
 
 [한국어](#korean)
-# <a name="english"></a>Mago3DJs
+# <a name="english"></a>mago3DJS
 Open source JavaScript library for 3D multi-block visualization
 
 Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Engineering, Construction) areas and traditional 3D spatial information (3D GIS). Integrate AEC and 3D GIS in a web browser, indoors, outdoors, indistinguishable. You can browse and collaborate on large-scale BIM (Building Information Modeling), JT (Jupiter Tessellation), and 3D GIS files without installing any programs on the web browser.
@@ -107,27 +109,29 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 
 ## Development Environment ##
  - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
- - [eclipse neon(necessary)](https://www.eclipse.org/downloads/eclipse-packages/)
- &emsp;&emsp;&emsp;&emsp;&emsp;&nbsp; ● [Jsdoc](https://github.com/Gaia3D/mago3djs/wiki/Documentation)
+ - [eclipse neon(need)](https://www.eclipse.org/downloads/eclipse-packages/)
+ &emsp;&emsp;&emsp;&emsp;&emsp; ● [Jsdoc](https://github.com/Gaia3D/mago3djs/wiki/Documentation)
  - [node](https://nodejs.org/ko/download/) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Gulp](https://github.com/Gaia3D/mago3djs/wiki/Build)
  - [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
- - [web server setting](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
+ - [server settings](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
 
 ### Getting Started ###
 
-#### Install ####
-First, click Clone or download to accept Mago3DJs.
+### Install
+#### Source Download ####
+- Click the Clone or download button in the upper right corner.
+- Click the Download ZIP link and save it in the C: \ directory.
+  - If you use git git clone https://github.com/Gaia3D/mago3djs.git
+- Confirm after decompression.
+  - C: \ mago3djs
 
-#### Preferences ####
-In the sample folder, set the desired data in database.json.
+#### Node install ####
+- [node](https://nodejs.org/en/download/) to install Window Install (.msi) 64-bit.
+- Go to the C: \ mago3djs directory.
+- node Setup
+  - <code> C: \ mago3djs> npm install </code>
+  - <code> C: \ mago3djs> npm install -g gulp</code>
 
-#### Web server settings ####
-Install Dependencies before running server.
-
-#### node Setup ####
-```
-npm install, npm install -g gulp
-```
 
 #### Running the server
 ##### Run Local Server
@@ -151,5 +155,3 @@ C:\git\repository\mago3djs>rmdir data
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
-
-
