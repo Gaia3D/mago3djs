@@ -170,7 +170,7 @@ NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(id
 
 NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z, applyOcclusionCulling) 
 {
-	if (applyOcclusionCulling == undefined)
+	if (applyOcclusionCulling === undefined)
 	{ applyOcclusionCulling = true; }
 	
 	if (isExterior)
@@ -337,18 +337,18 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			// 3) Transform Matrix4.***
 			// in versioned mode read the matrixType first.
 			var matrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (matrixType == 0)
+			if (matrixType === 0)
 			{ 
 				// do nothing.
 			}
-			else if (matrixType == 1)
+			else if (matrixType === 1)
 			{
 				// read the translation vector.
 				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			}
-			else if (matrixType == 2)
+			else if (matrixType === 2)
 			{
 				// read the transformation matrix.
 				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -444,9 +444,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			var materialIdAux = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			
 			// do the stadistic recount.
-			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
-			if (neoRef.refMatrixType == 1){ stadistic_refMat_Translates_count +=1; }
-			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
+			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType === 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
 		}
 		else
 		{
@@ -459,7 +459,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId == "noObjectId")
+			if (objectId === "noObjectId")
 			{ objectId = neoRef._id; }
 		
 			neoRef.objectId = objectId;
@@ -471,12 +471,12 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			// 3) Transform Matrix4.***
 			neoRef.refMatrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (neoRef.refMatrixType == 0)
+			if (neoRef.refMatrixType === 0)
 			{ 
 				// do nothing.
 				stadistic_refMat_Identities_count +=1;
 			}
-			else if (neoRef.refMatrixType == 1)
+			else if (neoRef.refMatrixType === 1)
 			{
 				// read the translation vector.
 				translationX = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -486,7 +486,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 				
 				stadistic_refMat_Translates_count +=1;
 			}
-			else if (neoRef.refMatrixType == 2)
+			else if (neoRef.refMatrixType === 2)
 			{
 				// read the transformation matrix.
 				neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -622,7 +622,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			// 4) read the reference material id.
 			neoRef.materialId = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if (neoRef.materialId == -1)
+			if (neoRef.materialId === -1)
 			{ neoRef.hasTexture = false; }
 			else { neoRef.hasTexture = true; }
 
@@ -840,7 +840,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId == "noObjectId" || objectId == "")
+			if (objectId === "noObjectId" || objectId === "")
 			{ objectId = neoRef._id; }
 		
 			neoRef.objectId = objectId;

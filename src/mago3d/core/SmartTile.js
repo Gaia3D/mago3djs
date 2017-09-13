@@ -109,10 +109,10 @@ SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId)
 {
 	var resultNeoBuildingSeed;
 	var hasSubTiles = true;
-	if (this.subTiles == undefined)
+	if (this.subTiles === undefined)
 	{ hasSubTiles = false; }
 	
-	if (this.subTiles && this.subTiles.length == 0)
+	if (this.subTiles && this.subTiles.length === 0)
 	{ hasSubTiles = false; }
 		
 	if (!hasSubTiles)
@@ -176,7 +176,8 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 	this.sphereExtent.centerPoint = ManagerUtils.geographicCoordToWorldPoint(midLongitude, midLatitude, midAltitude, this.sphereExtent.centerPoint, magoManager);
 	
 	// calculate an aproximate radius.
-	var cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
+	var cornerPoint;
+	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
 	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
 };
 
@@ -230,19 +231,9 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 	{
 		buildingSeed = buildingSeedsArray[i];
 		
-		if (buildingSeed.buildingId == "fromJapanIfcExample_2")
-		{
-			var hola = 0;
-		}
-			
 		//if (this.intersectPoint(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude)) // original.
 		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
 		{
-			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
-			{
-				var hola = 0;
-			}
-		
 			buildingSeedsArray.splice(i, 1);
 			i--;
 			buildingSeedsCount = buildingSeedsArray.length;

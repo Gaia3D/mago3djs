@@ -296,7 +296,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				if (neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 			
-				if (neoReference.texture.texId == undefined)
+				if (neoReference.texture.texId === undefined)
 				{ continue; }
 			}
 			
@@ -1194,22 +1194,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
-		
-		if (neoReference.objectId == 32036)
-		{
-			var hola = 0;
-		}
-		
+			
 		if (neoReference.selColor4) 
 		{
 			//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***
 			//gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 			gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
 		}
-		else
-		{
-			var hola = 0;
-		}
+
 		this.renderNeoReferenceAsimetricVersionColorSelection(gl, neoReference, neoReferencesMotherAndIndices, neoBuilding, magoManager, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
 	}
 
@@ -1681,6 +1673,7 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
 
+	var vbo_vicky;
 	if (ssao_idx === 0) // depth.***
 	{
 		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
@@ -1698,7 +1691,7 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 	}
 	else if (ssao_idx === 1) // ssao.***
 	{
-		var vbo_vicky = lego.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		vbo_vicky = lego.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
 		var vertices_count = vbo_vicky.vertexCount;
 
 		if (vertices_count === 0) 

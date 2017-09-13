@@ -10,6 +10,12 @@
 	<script type="text/javascript" src="/tutorials/mago3d.js"></script>
 </head>
 <body>
+	<div style="text-align: center; padding-bottom: 10px;">
+		<form id="apiForm" name="apiForm" action="" onsubmit="return false;" >
+			<input type="text" id="data_key" name="data_key" size="20" />
+			<button id="searchData" name="searchData">Search</button>
+		</form>
+	</div>
 	<div id="magoContainer" class="mapWrap"></div>
 <script>
 	var imagePath = "/images/ko";
@@ -18,7 +24,7 @@
 	// mago3d start. policy loading
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
-			url: "/tutorials/policy-tutorials.json",
+			url: "/tutorials/workshop-policy-tutorials.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -32,7 +38,7 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		$.ajax({
-			url: "/tutorials/data-tutorials.json",
+			url: "/tutorials/workshop-data-tutorials.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverData){
@@ -43,6 +49,10 @@
 			}
 		});
 	}
+	
+	$("#searchData").click(function() {
+		searchDataAPI($("#data_key").val());
+	});
 </script>
 </body>
 </html>

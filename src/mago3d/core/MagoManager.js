@@ -748,7 +748,7 @@ function handleTextureLoaded(gl, image, texture)
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
 	//var gl = viewer.scene.context._gl;
-	if (texture == undefined)
+	if (texture === undefined)
 	{ var hola = 0; }
 	
 	gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1260,7 +1260,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
 {
 	var canvas = document.getElementById("objectLabel");
-	if (canvas == undefined)
+	if (canvas === undefined)
 	{ return; }
 	
 	canvas.style.opacity = 1.0;
@@ -2309,7 +2309,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-	if (buildingGeoLocation == undefined)
+	if (buildingGeoLocation === undefined)
 	{ return false; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
@@ -2508,9 +2508,6 @@ MagoManager.prototype.manageQueue = function()
 	{
 		neoBuilding = buildingsToDeleteArray[i];
 		this.processQueue.eraseBuildingToDelete(neoBuilding);
-		if (neoBuilding.buildingId == "Grendizer")
-		{ var hola = 0; }
-		
 		this.deleteNeoBuilding(gl, neoBuilding);
 		
 	}
@@ -2527,7 +2524,7 @@ MagoManager.prototype.manageQueue = function()
 	{
 		neoBuilding = buildingsToDeleteModelReferencesArray[i];
 		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
-		if (neoBuilding == undefined)
+		if (neoBuilding === undefined)
 		{ continue; }
 
 		if (neoBuilding.octree)
@@ -2538,7 +2535,13 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse pendent data.
-	var maxParsesCount = 2;
+	var maxParsesCount = 1;
+	
+	// parse references lod0 & lod 1.
+	var toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
+	if (toParseCount < maxParsesCount)
+	{ maxParsesCount = toParseCount; }
+	
 	var lowestOctree;
 	var lowestOctreeToParse;
 	var neoBuilding;
@@ -2642,8 +2645,23 @@ MagoManager.prototype.manageQueue = function()
 	maxParsesCount = 1;
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
+<<<<<<< HEAD
 		octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
 		for (var i=0; i<octreesLod0Count; i++)
+=======
+		lowestOctree = this.parseQueue.octreesLod0ModelsToParseArray.shift();
+		
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+		{ continue; }
+		
+		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+		if (blocksList.dataArraybuffer === undefined)
+		{ continue; }
+		
+		neoBuilding = lowestOctree.neoBuildingOwner;
+		headerVersion = neoBuilding.getHeaderVersion();
+		if (headerVersion[0] === "v")
+>>>>>>> develop
 		{
 			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
 			
@@ -4636,10 +4654,10 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var smartTile1 = this.smartTileManager.tilesArray[0]; // America side tile.
 	var smartTile2 = this.smartTileManager.tilesArray[1]; // Asia side tile.
 	
-	if (this.intersectedLowestTilesArray == undefined)
+	if (this.intersectedLowestTilesArray === undefined)
 	{ this.intersectedLowestTilesArray = []; }
 	
-	if (this.lastIntersectedLowestTilesArray == undefined)
+	if (this.lastIntersectedLowestTilesArray === undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }
 
 	// save the last frustumCulled lowestTiles to delete if necessary.
@@ -4725,7 +4743,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = this.intersectedLowestTilesArray[i];
-		if (lowestTile.sphereExtent == undefined)
+		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 		
 		tileCenterPos = lowestTile.sphereExtent.centerPoint;
@@ -4741,13 +4759,10 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// determine LOD for each building.
 				neoBuilding = lowestTile.buildingsArray[j];
 				
-				if (neoBuilding.buildingId == "Grendizer")
-				{ var hola = 0; }
-	
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
-					if (neoBuilding.metaData.geographicCoord == undefined)
+					if (neoBuilding.metaData.geographicCoord === undefined)
 					{
 						neoBuilding.metaData.geographicCoord = new GeographicCoord();
 			
@@ -4877,9 +4892,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// create a building and set the location.***
 				neoBuilding.name = buildingSeed.name;
 				neoBuilding.buildingId = buildingSeed.buildingId;
-				if (neoBuilding.buildingId == "Grendizer")
-				{ var hola = 0; }
-				
+			
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
@@ -4973,7 +4986,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (this.renderingModeTemp === 2)
 	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
 
-	if (this.boundingSphere_Aux == undefined)
+	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
@@ -5879,7 +5892,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				}
 			}
 			
-			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
+			if (buildingSeed.buildingId === "fromJapanIfcExample_2")
 			{
 				var hola = 0;
 			}
@@ -6070,6 +6083,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "move") 
 	{
+		;
 	}
 	else if (apiName === "changeOutFitting") 
 	{
@@ -6199,43 +6213,60 @@ MagoManager.prototype.callAPI = function(api)
 		if (api.getFPVMode())
 		{
 			if (this.cameraFPV._camera !== undefined)	{ return; }
-			var scratchLookAtMatrix4 = new Cesium.Matrix4();
-			var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
 
-			var camera = this.scene._camera;
 			this.cameraFPV.init();
-			this.cameraFPV._camera = camera;
-			this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
 
-			var position = new Cesium.Cartesian3();
-			var direction = new Cesium.Cartesian3();
-			var up = new Cesium.Cartesian3();
+			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+			{
+				;
+			}
+			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				var scratchLookAtMatrix4 = new Cesium.Matrix4();
+				var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
+				var camera = this.scene._camera;
 
-			var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
-			cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
-
-			this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
-			var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
-			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), direction);
-			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), up);
-
-			camera.flyTo({
-				destination : position,
-				orientation : {
-					direction : direction,
-					up        : up
-				},
-				duration: 1
-			});
+				this.cameraFPV._camera = camera;
+				this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
+	
+				var position = new Cesium.Cartesian3();
+				var direction = new Cesium.Cartesian3();
+				var up = new Cesium.Cartesian3();
+	
+				var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
+				cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
+	
+				this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
+				var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
+				Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), direction);
+				Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), up);
+	
+				camera.flyTo({
+					destination : position,
+					orientation : {
+						direction : direction,
+						up        : up
+					},
+					duration: 1
+				});
+			}
 		}
 		else 
 		{
 			if (this.cameraFPV._cameraBAK === undefined)	{ return; }
-			this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+			{
+				;
+			}
+			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+			}
 			this.cameraFPV.release();
 		}
 	}
 };
+
 MagoManager.prototype.checkCollision = function (position, direction)
 {
 	var gl = this.sceneState.gl;

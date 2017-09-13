@@ -967,7 +967,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			var ver1 = neoBuilding.metaData.version[2];
 			var ver2 = neoBuilding.metaData.version[4];
 			
-			if (ver0 == 0 && ver1 == 0 && ver2 == 1)
+			if (ver0 === 0 && ver1 === 0 && ver2 === 1)
 			{
 				// read materials list.
 				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1350,7 +1350,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 		neoRefImage.onload = function() 
 		{
 			// is possible that during loading image the building was deleted. Then return.
-			if (texture.texId == undefined)
+			if (texture.texId === undefined)
 			{
 				return;
 			}
