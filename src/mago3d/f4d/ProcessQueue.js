@@ -21,7 +21,7 @@ ProcessQueue.prototype.putBuildingsToDeleteModelReferences = function(building, 
 {
 	// this puts the building to the "buildingsToDeleteModelReferencesMap".
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	this.buildingsToDeleteModelReferencesMap.set(building, aValue);
@@ -37,7 +37,7 @@ ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
 {
 	// this puts the building to the "buildingsToDeleteMap".
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	this.buildingsToDeleteMap.set(building, aValue);
@@ -45,12 +45,12 @@ ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
 
 ProcessQueue.prototype.putBuildingsArrayToDelete = function(buildingsToDeleteArray, aValue)
 {
-	if (buildingsToDeleteArray == undefined)
+	if (buildingsToDeleteArray === undefined)
 	{ return; }
 	
 	// this puts the buildingsToDeleteArray to the "buildingsToDeleteMap".
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	var buildingsToDeleteCount = buildingsToDeleteArray.length;

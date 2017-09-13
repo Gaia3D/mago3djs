@@ -4,7 +4,7 @@
 
 <a name="korean"></a>
 
-# mago3DJS
+# mago3DJs
 3차원 다중 블록 가시화를 위한 오픈소스 자바스크립트 라이브러리
 
 AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공간정보(3D GIS)를 통합적으로 관리 및 가시화하는 차세대 3차원 GIS 플랫폼입니다. 실내,실 외 구별없이 AEC와 3D GIS를 웹 브라우저에서 통합해 줍니다. 대용량 BIM(Building Information Modelling), JT(Jupiter Tessellation), 3D GIS 파일 등을 별도의 프로그램 설치 없이 웹 브라우저 상에서 바로 살펴보고 협업작업을 진행할 수 있습니다.
@@ -25,7 +25,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - COLLADA
 
 # 적용 사례
-- 남극과학기지 웹기반 3차원 시설ㆍ기장비 관리시스템
+- 남극과학기지 웹기반 3차원 시설, 기장비 관리시스템
 - LiveDroneMap
 
 ## Development Environment ##
@@ -50,29 +50,20 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치합니다.
 - C:\mago3djs 디렉토리로 이동합니다.
 - node Setup
-  - <code> C:\mago3djs> npm install</code>
-  - <code> C:\mago3djs> npm install -g gulp </code>
-
-
-####  서버 실행
-##### Local 서버 실행
-```
-C:\git\repository\mago3djs>node server.js
-```
-##### public 서버 실행
-```
-C:\git\repository\mago3djs>node server.js --public true
-```
+  - <code>C:\mago3djs> npm install</code>
+  - <code>C:\mago3djs> npm install -g gulp</code>
 
 #### 데이터 폴더 링크 ####
-##### 데이터 폴더 생성
-```
-mklink /d "C:\git\repository\mago3djs\data" "C:\data"
-```
-##### 데이터 폴더 삭제
-```
-C:\git\repository\mago3djs>rmdir data
-```
+  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code>
+
+####  서버 실행
+##### private 서버 실행
+- <code>C:\git\repository\mago3djs>node server.js</code>
+
+##### public 서버 실행
+- <code>C:\git\repository\mago3djs>node server.js --public true</code>
+
+
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
@@ -104,7 +95,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - COLLADA
 
 # Application example
-- Antarctic Science Base Web-based 3D facility / equipment management system
+- Antarctic Science Base Web-based 3D facility, equipment management system
 - LiveDroneMap
 
 ## Development Environment ##
@@ -129,29 +120,22 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - [node](https://nodejs.org/en/download/) to install Window Install (.msi) 64-bit.
 - Go to the C: \ mago3djs directory.
 - node Setup
-  - <code> C: \ mago3djs> npm install </code>
-  - <code> C: \ mago3djs> npm install -g gulp</code>
-
-
-#### Running the server
-##### Run Local Server
-```
-C:\git\repository\mago3djs>node server.js
-```
-##### public server run
-```
-C:\git\repository\mago3djs>node server.js --public true
-```
+  - <code>C: \ mago3djs> npm install</code>
+  - <code>C: \ mago3djs> npm install -g gulp</code>
 
 #### Data folder link ####
-##### Create Data Folder
-```
-mklink /d "C:\git\repository\mago3djs\data" "C:\data"
-```
-##### Delete data folder
-```
-C:\git\repository\mago3djs>rmdir data
-```
+  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code>
+
+#### Running the server
+##### Private server run
+- <code>C:\git\repository\mago3djs>node server.js</code>
+
+##### Public server run
+- <code>C:\git\repository\mago3djs>node server.js --public true</code>
+
+
+
+
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).

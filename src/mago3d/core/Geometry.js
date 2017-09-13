@@ -381,7 +381,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 	var point3dScratch = new Point3D();
 	
-	if (resultRelEyePosToBuilding == undefined)
+	if (resultRelEyePosToBuilding === undefined)
 	{ resultRelEyePosToBuilding = new Point3D(); }
 	
 	point3dScratch.set(relativeEyePosX, relativeEyePosY, relativeEyePosZ);
@@ -405,16 +405,16 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
-	if (this.metaData.version[0] == "v")
+	if (this.metaData.version[0] === "v")
 	{
 		// this is the version beta.
-		if (neoReference.texture == undefined)
+		if (neoReference.texture === undefined)
 		{ return undefined; }
 		
 		if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
 		{
 			// 1rst, check if the texture is loaded.
-			if (this.texturesLoaded == undefined)
+			if (this.texturesLoaded === undefined)
 			{ this.texturesLoaded = []; }
 			
 			var sameTexture = this.getSameTexture(neoReference.texture);
@@ -445,7 +445,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			}
 		}
 	}
-	else if (this.metaData.version[0] == 0 && this.metaData.version[2] == 0 && this.metaData.version[4] == 1 )
+	else if (this.metaData.version[0] === 0 && this.metaData.version[2] === 0 && this.metaData.version[4] === 1 )
 	{
 		if (magoManager.backGround_fileReadings_count > 10) 
 		{ return; }
@@ -454,7 +454,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		var textureId = neoReference.materialId;
 		var texture = this.texturesLoaded[textureId];
 		
-		if (texture == undefined)
+		if (texture === undefined)
 		{
 			//texture = new Texture();
 			//texture.fileLoadState = CODE.fileLoadState.READY

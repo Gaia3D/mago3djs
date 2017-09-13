@@ -338,7 +338,7 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 		var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
 		if (existLego)
 		{
-			if (block.lego == undefined)
+			if (block.lego === undefined)
 			{ block.lego = new Lego(); }
 			
 			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
