@@ -4,7 +4,7 @@
 
 <a name="korean"></a>
 
-# mago3DJS
+# mago3DJs
 3차원 다중 블록 가시화를 위한 오픈소스 자바스크립트 라이브러리
 
 AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공간정보(3D GIS)를 통합적으로 관리 및 가시화하는 차세대 3차원 GIS 플랫폼입니다. 실내,실 외 구별없이 AEC와 3D GIS를 웹 브라우저에서 통합해 줍니다. 대용량 BIM(Building Information Modelling), JT(Jupiter Tessellation), 3D GIS 파일 등을 별도의 프로그램 설치 없이 웹 브라우저 상에서 바로 살펴보고 협업작업을 진행할 수 있습니다.
@@ -25,7 +25,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - COLLADA
 
 # 적용 사례
-- 남극과학기지 웹기반 3차원 시설ㆍ기장비 관리시스템
+- 남극과학기지 웹기반 3차원 시설, 기장비 관리시스템
 - LiveDroneMap
 
 ## Development Environment ##
@@ -53,26 +53,17 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
   - <code> C:\mago3djs> npm install</code>
   - <code> C:\mago3djs> npm install -g gulp </code>
 
+#### 데이터 폴더 링크 ####
+  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
 
 ####  서버 실행
-##### Local 서버 실행
-```
-C:\git\repository\mago3djs>node server.js
-```
-##### public 서버 실행
-```
-C:\git\repository\mago3djs>node server.js --public true
-```
+##### private 서버 실행
+- C:\git\repository\mago3djs>node server.js
 
-#### 데이터 폴더 링크 ####
-##### 데이터 폴더 생성
-```
-mklink /d "C:\git\repository\mago3djs\data" "C:\data"
-```
-##### 데이터 폴더 삭제
-```
-C:\git\repository\mago3djs>rmdir data
-```
+##### public 서버 실행
+- C:\git\repository\mago3djs>node server.js --public true
+
+
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
@@ -104,7 +95,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - COLLADA
 
 # Application example
-- Antarctic Science Base Web-based 3D facility / equipment management system
+- Antarctic Science Base Web-based 3D facility, equipment management system
 - LiveDroneMap
 
 ## Development Environment ##
@@ -132,26 +123,19 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
   - <code> C: \ mago3djs> npm install </code>
   - <code> C: \ mago3djs> npm install -g gulp</code>
 
+#### Data folder link ####
+  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
 
 #### Running the server
-##### Run Local Server
-```
-C:\git\repository\mago3djs>node server.js
-```
-##### public server run
-```
-C:\git\repository\mago3djs>node server.js --public true
-```
+##### Private server run
+- C:\git\repository\mago3djs>node server.js
 
-#### Data folder link ####
-##### Create Data Folder
-```
-mklink /d "C:\git\repository\mago3djs\data" "C:\data"
-```
-##### Delete data folder
-```
-C:\git\repository\mago3djs>rmdir data
-```
+##### Public server run
+- C:\git\repository\mago3djs>node server.js --public true
+
+
+
+
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
