@@ -2518,10 +2518,10 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = undefined;
 	
 	// now delete modelReferences of lod2Octrees.
-	var maxDeleteModelReferencesCount = 10;
+	var maxDeleteModelReferencesCount = 20;
 	var buildingsDeleteCount = this.processQueue.buildingsToDeleteModelReferencesMap.size;
 	var buildingsToDeleteModelReferencesArray = Array.from(this.processQueue.buildingsToDeleteModelReferencesMap.keys());
-	if (maxDeleteModelReferencesCount < buildingsDeleteCount)
+	if (maxDeleteModelReferencesCount > buildingsDeleteCount)
 	{ maxDeleteModelReferencesCount = buildingsDeleteCount; }
 	for (var i=0; i<maxDeleteModelReferencesCount; i++)
 	{
@@ -2538,96 +2538,407 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// parse pendent data.
-	var maxParsesCount = 1;
-	
-	// parse references lod0 & lod 1.
-	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
+	var maxParsesCount = 2;
 	var lowestOctree;
+	var lowestOctreeToParse;
 	var neoBuilding;
 	var headerVersion;
+	var octreesParsedCount = 0;
 	
 	if (this.matrix4SC === undefined)
 	{ this.matrix4SC = new Matrix4(); }
-	
-	for (var i=0; i<maxParsesCount; i++)
-	{
-		lowestOctree = this.parseQueue.octreesLod0ReferencesToParseArray.shift();
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ continue; }
-		
-		if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
-		{ continue; }
-		
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		headerVersion = neoBuilding.getHeaderVersion();
-		//if(headerVersion == "undefinedv.0.0")
-		this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-		if (headerVersion[0] == "v")
-		{
-			// parse beta version.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
-		}
-		else 
-		{
-			// parse vesioned.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
-		}
-		lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-	}
-	
-	// parse models lod0 & lod1.
+
+	// is desirable to parse octrees references ordered by the current eye distance.
+	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
+	// parse octrees lod1 references.
+	octreesParsedCount = 0;
 	maxParsesCount = 1;
-	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
-	for (var i=0; i<maxParsesCount; i++)
+	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
-		lowestOctree = this.parseQueue.octreesLod0ModelsToParseArray.shift();
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ continue; }
-		
-		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-		if (blocksList.dataArraybuffer === undefined)
-		{ continue; }
-		
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		headerVersion = neoBuilding.getHeaderVersion();
-		if (headerVersion[0] == "v")
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
 		{
-			// parse the beta version.
-			blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles0[i];
+			if (this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
 		}
-		else 
+		
+		if (octreesParsedCount == 0)
 		{
-			// parse versioned.
-			blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
 		}
-		blocksList.dataArraybuffer = undefined;
 	}
 	
-	// parse lego lod2.
-	maxParsesCount = 3;
-	var toParseCount = this.parseQueue.octreesLod2LegosToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
-	for (var i=0; i<maxParsesCount; i++)
+	// parse octrees lod1 references.
+	octreesParsedCount = 0;
+	maxParsesCount = 1;
+	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
-		lowestOctree = this.parseQueue.octreesLod2LegosToParseArray.shift();
-		if (lowestOctree.lego === undefined)
-		{ continue; }
+		octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
+			
+			if (this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
 		
-		lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
-		lowestOctree.lego.dataArrayBuffer = undefined;
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+	
+	// parse octrees lod0 models.
+	octreesParsedCount = 0;
+	maxParsesCount = 1;
+	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
+	{
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles0[i];
+			
+			if (this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList == undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				//	continue;
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList == undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				//	continue;
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+	
+	// parse octrees lod1 models.
+	octreesParsedCount = 0;
+	maxParsesCount = 1;
+	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
+	{
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
+
+			if (this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList == undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				//	continue;
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				//	continue;
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+
+	// parse octrees lod2 (lego).
+	octreesParsedCount = 0;
+	maxParsesCount = 6;
+	if (this.parseQueue.octreesLod2LegosToParseMap.size > 0)
+	{
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles2.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles2[i];
+			if (this.parseQueue.octreesLod2LegosToParseMap.delete(lowestOctree))
+			{
+				//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+				if (lowestOctree.lego === undefined)
+				{ continue; }
+				
+				lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+				lowestOctree.lego.dataArrayBuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				if (this.parseQueue.octreesLod2LegosToParseMap.delete(lowestOctree))
+				{
+					//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+					if (lowestOctree.lego === undefined)
+					{ continue; }
+					
+					lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+					lowestOctree.lego.dataArrayBuffer = undefined;
+					
+					octreesParsedCount++;
+				}
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
 	}
 };
 
@@ -2701,6 +3012,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			// 4 = parsed.***
 			// now, check if the blocksList is loaded & parsed.***
 			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			if (blocksList == undefined)
+			{ continue; }
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 			{
@@ -4385,11 +4698,11 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var lod2_minSquaredDist = 100000*10000;
 	
 	
-	lod0_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	lod0_minSquaredDist = this.magoPolicy.getLod1DistInMeters();
 	lod0_minSquaredDist *= lod0_minSquaredDist;
 	
-	//lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
-	//lod2_minSquaredDist *= lod2_minSquaredDist;
+	lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	lod2_minSquaredDist *= lod2_minSquaredDist;
 	
 	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
 	
@@ -5520,7 +5833,7 @@ MagoManager.prototype.getObjectIndexFile = function()
 	// use smartTile. Create one smartTile for all Korea.
 	this.buildingSeedList = new BuildingSeedList();
 	this.readerWriter.getObjectIndexFileForSmartTile(
-			this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
 /**
