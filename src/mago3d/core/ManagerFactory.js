@@ -465,16 +465,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	function initEntity() 
 	{
 		return viewer.entities.add({
-			name     : "여의도",
+			name     : "mago3D",
 			position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
 			box      : {
-				dimensions   : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
-				//material : Cesium.Color.TRANSPARENT
-				fill         : false,
-				material     : Cesium.Color.TRANSPARENT,
-				outline      : true,
-				outlineWidth : 3.0,
-				outlineColor : Cesium.Color.BLACK
+				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				fill       : true,
+				material   : Cesium.Color.BLUE,
+				outline    : false
 			}
 		});
 	}
