@@ -2538,9 +2538,6 @@ MagoManager.prototype.manageQueue = function()
 	var maxParsesCount = 1;
 	
 	// parse references lod0 & lod 1.
-	var toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
 	
 	var lowestOctree;
 	var lowestOctreeToParse;
@@ -2645,23 +2642,8 @@ MagoManager.prototype.manageQueue = function()
 	maxParsesCount = 1;
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
-<<<<<<< HEAD
 		octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
 		for (var i=0; i<octreesLod0Count; i++)
-=======
-		lowestOctree = this.parseQueue.octreesLod0ModelsToParseArray.shift();
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ continue; }
-		
-		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-		if (blocksList.dataArraybuffer === undefined)
-		{ continue; }
-		
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		headerVersion = neoBuilding.getHeaderVersion();
-		if (headerVersion[0] === "v")
->>>>>>> develop
 		{
 			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
 			
