@@ -70,6 +70,7 @@
 	"security_dynamic_block_yn": "N",
 	"security_api_result_secure_yn": "N",
 	"security_masking_yn": "Y",
+	"content_cache_version": 0,
 	"content_main_widget_count": 6,
 	"content_main_widget_interval": 65,
 	"content_monitoring_interval": 1,
