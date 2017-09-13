@@ -2594,7 +2594,7 @@ MagoManager.prototype.manageQueue = function()
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
 		}
-		/*
+		
 		if (octreesParsedCount == 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
@@ -2635,7 +2635,7 @@ MagoManager.prototype.manageQueue = function()
 				{ break; }
 			}
 		}
-		*/
+		
 	}
 	
 	// parse octrees lod1 references.
