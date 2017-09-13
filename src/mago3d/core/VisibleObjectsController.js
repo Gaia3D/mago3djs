@@ -16,12 +16,12 @@ var VisibleObjectsController = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	
-	this.currentRenderables0 = [];
-	this.currentRenderables1 = [];
-	this.currentRenderables2 = [];
-	this.currentRenderables3 = [];
+	//this.currentRenderables0 = [];
+	//this.currentRenderables1 = [];
+	//this.currentRenderables2 = [];
+	//this.currentRenderables3 = [];
 	
-	this.currentRenderableRefArray = [];
+	//this.currentRenderableRefArray = [];
 };
 
 VisibleObjectsController.prototype.initArrays = function() 
@@ -31,8 +31,8 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	
-	this.currentRenderables0 = [];
-	this.currentRenderables1 = [];
-	this.currentRenderables2 = [];
-	this.currentRenderables3 = [];
+	//this.currentRenderables0 = [];
+	//this.currentRenderables1 = [];
+	//this.currentRenderables2 = [];
+	//this.currentRenderables3 = [];
 };
