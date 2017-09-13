@@ -54,14 +54,14 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
   - <code> C:\mago3djs> npm install -g gulp </code>
 
 #### 데이터 폴더 링크 ####
-  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
+  - <code> mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code>
 
 ####  서버 실행
 ##### private 서버 실행
-- C:\git\repository\mago3djs>node server.js
+- <code> C:\git\repository\mago3djs>node server.js</code>
 
 ##### public 서버 실행
-- C:\git\repository\mago3djs>node server.js --public true
+- <code> C:\git\repository\mago3djs>node server.js --public true </code>
 
 
 
