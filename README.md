@@ -120,18 +120,18 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - [node](https://nodejs.org/en/download/) to install Window Install (.msi) 64-bit.
 - Go to the C: \ mago3djs directory.
 - node Setup
-  - <code> C: \ mago3djs> npm install </code>
-  - <code> C: \ mago3djs> npm install -g gulp</code>
+  - <code>C: \ mago3djs> npm install</code>
+  - <code>C: \ mago3djs> npm install -g gulp</code>
 
 #### Data folder link ####
-  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
+  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code>
 
 #### Running the server
 ##### Private server run
-- C:\git\repository\mago3djs>node server.js
+- <code>C:\git\repository\mago3djs>node server.js</code>
 
 ##### Public server run
-- C:\git\repository\mago3djs>node server.js --public true
+- <code>C:\git\repository\mago3djs>node server.js --public true</code>
 
 
 
