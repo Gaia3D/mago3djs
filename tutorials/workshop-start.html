@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
 	<title>Cesium</title>
+	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
@@ -18,7 +19,7 @@
 	// mago3d start. policy loading
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
-			url: "/tutorials/policy-tutorials.json",
+			url: "/tutorials/workshop-policy-tutorials.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -32,7 +33,7 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		$.ajax({
-			url: "/tutorials/data-tutorials.json",
+			url: "/tutorials/workshop-data-tutorials.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverData){
