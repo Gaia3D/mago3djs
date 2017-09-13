@@ -273,7 +273,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 			blocksList.dataArraybuffer = arrayBuffer;
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
-			magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
+			//magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
+			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
 		}
 		else 
 		{
@@ -350,7 +351,8 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 			{
 				neoRefsList.dataArraybuffer = arrayBuffer;
 				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
+				//magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
+				magoManager.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
 			}
 			arrayBuffer = null;
 			
@@ -391,7 +393,8 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 			{
 				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
 				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
+				//magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
+				magoManager.parseQueue.putOctreeLod2LegosToParse(lowestOctree);
 			}
 			else 
 			{
