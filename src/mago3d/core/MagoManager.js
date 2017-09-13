@@ -2508,6 +2508,9 @@ MagoManager.prototype.manageQueue = function()
 	{
 		neoBuilding = buildingsToDeleteArray[i];
 		this.processQueue.eraseBuildingToDelete(neoBuilding);
+		if (neoBuilding.buildingId == "Grendizer")
+		{ var hola = 0; }
+		
 		this.deleteNeoBuilding(gl, neoBuilding);
 		
 	}
@@ -4425,7 +4428,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// determine LOD for each building.
 				neoBuilding = lowestTile.buildingsArray[j];
 				
-				if (neoBuilding.buildingId === "U310T")
+				if (neoBuilding.buildingId == "Grendizer")
 				{ var hola = 0; }
 	
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
@@ -4433,9 +4436,19 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				{ 
 					if (neoBuilding.metaData.geographicCoord == undefined)
 					{
+						neoBuilding.metaData.geographicCoord = new GeographicCoord();
+			
+						var buildingSeed = lowestTile.getBuildingSeedById(undefined, neoBuilding.buildingId) ;
+						if (buildingSeed)
+						{
+							neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+							neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+							neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+							neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+						}
 						// this building was deleted, so, put this in visibleBuildingsList to load data.
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
-						continue;
+						//this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
+						//continue;
 					}
 			
 					geoLoc = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
@@ -4551,6 +4564,9 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// create a building and set the location.***
 				neoBuilding.name = buildingSeed.name;
 				neoBuilding.buildingId = buildingSeed.buildingId;
+				if (neoBuilding.buildingId == "Grendizer")
+				{ var hola = 0; }
+				
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
