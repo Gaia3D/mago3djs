@@ -177,7 +177,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 	
 	// calculate an aproximate radius.
 	var cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
-	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 0.8;
+	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
 };
 
 /**
@@ -467,16 +467,6 @@ SmartTile.prototype.calculateTileRange = function()
 	}
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
- */
-/*
-SmartTile.prototype.deleteBuildings = function(gl, vboMemManager) 
-{
-	
-};
-*/
 
 /**
  * Quadtree based tile with thickness.
