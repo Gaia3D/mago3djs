@@ -194,11 +194,8 @@ NeoBuilding.prototype.setRenderSettingApplyOcclusionCulling = function(applyOccl
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager) 
+NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManager) 
 {
-	this.metaData.deleteObjects();
-	this.metaData.fileLoadState = CODE.fileLoadState.READY;
-
 	var blocksCount = this.motherBlocksArray.length;
 	for (var i=0; i<blocksCount; i++)
 	{
@@ -212,14 +209,27 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 	for (var i=0; i<referencesCount; i++)
 	{
 		if (this.motherNeoReferencesArray[i])
-		{ this.motherNeoReferencesArray[i].deleteGlObjects(gl, vboMemoryManager); }
+		{ this.motherNeoReferencesArray[i].deleteObjects(gl, vboMemoryManager); }
 		this.motherNeoReferencesArray[i] = undefined;
 	}
 	this.motherNeoReferencesArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager) 
+{
+	this.metaData.deleteObjects();
+	this.metaData.fileLoadState = CODE.fileLoadState.READY;
+
+	this.deleteObjectsModelReferences(gl, vboMemoryManager);
 
 	// The octree.
 	if (this.octree !== undefined)
-	{ this.octree.deleteGlObjects(gl, vboMemoryManager); }
+	{ this.octree.deleteObjects(gl, vboMemoryManager); }
 	this.octree = undefined; // f4d_octree. Interior objects.***
 	
 	//this.buildingFileName = "";

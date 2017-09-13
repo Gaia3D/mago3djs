@@ -86,7 +86,7 @@ NeoReference.prototype.hasKeyMatrix = function(idxKey)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoReference.prototype.deleteGlObjects = function(gl, vboMemManager) 
+NeoReference.prototype.deleteObjects = function(gl, vboMemManager) 
 {
 	// 1) Object ID.***
 	this._id = undefined;
@@ -142,8 +142,9 @@ var NeoReferencesMotherAndIndices = function()
 	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
 	this.neoRefsIndices = []; // All objects(references) of this class.
 	this.modelReferencedGroupsList; // (for new format).
+	this.blocksList;
 
-	this.fileLoadState = 0;
+	this.fileLoadState = 0; // init as "READY".
 	this.dataArraybuffer;
 	this.succesfullyGpuDataBinded;
 
@@ -237,6 +238,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 {
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	this.neoRefsIndices = undefined;
+	this.blocksList = undefined;
 
 	this.fileLoadState = 0;
 	this.dataArraybuffer = undefined;
@@ -324,8 +326,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId == "noObjectId")
-			{ objectId = neoRef._id; }
 			
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
@@ -459,6 +459,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			if (objectId == "noObjectId")
+			{ objectId = neoRef._id; }
+		
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
@@ -707,7 +710,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
 			// 2) Block's Idx.***
@@ -838,6 +840,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			if (objectId == "noObjectId" || objectId == "")
+			{ objectId = neoRef._id; }
+		
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
