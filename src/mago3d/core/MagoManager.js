@@ -2538,9 +2538,6 @@ MagoManager.prototype.manageQueue = function()
 	var maxParsesCount = 1;
 	
 	// parse references lod0 & lod 1.
-	var toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
 	
 	var lowestOctree;
 	var lowestOctreeToParse;
