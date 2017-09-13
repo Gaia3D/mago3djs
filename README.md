@@ -51,17 +51,17 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - C:\mago3djs 디렉토리로 이동합니다.
 - node Setup
   - <code>C:\mago3djs> npm install</code>
-  - <code>C:\mago3djs> npm install -g gulp </code>
+  - <code>C:\mago3djs> npm install -g gulp</code>
 
 #### 데이터 폴더 링크 ####
-  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code>
+  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code>
 
 ####  서버 실행
 ##### private 서버 실행
 - <code>C:\git\repository\mago3djs>node server.js</code>
 
 ##### public 서버 실행
-- <code>C:\git\repository\mago3djs>node server.js --public true </code>
+- <code>C:\git\repository\mago3djs>node server.js --public true</code>
 
 
 
