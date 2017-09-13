@@ -1190,9 +1190,16 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
+
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
+		
+		if (neoReference.objectId == 32036)
+		{
+			var hola = 0;
+		}
+		
 		if (neoReference.selColor4) 
 		{
 			//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***

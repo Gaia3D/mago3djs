@@ -55,7 +55,41 @@ Octree.prototype.new_subOctree = function()
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-Octree.prototype.deleteGlObjects = function(gl, vboMemManager) 
+Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager) 
+{
+	if (this.neoReferencesMotherAndIndices)
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
+
+	this.neoReferencesMotherAndIndices = undefined;
+
+	// delete the blocksList.***
+	if (this.neoRefsList_Array !== undefined) 
+	{
+		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
+		{
+			if (this.neoRefsList_Array[i]) 
+			{
+				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
+			}
+			this.neoRefsList_Array[i] = undefined;
+		}
+		this.neoRefsList_Array = undefined;
+	}
+
+	if (this.subOctrees_array !== undefined) 
+	{
+		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].deleteObjectsModelReferences(gl, vboMemManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.deleteObjects = function(gl, vboMemManager) 
 {
 	if (this.lego !== undefined) 
 	{
@@ -91,7 +125,7 @@ Octree.prototype.deleteGlObjects = function(gl, vboMemManager)
 		{
 			if (this.neoRefsList_Array[i]) 
 			{
-				this.neoRefsList_Array[i].deleteGlObjects(gl, vboMemManager);
+				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
 			}
 			this.neoRefsList_Array[i] = undefined;
 		}
@@ -102,7 +136,7 @@ Octree.prototype.deleteGlObjects = function(gl, vboMemManager)
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
 		{
-			this.subOctrees_array[i].deleteGlObjects(gl, vboMemManager);
+			this.subOctrees_array[i].deleteObjects(gl, vboMemManager);
 			this.subOctrees_array[i] = undefined;
 		}
 		this.subOctrees_array = undefined;

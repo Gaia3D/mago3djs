@@ -1078,11 +1078,12 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		this.visibleObjControlerOctrees.initArrays(); // init.******
 		this.visibleObjControlerOctreesAux.initArrays(); // init.******
 
+		var neoBuilding;
 		// lod 0 & lod 1.
 		var buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for (var i=0; i<buildingsCount; i++) 
 		{
-			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
+			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0))
 			{
 				// any octree is visible.
@@ -1100,7 +1101,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 		for (var i=0; i<buildingsCount; i++) 
 		{
-			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
+			neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 2))
 			{
 				// any octree is visible.
@@ -1112,22 +1113,25 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
 		
+		
 		// in this point, put octrees of lod2 to the deletingQueue to delete the lod0 data.
-		var visibleOctreesLod2Count = this.visibleObjControlerOctrees.currentVisibles2.length;
-		var octreesLod2DeletingCount = 0;
-		for (var i=visibleOctreesLod2Count-1; i>=0; i--)
+		buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
+		//var buildingsDeletingModelRefCount = 0;
+		for (var i=buildingsCount-1; i>=0; i--) 
 		{
-			this.processQueue.putOctreeToDeleteLod0(this.visibleObjControlerOctrees.currentVisibles2[i], 0);
-			octreesLod2DeletingCount++;
-			if (octreesLod2DeletingCount > 10)
-			{ break; }
+			neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
+			this.processQueue.putBuildingsToDeleteModelReferences(neoBuilding, 0);
+			//buildingsDeletingModelRefCount++;
+			//if (buildingsDeletingModelRefCount > 10)
+			//{ break; }
 		}
+		
 		
 		// if a LOD0 building has a NO ready lowestOctree, then push this building to the LOD2BuildingsArray.***
 		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 		for (var i=0; i<buildingsCount; i++) 
 		{
-			var neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
+			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 			if (neoBuilding.currentVisibleOctreesControler === undefined)
 			{ continue; }
 			if (neoBuilding.currentVisibleOctreesControler.currentVisibles2.length > 0)
@@ -1856,6 +1860,7 @@ MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY) 
 {
+	/*
 	this.dateSC = new Date();
 	this.startTimeSC = this.dateSC.getTime();
 
@@ -1863,6 +1868,7 @@ MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY)
 	this.mouse_y = mouseY;
 	this.mouseRightDown = true;
 	this.isCameraMoving = true;
+	*/
 };
 
 /**
@@ -1872,8 +1878,10 @@ MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY)
  */
 MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY) 
 {
+	/*
 	this.isCameraMoving = false;
 	this.enableCameraMotion(false);
+	*/
 };
 
 /**
@@ -2506,21 +2514,25 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = [];
 	buildingsToDeleteArray = undefined;
 	
-	// now delete lod0data of octreesLod2.
-	/*
-	var maxDeleteOctreesCount = 10;
-	var octreesDeleteCount = this.processQueue.octreesToDeleteLod0Map.size;
-	var octreesToDeleteArray = Array.from(this.processQueue.octreesToDeleteLod0Map.keys());
-	if(maxDeleteOctreesCount < maxDeleteOctreesCount)
-		maxDeleteOctreesCount = maxDeleteOctreesCount;
-	for (var i=0; i<maxDeleteOctreesCount; i++)
+	// now delete modelReferences of lod2Octrees.
+	var maxDeleteModelReferencesCount = 10;
+	var buildingsDeleteCount = this.processQueue.buildingsToDeleteModelReferencesMap.size;
+	var buildingsToDeleteModelReferencesArray = Array.from(this.processQueue.buildingsToDeleteModelReferencesMap.keys());
+	if (maxDeleteModelReferencesCount < buildingsDeleteCount)
+	{ maxDeleteModelReferencesCount = buildingsDeleteCount; }
+	for (var i=0; i<maxDeleteModelReferencesCount; i++)
 	{
-		octree = octreesToDeleteArray[i];
-		this.processQueue.eraseOctreeToDeleteLod0(octree);
-		//octree.deleteGlObjects(gl, this.vboMemoryManager);
-		
+		neoBuilding = buildingsToDeleteModelReferencesArray[i];
+		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
+		if (neoBuilding == undefined)
+		{ continue; }
+
+		if (neoBuilding.octree)
+		{
+			neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+		}
+		neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
 	}
-	*/
 	
 	// parse pendent data.
 	var maxParsesCount = 1;
@@ -4368,6 +4380,14 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var lod0_minSquaredDist = 100000;
 	var lod1_minSquaredDist = 1;
 	var lod2_minSquaredDist = 100000*10000;
+	
+	
+	lod0_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	lod0_minSquaredDist *= lod0_minSquaredDist;
+	
+	//lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	//lod2_minSquaredDist *= lod2_minSquaredDist;
+	
 	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
 	
 	//lod2_minSquaredDist*= 10000000;
