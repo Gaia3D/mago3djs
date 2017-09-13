@@ -742,6 +742,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  */
 ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList) 
 {
+	console.log(" object Index File = " + fileName);
 	loadWithXhr(fileName).done(function(response) 
 	{
 		var arrayBuffer = response;
