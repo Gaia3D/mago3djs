@@ -53,6 +53,8 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
   - <code> C:\mago3djs> npm install</code>
   - <code> C:\mago3djs> npm install -g gulp </code>
 
+#### 데이터 폴더 링크 ####
+  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
 
 ####  서버 실행
 ##### private 서버 실행
@@ -60,10 +62,6 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 
 ##### public 서버 실행
 - C:\git\repository\mago3djs>node server.js --public true
-
-
-#### 데이터 폴더 링크 ####
-- mklink /d "C:\git\repository\mago3djs\data" "C:\data"
 
 
 
@@ -125,6 +123,8 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
   - <code> C: \ mago3djs> npm install </code>
   - <code> C: \ mago3djs> npm install -g gulp</code>
 
+#### Data folder link ####
+  - mklink /d "C:\git\repository\mago3djs\data" "C:\data"
 
 #### Running the server
 ##### Private server run
@@ -134,8 +134,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - C:\git\repository\mago3djs>node server.js --public true
 
 
-#### Data folder link ####
-- mklink /d "C:\git\repository\mago3djs\data" "C:\data"
+
 
 
 ## LICENSE ##
