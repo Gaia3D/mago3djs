@@ -2635,6 +2635,7 @@ MagoManager.prototype.manageQueue = function()
 				{ break; }
 			}
 		}
+		
 	}
 	
 	// parse octrees lod1 references.
@@ -2741,7 +2742,7 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList == undefined)
+				if (blocksList === undefined)
 				{ continue; }
 				
 				if (blocksList.dataArraybuffer === undefined)
@@ -2781,7 +2782,7 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList == undefined)
+				if (blocksList === undefined)
 				{ continue; }
 				
 				if (blocksList.dataArraybuffer === undefined)
@@ -2867,6 +2868,9 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if(blocksList === undefined)
+					continue;
+				
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
