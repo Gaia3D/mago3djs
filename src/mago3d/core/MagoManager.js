@@ -5503,7 +5503,8 @@ MagoManager.prototype.getObjectIndexFile = function()
 	
 	// use smartTile. Create one smartTile for all Korea.
 	this.buildingSeedList = new BuildingSeedList();
-	this.readerWriter.getObjectIndexFileForSmartTile(	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this, this.buildingSeedList);
+	this.readerWriter.getObjectIndexFileForSmartTile(
+			this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
 /**
