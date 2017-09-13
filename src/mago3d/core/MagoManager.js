@@ -1091,6 +1091,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 			}
+			else 
+			{
+				this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
+			}
 		}
 		var fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
@@ -1108,6 +1112,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.visibleObjControlerBuildings.currentVisibles2.splice(i, 1);
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
+			}
+			else 
+			{
+				this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
 			}
 		}
 		fileRequestExtraCount = 2;
@@ -2515,12 +2523,10 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = undefined;
 	
 	// now delete modelReferences of lod2Octrees.
-	var maxDeleteModelReferencesCount = 20;
+	var modelRefsDeletedCount = 0;
 	var buildingsDeleteCount = this.processQueue.buildingsToDeleteModelReferencesMap.size;
 	var buildingsToDeleteModelReferencesArray = Array.from(this.processQueue.buildingsToDeleteModelReferencesMap.keys());
-	if (maxDeleteModelReferencesCount > buildingsDeleteCount)
-	{ maxDeleteModelReferencesCount = buildingsDeleteCount; }
-	for (var i=0; i<maxDeleteModelReferencesCount; i++)
+	for (var i=0; i<buildingsDeleteCount; i++)
 	{
 		neoBuilding = buildingsToDeleteModelReferencesArray[i];
 		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
@@ -2531,14 +2537,20 @@ MagoManager.prototype.manageQueue = function()
 		{
 			neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
 		}
+		if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+		{
+			modelRefsDeletedCount ++;
+		}
 		neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+		
+		if (modelRefsDeletedCount > 10)
+		{ break; }
 	}
 	
 	// parse pendent data.
 	var maxParsesCount = 1;
 	
 	// parse references lod0 & lod 1.
-	
 	var lowestOctree;
 	var lowestOctreeToParse;
 	var neoBuilding;
@@ -2868,8 +2880,8 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if(blocksList === undefined)
-					continue;
+				if (blocksList === undefined)
+				{ continue; }
 				
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
