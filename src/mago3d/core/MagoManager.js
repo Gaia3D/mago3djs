@@ -1091,14 +1091,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 			}
-			else 
-			{
-				this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
-			}
 		}
-		var fileRequestExtraCount = 2;
+		var fileRequestExtraCount = 1;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
-		fileRequestExtraCount = 5;
+		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
 		
 		// lod 2.
@@ -1113,12 +1109,8 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				i--;
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 			}
-			else 
-			{
-				this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
-			}
 		}
-		fileRequestExtraCount = 2;
+		fileRequestExtraCount = 3;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
 		
 		
@@ -2427,12 +2419,21 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
 				find = true;
+				
+				//neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
+				//find = true;
 			}
 			else 
 			{
 				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					
+				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
 			}
 		}
 
@@ -2440,6 +2441,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		{
 			this.processQueue.putBuildingToDelete(neoBuilding, 0);
 			return false;
+		}
+		else 
+		{
+			this.processQueue.eraseBuildingToDelete(neoBuilding);
 		}
 	}
 	else
@@ -2454,6 +2459,16 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var lowestOctree;
 	var currentVisibleOctrees = [].concat(neoBuilding.currentVisibleOctreesControler.currentVisibles0, neoBuilding.currentVisibleOctreesControler.currentVisibles1);
 	var applyOcclusionCulling = neoBuilding.getRenderSettingApplyOcclusionCulling();
+	
+	// if there are no lod0 & lod1 then put the neobuilding to delete model-references data.
+	if (currentVisibleOctrees.length == 0)
+	{
+		this.processQueue.putBuildingsToDeleteModelReferences(neoBuilding, 0);
+	}
+	else 
+	{
+		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
+	}
 	
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
@@ -2564,9 +2579,10 @@ MagoManager.prototype.manageQueue = function()
 	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 1;
+	maxParsesCount = 2;
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
+		// 1rst parse the currently closest lowestOctrees to camera.
 		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
 		for (var i=0; i<octreesLod0Count; i++)
 		{
@@ -2603,10 +2619,20 @@ MagoManager.prototype.manageQueue = function()
 				
 				octreesParsedCount++;
 			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
 		}
 		
+		// if no parsed any octree, then parse any octree of thr queue.
 		if (octreesParsedCount == 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
@@ -2652,9 +2678,10 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 1;
+	maxParsesCount = 2;
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
+		// 1rst parse the currently closest lowestOctrees to camera.
 		octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
 		for (var i=0; i<octreesLod0Count; i++)
 		{
@@ -2691,6 +2718,15 @@ MagoManager.prototype.manageQueue = function()
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
 				
 				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -2740,9 +2776,10 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod0 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 1;
+	maxParsesCount = 5;
 	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
 	{
+		// 1rst parse the currently closest lowestOctrees to camera.
 		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
 		for (var i=0; i<octreesLod0Count; i++)
 		{
@@ -2760,8 +2797,8 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
-				//	continue;
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -2778,6 +2815,15 @@ MagoManager.prototype.manageQueue = function()
 				blocksList.dataArraybuffer = undefined;
 				
 				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -2800,8 +2846,8 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
-				//	continue;
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -2826,9 +2872,10 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod1 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 1;
+	maxParsesCount = 3;
 	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
 	{
+		// 1rst parse the currently closest lowestOctrees to camera.
 		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
 		for (var i=0; i<octreesLod0Count; i++)
 		{
@@ -2846,8 +2893,8 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
-				//	continue;
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -2864,6 +2911,15 @@ MagoManager.prototype.manageQueue = function()
 				blocksList.dataArraybuffer = undefined;
 				
 				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -2886,8 +2942,8 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				//if(lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
-				//	continue;
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -2950,6 +3006,11 @@ MagoManager.prototype.manageQueue = function()
 					lowestOctree.lego.dataArrayBuffer = undefined;
 					
 					octreesParsedCount++;
+				}
+				else 
+				{
+					// test else.
+					
 				}
 				if (octreesParsedCount > maxParsesCount)
 				{ break; }
@@ -4713,16 +4774,17 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var lod1_minSquaredDist = 1;
 	var lod2_minSquaredDist = 100000*10000;
 	
-	
+	/*
 	lod0_minSquaredDist = this.magoPolicy.getLod1DistInMeters();
 	lod0_minSquaredDist *= lod0_minSquaredDist;
 	
 	lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
 	lod2_minSquaredDist *= lod2_minSquaredDist;
+	*/
 	
 	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
 	
-	//lod2_minSquaredDist*= 10000000;
+	lod0_minSquaredDist = 100000*10000;
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;

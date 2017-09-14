@@ -11,7 +11,7 @@ var FileRequestControler = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.maxFilesRequestedCount = 6;
+	this.maxFilesRequestedCount = 1;
 	this.filesRequestedCount = 0;
 };
 
