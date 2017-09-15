@@ -261,7 +261,7 @@ ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, r
 
 ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
-	magoManager.fileRequestControler.filesRequestedCount += 1;
+	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
@@ -273,7 +273,6 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 			blocksList.dataArraybuffer = arrayBuffer;
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
-			//magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
 			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
 		}
 		else 
@@ -287,8 +286,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 		else { blocksList.fileLoadState = status; }
 	}).always(function() 
 	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
 	});
 };
 
@@ -338,7 +337,7 @@ ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerW
  */
 ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
-	magoManager.fileRequestControler.filesRequestedCount += 1;
+	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
@@ -351,7 +350,6 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 			{
 				neoRefsList.dataArraybuffer = arrayBuffer;
 				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				//magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
 				magoManager.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
 			}
 			arrayBuffer = null;
@@ -368,8 +366,8 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
 	}).always(function() 
 	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
 	});
 };
 
@@ -935,7 +933,7 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
 {
 	//BR_Project._f4d_header_readed = true;
-	magoManager.fileRequestControler.filesRequestedCount += 1;
+	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
 	loadWithXhr(fileName).done(function(response) 
@@ -1016,8 +1014,8 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		else { neoBuilding.metaData.fileLoadState = status; }
 	}).always(function() 
 	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+		magoManager.fileRequestControler.headerFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.headerFilesRequestedCount < 0) { magoManager.fileRequestControler.headerFilesRequestedCount = 0; }
 	});
 };
 

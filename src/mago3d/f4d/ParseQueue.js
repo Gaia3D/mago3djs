@@ -19,6 +19,113 @@ var ParseQueue = function()
 	//this.neoBuildingsHeaderToParseArray = new Map(); // no used yet.
 };
 
+ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControlerOctrees, magoManager, maxParsesCount)
+{
+	var neoBuilding;
+	var lowestOctree;
+	var headerVersion;
+	
+	if (this.matrix4SC == undefined)
+	{ this.matrix4SC = new Matrix4(); }
+	
+	var octreesParsedCount = 0;
+	if (maxParsesCount == undefined)
+	{ maxParsesCount = 20; }
+	
+	if (this.octreesLod0ReferencesToParseMap.size > 0)
+	{
+		// 1rst parse the currently closest lowestOctrees to camera.
+		var octreesLod0Count = visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+			if (this.octreesLod0ReferencesToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		// if no parsed any octree, then parse some octrees of the queue.
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.octreesLod0ReferencesToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.octreesLod0ReferencesToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+};
+
 ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
 {
 	// provisionally "aValue" can be anything.

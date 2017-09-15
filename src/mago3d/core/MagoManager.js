@@ -769,6 +769,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	// for all renderables, prepare data.***
 	var neoBuilding;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
+	if (this.headersRequestedCounter == undefined)
+	{ this.headersRequestedCounter = 0; }
 
 	var currentVisibleBlocks = [].concat(this.visibleObjControlerBuildings.currentVisibles0, this.visibleObjControlerBuildings.currentVisibles2);
 	for (var i=0, length = currentVisibleBlocks.length; i<length; i++) 
@@ -782,10 +784,16 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 			var metaData = neoBuilding.metaData;
 			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				if (this.fileRequestControler.isFull())	{ return; }
+				if (this.fileRequestControler.isFullHeaders())	{ return; }
+				if (this.headersRequestedCounter <2)
+				{
+					this.headersRequestedCounter ++;
+					return;
+				}
 				
 				var neoBuildingHeaderPath = geometryDataPath + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+				this.headersRequestedCounter = 0;
 			}
 		}
 	}
@@ -1062,7 +1070,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				this.upDateCamera(this.myCameraSCX);
 				this.currentVisibleNeoBuildings_array.length = 0;
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
-				//this.prepareNeoBuildingsAsimetricVersion(gl);
 				//this.sceneState.camera.setDirty(false);
 			}
 			this.prepareNeoBuildingsAsimetricVersion(gl);
@@ -1094,7 +1101,10 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		}
 		var fileRequestExtraCount = 1;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
-		fileRequestExtraCount = 2;
+		//fileRequestExtraCount = 2;
+		fileRequestExtraCount = this.visibleObjControlerOctrees.currentVisibles0.length;
+		if (fileRequestExtraCount > 2)
+		{ fileRequestExtraCount = 2; }
 		this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
 		
 		// lod 2.
@@ -1110,7 +1120,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 			}
 		}
-		fileRequestExtraCount = 3;
+		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
 		
 		
@@ -2318,9 +2328,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	}	
 
 	if (this.myFrustumSC === undefined) 
-	{
-		this.myFrustumSC = new Frustum();
-	}
+	{ this.myFrustumSC = new Frustum(); }
+
+	if (this.myFrustumLowFov === undefined) 
+	{ this.myFrustumLowFov = new Frustum(); }
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
@@ -2401,6 +2412,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			this.myCameraSC.near = near;
 			this.myCameraSC.far = far;
 			var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
+			
+			// now, make lowFovCamera.***
 
 			for (var i=0, length = frustumVolume.planes.length; i<length; i++)
 			{
@@ -2419,21 +2432,16 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
 				find = true;
-				
-				//neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
-				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
-				//find = true;
 			}
 			else 
 			{
-				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-					squaredDistLod0, squaredDistLod1, squaredDistLod2);
-					
 				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+				//	this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					
+				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+					this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+					squaredDistLod0, squaredDistLod1, squaredDistLod2);
 			}
 		}
 
@@ -2579,7 +2587,10 @@ MagoManager.prototype.manageQueue = function()
 	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 2;
+	maxParsesCount = 20;
+	
+	this.parseQueue.parseOctreesLod0References(gl, this.visibleObjControlerOctrees, this, maxParsesCount);
+	/*
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -2602,7 +2613,6 @@ MagoManager.prototype.manageQueue = function()
 				
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				headerVersion = neoBuilding.getHeaderVersion();
-				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
 				{
@@ -2616,7 +2626,6 @@ MagoManager.prototype.manageQueue = function()
 				}
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-				
 				octreesParsedCount++;
 			}
 			else 
@@ -2675,10 +2684,11 @@ MagoManager.prototype.manageQueue = function()
 		}
 		
 	}
+	*/
 	
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 2;
+	maxParsesCount = 20;
 	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -2702,7 +2712,6 @@ MagoManager.prototype.manageQueue = function()
 				
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				headerVersion = neoBuilding.getHeaderVersion();
-				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
 				{
@@ -2752,7 +2761,6 @@ MagoManager.prototype.manageQueue = function()
 				
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				headerVersion = neoBuilding.getHeaderVersion();
-				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
 				{
@@ -2776,7 +2784,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod0 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 5;
+	maxParsesCount = 50;
 	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -2872,7 +2880,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod1 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 50;
 	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -3028,28 +3036,18 @@ MagoManager.prototype.manageQueue = function()
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene, globalVisibleObjControlerOctrees, fileRequestExtraCount) 
 {
-	if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
+	//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 
-	var refListsParsingCount = 0;
-	var maxRefListParsingCount = 20;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var buildingFolderName;
 	var neoBuilding;
+	var isUrgent = false;
 	// LOD0 & LOD1
 	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
 	var currentVisibleOctrees = [].concat(globalVisibleObjControlerOctrees.currentVisibles0, globalVisibleObjControlerOctrees.currentVisibles1);
 	var lowestOctree;
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
-		//if (this.vboMemoryManager.isGpuMemFull())
-		//{ return; }
-		
-		//if (refListsParsingCount > maxRefListParsingCount && this.fileRequestControler.isFullPlus(fileRequestExtraCount)) 
-		//{ return; }
-	
-		//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount)) 
-		//{ return; }
-			
 		lowestOctree = currentVisibleOctrees[i];
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		
@@ -3069,11 +3067,17 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			lowestOctree.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
 			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 		}
+		
+		if (lowestOctree.squareDistToEye < 50)
+		{ isUrgent = true; }
+		else 
+		{ isUrgent = false; }
+		
+		if (!isUrgent)
+		{ if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	{ return; } }
 
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 		{
-			if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
-
 			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
 			{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
 
@@ -3081,10 +3085,27 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
-			continue;
+			if (!isUrgent) { continue; }
 		}
-
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.PARSE_FINISHED ) 
+		
+		if (isUrgent)
+		{
+			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			if (blocksList == undefined)
+			{ continue; }
+			// 0 = file loading NO started.***
+			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
+			{
+				// must read blocksList.***
+				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+				var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+				var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, this);
+				continue;
+			}
+			else { continue; }
+		}
+		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.PARSE_FINISHED ) 
 		{
 			// 4 = parsed.***
 			// now, check if the blocksList is loaded & parsed.***
@@ -3094,8 +3115,10 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
-
+				if (!isUrgent)
+				{ if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	{ return; } }
+				
+				//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 				// must read blocksList.***
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 				var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
@@ -3103,6 +3126,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 				this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, this);
 				continue;
 			}
+			else { continue; }
 		}
 		
 		// if the lowest octree is not ready to render, then:
@@ -3123,9 +3147,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, scene, globalVisibleObjControlerOctrees, fileRequestExtraCount) 
 {
 	var extraCount = fileRequestExtraCount;
-	if (this.fileRequestControler.isFullPlus(extraCount))	{ return; }
 
-	//var visibleObjControlerOctrees = neoBuilding.currentVisibleOctreesControler;
 	if (globalVisibleObjControlerOctrees === undefined)
 	{ return; }
 
@@ -3141,6 +3163,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 
 	for (var i=0, length = globalVisibleObjControlerOctrees.currentVisibles2.length; i<length; i++) 
 	{
+		if (this.fileRequestControler.isFullPlus(extraCount))	{ return; }
+		
 		lowestOctree = globalVisibleObjControlerOctrees.currentVisibles2[i];
 		
 		if (lowestOctree.octree_number_name === undefined)
@@ -3160,9 +3184,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 		{ continue; }
 		
 		buildingFolderName = neoBuilding.buildingFileName;
-
-		if (neoBuilding.buildingType === "outfitting")
-		{ continue; }
 
 		// && lowestOctree.neoRefsList_Array.length === 0)
 		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY && !this.isCameraMoving) 
@@ -4555,9 +4576,6 @@ MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cam
 	{
 		var neoBuilding = this.neoBuildingsList.get(i);
 
-		if (this.renderingModeTemp === 2 && neoBuilding.isDemoBlock === false)
-		{ continue; }
-
 		if (neoBuilding.bbox === undefined)
 		{
 			if (currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
@@ -4755,6 +4773,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 		if (!lowestTile.isVisible)
 		{
 			this.processQueue.putBuildingsArrayToDelete(lowestTile.buildingsArray);
+			lowestTile.clearBuildingsArray();
 		}
 	}
 	
