@@ -237,9 +237,7 @@ VBOKeysWorld.prototype.getClassifiedBufferSize = function(currentBufferSize)
 	// 1rst, find the Nation for this bufferSize.
 	var keyNation = this.getKeyNationBySize(currentBufferSize);
 	var classifiedSize = -1;
-	if (keyNation === -1)
-	{ var hola =0; }
-	
+
 	if (keyNation !== -1)
 	{ classifiedSize = keyNation.getClosestBufferSize(currentBufferSize); }
 	return classifiedSize;

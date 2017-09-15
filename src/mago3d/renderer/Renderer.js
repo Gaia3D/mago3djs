@@ -539,7 +539,6 @@ Renderer.prototype.renderNeoRefListsGroupedVersion = function(gl, neoReferencesM
 	}
 
 	var timeControlCounter = 0;
-	
 
 	var cacheKeys_count;
 	var reference;

@@ -1,6 +1,1261 @@
 'use strict';
 
 /**
+ * mago3djs API
+ * 
+ * @alias API
+ * @class API
+ * 
+ * @param {any} apiName api이름
+ */
+function API(apiName)
+{
+	if (!(this instanceof API)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// mago3d 활성화/비활성화 여부
+	this.magoEnable = true;
+
+	// api 이름
+	this.apiName = apiName;
+	// project id
+	this.projectId = null;
+	// block id
+	this.blockId = null;
+	// blockIds
+	this.blockIds = null;
+	// objectIds
+	this.objectIds = null;
+	// data_key
+	this.dataKey = null;
+	// issueId
+	this.issueId = null;
+	// issueType
+	this.issueType = null;
+	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
+	this.drawType = 0;
+
+	// fullship = 0, deploy = 1
+	this.renderMode = 0;
+	// 위도
+	this.latitude = 0;
+	// 경도
+	this.longitude = 0;
+	// 높이
+	this.elevation = 0;
+	// heading
+	this.heading = 0;
+	// pitch
+	this.pitch = 0;
+	// roll
+	this.roll = 0;
+
+	// 색깔
+	this.color = 0;
+	// structs = MSP, outfitting = MOP
+	this.blockType = null;
+	// outfitting 표시/비표시
+	this.showOutFitting = false;
+	// label 표시/비표시
+	this.showLabelInfo = true;
+	// boundingBox 표시/비표시
+	this.showBoundingBox = false;
+	// 그림자 표시/비표시
+	this.showShadow = false;
+	// frustum culling 가시 거리(M단위)
+	this.frustumFarDistance = 0;
+	// move mode 
+	this.mouseMoveMode = CODE.moveMode.NONE;
+	// 이슈 등록 표시
+	this.issueInsertEnable = false;
+	// object 정보 표시
+	this.objectInfoViewEnable = false;
+	// 이슈 목록 표시
+	this.nearGeoIssueListEnable = false;
+	// occlusion culling
+	this.occlusionCullingEnable = false;
+	//
+	this.insertIssueState = 0;
+	
+	// LOD1
+	this.lod0DistInMeters = null;
+	this.lod1DistInMeters = null;
+	this.lod2DistInMeters = null;
+	this.lod3DistInMeters = null;
+	
+	// Lighting
+	this.ambientReflectionCoef = null;
+	this.diffuseReflectionCoef = null;
+	this.specularReflectionCoef = null;
+	this.ambientColor = null;
+	this.specularColor = null;
+	
+	this.ssaoRadius = null;
+	//
+	this.FPVMode = false;
+};
+
+API.prototype.getMagoEnable = function() 
+{
+	return this.magoEnable;
+};
+API.prototype.setMagoEnable = function(magoEnable) 
+{
+	this.magoEnable = magoEnable;
+};
+
+API.prototype.getAPIName = function() 
+{
+	return this.apiName;
+};
+
+API.prototype.getProjectId = function() 
+{
+	return this.projectId;
+};
+API.prototype.setProjectId = function(projectId) 
+{
+	this.projectId = projectId;
+};
+
+API.prototype.getBlockId = function() 
+{
+	return this.blockId;
+};
+API.prototype.setBlockId = function(blockId) 
+{
+	this.blockId = blockId;
+};
+
+API.prototype.getBlockIds = function() 
+{
+	return this.blockIds;
+};
+API.prototype.setBlockIds = function(blockIds) 
+{
+	this.blockIds = blockIds;
+};
+
+API.prototype.getObjectIds = function() 
+{
+	return this.objectIds;
+};
+API.prototype.setObjectIds = function(objectIds) 
+{
+	this.objectIds = objectIds;
+};
+
+API.prototype.getIssueId = function() 
+{
+	return this.issueId;
+};
+API.prototype.setIssueId = function(issueId) 
+{
+	this.issueId = issueId;
+};
+API.prototype.getIssueType = function() 
+{
+	return this.issueType;
+};
+API.prototype.setIssueType = function(issueType) 
+{
+	this.issueId = issueType;
+};
+
+API.prototype.getDataKey = function() 
+{
+	return this.dataKey;
+};
+API.prototype.setDataKey = function(dataKey) 
+{
+	this.dataKey = dataKey;
+};
+
+API.prototype.getRenderMode = function() 
+{
+	return this.renderMode;
+};
+API.prototype.setRenderMode = function(renderMode) 
+{
+	this.renderMode = renderMode;
+};
+
+API.prototype.getLatitude = function() 
+{
+	return this.latitude;
+};
+API.prototype.setLatitude = function(latitude) 
+{
+	this.latitude = latitude;
+};
+
+API.prototype.getLongitude = function() 
+{
+	return this.longitude;
+};
+API.prototype.setLongitude = function(longitude) 
+{
+	this.longitude = longitude;
+};
+
+API.prototype.getElevation = function() 
+{
+	return this.elevation;
+};
+API.prototype.setElevation = function(elevation) 
+{
+	this.elevation = elevation;
+};
+
+API.prototype.getHeading = function() 
+{
+	return this.heading;
+};
+API.prototype.setHeading = function(heading) 
+{
+	this.heading = heading;
+};
+
+API.prototype.getPitch = function() 
+{
+	return this.pitch;
+};
+API.prototype.setPitch = function(pitch) 
+{
+	this.pitch = pitch;
+};
+
+API.prototype.getRoll = function() 
+{
+	return this.roll;
+};
+API.prototype.setRoll = function(roll) 
+{
+	this.roll = roll;
+};
+
+API.prototype.getColor = function() 
+{
+	return this.color;
+};
+API.prototype.setColor = function(color) 
+{
+	this.color = color;
+};
+
+API.prototype.getBlockType = function() 
+{
+	return this.blockType;
+};
+API.prototype.setBlockType = function(blockType) 
+{
+	this.blockType = blockType;
+};
+
+API.prototype.getShowOutFitting = function() 
+{
+	return this.showOutFitting;
+};
+API.prototype.setShowOutFitting = function(showOutFitting) 
+{
+	this.showOutFitting = showOutFitting;
+};
+
+
+API.prototype.getShowLabelInfo = function() 
+{
+	return this.showLabelInfo;
+};
+API.prototype.setShowLabelInfo = function(showLabelInfo) 
+{
+	this.showLabelInfo = showLabelInfo;
+};
+API.prototype.getShowBoundingBox = function() 
+{
+	return this.showBoundingBox;
+};
+API.prototype.setShowBoundingBox = function(showBoundingBox) 
+{
+	this.showBoundingBox = showBoundingBox;
+};
+
+API.prototype.getShowShadow = function() 
+{
+	return this.showShadow;
+};
+API.prototype.setShowShadow = function(showShadow) 
+{
+	this.showShadow = showShadow;
+};
+
+API.prototype.getFrustumFarDistance = function() 
+{
+	return this.frustumFarDistance;
+};
+API.prototype.setFrustumFarDistance = function(frustumFarDistance) 
+{
+	this.frustumFarDistance = frustumFarDistance;
+};
+
+API.prototype.getMouseMoveMode = function() 
+{
+	return this.mouseMoveMode;
+};
+API.prototype.setMouseMoveMode = function(mouseMoveMode) 
+{
+	this.mouseMoveMode = mouseMoveMode;
+};
+
+API.prototype.getIssueInsertEnable = function() 
+{
+	return this.issueInsertEnable;
+};
+API.prototype.setIssueInsertEnable = function(issueInsertEnable) 
+{
+	this.issueInsertEnable = issueInsertEnable;
+};
+API.prototype.getObjectInfoViewEnable = function() 
+{
+	return this.objectInfoViewEnable;
+};
+API.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
+{
+	this.objectInfoViewEnable = objectInfoViewEnable;
+};
+API.prototype.getOcclusionCullingEnable = function() 
+{
+	return this.occlusionCullingEnable;
+};
+API.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
+{
+	this.occlusionCullingEnable = occlusionCullingEnable;
+};
+API.prototype.getNearGeoIssueListEnable = function() 
+{
+	return this.nearGeoIssueListEnable;
+};
+API.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
+{
+	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
+};
+
+API.prototype.getInsertIssueState = function() 
+{
+	return this.insertIssueState;
+};
+API.prototype.setInsertIssueState = function(insertIssueState) 
+{
+	this.insertIssueState = insertIssueState;
+};
+
+API.prototype.getDrawType = function() 
+{
+	return this.drawType;
+};
+API.prototype.setDrawType = function(drawType) 
+{
+	this.drawType = drawType;
+};
+
+API.prototype.getLod0DistInMeters = function() 
+{
+	return this.lod0DistInMeters;
+};
+API.prototype.setLod0DistInMeters = function(lod0DistInMeters) 
+{
+	this.lod0DistInMeters = lod0DistInMeters;
+};
+API.prototype.getLod1DistInMeters = function() 
+{
+	return this.lod1DistInMeters;
+};
+API.prototype.setLod1DistInMeters = function(lod1DistInMeters) 
+{
+	this.lod1DistInMeters = lod1DistInMeters;
+};
+API.prototype.getLod2DistInMeters = function() 
+{
+	return this.lod2DistInMeters;
+};
+API.prototype.setLod2DistInMeters = function(lod2DistInMeters) 
+{
+	this.lod2DistInMeters = lod2DistInMeters;
+};
+API.prototype.getLod3DistInMeters = function() 
+{
+	return this.lod3DistInMeters;
+};
+API.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
+{
+	this.lod3DistInMeters = lod3DistInMeters;
+};
+
+API.prototype.getAmbientReflectionCoef = function() 
+{
+	return this.ambientReflectionCoef;
+};
+API.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
+{
+	this.ambientReflectionCoef = ambientReflectionCoef;
+};
+API.prototype.getDiffuseReflectionCoef = function() 
+{
+	return this.diffuseReflectionCoef;
+};
+API.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
+{
+	this.diffuseReflectionCoef = diffuseReflectionCoef;
+};
+API.prototype.getSpecularReflectionCoef = function() 
+{
+	return this.specularReflectionCoef;
+};
+API.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
+{
+	this.specularReflectionCoef = specularReflectionCoef;
+};
+API.prototype.getAmbientColor = function() 
+{
+	return this.ambientColor;
+};
+API.prototype.setAmbientColor = function(ambientColor) 
+{
+	this.ambientColor = ambientColor;
+};
+API.prototype.getSpecularColor = function() 
+{
+	return this.specularColor;
+};
+API.prototype.setSpecularColor = function(specularColor) 
+{
+	this.specularColor = specularColor;
+};
+API.prototype.getSsaoRadius = function() 
+{
+	return this.ssaoRadius;
+};
+API.prototype.setSsaoRadius = function(ssaoRadius) 
+{
+	this.ssaoRadius = ssaoRadius;
+};
+API.prototype.getFPVMode = function()
+{
+	return this.FPVMode;
+};
+API.prototype.setFPVMode = function(value)
+{
+	this.FPVMode = value;
+};
+'use strict';
+
+/**
+ * 선택한 object 정보를 화면에 표시
+ * @param data_key
+ * @param objectId
+ * @param latitude
+ * @param longitude
+ * @param elevation
+ * @param heading
+ * @param pitch
+ * @param roll
+ * @param
+ */
+function selectedObjectCallback(functionName, data_key, objectId, latitude, longitude, elevation, heading, pitch, roll) 
+{
+	window[functionName](data_key, objectId, latitude, longitude, elevation, heading, pitch, roll);
+}
+
+/**
+ * 선택한 object 정보를 화면에 표시
+ * @param functionName
+ * @param data_key
+ * @param objectId
+ * @param latitude
+ * @param longitude
+ * @param elevation
+ */
+function insertIssueCallback(functionName, data_key, objectId, latitude, longitude, elevation) 
+{
+	window[functionName](data_key, objectId, latitude, longitude, elevation);
+}
+
+/**
+ * mouse click 위치 정보를 화면에 표시
+ * @param functionName
+ * @param position
+ */
+function clickPositionCallback(functionName, position) 
+{
+	window[functionName](position);
+}
+
+'use strict';
+
+/**
+ * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
+ * @class MagoConfig
+ */
+var MagoConfig = {};
+
+MagoConfig.getPolicy = function() 
+{
+	return this.serverPolicy;
+};
+
+MagoConfig.getData = function() 
+{
+	return this.serverData;
+};
+
+/**
+ * 환경설정 세팅
+ * 
+ * @param serverPolicy mago3d policy(json)
+ * @param serverData data 정보(json)
+ */
+MagoConfig.init = function(serverPolicy, serverData) 
+{
+	this.serverPolicy = serverPolicy;
+	this.serverData = serverData;
+};
+
+/* eslint-env jquery */
+'use strict';
+
+/**
+ * 화면단 UI와 연동 되는 API. APIGateWay 혹은 API 클래스로 클래스명 수정 예정
+ * @class MagoFacade
+ */
+/**
+ * mago3d 활성화/비활성화
+ * 
+ * @param {Property} isShow true = 활성화, false = 비활성화
+ */
+function changeMagoStateAPI(isShow) 
+{
+	var api = new API("changeMagoState");
+	api.setMagoEnable(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * render mode
+ * 
+ * @param {Property} renderMode 0 = 호선, 1 = 지번전개
+ */
+function changeRenderAPI(renderMode) 
+{
+	var api = new API("changeRender");
+	api.setRenderMode(renderMode);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * outfitting 표시/비표시
+ * 
+ * @param {Property} isShow true = 활성화, false = 비활성화
+ */
+function changeOutFittingAPI(isShow) 
+{
+	var api = new API("changeOutFitting");
+	api.setShowOutFitting(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * Label 표시/비표시
+ * 
+ * @param {Property} isShow true = 표시, false = 비표시
+ */
+function changeLabelAPI(isShow) 
+{
+	var api = new API("changeLabel");
+	api.setShowLabelInfo(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * boundingBox 표시/비표시
+ * 
+ * @param {Property} isShow true = 활성화, false = 비활성화
+ */
+function changeBoundingBoxAPI(isShow) 
+{
+	var api = new API("changeBoundingBox");
+	api.setShowBoundingBox(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 그림자 표시/비표시
+ * 
+ * @param {Property} isShow true = 활성화, false = 비활성화
+ */
+function changeShadowAPI(isShow) 
+{
+	var api = new API("changeShadow");
+	api.setShowShadow(isShow);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * frustum culling 가시 거리
+ * 
+ * @param {Property} frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
+ */
+function changeFrustumFarDistanceAPI(frustumFarDistance) 
+{
+	var api = new API("changefrustumFarDistance");
+	api.setFrustumFarDistance(frustumFarDistance);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 데이터 검색
+ * 
+ * @param {Property} dataKey 데이터 고유키
+ */
+function searchDataAPI(dataKey) 
+{
+	var api = new API("searchData");
+	api.setDataKey(dataKey);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * highlighting
+ * 
+ * @param {Property} projectId 프로젝트 아이디
+ * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
+ * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
+ */
+function changeHighLightingAPI(projectId, blockIds, objectIds) 
+{
+	var api = new API("changeHighLighting");
+	api.setProjectId(projectId);
+	api.setBlockIds(blockIds);
+	api.setObjectIds(objectIds);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * color 변경
+ * 
+ * @param {Property} projectId 프로젝트 아이디
+ * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
+ * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
+ * @param {Property} color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
+ */
+function changeColorAPI(projectId, blockIds, objectIds, color) 
+{
+	var api = new API("changeColor");
+	api.setProjectId(projectId);
+	api.setBlockIds(blockIds);
+	api.setObjectIds(objectIds);
+	api.setColor(color);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * location and rotation 변경
+ * 
+ * @param {Property} data_key
+ * @param {Property} latitude 위도
+ * @param {Property} longitude 경도
+ * @param {Property} height 높이
+ * @param {Property} heading 좌, 우
+ * @param {Property} pitch 위, 아래
+ * @param {Property} roll 좌, 우 기울기
+ */
+function changeLocationAndRotationAPI(data_key, latitude, longitude, height, heading, pitch, roll) 
+{
+	var api = new API("changeLocationAndRotation");
+	api.setDataKey(data_key);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(height);
+	api.setHeading(heading);
+	api.setPitch(pitch);
+	api.setRoll(roll);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 마우스 클릭 객체 이동 대상 변경
+ * 
+ * @param {Property} mouseMoveMode 0 = All, 1 = object, 2 = None
+ */
+function changeMouseMoveAPI(mouseMoveMode) 
+{
+	var api = new API("changeMouseMove");
+	api.setMouseMoveMode(mouseMoveMode);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 이슈 등록 활성화 유무
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ */
+function changeInsertIssueModeAPI(flag) 
+{
+	var api = new API("changeInsertIssueMode");
+	api.setIssueInsertEnable(flag);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * object 정보 표시 활성화 유무
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ */
+function changeObjectInfoViewModeAPI(flag) 
+{
+	var api = new API("changeObjectInfoViewMode");
+	api.setObjectInfoViewEnable(flag);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * Object Occlusion culling
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {Property} dataKey
+ */
+function changeOcclusionCullingAPI(flag, dataKey) 
+{
+	var api = new API("changeOcclusionCulling");
+	api.setOcclusionCullingEnable(flag);
+	api.setDataKey(dataKey);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 1인칭, 3인칭 모드 개발중...
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ */
+function changeFPVModeAPI(flag)
+{
+	var api = new API("changeFPVMode");
+	api.setFPVMode(flag);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 현재 위치 근처 issue list. false인 경우 clear
+ * 
+ * @param {Property} flag true = 활성화, false = 비활성화
+ */
+function changeNearGeoIssueListViewModeAPI(flag) 
+{
+	var api = new API("changeNearGeoIssueListViewMode");
+	api.setNearGeoIssueListEnable(flag);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * pin image를 그림
+ * 
+ * @param {Property} drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
+ * @param {Property} issue_id 이슈 고유키
+ * @param {Property} issue_type 이슈 고유키
+ * @param {Property} data_key 데이터 고유키
+ * @param {Property} latitude 데이터 고유키
+ * @param {Property} longitude 데이터 고유키
+ * @param {Property} height 데이터 고유키
+ */
+function drawInsertIssueImageAPI(drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
+{
+	var api = new API("drawInsertIssueImage");
+	api.setDrawType(drawType);
+	api.setIssueId(issue_id);
+	api.setIssueId(issue_type);
+	api.setDataKey(data_key);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(height);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
+ * issue 등록 geo 정보 관련 상태 변경
+ * 
+ * @param {Property} insertIssueState 이슈 등록 좌표 상태
+ */
+function changeInsertIssueStateAPI(insertIssueState) 
+{
+	var api = new API("changeInsertIssueState");
+	api.setInsertIssueState(insertIssueState);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
+ * @param {Property} eventType 어떤 마우스 동작을 원하는지를 구분
+ */
+function mouseMoveAPI(eventType) 
+{
+	if (managerFactory !== null) 
+	{
+		managerFactory.mouseMove(eventType);
+	}
+}
+
+/**
+ * LOD 설정을 변경
+ * @param {Property} lod0DistInMeters
+ * @param {Property} lod1DistInMeters
+ * @param {Property} lod2DistInMeters
+ * @param {Property} lod3DistInMeters
+ */
+function changeLodAPI(lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
+{
+	var api = new API("changeLod");
+	api.setLod0DistInMeters(lod0DistInMeters);
+	api.setLod1DistInMeters(lod1DistInMeters);
+	api.setLod2DistInMeters(lod2DistInMeters);
+	api.setLod3DistInMeters(lod3DistInMeters);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * Lighting 설정
+ * @param {Property} ambientReflectionCoef
+ * @param {Property} diffuseReflectionCoef
+ * @param {Property} specularReflectionCoef
+ * @param {Property} ambientColor
+ * @param {Property} specularColor
+ */
+function changeLightingAPI(ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
+{
+	var api = new API("changeLighting");
+	api.setAmbientReflectionCoef(ambientReflectionCoef);
+	api.setDiffuseReflectionCoef(diffuseReflectionCoef);
+	api.setSpecularReflectionCoef(specularReflectionCoef);
+	api.setAmbientColor(ambientColor);
+	api.setSpecularColor(specularColor);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+
+/**
+ * SSAD Radius 설정
+ * @param {Property} ssaoRadius
+ */
+function changeSsadRadiusAPI(ssaoRadius)
+{
+	var api = new API("changeSsadRadius");
+	api.setSsaoRadius(ssaoRadius);
+	if (managerFactory !== null) 
+	{
+		managerFactory.callAPI(api);
+	}
+}
+'use strict';
+
+/**
+ * Policy
+ * @class Policy
+ */
+var Policy = function() 
+{
+	if (!(this instanceof Policy)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// mago3d 활성화/비활성화 여부
+	this.magoEnable = true;
+
+	// outfitting 표시 여부
+	this.showOutFitting = false;
+	// label 표시/비표시
+	this.showLabelInfo = false;
+	// boundingBox 표시/비표시
+	this.showBoundingBox = false;
+	// 그림자 표시/비표시
+	this.showShadow = false;
+	// far frustum 거리
+	this.frustumFarSquaredDistance = 5000000;
+
+	// highlighting
+	this.highLightedBuildings = [];
+	// color
+	this.colorBuildings = [];
+	// color
+	this.color = [];
+	// show/hide
+	this.hideBuildings = [];
+	// move mode
+	this.mouseMoveMode = CODE.moveMode.NONE;
+	// 이슈 등록 표시
+	this.issueInsertEnable = false;
+	// object 정보 표시
+	this.objectInfoViewEnable = false;
+	// 이슈 목록 표시
+	this.nearGeoIssueListEnable = false;
+	// occlusion culling
+	this.occlusionCullingEnable = false;
+	
+	// 이미지 경로
+	this.imagePath = "";
+	
+	// provisional.***
+	this.colorChangedObjectId;
+	
+	// LOD1
+	this.lod0DistInMeters = 22;
+	this.lod1DistInMeters = 70;
+	this.lod2DistInMeters = 22360;
+	this.lod3DistInMeters = 60000;
+	
+	// Lighting
+	this.ambientReflectionCoef = 0.2;
+	this.diffuseReflectionCoef = 1.0;
+	this.specularReflectionCoef = 0.7;
+	this.ambientColor = null;
+	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
+	
+	this.ssaoRadius = 0.15;
+};
+
+Policy.prototype.getMagoEnable = function() 
+{
+	return this.magoEnable;
+};
+Policy.prototype.setMagoEnable = function(magoEnable) 
+{
+	this.magoEnable = magoEnable;
+};
+
+Policy.prototype.getShowOutFitting = function() 
+{
+	return this.showOutFitting;
+};
+Policy.prototype.setShowOutFitting = function(showOutFitting) 
+{
+	this.showOutFitting = showOutFitting;
+};
+Policy.prototype.getShowLabelInfo = function() 
+{
+	return this.showLabelInfo;
+};
+Policy.prototype.setShowLabelInfo = function(showLabelInfo) 
+{
+	this.showLabelInfo = showLabelInfo;
+};
+Policy.prototype.getShowBoundingBox = function() 
+{
+	return this.showBoundingBox;
+};
+Policy.prototype.setShowBoundingBox = function(showBoundingBox) 
+{
+	this.showBoundingBox = showBoundingBox;
+};
+
+Policy.prototype.getShowShadow = function() 
+{
+	return this.showShadow;
+};
+Policy.prototype.setShowShadow = function(showShadow) 
+{
+	this.showShadow = showShadow;
+};
+
+Policy.prototype.getFrustumFarSquaredDistance = function() 
+{
+	return this.frustumFarSquaredDistance;
+};
+Policy.prototype.setFrustumFarSquaredDistance = function(frustumFarSquaredDistance) 
+{
+	this.frustumFarSquaredDistance = frustumFarSquaredDistance;
+};
+
+Policy.prototype.getHighLightedBuildings = function() 
+{
+	return this.highLightedBuildings;
+};
+Policy.prototype.setHighLightedBuildings = function(highLightedBuildings) 
+{
+	this.highLightedBuildings = highLightedBuildings;
+};
+
+Policy.prototype.getColorBuildings = function() 
+{
+	return this.colorBuildings;
+};
+Policy.prototype.setColorBuildings = function(colorBuildings) 
+{
+	this.colorBuildings = colorBuildings;
+};
+
+Policy.prototype.getColor = function() 
+{
+	return this.color;
+};
+Policy.prototype.setColor = function(color) 
+{
+	this.color = color;
+};
+
+Policy.prototype.getHideBuildings = function() 
+{
+	return this.hideBuildings;
+};
+Policy.prototype.setHideBuildings = function(hideBuildings) 
+{
+	this.hideBuildings = hideBuildings;
+};
+
+Policy.prototype.getMouseMoveMode = function() 
+{
+	return this.mouseMoveMode;
+};
+Policy.prototype.setMouseMoveMode = function(mouseMoveMode) 
+{
+	this.mouseMoveMode = mouseMoveMode;
+};
+
+Policy.prototype.getIssueInsertEnable = function() 
+{
+	return this.issueInsertEnable;
+};
+Policy.prototype.setIssueInsertEnable = function(issueInsertEnable) 
+{
+	this.issueInsertEnable = issueInsertEnable;
+};
+Policy.prototype.getObjectInfoViewEnable = function() 
+{
+	return this.objectInfoViewEnable;
+};
+Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
+{
+	this.objectInfoViewEnable = objectInfoViewEnable;
+};
+Policy.prototype.getOcclusionCullingEnable = function() 
+{
+	return this.occlusionCullingEnable;
+};
+Policy.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
+{
+	this.occlusionCullingEnable = occlusionCullingEnable;
+};
+Policy.prototype.getNearGeoIssueListEnable = function() 
+{
+	return this.nearGeoIssueListEnable;
+};
+Policy.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
+{
+	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
+};
+
+Policy.prototype.getImagePath = function() 
+{
+	return this.imagePath;
+};
+Policy.prototype.setImagePath = function(imagePath) 
+{
+	this.imagePath = imagePath;
+};
+
+Policy.prototype.getLod0DistInMeters = function() 
+{
+	return this.lod0DistInMeters;
+};
+Policy.prototype.setLod0DistInMeters = function(lod0DistInMeters) 
+{
+	this.lod0DistInMeters = lod0DistInMeters;
+};
+Policy.prototype.getLod1DistInMeters = function() 
+{
+	return this.lod1DistInMeters;
+};
+Policy.prototype.setLod1DistInMeters = function(lod1DistInMeters) 
+{
+	this.lod1DistInMeters = lod1DistInMeters;
+};
+Policy.prototype.getLod2DistInMeters = function() 
+{
+	return this.lod2DistInMeters;
+};
+Policy.prototype.setLod2DistInMeters = function(lod2DistInMeters) 
+{
+	this.lod2DistInMeters = lod2DistInMeters;
+};
+Policy.prototype.getLod3DistInMeters = function() 
+{
+	return this.lod3DistInMeters;
+};
+Policy.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
+{
+	this.lod3DistInMeters = lod3DistInMeters;
+};
+
+Policy.prototype.getAmbientReflectionCoef = function() 
+{
+	return this.ambientReflectionCoef;
+};
+Policy.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
+{
+	this.ambientReflectionCoef = ambientReflectionCoef;
+};
+Policy.prototype.getDiffuseReflectionCoef = function() 
+{
+	return this.diffuseReflectionCoef;
+};
+Policy.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
+{
+	this.diffuseReflectionCoef = diffuseReflectionCoef;
+};
+Policy.prototype.getSpecularReflectionCoef = function() 
+{
+	return this.specularReflectionCoef;
+};
+Policy.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
+{
+	this.specularReflectionCoef = specularReflectionCoef;
+};
+Policy.prototype.getAmbientColor = function() 
+{
+	return this.ambientColor;
+};
+Policy.prototype.setAmbientColor = function(ambientColor) 
+{
+	this.ambientColor = ambientColor;
+};
+Policy.prototype.getSpecularColor = function() 
+{
+	return this.specularColor;
+};
+Policy.prototype.setSpecularColor = function(specularColor) 
+{
+	this.specularColor = specularColor;
+};
+Policy.prototype.getSsaoRadius = function() 
+{
+	return this.ssaoRadius;
+};
+Policy.prototype.setSsaoRadius = function(ssaoRadius) 
+{
+	this.ssaoRadius = ssaoRadius;
+};
+'use strict';
+
+/**
+ * 프로젝트(ship, weather등)의 구성 요소
+ * @class SearchCondition
+ */
+var ProjectLayer = function() 
+{
+	if (!(this instanceof ProjectLayer)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	// project id
+	this.projectId = null;
+	// block id
+	this.blockId = null;
+	// object id
+	this.objectId = null;
+	
+};
+
+ProjectLayer.prototype.getProjectId = function() 
+{
+	return this.projectId;
+};
+ProjectLayer.prototype.setProjectId = function(projectId) 
+{
+	this.projectId = projectId;
+};
+
+ProjectLayer.prototype.getBlockId = function() 
+{
+	return this.blockId;
+};
+ProjectLayer.prototype.setBlockId = function(blockId) 
+{
+	this.blockId = blockId;
+};
+
+ProjectLayer.prototype.getObjectId = function() 
+{
+	return this.objectId;
+};
+ProjectLayer.prototype.setObjectId = function(objectId) 
+{
+	this.objectId = objectId;
+};
+'use strict';
+
+/**
  * 하늘에 구름을 관리하는 매니저
  *
  * @class Atmosphere
@@ -1683,7 +2938,7 @@ var FileRequestControler = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.maxFilesRequestedCount = 6;
+	this.maxFilesRequestedCount = 1;
 	this.filesRequestedCount = 0;
 };
 
@@ -2662,7 +3917,7 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
 
 	var point3dScratch = new Point3D();
 	
-	if (resultRelEyePosToBuilding == undefined)
+	if (resultRelEyePosToBuilding === undefined)
 	{ resultRelEyePosToBuilding = new Point3D(); }
 	
 	point3dScratch.set(relativeEyePosX, relativeEyePosY, relativeEyePosZ);
@@ -2686,16 +3941,16 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
-	if (this.metaData.version[0] == "v")
+	if (this.metaData.version[0] === "v")
 	{
 		// this is the version beta.
-		if (neoReference.texture == undefined)
+		if (neoReference.texture === undefined)
 		{ return undefined; }
 		
 		if (neoReference.texture.texId === undefined && neoReference.texture.textureImageFileName !== "") 
 		{
 			// 1rst, check if the texture is loaded.
-			if (this.texturesLoaded == undefined)
+			if (this.texturesLoaded === undefined)
 			{ this.texturesLoaded = []; }
 			
 			var sameTexture = this.getSameTexture(neoReference.texture);
@@ -2726,7 +3981,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			}
 		}
 	}
-	else if (this.metaData.version[0] == 0 && this.metaData.version[2] == 0 && this.metaData.version[4] == 1 )
+	else if (this.metaData.version[0] === 0 && this.metaData.version[2] === 0 && this.metaData.version[4] === 1 )
 	{
 		if (magoManager.backGround_fileReadings_count > 10) 
 		{ return; }
@@ -2735,7 +3990,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		var textureId = neoReference.materialId;
 		var texture = this.texturesLoaded[textureId];
 		
-		if (texture == undefined)
+		if (texture === undefined)
 		{
 			//texture = new Texture();
 			//texture.fileLoadState = CODE.fileLoadState.READY
@@ -4268,7 +5523,7 @@ function handleTextureLoaded(gl, image, texture)
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
 	//var gl = viewer.scene.context._gl;
-	if (texture == undefined)
+	if (texture === undefined)
 	{ var hola = 0; }
 	
 	gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -4612,9 +5867,9 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
 			}
 		}
-		var fileRequestExtraCount = 2;
+		var fileRequestExtraCount = 1;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
-		fileRequestExtraCount = 5;
+		fileRequestExtraCount = 2;
 		this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
 		
 		// lod 2.
@@ -4630,7 +5885,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 				buildingsCount = this.visibleObjControlerBuildings.currentVisibles2.length;
 			}
 		}
-		fileRequestExtraCount = 2;
+		fileRequestExtraCount = 3;
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
 		
 		
@@ -4780,7 +6035,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
 {
 	var canvas = document.getElementById("objectLabel");
-	if (canvas == undefined)
+	if (canvas === undefined)
 	{ return; }
 	
 	canvas.style.opacity = 1.0;
@@ -5829,7 +7084,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-	if (buildingGeoLocation == undefined)
+	if (buildingGeoLocation === undefined)
 	{ return false; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
@@ -5939,12 +7194,21 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
 				find = true;
+				
+				//neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
+				//find = true;
 			}
 			else 
 			{
 				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
 					squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					
+				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				//	this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
+				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
 			}
 		}
 
@@ -5952,6 +7216,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		{
 			this.processQueue.putBuildingToDelete(neoBuilding, 0);
 			return false;
+		}
+		else 
+		{
+			this.processQueue.eraseBuildingToDelete(neoBuilding);
 		}
 	}
 	else
@@ -5966,6 +7234,16 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var lowestOctree;
 	var currentVisibleOctrees = [].concat(neoBuilding.currentVisibleOctreesControler.currentVisibles0, neoBuilding.currentVisibleOctreesControler.currentVisibles1);
 	var applyOcclusionCulling = neoBuilding.getRenderSettingApplyOcclusionCulling();
+	
+	// if there are no lod0 & lod1 then put the neobuilding to delete model-references data.
+	if (currentVisibleOctrees.length == 0)
+	{
+		this.processQueue.putBuildingsToDeleteModelReferences(neoBuilding, 0);
+	}
+	else 
+	{
+		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
+	}
 	
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
@@ -6028,9 +7306,6 @@ MagoManager.prototype.manageQueue = function()
 	{
 		neoBuilding = buildingsToDeleteArray[i];
 		this.processQueue.eraseBuildingToDelete(neoBuilding);
-		if (neoBuilding.buildingId == "Grendizer")
-		{ var hola = 0; }
-		
 		this.deleteNeoBuilding(gl, neoBuilding);
 		
 	}
@@ -6038,116 +7313,484 @@ MagoManager.prototype.manageQueue = function()
 	buildingsToDeleteArray = undefined;
 	
 	// now delete modelReferences of lod2Octrees.
-	var maxDeleteModelReferencesCount = 10;
+	var modelRefsDeletedCount = 0;
 	var buildingsDeleteCount = this.processQueue.buildingsToDeleteModelReferencesMap.size;
 	var buildingsToDeleteModelReferencesArray = Array.from(this.processQueue.buildingsToDeleteModelReferencesMap.keys());
-	if (maxDeleteModelReferencesCount < buildingsDeleteCount)
-	{ maxDeleteModelReferencesCount = buildingsDeleteCount; }
-	for (var i=0; i<maxDeleteModelReferencesCount; i++)
+	for (var i=0; i<buildingsDeleteCount; i++)
 	{
 		neoBuilding = buildingsToDeleteModelReferencesArray[i];
 		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
-		if (neoBuilding == undefined)
+		if (neoBuilding === undefined)
 		{ continue; }
 
 		if (neoBuilding.octree)
 		{
 			neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
 		}
+		if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+		{
+			modelRefsDeletedCount ++;
+		}
 		neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+		
+		if (modelRefsDeletedCount > 10)
+		{ break; }
 	}
 	
 	// parse pendent data.
 	var maxParsesCount = 1;
 	
 	// parse references lod0 & lod 1.
-	toParseCount = this.parseQueue.octreesLod0ReferencesToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
 	var lowestOctree;
+	var lowestOctreeToParse;
 	var neoBuilding;
 	var headerVersion;
+	var octreesParsedCount = 0;
 	
 	if (this.matrix4SC === undefined)
 	{ this.matrix4SC = new Matrix4(); }
-	
-	for (var i=0; i<maxParsesCount; i++)
+
+	// is desirable to parse octrees references ordered by the current eye distance.
+	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
+	// parse octrees lod1 references.
+	octreesParsedCount = 0;
+	maxParsesCount = 2;
+	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
-		lowestOctree = this.parseQueue.octreesLod0ReferencesToParseArray.shift();
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ continue; }
-		
-		if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
-		{ continue; }
-		
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-		headerVersion = neoBuilding.getHeaderVersion();
-		//if(headerVersion == "undefinedv.0.0")
-		this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-		if (headerVersion[0] == "v")
+		// 1rst parse the currently closest lowestOctrees to camera.
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
 		{
-			// parse beta version.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles0[i];
+			if (this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
 		}
-		else 
+		
+		// if no parsed any octree, then parse any octree of thr queue.
+		if (octreesParsedCount == 0)
 		{
-			// parse vesioned.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
 		}
-		lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+		
 	}
 	
-	// parse models lod0 & lod1.
-	maxParsesCount = 1;
-	var toParseCount = this.parseQueue.octreesLod0ModelsToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
-	for (var i=0; i<maxParsesCount; i++)
+	// parse octrees lod1 references.
+	octreesParsedCount = 0;
+	maxParsesCount = 2;
+	if (this.parseQueue.octreesLod0ReferencesToParseMap.size > 0)
 	{
-		lowestOctree = this.parseQueue.octreesLod0ModelsToParseArray.shift();
-		
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ continue; }
-		
-		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-		if (blocksList.dataArraybuffer === undefined)
-		{ continue; }
-		
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		headerVersion = neoBuilding.getHeaderVersion();
-		if (headerVersion[0] == "v")
+		// 1rst parse the currently closest lowestOctrees to camera.
+		octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
+		for (var i=0; i<octreesLod0Count; i++)
 		{
-			// parse the beta version.
-			blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
+			
+			if (this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
 		}
-		else 
+		
+		if (octreesParsedCount == 0)
 		{
-			// parse versioned.
-			blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ReferencesToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				
+				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				headerVersion = neoBuilding.getHeaderVersion();
+				//if(headerVersion == "undefinedv.0.0")
+				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+				if (headerVersion[0] == "v")
+				{
+					// parse beta version.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				else 
+				{
+					// parse vesioned.
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+				}
+				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
 		}
-		blocksList.dataArraybuffer = undefined;
 	}
 	
-	// parse lego lod2.
+	// parse octrees lod0 models.
+	octreesParsedCount = 0;
+	maxParsesCount = 5;
+	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
+	{
+		// 1rst parse the currently closest lowestOctrees to camera.
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles0[i];
+			
+			if (this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList === undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList === undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+	
+	// parse octrees lod1 models.
+	octreesParsedCount = 0;
 	maxParsesCount = 3;
-	var toParseCount = this.parseQueue.octreesLod2LegosToParseArray.length;
-	if (toParseCount < maxParsesCount)
-	{ maxParsesCount = toParseCount; }
-	
-	for (var i=0; i<maxParsesCount; i++)
+	if (this.parseQueue.octreesLod0ModelsToParseMap.size > 0)
 	{
-		lowestOctree = this.parseQueue.octreesLod2LegosToParseArray.shift();
-		if (lowestOctree.lego === undefined)
-		{ continue; }
+		// 1rst parse the currently closest lowestOctrees to camera.
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles1.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles1[i];
+
+			if (this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree))
+			{
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList == undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				{
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					{ var hola = 0; }
+				}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
 		
-		lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
-		lowestOctree.lego.dataArrayBuffer = undefined;
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				this.parseQueue.octreesLod0ModelsToParseMap.delete(lowestOctree);
+				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+				{ continue; }
+				
+				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+				if (blocksList === undefined)
+				{ continue; }
+				
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+				
+				neoBuilding = lowestOctree.neoBuildingOwner;
+				headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] == "v")
+				{
+					// parse the beta version.
+					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				else 
+				{
+					// parse versioned.
+					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+				}
+				blocksList.dataArraybuffer = undefined;
+				
+				octreesParsedCount++;
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
+	}
+
+	// parse octrees lod2 (lego).
+	octreesParsedCount = 0;
+	maxParsesCount = 6;
+	if (this.parseQueue.octreesLod2LegosToParseMap.size > 0)
+	{
+		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles2.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = this.visibleObjControlerOctrees.currentVisibles2[i];
+			if (this.parseQueue.octreesLod2LegosToParseMap.delete(lowestOctree))
+			{
+				//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+				if (lowestOctree.lego === undefined)
+				{ continue; }
+				
+				lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+				lowestOctree.lego.dataArrayBuffer = undefined;
+				
+				octreesParsedCount++;
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount == 0)
+		{
+			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
+			for (var i=0; i<octreesArray.length; i++)
+			{
+				lowestOctree = octreesArray[i];
+				if (this.parseQueue.octreesLod2LegosToParseMap.delete(lowestOctree))
+				{
+					//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+					if (lowestOctree.lego === undefined)
+					{ continue; }
+					
+					lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+					lowestOctree.lego.dataArrayBuffer = undefined;
+					
+					octreesParsedCount++;
+				}
+				else 
+				{
+					// test else.
+					
+				}
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }
+			}
+		}
 	}
 };
 
@@ -6221,6 +7864,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			// 4 = parsed.***
 			// now, check if the blocksList is loaded & parsed.***
 			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			if (blocksList == undefined)
+			{ continue; }
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 			{
@@ -7843,10 +9488,10 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var smartTile1 = this.smartTileManager.tilesArray[0]; // America side tile.
 	var smartTile2 = this.smartTileManager.tilesArray[1]; // Asia side tile.
 	
-	if (this.intersectedLowestTilesArray == undefined)
+	if (this.intersectedLowestTilesArray === undefined)
 	{ this.intersectedLowestTilesArray = []; }
 	
-	if (this.lastIntersectedLowestTilesArray == undefined)
+	if (this.lastIntersectedLowestTilesArray === undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }
 
 	// save the last frustumCulled lowestTiles to delete if necessary.
@@ -7904,16 +9549,17 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	var lod1_minSquaredDist = 1;
 	var lod2_minSquaredDist = 100000*10000;
 	
-	
-	lod0_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	/*
+	lod0_minSquaredDist = this.magoPolicy.getLod1DistInMeters();
 	lod0_minSquaredDist *= lod0_minSquaredDist;
 	
-	//lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
-	//lod2_minSquaredDist *= lod2_minSquaredDist;
+	lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
+	lod2_minSquaredDist *= lod2_minSquaredDist;
+	*/
 	
 	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
 	
-	//lod2_minSquaredDist*= 10000000;
+	lod0_minSquaredDist = 100000*10000;
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
@@ -7932,7 +9578,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = this.intersectedLowestTilesArray[i];
-		if (lowestTile.sphereExtent == undefined)
+		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 		
 		tileCenterPos = lowestTile.sphereExtent.centerPoint;
@@ -7948,13 +9594,10 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// determine LOD for each building.
 				neoBuilding = lowestTile.buildingsArray[j];
 				
-				if (neoBuilding.buildingId == "Grendizer")
-				{ var hola = 0; }
-	
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
-					if (neoBuilding.metaData.geographicCoord == undefined)
+					if (neoBuilding.metaData.geographicCoord === undefined)
 					{
 						neoBuilding.metaData.geographicCoord = new GeographicCoord();
 			
@@ -8084,9 +9727,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 				// create a building and set the location.***
 				neoBuilding.name = buildingSeed.name;
 				neoBuilding.buildingId = buildingSeed.buildingId;
-				if (neoBuilding.buildingId == "Grendizer")
-				{ var hola = 0; }
-				
+			
 				neoBuilding.buildingType = "basicBuilding";
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
@@ -8180,7 +9821,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (this.renderingModeTemp === 2)
 	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
 
-	if (this.boundingSphere_Aux == undefined)
+	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
@@ -9040,7 +10681,7 @@ MagoManager.prototype.getObjectIndexFile = function()
 	// use smartTile. Create one smartTile for all Korea.
 	this.buildingSeedList = new BuildingSeedList();
 	this.readerWriter.getObjectIndexFileForSmartTile(
-			this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
 /**
@@ -9086,7 +10727,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				}
 			}
 			
-			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
+			if (buildingSeed.buildingId === "fromJapanIfcExample_2")
 			{
 				var hola = 0;
 			}
@@ -9277,6 +10918,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "move") 
 	{
+		;
 	}
 	else if (apiName === "changeOutFitting") 
 	{
@@ -9406,43 +11048,60 @@ MagoManager.prototype.callAPI = function(api)
 		if (api.getFPVMode())
 		{
 			if (this.cameraFPV._camera !== undefined)	{ return; }
-			var scratchLookAtMatrix4 = new Cesium.Matrix4();
-			var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
 
-			var camera = this.scene._camera;
 			this.cameraFPV.init();
-			this.cameraFPV._camera = camera;
-			this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
 
-			var position = new Cesium.Cartesian3();
-			var direction = new Cesium.Cartesian3();
-			var up = new Cesium.Cartesian3();
+			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+			{
+				;
+			}
+			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				var scratchLookAtMatrix4 = new Cesium.Matrix4();
+				var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
+				var camera = this.scene._camera;
 
-			var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
-			cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
-
-			this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
-			var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
-			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), direction);
-			Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), up);
-
-			camera.flyTo({
-				destination : position,
-				orientation : {
-					direction : direction,
-					up        : up
-				},
-				duration: 1
-			});
+				this.cameraFPV._camera = camera;
+				this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
+	
+				var position = new Cesium.Cartesian3();
+				var direction = new Cesium.Cartesian3();
+				var up = new Cesium.Cartesian3();
+	
+				var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
+				cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
+	
+				this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
+				var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
+				Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), direction);
+				Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), up);
+	
+				camera.flyTo({
+					destination : position,
+					orientation : {
+						direction : direction,
+						up        : up
+					},
+					duration: 1
+				});
+			}
 		}
 		else 
 		{
 			if (this.cameraFPV._cameraBAK === undefined)	{ return; }
-			this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+			{
+				;
+			}
+			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+			}
 			this.cameraFPV.release();
 		}
 	}
 };
+
 MagoManager.prototype.checkCollision = function (position, direction)
 {
 	var gl = this.sceneState.gl;
@@ -11534,10 +13193,10 @@ SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId)
 {
 	var resultNeoBuildingSeed;
 	var hasSubTiles = true;
-	if (this.subTiles == undefined)
+	if (this.subTiles === undefined)
 	{ hasSubTiles = false; }
 	
-	if (this.subTiles && this.subTiles.length == 0)
+	if (this.subTiles && this.subTiles.length === 0)
 	{ hasSubTiles = false; }
 		
 	if (!hasSubTiles)
@@ -11601,7 +13260,8 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 	this.sphereExtent.centerPoint = ManagerUtils.geographicCoordToWorldPoint(midLongitude, midLatitude, midAltitude, this.sphereExtent.centerPoint, magoManager);
 	
 	// calculate an aproximate radius.
-	var cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
+	var cornerPoint;
+	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
 	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
 };
 
@@ -11655,19 +13315,9 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 	{
 		buildingSeed = buildingSeedsArray[i];
 		
-		if (buildingSeed.buildingId == "fromJapanIfcExample_2")
-		{
-			var hola = 0;
-		}
-			
 		//if (this.intersectPoint(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude)) // original.
 		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
 		{
-			if (buildingSeed.buildingId == "fromJapanIfcExample_2")
-			{
-				var hola = 0;
-			}
-		
 			buildingSeedsArray.splice(i, 1);
 			i--;
 			buildingSeedsCount = buildingSeedsArray.length;
@@ -14044,12 +15694,12 @@ var VisibleObjectsController = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	
-	this.currentRenderables0 = [];
-	this.currentRenderables1 = [];
-	this.currentRenderables2 = [];
-	this.currentRenderables3 = [];
+	//this.currentRenderables0 = [];
+	//this.currentRenderables1 = [];
+	//this.currentRenderables2 = [];
+	//this.currentRenderables3 = [];
 	
-	this.currentRenderableRefArray = [];
+	//this.currentRenderableRefArray = [];
 };
 
 VisibleObjectsController.prototype.initArrays = function() 
@@ -14059,1267 +15709,8200 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	
-	this.currentRenderables0 = [];
-	this.currentRenderables1 = [];
-	this.currentRenderables2 = [];
-	this.currentRenderables3 = [];
+	//this.currentRenderables0 = [];
+	//this.currentRenderables1 = [];
+	//this.currentRenderables2 = [];
+	//this.currentRenderables3 = [];
 };
 
 'use strict';
 
+
 /**
- * mago3djs API
- * 
- * @alias API
- * @class API
- * 
- * @param {any} apiName api이름
+ * 어떤 일을 하고 있습니까?
+ * @class UniformMatrix4fvDataPair
+ * @param gl 변수
  */
-function API(apiName)
+var UniformMatrix4fvDataPair = function(gl, uniformName) 
 {
-	if (!(this instanceof API)) 
+	if (!(this instanceof UniformMatrix4fvDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.matrix4fv; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+UniformMatrix4fvDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniformMatrix4fv(this.uniformLocation, false, this.matrix4fv);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class UniformVec2fvDataPair
+ * @param gl 변수
+ */
+var UniformVec2fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec2fvDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.vec2fv; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+UniformVec2fvDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniform2fv(this.uniformLocation, false, this.vec2fv);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class UniformVec3fvDataPair
+ * @param gl 변수
+ */
+var UniformVec3fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec3fvDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.vec3fv; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+UniformVec3fvDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniform3fv(this.uniformLocation, false, this.vec3fv);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class UniformVec4fvDataPair
+ * @param gl 변수
+ */
+var UniformVec4fvDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof UniformVec4fvDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.vec4fv; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+UniformVec4fvDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniform4fv(this.uniformLocation, false, this.vec4fv);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class Uniform1fDataPair
+ * @param gl 변수
+ */
+var Uniform1fDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof Uniform1fDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.floatValue; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+Uniform1fDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniform1f(this.uniformLocation, false, this.floatValue);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class Uniform1iDataPair
+ * @param gl 변수
+ */
+var Uniform1iDataPair = function(gl, uniformName) 
+{
+	if (!(this instanceof Uniform1iDataPair)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name = uniformName;
+	this.uniformLocation;
+	this.intValue; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+Uniform1iDataPair.prototype.bindUniform = function() 
+{
+	this.gl.uniform1i(this.uniformLocation, false, this.intValue);
+};
+
+//**********************************************************************************************************************************************************
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class PostFxShader
+ * @param gl 변수
+ */
+var PostFxShader = function(gl) 
+{
+	if (!(this instanceof PostFxShader)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl = gl;
+	this.name;
+	this.attribLocationCacheObj = {};
+	this.uniformsArray = []; // this array has the same uniforms that "uniformsCacheObj".***
+	this.uniformsCacheObj = {}; // this object has the same uniforms that "uniformsArray".***
+	
+	// shader program.***
+	this.program;
+	this.shader_vertex;
+	this.shader_fragment;
+
+	// attributes.***
+	this.position3_loc;
+	this.color3_loc;
+	this.normal3_loc;
+	this.texCoord2_loc;
+
+	// uniforms matrix.***
+	this.projectionMatrix4_loc; // usually no used.***
+	this.modelViewMatrix4_loc;
+	this.modelViewProjectionMatrix4_loc;
+	this.modelViewMatrix4RelToEye_loc;
+	this.modelViewProjectionMatrix4RelToEye_loc;
+	this.normalMatrix4_loc;
+	this.normalMatrix3_loc;
+	this.RefTransfMatrix;
+
+	// uniform vectors.***
+	this.buildingPosHIGH_loc;
+	this.buildingPosLOW_loc;
+	this.cameraPosHIGH_loc;
+	this.cameraPosLOW_loc;
+	this.noiseScale2_loc;
+	this.kernel16_loc;
+
+	// uniform values.***
+	this.near_loc;
+	this.far_loc;
+	this.fov_loc;
+	this.aspectRatio_loc;
+	this.screenWidth_loc;
+	this.screenHeight_loc;
+
+	// uniform samplers.***
+	this.diffuseTex_loc;
+	this.depthTex_loc;
+	this.noiseTex_loc;
+
+	// blur.***
+	this.texelSize_loc;
+	this.colorTex_loc;
+
+	// Model Reference meshes.***
+	this.useRefTransfMatrix_loc;
+	this.useTexture_loc;
+	this.invertNormals_loc;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.bindUniforms = function()
+{
+	var uniformsDataPairsCount = this.uniformsArray.length;
+	for (var i=0; i<uniformsDataPairsCount; i++)
+	{
+		this.uniformsArray[i].bindUniform();
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
+{
+	var uniformDataPair;//
+	if (uniformType === "Matrix4fv")
+	{
+		uniformDataPair = new UniformMatrix4fvDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if (uniformType === "Vec4fv")
+	{
+		uniformDataPair = new UniformVec4fvDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if (uniformType === "Vec3fv")
+	{
+		uniformDataPair = new UniformVec3fvDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if (uniformType === "Vec2fv")
+	{
+		uniformDataPair = new UniformVec2fvDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if (uniformType === "1f")
+	{
+		uniformDataPair = new Uniform1fDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	else if (uniformType === "1i")
+	{
+		uniformDataPair = new Uniform1iDataPair(this.gl, uniformName);
+		this.uniformsArray.push(uniformDataPair);
+		this.uniformsCacheObj[uniformName] = uniformDataPair;
+	}
+	
+	return uniformDataPair;
+};
+
+//*********************************************************************************************************************
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class PostFxShadersManager
+ */
+var PostFxShadersManager = function() 
+{
+	if (!(this instanceof PostFxShadersManager)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.gl;
+	this.pFx_shaders_array = []; // old.***
+	this.shadersCache = {};
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShadersManager.prototype.newShader = function(shaderName)
+{
+	var shader = new PostFxShader(this.gl);
+	shader.name = shaderName;
+	this.shadersCache[shaderName] = shader;
+	return shader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param source 변수
+ * @param type 변수
+ * @param typeString 변수
+ * @returns shader
+ */
+PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString) 
+{
+	// Source from internet.***
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+	{
+		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
+		return false;
+	}
+	return shader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createDefaultShaders = function(gl) 
+{
+	this.createRenderDepthShader(gl); // 0.***
+	this.createSsaoShader(gl); // 1.***
+	this.createBlurShader(gl); // 2.***
+
+	// Now, create shaders for modelReference geometries.****
+	this.createRenderDepthShaderModelRef(gl); // 3.***
+	this.createSsaoShaderModelRef(gl); // 4.***
+	//this.createBlurShader_ModelRef(gl); // 5.***
+
+	this.createColorSelectionShaderModelRef(gl);// 5.***
+	this.createSimpleDepthShaderModelRef(gl);// 6.***
+
+	this.createRenderDepthShaderLODBuilding(gl);// 7.***
+	this.createSsaoShaderLODBuilding(gl);// 8.***
+
+	this.createRenderDepthShaderLego(gl);// 9.***
+	this.createSsaoShaderLego(gl);// 10.***
+
+	this.createDepthShaderBox(gl); // 11.***
+	this.createSsaoShaderBox(gl); // 12.***
+
+	this.createPngImageShader(gl); // 13.***
+	this.createSilhouetteShaderModelRef(gl); // 14.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createBlurShader = function(gl) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var blur_vs_source = ShaderSource.BlurVS;
+	var blur_fs_source = ShaderSource.BlurFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, blur_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
+
+	shader.texelSize_loc = gl.getUniformLocation(shader.program, "texelSize");
+	shader.colorTex_loc = gl.getUniformLocation(shader.program, "colorTex");
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSsaoShader = function(gl) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.SsaoVS;
+	var ssao_fs_source = ShaderSource.SsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
+	// ssao uniforms.**********************************************************************
+	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+
+	// uniform values.***
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+
+	// uniform samplers.***
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createRenderDepthShader = function(gl) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.ShowDepthVS;
+	var showDepth_fs_source = ShaderSource.ShowDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// Ref Model.***********************************************************************************************************************
+// Ref Model.***********************************************************************************************************************
+// Ref Model.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
+	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.***
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow"); // sceneState.***
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye"); // sceneState.***
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye"); // sceneState.***
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.***
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.***
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	//*********************************************************************************
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	// ssao uniforms.**********************************************************************
+	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+
+	// uniform values.***
+	shader.near_loc = gl.getUniformLocation(shader.program, "near"); // sceneState.***
+	shader.far_loc = gl.getUniformLocation(shader.program, "far"); // sceneState.***
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov"); // sceneState.***
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio"); // sceneState.***
+
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.***
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.***
+	
+	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
+
+	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
+
+	// uniform samplers.***
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 
+	
+	// lighting.
+	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
+	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius");  
+
+	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
+	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
+	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
+
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sceneState) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
+	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// Selection shader.***********************************************************************************************************************
+// Selection shader.***********************************************************************************************************************
+// Selection shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) 
+{
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.ColorSelectionSsaoVS;
+	var ssao_fs_source = ShaderSource.ColorSelectionSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+};
+
+// SimpleDepth shader.***********************************************************************************************************************
+// SimpleDepth shader.***********************************************************************************************************************
+// SimpleDepth shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) 
+{
+	// no used.!!!!!!!!!!!!!!!
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.SimpleDepthSsaoVS;
+	var ssao_fs_source = ShaderSource.SimpleDepthSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+
+	//shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// LOD 2 Building Shader.***********************************************************************************************************************
+// LOD 2 Building Shader.***********************************************************************************************************************
+// LOD 2 Building Shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) 
+{
+	// 8.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
+	var ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
+
+	//*********************************************************************************
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	// ssao uniforms.**********************************************************************
+	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+
+	// uniform values.***
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+
+	//shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+
+	// uniform samplers.***
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
+
+	// ModelReference.****
+	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
+	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
+	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
+{
+	// 7.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
+	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// Lego Shader.***********************************************************************************************************************
+// Lego Shader.***********************************************************************************************************************
+// Lego Shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) 
+{
+	// 10.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.LegoSsaoVS;
+	var ssao_fs_source = ShaderSource.LegoSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
+
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	// ssao uniforms.**********************************************************************
+	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+
+	// uniform values.***
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+
+	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+
+	// uniform samplers.***
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
+
+	// ModelReference.****
+	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
+	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
+	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) 
+{
+	// 9.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.LegoDepthVS;
+	var showDepth_fs_source = ShaderSource.LegoDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+
+
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
+{
+	// 7.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
+	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// box depth Shader.***********************************************************************************************************************
+// box depth Shader.***********************************************************************************************************************
+// box depth Shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createDepthShaderBox = function(gl) 
+{
+	// 7.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var showDepth_vs_source = ShaderSource.BoxDepthVS;
+	var showDepth_fs_source = ShaderSource.BoxDepthFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+};
+
+// box Shader.***********************************************************************************************************************
+// box Shader.***********************************************************************************************************************
+// box Shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) 
+{
+	// 8.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.BoxSsaoVS;
+	var ssao_fs_source = ShaderSource.BoxSsaoFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	//shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
+	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
+
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
+
+	//*********************************************************************************
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	// ssao uniforms.**********************************************************************
+	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+
+	// uniform values.***
+	shader.near_loc = gl.getUniformLocation(shader.program, "near");
+	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+
+	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+
+	// uniform samplers.***
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
+	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
+
+	// ModelReference.****
+	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
+	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
+	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+};
+
+// PNG images shader.**************************************************************************************************
+// PNG images shader.**************************************************************************************************
+// PNG images shader.**************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createPngImageShader = function(gl) 
+{
+	// 13.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.PngImageVS;
+	var ssao_fs_source = ShaderSource.PngImageFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.texture_loc = gl.getUniformLocation(shader.program, "u_texture"); 
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	
+	shader.position3_loc = gl.getAttribLocation(shader.program, "a_position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_texcoord");
+	
+	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
+	
+};
+
+// 14) Silhouette shader.***********************************************************************************************************************
+// 14) Silhouette shader.***********************************************************************************************************************
+// 14) Silhouette shader.***********************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ */
+PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) 
+{
+	// 14.***
+	var shader = new PostFxShader(this.gl);
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.SilhouetteVS;
+	var ssao_fs_source = ShaderSource.SilhouetteFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
+	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
+
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+
+	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
+
+	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+	shader.camSpacePixelTranslation_loc = gl.getUniformLocation(shader.program, "camSpacePixelTranslation");
+	shader.screenSize_loc = gl.getUniformLocation(shader.program, "screenSize");
+	shader.ProjectionMatrix_loc = gl.getUniformLocation(shader.program, "ProjectionMatrix");
+	shader.ModelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewMatrixRelToEye");
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use strict';
+
+// An basic example.***********************************************************
+/*
+	var shader_vertex_source="\n\
+		attribute vec3 position;\n\
+		uniform mat4 Pmatrix;\n\
+		uniform mat4 Vmatrix;\n\
+		uniform mat4 Mmatrix;\n\
+		attribute vec3 color; //the color of the point\n\
+		varying vec3 vColor;\n\
+		void main(void) { //pre-built function\n\
+		gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);\n\
+		vColor=color;\n\
+		}";
+
+	var shader_fragment_source="\n\
+		precision mediump float;\n\
+		varying vec3 vColor;\n\
+		void main(void) {\n\
+		gl_FragColor = vec4(vColor, 1.);\n\
+		}";
+		*/
+// End example.-----------------------------------------------------------------
+
+// http://learningwebgl.com/blog/?p=507
+/*
+		http://blogs.agi.com/insight3d/index.php/2008/09/03/precisions-precisions/ // GPU RTE HighValue-LowValue
+		uniform vec3 uViewerHigh;
+		uniform vec3 uViewerLow;
+
+		void main(void)
+		{
+			vec3 highDifference = vec3(gl_Vertex.xyz - uViewerHigh);
+			vec3 lowDifference = vec3(gl_Normal.xyz - uViewerLow);
+			gl_Position = gl_ModelViewProjectionMatrix *
+				 vec4(highDifference + lowDifference, 1.0);
+		}
+		//-----------------------------------------------
+		void CDoubleToTwoFloats::Convert(double doubleValue,
+		float&amp; floatHigh, float&amp; floatLow)
+		{
+			if (doubleValue &gt;= 0.0)
+			{
+				double doubleHigh = floor(doubleValue / 65536.0) * 65536.0;
+				floatHigh = (float)doubleHigh;
+				floatLow = (float)(doubleValue - doubleHigh);
+			}
+			else
+			{
+				double doubleHigh = floor(-doubleValue / 65536.0) * 65536.0;
+				floatHigh = (float)-doubleHigh;
+				floatLow = (float)(doubleValue + doubleHigh);
+			}
+		}
+		//-----------------------------------------------
+		*/
+/*
+		vec4 czm_translateRelativeToEye(vec3 high, vec3 low)\n\
+		{\n\
+			vec3 highDifference = high - czm_encodedCameraPositionMCHigh;\n\
+			vec3 lowDifference = low - czm_encodedCameraPositionMCLow;\n\
+		\n\
+			return vec4(highDifference + lowDifference, 1.0);\n\
+		}\n\
+		*/
+
+/**
+ * 조명 입력 및 재질 구성을 기반으로 렌더링 된 각 픽셀의 색상을 계산하기위한 수학적 계산 및 알고리즘을 포함하는 작은 스크립트
+ * @class Shader
+ */
+var Shader = function() 
+{
+	if (!(this instanceof Shader)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// mago3d 활성화/비활성화 여부
-	this.magoEnable = true;
+	this.shader_name;
+	this.shader_vertex_source;
+	this.shader_fragment_source;
+	this.SHADER_PROGRAM;
 
-	// api 이름
-	this.apiName = apiName;
-	// project id
-	this.projectId = null;
-	// block id
-	this.blockId = null;
-	// blockIds
-	this.blockIds = null;
-	// objectIds
-	this.objectIds = null;
-	// data_key
-	this.dataKey = null;
-	// issueId
-	this.issueId = null;
-	// issueType
-	this.issueType = null;
-	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
-	this.drawType = 0;
+	this.shader_vertex;
+	this.shader_fragment;
 
-	// fullship = 0, deploy = 1
-	this.renderMode = 0;
-	// 위도
-	this.latitude = 0;
-	// 경도
-	this.longitude = 0;
-	// 높이
-	this.elevation = 0;
-	// heading
-	this.heading = 0;
-	// pitch
-	this.pitch = 0;
-	// roll
-	this.roll = 0;
+	this._ModelViewProjectionMatrixRelToEye;
+	this._RefTransfMatrix;
+	this._NormalMatrix;
 
-	// 색깔
-	this.color = 0;
-	// structs = MSP, outfitting = MOP
-	this.blockType = null;
-	// outfitting 표시/비표시
-	this.showOutFitting = false;
-	// label 표시/비표시
-	this.showLabelInfo = true;
-	// boundingBox 표시/비표시
-	this.showBoundingBox = false;
-	// 그림자 표시/비표시
-	this.showShadow = false;
-	// frustum culling 가시 거리(M단위)
-	this.frustumFarDistance = 0;
-	// move mode 
-	this.mouseMoveMode = CODE.moveMode.NONE;
-	// 이슈 등록 표시
-	this.issueInsertEnable = false;
-	// object 정보 표시
-	this.objectInfoViewEnable = false;
-	// 이슈 목록 표시
-	this.nearGeoIssueListEnable = false;
-	// occlusion culling
-	this.occlusionCullingEnable = false;
-	//
-	this.insertIssueState = 0;
-	
-	// LOD1
-	this.lod0DistInMeters = null;
-	this.lod1DistInMeters = null;
-	this.lod2DistInMeters = null;
-	this.lod3DistInMeters = null;
-	
-	// Lighting
-	this.ambientReflectionCoef = null;
-	this.diffuseReflectionCoef = null;
-	this.specularReflectionCoef = null;
-	this.ambientColor = null;
-	this.specularColor = null;
-	
-	this.ssaoRadius = null;
-	//
-	this.FPVMode = false;
-};
+	this._encodedCamPosHIGH;
+	this._encodedCamPosLOW;
+	this._BuildingPosHIGH;
+	this._BuildingPosLOW;
+	this._lightDirection;
 
-API.prototype.getMagoEnable = function() 
-{
-	return this.magoEnable;
-};
-API.prototype.setMagoEnable = function(magoEnable) 
-{
-	this.magoEnable = magoEnable;
-};
+	this._color;
+	this._position;
+	this._texcoord;
+	this._normal;
 
-API.prototype.getAPIName = function() 
-{
-	return this.apiName;
-};
-
-API.prototype.getProjectId = function() 
-{
-	return this.projectId;
-};
-API.prototype.setProjectId = function(projectId) 
-{
-	this.projectId = projectId;
-};
-
-API.prototype.getBlockId = function() 
-{
-	return this.blockId;
-};
-API.prototype.setBlockId = function(blockId) 
-{
-	this.blockId = blockId;
-};
-
-API.prototype.getBlockIds = function() 
-{
-	return this.blockIds;
-};
-API.prototype.setBlockIds = function(blockIds) 
-{
-	this.blockIds = blockIds;
-};
-
-API.prototype.getObjectIds = function() 
-{
-	return this.objectIds;
-};
-API.prototype.setObjectIds = function(objectIds) 
-{
-	this.objectIds = objectIds;
-};
-
-API.prototype.getIssueId = function() 
-{
-	return this.issueId;
-};
-API.prototype.setIssueId = function(issueId) 
-{
-	this.issueId = issueId;
-};
-API.prototype.getIssueType = function() 
-{
-	return this.issueType;
-};
-API.prototype.setIssueType = function(issueType) 
-{
-	this.issueId = issueType;
-};
-
-API.prototype.getDataKey = function() 
-{
-	return this.dataKey;
-};
-API.prototype.setDataKey = function(dataKey) 
-{
-	this.dataKey = dataKey;
-};
-
-API.prototype.getRenderMode = function() 
-{
-	return this.renderMode;
-};
-API.prototype.setRenderMode = function(renderMode) 
-{
-	this.renderMode = renderMode;
-};
-
-API.prototype.getLatitude = function() 
-{
-	return this.latitude;
-};
-API.prototype.setLatitude = function(latitude) 
-{
-	this.latitude = latitude;
-};
-
-API.prototype.getLongitude = function() 
-{
-	return this.longitude;
-};
-API.prototype.setLongitude = function(longitude) 
-{
-	this.longitude = longitude;
-};
-
-API.prototype.getElevation = function() 
-{
-	return this.elevation;
-};
-API.prototype.setElevation = function(elevation) 
-{
-	this.elevation = elevation;
-};
-
-API.prototype.getHeading = function() 
-{
-	return this.heading;
-};
-API.prototype.setHeading = function(heading) 
-{
-	this.heading = heading;
-};
-
-API.prototype.getPitch = function() 
-{
-	return this.pitch;
-};
-API.prototype.setPitch = function(pitch) 
-{
-	this.pitch = pitch;
-};
-
-API.prototype.getRoll = function() 
-{
-	return this.roll;
-};
-API.prototype.setRoll = function(roll) 
-{
-	this.roll = roll;
-};
-
-API.prototype.getColor = function() 
-{
-	return this.color;
-};
-API.prototype.setColor = function(color) 
-{
-	this.color = color;
-};
-
-API.prototype.getBlockType = function() 
-{
-	return this.blockType;
-};
-API.prototype.setBlockType = function(blockType) 
-{
-	this.blockType = blockType;
-};
-
-API.prototype.getShowOutFitting = function() 
-{
-	return this.showOutFitting;
-};
-API.prototype.setShowOutFitting = function(showOutFitting) 
-{
-	this.showOutFitting = showOutFitting;
-};
-
-
-API.prototype.getShowLabelInfo = function() 
-{
-	return this.showLabelInfo;
-};
-API.prototype.setShowLabelInfo = function(showLabelInfo) 
-{
-	this.showLabelInfo = showLabelInfo;
-};
-API.prototype.getShowBoundingBox = function() 
-{
-	return this.showBoundingBox;
-};
-API.prototype.setShowBoundingBox = function(showBoundingBox) 
-{
-	this.showBoundingBox = showBoundingBox;
-};
-
-API.prototype.getShowShadow = function() 
-{
-	return this.showShadow;
-};
-API.prototype.setShowShadow = function(showShadow) 
-{
-	this.showShadow = showShadow;
-};
-
-API.prototype.getFrustumFarDistance = function() 
-{
-	return this.frustumFarDistance;
-};
-API.prototype.setFrustumFarDistance = function(frustumFarDistance) 
-{
-	this.frustumFarDistance = frustumFarDistance;
-};
-
-API.prototype.getMouseMoveMode = function() 
-{
-	return this.mouseMoveMode;
-};
-API.prototype.setMouseMoveMode = function(mouseMoveMode) 
-{
-	this.mouseMoveMode = mouseMoveMode;
-};
-
-API.prototype.getIssueInsertEnable = function() 
-{
-	return this.issueInsertEnable;
-};
-API.prototype.setIssueInsertEnable = function(issueInsertEnable) 
-{
-	this.issueInsertEnable = issueInsertEnable;
-};
-API.prototype.getObjectInfoViewEnable = function() 
-{
-	return this.objectInfoViewEnable;
-};
-API.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
-{
-	this.objectInfoViewEnable = objectInfoViewEnable;
-};
-API.prototype.getOcclusionCullingEnable = function() 
-{
-	return this.occlusionCullingEnable;
-};
-API.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
-{
-	this.occlusionCullingEnable = occlusionCullingEnable;
-};
-API.prototype.getNearGeoIssueListEnable = function() 
-{
-	return this.nearGeoIssueListEnable;
-};
-API.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
-{
-	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
-};
-
-API.prototype.getInsertIssueState = function() 
-{
-	return this.insertIssueState;
-};
-API.prototype.setInsertIssueState = function(insertIssueState) 
-{
-	this.insertIssueState = insertIssueState;
-};
-
-API.prototype.getDrawType = function() 
-{
-	return this.drawType;
-};
-API.prototype.setDrawType = function(drawType) 
-{
-	this.drawType = drawType;
-};
-
-API.prototype.getLod0DistInMeters = function() 
-{
-	return this.lod0DistInMeters;
-};
-API.prototype.setLod0DistInMeters = function(lod0DistInMeters) 
-{
-	this.lod0DistInMeters = lod0DistInMeters;
-};
-API.prototype.getLod1DistInMeters = function() 
-{
-	return this.lod1DistInMeters;
-};
-API.prototype.setLod1DistInMeters = function(lod1DistInMeters) 
-{
-	this.lod1DistInMeters = lod1DistInMeters;
-};
-API.prototype.getLod2DistInMeters = function() 
-{
-	return this.lod2DistInMeters;
-};
-API.prototype.setLod2DistInMeters = function(lod2DistInMeters) 
-{
-	this.lod2DistInMeters = lod2DistInMeters;
-};
-API.prototype.getLod3DistInMeters = function() 
-{
-	return this.lod3DistInMeters;
-};
-API.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
-{
-	this.lod3DistInMeters = lod3DistInMeters;
-};
-
-API.prototype.getAmbientReflectionCoef = function() 
-{
-	return this.ambientReflectionCoef;
-};
-API.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
-{
-	this.ambientReflectionCoef = ambientReflectionCoef;
-};
-API.prototype.getDiffuseReflectionCoef = function() 
-{
-	return this.diffuseReflectionCoef;
-};
-API.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
-{
-	this.diffuseReflectionCoef = diffuseReflectionCoef;
-};
-API.prototype.getSpecularReflectionCoef = function() 
-{
-	return this.specularReflectionCoef;
-};
-API.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
-{
-	this.specularReflectionCoef = specularReflectionCoef;
-};
-API.prototype.getAmbientColor = function() 
-{
-	return this.ambientColor;
-};
-API.prototype.setAmbientColor = function(ambientColor) 
-{
-	this.ambientColor = ambientColor;
-};
-API.prototype.getSpecularColor = function() 
-{
-	return this.specularColor;
-};
-API.prototype.setSpecularColor = function(specularColor) 
-{
-	this.specularColor = specularColor;
-};
-API.prototype.getSsaoRadius = function() 
-{
-	return this.ssaoRadius;
-};
-API.prototype.setSsaoRadius = function(ssaoRadius) 
-{
-	this.ssaoRadius = ssaoRadius;
-};
-API.prototype.getFPVMode = function()
-{
-	return this.FPVMode;
-};
-API.prototype.setFPVMode = function(value)
-{
-	this.FPVMode = value;
-};
-'use strict';
-
-/**
- * 선택한 object 정보를 화면에 표시
- * @param data_key
- * @param objectId
- * @param latitude
- * @param longitude
- * @param elevation
- * @param heading
- * @param pitch
- * @param roll
- * @param
- */
-function selectedObjectCallback(functionName, data_key, objectId, latitude, longitude, elevation, heading, pitch, roll) 
-{
-	window[functionName](data_key, objectId, latitude, longitude, elevation, heading, pitch, roll);
-}
-
-/**
- * 선택한 object 정보를 화면에 표시
- * @param functionName
- * @param data_key
- * @param objectId
- * @param latitude
- * @param longitude
- * @param elevation
- */
-function insertIssueCallback(functionName, data_key, objectId, latitude, longitude, elevation) 
-{
-	window[functionName](data_key, objectId, latitude, longitude, elevation);
-}
-
-/**
- * mouse click 위치 정보를 화면에 표시
- * @param functionName
- * @param position
- */
-function clickPositionCallback(functionName, position) 
-{
-	window[functionName](position);
-}
-
-'use strict';
-
-/**
- * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
- * @class MagoConfig
- */
-var MagoConfig = {};
-
-MagoConfig.getPolicy = function() 
-{
-	return this.serverPolicy;
-};
-
-MagoConfig.getData = function() 
-{
-	return this.serverData;
+	// test.***
+	this.samplerUniform;
 };
 
 /**
- * 환경설정 세팅
- * 
- * @param serverPolicy mago3d policy(json)
- * @param serverData data 정보(json)
+ * 어떤 일을 하고 있습니까?
+ * @class ShadersManager
  */
-MagoConfig.init = function(serverPolicy, serverData) 
+var ShadersManager = function() 
 {
-	this.serverPolicy = serverPolicy;
-	this.serverData = serverData;
-};
-
-/* eslint-env jquery */
-'use strict';
-
-/**
- * 화면단 UI와 연동 되는 API. APIGateWay 혹은 API 클래스로 클래스명 수정 예정
- * @class MagoFacade
- */
-/**
- * mago3d 활성화/비활성화
- * 
- * @param {Property} isShow true = 활성화, false = 비활성화
- */
-function changeMagoStateAPI(isShow) 
-{
-	var api = new API("changeMagoState");
-	api.setMagoEnable(isShow);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * render mode
- * 
- * @param {Property} renderMode 0 = 호선, 1 = 지번전개
- */
-function changeRenderAPI(renderMode) 
-{
-	var api = new API("changeRender");
-	api.setRenderMode(renderMode);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * outfitting 표시/비표시
- * 
- * @param {Property} isShow true = 활성화, false = 비활성화
- */
-function changeOutFittingAPI(isShow) 
-{
-	var api = new API("changeOutFitting");
-	api.setShowOutFitting(isShow);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * Label 표시/비표시
- * 
- * @param {Property} isShow true = 표시, false = 비표시
- */
-function changeLabelAPI(isShow) 
-{
-	var api = new API("changeLabel");
-	api.setShowLabelInfo(isShow);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * boundingBox 표시/비표시
- * 
- * @param {Property} isShow true = 활성화, false = 비활성화
- */
-function changeBoundingBoxAPI(isShow) 
-{
-	var api = new API("changeBoundingBox");
-	api.setShowBoundingBox(isShow);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 그림자 표시/비표시
- * 
- * @param {Property} isShow true = 활성화, false = 비활성화
- */
-function changeShadowAPI(isShow) 
-{
-	var api = new API("changeShadow");
-	api.setShowShadow(isShow);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * frustum culling 가시 거리
- * 
- * @param {Property} frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
- */
-function changeFrustumFarDistanceAPI(frustumFarDistance) 
-{
-	var api = new API("changefrustumFarDistance");
-	api.setFrustumFarDistance(frustumFarDistance);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 데이터 검색
- * 
- * @param {Property} dataKey 데이터 고유키
- */
-function searchDataAPI(dataKey) 
-{
-	var api = new API("searchData");
-	api.setDataKey(dataKey);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * highlighting
- * 
- * @param {Property} projectId 프로젝트 아이디
- * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
- * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
- */
-function changeHighLightingAPI(projectId, blockIds, objectIds) 
-{
-	var api = new API("changeHighLighting");
-	api.setProjectId(projectId);
-	api.setBlockIds(blockIds);
-	api.setObjectIds(objectIds);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * color 변경
- * 
- * @param {Property} projectId 프로젝트 아이디
- * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
- * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
- * @param {Property} color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
- */
-function changeColorAPI(projectId, blockIds, objectIds, color) 
-{
-	var api = new API("changeColor");
-	api.setProjectId(projectId);
-	api.setBlockIds(blockIds);
-	api.setObjectIds(objectIds);
-	api.setColor(color);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * location and rotation 변경
- * 
- * @param {Property} data_key
- * @param {Property} latitude 위도
- * @param {Property} longitude 경도
- * @param {Property} height 높이
- * @param {Property} heading 좌, 우
- * @param {Property} pitch 위, 아래
- * @param {Property} roll 좌, 우 기울기
- */
-function changeLocationAndRotationAPI(data_key, latitude, longitude, height, heading, pitch, roll) 
-{
-	var api = new API("changeLocationAndRotation");
-	api.setDataKey(data_key);
-	api.setLatitude(latitude);
-	api.setLongitude(longitude);
-	api.setElevation(height);
-	api.setHeading(heading);
-	api.setPitch(pitch);
-	api.setRoll(roll);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 마우스 클릭 객체 이동 대상 변경
- * 
- * @param {Property} mouseMoveMode 0 = All, 1 = object, 2 = None
- */
-function changeMouseMoveAPI(mouseMoveMode) 
-{
-	var api = new API("changeMouseMove");
-	api.setMouseMoveMode(mouseMoveMode);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 이슈 등록 활성화 유무
- * 
- * @param {Property} flag true = 활성화, false = 비활성화
- */
-function changeInsertIssueModeAPI(flag) 
-{
-	var api = new API("changeInsertIssueMode");
-	api.setIssueInsertEnable(flag);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * object 정보 표시 활성화 유무
- * 
- * @param {Property} flag true = 활성화, false = 비활성화
- */
-function changeObjectInfoViewModeAPI(flag) 
-{
-	var api = new API("changeObjectInfoViewMode");
-	api.setObjectInfoViewEnable(flag);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * Object Occlusion culling
- * 
- * @param {Property} flag true = 활성화, false = 비활성화
- * @param {Property} dataKey
- */
-function changeOcclusionCullingAPI(flag, dataKey) 
-{
-	var api = new API("changeOcclusionCulling");
-	api.setOcclusionCullingEnable(flag);
-	api.setDataKey(dataKey);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 1인칭, 3인칭 모드 개발중...
- * 
- * @param {Property} flag true = 활성화, false = 비활성화
- */
-function changeFPVModeAPI(flag)
-{
-	var api = new API("changeFPVMode");
-	api.setFPVMode(flag);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 현재 위치 근처 issue list. false인 경우 clear
- * 
- * @param {Property} flag true = 활성화, false = 비활성화
- */
-function changeNearGeoIssueListViewModeAPI(flag) 
-{
-	var api = new API("changeNearGeoIssueListViewMode");
-	api.setNearGeoIssueListEnable(flag);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * pin image를 그림
- * 
- * @param {Property} drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
- * @param {Property} issue_id 이슈 고유키
- * @param {Property} issue_type 이슈 고유키
- * @param {Property} data_key 데이터 고유키
- * @param {Property} latitude 데이터 고유키
- * @param {Property} longitude 데이터 고유키
- * @param {Property} height 데이터 고유키
- */
-function drawInsertIssueImageAPI(drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
-{
-	var api = new API("drawInsertIssueImage");
-	api.setDrawType(drawType);
-	api.setIssueId(issue_id);
-	api.setIssueId(issue_type);
-	api.setDataKey(data_key);
-	api.setLatitude(latitude);
-	api.setLongitude(longitude);
-	api.setElevation(height);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
- * issue 등록 geo 정보 관련 상태 변경
- * 
- * @param {Property} insertIssueState 이슈 등록 좌표 상태
- */
-function changeInsertIssueStateAPI(insertIssueState) 
-{
-	var api = new API("changeInsertIssueState");
-	api.setInsertIssueState(insertIssueState);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
- * @param {Property} eventType 어떤 마우스 동작을 원하는지를 구분
- */
-function mouseMoveAPI(eventType) 
-{
-	if (managerFactory !== null) 
-	{
-		managerFactory.mouseMove(eventType);
-	}
-}
-
-/**
- * LOD 설정을 변경
- * @param {Property} lod0DistInMeters
- * @param {Property} lod1DistInMeters
- * @param {Property} lod2DistInMeters
- * @param {Property} lod3DistInMeters
- */
-function changeLodAPI(lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
-{
-	var api = new API("changeLod");
-	api.setLod0DistInMeters(lod0DistInMeters);
-	api.setLod1DistInMeters(lod1DistInMeters);
-	api.setLod2DistInMeters(lod2DistInMeters);
-	api.setLod3DistInMeters(lod3DistInMeters);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * Lighting 설정
- * @param {Property} ambientReflectionCoef
- * @param {Property} diffuseReflectionCoef
- * @param {Property} specularReflectionCoef
- * @param {Property} ambientColor
- * @param {Property} specularColor
- */
-function changeLightingAPI(ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
-{
-	var api = new API("changeLighting");
-	api.setAmbientReflectionCoef(ambientReflectionCoef);
-	api.setDiffuseReflectionCoef(diffuseReflectionCoef);
-	api.setSpecularReflectionCoef(specularReflectionCoef);
-	api.setAmbientColor(ambientColor);
-	api.setSpecularColor(specularColor);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-
-/**
- * SSAD Radius 설정
- * @param {Property} ssaoRadius
- */
-function changeSsadRadiusAPI(ssaoRadius)
-{
-	var api = new API("changeSsadRadius");
-	api.setSsaoRadius(ssaoRadius);
-	if (managerFactory !== null) 
-	{
-		managerFactory.callAPI(api);
-	}
-}
-'use strict';
-
-/**
- * Policy
- * @class Policy
- */
-var Policy = function() 
-{
-	if (!(this instanceof Policy)) 
+	if (!(this instanceof ShadersManager)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// mago3d 활성화/비활성화 여부
-	this.magoEnable = true;
+	this.shaders_array = [];
 
-	// outfitting 표시 여부
-	this.showOutFitting = false;
-	// label 표시/비표시
-	this.showLabelInfo = false;
-	// boundingBox 표시/비표시
-	this.showBoundingBox = false;
-	// 그림자 표시/비표시
-	this.showShadow = false;
-	// far frustum 거리
-	this.frustumFarSquaredDistance = 5000000;
-
-	// highlighting
-	this.highLightedBuildings = [];
-	// color
-	this.colorBuildings = [];
-	// color
-	this.color = [];
-	// show/hide
-	this.hideBuildings = [];
-	// move mode
-	this.mouseMoveMode = CODE.moveMode.NONE;
-	// 이슈 등록 표시
-	this.issueInsertEnable = false;
-	// object 정보 표시
-	this.objectInfoViewEnable = false;
-	// 이슈 목록 표시
-	this.nearGeoIssueListEnable = false;
-	// occlusion culling
-	this.occlusionCullingEnable = false;
-	
-	// 이미지 경로
-	this.imagePath = "";
-	
-	// provisional.***
-	this.colorChangedObjectId;
-	
-	// LOD1
-	this.lod0DistInMeters = 22;
-	this.lod1DistInMeters = 70;
-	this.lod2DistInMeters = 22360;
-	this.lod3DistInMeters = 60000;
-	
-	// Lighting
-	this.ambientReflectionCoef = 0.2;
-	this.diffuseReflectionCoef = 1.0;
-	this.specularReflectionCoef = 0.7;
-	this.ambientColor = null;
-	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
-	
-	this.ssaoRadius = 0.15;
+	// Create shaders to render F4D_Format.**********************
+	// 1) Standard shader, that can render light mapping.***
 };
 
-Policy.prototype.getMagoEnable = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx = 변수
+ * returns shader
+ */
+ShadersManager.prototype.getMagoShader = function(idx) 
 {
-	return this.magoEnable;
-};
-Policy.prototype.setMagoEnable = function(magoEnable) 
-{
-	this.magoEnable = magoEnable;
+	var shader;
+
+	if (idx >= 0 && idx < this.shaders_array.length) 
+	{
+		shader = this.shaders_array[idx];
+	}
+
+	return shader;
 };
 
-Policy.prototype.getShowOutFitting = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.getShader = function(gl, source, type, typeString) 
 {
-	return this.showOutFitting;
-};
-Policy.prototype.setShowOutFitting = function(showOutFitting) 
-{
-	this.showOutFitting = showOutFitting;
-};
-Policy.prototype.getShowLabelInfo = function() 
-{
-	return this.showLabelInfo;
-};
-Policy.prototype.setShowLabelInfo = function(showLabelInfo) 
-{
-	this.showLabelInfo = showLabelInfo;
-};
-Policy.prototype.getShowBoundingBox = function() 
-{
-	return this.showBoundingBox;
-};
-Policy.prototype.setShowBoundingBox = function(showBoundingBox) 
-{
-	this.showBoundingBox = showBoundingBox;
+	// Source from internet.***
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+	{
+		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
+		return false;
+	}
+	return shader;
 };
 
-Policy.prototype.getShowShadow = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createDefaultShader = function(gl) 
 {
-	return this.showShadow;
-};
-Policy.prototype.setShowShadow = function(showShadow) 
-{
-	this.showShadow = showShadow;
-};
-
-Policy.prototype.getFrustumFarSquaredDistance = function() 
-{
-	return this.frustumFarSquaredDistance;
-};
-Policy.prototype.setFrustumFarSquaredDistance = function(frustumFarSquaredDistance) 
-{
-	this.frustumFarSquaredDistance = frustumFarSquaredDistance;
+	this.createStandardShader(gl);                // 0.***
+	this.createTextureSimpleObjectShader(gl);     // 1.***
+	this.createColorSelectionShader(gl);          // 2.***
+	this.createTextureSimpleObjectA1Shader(gl);   // 3.***
+	this.createCloudShader(gl);                   // 4.***
+	this.createBlendingCubeShader(gl);            // 5.***
+	this.createPCloudShader(gl);                  // 6.***
+	this.createSimpleObjectTexNormalShader(gl); // 7.***
 };
 
-Policy.prototype.getHighLightedBuildings = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createColorSelectionShader = function(gl) 
 {
-	return this.highLightedBuildings;
-};
-Policy.prototype.setHighLightedBuildings = function(highLightedBuildings) 
-{
-	this.highLightedBuildings = highLightedBuildings;
+	var shader = new Shader();
+	this.shaders_array.push(shader);
+
+	shader.shader_vertex_source = ShaderSource.ColorVS;
+	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
+
+	shader.shader_fragment_source = ShaderSource.ColorFS;
+
+	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
+
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._RefTransfMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "RefTransfMatrix");
+
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
 };
 
-Policy.prototype.getColorBuildings = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) 
 {
-	return this.colorBuildings;
-};
-Policy.prototype.setColorBuildings = function(colorBuildings) 
-{
-	this.colorBuildings = colorBuildings;
+	var shader = new Shader();
+	this.shaders_array.push(shader);
+
+	shader.shader_vertex_source = ShaderSource.TextureVS;
+	shader.shader_fragment_source = ShaderSource.TextureFS;
+
+	//http://learningwebgl.com/blog/?p=507
+	//https://gist.github.com/elnaqah/5070979
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
+
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._Mmatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "Mmatrix");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
-Policy.prototype.getColor = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) 
 {
-	return this.color;
-};
-Policy.prototype.setColor = function(color) 
-{
-	this.color = color;
+	var shader = new Shader();
+	this.shaders_array.push(shader);
+
+	shader.shader_vertex_source = ShaderSource.TextureA1VS;
+	shader.shader_fragment_source = ShaderSource.TextureA1FS;
+
+	//http://learningwebgl.com/blog/?p=507
+	//https://gist.github.com/elnaqah/5070979
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
+
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
 };
 
-Policy.prototype.getHideBuildings = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createStandardShader = function(gl) 
 {
-	return this.hideBuildings;
-};
-Policy.prototype.setHideBuildings = function(hideBuildings) 
-{
-	this.hideBuildings = hideBuildings;
+	// This shader renders the normal f4d geometry.***
+	var standard_shader = new Shader();
+	this.shaders_array.push(standard_shader);
+
+	standard_shader.shader_vertex_source = ShaderSource.StandardVS;
+	standard_shader.shader_fragment_source = ShaderSource.StandardFS;
+
+	// Default ShaderProgram.********************************************************************
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
+
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._RefTransfMatrix = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "RefTransfMatrix");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
+	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
+
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
-Policy.prototype.getMouseMoveMode = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createCloudShader = function(gl) 
 {
-	return this.mouseMoveMode;
-};
-Policy.prototype.setMouseMoveMode = function(mouseMoveMode) 
-{
-	this.mouseMoveMode = mouseMoveMode;
+	// This shader renders the f4d clouds.***
+	var standard_shader = new Shader();
+	this.shaders_array.push(standard_shader);
+
+	standard_shader.shader_vertex_source = ShaderSource.CloudVS;
+	standard_shader.shader_fragment_source = ShaderSource.CloudFS;
+
+	// Default ShaderProgram.********************************************************************
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
+
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._cloudPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosHIGH");
+	standard_shader._cloudPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosLOW");
+
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
-Policy.prototype.getIssueInsertEnable = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createBlendingCubeShader = function(gl) 
 {
-	return this.issueInsertEnable;
-};
-Policy.prototype.setIssueInsertEnable = function(issueInsertEnable) 
-{
-	this.issueInsertEnable = issueInsertEnable;
-};
-Policy.prototype.getObjectInfoViewEnable = function() 
-{
-	return this.objectInfoViewEnable;
-};
-Policy.prototype.setObjectInfoViewEnable = function(objectInfoViewEnable) 
-{
-	this.objectInfoViewEnable = objectInfoViewEnable;
-};
-Policy.prototype.getOcclusionCullingEnable = function() 
-{
-	return this.occlusionCullingEnable;
-};
-Policy.prototype.setOcclusionCullingEnable = function(occlusionCullingEnable) 
-{
-	this.occlusionCullingEnable = occlusionCullingEnable;
-};
-Policy.prototype.getNearGeoIssueListEnable = function() 
-{
-	return this.nearGeoIssueListEnable;
-};
-Policy.prototype.setNearGeoIssueListEnable = function(nearGeoIssueListEnable) 
-{
-	this.nearGeoIssueListEnable = nearGeoIssueListEnable;
+	// This shader renders the f4d clouds.***
+	var standard_shader = new Shader();
+	this.shaders_array.push(standard_shader);
+
+	standard_shader.shader_vertex_source = ShaderSource.BlendingCubeVS;
+	standard_shader.shader_fragment_source = ShaderSource.BlendingCubeFS;
+
+	// Default ShaderProgram.********************************************************************
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
+
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
-Policy.prototype.getImagePath = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createPCloudShader = function(gl) 
 {
-	return this.imagePath;
-};
-Policy.prototype.setImagePath = function(imagePath) 
-{
-	this.imagePath = imagePath;
+	// This shader renders the f4d clouds.***
+	var standard_shader = new Shader();
+	this.shaders_array.push(standard_shader);
+
+	standard_shader.shader_vertex_source = ShaderSource.PointCloudVS;
+	standard_shader.shader_fragment_source = ShaderSource.PointCloudFS;
+
+	// Default ShaderProgram.********************************************************************
+	standard_shader.SHADER_PROGRAM = gl.createProgram();
+	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
+	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
+	gl.linkProgram(standard_shader.SHADER_PROGRAM);
+
+	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
+	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
+
+	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
+	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
 };
 
-Policy.prototype.getLod0DistInMeters = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) 
 {
-	return this.lod0DistInMeters;
-};
-Policy.prototype.setLod0DistInMeters = function(lod0DistInMeters) 
-{
-	this.lod0DistInMeters = lod0DistInMeters;
-};
-Policy.prototype.getLod1DistInMeters = function() 
-{
-	return this.lod1DistInMeters;
-};
-Policy.prototype.setLod1DistInMeters = function(lod1DistInMeters) 
-{
-	this.lod1DistInMeters = lod1DistInMeters;
-};
-Policy.prototype.getLod2DistInMeters = function() 
-{
-	return this.lod2DistInMeters;
-};
-Policy.prototype.setLod2DistInMeters = function(lod2DistInMeters) 
-{
-	this.lod2DistInMeters = lod2DistInMeters;
-};
-Policy.prototype.getLod3DistInMeters = function() 
-{
-	return this.lod3DistInMeters;
-};
-Policy.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
-{
-	this.lod3DistInMeters = lod3DistInMeters;
+	var shader = new Shader();
+	this.shaders_array.push(shader);
+	shader.shader_vertex_source = ShaderSource.TextureNormalVS;
+	shader.shader_fragment_source = ShaderSource.TextureNormalFS;
+
+	//http://learningwebgl.com/blog/?p=507
+	//https://gist.github.com/elnaqah/5070979
+	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
+	//http://learningwebgl.com/blog/?p=684 // good.***
+	shader.SHADER_PROGRAM = gl.createProgram();
+	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
+	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
+	gl.linkProgram(shader.SHADER_PROGRAM);
+
+	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
+	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
+	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
+	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
+
+	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
+	shader._NormalMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
+
+	//shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
+	shader._lightDirection = gl.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
+
+	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
+	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
+	shader._normal = gl.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
 };
 
-Policy.prototype.getAmbientReflectionCoef = function() 
-{
-	return this.ambientReflectionCoef;
-};
-Policy.prototype.setAmbientReflectionCoef = function(ambientReflectionCoef) 
-{
-	this.ambientReflectionCoef = ambientReflectionCoef;
-};
-Policy.prototype.getDiffuseReflectionCoef = function() 
-{
-	return this.diffuseReflectionCoef;
-};
-Policy.prototype.setDiffuseReflectionCoef = function(diffuseReflectionCoef) 
-{
-	this.diffuseReflectionCoef = diffuseReflectionCoef;
-};
-Policy.prototype.getSpecularReflectionCoef = function() 
-{
-	return this.specularReflectionCoef;
-};
-Policy.prototype.setSpecularReflectionCoef = function(specularReflectionCoef) 
-{
-	this.specularReflectionCoef = specularReflectionCoef;
-};
-Policy.prototype.getAmbientColor = function() 
-{
-	return this.ambientColor;
-};
-Policy.prototype.setAmbientColor = function(ambientColor) 
-{
-	this.ambientColor = ambientColor;
-};
-Policy.prototype.getSpecularColor = function() 
-{
-	return this.specularColor;
-};
-Policy.prototype.setSpecularColor = function(specularColor) 
-{
-	this.specularColor = specularColor;
-};
-Policy.prototype.getSsaoRadius = function() 
-{
-	return this.ssaoRadius;
-};
-Policy.prototype.setSsaoRadius = function(ssaoRadius) 
-{
-	this.ssaoRadius = ssaoRadius;
-};
+//# sourceURL=Shader.js
+
+'use strict';
+var ShaderSource = {};
+ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
+	varying vec4 vColor;\n\
+\n\
+	void main()\n\
+    {\n\
+		gl_FragColor = vColor;\n\
+	}";
+ShaderSource.BlendingCubeVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+attribute vec4 color;\n\
+varying vec4 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    vec3 highDifference = -encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = position.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(position.xyz, 1.0);\n\
+\n\
+    vColor=color;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}";
+ShaderSource.BlurFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+    #endif\n\
+uniform sampler2D colorTex;\n\
+uniform vec2 texelSize;\n\
+varying vec2 vTexCoord; 	 	\n\
+\n\
+void main()\n\
+{\n\
+    vec3 result = vec3(0.0);\n\
+    for (int i = 0; i < 4; ++i) {\n\
+        for (int j = 0; j < 4; ++j) {\n\
+            vec2 offset = vec2(texelSize.x * float(j), texelSize.y * float(i));\n\
+            result += texture2D(colorTex, vTexCoord + offset).rgb;\n\
+        }\n\
+    }\n\
+            \n\
+    gl_FragColor.rgb = vec3(result * 0.0625); \n\
+    gl_FragColor.a = 1.0;\n\
+}\n\
+";
+ShaderSource.BlurVS = "attribute vec4 position;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;  \n\
+\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main()\n\
+{	\n\
+    vTexCoord = texCoord;\n\
+    \n\
+    gl_Position = projectionMatrix * modelViewMatrix * position;\n\
+}\n\
+";
+ShaderSource.BoxDepthFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying float depth;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = packDepth(-depth);\n\
+}\n\
+";
+ShaderSource.BoxDepthVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+\n\
+varying float depth;  \n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    //linear depth in camera space (0..far)\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.BoxSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+const int kernelSize = 16;  \n\
+const float radius = 0.5;      \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{                          \n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+    vec3 normal2 = vNormal;   \n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+        \n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+                                \n\
+    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+    vec3 L = normalize(lightPos);\n\
+    float DiffuseFactor = dot(normal2, L);\n\
+    float NdotL = abs(DiffuseFactor);\n\
+    vec3 diffuse = vec3(NdotL);\n\
+    vec3 ambient = vec3(1.0);\n\
+    vec4 textureColor;\n\
+    textureColor = vcolor4;\n\
+\n\
+    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+    gl_FragColor.a = 1.0;   \n\
+}\n\
+";
+ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec4 color4;\n\
+\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec4 oneColor4;\n\
+uniform bool bUse1Color;\n\
+uniform vec3 scale;\n\
+uniform bool bScale;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;  \n\
+varying vec3 uAmbientColor;\n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+void main()\n\
+{	\n\
+    vec4 position2 = vec4(position.xyz, 1.0);\n\
+    if(bScale)\n\
+    {\n\
+        position2.x *= scale.x;\n\
+        position2.y *= scale.y;\n\
+        position2.z *= scale.z;\n\
+    }\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+   \n\
+    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
+    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+    if(bUse1Color)\n\
+    {\n\
+        vcolor4 = oneColor4;\n\
+    }\n\
+    else\n\
+    {\n\
+        vcolor4 = color4;\n\
+    }\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.CloudFS = "precision lowp float;\n\
+varying vec3 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = vec4(vColor, 1.);\n\
+}";
+ShaderSource.CloudVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 cloudPosHIGH;\n\
+uniform vec3 cloudPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+attribute vec3 color;\n\
+varying vec3 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    vec3 objPosHigh = cloudPosHIGH;\n\
+    vec3 objPosLow = cloudPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    vColor=color;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}";
+ShaderSource.ColorFS = "precision mediump float;\n\
+uniform int byteColor_r;\n\
+uniform int byteColor_g;\n\
+uniform int byteColor_b;\n\
+\n\
+void main()\n\
+{\n\
+    float byteMaxValue = 255.0;\n\
+\n\
+    gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
+}\n\
+";
+ShaderSource.ColorSelectionSsaoFS = "precision highp float;\n\
+uniform vec4 vColor4Aux;\n\
+\n\
+void main()\n\
+{          \n\
+    gl_FragColor = vColor4Aux;\n\
+}\n\
+";
+ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 RefTransfMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec3 refTranslationVec;\n\
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
+void main()\n\
+{\n\
+    vec4 rotatedPos;\n\
+	if(refMatrixType == 0)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 1)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 2)\n\
+	{\n\
+		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    gl_PointSize = 10.0;\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.ColorVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform mat4 RefTransfMatrix;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}\n\
+";
+ShaderSource.LegoDepthFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying float depth;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = packDepth(-depth);\n\
+}\n\
+";
+ShaderSource.LegoDepthVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 RefTransfMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+\n\
+varying float depth;  \n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+    \n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.LegoSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+const int kernelSize = 16;  \n\
+const float radius = 0.5;      \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{                          \n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+    vec3 normal2 = vNormal;   \n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+        \n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+                                \n\
+    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+    vec3 L = normalize(lightPos);\n\
+    float DiffuseFactor = dot(normal2, L);\n\
+    float NdotL = abs(DiffuseFactor);\n\
+    vec3 diffuse = vec3(NdotL);\n\
+    vec3 ambient = vec3(1.0);\n\
+    vec4 textureColor;\n\
+    textureColor = vcolor4;\n\
+\n\
+    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+    gl_FragColor.a = 1.0;   \n\
+}\n\
+";
+ShaderSource.LegoSsaoVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec4 color4;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 RefTransfMatrix;\n\
+uniform mat4 normalMatrix4;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;  \n\
+varying vec3 uAmbientColor;\n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    vec3 rotatedNormal = mat3(RefTransfMatrix) * normal;\n\
+    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+\n\
+    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+    vcolor4 = color4;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.LodBuildingDepthFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying float depth;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = packDepth(-depth);\n\
+}\n\
+";
+ShaderSource.LodBuildingDepthVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+\n\
+varying float depth;  \n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+        \n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+    \n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.LodBuildingSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+uniform bool textureFlipYAxis;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+const int kernelSize = 16;  \n\
+const float radius = 0.5;      \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{                          \n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+\n\
+    vec3 normal2 = vNormal;   \n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+        \n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+                                \n\
+    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+    vec3 L = normalize(lightPos);\n\
+    float DiffuseFactor = dot(normal2, L);\n\
+    float NdotL = abs(DiffuseFactor);\n\
+    vec3 diffuse = vec3(NdotL);\n\
+    vec3 ambient = vec3(1.0);\n\
+    vec4 textureColor;\n\
+    if(hasTexture)\n\
+    {\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        textureColor = vcolor4;\n\
+    }\n\
+    \n\
+    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+    gl_FragColor.a = 1.0;   \n\
+}\n\
+";
+ShaderSource.LodBuildingSsaoVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec4 color4;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform sampler2D diffuseTex;\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec4 oneColor4;\n\
+uniform bool bUse1Color;\n\
+uniform bool hasTexture;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 uAmbientColor;\n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+   \n\
+    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
+    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+\n\
+    if(bUse1Color)\n\
+    {\n\
+        vcolor4 = oneColor4;\n\
+    }\n\
+    else\n\
+    {\n\
+        vcolor4 = color4;\n\
+    }\n\
+    vTexCoord = texCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+uniform bool textureFlipYAxis;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform float shininessValue;\n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+\n\
+varying vec3 diffuseColor;\n\
+uniform vec3 specularColor;\n\
+varying vec3 vertexPos;\n\
+\n\
+const int kernelSize = 16;  \n\
+uniform float radius;      \n\
+\n\
+uniform float ambientReflectionCoef;\n\
+uniform float diffuseReflectionCoef;  \n\
+uniform float specularReflectionCoef; \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{\n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+\n\
+    vec3 normal2 = vNormal;\n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+\n\
+    vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
+    vec3 L = normalize(lightPos - vertexPos);\n\
+    float lambertian = max(dot(normal2, L), 0.0);\n\
+    float specular = 0.0;\n\
+    if(lambertian > 0.0)\n\
+    {\n\
+        vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+        vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+        \n\
+        // Compute the specular term\n\
+        float specAngle = max(dot(R, V), 0.0);\n\
+        specular = pow(specAngle, shininessValue);\n\
+    }\n\
+	\n\
+	if(lambertian < 0.5)\n\
+    {\n\
+		lambertian = 0.5;\n\
+	}\n\
+\n\
+    vec4 textureColor;\n\
+    if(hasTexture)\n\
+    {\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+        if(textureColor.w == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
+    else{\n\
+        textureColor = vColor4Aux;\n\
+    }\n\
+	\n\
+	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
+\n\
+    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+}\n\
+";
+ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 projectionMatrix;  \n\
+	uniform mat4 modelViewMatrix;\n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 RefTransfMatrix;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec3 refTranslationVec;\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
+	varying vec3 vNormal;\n\
+	varying vec2 vTexCoord;  \n\
+	varying vec3 uAmbientColor;\n\
+	varying vec3 vLightWeighting;\n\
+	varying vec3 vertexPos;\n\
+	\n\
+	void main()\n\
+    {	\n\
+		vec4 rotatedPos;\n\
+		mat3 currentTMat;\n\
+		if(refMatrixType == 0)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 1)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 2)\n\
+		{\n\
+			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(RefTransfMatrix);\n\
+		}\n\
+\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
+		vec3 rotatedNormal = currentTMat * normal;\n\
+		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+		uAmbientColor = vec3(0.8);\n\
+		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
+		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		vTexCoord = texCoord;\n\
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+\n\
+        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	}\n\
+";
+ShaderSource.PngImageFS = "precision mediump float;\n\
+varying vec2 v_texcoord;\n\
+uniform bool textureFlipYAxis;\n\
+uniform sampler2D u_texture;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 textureColor;\n\
+    if(textureFlipYAxis)\n\
+    {\n\
+        textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
+    }\n\
+    else\n\
+    {\n\
+        textureColor = texture2D(u_texture, v_texcoord);\n\
+    }\n\
+    if(textureColor.w < 0.1)\n\
+    {\n\
+        discard;\n\
+    }\n\
+\n\
+    gl_FragColor = textureColor;\n\
+}";
+ShaderSource.PngImageVS = "attribute vec3 a_position;\n\
+attribute vec2 a_texcoord;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+varying vec2 v_texcoord;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 position2 = vec4(a_position.xyz, 1.0);\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    v_texcoord = a_texcoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.PointCloudFS = "	precision lowp float;\n\
+	varying vec4 vColor;\n\
+\n\
+	void main()\n\
+    {\n\
+		gl_FragColor = vColor;\n\
+	}";
+ShaderSource.PointCloudVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+attribute vec4 color;\n\
+varying vec4 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    vColor=color;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}";
+ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying float depth;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = packDepth(-depth);\n\
+}\n\
+";
+ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 buildingRotMatrix; \n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 RefTransfMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec3 refTranslationVec;\n\
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
+varying float depth;\n\
+  \n\
+void main()\n\
+{	\n\
+	vec4 rotatedPos;\n\
+\n\
+	if(refMatrixType == 0)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 1)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 2)\n\
+	{\n\
+		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    //linear depth in camera space (0..far)\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.ShowDepthFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying float depth;  \n\
+varying vec3 vN; \n\
+varying vec4 vVSPos;\n\
+\n\
+// from http://spidergl.org/example.php?id=6\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+\n\
+    return res;  \n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragData[0] = packDepth(-depth);\n\
+    gl_FragData[0].r = -depth/far;\n\
+}\n\
+";
+ShaderSource.ShowDepthVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix3;\n\
+uniform mat4 normalMatrix4;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+varying vec3 vN;\n\
+varying float depth;  \n\
+varying vec4 vVSPos;\n\
+\n\
+void main()\n\
+{	\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    vN = normalize((normalMatrix4 * vec4(normal, 1.0)).xyz);\n\
+    \n\
+    //linear depth in camera space (0..far)\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+    vVSPos = modelViewMatrixRelToEye * pos4;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.SilhouetteFS = "precision highp float;\n\
+uniform vec4 vColor4Aux;\n\
+\n\
+void main()\n\
+{          \n\
+    gl_FragColor = vColor4Aux;\n\
+}";
+ShaderSource.SilhouetteVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 buildingRotMatrix; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 ModelViewMatrixRelToEye;\n\
+uniform mat4 ProjectionMatrix;\n\
+uniform mat4 RefTransfMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec3 refTranslationVec;\n\
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform vec2 camSpacePixelTranslation;\n\
+uniform vec2 screenSize;    \n\
+varying vec2 camSpaceTranslation;\n\
+\n\
+void main()\n\
+{    \n\
+    vec4 rotatedPos;\n\
+	if(refMatrixType == 0)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 1)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 2)\n\
+	{\n\
+		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    vec4 camSpacePos = ModelViewMatrixRelToEye * pos4;\n\
+    vec4 translationVec = ProjectionMatrix * vec4(camSpacePixelTranslation.x*(-camSpacePos.z), camSpacePixelTranslation.y*(-camSpacePos.z), 0.0, 1.0);\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+    gl_Position += translationVec;  \n\
+}";
+ShaderSource.SimpleDepthSsaoFS = "precision highp float;\n\
+const vec4 bitEnc = vec4(1.0,255.0,65025.0,16581375.0);\n\
+const vec4 bitDec = 1.0/bitEnc;\n\
+varying float zDepth;\n\
+\n\
+vec4 EncodeFloatRGBA (float v)\n\
+{\n\
+    vec4 enc = bitEnc * v;\n\
+    enc = fract(enc);\n\
+    enc -= enc.yzww * vec2(1.0/255.0, 0.0).xxxy;\n\
+    return enc;\n\
+}\n\
+\n\
+void main()\n\
+{          \n\
+    vec4 encodedZ = EncodeFloatRGBA(zDepth);\n\
+    gl_FragData[0] = encodedZ;\n\
+}\n\
+";
+ShaderSource.SimpleDepthSsaoVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 RefTransfMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+varying float zDepth;\n\
+uniform float far;\n\
+\n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    zDepth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.SsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform vec3 kernel[16];   \n\
+\n\
+varying vec2 vTexCoord;   \n\
+\n\
+const int kernelSize = 16;  \n\
+const float radius = 1.0;      \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{                          \n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+ \n\
+    vec3 normal2 = vNormal;   \n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+\n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+        \n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - (occlusion) / float(kernelSize);\n\
+                                \n\
+    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+    vec3 L = normalize(lightPos);\n\
+    float NdotL = abs(dot(normal2, L));\n\
+    vec3 diffuse = vec3(NdotL);\n\
+    vec3 ambient = vec3(1.0);\n\
+    vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+\n\
+    gl_FragColor.rgb = vec3((textureColor.xyz*0.2 + textureColor.xyz*0.8) * occlusion); // with texture.***\n\
+    gl_FragColor.a = 1.0;   \n\
+}\n\
+";
+ShaderSource.SsaoVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;  \n\
+\n\
+void main()\n\
+{	\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    vNormal = (normalMatrix4 * vec4(-normal.x, -normal.y, -normal.z, 1.0)).xyz;\n\
+    vTexCoord = texCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}";
+ShaderSource.StandardFS = "precision lowp float;\n\
+varying vec3 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = vec4(vColor, 1.);\n\
+}";
+ShaderSource.StandardVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform mat4 RefTransfMatrix;\n\
+attribute vec3 color;\n\
+varying vec3 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+ \n\
+    vColor=color;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}";
+ShaderSource.TextureA1FS = "precision mediump float;\n\
+varying vec4 vColor;\n\
+varying vec2 vTextureCoord;\n\
+uniform sampler2D uSampler;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
+}\n\
+";
+ShaderSource.TextureA1VS = "attribute vec3 position;\n\
+attribute vec4 aVertexColor;\n\
+attribute vec2 aTextureCoord;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+varying vec4 vColor;\n\
+varying vec2 vTextureCoord;\n\
+\n\
+void main()\n\
+{\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+ \n\
+    vColor=aVertexColor;\n\
+    vTextureCoord = aTextureCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}";
+ShaderSource.TextureFS = "precision mediump float;\n\
+varying vec4 vColor;\n\
+varying vec2 vTextureCoord;\n\
+uniform sampler2D uSampler;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
+}";
+ShaderSource.TextureNormalFS = "	precision mediump float;\n\
+	varying vec4 vColor;\n\
+	varying vec2 vTextureCoord;\n\
+	uniform sampler2D uSampler;\n\
+	varying vec3 vLightWeighting;\n\
+\n\
+	void main()\n\
+    {\n\
+		vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
+        \n\
+		gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
+	}\n\
+";
+ShaderSource.TextureNormalVS = "attribute vec3 position;\n\
+attribute vec4 aVertexColor;\n\
+attribute vec2 aTextureCoord;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+varying vec4 vColor;\n\
+varying vec2 vTextureCoord;\n\
+attribute vec3 aVertexNormal;\n\
+varying vec3 uAmbientColor;\n\
+varying vec3 vLightWeighting;\n\
+uniform mat3 uNMatrix;\n\
+\n\
+void main()\n\
+{\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    vColor = aVertexColor;\n\
+    vTextureCoord = aTextureCoord;\n\
+    \n\
+    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+    uAmbientColor = vec3(0.7, 0.7, 0.7);\n\
+    vec3 uLightingDirection = vec3(0.8, 0.2, -0.9);\n\
+    vec3 directionalLightColor = vec3(0.4, 0.4, 0.4);\n\
+    vec3 transformedNormal = uNMatrix * aVertexNormal;\n\
+    float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
+    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+}\n\
+";
+ShaderSource.TextureVS = "attribute vec3 position;\n\
+attribute vec4 aVertexColor;\n\
+attribute vec2 aTextureCoord;\n\
+uniform mat4 Mmatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+varying vec4 vColor;\n\
+varying vec2 vTextureCoord;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 rotatedPos = Mmatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+    vColor=aVertexColor;\n\
+    vTextureCoord = aTextureCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+    \n\
+}";
+
 'use strict';
 
 /**
- * 프로젝트(ship, weather등)의 구성 요소
- * @class SearchCondition
+ * 버퍼 안의 데이터를 어떻게 읽어야 할지 키가 되는 객체
+ * 
+ * @alias Accessor
+ * @class Accessor
  */
-var ProjectLayer = function() 
+var Accessor = function () 
 {
-	if (!(this instanceof ProjectLayer)) 
+
+	if (!(this instanceof Accessor)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.bufferId;
+	// 0= position, 1= normal, 2= color, 3= texcoord.***
+	this.accesorType;
+	this.bufferStart;
+	// 버퍼의 시작 시점
+	this.stride;
+	// character, int 등
+	this.dataType;
+	// 2차원, 3차원
+	this.dimension;
+
+	// 데이터가 포함되어 있는 x,y,z의 한계를 바운드라고 한다. 바운드 좌표
+	this.minX = 0.0;
+	this.minY = 0.0;
+	this.minZ = 0.0;
+	this.maxX = 0.0;
+	this.maxY = 0.0;
+	this.maxZ = 0.0;
+};
+
+'use strict';
+
+/**
+ * 블럭 모델
+ * @class Block
+ */
+var Block = function() 
+{
+	if (!(this instanceof Block)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
+	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+	this.mIFCEntityType = -1;
+	this.isSmallObj = false;
+	this.radius = 10;
+	this.vertexCount = 0; // only for test.*** delete this.***
+
+	this.lego; // legoBlock.***
+};
+
+/**
+ * 블럭이 가지는 데이터 삭제
+ * @returns block
+ */
+Block.prototype.deleteObjects = function(gl, vboMemManager) 
+{
+
+	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
+	this.vBOVertexIdxCacheKeysContainer = undefined;
+	this.mIFCEntityType = undefined;
+	this.isSmallObj = undefined;
+	this.radius = undefined;
+	this.vertexCount = undefined; // only for test.*** delete this.***
+
+	if (this.lego) { this.lego.deleteGlObjects(gl); }
+
+	this.lego = undefined;
+};
+
+/**
+ * 블록 목록
+ * @class BlocksList
+ */
+var BlocksList = function() 
+{
+	if (!(this instanceof BlocksList)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.name = "";
+	this.blocksArray;
+	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = CODE.fileLoadState.READY;
+	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
+};
+
+/**
+ * 새 블록 생성
+ * @returns block
+ */
+BlocksList.prototype.newBlock = function() 
+{
+	if (this.blocksArray === undefined) { this.blocksArray = []; }
+
+	var block = new Block();
+	this.blocksArray.push(block);
+	return block;
+};
+
+/**
+ * 블록 획득
+ * @param idx 변수
+ * @returns block
+ */
+BlocksList.prototype.getBlock = function(idx) 
+{
+	if (this.blocksArray === undefined) { return null; }
+
+	if (idx >= 0 && idx < this.blocksArray.length) 
+	{
+		return this.blocksArray[idx];
+	}
+	return null;
+};
+
+/**
+ * 블록을 삭제
+ * @param idx 변수
+ * @returns block
+ */
+BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
+{
+	if (this.blocksArray === undefined) { return; }
+
+	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) 
+	{
+		var block = this.blocksArray[i];
+		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
+		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+		block.mIFCEntityType = undefined;
+		block.isSmallObj = undefined;
+		block.radius = undefined;
+		block.vertexCount = undefined; // only for test.*** delete this.***
+		if (block.lego) 
+		{
+			block.lego.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
+			block.lego.vbo_vicks_container = undefined;
+		}
+		block.lego = undefined; // legoBlock.***
+		this.blocksArray[i] = undefined;
+	}
+	this.blocksArray = undefined;
+	this.name = undefined;
+	this.fileLoadState = undefined;
+	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
+{
+	var vertexCount;
+	var verticesFloatValuesCount;
+	var normalByteValuesCount;
+	var shortIndicesValuesCount;
+	var sizeLevels;
+	var startBuff, endBuff;
+	
+	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	bytesReaded += 4;
+	for ( var j = 0; j < vboDatasCount; j++ ) 
+	{
+		// 1) Positions array.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		verticesFloatValuesCount = vertexCount * 3;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+
+		// 2) Normals.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		normalByteValuesCount = vertexCount * 3;
+		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+
+		// 3) Indices.
+		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
+		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
+		bytesReaded = bytesReaded + sizeLevels * 4;
+		bytesReaded = bytesReaded + sizeLevels * 4;
+		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
+{
+	var posByteSize;
+	var norByteSize;
+	var idxByteSize;
+	var classifiedPosByteSize;
+	var classifiedNorByteSize;
+	var classifiedIdxByteSize;
+	var startBuff, endBuff;
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	for ( var j = 0; j < vboDatasCount; j++ ) 
+	{
+		// 1) Positions array.
+		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var verticesFloatValuesCount = vertexCount * 3;
+		// now padding the array to adjust to standard memory size of pool.
+		posByteSize = 4 * verticesFloatValuesCount;
+		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+		
+		block.vertexCount = vertexCount;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+		vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
+		vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
+		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+		
+		// 2) Normals.
+		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var normalByteValuesCount = vertexCount * 3;
+		// now padding the array to adjust to standard memory size of pool.
+		norByteSize = 1 * normalByteValuesCount;
+		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 1 * normalByteValuesCount;
+		vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
+		vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
+		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+		
+		// 3) Indices.
+		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		// now padding the array to adjust to standard memory size of pool.
+		idxByteSize = 2 * shortIndicesValuesCount;
+		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
+
+		var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded +=1;
+		var sizeThresholds = [];
+		for ( var k = 0; k < sizeLevels; k++ )
+		{
+			sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))); bytesReaded += 4;
+		}
+		var indexMarkers = [];
+		for ( var k = 0; k < sizeLevels; k++ )
+		{
+			indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		}
+		var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+		vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+
+		vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
+		vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
+		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+		vboViCacheKey.indicesCount = shortIndicesValuesCount;
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	var bytesReaded = 0;
+	var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
+	var gl = magoManager.sceneState.gl;
+	var succesfullyGpuDataBinded = true;
+	
+	// read the version.
+	var versionLength = 5;
+	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
+	bytesReaded += versionLength;
+	
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+	for ( var i = 0; i< blocksCount; i++ ) 
+	{
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+		// Check if block exist.
+		if (motherBlocksArray[blockIdx]) 
+		{
+			// The block exists, then read data but no create a new block.
+			bytesReaded += 4 * 6; // boundingBox.
+			// step over vbo datas of the model.
+			bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
+			
+			// read lego if exist. (note: lego is exactly same of a model, is a mesh).
+			var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+			if (existLego)
+			{
+				bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
+			}
+			
+			continue;
+		}
+		
+		// The block doesn't exist, so creates a new block and read data.
+		var block = new Block();
+		block.idx = blockIdx;
+		motherBlocksArray[blockIdx] = block;
+
+		// 1rst, read bbox.
+		var bbox = new BoundingBox();
+		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
+		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
+		var maxLength = bbox.getMaxLength();
+		if (maxLength < 0.5) { block.isSmallObj = true; }
+		else { block.isSmallObj = false; }
+
+		block.radius = maxLength/2.0;
+
+		bbox.deleteObjects();
+		bbox = undefined;
+		
+		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
+		
+		// now bind vbo buffer datas.
+		var vboDatasCount = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
+		for (var j=0; j<vboDatasCount; j++)
+		{
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[j];
+			
+			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+		}
+		
+		// parse lego if exist.
+		var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		if (existLego)
+		{
+			if (block.lego === undefined)
+			{ block.lego = new Lego(); }
+			
+			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
+		}
+
+	}
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return succesfullyGpuDataBinded;
+};
+
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	var bytesReaded = 0;
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+	
+	var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
+	var gl = magoManager.sceneState.gl;
+	var succesfullyGpuDataBinded = true;
+
+	for ( var i = 0; i< blocksCount; i++ ) 
+	{
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		// Check if block exist.
+		if (motherBlocksArray[blockIdx]) 
+		{
+			// The block exists, then read data but no create a new block.
+			bytesReaded += 4 * 6; // boundingBox.
+			// Read vbo datas (indices cannot superate 65535 value).
+			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+			
+			for ( var j = 0; j < vboDatasCount; j++ ) 
+			{
+				// 1) Positions array.
+				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var verticesFloatValuesCount = vertexCount * 3;
+				startBuff = bytesReaded;
+				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+				bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+
+				// 2) Normals.
+				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var normalByteValuesCount = vertexCount * 3;
+				bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+
+				// 3) Indices.
+				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+				
+				bytesReaded = bytesReaded + sizeLevels * 4;
+				bytesReaded = bytesReaded + sizeLevels * 4;
+				bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+			}
+			// Pendent to load the block's lego.***
+			continue;
+		}
+		
+		// The block doesn't exist, so creates a new block and read data.
+		var block = new Block();
+		block.idx = blockIdx;
+		motherBlocksArray[blockIdx] = block;
+
+		// 1rst, read bbox.
+		var bbox = new BoundingBox();
+		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+
+		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+
+		var maxLength = bbox.getMaxLength();
+		if (maxLength < 0.5) { block.isSmallObj = true; }
+		else { block.isSmallObj = false; }
+
+		block.radius = maxLength/2.0;
+
+		bbox.deleteObjects();
+		bbox = undefined;
+
+		// New for read multiple vbo datas (indices cannot superate 65535 value).***
+		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		bytesReaded += 4;
+		for ( var j = 0; j < vboDatasCount; j++ ) 
+		{
+			// 1) Positions array.
+			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+			var verticesFloatValuesCount = vertexCount * 3;
+			// now padding the array to adjust to standard memory size of pool.
+			posByteSize = 4 * verticesFloatValuesCount;
+			classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+			
+			block.vertexCount = vertexCount;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+			vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
+			vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+			vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
+			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+			
+			// 2) Normals.
+			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			bytesReaded += 4;
+			var normalByteValuesCount = vertexCount * 3;
+			// now padding the array to adjust to standard memory size of pool.
+			norByteSize = 1 * normalByteValuesCount;
+			classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+			
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 1 * normalByteValuesCount;
+			vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
+			vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
+			vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
+			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+			
+			// 3) Indices.
+			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+			// now padding the array to adjust to standard memory size of pool.
+			idxByteSize = 2 * shortIndicesValuesCount;
+			classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
+			
+			bytesReaded += 4;
+			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+			bytesReaded +=1;
+			var sizeThresholds = [];
+			for ( var k = 0; k < sizeLevels; k++ )
+			{
+				sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
+				bytesReaded += 4;
+			}
+			var indexMarkers = [];
+			for ( var k = 0; k < sizeLevels; k++ )
+			{
+				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
+				bytesReaded += 4;
+			}
+			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+			startBuff = bytesReaded;
+			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+
+			vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
+			vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
+			vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
+			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+			vboViCacheKey.indicesCount = shortIndicesValuesCount;
+
+			posByteSize;
+			norByteSize;
+			idxByteSize;
+			
+			classifiedPosByteSize;
+			classifiedNorByteSize;
+			classifiedIdxByteSize;
+			
+			var hola = 0;
+			
+			// test.
+			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
+			{ succesfullyGpuDataBinded = false; }
+		}
+		
+		
+
+		// Pendent to load the block's lego.***
+	}
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return succesfullyGpuDataBinded;
+};
+
+/**
+ * 블록 컨테이너
+ * @class BlocksListsContainer
+ */
+var BlocksListsContainer = function() 
+{
+	if (!(this instanceof BlocksListsContainer)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.blocksListsArray = [];
+};
+
+/**
+ * 새 블록 리스트를 생성
+ * @param blocksListName 변수
+ * @returns blocksList
+ */
+BlocksListsContainer.prototype.newBlocksList = function(blocksListName) 
+{
+	var blocksList = new BlocksList();
+	blocksList.name = blocksListName;
+	this.blocksListsArray.push(blocksList);
+	return blocksList;
+};
+
+/**
+ * 블록 리스트 획득
+ * @param blockList_name 변수
+ * @returns blocksList
+ */
+BlocksListsContainer.prototype.getBlockList = function(blockList_name) 
+{
+	var blocksListsCount = this.blocksListsArray.length;
+	var found = false;
+	var i=0;
+	var blocksList = null;
+	while (!found && i<blocksListsCount) 
+	{
+		var currentBlocksList = this.blocksListsArray[i];
+		if (currentBlocksList.name === blockList_name) 
+		{
+			found = true;
+			blocksList = currentBlocksList;
+		}
+		i++;
+	}
+	return blocksList;
+};
+
+'use strict';
+
+/**
+ * F4D Lego 클래스
+ * 
+ * @alias Lego
+ * @class Lego
+ */
+var Lego = function() 
+{
+	if (!(this instanceof Lego)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.fileLoadState = CODE.fileLoadState.READY;
+	this.dataArrayBuffer;
+	this.selColor4;
+};
+
+/**
+ * F4D Lego 자료를 읽는다
+ * 
+ * @param {any} gl 
+ * @param {any} readWriter 
+ * @param {any} dataArraybuffer 
+ * @param {any} bytesReaded 
+ */
+Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
+{
+	this.parseLegoData(dataArraybuffer, gl, magoManager);
+};
+
+/**
+ * F4D Lego 자료를 읽는다
+ * 
+ * @param {any} gl 
+ * @param {any} readWriter 
+ * @param {any} dataArraybuffer 
+ * @param {any} bytesReaded 
+ */
+Lego.prototype.deleteObjects = function(gl, vboMemManager)
+{
+	this.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
+	this.vbo_vicks_container = undefined;
+	this.fileLoadState = undefined;
+	this.dataArrayBuffer = undefined;
+	if (this.selColor4 !== undefined)
+	{
+		this.selColor4.deleteObjects();
+		this.selColor4 = undefined;
+	}
+};
+
+/**
+ * F4D Lego 자료를 읽는다
+ * 
+ * @param {ArrayBuffer} buffer 
+ */
+Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
+{
+	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
+	
+	var vboMemManager = magoManager.vboMemoryManager;
+
+	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+
+	var bbox = new BoundingBox();
+	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+
+	// BoundingBox
+	bbox.minX = stream.readFloat32();
+	bbox.minY = stream.readFloat32();
+	bbox.minZ = stream.readFloat32();
+	bbox.maxX = stream.readFloat32();
+	bbox.maxY = stream.readFloat32();
+	bbox.maxZ = stream.readFloat32();
+
+	// VBO(Position Buffer) - x,y,z
+	var numPositions = stream.readUint32();
+	var posByteSize = 4 * numPositions * 3;
+	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+	//var positionBuffer = stream.readFloat32Array(numPositions * 3); // original.***
+	var positionBuffer = new Float32Array(classifiedPosByteSize);
+	positionBuffer.set(stream.readFloat32Array(numPositions * 3));
+	// console.log(numPositions + " Positions = " + positionBuffer[0]);
+
+	vboCacheKey.vertexCount = numPositions;
+	vboCacheKey.posVboDataArray = positionBuffer;
+	vboCacheKey.posArrayByteSize = classifiedPosByteSize;
+
+	// VBO(Normal Buffer) - i,j,k
+	var hasNormals = stream.readUint8();
+	if (hasNormals) 
+	{
+		var numNormals = stream.readUint32();
+		var norByteSize = 1 * numNormals * 3;
+		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		//var normalBuffer = stream.readInt8Array(numNormals * 3); // original.***
+		var normalBuffer = new Int8Array(classifiedNorByteSize);
+		normalBuffer.set(stream.readInt8Array(numNormals * 3));
+		// console.log(numNormals + " Normals = " + normalBuffer[0]);
+
+		vboCacheKey.norVboDataArray = normalBuffer;
+		vboCacheKey.norArrayByteSize = classifiedNorByteSize;
+	}
+
+	// VBO(Color Buffer) - r,g,b,a
+	var hasColors = stream.readUint8();
+	if (hasColors)
+	{
+		var numColors = stream.readUint32();
+		var colByteSize = 1 * numColors * 4;
+		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+						
+		//var colorBuffer = stream.readUint8Array(numColors * 4); // original.***
+		var colorBuffer = new Uint8Array(classifiedColByteSize);
+		colorBuffer.set(stream.readUint8Array(numColors * 4));
+		// console.log(numColors + " Colors = " + colorBuffer[0]);
+
+		vboCacheKey.colVboDataArray = colorBuffer;
+		vboCacheKey.colArrayByteSize = classifiedColByteSize;
+	}
+
+	// VBO(TextureCoord Buffer) - u,v
+	var hasTexCoords = stream.readUint8();
+	if (hasTexCoords)
+	{
+		var dataType = stream.readUint16();
+		var numCoords = stream.readUint32();
+		var tCoordByteSize = 2 * numCoords * 4;
+		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+		//var coordBuffer = stream.readFloat32Array(numCoords * 2); // original.***
+		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
+		coordBuffer.set(stream.readFloat32Array(numCoords * 2));
+		// console.log(numCoords + " Coords = " + coordBuffer[0]);
+
+		vboCacheKey.tcoordVboDataArray = coordBuffer;
+		vboCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+	}
+
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	
+	var succesfullyGpuDataBinded = true;
+	if (!vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
+	if (!vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
+	if (!vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+	{ succesfullyGpuDataBinded = false; }
+
+	// 4) Texcoord.*********************************************
+	if (hasTexCoords)
+	{
+		if (!vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+		{ succesfullyGpuDataBinded = false; }
+	}	
+	return succesfullyGpuDataBinded;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use strict';
+
+/**
+ * F4D MetaData 클래스
+ * 
+ * @alias MetaData
+ * @class MetaData
+ */
+var MetaData = function() 
+{
+	if (!(this instanceof MetaData)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.guid; // must be undefined initially.***
+	this.version = "";
+	this.geographicCoord; // longitude, latitude, altitude.***
+
+	this.heading;
+	this.pitch;
+	this.roll;
+
+	this.bbox; // BoundingBox.***
+	this.imageLodCount;
+
+	// Buildings octree mother size.***
+	this.oct_min_x = 0.0;
+	this.oct_max_x = 0.0;
+	this.oct_min_y = 0.0;
+	this.oct_max_y = 0.0;
+	this.oct_min_z = 0.0;
+	this.oct_max_z = 0.0;
+
+	this.isSmall = false;
+	this.fileLoadState = CODE.fileLoadState.READY;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param arrayBuffer 변수
+ * @param readWriter 변수
+ */
+MetaData.prototype.deleteObjects = function() 
+{
+	this.guid = undefined; // must be undefined initially.***
+	this.version = undefined;
+	if (this.geographicCoord)
+	{ this.geographicCoord.deleteObjects(); }
+	this.geographicCoord = undefined; // longitude, latitude, altitude.***
+
+	this.heading = undefined;
+	this.pitch = undefined;
+	this.roll = undefined;
+
+	if (this.bbox)
+	{ this.bbox.deleteObjects(); }
+	this.bbox = undefined; // BoundingBox.***
+	this.imageLodCount = undefined;
+
+	// Buildings octree mother size.***
+	this.oct_min_x = undefined;
+	this.oct_max_x = undefined;
+	this.oct_min_y = undefined;
+	this.oct_max_y = undefined;
+	this.oct_min_z = undefined;
+	this.oct_max_z = undefined;
+
+	this.isSmall = undefined;
+	this.fileLoadState = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param arrayBuffer 변수
+ * @param readWriter 변수
+ */
+MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter, neoBuilding) 
+{
+	var version_string_length = 5;
+	var intAux_scratch = 0;
+	var auxScratch;
+	//var header = BR_Project._header;
+	//var arrayBuffer = this.fileArrayBuffer;
+	//var bytes_readed = this.fileBytesReaded;
+	var bytes_readed = 0;
+
+	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
+
+	// 1) Version(5 chars).***********
+	this.version = "";
+	for (var j=0; j<version_string_length; j++)
+	{
+		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	}
+
+	// 3) Global unique ID.*********************
+	if (this.guid === undefined) { this.guid =""; }
+
+	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for (var j=0; j<intAux_scratch; j++)
+	{
+		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+	}
+
+	// 4) Location.*************************
+	if (this.longitude === undefined) 
+	{
+		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+	}
+	else { bytes_readed += 8; }
+
+	if (this.latitude === undefined) 
+	{
+		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+	}
+	else { bytes_readed += 8; }
+
+	if (this.altitude === undefined) 
+	{
+		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	}
+	else { bytes_readed += 4; }
+
+	//this.altitude -= 140.0; // TEST.***
+
+	//header._elevation += 70.0; // delete this. TEST.!!!
+	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
+
+	// 6) BoundingBox.************************
+	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	this.bbox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+
+	var isLarge = false;
+	if (this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0) 
+	{
+		isLarge = true;
+	}
+
+	if (!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0) 
+	{
+		this.isSmall = true;
+	}
+
+	return bytes_readed;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use strict';
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ModelReferencedGroup
+ */
+var ModelReferencedGroup = function() 
+{
+	if (!(this instanceof ModelReferencedGroup)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	this.modelIdx; // there are only one model.
+	this.referencesIdxArray = []; // all references has the same model.
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ModelReferencedGroupsList
+ */
+var ModelReferencedGroupsList = function() 
+{
+	if (!(this instanceof ModelReferencedGroupsList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// project id
-	this.projectId = null;
-	// block id
-	this.blockId = null;
-	// object id
-	this.objectId = null;
+	this.modelReferencedGroupsMap = [];
+	this.modelReferencedGroupsArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+ModelReferencedGroupsList.prototype.getModelReferencedGroup = function(modelIdx) 
+{
+	var modelReferencedGroup = this.modelReferencedGroupsMap[modelIdx];
+	
+	if (modelReferencedGroup === undefined)
+	{
+		modelReferencedGroup = new ModelReferencedGroup();
+		modelReferencedGroup.modelIdx = modelIdx;
+		this.modelReferencedGroupsMap[modelIdx] = modelReferencedGroup;
+	}
+	
+	return modelReferencedGroup;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+ModelReferencedGroupsList.prototype.makeModelReferencedGroupsArray = function() 
+{
+	this.modelReferencedGroupsArray.length = 0;
+	
+	var modelRefGroupsCount = this.modelReferencedGroupsMap.length;
+	for (var i=0; i<modelRefGroupsCount; i++)
+	{
+		if (this.modelReferencedGroupsMap[i] !== undefined)
+		{ this.modelReferencedGroupsArray.push(this.modelReferencedGroupsMap[i]); }
+	}
+	this.modelReferencedGroupsMap.length = 0;
 	
 };
 
-ProjectLayer.prototype.getProjectId = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+ModelReferencedGroupsList.prototype.createModelReferencedGroups = function(neoRefsIndices, motherNeoRefsList) 
 {
-	return this.projectId;
-};
-ProjectLayer.prototype.setProjectId = function(projectId) 
-{
-	this.projectId = projectId;
+	// Group all the references that has the same model.
+	if (neoRefsIndices === undefined)
+	{ return; }
+	
+	if (motherNeoRefsList === undefined)
+	{ return; }
+	
+	var referenceIdx;
+	var modelIdx;
+	var modelRefGroup;
+	var referencesCount = neoRefsIndices.length;
+	for (var i=0; i<referencesCount; i++)
+	{
+		referenceIdx = neoRefsIndices[i];
+		modelIdx = motherNeoRefsList[referenceIdx]._block_idx;
+		modelRefGroup = this.getModelReferencedGroup(modelIdx);
+		modelRefGroup.referencesIdxArray.push(referenceIdx);
+	}
+	
+	// Now, delete the "modelReferencedGroupsMap" and make a simple array.
+	this.makeModelReferencedGroupsArray();
+	
 };
 
-ProjectLayer.prototype.getBlockId = function() 
+
+
+
+
+'use strict';
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class NeoReference
+ */
+var NeoReference = function() 
 {
-	return this.blockId;
-};
-ProjectLayer.prototype.setBlockId = function(blockId) 
-{
-	this.blockId = blockId;
+	if (!(this instanceof NeoReference)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// 1) Object IDX.***
+	this._id = 0;
+
+	this.objectId = "";
+
+	// 2) Block Idx.***
+	this._block_idx = -1;
+
+	// 3) Transformation Matrix.***
+	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
+	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
+	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
+	this.refMatrixType = 2; // 0 = identity matrix, 1 = translate matrix, 2 = transformation matrix.
+	this.refTranslationVec; // use this if "refMatrixType" === 1.
+	// 4) VBO datas container.***
+	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
+
+	// 5) The texture image.***
+	this.materialId;
+	this.hasTexture = false;
+	this.texture; // Texture
+
+	// 6) 1 color.***
+	this.color4; //new Color();
+	this.aditionalColor; // used when object color was changed.***
+
+	// 7) selection color.***
+	//this.selColor4; //new Color(); // delete this..***
+
+	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
+
+	// 8) movement of the object.***
+	this.moveVector; // Point3D.***
+
+	// 9) check for render.***
+	this.bRendered = false;
 };
 
-ProjectLayer.prototype.getObjectId = function() 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
 {
-	return this.objectId;
+	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
 };
-ProjectLayer.prototype.setObjectId = function(objectId) 
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
 {
-	this.objectId = objectId;
+	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
+	if (this.tMatrixAuxArray === undefined)
+	{ this.tMatrixAuxArray = []; }
+
+	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.hasKeyMatrix = function(idxKey) 
+{
+	if (this.tMatrixAuxArray === undefined)
+	{ return false; }
+
+	if (this.tMatrixAuxArray[idxKey] === undefined)
+	{ return false; }
+	else
+	{ return true; }
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoReference.prototype.deleteObjects = function(gl, vboMemManager) 
+{
+	// 1) Object ID.***
+	this._id = undefined;
+
+	// 2) Block Idx.***
+	this._block_idx = undefined;
+
+	// 3) Transformation Matrix.***
+	this._matrix4._floatArrays = undefined;
+	this._matrix4 = undefined;
+	this._originalMatrix4._floatArrays = undefined;
+	this._originalMatrix4 = undefined; //
+
+	// 5) The texture image.***
+	this.hasTexture = undefined;
+	// no delete the texture, only break the referencing.
+	this.texture = undefined; // Texture
+
+	// 6) 1 color.***
+	if (this.color4)
+	{ this.color4.deleteObjects(); }
+	this.color4 = undefined; //new Color();
+
+	// 7) selection color.***
+	if (this.selColor4)
+	{ this.selColor4.deleteObjects(); }
+	this.selColor4 = undefined; //new Color(); // use for selection only.***
+
+	this.vertexCount = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
+
+	// 8) movement of the object.***
+	if (this.moveVector)
+	{ this.moveVector.deleteObjects(); }
+	this.moveVector = undefined; // Point3D.***
+
+	this.bRendered = undefined;
+};
+
+//*************************************************************************************************************************************************************
+//*************************************************************************************************************************************************************
+//*************************************************************************************************************************************************************
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class NeoReferencesMotherAndIndices
+ */
+var NeoReferencesMotherAndIndices = function() 
+{
+	if (!(this instanceof NeoReferencesMotherAndIndices)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
+	this.neoRefsIndices = []; // All objects(references) of this class.
+	this.modelReferencedGroupsList; // (for new format).
+	this.blocksList;
+
+	this.fileLoadState = 0; // init as "READY".
+	this.dataArraybuffer;
+	this.succesfullyGpuDataBinded;
+
+	this.exterior_ocCullOctree; // octree that contains the visible indices.
+	this.interior_ocCullOctree; // octree that contains the visible indices.
+	
+	this.currentVisibleIndices = [];
+	this.currentVisibleMRG; // MRG = ModelReferencedGroup (for new format).
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param matrix 변수
+ */
+NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
+{
+	var refIndicesCount = this.neoRefsIndices.length;
+	for (var i=0; i<refIndicesCount; i++)
+	{
+		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
+	}
+};
+
+NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z, applyOcclusionCulling) 
+{
+	if (applyOcclusionCulling === undefined)
+	{ applyOcclusionCulling = true; }
+	
+	if (isExterior)
+	{
+		if (this.exterior_ocCullOctree !== undefined)
+		{
+			var thisHasOcCullData = false;
+			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
+			{ thisHasOcCullData = true; }
+		
+			if (thisHasOcCullData && applyOcclusionCulling)
+			{
+				if (this.currentVisibleMRG === undefined)
+				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
+				
+				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
+			}
+			else 
+			{
+				// In this case there are no occlusionCulling data.
+				this.currentVisibleIndices = this.neoRefsIndices;
+				this.currentVisibleMRG = this.modelReferencedGroupsList;
+			}
+		}
+	}
+	else
+	{
+		if (this.interior_ocCullOctree !== undefined)
+		{
+			var thisHasOcCullData = false;
+			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
+			{ thisHasOcCullData = true; }
+		
+			if (thisHasOcCullData && applyOcclusionCulling)
+			{
+				if (this.currentVisibleMRG === undefined)
+				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
+				
+				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
+			}
+			else
+			{
+				// In this case there are no occlusionCulling data.
+				this.currentVisibleIndices = this.neoRefsIndices;
+				this.currentVisibleMRG = this.modelReferencedGroupsList;
+			}
+		}
+	}
+};
+
+/**
+ * Returns the neoReference
+ * @param matrix 변수
+ */
+NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) 
+{
+	return this.motherNeoRefsList[this.neoRefsIndices[idx]];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
+{
+	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
+	this.neoRefsIndices = undefined;
+	this.blocksList = undefined;
+
+	this.fileLoadState = 0;
+	this.dataArraybuffer = undefined;
+
+	this.exterior_ocCullOctree = undefined;
+	this.interior_ocCullOctree = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() 
+{
+	var refIndicesCount = this.neoRefsIndices.length;
+	for (var i=0; i<refIndicesCount; i++)
+	{
+		this.motherNeoRefsList[this.neoRefsIndices[i]].bRendered = false;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function() 
+{
+	// Group all the references that has the same model.
+	if (this.neoRefsIndices === undefined)
+	{ return; }
+	
+	if (this.modelReferencedGroupsList === undefined)
+	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
+
+	this.modelReferencedGroupsList.createModelReferencedGroups(this.neoRefsIndices, this.motherNeoRefsList);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param arrayBuffer 변수
+ * @param neoBuilding 변수
+ * @param readWriter 변수
+ */
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+
+	var startBuff;
+	var endBuff;
+	var bytes_readed = 0;
+	var testIdentityMatsCount = 0;
+	var stadistic_refMat_Identities_count = 0;
+	var stadistic_refMat_Translates_count = 0;
+	var stadistic_refMat_Transforms_count = 0;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
+	var colByteSize, tCoordByteSize;
+	this.succesfullyGpuDataBinded = true;
+	var translationX, translationY, translationZ;
+	
+	// read the version.
+	var versionLength = 5;
+	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+versionLength)));
+	bytes_readed += versionLength;
+
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for (var i = 0; i < neoRefsCount; i++) 
+	{
+		var neoRef = new NeoReference();
+
+		// 1) Id.***
+		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._id = ref_ID;
+
+		this.motherNeoRefsList = motherNeoReferencesArray;
+		if (motherNeoReferencesArray[neoRef._id] !== undefined)
+		{
+			// pass this neoReference because exist in the motherNeoReferencesArray.***
+			neoRef = motherNeoReferencesArray[neoRef._id];
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			
+			neoRef.objectId = objectId;
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			// in versioned mode read the matrixType first.
+			var matrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (matrixType === 0)
+			{ 
+				// do nothing.
+			}
+			else if (matrixType === 1)
+			{
+				// read the translation vector.
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			}
+			else if (matrixType === 2)
+			{
+				// read the transformation matrix.
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			}
+
+			// Float mode.**************************************************************
+			// New modifications for xxxx 20161013.*****************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+					}
+				}
+			}
+			
+			// 4) short texcoords. OLD. Change this for Materials.***
+			var materialIdAux = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			
+			// do the stadistic recount.
+			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType === 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
+		}
+		else
+		{
+
+			motherNeoReferencesArray[neoRef._id] = neoRef;
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			if (objectId === "noObjectId")
+			{ objectId = neoRef._id; }
+		
+			neoRef.objectId = objectId;
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			neoRef.refMatrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (neoRef.refMatrixType === 0)
+			{ 
+				// do nothing.
+				stadistic_refMat_Identities_count +=1;
+			}
+			else if (neoRef.refMatrixType === 1)
+			{
+				// read the translation vector.
+				translationX = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				translationY = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				translationZ = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef.refTranslationVec = new Float32Array([translationX, translationY, translationZ]);
+				
+				stadistic_refMat_Translates_count +=1;
+			}
+			else if (neoRef.refMatrixType === 2)
+			{
+				// read the transformation matrix.
+				neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+				neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				stadistic_refMat_Transforms_count +=1;
+			}
+
+			// Float mode.**************************************************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+
+				neoRef.color4 = new Color();
+				neoRef.color4.set(r, g, b, alfa);
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				if (vboDatasCount > 0)
+				{
+					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
+					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+				}
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+					
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						colByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						// TODO: Float32Array or UintArray depending of dataType.***
+						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
+						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						// example: posByteSize = 4 * verticesFloatValuesCount;
+						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+				}
+			}
+
+			// 4) read the reference material id.
+			neoRef.materialId = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			if (neoRef.materialId === -1)
+			{ neoRef.hasTexture = false; }
+			else { neoRef.hasTexture = true; }
+
+			if (tMatrix4)
+			{
+				// multiply the building transformation matrix with the reference matrix, then we save aditional multiplications inside the shader.
+				neoRef.multiplyTransformMatrix(tMatrix4);
+			}
+		}
+
+	}
+	
+	// finally read the triangles count.
+	var trianglesCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	
+	//this.createModelReferencedGroups(); // test for stadistics.
+	
+
+	// Now occlusion cullings.***
+	// Occlusion culling octree data.*****
+	if (this.exterior_ocCullOctree === undefined)
+	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var infiniteOcCullBox = this.exterior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
+	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
+	infiniteOcCullBox.setSizesSubBoxes();
+	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	if (this.interior_ocCullOctree === undefined)
+	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var ocCullBox = this.interior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
+	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	ocCullBox.setSizesSubBoxes();
+	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return this.succesfullyGpuDataBinded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param arrayBuffer 변수
+ * @param neoBuilding 변수
+ * @param readWriter 변수
+ */
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
+{
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+
+	var startBuff;
+	var endBuff;
+	var bytes_readed = 0;
+	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	var testIdentityMatsCount = 0;
+	var stadistic_refMat_Identities_count = 0;
+	var stadistic_refMat_Translates_count = 0;
+	var stadistic_refMat_Transforms_count = 0;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
+	var colByteSize, tCoordByteSize;
+	this.succesfullyGpuDataBinded = true;
+
+	for (var i = 0; i < neoRefsCount; i++) 
+	{
+		var neoRef = new NeoReference();
+
+		// 1) Id.***
+		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		neoRef._id = ref_ID;
+
+		this.motherNeoRefsList = motherNeoReferencesArray;
+		if (motherNeoReferencesArray[neoRef._id] !== undefined)
+		{
+			// pass this neoReference because exist in the motherNeoReferencesArray.***
+			neoRef = motherNeoReferencesArray[neoRef._id];
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			// Float mode.**************************************************************
+			// New modifications for xxxx 20161013.*****************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+					}
+				}
+			}
+			
+			// 4) short texcoords. OLD. Change this for Materials.***
+			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
+			if (textures_count > 0) 
+			{
+
+				// Now, read the texture_type and texture_file_name.***
+				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var j=0; j<texture_type_nameLegth; j++) 
+				{
+					bytes_readed += 1; // for example "diffuse".***
+				}
+
+				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var j=0; j<texture_fileName_Legth; j++) 
+				{
+					bytes_readed += 1;
+				}
+			} 
+			
+			// do the stadistic recount.
+			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType === 1){ stadistic_refMat_Translates_count +=1; }
+			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
+		}
+		else
+		{
+
+			motherNeoReferencesArray[neoRef._id] = neoRef;
+			if (this.neoRefsIndices === undefined)
+			{ this.neoRefsIndices = []; }
+			
+			this.neoRefsIndices.push(neoRef._id);
+
+			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
+			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
+			if (objectId === "noObjectId" || objectId === "")
+			{ objectId = neoRef._id; }
+		
+			neoRef.objectId = objectId;
+			bytes_readed += objectIdLength;
+
+			// 2) Block's Idx.***
+			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._block_idx = blockIdx;
+
+			// 3) Transform Matrix4.***
+			neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			
+			// Compute the references matrix type.
+			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
+			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
+			if (neoRef.refMatrixType === 1)
+			{
+				neoRef.refTranslationVec = new Float32Array([neoRef._originalMatrix4._floatArrays[12], neoRef._originalMatrix4._floatArrays[13], neoRef._originalMatrix4._floatArrays[14]]);
+				stadistic_refMat_Translates_count +=1;
+			}
+			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
+
+			// Float mode.**************************************************************
+			// New modifications for xxxx 20161013.*****************************
+			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			if (has_1_color) 
+			{
+				// "type" : one of following
+				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
+				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+				var daya_bytes;
+				if (data_type === 5121) { daya_bytes = 1; }
+
+				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				var alfa = 255;
+
+				if (dim === 4) 
+				{
+					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
+				}
+
+				neoRef.color4 = new Color();
+				neoRef.color4.set(r, g, b, alfa);
+			}
+			
+			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+			
+			if (has_colors || has_texCoords)
+			{
+				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				
+				if (vboDatasCount > 0)
+				{
+					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
+					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+				}
+				
+				for (var j=0; j<vboDatasCount; j++)
+				{
+					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+					
+					if (has_colors)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * dim;
+						colByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						// TODO: Float32Array or UintArray depending of dataType.***
+						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
+						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+					
+					if (has_texCoords)
+					{
+						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+						
+						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
+						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
+						else if (data_type === 5126) { daya_bytes = 4; }
+						
+						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						// example: posByteSize = 4 * verticesFloatValuesCount;
+						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
+						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+						
+						neoRef.vertexCount = vertexCount; // no necessary.***
+						startBuff = bytes_readed;
+						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
+						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
+						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+						bytes_readed += daya_bytes * verticesFloatValuesCount;
+						
+						// send data to gpu.
+						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+						{
+							this.succesfullyGpuDataBinded = false;
+						}
+					}
+				}
+			}
+
+			// 4) short texcoords. OLD. Change this for Materials.***
+			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
+			if (textures_count > 0) 
+			{
+				var textureTypeName = "";
+				var textureImageFileName = "";
+
+				// Now, read the texture_type and texture_file_name.***
+				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var j=0; j<texture_type_nameLegth; j++) 
+				{
+					textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+				}
+
+				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var j=0; j<texture_fileName_Legth; j++) 
+				{
+					textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+				
+				if (texture_fileName_Legth > 0)
+				{
+					neoRef.texture = new Texture();
+					neoRef.hasTexture = true;
+					neoRef.texture.textureTypeName = textureTypeName;
+					neoRef.texture.textureImageFileName = textureImageFileName;
+				}
+
+				/*
+				// 1pixel texture, wait for texture to load.********************************************
+				if(neoRef.texture.texId === undefined)
+					neoRef.texture.texId = gl.createTexture();
+				gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				*/
+			}
+			else 
+			{
+				neoRef.hasTexture = false;
+			}
+
+			if (tMatrix4)
+			{
+				neoRef.multiplyTransformMatrix(tMatrix4);
+			}
+		}
+
+	}
+	
+	//this.createModelReferencedGroups(); // test for new format.
+	
+
+	// Now occlusion cullings.***
+	// Occlusion culling octree data.*****
+	if (this.exterior_ocCullOctree === undefined)
+	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var infiniteOcCullBox = this.exterior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
+	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
+	infiniteOcCullBox.setSizesSubBoxes();
+	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	if (this.interior_ocCullOctree === undefined)
+	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
+
+	var ocCullBox = this.interior_ocCullOctree;
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
+	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
+	ocCullBox.setSizesSubBoxes();
+	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
+
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return this.succesfullyGpuDataBinded;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use strict';
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class NeoTexture
+ */
+var NeoTexture = function() 
+{
+	if (!(this instanceof NeoTexture)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	this.lod;
+	this.textureId; // texture id in gl.***
+	this.texImage; // image. delete this once upload to gl.***
+	this.loadStarted = false;
+	this.loadFinished = false;
+};
+'use strict';
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class Octree
+ *
+ * @param octreeOwner 변수
+ */
+var Octree = function(octreeOwner) 
+{
+	if (!(this instanceof Octree)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// Note: an octree is a cube, not a box.***
+	this.centerPos = new Point3D();
+	this.half_dx = 0.0; // half width.***
+	this.half_dy = 0.0; // half length.***
+	this.half_dz = 0.0; // half height.***
+
+	this.octree_owner;
+	this.octree_level = 0;
+	this.octree_number_name = 0;
+	this.squareDistToEye = 10000.0;
+	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
+	this.fileLoadState = CODE.fileLoadState.READY;
+
+	if (octreeOwner) 
+	{
+		this.octree_owner = octreeOwner;
+		this.octree_level = octreeOwner.octree_level + 1;
+	}
+
+	this.subOctrees_array = [];
+	this.neoReferencesMotherAndIndices; // Asimetric mode.***
+
+	// now, for legoStructure.***
+	this.lego;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns subOctree 변수
+ */
+Octree.prototype.new_subOctree = function() 
+{
+	var subOctree = new Octree(this);
+	subOctree.octree_level = this.octree_level + 1;
+	this.subOctrees_array.push(subOctree);
+	return subOctree;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager) 
+{
+	if (this.neoReferencesMotherAndIndices)
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
+
+	this.neoReferencesMotherAndIndices = undefined;
+
+	// delete the blocksList.***
+	if (this.neoRefsList_Array !== undefined) 
+	{
+		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
+		{
+			if (this.neoRefsList_Array[i]) 
+			{
+				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
+			}
+			this.neoRefsList_Array[i] = undefined;
+		}
+		this.neoRefsList_Array = undefined;
+	}
+
+	if (this.subOctrees_array !== undefined) 
+	{
+		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].deleteObjectsModelReferences(gl, vboMemManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.deleteObjects = function(gl, vboMemManager) 
+{
+	if (this.lego !== undefined) 
+	{
+		this.lego.deleteObjects(gl, vboMemManager);
+		this.lego = undefined;
+	}
+	
+	this.legoDataArrayBuffer = undefined;
+	this.centerPos.deleteObjects();
+	this.centerPos = undefined;
+	this.half_dx = undefined; // half width.***
+	this.half_dy = undefined; // half length.***
+	this.half_dz = undefined; // half height.***
+
+	this.octree_owner = undefined;
+	this.octree_level = undefined;
+	this.octree_number_name = undefined;
+	this.squareDistToEye = undefined;
+	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.***
+	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+
+	this.neoBuildingOwner = undefined;
+
+	if (this.neoReferencesMotherAndIndices)
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
+
+	this.neoReferencesMotherAndIndices = undefined;
+
+	// delete the blocksList.***
+	if (this.neoRefsList_Array !== undefined) 
+	{
+		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
+		{
+			if (this.neoRefsList_Array[i]) 
+			{
+				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
+			}
+			this.neoRefsList_Array[i] = undefined;
+		}
+		this.neoRefsList_Array = undefined;
+	}
+
+	if (this.subOctrees_array !== undefined) 
+	{
+		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].deleteObjects(gl, vboMemManager);
+			this.subOctrees_array[i] = undefined;
+		}
+		this.subOctrees_array = undefined;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.deleteLod0GlObjects = function(gl, vboMemManager) 
+{
+	if (this.neoReferencesMotherAndIndices)
+	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
+
+	if (this.subOctrees_array !== undefined) 
+	{
+		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].deleteLod0GlObjects(gl, vboMemManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.setRenderedFalseToAllReferences = function() 
+{
+
+
+	if (this.neoReferencesMotherAndIndices)
+	{
+		this.neoReferencesMotherAndIndices.setRenderedFalseToAllReferences();
+		var subOctreesCount = this.subOctrees_array.length;
+		for (var i=0; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].setRenderedFalseToAllReferences();
+		}
+	}
+
+
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.makeTree = function(treeDepth) 
+{
+	if (this.octree_level < treeDepth) 
+	{
+		for (var i=0; i<8; i++) 
+		{
+			var subOctree = this.new_subOctree();
+			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
+		}
+
+		this.setSizesSubBoxes();
+
+		for (var i=0; i<8; i++) 
+		{
+			this.subOctrees_array[i].makeTree(treeDepth);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param intNumber 변수
+ * @returns numDigits
+ */
+Octree.prototype.getNumberOfDigits = function(intNumber) 
+{
+	if (intNumber > 0) 
+	{
+		var numDigits = Math.floor(Math.log10(intNumber)+1);
+		return numDigits;
+	}
+	else 
+	{
+		return 1;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.getMotherOctree = function() 
+{
+	if (this.octree_owner === undefined) { return this; }
+
+	return this.octree_owner.getMotherOctree();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param octreeNumberName 변수
+ * @param numDigits 변수
+ * @returns subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
+ */
+Octree.prototype.getOctree = function(octreeNumberName, numDigits) 
+{
+	if (numDigits === 1) 
+	{
+		if (octreeNumberName === 0) { return this.getMotherOctree(); }
+		else { return this.subOctrees_array[octreeNumberName-1]; }
+	}
+
+	// determine the next level octree.***
+	var exp = numDigits-1;
+	var denominator = Math.pow(10, exp);
+	var idx = Math.floor(octreeNumberName /denominator) % 10;
+	var rest_octreeNumberName = octreeNumberName - idx * denominator;
+	return this.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param octreeNumberName 변수
+ * @returns motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
+ */
+Octree.prototype.getOctreeByNumberName = function(octreeNumberName) 
+{
+	var motherOctree = this.getMotherOctree();
+	var numDigits = this.getNumberOfDigits(octreeNumberName);
+	if (numDigits === 1) 
+	{
+		if (octreeNumberName === 0) { return motherOctree; }
+		else { return motherOctree.subOctrees_array[octreeNumberName-1]; }
+	}
+
+	if (motherOctree.subOctrees_array.length === 0) { return undefined; }
+
+	// determine the next level octree.***
+	var exp = numDigits-1;
+	var denominator = Math.pow(10, exp);
+	var idx = Math.floor(octreeNumberName /denominator) % 10;
+	var rest_octreeNumberName = octreeNumberName - idx * denominator;
+	return motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.setSizesSubBoxes = function() 
+{
+	// Octree number name.********************************
+	// Bottom                      Top
+	// |---------|---------|     |---------|---------|
+	// |         |         |     |         |         |       Y
+	// |    3    |    2    |     |    7    |    6    |       ^
+	// |         |         |     |         |         |       |
+	// |---------+---------|     |---------+---------|       |
+	// |         |         |     |         |         |       |
+	// |    0    |    1    |     |    4    |    5    |       |
+	// |         |         |     |         |         |       |-----------> X
+	// |---------|---------|     |---------|---------|
+
+	if (this.subOctrees_array.length > 0) 
+	{
+		var half_x = this.centerPos.x;
+		var half_y = this.centerPos.y;
+		var half_z = this.centerPos.z;
+
+		var min_x = this.centerPos.x - this.half_dx;
+		var min_y = this.centerPos.y - this.half_dy;
+		var min_z = this.centerPos.z - this.half_dz;
+
+		var max_x = this.centerPos.x + this.half_dx;
+		var max_y = this.centerPos.y + this.half_dy;
+		var max_z = this.centerPos.z + this.half_dz;
+
+		this.subOctrees_array[0].setBoxSize(min_x, half_x, min_y, half_y, min_z, half_z);
+		this.subOctrees_array[1].setBoxSize(half_x, max_x, min_y, half_y, min_z, half_z);
+		this.subOctrees_array[2].setBoxSize(half_x, max_x, half_y, max_y, min_z, half_z);
+		this.subOctrees_array[3].setBoxSize(min_x, half_x, half_y, max_y, min_z, half_z);
+
+		this.subOctrees_array[4].setBoxSize(min_x, half_x, min_y, half_y, half_z, max_z);
+		this.subOctrees_array[5].setBoxSize(half_x, max_x, min_y, half_y, half_z, max_z);
+		this.subOctrees_array[6].setBoxSize(half_x, max_x, half_y, max_y, half_z, max_z);
+		this.subOctrees_array[7].setBoxSize(min_x, half_x, half_y, max_y, half_z, max_z);
+
+		for (var i=0; i<8; i++) 
+		{
+			this.subOctrees_array[i].setSizesSubBoxes();
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param Min_x 변수
+ * @param Max_x 변수
+ * @param Min_y 변수
+ * @param Max_y 변수
+ * @param Min_z 변수
+ * @param Max_z 변수
+ */
+Octree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y, Min_Z, Max_Z) 
+{
+	this.centerPos.x = (Max_X + Min_X)/2.0;
+	this.centerPos.y = (Max_Y + Min_Y)/2.0;
+	this.centerPos.z = (Max_Z + Min_Z)/2.0;
+
+	this.half_dx = (Max_X - Min_X)/2.0; // half width.***
+	this.half_dy = (Max_Y - Min_Y)/2.0; // half length.***
+	this.half_dz = (Max_Z - Min_Z)/2.0; // half height.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns centerPos
+ */
+Octree.prototype.getCenterPos = function() 
+{
+	return this.centerPos;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns Math.abs(this.half_dx*1.2);
+ */
+Octree.prototype.getRadiusAprox = function() 
+{
+	//return Math.abs(this.half_dx*1.2);
+	return Math.abs(this.half_dx*3.0);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_CRefListsArray 변수
+ */
+Octree.prototype.getCRefListArray = function(result_CRefListsArray) 
+{
+	if (result_CRefListsArray === undefined) { result_CRefListsArray = []; }
+
+	if (this.subOctrees_array.length > 0) 
+	{
+		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
+		{
+			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
+		}
+	}
+	else 
+	{
+		if (this.compRefsListArray.length>0) 
+		{
+			result_CRefListsArray.push(this.compRefsListArray[0]); // there are only 1.***
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_NeoRefListsArray 변수
+ */
+Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) 
+{
+	if (result_NeoRefListsArray === undefined) { result_NeoRefListsArray = []; }
+
+	var subOctreesArrayLength = this.subOctrees_array.length;
+	if (subOctreesArrayLength > 0) 
+	{
+		for (var i=0; i<subOctreesArrayLength; i++) 
+		{
+			this.subOctrees_array[i].getNeoRefListArray(result_NeoRefListsArray);
+		}
+	}
+	else 
+	{
+		if (this.neoRefsList_Array.length>0) // original.***
+		//if(this.triPolyhedronsCount>0)
+		{
+			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_CRefListsArray 변수
+ * @param cesium_boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume, result_CRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) 
+{
+	var visibleOctreesArray = [];
+	var sortedOctreesArray = [];
+	var distAux = 0.0;
+
+	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
+	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
+
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = visibleOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		sortedOctreesArray[i].getCRefListArray(result_CRefListsArray);
+		//visibleOctreesArray[i].getCRefListArray(result_CRefListsArray);
+	}
+
+	visibleOctreesArray.length = 0;
+	excludedOctArray.length = 0;
+
+	visibleOctreesArray = undefined;
+	excludedOctArray = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param cesium_boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolume, result_NeoRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) 
+{
+	var visibleOctreesArray = [];
+	var sortedOctreesArray = [];
+	var distAux = 0.0;
+
+	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
+	this.getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
+
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = visibleOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		sortedOctreesArray[i].getNeoRefListArray(result_NeoRefListsArray);
+	}
+
+	visibleOctreesArray = null;
+	sortedOctreesArray = null;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
+	bbox_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+{
+	var visibleOctreesArray = [];
+	var distAux = 0.0;
+	var find = false;
+
+	this.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion(bbox, visibleOctreesArray, bbox_scratch);
+	//this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
+
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = visibleOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+	}
+
+	visibleOctreesArray = null;
+	return find;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
+	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+{
+	var visibleOctreesArray = [];
+	var distAux = 0.0;
+	var find = false;
+
+	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
+	this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
+
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = visibleOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+		else 
+		{
+			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ globalVisibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]); }
+				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				find = true;
+			}
+		}
+	}
+
+	visibleOctreesArray = null;
+	return find;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cullingVolume 변수
+ * @param result_NeoRefListsArray 변수
+ * @param boundingSphere_scratch 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
+	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+{
+	var lowestOctreesArray = [];
+	var distAux = 0.0;
+	var find = false;
+
+	this.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	
+	// Now, we must sort the subOctrees near->far from eye.***
+	var visibleOctrees_count = lowestOctreesArray.length;
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		lowestOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+	}
+
+	for (var i=0; i<visibleOctrees_count; i++) 
+	{
+		if (lowestOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles0.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles1.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				visibleObjControlerOctrees.currentVisibles2.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+		else 
+		{
+			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			{
+				if (globalVisibleObjControlerOctrees)
+				{ globalVisibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]); }
+				visibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]);
+				find = true;
+			}
+		}
+	}
+
+	return find;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_octreesArray 변수
+ * @param cesium_boundingSphere_scratch 변수
+ */
+Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
+{
+	if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	//if(this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
+	{ return; }
+
+	// this function has Cesium dependence.***
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+
+	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
+
+	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
+	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
+	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
+
+	if (this.subOctrees_array.length === 0) 
+	{
+	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
+		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
+	}
+	else 
+	{
+		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
+	}
+
+	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
+	if (frustumCull === Cesium.Intersect.INSIDE ) 
+	{
+		//result_octreesArray.push(this);
+		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
+	}
+	else if (frustumCull === Cesium.Intersect.INTERSECTING  ) 
+	{
+		if (this.subOctrees_array.length === 0) 
+		{
+			//if(this.neoRefsList_Array.length > 0) // original.***
+			//if(this.triPolyhedronsCount > 0)
+			result_octreesArray.push(this);
+		}
+		else 
+		{
+			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
+			{
+				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
+			}
+		}
+	}
+	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_octreesArray 변수
+ * @param boundingSphere_scratch 변수
+ */
+Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cullingVolume, result_octreesArray, boundingSphere_scratch) 
+{
+	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	if (this.subOctrees_array === undefined) { return; }
+
+	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
+	{ return; }
+
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+	
+	if (boundingSphere_scratch === undefined) 
+	{ boundingSphere_scratch = new Sphere(); } 
+
+	boundingSphere_scratch.centerPoint.x = this.centerPos.x;
+	boundingSphere_scratch.centerPoint.y = this.centerPos.y;
+	boundingSphere_scratch.centerPoint.z = this.centerPos.z;
+	boundingSphere_scratch.r = this.getRadiusAprox();
+
+	var frustumCull = cullingVolume.intersectionSphere(boundingSphere_scratch);
+	if (frustumCull === Constant.INTERSECTION_INSIDE ) 
+	{
+		//result_octreesArray.push(this);
+		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
+	}
+	else if (frustumCull === Constant.INTERSECTION_INTERSECT  ) 
+	{
+		if (this.subOctrees_array.length === 0) 
+		{
+			//if(this.neoRefsList_Array.length > 0) // original.***
+			//if(this.triPolyhedronsCount > 0)
+			result_octreesArray.push(this);
+		}
+		else 
+		{
+			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
+			{
+				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, result_octreesArray, boundingSphere_scratch);
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_octreesArray 변수
+ * @param boundingSphere_scratch 변수
+ */
+Octree.prototype.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion = function(bbox, result_octreesArray, bbox_scratch) 
+{
+	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
+	if (this.subOctrees_array === undefined) { return; }
+
+	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
+	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
+	{ return; }
+
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+	
+	if (bbox_scratch === undefined) 
+	{ bbox_scratch = new BoundingBox(); } 
+	
+
+	bbox_scratch.minX = this.centerPos.x - this.half_dx;
+	bbox_scratch.maxX = this.centerPos.x + this.half_dx;
+	bbox_scratch.minY = this.centerPos.y - this.half_dy;
+	bbox_scratch.maxY = this.centerPos.y + this.half_dy;
+	bbox_scratch.minZ = this.centerPos.z - this.half_dz;
+	bbox_scratch.maxZ = this.centerPos.z + this.half_dz;
+
+	var intersects = bbox.intersectsWithBBox(bbox_scratch);
+	if (intersects)
+	{
+		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param cesium_cullingVolume 변수
+ * @param result_octreesArray 변수
+ * @param cesium_boundingSphere_scratch 변수
+ */
+Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
+{
+	if (this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
+	{ return; }
+	// old. delete this.***
+	// this function has Cesium dependence.***
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+
+	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
+
+	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
+	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
+	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
+
+	if (this.subOctrees_array.length === 0) 
+	{
+	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
+		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
+	}
+	else 
+	{
+		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
+	}
+
+	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
+	if (frustumCull === Cesium.Intersect.INSIDE ) 
+	{
+		//result_octreesArray.push(this);
+		this.getAllSubOctrees(result_octreesArray);
+	}
+	else if (frustumCull === Cesium.Intersect.INTERSECTING ) 
+	{
+		if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length > 0) 
+		{
+			result_octreesArray.push(this);
+		}
+		else 
+		{
+			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
+			{
+				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
+			}
+		}
+	}
+	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z) 
+{
+	this.squareDistToEye = (this.centerPos.x - eye_x)*(this.centerPos.x - eye_x) +
+							(this.centerPos.y - eye_y)*(this.centerPos.y - eye_y) +
+							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z) ;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param octreesArray 변수
+ * @param octree 변수
+ * @returns result_idx
+ */
+Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree) 
+{
+	// lineal implementation. In the future use dicotomic search technique.***
+	var finished = false;
+	var octrees_count = octreesArray.length;
+	var i=0;
+	var result_idx = 0;
+
+	while (!finished && i<octrees_count) 
+	{
+		if (octreesArray[i].squareDistToEye > octree.squareDistToEye) 
+		{
+			result_idx = i;
+			finished = true;
+		}
+		i++;
+	}
+	if (!finished) 
+	{
+		result_idx = octrees_count;
+	}
+
+	return result_idx;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ * @param octree 변수
+ * @param eye_x 변수
+ * @param eye_y 변수
+ * @param eye_z 변수
+ */
+Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree, eye_x, eye_y, eye_z) 
+{
+	// sorting is from minDist to maxDist.***
+	// http://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index
+
+	var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree);
+
+	result_octreesArray.splice(insert_idx, 0, octree);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
+Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) 
+{
+	if (this.subOctrees_array === undefined) { return; }
+
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+
+	if (this.subOctrees_array.length > 0) 
+	{
+		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
+		{
+			this.subOctrees_array[i].getAllSubOctreesIfHasRefLists(result_octreesArray);
+		}
+	}
+	else 
+	{
+		//if(this.neoRefsList_Array.length > 0)
+		if (this.triPolyhedronsCount > 0) { result_octreesArray.push(this); } // there are only 1.***
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
+Octree.prototype.getAllSubOctrees = function(result_octreesArray) 
+{
+	if (result_octreesArray === undefined) { result_octreesArray = []; }
+
+	if (this.subOctrees_array.length > 0) 
+	{
+		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
+		{
+			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
+		}
+	}
+	else 
+	{
+		result_octreesArray.push(this); // there are only 1.***
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
+Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray) 
+{
+	if (this.subOctrees_array === undefined)
+	{ return; }
+	
+	var subOctreesCount = this.subOctrees_array.length;
+
+	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
+	{
+		lowestOctreesArray.push(this);
+	}
+	else 
+	{
+		for (var i=0; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
+Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
+{
+	var subOctreesCount = this.subOctrees_array.length;
+
+	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
+	{
+		if (this.neoReferencesMotherAndIndices)
+		{ this.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(idxKey, matrix); }
+	}
+	else 
+	{
+		for (var i=0; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].multiplyKeyTransformMatrix(idxKey, matrix);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
+Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
+{
+	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+	if (octreeLevel === 0) 
+	{
+		// this is the mother octree, so read the mother octree's size.***
+		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+		this.setBoxSize(minX, maxX, minY, maxY, minZ, maxZ );
+		this.octree_number_name = 0;
+	}
+
+	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.***
+	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	if (this.triPolyhedronsCount > 0)
+	{ this.neoBuildingOwner = neoBuildingOwner; }
+
+	// 1rst, create the 8 subOctrees.***
+	for (var i=0; i<subOctreesCount; i++) 
+	{
+		var subOctree = this.new_subOctree();
+		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
+	}
+
+	// now, set size of subOctrees.***
+	this.setSizesSubBoxes();
+
+	for (var i=0; i<subOctreesCount; i++) 
+	{
+		var subOctree = this.subOctrees_array[i];
+		bytesReaded = subOctree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner);
+	}
+
+	return bytesReaded;
+};
+
+'use strict';
+
+/**
+ * ParseQueue
+ * 
+ * @alias ParseQueue
+ * @class ParseQueue
+ */
+var ParseQueue = function() 
+{
+	if (!(this instanceof ParseQueue)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.octreesLod0ReferencesToParseMap = new Map();
+	this.octreesLod0ModelsToParseMap = new Map();
+	this.octreesLod2LegosToParseMap = new Map();
+	//this.neoBuildingsHeaderToParseArray = new Map(); // no used yet.
+};
+
+ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	this.octreesLod0ReferencesToParseMap.set(octree, aValue);
+};
+
+ParseQueue.prototype.eraseOctreeLod0ReferencesToParse = function(octree)
+{
+	this.octreesLod0ReferencesToParseMap.delete(octree);
+};
+
+ParseQueue.prototype.putOctreeLod0ModelsToParse = function(octree, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	this.octreesLod0ModelsToParseMap.set(octree, aValue);
+};
+
+ParseQueue.prototype.eraseOctreeLod0ModelsToParse = function(octree)
+{
+	this.octreesLod0ModelsToParseMap.delete(octree);
+};
+
+ParseQueue.prototype.putOctreeLod2LegosToParse = function(octree, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue == undefined)
+	{ aValue = 0; }
+	
+	this.octreesLod2LegosToParseMap.set(octree, aValue);
+};
+
+ParseQueue.prototype.eraseOctreeLod2LegosToParse = function(octree)
+{
+	this.octreesLod2LegosToParseMap.delete(octree);
+};
+
+
+
+
+'use strict';
+
+/**
+ * ProcessQueue
+ * 
+ * @alias ProcessQueue
+ * @class ProcessQueue
+ */
+var ProcessQueue = function() 
+{
+	if (!(this instanceof ProcessQueue)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	this.buildingsToDeleteMap = new Map();
+	this.buildingsToDeleteModelReferencesMap = new Map();
+};
+
+ProcessQueue.prototype.putBuildingsToDeleteModelReferences = function(building, aValue)
+{
+	// this puts the building to the "buildingsToDeleteModelReferencesMap".
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.buildingsToDeleteModelReferencesMap.set(building, aValue);
+};
+
+ProcessQueue.prototype.eraseBuildingsToDeleteModelReferences = function(building)
+{
+	// this erases the building from the "buildingsToDeleteModelReferencesMap".
+	this.buildingsToDeleteModelReferencesMap.delete(building);
+};
+
+ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
+{
+	// this puts the building to the "buildingsToDeleteMap".
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.buildingsToDeleteMap.set(building, aValue);
+};
+
+ProcessQueue.prototype.putBuildingsArrayToDelete = function(buildingsToDeleteArray, aValue)
+{
+	if (buildingsToDeleteArray === undefined)
+	{ return; }
+	
+	// this puts the buildingsToDeleteArray to the "buildingsToDeleteMap".
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	var buildingsToDeleteCount = buildingsToDeleteArray.length;
+	for (var i=0; i<buildingsToDeleteCount; i++)
+	{
+		this.putBuildingToDelete(buildingsToDeleteArray[i], aValue);
+	}
+};
+
+ProcessQueue.prototype.eraseBuildingToDelete = function(building)
+{
+	// this erases the building from the "buildingsToDeleteMap".
+	this.buildingsToDeleteMap.delete(building);
+};
+
+'use strict';
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ReaderWriter
+ */
+var ReaderWriter = function() 
+{
+	if (!(this instanceof ReaderWriter)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	//this.geometryDataPath = "/F4D_GeometryData";
+	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
+	this.viArraysContainer = new VertexIdxVBOArraysContainer();
+	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
+	//var simpleBuildingImage = new Image();
+
+	this.j_counter;
+	this.k_counter;
+
+	this.gl;
+	this.incre_latAng = 0.001;
+	this.incre_longAng = 0.001;
+	this.GAIA3D__offset_latitude = -0.001;
+	this.GAIA3D__offset_longitude = -0.001;
+	this.GAIA3D__counter = 0;
+
+	// Var for reading files.
+	this.uint32;
+	this.uint16;
+	this.int16;
+	this.float32;
+	this.float16;
+	this.int8;
+	this.int8_value;
+	this.max_color_value = 126;
+
+	this.startBuff;
+	this.endBuff;
+
+	this.filesReadings_count = 0;
+
+	// SCRATCH.*** 
+	this.temp_var_to_waste;
+	this.countSC;
+	this.xSC;
+	this.ySC;
+	this.zSC;
+	this.point3dSC = new Point3D();
+	this.bboxSC = new BoundingBox();
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint32[0]
+ */
+ReaderWriter.prototype.readUInt32 = function(buffer, start, end) 
+{
+	var uint32 = new Uint32Array(buffer.slice(start, end));
+	return uint32[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int32[0]
+ */
+ReaderWriter.prototype.readInt32 = function(buffer, start, end) 
+{
+	var int32 = new Int32Array(buffer.slice(start, end));
+	return int32[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 16비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint16[0]
+ */
+ReaderWriter.prototype.readUInt16 = function(buffer, start, end) 
+{
+	var uint16 = new Uint16Array(buffer.slice(start, end));
+	return uint16[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int16[0]
+ */
+ReaderWriter.prototype.readInt16 = function(buffer, start, end) 
+{
+	var int16 = new Int16Array(buffer.slice(start, end));
+	return int16[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 64비트 float값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns float64[0]
+ */
+ReaderWriter.prototype.readFloat64 = function(buffer, start, end) 
+{
+	var float64 = new Float64Array(buffer.slice(start, end));
+	return float64[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 float값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns float32[0]
+ */
+ReaderWriter.prototype.readFloat32 = function(buffer, start, end) 
+{
+	var float32 = new Float32Array(buffer.slice(start, end));
+	return float32[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns float16[0]
+ */
+ReaderWriter.prototype.readFloat16 = function(buffer, start, end) 
+{
+	var float16 = new Float32Array(buffer.slice(start, end));
+	return float16[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 8비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int8[0]
+ */
+ReaderWriter.prototype.readInt8 = function(buffer, start, end) 
+{
+	var int8 = new Int8Array(buffer.slice(start, end));
+	return int8[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 8비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint8[0]
+ */
+ReaderWriter.prototype.readUInt8 = function(buffer, start, end) 
+{
+	var uint8 = new Uint8Array(buffer.slice(start, end));
+	return uint8[0];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param buffer 변수
+ * @param start 변수
+ * @param end 변수
+ * @returns int8_value
+ */
+ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end) 
+{
+	var int8 = new Int8Array(buffer.slice(start, end));
+	var int8_value = int8[0];
+
+	if (int8_value > max_color_value) { int8_value = max_color_value; }
+
+	if (int8_value < 0) { int8_value += 256; }
+
+	return int8_value;
+};
+
+function loadWithXhr(fileName) 
+{
+	// 1) 사용될 jQuery Deferred 객체를 생성한다.
+	var deferred = $.Deferred();
+	
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", fileName, true);
+	xhr.responseType = "arraybuffer";;
+	  
+	// 이벤트 핸들러를 등록한다.
+	xhr.onload = function() 
+	{
+		if (xhr.status < 200 || xhr.status >= 300) 
+		{
+			deferred.reject(xhr.status);
+			return;
+		}
+		else 
+		{
+			// 3.1) DEFERRED를 해결한다. (모든 done()...을 동작시킬 것이다.)
+			deferred.resolve(xhr.response);
+		} 
+	};
+	
+	xhr.onerror = function(e) 
+	{
+		console.log("Invalid XMLHttpRequest response type.");
+		deferred.reject(xhr.status);
+	};
+
+	// 작업을 수행한다.
+	xhr.send(null);
+	
+	// 참고: jQuery.ajax를 사용할 수 있었고 해야할 수 있었다.
+	// 참고: jQuery.ajax는 Promise를 반환하지만 다른 Deferred/Promise를 사용하여 애플리케이션에 의미있는 구문으로 감싸는 것은 언제나 좋은 생각이다.
+	// ---- /AJAX 호출 ---- //
+	  
+	// 2) 이 deferred의 promise를 반환한다.
+	return deferred.promise();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param float32Array 변수
+ * @param resultBbox 변수
+ * @returns resultBbox
+ */
+ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, resultBbox) 
+{
+	if (resultBbox === undefined) { resultBbox = new BoundingBox(); }
+
+	var values_count = float32Array.length;
+	for (var i=0; i<values_count; i+=3) 
+	{
+		this.point3dSC.x = float32Array[i];
+		this.point3dSC.y = float32Array[i+1];
+		this.point3dSC.z = float32Array[i+2];
+
+		if (i===0) 
+		{
+			resultBbox.init(this.point3dSC);
+		}
+		else 
+		{
+			resultBbox.addPoint(this.point3dSC);
+		}
+	}
+
+	return resultBbox;
+};
+
+ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager) 
+{
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			blocksList.dataArraybuffer = arrayBuffer;
+			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+			//magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
+			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
+		}
+		else 
+		{
+			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("Invalid XMLHttpRequest status = " + status);
+		if (status === 0) { blocksList.fileLoadState = 500; }
+		else { blocksList.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param blocksList 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ */
+ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) 
+{
+//	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
+			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { blocksList.fileLoadState = 500; }
+		else { blocksList.fileLoadState = status; }
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
+{
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			var neoRefsList = lowestOctree.neoReferencesMotherAndIndices;
+			if (neoRefsList)
+			{
+				neoRefsList.dataArraybuffer = arrayBuffer;
+				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				//magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
+				magoManager.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
+			}
+			arrayBuffer = null;
+			
+		}
+		else 
+		{
+			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
+		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, magoManager) 
+{
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (lowestOctree.lego)
+			{
+				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
+				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				//magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
+				magoManager.parseQueue.putOctreeLod2LegosToParse(lowestOctree);
+			}
+			else 
+			{
+				lowestOctree = undefined;
+			}
+			arrayBuffer = null;
+		}
+		else 
+		{
+			lowestOctree.lego.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
+		else { lowestOctree.lego.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param fileName 변수
+ * @param lodBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuilding, magoManager) 
+{
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			lodBuilding.dataArraybuffer = arrayBuffer;
+			lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			lodBuilding.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { lodBuilding.fileLoadState = 500; }
+		else { lodBuilding.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param arrayBuffer 변수
+ * @param filePath_inServer 변수
+ * @param terranTile 변수
+ * @param readerWriter 변수
+ * @param bytes_readed 변수
+ * @returns bytes_readed
+ */
+ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) 
+{
+	//var bytes_readed = 0;
+//	var f4d_headerPathName_length = 0;
+//	var BP_Project;
+//	var idxFile;
+//	var subTile;
+
+	terranTile._depth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	if (terranTile._depth === 0) 
+	{
+		// Read dimensions.***
+		terranTile.longitudeMin = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
+		terranTile.longitudeMax = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
+		terranTile.latitudeMin = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
+		terranTile.latitudeMax = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
+	}
+
+	// Read the max_depth of the quadtree.***
+	var max_dpeth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+	// Now, make the quadtree.***
+	terranTile.makeTree(max_dpeth);
+
+	return bytes_readed;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param terranTile 변수
+ * @param readerWriter 변수
+ */
+ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, readerWriter) 
+{
+	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			var bytes_readed = 0;
+			readerWriter.readTerranTileFile(gl, arrayBuffer, fileName, terranTile, readerWriter, bytes_readed);
+
+			// Once readed the terranTilesFile, must make all the quadtree.***
+			terranTile.setDimensionsSubTiles();
+			terranTile.calculatePositionByLonLatSubTiles();
+			terranTile.terranIndexFile_readed = true;
+
+			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + xhr.status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param BR_ProjectsList 변수
+ * @param readerWriter 변수
+ */
+ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsList, readerWriter) 
+{
+//	magoManager.fileRequestControler.filesRequestedCount += 1;
+//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			// write code here.***
+			var pCloudProject;
+
+			var bytes_readed = 0;
+
+			var f4d_rawPathName_length = 0;
+			//			var f4d_simpleBuildingPathName_length = 0;
+			//			var f4d_nailImagePathName_length = 0;
+
+			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+			for (var i=0; i<pCloudProjects_count; i++) 
+			{
+				pCloudProject = new PCloudMesh();
+				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
+				pCloudProject._header._f4d_version = 2;
+				// 1rst, read the files path names.************************************************************************************************************
+				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				for (var j=0; j<f4d_rawPathName_length; j++) 
+				{
+					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				}
+
+				pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
+				pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
+
+				//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
+				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
+				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
+			}
+			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param pCloud 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWriter, magoManager) 
+{
+	pCloud._f4d_header_readed = true;
+	//	magoManager.fileRequestControler.filesRequestedCount += 1;
+	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			// write code here.***
+
+			var bytes_readed = 0;
+			var version_string_length = 5;
+			var intAux_scratch = 0;
+			var auxScratch;
+			var header = pCloud._header;
+
+			// 1) Version(5 chars).***********
+			for (var j=0; j<version_string_length; j++)
+			{
+				header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+			}
+
+			// 2) Type (1 byte).**************
+			header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+
+			// 3) Global unique ID.*********************
+			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			for (var j=0; j<intAux_scratch; j++)
+			{
+				header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+			}
+
+			// 4) Location.*************************
+			header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+			header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+			header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+
+			header._elevation += 60.0; // delete this. TEST.!!!
+
+			// 5) Orientation.*********************
+			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // yaw.***
+			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // pitch.***
+			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // roll.***
+
+			// 6) BoundingBox.************************
+			header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+
+			var isLarge = false;
+			if (header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0) 
+			{
+				isLarge = true;
+			}
+
+			if (!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0) 
+			{
+				header.isSmall = true;
+			}
+
+			// 7) octZerothBox.***********************
+			header._octZerothBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._octZerothBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._octZerothBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._octZerothBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._octZerothBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+			header._octZerothBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+
+			// 8) Data file name.********************
+			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			for (var j=0; j<intAux_scratch; j++) 
+			{
+				header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+			}
+
+			// Now, must calculate some params of the project.**********************************************
+			// 0) PositionMatrix.************************************************************************
+			//var height = elevation;
+
+			var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation); // Old.***
+			pCloud._pCloudPosition = position;
+
+			// High and Low values of the position.****************************************************
+			var splitValue = Cesium.EncodedCartesian3.encode(position);
+			var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
+			var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
+			var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
+
+			pCloud._pCloudPositionHIGH = new Float32Array(3);
+			pCloud._pCloudPositionHIGH[0] = splitVelue_X.high;
+			pCloud._pCloudPositionHIGH[1] = splitVelue_Y.high;
+			pCloud._pCloudPositionHIGH[2] = splitVelue_Z.high;
+
+			pCloud._pCloudPositionLOW = new Float32Array(3);
+			pCloud._pCloudPositionLOW[0] = splitVelue_X.low;
+			pCloud._pCloudPositionLOW[1] = splitVelue_Y.low;
+			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
+
+			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+
+			pCloud._f4d_header_readed_finished = true;
+			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
+ * @param fileName 파일명
+ * @param readerWriter 파일 처리를 담당
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList) 
+{
+	console.log(" object Index File = " + fileName);
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			buildingSeedList.dataArrayBuffer = arrayBuffer;
+			buildingSeedList.parseBuildingSeedArrayBuffer();
+			
+			magoManager.makeSmartTile(buildingSeedList);
+			arrayBuffer = null;
+			//magoManager.createDeploymentGeoLocationsForHeavyIndustries();
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
+ * @param fileName 파일명
+ * @param readerWriter 파일 처리를 담당
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neoBuildingsList, magoManager) 
+{
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
+			arrayBuffer = null;
+			magoManager.createDeploymentGeoLocationsForHeavyIndustries();
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param arrayBuffer object index file binary data
+ * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ */
+ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildingsList) 
+{
+	var bytesReaded = 0;
+	var buildingNameLength;
+	var longitude;
+	var latitude;
+	var altitude;
+
+	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	bytesReaded += 4;
+	for (var i =0; i<buildingsCount; i++) 
+	{
+		// read the building location data.***
+		var neoBuilding = neoBuildingsList.newNeoBuilding();
+		if (neoBuilding.metaData === undefined) 
+		{
+			neoBuilding.metaData = new MetaData();
+		}
+
+		if (neoBuilding.metaData.geographicCoord === undefined)
+		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+		if (neoBuilding.metaData.bbox === undefined) 
+		{
+			neoBuilding.metaData.bbox = new BoundingBox();
+		}
+
+		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+		bytesReaded += 4;
+		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
+		bytesReaded += buildingNameLength;
+
+		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
+		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
+		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+		neoBuilding.bbox = new BoundingBox();
+		neoBuilding.bbox.minX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.minY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.minZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+
+		// create a building and set the location.***
+		neoBuilding.buildingId = buildingName.substr(4, buildingNameLength-4);
+		neoBuilding.buildingType = "basicBuilding";
+		neoBuilding.buildingFileName = buildingName;
+		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+	}
+
+	neoBuildingsList.neoBuildingsArray.reverse();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
+{
+	//BR_Project._f4d_header_readed = true;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (neoBuilding.metaData === undefined) 
+			{
+				neoBuilding.metaData = new MetaData();
+			}
+			neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
+
+			// Now, make the neoBuilding's octree.***
+			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
+
+			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
+				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
+				neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
+
+			neoBuilding.octree.makeTree(3);
+			neoBuilding.octree.setSizesSubBoxes();
+
+			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			//if(magoManager.backGround_fileReadings_count > 0 )
+			//    magoManager.backGround_fileReadings_count -= 1; // old.***
+			//BR_Project._f4d_header_readed_finished = true;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			neoBuilding.metaData.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
+		else { neoBuilding.metaData.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param neoBuilding 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
+{
+	//BR_Project._f4d_header_readed = true;
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (neoBuilding.metaData === undefined) 
+			{
+				neoBuilding.metaData = new MetaData();
+			}
+			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter, neoBuilding);
+
+			// Now, make the neoBuilding's octree.***
+			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
+
+			// now, parse octreeAsimetric.***
+			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+
+			neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
+			neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
+			neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
+			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
+			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
+			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
+			
+			// now parse materialsList of the neoBuilding.
+			var ver0 = neoBuilding.metaData.version[0];
+			var ver1 = neoBuilding.metaData.version[2];
+			var ver2 = neoBuilding.metaData.version[4];
+			
+			if (ver0 === 0 && ver1 === 0 && ver2 === 1)
+			{
+				// read materials list.
+				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+				for (var i=0; i<materialsCount; i++)
+				{
+					var textureTypeName = "";
+					var textureImageFileName = "";
+
+					// Now, read the texture_type and texture_file_name.***
+					var texture_type_nameLegth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					for (var j=0; j<texture_type_nameLegth; j++) 
+					{
+						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
+					}
+
+					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+					for (var j=0; j<texture_fileName_Legth; j++) 
+					{
+						textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
+					}
+					
+					if (texture_fileName_Legth > 0)
+					{
+						var texture = new Texture();
+						texture.textureTypeName = textureTypeName;
+						texture.textureImageFileName = textureImageFileName;
+						neoBuilding.texturesLoaded.push(texture);
+					}
+				}
+			}
+
+			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+			//BR_Project._f4d_header_readed_finished = true;
+			arrayBuffer = undefined;
+		}
+		else 
+		{
+			neoBuilding.metaData.fileLoadState = 500;
+			arrayBuffer = undefined;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
+		else { neoBuilding.metaData.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param imageArrayBuffer 변수
+ * @param BR_Project 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ * @param imageLod 변수
+ */
+ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, magoManager, imageLod) 
+{
+	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
+	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
+	var urlCreator = window.URL || window.webkitURL;
+	var imagenUrl = urlCreator.createObjectURL(blob);
+	var simpleBuildingImage = new Image();
+
+	simpleBuildingImage.onload = function () 
+	{
+		//console.log("Image Onload");
+		if (simpBuildingV1._simpleBuildingTexture === undefined)
+		{ simpBuildingV1._simpleBuildingTexture = gl.createTexture(); }
+		handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
+		BR_Project._f4d_nailImage_readed_finished = true;
+		imageArrayBuffer = null;
+		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
+
+		if (magoManager.backGround_imageReadings_count > 0) 
+		{
+			magoManager.backGround_imageReadings_count--;
+		}
+	};
+
+	simpleBuildingImage.onerror = function() 
+	{
+		// doesn't exist or error loading
+
+		//BR_Project._f4d_lod0Image_readed_finished = false;
+		//BR_Project._f4d_lod0Image_exists = false;
+		//if(magoManager.backGround_fileReadings_count > 0 )
+		//	  magoManager.backGround_fileReadings_count -=1;
+
+		return;
+	};
+
+	simpleBuildingImage.src = imagenUrl;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param BR_Project 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ * @param imageLod 변수
+ */
+ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, magoManager, imageLod) 
+{
+	if (imageLod === undefined) { imageLod = 3; } // The lowest lod.***
+
+	if (imageLod === 3) { BR_Project._f4d_nailImage_readed = true; }
+	else if (imageLod === 0) { BR_Project._f4d_lod0Image_readed  = true; }
+
+	if (BR_Project._simpleBuilding_v1 === undefined) { BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
+
+	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
+
+	var simpleBuildingImage = new Image();
+	simpleBuildingImage.onload = function() 
+	{
+	/*
+		if(magoManager.render_time > 20)// for the moment is a test.***
+		{
+			if(imageLod === 3)
+				BR_Project._f4d_nailImage_readed = false;
+			else if(imageLod === 0)
+				BR_Project._f4d_lod0Image_readed  = false;
+
+			if(magoManager.backGround_fileReadings_count > 0 )
+			  magoManager.backGround_fileReadings_count -=1;
+
+			return;
+		}
+		*/
+
+		if (imageLod === 3) 
+		{
+			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
+			BR_Project._f4d_nailImage_readed_finished = true;
+		}
+		else if (imageLod === 0) 
+		{
+			if (simpBuildingV1._texture_0 === undefined) { simpBuildingV1._texture_0 = gl.createTexture(); }
+
+			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._texture_0);
+			BR_Project._f4d_lod0Image_readed_finished = true;
+		}
+
+		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+	};
+
+	simpleBuildingImage.onerror = function() 
+	{
+		// doesn't exist or error loading
+		BR_Project._f4d_lod0Image_readed_finished = false;
+		BR_Project._f4d_lod0Image_exists = false;
+		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+		return;
+	};
+
+	var filePath_inServer_SimpleBuildingImage = filePath_inServer;
+	simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param f4dTex 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, magoManager) 
+{
+	f4dTex.loadStarted = true;
+	f4dTex.texImage = new Image();
+	f4dTex.texImage.onload = function() 
+	{
+		f4dTex.loadFinished = true;
+
+		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+	};
+
+	f4dTex.texImage.onerror = function() 
+	{
+		// doesn't exist or error loading
+		f4dTex.loadStarted = false;
+		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+		return;
+	};
+
+	f4dTex.texImage.src = filePath_inServer;
+};
+
+ReaderWriter.prototype.decodeTGA = function(arrayBuffer) 
+{
+	// code from toji.***
+	var content = new Uint8Array(arrayBuffer),
+		contentOffset = 18 + content[0],
+		imagetype = content[2], // 2 = rgb, only supported format for now
+		width = content[12] + (content[13] << 8),
+		height = content[14] + (content[15] << 8),
+		bpp = content[16], // should be 8,16,24,32
+		
+		bytesPerPixel = bpp / 8,
+		bytesPerRow = width * 4,
+		data, i, j, x, y;
+
+	if (!width || !height) 
+	{
+		console.error("Invalid dimensions");
+		return null;
+	}
+
+	if (imagetype !== 2) 
+	{
+		console.error("Unsupported TGA format:", imagetype);
+		return null;
+	}
+
+	data = new Uint8Array(width * height * 4);
+	i = contentOffset;
+
+	// Oy, with the flipping of the rows...
+	for (y = height-1; y >= 0; --y) 
+	{
+		for (x = 0; x < width; ++x, i += bytesPerPixel) 
+		{
+			j = (x * 4) + (y * bytesPerRow);
+			data[j] = content[i+2];
+			data[j+1] = content[i+1];
+			data[j+2] = content[i+0];
+			data[j+3] = (bpp === 32 ? content[i+3] : 255);
+		}
+	}
+
+	return {
+		width  : width,
+		height : height,
+		data   : data
+	};
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param texture 변수
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) 
+{
+	// Must know the fileExtension.***
+	var extension = filePath_inServer.split('.').pop();
+	
+	if (extension === "tga" || extension === "TGA" || extension === "Tga")
+	{
+		//texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		loadWithXhr(filePath_inServer).done(function(response) 
+		{
+			var arrayBuffer = response;
+			if (arrayBuffer) 
+			{
+				// decode tga.***
+				// Test with tga decoder from https://github.com/schmittl/tgajs
+				var tga = new TGA();
+				tga.load(arrayBuffer);
+				// End decoding.---------------------------------------------------
+				
+				//var tga = magoManager.readerWriter.decodeTGA(arrayBuffer); // old code.
+				//if(tga) {
+				//    gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+				//     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tga.width, tga.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tga.data);
+				//    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				//	gl.generateMipmap(gl.TEXTURE_2D);
+				//	texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+				//}
+				
+				// example values of tga.header
+				// alphaBits 0
+				// bytePerPixel 3
+				// colorMapDepth 0
+				// colorMapIndex 0
+				// colorMapLength 0
+				// colorMapType 0
+				// flags 32
+				// hasColorMap false
+				// hasEncoding false
+				// height 2048
+				// idLength 0
+				// imageType 2
+				// isGreyColor false
+				// offsetX 0
+				// offsetY 0
+				// origin 2
+				// pixelDepth 24
+				// width 2048
+				
+				if (tga) 
+				{
+					var rgbType;
+					if (tga.header.bytePerPixel === 3)
+					{
+						rgbType = gl.RGB;
+						
+						// test change rgb to bgr.***
+						/*
+						var imageDataLength = tga.imageData.length;
+						var pixelsCount = imageDataLength/3;
+						var r, g, b;
+						for(var i=0; i<pixelsCount; i++)
+						{
+							r = tga.imageData[i*3];
+							g = tga.imageData[i*3+1];
+							b = tga.imageData[i*3+2];
+							
+							tga.imageData[i*3] = b;
+							tga.imageData[i*3+1] = g;
+							tga.imageData[i*3+2] = r;
+						}
+						*/
+					}
+					else if (tga.header.bytePerPixel === 4)
+					{
+						rgbType = gl.RGBA;
+						
+						// test change rgb to bgr.***
+						
+						var imageDataLength = tga.imageData.length;
+						var pixelsCount = imageDataLength/4;
+						var r, g, b, a;
+						for (var i=0; i<pixelsCount; i++)
+						{
+							r = tga.imageData[i*4];
+							g = tga.imageData[i*4+1];
+							b = tga.imageData[i*4+2];
+							a = tga.imageData[i*4+3];
+							
+							tga.imageData[i*4] = b;
+							tga.imageData[i*4+1] = g;
+							tga.imageData[i*4+2] = r;
+							tga.imageData[i*4+3] = a;
+						}
+						
+					}
+					
+					
+					
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+					gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+					gl.generateMipmap(gl.TEXTURE_2D);
+					texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+				}
+			}
+		}).fail(function(status) 
+		{
+			if (neoBuilding)
+			{
+				console.log("xhr status = " + status);
+				if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
+				else { neoBuilding.metaData.fileLoadState = status; }
+			}
+		}).always(function() 
+		{
+			magoManager.backGround_fileReadings_count -= 1;
+			if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
+		});
+	}
+	else 
+	{
+		var neoRefImage = new Image();
+		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
+		
+		//magoManager.backGround_fileReadings_count ++;
+		neoRefImage.onload = function() 
+		{
+			// is possible that during loading image the building was deleted. Then return.
+			if (texture.texId === undefined)
+			{
+				return;
+			}
+			
+			// if "texture.texId" exist then bind it.
+			handleTextureLoaded(gl, neoRefImage, texture.texId);
+			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+
+			if (magoManager.backGround_fileReadings_count > 0 ) 
+			{ magoManager.backGround_fileReadings_count -=1; }
+		};
+
+		neoRefImage.onerror = function() 
+		{
+			// doesn't exist or error loading
+			return;
+		};
+		neoRefImage.src = filePath_inServer;
+	}	
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param texture 변수
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inServer, texture, magoManager) 
+{
+	var neoRefImage = new Image();
+	//magoManager.backGround_fileReadings_count ++;
+	neoRefImage.onload = function() 
+	{
+		if (texture.texId === undefined) 
+		{ texture.texId = gl.createTexture(); }
+
+		handleTextureLoaded(gl, neoRefImage, texture.texId);
+
+		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+	};
+
+	neoRefImage.onerror = function() 
+	{
+		// doesn't exist or error loading
+		return;
+	};
+
+	neoRefImage.src = filePath_inServer;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param terranTile 변수
+ * @param readerWriter 변수
+ */
+ReaderWriter.prototype.openTerranTile = function(gl, terranTile, readerWriter ) 
+{
+	var filePath_inServer = this.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILEFILE_TXT;
+	readerWriter.getTerranTileFile(gl, filePath_inServer, terranTile, readerWriter);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 변수
+ * @param terranTile 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, readerWriter, magoManager) 
+{
+	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+	terranTile.fileReading_started = true;
+	//	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
+	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			//var BR_Project = new BRBuildingProject(); // Test.***
+			//readerWriter.readF4D_Header(gl, arrayBuffer, BR_Project ); // Test.***
+			terranTile.fileArrayBuffer = arrayBuffer;
+			terranTile.fileReading_finished = true;
+
+			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param pCloud 변수
+ * @param readerWriter 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, readerWriter, magoManager) 
+{
+	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+	pCloud._f4d_geometry_readed = true;
+	//	magoManager.fileRequestControler.filesRequestedCount += 1;
+	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			// write code here.***
+			var bytes_readed = 0;
+			var startBuff;
+			var endBuff;
+
+			var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+			for (var a=0; a<meshes_count; a++) 
+			{
+				var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
+
+				// single interleaved buffer mode.*********************************************************************************
+				for (var i=0; i<vbo_objects_count; i++) 
+				{
+					var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
+					//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
+
+					var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertexCount.***
+					startBuff = bytes_readed;
+					//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
+					endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
+
+					//vt_cacheKey._verticesArray_cacheKey = gl.createBuffer ();
+					vbo_vertexIdx_data.meshVertexCacheKey = gl.createBuffer();
+					gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.meshVertexCacheKey);
+					gl.bufferData(gl.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), gl.STATIC_DRAW);
+
+					//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
+					bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
+
+					//vt_cacheKey._vertices_count = iDatas_count;
+					// Now, read short indices.***
+					var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+					vbo_vertexIdx_data.indicesCount = shortIndices_count;
+
+					// Indices.***********************
+					startBuff = bytes_readed;
+					endBuff = bytes_readed + 2*shortIndices_count;
+					/*
+					// Test.***************************************************************************************
+					for(var counter = 0; counter<shortIndices_count; counter++)
+					{
+						var shortIdx = new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2));bytes_readed += 2;
+						if(shortIdx[0] >= iDatas_count)
+						{
+							var h=0;
+						}
+					}
+					bytes_readed -= 2*shortIndices_count;
+					// End test.------------------------------------------------------------------------------------
+					*/
+
+					vbo_vertexIdx_data.meshFacesCacheKey= gl.createBuffer();
+					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.meshFacesCacheKey);
+					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
+
+					bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
+				}
+			}
+
+			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+
+			pCloud._f4d_geometry_readed_finished = true;
+			arrayBuffer = null;
+		}
+		else 
+		{
+			//			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).always(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+
+//load neoTextures
+ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
+{
+	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+	//var gl = viewer.scene.context._gl;
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.generateMipmap(gl.TEXTURE_2D);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
 /**
   DataStream reads scalars, arrays and structs of data from an ArrayBuffer.
   It's like a file-like DataView on steroids.
@@ -24683,4965 +33266,6 @@ var forEach = exports.forEach = function () {
 'use strict';
 
 /**
- * 버퍼 안의 데이터를 어떻게 읽어야 할지 키가 되는 객체
- * 
- * @alias Accessor
- * @class Accessor
- */
-var Accessor = function () 
-{
-
-	if (!(this instanceof Accessor)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.bufferId;
-	// 0= position, 1= normal, 2= color, 3= texcoord.***
-	this.accesorType;
-	this.bufferStart;
-	// 버퍼의 시작 시점
-	this.stride;
-	// character, int 등
-	this.dataType;
-	// 2차원, 3차원
-	this.dimension;
-
-	// 데이터가 포함되어 있는 x,y,z의 한계를 바운드라고 한다. 바운드 좌표
-	this.minX = 0.0;
-	this.minY = 0.0;
-	this.minZ = 0.0;
-	this.maxX = 0.0;
-	this.maxY = 0.0;
-	this.maxZ = 0.0;
-};
-
-'use strict';
-
-/**
- * 블럭 모델
- * @class Block
- */
-var Block = function() 
-{
-	if (!(this instanceof Block)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
-	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
-	this.mIFCEntityType = -1;
-	this.isSmallObj = false;
-	this.radius = 10;
-	this.vertexCount = 0; // only for test.*** delete this.***
-
-	this.lego; // legoBlock.***
-};
-
-/**
- * 블럭이 가지는 데이터 삭제
- * @returns block
- */
-Block.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-
-	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
-	this.vBOVertexIdxCacheKeysContainer = undefined;
-	this.mIFCEntityType = undefined;
-	this.isSmallObj = undefined;
-	this.radius = undefined;
-	this.vertexCount = undefined; // only for test.*** delete this.***
-
-	if (this.lego) { this.lego.deleteGlObjects(gl); }
-
-	this.lego = undefined;
-};
-
-/**
- * 블록 목록
- * @class BlocksList
- */
-var BlocksList = function() 
-{
-	if (!(this instanceof BlocksList)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.name = "";
-	this.blocksArray;
-	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
-	this.fileLoadState = CODE.fileLoadState.READY;
-	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
-};
-
-/**
- * 새 블록 생성
- * @returns block
- */
-BlocksList.prototype.newBlock = function() 
-{
-	if (this.blocksArray === undefined) { this.blocksArray = []; }
-
-	var block = new Block();
-	this.blocksArray.push(block);
-	return block;
-};
-
-/**
- * 블록 획득
- * @param idx 변수
- * @returns block
- */
-BlocksList.prototype.getBlock = function(idx) 
-{
-	if (this.blocksArray === undefined) { return null; }
-
-	if (idx >= 0 && idx < this.blocksArray.length) 
-	{
-		return this.blocksArray[idx];
-	}
-	return null;
-};
-
-/**
- * 블록을 삭제
- * @param idx 변수
- * @returns block
- */
-BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
-{
-	if (this.blocksArray === undefined) { return; }
-
-	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) 
-	{
-		var block = this.blocksArray[i];
-		block.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
-		block.vBOVertexIdxCacheKeysContainer = undefined; // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
-		block.mIFCEntityType = undefined;
-		block.isSmallObj = undefined;
-		block.radius = undefined;
-		block.vertexCount = undefined; // only for test.*** delete this.***
-		if (block.lego) 
-		{
-			block.lego.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
-			block.lego.vbo_vicks_container = undefined;
-		}
-		block.lego = undefined; // legoBlock.***
-		this.blocksArray[i] = undefined;
-	}
-	this.blocksArray = undefined;
-	this.name = undefined;
-	this.fileLoadState = undefined;
-	this.dataArraybuffer = undefined; // file loaded data, that is no parsed yet.***
-};
-
-/**
- * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
- * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
- */
-BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
-{
-	var vertexCount;
-	var verticesFloatValuesCount;
-	var normalByteValuesCount;
-	var shortIndicesValuesCount;
-	var sizeLevels;
-	var startBuff, endBuff;
-	
-	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-	bytesReaded += 4;
-	for ( var j = 0; j < vboDatasCount; j++ ) 
-	{
-		// 1) Positions array.
-		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
-		verticesFloatValuesCount = vertexCount * 3;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-
-		// 2) Normals.
-		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
-		normalByteValuesCount = vertexCount * 3;
-		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-
-		// 3) Indices.
-		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
-		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
-		bytesReaded = bytesReaded + sizeLevels * 4;
-		bytesReaded = bytesReaded + sizeLevels * 4;
-		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-	}
-	
-	return bytesReaded;
-};
-
-/**
- * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
- * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
- */
-BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
-{
-	var posByteSize;
-	var norByteSize;
-	var idxByteSize;
-	var classifiedPosByteSize;
-	var classifiedNorByteSize;
-	var classifiedIdxByteSize;
-	var startBuff, endBuff;
-	var vboMemManager = magoManager.vboMemoryManager;
-	
-	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	for ( var j = 0; j < vboDatasCount; j++ ) 
-	{
-		// 1) Positions array.
-		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var verticesFloatValuesCount = vertexCount * 3;
-		// now padding the array to adjust to standard memory size of pool.
-		posByteSize = 4 * verticesFloatValuesCount;
-		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-		
-		block.vertexCount = vertexCount;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-		vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-		vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
-		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-		
-		// 2) Normals.
-		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var normalByteValuesCount = vertexCount * 3;
-		// now padding the array to adjust to standard memory size of pool.
-		norByteSize = 1 * normalByteValuesCount;
-		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 1 * normalByteValuesCount;
-		vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
-		vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
-		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-		
-		// 3) Indices.
-		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		// now padding the array to adjust to standard memory size of pool.
-		idxByteSize = 2 * shortIndicesValuesCount;
-		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-
-		var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded +=1;
-		var sizeThresholds = [];
-		for ( var k = 0; k < sizeLevels; k++ )
-		{
-			sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))); bytesReaded += 4;
-		}
-		var indexMarkers = [];
-		for ( var k = 0; k < sizeLevels; k++ )
-		{
-			indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		}
-		var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
-		vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
-
-		vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
-		vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
-		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-		vboViCacheKey.indicesCount = shortIndicesValuesCount;
-	}
-	
-	return bytesReaded;
-};
-
-/**
- * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
- * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
- */
-BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
-{
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
-	var succesfullyGpuDataBinded = true;
-	
-	// read the version.
-	var versionLength = 5;
-	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
-	bytesReaded += versionLength;
-	
-	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
-	for ( var i = 0; i< blocksCount; i++ ) 
-	{
-		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-		// Check if block exist.
-		if (motherBlocksArray[blockIdx]) 
-		{
-			// The block exists, then read data but no create a new block.
-			bytesReaded += 4 * 6; // boundingBox.
-			// step over vbo datas of the model.
-			bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
-			
-			// read lego if exist. (note: lego is exactly same of a model, is a mesh).
-			var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-			if (existLego)
-			{
-				bytesReaded = this.stepOverBlockVersioned(arrayBuffer, bytesReaded, readWriter) ;
-			}
-			
-			continue;
-		}
-		
-		// The block doesn't exist, so creates a new block and read data.
-		var block = new Block();
-		block.idx = blockIdx;
-		motherBlocksArray[blockIdx] = block;
-
-		// 1rst, read bbox.
-		var bbox = new BoundingBox();
-		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-
-		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
-
-		var maxLength = bbox.getMaxLength();
-		if (maxLength < 0.5) { block.isSmallObj = true; }
-		else { block.isSmallObj = false; }
-
-		block.radius = maxLength/2.0;
-
-		bbox.deleteObjects();
-		bbox = undefined;
-		
-		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
-		
-		// now bind vbo buffer datas.
-		var vboDatasCount = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
-		for (var j=0; j<vboDatasCount; j++)
-		{
-			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[j];
-			
-			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-		}
-		
-		// parse lego if exist.
-		var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		if (existLego)
-		{
-			if (block.lego == undefined)
-			{ block.lego = new Lego(); }
-			
-			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
-		}
-
-	}
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	return succesfullyGpuDataBinded;
-};
-
-
-/**
- * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
- * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
- */
-BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
-{
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	var bytesReaded = 0;
-	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
-	
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
-	var succesfullyGpuDataBinded = true;
-
-	for ( var i = 0; i< blocksCount; i++ ) 
-	{
-		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		
-		// Check if block exist.
-		if (motherBlocksArray[blockIdx]) 
-		{
-			// The block exists, then read data but no create a new block.
-			bytesReaded += 4 * 6; // boundingBox.
-			// Read vbo datas (indices cannot superate 65535 value).
-			var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-			
-			for ( var j = 0; j < vboDatasCount; j++ ) 
-			{
-				// 1) Positions array.
-				var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-				var verticesFloatValuesCount = vertexCount * 3;
-				startBuff = bytesReaded;
-				endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-				bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-
-				// 2) Normals.
-				vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-				var normalByteValuesCount = vertexCount * 3;
-				bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-
-				// 3) Indices.
-				var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-				var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-				
-				bytesReaded = bytesReaded + sizeLevels * 4;
-				bytesReaded = bytesReaded + sizeLevels * 4;
-				bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-			}
-			// Pendent to load the block's lego.***
-			continue;
-		}
-		
-		// The block doesn't exist, so creates a new block and read data.
-		var block = new Block();
-		block.idx = blockIdx;
-		motherBlocksArray[blockIdx] = block;
-
-		// 1rst, read bbox.
-		var bbox = new BoundingBox();
-		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-
-		bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-		bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-		bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
-		bytesReaded += 4;
-
-		var maxLength = bbox.getMaxLength();
-		if (maxLength < 0.5) { block.isSmallObj = true; }
-		else { block.isSmallObj = false; }
-
-		block.radius = maxLength/2.0;
-
-		bbox.deleteObjects();
-		bbox = undefined;
-
-		// New for read multiple vbo datas (indices cannot superate 65535 value).***
-		var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-		bytesReaded += 4;
-		for ( var j = 0; j < vboDatasCount; j++ ) 
-		{
-			// 1) Positions array.
-			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			var verticesFloatValuesCount = vertexCount * 3;
-			// now padding the array to adjust to standard memory size of pool.
-			posByteSize = 4 * verticesFloatValuesCount;
-			classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-			
-			block.vertexCount = vertexCount;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-			vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
-			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-			
-			// 2) Normals.
-			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			var normalByteValuesCount = vertexCount * 3;
-			// now padding the array to adjust to standard memory size of pool.
-			norByteSize = 1 * normalByteValuesCount;
-			classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-			
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1 * normalByteValuesCount;
-			vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
-			vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
-			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-			
-			// 3) Indices.
-			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			// now padding the array to adjust to standard memory size of pool.
-			idxByteSize = 2 * shortIndicesValuesCount;
-			classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-			
-			bytesReaded += 4;
-			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
-			bytesReaded +=1;
-			var sizeThresholds = [];
-			for ( var k = 0; k < sizeLevels; k++ )
-			{
-				sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
-				bytesReaded += 4;
-			}
-			var indexMarkers = [];
-			for ( var k = 0; k < sizeLevels; k++ )
-			{
-				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
-				bytesReaded += 4;
-			}
-			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
-			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
-
-			vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
-			vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
-			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-			vboViCacheKey.indicesCount = shortIndicesValuesCount;
-
-			posByteSize;
-			norByteSize;
-			idxByteSize;
-			
-			classifiedPosByteSize;
-			classifiedNorByteSize;
-			classifiedIdxByteSize;
-			
-			var hola = 0;
-			
-			// test.
-			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-			if (!vboViCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
-			{ succesfullyGpuDataBinded = false; }
-		}
-		
-		
-
-		// Pendent to load the block's lego.***
-	}
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	return succesfullyGpuDataBinded;
-};
-
-/**
- * 블록 컨테이너
- * @class BlocksListsContainer
- */
-var BlocksListsContainer = function() 
-{
-	if (!(this instanceof BlocksListsContainer)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.blocksListsArray = [];
-};
-
-/**
- * 새 블록 리스트를 생성
- * @param blocksListName 변수
- * @returns blocksList
- */
-BlocksListsContainer.prototype.newBlocksList = function(blocksListName) 
-{
-	var blocksList = new BlocksList();
-	blocksList.name = blocksListName;
-	this.blocksListsArray.push(blocksList);
-	return blocksList;
-};
-
-/**
- * 블록 리스트 획득
- * @param blockList_name 변수
- * @returns blocksList
- */
-BlocksListsContainer.prototype.getBlockList = function(blockList_name) 
-{
-	var blocksListsCount = this.blocksListsArray.length;
-	var found = false;
-	var i=0;
-	var blocksList = null;
-	while (!found && i<blocksListsCount) 
-	{
-		var currentBlocksList = this.blocksListsArray[i];
-		if (currentBlocksList.name === blockList_name) 
-		{
-			found = true;
-			blocksList = currentBlocksList;
-		}
-		i++;
-	}
-	return blocksList;
-};
-
-'use strict';
-
-/**
- * F4D Lego 클래스
- * 
- * @alias Lego
- * @class Lego
- */
-var Lego = function() 
-{
-	if (!(this instanceof Lego)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
-	this.fileLoadState = CODE.fileLoadState.READY;
-	this.dataArrayBuffer;
-	this.selColor4;
-};
-
-/**
- * F4D Lego 자료를 읽는다
- * 
- * @param {any} gl 
- * @param {any} readWriter 
- * @param {any} dataArraybuffer 
- * @param {any} bytesReaded 
- */
-Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
-{
-	this.parseLegoData(dataArraybuffer, gl, magoManager);
-};
-
-/**
- * F4D Lego 자료를 읽는다
- * 
- * @param {any} gl 
- * @param {any} readWriter 
- * @param {any} dataArraybuffer 
- * @param {any} bytesReaded 
- */
-Lego.prototype.deleteObjects = function(gl, vboMemManager)
-{
-	this.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
-	this.vbo_vicks_container = undefined;
-	this.fileLoadState = undefined;
-	this.dataArrayBuffer = undefined;
-	if (this.selColor4 !== undefined)
-	{
-		this.selColor4.deleteObjects();
-		this.selColor4 = undefined;
-	}
-};
-
-/**
- * F4D Lego 자료를 읽는다
- * 
- * @param {ArrayBuffer} buffer 
- */
-Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
-{
-	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
-	
-	var vboMemManager = magoManager.vboMemoryManager;
-
-	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-
-	var bbox = new BoundingBox();
-	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
-
-	// BoundingBox
-	bbox.minX = stream.readFloat32();
-	bbox.minY = stream.readFloat32();
-	bbox.minZ = stream.readFloat32();
-	bbox.maxX = stream.readFloat32();
-	bbox.maxY = stream.readFloat32();
-	bbox.maxZ = stream.readFloat32();
-
-	// VBO(Position Buffer) - x,y,z
-	var numPositions = stream.readUint32();
-	var posByteSize = 4 * numPositions * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	//var positionBuffer = stream.readFloat32Array(numPositions * 3); // original.***
-	var positionBuffer = new Float32Array(classifiedPosByteSize);
-	positionBuffer.set(stream.readFloat32Array(numPositions * 3));
-	// console.log(numPositions + " Positions = " + positionBuffer[0]);
-
-	vboCacheKey.vertexCount = numPositions;
-	vboCacheKey.posVboDataArray = positionBuffer;
-	vboCacheKey.posArrayByteSize = classifiedPosByteSize;
-
-	// VBO(Normal Buffer) - i,j,k
-	var hasNormals = stream.readUint8();
-	if (hasNormals) 
-	{
-		var numNormals = stream.readUint32();
-		var norByteSize = 1 * numNormals * 3;
-		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		//var normalBuffer = stream.readInt8Array(numNormals * 3); // original.***
-		var normalBuffer = new Int8Array(classifiedNorByteSize);
-		normalBuffer.set(stream.readInt8Array(numNormals * 3));
-		// console.log(numNormals + " Normals = " + normalBuffer[0]);
-
-		vboCacheKey.norVboDataArray = normalBuffer;
-		vboCacheKey.norArrayByteSize = classifiedNorByteSize;
-	}
-
-	// VBO(Color Buffer) - r,g,b,a
-	var hasColors = stream.readUint8();
-	if (hasColors)
-	{
-		var numColors = stream.readUint32();
-		var colByteSize = 1 * numColors * 4;
-		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-						
-		//var colorBuffer = stream.readUint8Array(numColors * 4); // original.***
-		var colorBuffer = new Uint8Array(classifiedColByteSize);
-		colorBuffer.set(stream.readUint8Array(numColors * 4));
-		// console.log(numColors + " Colors = " + colorBuffer[0]);
-
-		vboCacheKey.colVboDataArray = colorBuffer;
-		vboCacheKey.colArrayByteSize = classifiedColByteSize;
-	}
-
-	// VBO(TextureCoord Buffer) - u,v
-	var hasTexCoords = stream.readUint8();
-	if (hasTexCoords)
-	{
-		var dataType = stream.readUint16();
-		var numCoords = stream.readUint32();
-		var tCoordByteSize = 2 * numCoords * 4;
-		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-		//var coordBuffer = stream.readFloat32Array(numCoords * 2); // original.***
-		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
-		coordBuffer.set(stream.readFloat32Array(numCoords * 2));
-		// console.log(numCoords + " Coords = " + coordBuffer[0]);
-
-		vboCacheKey.tcoordVboDataArray = coordBuffer;
-		vboCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
-	}
-
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	
-	var succesfullyGpuDataBinded = true;
-	if (!vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-	if (!vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-	if (!vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-
-	// 4) Texcoord.*********************************************
-	if (hasTexCoords)
-	{
-		if (!vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-		{ succesfullyGpuDataBinded = false; }
-	}	
-	return succesfullyGpuDataBinded;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'use strict';
-
-/**
- * F4D MetaData 클래스
- * 
- * @alias MetaData
- * @class MetaData
- */
-var MetaData = function() 
-{
-	if (!(this instanceof MetaData)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.guid; // must be undefined initially.***
-	this.version = "";
-	this.geographicCoord; // longitude, latitude, altitude.***
-
-	this.heading;
-	this.pitch;
-	this.roll;
-
-	this.bbox; // BoundingBox.***
-	this.imageLodCount;
-
-	// Buildings octree mother size.***
-	this.oct_min_x = 0.0;
-	this.oct_max_x = 0.0;
-	this.oct_min_y = 0.0;
-	this.oct_max_y = 0.0;
-	this.oct_min_z = 0.0;
-	this.oct_max_z = 0.0;
-
-	this.isSmall = false;
-	this.fileLoadState = CODE.fileLoadState.READY;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param arrayBuffer 변수
- * @param readWriter 변수
- */
-MetaData.prototype.deleteObjects = function() 
-{
-	this.guid = undefined; // must be undefined initially.***
-	this.version = undefined;
-	if (this.geographicCoord)
-	{ this.geographicCoord.deleteObjects(); }
-	this.geographicCoord = undefined; // longitude, latitude, altitude.***
-
-	this.heading = undefined;
-	this.pitch = undefined;
-	this.roll = undefined;
-
-	if (this.bbox)
-	{ this.bbox.deleteObjects(); }
-	this.bbox = undefined; // BoundingBox.***
-	this.imageLodCount = undefined;
-
-	// Buildings octree mother size.***
-	this.oct_min_x = undefined;
-	this.oct_max_x = undefined;
-	this.oct_min_y = undefined;
-	this.oct_max_y = undefined;
-	this.oct_min_z = undefined;
-	this.oct_max_z = undefined;
-
-	this.isSmall = undefined;
-	this.fileLoadState = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param arrayBuffer 변수
- * @param readWriter 변수
- */
-MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter, neoBuilding) 
-{
-	var version_string_length = 5;
-	var intAux_scratch = 0;
-	var auxScratch;
-	//var header = BR_Project._header;
-	//var arrayBuffer = this.fileArrayBuffer;
-	//var bytes_readed = this.fileBytesReaded;
-	var bytes_readed = 0;
-
-	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
-
-	// 1) Version(5 chars).***********
-	this.version = "";
-	for (var j=0; j<version_string_length; j++)
-	{
-		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-	}
-
-	// 3) Global unique ID.*********************
-	if (this.guid === undefined) { this.guid =""; }
-
-	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	for (var j=0; j<intAux_scratch; j++)
-	{
-		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-	}
-
-	// 4) Location.*************************
-	if (this.longitude === undefined) 
-	{
-		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else { bytes_readed += 8; }
-
-	if (this.latitude === undefined) 
-	{
-		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-	}
-	else { bytes_readed += 8; }
-
-	if (this.altitude === undefined) 
-	{
-		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	}
-	else { bytes_readed += 4; }
-
-	//this.altitude -= 140.0; // TEST.***
-
-	//header._elevation += 70.0; // delete this. TEST.!!!
-	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
-
-	// 6) BoundingBox.************************
-	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-	var isLarge = false;
-	if (this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0) 
-	{
-		isLarge = true;
-	}
-
-	if (!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0) 
-	{
-		this.isSmall = true;
-	}
-
-	return bytes_readed;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'use strict';
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class ModelReferencedGroup
- */
-var ModelReferencedGroup = function() 
-{
-	if (!(this instanceof ModelReferencedGroup)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.modelIdx; // there are only one model.
-	this.referencesIdxArray = []; // all references has the same model.
-};
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class ModelReferencedGroupsList
- */
-var ModelReferencedGroupsList = function() 
-{
-	if (!(this instanceof ModelReferencedGroupsList)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	this.modelReferencedGroupsMap = [];
-	this.modelReferencedGroupsArray = [];
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-ModelReferencedGroupsList.prototype.getModelReferencedGroup = function(modelIdx) 
-{
-	var modelReferencedGroup = this.modelReferencedGroupsMap[modelIdx];
-	
-	if (modelReferencedGroup === undefined)
-	{
-		modelReferencedGroup = new ModelReferencedGroup();
-		modelReferencedGroup.modelIdx = modelIdx;
-		this.modelReferencedGroupsMap[modelIdx] = modelReferencedGroup;
-	}
-	
-	return modelReferencedGroup;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-ModelReferencedGroupsList.prototype.makeModelReferencedGroupsArray = function() 
-{
-	this.modelReferencedGroupsArray.length = 0;
-	
-	var modelRefGroupsCount = this.modelReferencedGroupsMap.length;
-	for (var i=0; i<modelRefGroupsCount; i++)
-	{
-		if (this.modelReferencedGroupsMap[i] !== undefined)
-		{ this.modelReferencedGroupsArray.push(this.modelReferencedGroupsMap[i]); }
-	}
-	this.modelReferencedGroupsMap.length = 0;
-	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-ModelReferencedGroupsList.prototype.createModelReferencedGroups = function(neoRefsIndices, motherNeoRefsList) 
-{
-	// Group all the references that has the same model.
-	if (neoRefsIndices === undefined)
-	{ return; }
-	
-	if (motherNeoRefsList === undefined)
-	{ return; }
-	
-	var referenceIdx;
-	var modelIdx;
-	var modelRefGroup;
-	var referencesCount = neoRefsIndices.length;
-	for (var i=0; i<referencesCount; i++)
-	{
-		referenceIdx = neoRefsIndices[i];
-		modelIdx = motherNeoRefsList[referenceIdx]._block_idx;
-		modelRefGroup = this.getModelReferencedGroup(modelIdx);
-		modelRefGroup.referencesIdxArray.push(referenceIdx);
-	}
-	
-	// Now, delete the "modelReferencedGroupsMap" and make a simple array.
-	this.makeModelReferencedGroupsArray();
-	
-};
-
-
-
-
-
-'use strict';
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class NeoReference
- */
-var NeoReference = function() 
-{
-	if (!(this instanceof NeoReference)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// 1) Object IDX.***
-	this._id = 0;
-
-	this.objectId = "";
-
-	// 2) Block Idx.***
-	this._block_idx = -1;
-
-	// 3) Transformation Matrix.***
-	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
-	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
-	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
-	this.refMatrixType = 2; // 0 = identity matrix, 1 = translate matrix, 2 = transformation matrix.
-	this.refTranslationVec; // use this if "refMatrixType" === 1.
-	// 4) VBO datas container.***
-	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
-
-	// 5) The texture image.***
-	this.materialId;
-	this.hasTexture = false;
-	this.texture; // Texture
-
-	// 6) 1 color.***
-	this.color4; //new Color();
-	this.aditionalColor; // used when object color was changed.***
-
-	// 7) selection color.***
-	//this.selColor4; //new Color(); // delete this..***
-
-	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
-
-	// 8) movement of the object.***
-	this.moveVector; // Point3D.***
-
-	// 9) check for render.***
-	this.bRendered = false;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
-{
-	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
-{
-	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
-	if (this.tMatrixAuxArray === undefined)
-	{ this.tMatrixAuxArray = []; }
-
-	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoReference.prototype.hasKeyMatrix = function(idxKey) 
-{
-	if (this.tMatrixAuxArray === undefined)
-	{ return false; }
-
-	if (this.tMatrixAuxArray[idxKey] === undefined)
-	{ return false; }
-	else
-	{ return true; }
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoReference.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-	// 1) Object ID.***
-	this._id = undefined;
-
-	// 2) Block Idx.***
-	this._block_idx = undefined;
-
-	// 3) Transformation Matrix.***
-	this._matrix4._floatArrays = undefined;
-	this._matrix4 = undefined;
-	this._originalMatrix4._floatArrays = undefined;
-	this._originalMatrix4 = undefined; //
-
-	// 5) The texture image.***
-	this.hasTexture = undefined;
-	// no delete the texture, only break the referencing.
-	this.texture = undefined; // Texture
-
-	// 6) 1 color.***
-	if (this.color4)
-	{ this.color4.deleteObjects(); }
-	this.color4 = undefined; //new Color();
-
-	// 7) selection color.***
-	if (this.selColor4)
-	{ this.selColor4.deleteObjects(); }
-	this.selColor4 = undefined; //new Color(); // use for selection only.***
-
-	this.vertexCount = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
-
-	// 8) movement of the object.***
-	if (this.moveVector)
-	{ this.moveVector.deleteObjects(); }
-	this.moveVector = undefined; // Point3D.***
-
-	this.bRendered = undefined;
-};
-
-//*************************************************************************************************************************************************************
-//*************************************************************************************************************************************************************
-//*************************************************************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @class NeoReferencesMotherAndIndices
- */
-var NeoReferencesMotherAndIndices = function() 
-{
-	if (!(this instanceof NeoReferencesMotherAndIndices)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
-	this.neoRefsIndices = []; // All objects(references) of this class.
-	this.modelReferencedGroupsList; // (for new format).
-	this.blocksList;
-
-	this.fileLoadState = 0; // init as "READY".
-	this.dataArraybuffer;
-	this.succesfullyGpuDataBinded;
-
-	this.exterior_ocCullOctree; // octree that contains the visible indices.
-	this.interior_ocCullOctree; // octree that contains the visible indices.
-	
-	this.currentVisibleIndices = [];
-	this.currentVisibleMRG; // MRG = ModelReferencedGroup (for new format).
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param matrix 변수
- */
-NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
-{
-	var refIndicesCount = this.neoRefsIndices.length;
-	for (var i=0; i<refIndicesCount; i++)
-	{
-		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
-	}
-};
-
-NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z, applyOcclusionCulling) 
-{
-	if (applyOcclusionCulling == undefined)
-	{ applyOcclusionCulling = true; }
-	
-	if (isExterior)
-	{
-		if (this.exterior_ocCullOctree !== undefined)
-		{
-			var thisHasOcCullData = false;
-			if (this.exterior_ocCullOctree._subBoxesArray && this.exterior_ocCullOctree._subBoxesArray.length > 0)
-			{ thisHasOcCullData = true; }
-		
-			if (thisHasOcCullData && applyOcclusionCulling)
-			{
-				if (this.currentVisibleMRG === undefined)
-				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
-				
-				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
-			}
-			else 
-			{
-				// In this case there are no occlusionCulling data.
-				this.currentVisibleIndices = this.neoRefsIndices;
-				this.currentVisibleMRG = this.modelReferencedGroupsList;
-			}
-		}
-	}
-	else
-	{
-		if (this.interior_ocCullOctree !== undefined)
-		{
-			var thisHasOcCullData = false;
-			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
-			{ thisHasOcCullData = true; }
-		
-			if (thisHasOcCullData && applyOcclusionCulling)
-			{
-				if (this.currentVisibleMRG === undefined)
-				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
-				
-				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
-			}
-			else
-			{
-				// In this case there are no occlusionCulling data.
-				this.currentVisibleIndices = this.neoRefsIndices;
-				this.currentVisibleMRG = this.modelReferencedGroupsList;
-			}
-		}
-	}
-};
-
-/**
- * Returns the neoReference
- * @param matrix 변수
- */
-NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx) 
-{
-	return this.motherNeoRefsList[this.neoRefsIndices[idx]];
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
-	this.neoRefsIndices = undefined;
-	this.blocksList = undefined;
-
-	this.fileLoadState = 0;
-	this.dataArraybuffer = undefined;
-
-	this.exterior_ocCullOctree = undefined;
-	this.interior_ocCullOctree = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-NeoReferencesMotherAndIndices.prototype.setRenderedFalseToAllReferences = function() 
-{
-	var refIndicesCount = this.neoRefsIndices.length;
-	for (var i=0; i<refIndicesCount; i++)
-	{
-		this.motherNeoRefsList[this.neoRefsIndices[i]].bRendered = false;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function() 
-{
-	// Group all the references that has the same model.
-	if (this.neoRefsIndices === undefined)
-	{ return; }
-	
-	if (this.modelReferencedGroupsList === undefined)
-	{ this.modelReferencedGroupsList = new ModelReferencedGroupsList(); }
-
-	this.modelReferencedGroupsList.createModelReferencedGroups(this.neoRefsIndices, this.motherNeoRefsList);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param arrayBuffer 변수
- * @param neoBuilding 변수
- * @param readWriter 변수
- */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
-{
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-
-	var startBuff;
-	var endBuff;
-	var bytes_readed = 0;
-	var testIdentityMatsCount = 0;
-	var stadistic_refMat_Identities_count = 0;
-	var stadistic_refMat_Translates_count = 0;
-	var stadistic_refMat_Transforms_count = 0;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
-	var colByteSize, tCoordByteSize;
-	this.succesfullyGpuDataBinded = true;
-	var translationX, translationY, translationZ;
-	
-	// read the version.
-	var versionLength = 5;
-	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+versionLength)));
-	bytes_readed += versionLength;
-
-	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	for (var i = 0; i < neoRefsCount; i++) 
-	{
-		var neoRef = new NeoReference();
-
-		// 1) Id.***
-		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._id = ref_ID;
-
-		this.motherNeoRefsList = motherNeoReferencesArray;
-		if (motherNeoReferencesArray[neoRef._id] !== undefined)
-		{
-			// pass this neoReference because exist in the motherNeoReferencesArray.***
-			neoRef = motherNeoReferencesArray[neoRef._id];
-			if (this.neoRefsIndices === undefined)
-			{ this.neoRefsIndices = []; }
-			
-			this.neoRefsIndices.push(neoRef._id);
-
-			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
-			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			
-			neoRef.objectId = objectId;
-			bytes_readed += objectIdLength;
-
-			// 2) Block's Idx.***
-			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._block_idx = blockIdx;
-
-			// 3) Transform Matrix4.***
-			// in versioned mode read the matrixType first.
-			var matrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (matrixType == 0)
-			{ 
-				// do nothing.
-			}
-			else if (matrixType == 1)
-			{
-				// read the translation vector.
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			}
-			else if (matrixType == 2)
-			{
-				// read the transformation matrix.
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			}
-
-			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
-			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (has_1_color) 
-			{
-				// "type" : one of following
-				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
-				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-				var daya_bytes;
-				if (data_type === 5121) { daya_bytes = 1; }
-
-				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var alfa = 255;
-
-				if (dim === 4) 
-				{
-					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				}
-			}
-			
-			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
-			if (has_colors || has_texCoords)
-			{
-				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				
-				for (var j=0; j<vboDatasCount; j++)
-				{
-					if (has_colors)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * dim;
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
-					}
-					
-					if (has_texCoords)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount;
-					}
-				}
-			}
-			
-			// 4) short texcoords. OLD. Change this for Materials.***
-			var materialIdAux = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			
-			// do the stadistic recount.
-			if (neoRef.refMatrixType == 0){ stadistic_refMat_Identities_count +=1; }
-			if (neoRef.refMatrixType == 1){ stadistic_refMat_Translates_count +=1; }
-			if (neoRef.refMatrixType == 2){ stadistic_refMat_Transforms_count +=1; }
-		}
-		else
-		{
-
-			motherNeoReferencesArray[neoRef._id] = neoRef;
-			if (this.neoRefsIndices === undefined)
-			{ this.neoRefsIndices = []; }
-			
-			this.neoRefsIndices.push(neoRef._id);
-
-			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
-			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId == "noObjectId")
-			{ objectId = neoRef._id; }
-		
-			neoRef.objectId = objectId;
-			bytes_readed += objectIdLength;
-
-			// 2) Block's Idx.***
-			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._block_idx = blockIdx;
-
-			// 3) Transform Matrix4.***
-			neoRef.refMatrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (neoRef.refMatrixType == 0)
-			{ 
-				// do nothing.
-				stadistic_refMat_Identities_count +=1;
-			}
-			else if (neoRef.refMatrixType == 1)
-			{
-				// read the translation vector.
-				translationX = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				translationY = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				translationZ = readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef.refTranslationVec = new Float32Array([translationX, translationY, translationZ]);
-				
-				stadistic_refMat_Translates_count +=1;
-			}
-			else if (neoRef.refMatrixType == 2)
-			{
-				// read the transformation matrix.
-				neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				
-				stadistic_refMat_Transforms_count +=1;
-			}
-
-			// Float mode.**************************************************************
-			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (has_1_color) 
-			{
-				// "type" : one of following
-				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
-				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-				var daya_bytes;
-				if (data_type === 5121) { daya_bytes = 1; }
-
-				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var alfa = 255;
-
-				if (dim === 4) 
-				{
-					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				}
-
-				neoRef.color4 = new Color();
-				neoRef.color4.set(r, g, b, alfa);
-			}
-			
-			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
-			if (has_colors || has_texCoords)
-			{
-				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				
-				if (vboDatasCount > 0)
-				{
-					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
-					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
-				}
-				
-				for (var j=0; j<vboDatasCount; j++)
-				{
-					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-					
-					if (has_colors)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * dim;
-						colByteSize = daya_bytes * verticesFloatValuesCount;
-						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-						
-						neoRef.vertexCount = vertexCount; // no necessary.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						// TODO: Float32Array or UintArray depending of dataType.***
-						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
-						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
-						
-						// send data to gpu.
-						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
-					}
-					
-					if (has_texCoords)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
-						// example: posByteSize = 4 * verticesFloatValuesCount;
-						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
-						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-						
-						neoRef.vertexCount = vertexCount; // no necessary.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
-						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
-						bytes_readed += daya_bytes * verticesFloatValuesCount;
-						
-						// send data to gpu.
-						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
-					}
-				}
-			}
-
-			// 4) read the reference material id.
-			neoRef.materialId = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if (neoRef.materialId == -1)
-			{ neoRef.hasTexture = false; }
-			else { neoRef.hasTexture = true; }
-
-			if (tMatrix4)
-			{
-				// multiply the building transformation matrix with the reference matrix, then we save aditional multiplications inside the shader.
-				neoRef.multiplyTransformMatrix(tMatrix4);
-			}
-		}
-
-	}
-	
-	// finally read the triangles count.
-	var trianglesCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	
-	//this.createModelReferencedGroups(); // test for stadistics.
-	
-
-	// Now occlusion cullings.***
-	// Occlusion culling octree data.*****
-	if (this.exterior_ocCullOctree === undefined)
-	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
-
-	var infiniteOcCullBox = this.exterior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
-	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
-	infiniteOcCullBox.setSizesSubBoxes();
-	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
-
-	if (this.interior_ocCullOctree === undefined)
-	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
-
-	var ocCullBox = this.interior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
-	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	ocCullBox.setSizesSubBoxes();
-	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
-
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	return this.succesfullyGpuDataBinded;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param arrayBuffer 변수
- * @param neoBuilding 변수
- * @param readWriter 변수
- */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
-{
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-
-	var startBuff;
-	var endBuff;
-	var bytes_readed = 0;
-	var neoRefsCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	var testIdentityMatsCount = 0;
-	var stadistic_refMat_Identities_count = 0;
-	var stadistic_refMat_Translates_count = 0;
-	var stadistic_refMat_Transforms_count = 0;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedTCoordByteSize = 0, classifiedColByteSize = 0;
-	var colByteSize, tCoordByteSize;
-	this.succesfullyGpuDataBinded = true;
-
-	for (var i = 0; i < neoRefsCount; i++) 
-	{
-		var neoRef = new NeoReference();
-
-		// 1) Id.***
-		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		neoRef._id = ref_ID;
-
-		this.motherNeoRefsList = motherNeoReferencesArray;
-		if (motherNeoReferencesArray[neoRef._id] !== undefined)
-		{
-			// pass this neoReference because exist in the motherNeoReferencesArray.***
-			neoRef = motherNeoReferencesArray[neoRef._id];
-			if (this.neoRefsIndices === undefined)
-			{ this.neoRefsIndices = []; }
-			
-			this.neoRefsIndices.push(neoRef._id);
-
-			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
-			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			bytes_readed += objectIdLength;
-
-			// 2) Block's Idx.***
-			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._block_idx = blockIdx;
-
-			// 3) Transform Matrix4.***
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
-			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (has_1_color) 
-			{
-				// "type" : one of following
-				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
-				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-				var daya_bytes;
-				if (data_type === 5121) { daya_bytes = 1; }
-
-				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var alfa = 255;
-
-				if (dim === 4) 
-				{
-					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				}
-			}
-			
-			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
-			if (has_colors || has_texCoords)
-			{
-				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				
-				for (var j=0; j<vboDatasCount; j++)
-				{
-					if (has_colors)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * dim;
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
-					}
-					
-					if (has_texCoords)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount;
-					}
-				}
-			}
-			
-			// 4) short texcoords. OLD. Change this for Materials.***
-			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
-			if (textures_count > 0) 
-			{
-
-				// Now, read the texture_type and texture_file_name.***
-				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<texture_type_nameLegth; j++) 
-				{
-					bytes_readed += 1; // for example "diffuse".***
-				}
-
-				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<texture_fileName_Legth; j++) 
-				{
-					bytes_readed += 1;
-				}
-			} 
-			
-			// do the stadistic recount.
-			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
-			if (neoRef.refMatrixType === 1){ stadistic_refMat_Translates_count +=1; }
-			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
-		}
-		else
-		{
-
-			motherNeoReferencesArray[neoRef._id] = neoRef;
-			if (this.neoRefsIndices === undefined)
-			{ this.neoRefsIndices = []; }
-			
-			this.neoRefsIndices.push(neoRef._id);
-
-			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
-			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId == "noObjectId" || objectId == "")
-			{ objectId = neoRef._id; }
-		
-			neoRef.objectId = objectId;
-			bytes_readed += objectIdLength;
-
-			// 2) Block's Idx.***
-			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._block_idx = blockIdx;
-
-			// 3) Transform Matrix4.***
-			neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[3] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			neoRef._originalMatrix4._floatArrays[4] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[5] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[6] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[7] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			neoRef._originalMatrix4._floatArrays[8] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[9] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[10] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[11] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			neoRef._originalMatrix4._floatArrays[12] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[13] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[14] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._originalMatrix4._floatArrays[15] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			
-			// Compute the references matrix type.
-			neoRef.refMatrixType = neoRef._originalMatrix4.computeMatrixType();
-			if (neoRef.refMatrixType === 0){ stadistic_refMat_Identities_count +=1; }
-			if (neoRef.refMatrixType === 1)
-			{
-				neoRef.refTranslationVec = new Float32Array([neoRef._originalMatrix4._floatArrays[12], neoRef._originalMatrix4._floatArrays[13], neoRef._originalMatrix4._floatArrays[14]]);
-				stadistic_refMat_Translates_count +=1;
-			}
-			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
-
-			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
-			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			if (has_1_color) 
-			{
-				// "type" : one of following
-				// 5120 : signed byte, 5121 : unsigned byte, 5122 : signed short, 5123 : unsigned short, 5126 : float
-				var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-				var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-				var daya_bytes;
-				if (data_type === 5121) { daya_bytes = 1; }
-
-				var r = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var g = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var b = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				var alfa = 255;
-
-				if (dim === 4) 
-				{
-					alfa = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+daya_bytes); bytes_readed += daya_bytes;
-				}
-
-				neoRef.color4 = new Color();
-				neoRef.color4.set(r, g, b, alfa);
-			}
-			
-			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-			
-			if (has_colors || has_texCoords)
-			{
-				var vboDatasCount = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				
-				if (vboDatasCount > 0)
-				{
-					if (neoRef.vBOVertexIdxCacheKeysContainer === undefined)
-					{ neoRef.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
-				}
-				
-				for (var j=0; j<vboDatasCount; j++)
-				{
-					var vboViCacheKey = neoRef.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-					
-					if (has_colors)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						var dim = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
-
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * dim;
-						colByteSize = daya_bytes * verticesFloatValuesCount;
-						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-						
-						neoRef.vertexCount = vertexCount; // no necessary.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						// TODO: Float32Array or UintArray depending of dataType.***
-						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
-						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
-						
-						// send data to gpu.
-						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
-					}
-					
-					if (has_texCoords)
-					{
-						var data_type = readWriter.readUInt16(arrayBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
-						
-						var daya_bytes; // (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
-						if (data_type === 5120 || data_type === 5121) { daya_bytes = 1; }
-						else if (data_type === 5122 || data_type === 5123) { daya_bytes = 2; }
-						else if (data_type === 5126) { daya_bytes = 4; }
-						
-						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
-						// example: posByteSize = 4 * verticesFloatValuesCount;
-						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
-						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-						
-						neoRef.vertexCount = vertexCount; // no necessary.***
-						startBuff = bytes_readed;
-						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
-						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
-						bytes_readed += daya_bytes * verticesFloatValuesCount;
-						
-						// send data to gpu.
-						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
-					}
-				}
-			}
-
-			// 4) short texcoords. OLD. Change this for Materials.***
-			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
-			if (textures_count > 0) 
-			{
-				var textureTypeName = "";
-				var textureImageFileName = "";
-
-				// Now, read the texture_type and texture_file_name.***
-				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<texture_type_nameLegth; j++) 
-				{
-					textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
-				}
-
-				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<texture_fileName_Legth; j++) 
-				{
-					textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-				}
-				
-				if (texture_fileName_Legth > 0)
-				{
-					neoRef.texture = new Texture();
-					neoRef.hasTexture = true;
-					neoRef.texture.textureTypeName = textureTypeName;
-					neoRef.texture.textureImageFileName = textureImageFileName;
-				}
-
-				/*
-				// 1pixel texture, wait for texture to load.********************************************
-				if(neoRef.texture.texId === undefined)
-					neoRef.texture.texId = gl.createTexture();
-				gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
-				gl.bindTexture(gl.TEXTURE_2D, null);
-				*/
-			}
-			else 
-			{
-				neoRef.hasTexture = false;
-			}
-
-			if (tMatrix4)
-			{
-				neoRef.multiplyTransformMatrix(tMatrix4);
-			}
-		}
-
-	}
-	
-	//this.createModelReferencedGroups(); // test for new format.
-	
-
-	// Now occlusion cullings.***
-	// Occlusion culling octree data.*****
-	if (this.exterior_ocCullOctree === undefined)
-	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
-
-	var infiniteOcCullBox = this.exterior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
-	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
-	infiniteOcCullBox.setSizesSubBoxes();
-	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
-
-	if (this.interior_ocCullOctree === undefined)
-	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
-
-	var ocCullBox = this.interior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
-	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	ocCullBox.setSizesSubBoxes();
-	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
-
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	return this.succesfullyGpuDataBinded;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-'use strict';
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class NeoTexture
- */
-var NeoTexture = function() 
-{
-	if (!(this instanceof NeoTexture)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	this.lod;
-	this.textureId; // texture id in gl.***
-	this.texImage; // image. delete this once upload to gl.***
-	this.loadStarted = false;
-	this.loadFinished = false;
-};
-'use strict';
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class Octree
- *
- * @param octreeOwner 변수
- */
-var Octree = function(octreeOwner) 
-{
-	if (!(this instanceof Octree)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// Note: an octree is a cube, not a box.***
-	this.centerPos = new Point3D();
-	this.half_dx = 0.0; // half width.***
-	this.half_dy = 0.0; // half length.***
-	this.half_dz = 0.0; // half height.***
-
-	this.octree_owner;
-	this.octree_level = 0;
-	this.octree_number_name = 0;
-	this.squareDistToEye = 10000.0;
-	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
-	this.fileLoadState = CODE.fileLoadState.READY;
-
-	if (octreeOwner) 
-	{
-		this.octree_owner = octreeOwner;
-		this.octree_level = octreeOwner.octree_level + 1;
-	}
-
-	this.subOctrees_array = [];
-	this.neoReferencesMotherAndIndices; // Asimetric mode.***
-
-	// now, for legoStructure.***
-	this.lego;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns subOctree 변수
- */
-Octree.prototype.new_subOctree = function() 
-{
-	var subOctree = new Octree(this);
-	subOctree.octree_level = this.octree_level + 1;
-	this.subOctrees_array.push(subOctree);
-	return subOctree;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager) 
-{
-	if (this.neoReferencesMotherAndIndices)
-	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
-
-	this.neoReferencesMotherAndIndices = undefined;
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
-
-	if (this.subOctrees_array !== undefined) 
-	{
-		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].deleteObjectsModelReferences(gl, vboMemManager);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-	if (this.lego !== undefined) 
-	{
-		this.lego.deleteObjects(gl, vboMemManager);
-		this.lego = undefined;
-	}
-	
-	this.legoDataArrayBuffer = undefined;
-	this.centerPos.deleteObjects();
-	this.centerPos = undefined;
-	this.half_dx = undefined; // half width.***
-	this.half_dy = undefined; // half length.***
-	this.half_dz = undefined; // half height.***
-
-	this.octree_owner = undefined;
-	this.octree_level = undefined;
-	this.octree_number_name = undefined;
-	this.squareDistToEye = undefined;
-	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.***
-	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
-
-	this.neoBuildingOwner = undefined;
-
-	if (this.neoReferencesMotherAndIndices)
-	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
-
-	this.neoReferencesMotherAndIndices = undefined;
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
-
-	if (this.subOctrees_array !== undefined) 
-	{
-		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].deleteObjects(gl, vboMemManager);
-			this.subOctrees_array[i] = undefined;
-		}
-		this.subOctrees_array = undefined;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.deleteLod0GlObjects = function(gl, vboMemManager) 
-{
-	if (this.neoReferencesMotherAndIndices)
-	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
-
-	if (this.subOctrees_array !== undefined) 
-	{
-		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].deleteLod0GlObjects(gl, vboMemManager);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.setRenderedFalseToAllReferences = function() 
-{
-
-
-	if (this.neoReferencesMotherAndIndices)
-	{
-		this.neoReferencesMotherAndIndices.setRenderedFalseToAllReferences();
-		var subOctreesCount = this.subOctrees_array.length;
-		for (var i=0; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].setRenderedFalseToAllReferences();
-		}
-	}
-
-
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.makeTree = function(treeDepth) 
-{
-	if (this.octree_level < treeDepth) 
-	{
-		for (var i=0; i<8; i++) 
-		{
-			var subOctree = this.new_subOctree();
-			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
-		}
-
-		this.setSizesSubBoxes();
-
-		for (var i=0; i<8; i++) 
-		{
-			this.subOctrees_array[i].makeTree(treeDepth);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param intNumber 변수
- * @returns numDigits
- */
-Octree.prototype.getNumberOfDigits = function(intNumber) 
-{
-	if (intNumber > 0) 
-	{
-		var numDigits = Math.floor(Math.log10(intNumber)+1);
-		return numDigits;
-	}
-	else 
-	{
-		return 1;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Octree.prototype.getMotherOctree = function() 
-{
-	if (this.octree_owner === undefined) { return this; }
-
-	return this.octree_owner.getMotherOctree();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param octreeNumberName 변수
- * @param numDigits 변수
- * @returns subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
- */
-Octree.prototype.getOctree = function(octreeNumberName, numDigits) 
-{
-	if (numDigits === 1) 
-	{
-		if (octreeNumberName === 0) { return this.getMotherOctree(); }
-		else { return this.subOctrees_array[octreeNumberName-1]; }
-	}
-
-	// determine the next level octree.***
-	var exp = numDigits-1;
-	var denominator = Math.pow(10, exp);
-	var idx = Math.floor(octreeNumberName /denominator) % 10;
-	var rest_octreeNumberName = octreeNumberName - idx * denominator;
-	return this.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param octreeNumberName 변수
- * @returns motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1)
- */
-Octree.prototype.getOctreeByNumberName = function(octreeNumberName) 
-{
-	var motherOctree = this.getMotherOctree();
-	var numDigits = this.getNumberOfDigits(octreeNumberName);
-	if (numDigits === 1) 
-	{
-		if (octreeNumberName === 0) { return motherOctree; }
-		else { return motherOctree.subOctrees_array[octreeNumberName-1]; }
-	}
-
-	if (motherOctree.subOctrees_array.length === 0) { return undefined; }
-
-	// determine the next level octree.***
-	var exp = numDigits-1;
-	var denominator = Math.pow(10, exp);
-	var idx = Math.floor(octreeNumberName /denominator) % 10;
-	var rest_octreeNumberName = octreeNumberName - idx * denominator;
-	return motherOctree.subOctrees_array[idx-1].getOctree(rest_octreeNumberName, numDigits-1);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Octree.prototype.setSizesSubBoxes = function() 
-{
-	// Octree number name.********************************
-	// Bottom                      Top
-	// |---------|---------|     |---------|---------|
-	// |         |         |     |         |         |       Y
-	// |    3    |    2    |     |    7    |    6    |       ^
-	// |         |         |     |         |         |       |
-	// |---------+---------|     |---------+---------|       |
-	// |         |         |     |         |         |       |
-	// |    0    |    1    |     |    4    |    5    |       |
-	// |         |         |     |         |         |       |-----------> X
-	// |---------|---------|     |---------|---------|
-
-	if (this.subOctrees_array.length > 0) 
-	{
-		var half_x = this.centerPos.x;
-		var half_y = this.centerPos.y;
-		var half_z = this.centerPos.z;
-
-		var min_x = this.centerPos.x - this.half_dx;
-		var min_y = this.centerPos.y - this.half_dy;
-		var min_z = this.centerPos.z - this.half_dz;
-
-		var max_x = this.centerPos.x + this.half_dx;
-		var max_y = this.centerPos.y + this.half_dy;
-		var max_z = this.centerPos.z + this.half_dz;
-
-		this.subOctrees_array[0].setBoxSize(min_x, half_x, min_y, half_y, min_z, half_z);
-		this.subOctrees_array[1].setBoxSize(half_x, max_x, min_y, half_y, min_z, half_z);
-		this.subOctrees_array[2].setBoxSize(half_x, max_x, half_y, max_y, min_z, half_z);
-		this.subOctrees_array[3].setBoxSize(min_x, half_x, half_y, max_y, min_z, half_z);
-
-		this.subOctrees_array[4].setBoxSize(min_x, half_x, min_y, half_y, half_z, max_z);
-		this.subOctrees_array[5].setBoxSize(half_x, max_x, min_y, half_y, half_z, max_z);
-		this.subOctrees_array[6].setBoxSize(half_x, max_x, half_y, max_y, half_z, max_z);
-		this.subOctrees_array[7].setBoxSize(min_x, half_x, half_y, max_y, half_z, max_z);
-
-		for (var i=0; i<8; i++) 
-		{
-			this.subOctrees_array[i].setSizesSubBoxes();
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param Min_x 변수
- * @param Max_x 변수
- * @param Min_y 변수
- * @param Max_y 변수
- * @param Min_z 변수
- * @param Max_z 변수
- */
-Octree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y, Min_Z, Max_Z) 
-{
-	this.centerPos.x = (Max_X + Min_X)/2.0;
-	this.centerPos.y = (Max_Y + Min_Y)/2.0;
-	this.centerPos.z = (Max_Z + Min_Z)/2.0;
-
-	this.half_dx = (Max_X - Min_X)/2.0; // half width.***
-	this.half_dy = (Max_Y - Min_Y)/2.0; // half length.***
-	this.half_dz = (Max_Z - Min_Z)/2.0; // half height.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns centerPos
- */
-Octree.prototype.getCenterPos = function() 
-{
-	return this.centerPos;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns Math.abs(this.half_dx*1.2);
- */
-Octree.prototype.getRadiusAprox = function() 
-{
-	//return Math.abs(this.half_dx*1.2);
-	return Math.abs(this.half_dx*3.0);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_CRefListsArray 변수
- */
-Octree.prototype.getCRefListArray = function(result_CRefListsArray) 
-{
-	if (result_CRefListsArray === undefined) { result_CRefListsArray = []; }
-
-	if (this.subOctrees_array.length > 0) 
-	{
-		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getCRefListArray(result_CRefListsArray);
-		}
-	}
-	else 
-	{
-		if (this.compRefsListArray.length>0) 
-		{
-			result_CRefListsArray.push(this.compRefsListArray[0]); // there are only 1.***
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_NeoRefListsArray 변수
- */
-Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) 
-{
-	if (result_NeoRefListsArray === undefined) { result_NeoRefListsArray = []; }
-
-	var subOctreesArrayLength = this.subOctrees_array.length;
-	if (subOctreesArrayLength > 0) 
-	{
-		for (var i=0; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getNeoRefListArray(result_NeoRefListsArray);
-		}
-	}
-	else 
-	{
-		if (this.neoRefsList_Array.length>0) // original.***
-		//if(this.triPolyhedronsCount>0)
-		{
-			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_CRefListsArray 변수
- * @param cesium_boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume, result_CRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) 
-{
-	var visibleOctreesArray = [];
-	var sortedOctreesArray = [];
-	var distAux = 0.0;
-
-	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
-
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = visibleOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		sortedOctreesArray[i].getCRefListArray(result_CRefListsArray);
-		//visibleOctreesArray[i].getCRefListArray(result_CRefListsArray);
-	}
-
-	visibleOctreesArray.length = 0;
-	excludedOctArray.length = 0;
-
-	visibleOctreesArray = undefined;
-	excludedOctArray = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_NeoRefListsArray 변수
- * @param cesium_boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolume, result_NeoRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) 
-{
-	var visibleOctreesArray = [];
-	var sortedOctreesArray = [];
-	var distAux = 0.0;
-
-	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	this.getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch); // Original.***
-
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = visibleOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		sortedOctreesArray[i].getNeoRefListArray(result_NeoRefListsArray);
-	}
-
-	visibleOctreesArray = null;
-	sortedOctreesArray = null;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cullingVolume 변수
- * @param result_NeoRefListsArray 변수
- * @param boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	bbox_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
-{
-	var visibleOctreesArray = [];
-	var distAux = 0.0;
-	var find = false;
-
-	this.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion(bbox, visibleOctreesArray, bbox_scratch);
-	//this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
-
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = visibleOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-	}
-
-	visibleOctreesArray = null;
-	return find;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cullingVolume 변수
- * @param result_NeoRefListsArray 변수
- * @param boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
-{
-	var visibleOctreesArray = [];
-	var distAux = 0.0;
-	var find = false;
-
-	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
-
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = visibleOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-		else 
-		{
-			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ globalVisibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
-				find = true;
-			}
-		}
-	}
-
-	visibleOctreesArray = null;
-	return find;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cullingVolume 변수
- * @param result_NeoRefListsArray 변수
- * @param boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
-{
-	var lowestOctreesArray = [];
-	var distAux = 0.0;
-	var find = false;
-
-	this.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
-	
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = lowestOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		lowestOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		if (lowestOctreesArray[i].squareDistToEye < squaredDistLod0) 
-		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles0.push(lowestOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod1) 
-		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles1.push(lowestOctreesArray[i]);
-				find = true;
-			}
-		}
-		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod2) 
-		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
-				visibleObjControlerOctrees.currentVisibles2.push(lowestOctreesArray[i]);
-				find = true;
-			}
-		}
-		else 
-		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
-			{
-				if (globalVisibleObjControlerOctrees)
-				{ globalVisibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]);
-				find = true;
-			}
-		}
-	}
-
-	return find;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_octreesArray 변수
- * @param cesium_boundingSphere_scratch 변수
- */
-Octree.prototype.getFrustumVisibleOctreesNeoBuilding = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
-{
-	if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
-	//if(this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
-	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
-	{ return; }
-
-	// this function has Cesium dependence.***
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-
-	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
-
-	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
-	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
-	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
-
-	if (this.subOctrees_array.length === 0) 
-	{
-	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
-		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-	}
-	else 
-	{
-		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-	}
-
-	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if (frustumCull === Cesium.Intersect.INSIDE ) 
-	{
-		//result_octreesArray.push(this);
-		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
-	}
-	else if (frustumCull === Cesium.Intersect.INTERSECTING  ) 
-	{
-		if (this.subOctrees_array.length === 0) 
-		{
-			//if(this.neoRefsList_Array.length > 0) // original.***
-			//if(this.triPolyhedronsCount > 0)
-			result_octreesArray.push(this);
-		}
-		else 
-		{
-			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
-			{
-				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuilding(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
-			}
-		}
-	}
-	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_octreesArray 변수
- * @param boundingSphere_scratch 변수
- */
-Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cullingVolume, result_octreesArray, boundingSphere_scratch) 
-{
-	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
-	if (this.subOctrees_array === undefined) { return; }
-
-	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
-	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
-	{ return; }
-
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-	
-	if (boundingSphere_scratch === undefined) 
-	{ boundingSphere_scratch = new Sphere(); } 
-
-	boundingSphere_scratch.centerPoint.x = this.centerPos.x;
-	boundingSphere_scratch.centerPoint.y = this.centerPos.y;
-	boundingSphere_scratch.centerPoint.z = this.centerPos.z;
-	boundingSphere_scratch.r = this.getRadiusAprox();
-
-	var frustumCull = cullingVolume.intersectionSphere(boundingSphere_scratch);
-	if (frustumCull === Constant.INTERSECTION_INSIDE ) 
-	{
-		//result_octreesArray.push(this);
-		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
-	}
-	else if (frustumCull === Constant.INTERSECTION_INTERSECT  ) 
-	{
-		if (this.subOctrees_array.length === 0) 
-		{
-			//if(this.neoRefsList_Array.length > 0) // original.***
-			//if(this.triPolyhedronsCount > 0)
-			result_octreesArray.push(this);
-		}
-		else 
-		{
-			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
-			{
-				this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, result_octreesArray, boundingSphere_scratch);
-			}
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_octreesArray 변수
- * @param boundingSphere_scratch 변수
- */
-Octree.prototype.getBBoxIntersectedOctreesNeoBuildingAsimetricVersion = function(bbox, result_octreesArray, bbox_scratch) 
-{
-	//if(this.subOctrees_array.length === 0 && this.neoRefsList_Array.length === 0) // original.***
-	if (this.subOctrees_array === undefined) { return; }
-
-	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
-	//if(this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
-	{ return; }
-
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-	
-	if (bbox_scratch === undefined) 
-	{ bbox_scratch = new BoundingBox(); } 
-	
-
-	bbox_scratch.minX = this.centerPos.x - this.half_dx;
-	bbox_scratch.maxX = this.centerPos.x + this.half_dx;
-	bbox_scratch.minY = this.centerPos.y - this.half_dy;
-	bbox_scratch.maxY = this.centerPos.y + this.half_dy;
-	bbox_scratch.minZ = this.centerPos.z - this.half_dz;
-	bbox_scratch.maxZ = this.centerPos.z + this.half_dz;
-
-	var intersects = bbox.intersectsWithBBox(bbox_scratch);
-	if (intersects)
-	{
-		this.getAllSubOctreesIfHasRefLists(result_octreesArray);
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_octreesArray 변수
- * @param cesium_boundingSphere_scratch 변수
- */
-Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch) 
-{
-	if (this.subOctrees_array.length === 0 && this.compRefsListArray.length === 0) // For use with ifc buildings.***
-	{ return; }
-	// old. delete this.***
-	// this function has Cesium dependence.***
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-
-	if (cesium_boundingSphere_scratch === undefined) { cesium_boundingSphere_scratch = new Cesium.BoundingSphere(); } // Cesium dependency.***
-
-	cesium_boundingSphere_scratch.center.x = this.centerPos.x;
-	cesium_boundingSphere_scratch.center.y = this.centerPos.y;
-	cesium_boundingSphere_scratch.center.z = this.centerPos.z;
-
-	if (this.subOctrees_array.length === 0) 
-	{
-	//cesium_boundingSphere_scratch.radius = this.getRadiusAprox()*0.7;
-		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-	}
-	else 
-	{
-		cesium_boundingSphere_scratch.radius = this.getRadiusAprox();
-	}
-
-	var frustumCull = cesium_cullingVolume.computeVisibility(cesium_boundingSphere_scratch);
-	if (frustumCull === Cesium.Intersect.INSIDE ) 
-	{
-		//result_octreesArray.push(this);
-		this.getAllSubOctrees(result_octreesArray);
-	}
-	else if (frustumCull === Cesium.Intersect.INTERSECTING ) 
-	{
-		if (this.subOctrees_array.length === 0 && this.neoRefsList_Array.length > 0) 
-		{
-			result_octreesArray.push(this);
-		}
-		else 
-		{
-			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
-			{
-				this.subOctrees_array[i].getFrustumVisibleOctrees(cesium_cullingVolume, result_octreesArray, cesium_boundingSphere_scratch);
-			}
-		}
-	}
-	// else if(frustumCull === Cesium.Intersect.OUTSIDE) => do nothing.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z) 
-{
-	this.squareDistToEye = (this.centerPos.x - eye_x)*(this.centerPos.x - eye_x) +
-							(this.centerPos.y - eye_y)*(this.centerPos.y - eye_y) +
-							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z) ;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param octreesArray 변수
- * @param octree 변수
- * @returns result_idx
- */
-Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree) 
-{
-	// lineal implementation. In the future use dicotomic search technique.***
-	var finished = false;
-	var octrees_count = octreesArray.length;
-	var i=0;
-	var result_idx = 0;
-
-	while (!finished && i<octrees_count) 
-	{
-		if (octreesArray[i].squareDistToEye > octree.squareDistToEye) 
-		{
-			result_idx = i;
-			finished = true;
-		}
-		i++;
-	}
-	if (!finished) 
-	{
-		result_idx = octrees_count;
-	}
-
-	return result_idx;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- * @param octree 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree, eye_x, eye_y, eye_z) 
-{
-	// sorting is from minDist to maxDist.***
-	// http://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index
-
-	var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree);
-
-	result_octreesArray.splice(insert_idx, 0, octree);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray) 
-{
-	if (this.subOctrees_array === undefined) { return; }
-
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-
-	if (this.subOctrees_array.length > 0) 
-	{
-		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getAllSubOctreesIfHasRefLists(result_octreesArray);
-		}
-	}
-	else 
-	{
-		//if(this.neoRefsList_Array.length > 0)
-		if (this.triPolyhedronsCount > 0) { result_octreesArray.push(this); } // there are only 1.***
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.getAllSubOctrees = function(result_octreesArray) 
-{
-	if (result_octreesArray === undefined) { result_octreesArray = []; }
-
-	if (this.subOctrees_array.length > 0) 
-	{
-		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getAllSubOctrees(result_octreesArray);
-		}
-	}
-	else 
-	{
-		result_octreesArray.push(this); // there are only 1.***
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctreesArray) 
-{
-	if (this.subOctrees_array === undefined)
-	{ return; }
-	
-	var subOctreesCount = this.subOctrees_array.length;
-
-	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
-	{
-		lowestOctreesArray.push(this);
-	}
-	else 
-	{
-		for (var i=0; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
-{
-	var subOctreesCount = this.subOctrees_array.length;
-
-	if (subOctreesCount === 0 && this.triPolyhedronsCount > 0) 
-	{
-		if (this.neoReferencesMotherAndIndices)
-		{ this.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(idxKey, matrix); }
-	}
-	else 
-	{
-		for (var i=0; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].multiplyKeyTransformMatrix(idxKey, matrix);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
-{
-	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-	if (octreeLevel === 0) 
-	{
-		// this is the mother octree, so read the mother octree's size.***
-		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-		this.setBoxSize(minX, maxX, minY, maxY, minZ, maxZ );
-		this.octree_number_name = 0;
-	}
-
-	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.***
-	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	if (this.triPolyhedronsCount > 0)
-	{ this.neoBuildingOwner = neoBuildingOwner; }
-
-	// 1rst, create the 8 subOctrees.***
-	for (var i=0; i<subOctreesCount; i++) 
-	{
-		var subOctree = this.new_subOctree();
-		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
-	}
-
-	// now, set size of subOctrees.***
-	this.setSizesSubBoxes();
-
-	for (var i=0; i<subOctreesCount; i++) 
-	{
-		var subOctree = this.subOctrees_array[i];
-		bytesReaded = subOctree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner);
-	}
-
-	return bytesReaded;
-};
-
-'use strict';
-
-/**
- * ParseQueue
- * 
- * @alias ParseQueue
- * @class ParseQueue
- */
-var ParseQueue = function() 
-{
-	if (!(this instanceof ParseQueue)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.octreesLod0ReferencesToParseArray = [];
-	this.octreesLod0ModelsToParseArray = [];
-	this.octreesLod2LegosToParseArray = [];
-	this.neoBuildingsHeaderToParseArray = [];
-};
-'use strict';
-
-/**
- * ProcessQueue
- * 
- * @alias ProcessQueue
- * @class ProcessQueue
- */
-var ProcessQueue = function() 
-{
-	if (!(this instanceof ProcessQueue)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.buildingsToDeleteMap = new Map();
-	this.buildingsToDeleteModelReferencesMap = new Map();
-};
-
-ProcessQueue.prototype.putBuildingsToDeleteModelReferences = function(building, aValue)
-{
-	// this puts the building to the "buildingsToDeleteModelReferencesMap".
-	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
-	{ aValue = 0; }
-	
-	this.buildingsToDeleteModelReferencesMap.set(building, aValue);
-};
-
-ProcessQueue.prototype.eraseBuildingsToDeleteModelReferences = function(building)
-{
-	// this erases the building from the "buildingsToDeleteModelReferencesMap".
-	this.buildingsToDeleteModelReferencesMap.delete(building);
-};
-
-ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
-{
-	// this puts the building to the "buildingsToDeleteMap".
-	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
-	{ aValue = 0; }
-	
-	this.buildingsToDeleteMap.set(building, aValue);
-};
-
-ProcessQueue.prototype.putBuildingsArrayToDelete = function(buildingsToDeleteArray, aValue)
-{
-	if (buildingsToDeleteArray == undefined)
-	{ return; }
-	
-	// this puts the buildingsToDeleteArray to the "buildingsToDeleteMap".
-	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
-	{ aValue = 0; }
-	
-	var buildingsToDeleteCount = buildingsToDeleteArray.length;
-	for (var i=0; i<buildingsToDeleteCount; i++)
-	{
-		this.putBuildingToDelete(buildingsToDeleteArray[i], aValue);
-	}
-};
-
-ProcessQueue.prototype.eraseBuildingToDelete = function(building)
-{
-	// this erases the building from the "buildingsToDeleteMap".
-	this.buildingsToDeleteMap.delete(building);
-};
-
-'use strict';
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class ReaderWriter
- */
-var ReaderWriter = function() 
-{
-	if (!(this instanceof ReaderWriter)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	//this.geometryDataPath = "/F4D_GeometryData";
-	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
-	this.viArraysContainer = new VertexIdxVBOArraysContainer();
-	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
-	//var simpleBuildingImage = new Image();
-
-	this.j_counter;
-	this.k_counter;
-
-	this.gl;
-	this.incre_latAng = 0.001;
-	this.incre_longAng = 0.001;
-	this.GAIA3D__offset_latitude = -0.001;
-	this.GAIA3D__offset_longitude = -0.001;
-	this.GAIA3D__counter = 0;
-
-	// Var for reading files.
-	this.uint32;
-	this.uint16;
-	this.int16;
-	this.float32;
-	this.float16;
-	this.int8;
-	this.int8_value;
-	this.max_color_value = 126;
-
-	this.startBuff;
-	this.endBuff;
-
-	this.filesReadings_count = 0;
-
-	// SCRATCH.*** 
-	this.temp_var_to_waste;
-	this.countSC;
-	this.xSC;
-	this.ySC;
-	this.zSC;
-	this.point3dSC = new Point3D();
-	this.bboxSC = new BoundingBox();
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns uint32[0]
- */
-ReaderWriter.prototype.readUInt32 = function(buffer, start, end) 
-{
-	var uint32 = new Uint32Array(buffer.slice(start, end));
-	return uint32[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns int32[0]
- */
-ReaderWriter.prototype.readInt32 = function(buffer, start, end) 
-{
-	var int32 = new Int32Array(buffer.slice(start, end));
-	return int32[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 16비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns uint16[0]
- */
-ReaderWriter.prototype.readUInt16 = function(buffer, start, end) 
-{
-	var uint16 = new Uint16Array(buffer.slice(start, end));
-	return uint16[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns int16[0]
- */
-ReaderWriter.prototype.readInt16 = function(buffer, start, end) 
-{
-	var int16 = new Int16Array(buffer.slice(start, end));
-	return int16[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 64비트 float값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns float64[0]
- */
-ReaderWriter.prototype.readFloat64 = function(buffer, start, end) 
-{
-	var float64 = new Float64Array(buffer.slice(start, end));
-	return float64[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 32비트 float값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns float32[0]
- */
-ReaderWriter.prototype.readFloat32 = function(buffer, start, end) 
-{
-	var float32 = new Float32Array(buffer.slice(start, end));
-	return float32[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns float16[0]
- */
-ReaderWriter.prototype.readFloat16 = function(buffer, start, end) 
-{
-	var float16 = new Float32Array(buffer.slice(start, end));
-	return float16[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 8비트 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns int8[0]
- */
-ReaderWriter.prototype.readInt8 = function(buffer, start, end) 
-{
-	var int8 = new Int8Array(buffer.slice(start, end));
-	return int8[0];
-};
-
-/**
- * 버퍼에서 데이터를 읽어서 8비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
- * @param buffer 복사할 버퍼
- * @param start 시작 바이트 인덱스
- * @param end 끝 바이트 인덱스
- * @returns uint8[0]
- */
-ReaderWriter.prototype.readUInt8 = function(buffer, start, end) 
-{
-	var uint8 = new Uint8Array(buffer.slice(start, end));
-	return uint8[0];
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param buffer 변수
- * @param start 변수
- * @param end 변수
- * @returns int8_value
- */
-ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end) 
-{
-	var int8 = new Int8Array(buffer.slice(start, end));
-	var int8_value = int8[0];
-
-	if (int8_value > max_color_value) { int8_value = max_color_value; }
-
-	if (int8_value < 0) { int8_value += 256; }
-
-	return int8_value;
-};
-
-function loadWithXhr(fileName) 
-{
-	// 1) 사용될 jQuery Deferred 객체를 생성한다.
-	var deferred = $.Deferred();
-	
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", fileName, true);
-	xhr.responseType = "arraybuffer";;
-	  
-	// 이벤트 핸들러를 등록한다.
-	xhr.onload = function() 
-	{
-		if (xhr.status < 200 || xhr.status >= 300) 
-		{
-			deferred.reject(xhr.status);
-			return;
-		}
-		else 
-		{
-			// 3.1) DEFERRED를 해결한다. (모든 done()...을 동작시킬 것이다.)
-			deferred.resolve(xhr.response);
-		} 
-	};
-	
-	xhr.onerror = function(e) 
-	{
-		console.log("Invalid XMLHttpRequest response type.");
-		deferred.reject(xhr.status);
-	};
-
-	// 작업을 수행한다.
-	xhr.send(null);
-	
-	// 참고: jQuery.ajax를 사용할 수 있었고 해야할 수 있었다.
-	// 참고: jQuery.ajax는 Promise를 반환하지만 다른 Deferred/Promise를 사용하여 애플리케이션에 의미있는 구문으로 감싸는 것은 언제나 좋은 생각이다.
-	// ---- /AJAX 호출 ---- //
-	  
-	// 2) 이 deferred의 promise를 반환한다.
-	return deferred.promise();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param float32Array 변수
- * @param resultBbox 변수
- * @returns resultBbox
- */
-ReaderWriter.prototype.getBoundingBoxFromFloat32Array = function(float32Array, resultBbox) 
-{
-	if (resultBbox === undefined) { resultBbox = new BoundingBox(); }
-
-	var values_count = float32Array.length;
-	for (var i=0; i<values_count; i+=3) 
-	{
-		this.point3dSC.x = float32Array[i];
-		this.point3dSC.y = float32Array[i+1];
-		this.point3dSC.z = float32Array[i+2];
-
-		if (i===0) 
-		{
-			resultBbox.init(this.point3dSC);
-		}
-		else 
-		{
-			resultBbox.addPoint(this.point3dSC);
-		}
-	}
-
-	return resultBbox;
-};
-
-ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			blocksList.dataArraybuffer = arrayBuffer;
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-			magoManager.parseQueue.octreesLod0ModelsToParseArray.push(lowestOctree);
-		}
-		else 
-		{
-			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("Invalid XMLHttpRequest status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else { blocksList.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param blocksList 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) 
-{
-//	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else { blocksList.fileLoadState = status; }
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 파일명
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			var neoRefsList = lowestOctree.neoReferencesMotherAndIndices;
-			if (neoRefsList)
-			{
-				neoRefsList.dataArraybuffer = arrayBuffer;
-				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.octreesLod0ReferencesToParseArray.push(lowestOctree);
-			}
-			arrayBuffer = null;
-			
-		}
-		else 
-		{
-			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
-		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 파일명
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			if (lowestOctree.lego)
-			{
-				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
-				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
-			}
-			else 
-			{
-				lowestOctree = undefined;
-			}
-			arrayBuffer = null;
-		}
-		else 
-		{
-			lowestOctree.lego.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
-		else { lowestOctree.lego.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param fileName 변수
- * @param lodBuilding 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuilding, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			lodBuilding.dataArraybuffer = arrayBuffer;
-			lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			lodBuilding.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { lodBuilding.fileLoadState = 500; }
-		else { lodBuilding.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param arrayBuffer 변수
- * @param filePath_inServer 변수
- * @param terranTile 변수
- * @param readerWriter 변수
- * @param bytes_readed 변수
- * @returns bytes_readed
- */
-ReaderWriter.prototype.readTerranTileFile = function(gl, arrayBuffer, filePath_inServer, terranTile, readerWriter, bytes_readed) 
-{
-	//var bytes_readed = 0;
-//	var f4d_headerPathName_length = 0;
-//	var BP_Project;
-//	var idxFile;
-//	var subTile;
-
-	terranTile._depth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-	if (terranTile._depth === 0) 
-	{
-		// Read dimensions.***
-		terranTile.longitudeMin = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
-		terranTile.longitudeMax = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
-		terranTile.latitudeMin = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
-		terranTile.latitudeMax = this.readFloat64(arrayBuffer, bytes_readed, bytes_readed+8); bytes_readed += 8;
-	}
-
-	// Read the max_depth of the quadtree.***
-	var max_dpeth = this.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-	// Now, make the quadtree.***
-	terranTile.makeTree(max_dpeth);
-
-	return bytes_readed;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param terranTile 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getTerranTileFile = function(gl, fileName, terranTile, readerWriter) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-//	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			var bytes_readed = 0;
-			readerWriter.readTerranTileFile(gl, arrayBuffer, fileName, terranTile, readerWriter, bytes_readed);
-
-			// Once readed the terranTilesFile, must make all the quadtree.***
-			terranTile.setDimensionsSubTiles();
-			terranTile.calculatePositionByLonLatSubTiles();
-			terranTile.terranIndexFile_readed = true;
-
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + xhr.status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param BR_ProjectsList 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsList, readerWriter) 
-{
-//	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-			var pCloudProject;
-
-			var bytes_readed = 0;
-
-			var f4d_rawPathName_length = 0;
-			//			var f4d_simpleBuildingPathName_length = 0;
-			//			var f4d_nailImagePathName_length = 0;
-
-			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			for (var i=0; i<pCloudProjects_count; i++) 
-			{
-				pCloudProject = new PCloudMesh();
-				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
-				pCloudProject._header._f4d_version = 2;
-				// 1rst, read the files path names.************************************************************************************************************
-				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<f4d_rawPathName_length; j++) 
-				{
-					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-				}
-
-				pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
-				pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
-
-				//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
-				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
-				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
-			}
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param pCloud 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWriter, magoManager) 
-{
-	pCloud._f4d_header_readed = true;
-	//	magoManager.fileRequestControler.filesRequestedCount += 1;
-	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-
-			var bytes_readed = 0;
-			var version_string_length = 5;
-			var intAux_scratch = 0;
-			var auxScratch;
-			var header = pCloud._header;
-
-			// 1) Version(5 chars).***********
-			for (var j=0; j<version_string_length; j++)
-			{
-				header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// 2) Type (1 byte).**************
-			header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-
-			// 3) Global unique ID.*********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for (var j=0; j<intAux_scratch; j++)
-			{
-				header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// 4) Location.*************************
-			header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			header._elevation += 60.0; // delete this. TEST.!!!
-
-			// 5) Orientation.*********************
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // yaw.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // pitch.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // roll.***
-
-			// 6) BoundingBox.************************
-			header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			var isLarge = false;
-			if (header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0) 
-			{
-				isLarge = true;
-			}
-
-			if (!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0) 
-			{
-				header.isSmall = true;
-			}
-
-			// 7) octZerothBox.***********************
-			header._octZerothBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			// 8) Data file name.********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for (var j=0; j<intAux_scratch; j++) 
-			{
-				header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// Now, must calculate some params of the project.**********************************************
-			// 0) PositionMatrix.************************************************************************
-			//var height = elevation;
-
-			var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation); // Old.***
-			pCloud._pCloudPosition = position;
-
-			// High and Low values of the position.****************************************************
-			var splitValue = Cesium.EncodedCartesian3.encode(position);
-			var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-			var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-			var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-
-			pCloud._pCloudPositionHIGH = new Float32Array(3);
-			pCloud._pCloudPositionHIGH[0] = splitVelue_X.high;
-			pCloud._pCloudPositionHIGH[1] = splitVelue_Y.high;
-			pCloud._pCloudPositionHIGH[2] = splitVelue_Z.high;
-
-			pCloud._pCloudPositionLOW = new Float32Array(3);
-			pCloud._pCloudPositionLOW[0] = splitVelue_X.low;
-			pCloud._pCloudPositionLOW[1] = splitVelue_Y.low;
-			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
-
-			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-
-			pCloud._f4d_header_readed_finished = true;
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- * @param gl gl context
- * @param fileName 파일명
- * @param readerWriter 파일 처리를 담당
- * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
- */
-ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList) 
-{
-	console.log(" object Index File = " + fileName);
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			buildingSeedList.dataArrayBuffer = arrayBuffer;
-			buildingSeedList.parseBuildingSeedArrayBuffer();
-			
-			magoManager.makeSmartTile(buildingSeedList);
-			arrayBuffer = null;
-			//magoManager.createDeploymentGeoLocationsForHeavyIndustries();
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- * @param gl gl context
- * @param fileName 파일명
- * @param readerWriter 파일 처리를 담당
- * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
- */
-ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neoBuildingsList, magoManager) 
-{
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			readerWriter.parseObjectIndexFile(arrayBuffer, neoBuildingsList);
-			arrayBuffer = null;
-			magoManager.createDeploymentGeoLocationsForHeavyIndustries();
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- * @param arrayBuffer object index file binary data
- * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
- */
-ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildingsList) 
-{
-	var bytesReaded = 0;
-	var buildingNameLength;
-	var longitude;
-	var latitude;
-	var altitude;
-
-	var buildingsCount = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-	bytesReaded += 4;
-	for (var i =0; i<buildingsCount; i++) 
-	{
-		// read the building location data.***
-		var neoBuilding = neoBuildingsList.newNeoBuilding();
-		if (neoBuilding.metaData === undefined) 
-		{
-			neoBuilding.metaData = new MetaData();
-		}
-
-		if (neoBuilding.metaData.geographicCoord === undefined)
-		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-		if (neoBuilding.metaData.bbox === undefined) 
-		{
-			neoBuilding.metaData.bbox = new BoundingBox();
-		}
-
-		buildingNameLength = this.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-		bytesReaded += 4;
-		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
-		bytesReaded += buildingNameLength;
-
-		longitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
-		latitude = this.readFloat64(arrayBuffer, bytesReaded, bytesReaded+8); bytesReaded += 8;
-		altitude = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-		neoBuilding.bbox = new BoundingBox();
-		neoBuilding.bbox.minX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		neoBuilding.bbox.minY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		neoBuilding.bbox.minZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		neoBuilding.bbox.maxX = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		neoBuilding.bbox.maxY = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		neoBuilding.bbox.maxZ = this.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-
-		// create a building and set the location.***
-		neoBuilding.buildingId = buildingName.substr(4, buildingNameLength-4);
-		neoBuilding.buildingType = "basicBuilding";
-		neoBuilding.buildingFileName = buildingName;
-		neoBuilding.metaData.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-	}
-
-	neoBuildingsList.neoBuildingsArray.reverse();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
-{
-	//BR_Project._f4d_header_readed = true;
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			if (neoBuilding.metaData === undefined) 
-			{
-				neoBuilding.metaData = new MetaData();
-			}
-			neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
-
-			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
-
-			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
-				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
-				neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-
-			neoBuilding.octree.makeTree(3);
-			neoBuilding.octree.setSizesSubBoxes();
-
-			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			//if(magoManager.backGround_fileReadings_count > 0 )
-			//    magoManager.backGround_fileReadings_count -= 1; // old.***
-			//BR_Project._f4d_header_readed_finished = true;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			neoBuilding.metaData.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
-		else { neoBuilding.metaData.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
-{
-	//BR_Project._f4d_header_readed = true;
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			if (neoBuilding.metaData === undefined) 
-			{
-				neoBuilding.metaData = new MetaData();
-			}
-			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter, neoBuilding);
-
-			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
-
-			// now, parse octreeAsimetric.***
-			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
-
-			neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
-			neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
-			neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
-			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
-			
-			// now parse materialsList of the neoBuilding.
-			var ver0 = neoBuilding.metaData.version[0];
-			var ver1 = neoBuilding.metaData.version[2];
-			var ver2 = neoBuilding.metaData.version[4];
-			
-			if (ver0 == 0 && ver1 == 0 && ver2 == 1)
-			{
-				// read materials list.
-				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-				for (var i=0; i<materialsCount; i++)
-				{
-					var textureTypeName = "";
-					var textureImageFileName = "";
-
-					// Now, read the texture_type and texture_file_name.***
-					var texture_type_nameLegth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					for (var j=0; j<texture_type_nameLegth; j++) 
-					{
-						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
-					}
-
-					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					for (var j=0; j<texture_fileName_Legth; j++) 
-					{
-						textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
-					}
-					
-					if (texture_fileName_Legth > 0)
-					{
-						var texture = new Texture();
-						texture.textureTypeName = textureTypeName;
-						texture.textureImageFileName = textureImageFileName;
-						neoBuilding.texturesLoaded.push(texture);
-					}
-				}
-			}
-
-			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-
-			//BR_Project._f4d_header_readed_finished = true;
-			arrayBuffer = undefined;
-		}
-		else 
-		{
-			neoBuilding.metaData.fileLoadState = 500;
-			arrayBuffer = undefined;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
-		else { neoBuilding.metaData.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param imageArrayBuffer 변수
- * @param BR_Project 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- * @param imageLod 변수
- */
-ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, magoManager, imageLod) 
-{
-	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
-	var urlCreator = window.URL || window.webkitURL;
-	var imagenUrl = urlCreator.createObjectURL(blob);
-	var simpleBuildingImage = new Image();
-
-	simpleBuildingImage.onload = function () 
-	{
-		//console.log("Image Onload");
-		if (simpBuildingV1._simpleBuildingTexture === undefined)
-		{ simpBuildingV1._simpleBuildingTexture = gl.createTexture(); }
-		handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
-		BR_Project._f4d_nailImage_readed_finished = true;
-		imageArrayBuffer = null;
-		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
-
-		if (magoManager.backGround_imageReadings_count > 0) 
-		{
-			magoManager.backGround_imageReadings_count--;
-		}
-	};
-
-	simpleBuildingImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-
-		//BR_Project._f4d_lod0Image_readed_finished = false;
-		//BR_Project._f4d_lod0Image_exists = false;
-		//if(magoManager.backGround_fileReadings_count > 0 )
-		//	  magoManager.backGround_fileReadings_count -=1;
-
-		return;
-	};
-
-	simpleBuildingImage.src = imagenUrl;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param BR_Project 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- * @param imageLod 변수
- */
-ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, magoManager, imageLod) 
-{
-	if (imageLod === undefined) { imageLod = 3; } // The lowest lod.***
-
-	if (imageLod === 3) { BR_Project._f4d_nailImage_readed = true; }
-	else if (imageLod === 0) { BR_Project._f4d_lod0Image_readed  = true; }
-
-	if (BR_Project._simpleBuilding_v1 === undefined) { BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
-
-	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-
-	var simpleBuildingImage = new Image();
-	simpleBuildingImage.onload = function() 
-	{
-	/*
-		if(magoManager.render_time > 20)// for the moment is a test.***
-		{
-			if(imageLod === 3)
-				BR_Project._f4d_nailImage_readed = false;
-			else if(imageLod === 0)
-				BR_Project._f4d_lod0Image_readed  = false;
-
-			if(magoManager.backGround_fileReadings_count > 0 )
-			  magoManager.backGround_fileReadings_count -=1;
-
-			return;
-		}
-		*/
-
-		if (imageLod === 3) 
-		{
-			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
-			BR_Project._f4d_nailImage_readed_finished = true;
-		}
-		else if (imageLod === 0) 
-		{
-			if (simpBuildingV1._texture_0 === undefined) { simpBuildingV1._texture_0 = gl.createTexture(); }
-
-			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._texture_0);
-			BR_Project._f4d_lod0Image_readed_finished = true;
-		}
-
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-	};
-
-	simpleBuildingImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-		BR_Project._f4d_lod0Image_readed_finished = false;
-		BR_Project._f4d_lod0Image_exists = false;
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-		return;
-	};
-
-	var filePath_inServer_SimpleBuildingImage = filePath_inServer;
-	simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param f4dTex 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, magoManager) 
-{
-	f4dTex.loadStarted = true;
-	f4dTex.texImage = new Image();
-	f4dTex.texImage.onload = function() 
-	{
-		f4dTex.loadFinished = true;
-
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-	};
-
-	f4dTex.texImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-		f4dTex.loadStarted = false;
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-		return;
-	};
-
-	f4dTex.texImage.src = filePath_inServer;
-};
-
-ReaderWriter.prototype.decodeTGA = function(arrayBuffer) 
-{
-	// code from toji.***
-	var content = new Uint8Array(arrayBuffer),
-		contentOffset = 18 + content[0],
-		imagetype = content[2], // 2 = rgb, only supported format for now
-		width = content[12] + (content[13] << 8),
-		height = content[14] + (content[15] << 8),
-		bpp = content[16], // should be 8,16,24,32
-		
-		bytesPerPixel = bpp / 8,
-		bytesPerRow = width * 4,
-		data, i, j, x, y;
-
-	if (!width || !height) 
-	{
-		console.error("Invalid dimensions");
-		return null;
-	}
-
-	if (imagetype !== 2) 
-	{
-		console.error("Unsupported TGA format:", imagetype);
-		return null;
-	}
-
-	data = new Uint8Array(width * height * 4);
-	i = contentOffset;
-
-	// Oy, with the flipping of the rows...
-	for (y = height-1; y >= 0; --y) 
-	{
-		for (x = 0; x < width; ++x, i += bytesPerPixel) 
-		{
-			j = (x * 4) + (y * bytesPerRow);
-			data[j] = content[i+2];
-			data[j+1] = content[i+1];
-			data[j+2] = content[i+0];
-			data[j+3] = (bpp === 32 ? content[i+3] : 255);
-		}
-	}
-
-	return {
-		width  : width,
-		height : height,
-		data   : data
-	};
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param texture 변수
- * @param neoBuilding 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer, texture, neoBuilding, magoManager) 
-{
-	// Must know the fileExtension.***
-	var extension = filePath_inServer.split('.').pop();
-	
-	if (extension === "tga" || extension === "TGA" || extension === "Tga")
-	{
-		//texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-		loadWithXhr(filePath_inServer).done(function(response) 
-		{
-			var arrayBuffer = response;
-			if (arrayBuffer) 
-			{
-				// decode tga.***
-				// Test with tga decoder from https://github.com/schmittl/tgajs
-				var tga = new TGA();
-				tga.load(arrayBuffer);
-				// End decoding.---------------------------------------------------
-				
-				//var tga = magoManager.readerWriter.decodeTGA(arrayBuffer); // old code.
-				//if(tga) {
-				//    gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-				//     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tga.width, tga.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tga.data);
-				//    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-				//	gl.generateMipmap(gl.TEXTURE_2D);
-				//	texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-				//}
-				
-				// example values of tga.header
-				// alphaBits 0
-				// bytePerPixel 3
-				// colorMapDepth 0
-				// colorMapIndex 0
-				// colorMapLength 0
-				// colorMapType 0
-				// flags 32
-				// hasColorMap false
-				// hasEncoding false
-				// height 2048
-				// idLength 0
-				// imageType 2
-				// isGreyColor false
-				// offsetX 0
-				// offsetY 0
-				// origin 2
-				// pixelDepth 24
-				// width 2048
-				
-				if (tga) 
-				{
-					var rgbType;
-					if (tga.header.bytePerPixel === 3)
-					{
-						rgbType = gl.RGB;
-						
-						// test change rgb to bgr.***
-						/*
-						var imageDataLength = tga.imageData.length;
-						var pixelsCount = imageDataLength/3;
-						var r, g, b;
-						for(var i=0; i<pixelsCount; i++)
-						{
-							r = tga.imageData[i*3];
-							g = tga.imageData[i*3+1];
-							b = tga.imageData[i*3+2];
-							
-							tga.imageData[i*3] = b;
-							tga.imageData[i*3+1] = g;
-							tga.imageData[i*3+2] = r;
-						}
-						*/
-					}
-					else if (tga.header.bytePerPixel === 4)
-					{
-						rgbType = gl.RGBA;
-						
-						// test change rgb to bgr.***
-						
-						var imageDataLength = tga.imageData.length;
-						var pixelsCount = imageDataLength/4;
-						var r, g, b, a;
-						for (var i=0; i<pixelsCount; i++)
-						{
-							r = tga.imageData[i*4];
-							g = tga.imageData[i*4+1];
-							b = tga.imageData[i*4+2];
-							a = tga.imageData[i*4+3];
-							
-							tga.imageData[i*4] = b;
-							tga.imageData[i*4+1] = g;
-							tga.imageData[i*4+2] = r;
-							tga.imageData[i*4+3] = a;
-						}
-						
-					}
-					
-					
-					
-					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-					gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-					gl.generateMipmap(gl.TEXTURE_2D);
-					texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-				}
-			}
-		}).fail(function(status) 
-		{
-			if (neoBuilding)
-			{
-				console.log("xhr status = " + status);
-				if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
-				else { neoBuilding.metaData.fileLoadState = status; }
-			}
-		}).always(function() 
-		{
-			magoManager.backGround_fileReadings_count -= 1;
-			if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
-		});
-	}
-	else 
-	{
-		var neoRefImage = new Image();
-		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
-		
-		//magoManager.backGround_fileReadings_count ++;
-		neoRefImage.onload = function() 
-		{
-			// is possible that during loading image the building was deleted. Then return.
-			if (texture.texId == undefined)
-			{
-				return;
-			}
-			
-			// if "texture.texId" exist then bind it.
-			handleTextureLoaded(gl, neoRefImage, texture.texId);
-			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-
-			if (magoManager.backGround_fileReadings_count > 0 ) 
-			{ magoManager.backGround_fileReadings_count -=1; }
-		};
-
-		neoRefImage.onerror = function() 
-		{
-			// doesn't exist or error loading
-			return;
-		};
-		neoRefImage.src = filePath_inServer;
-	}	
-};
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param texture 변수
- * @param neoBuilding 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inServer, texture, magoManager) 
-{
-	var neoRefImage = new Image();
-	//magoManager.backGround_fileReadings_count ++;
-	neoRefImage.onload = function() 
-	{
-		if (texture.texId === undefined) 
-		{ texture.texId = gl.createTexture(); }
-
-		handleTextureLoaded(gl, neoRefImage, texture.texId);
-
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-	};
-
-	neoRefImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-		return;
-	};
-
-	neoRefImage.src = filePath_inServer;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param terranTile 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.openTerranTile = function(gl, terranTile, readerWriter ) 
-{
-	var filePath_inServer = this.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILEFILE_TXT;
-	readerWriter.getTerranTileFile(gl, filePath_inServer, terranTile, readerWriter);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param terranTile 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, readerWriter, magoManager) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	terranTile.fileReading_started = true;
-	//	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
-	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			//var BR_Project = new BRBuildingProject(); // Test.***
-			//readerWriter.readF4D_Header(gl, arrayBuffer, BR_Project ); // Test.***
-			terranTile.fileArrayBuffer = arrayBuffer;
-			terranTile.fileReading_finished = true;
-
-			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param pCloud 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, readerWriter, magoManager) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	pCloud._f4d_geometry_readed = true;
-	//	magoManager.fileRequestControler.filesRequestedCount += 1;
-	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-			var bytes_readed = 0;
-			var startBuff;
-			var endBuff;
-
-			var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-			for (var a=0; a<meshes_count; a++) 
-			{
-				var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-
-				// single interleaved buffer mode.*********************************************************************************
-				for (var i=0; i<vbo_objects_count; i++) 
-				{
-					var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
-					//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
-
-					var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertexCount.***
-					startBuff = bytes_readed;
-					//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
-					endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
-
-					//vt_cacheKey._verticesArray_cacheKey = gl.createBuffer ();
-					vbo_vertexIdx_data.meshVertexCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.meshVertexCacheKey);
-					gl.bufferData(gl.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), gl.STATIC_DRAW);
-
-					//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
-					bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
-
-					//vt_cacheKey._vertices_count = iDatas_count;
-					// Now, read short indices.***
-					var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-					vbo_vertexIdx_data.indicesCount = shortIndices_count;
-
-					// Indices.***********************
-					startBuff = bytes_readed;
-					endBuff = bytes_readed + 2*shortIndices_count;
-					/*
-					// Test.***************************************************************************************
-					for(var counter = 0; counter<shortIndices_count; counter++)
-					{
-						var shortIdx = new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2));bytes_readed += 2;
-						if(shortIdx[0] >= iDatas_count)
-						{
-							var h=0;
-						}
-					}
-					bytes_readed -= 2*shortIndices_count;
-					// End test.------------------------------------------------------------------------------------
-					*/
-
-					vbo_vertexIdx_data.meshFacesCacheKey= gl.createBuffer();
-					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.meshFacesCacheKey);
-					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-
-					bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
-				}
-			}
-
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-
-			pCloud._f4d_geometry_readed_finished = true;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-
-//load neoTextures
-ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
-	//var gl = viewer.scene.context._gl;
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-	gl.generateMipmap(gl.TEXTURE_2D);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-};
-
-'use strict';
-
-/**
  * 어떤 일을 하고 있습니까?
  * @class Renderer
  */
@@ -29937,7 +33561,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				if (neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 			
-				if (neoReference.texture.texId == undefined)
+				if (neoReference.texture.texId === undefined)
 				{ continue; }
 			}
 			
@@ -30835,22 +34459,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
-		
-		if (neoReference.objectId == 32036)
-		{
-			var hola = 0;
-		}
-		
+			
 		if (neoReference.selColor4) 
 		{
 			//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***
 			//gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 			gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
 		}
-		else
-		{
-			var hola = 0;
-		}
+
 		this.renderNeoReferenceAsimetricVersionColorSelection(gl, neoReference, neoReferencesMotherAndIndices, neoBuilding, magoManager, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
 	}
 
@@ -31322,6 +34938,7 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
 
+	var vbo_vicky;
 	if (ssao_idx === 0) // depth.***
 	{
 		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
@@ -31339,7 +34956,7 @@ Renderer.prototype.renderLego = function(gl, lego, magoManager, shader, ssao_idx
 	}
 	else if (ssao_idx === 1) // ssao.***
 	{
-		var vbo_vicky = lego.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		vbo_vicky = lego.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
 		var vertices_count = vbo_vicky.vertexCount;
 
 		if (vertices_count === 0) 
@@ -34014,7 +37631,7 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
 {
 	// this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
-	if (resultGeoLocMatrix == undefined)
+	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
 	
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
@@ -34049,10 +37666,11 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
 ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix, magoManager) 
 {
 	// this function calculates the transformation matrix for (longitude, latitude, altitude) coordinate, that has NO heading, pitch or roll rotations.
-	if (resultGeoLocMatrix == undefined)
+	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
 	
-	var worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
+	var worldPosition;
+	worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
 	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
 	
 	return resultGeoLocMatrix;
@@ -34076,19 +37694,24 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 	if (roll !== undefined && roll !== 0)
 	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, -1.0, 0.0); }
 
-	if (resultGeoLocMatrix == undefined)
+	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }  // created as identity matrix.
 	
-	if (resultTransformMatrix == undefined)
+	if (resultTransformMatrix === undefined)
 	{ resultTransformMatrix = new Matrix4(); }  // created as identity matrix.
 
 	// 1rst, calculate the transformation matrix for the location.
 	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
 	
 	resultTransformMatrix.copyFromMatrix4(resultGeoLocMatrix);
-	var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultTransformMatrix, zRotatedTMatrix);
-	var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
-	var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	var zRotatedTMatrix;
+	var zxRotatedTMatrix;
+	var zxyRotatedTMatrix;
+
+	zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultTransformMatrix, zRotatedTMatrix);
+	zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+	zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	
 	resultTransformMatrix = zxyRotatedTMatrix;
 	return resultTransformMatrix;
 };
@@ -34515,3186 +38138,6 @@ ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding)
 	return realBuildingPos;
 };
 */
-'use strict';
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class UniformMatrix4fvDataPair
- * @param gl 변수
- */
-var UniformMatrix4fvDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof UniformMatrix4fvDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.matrix4fv; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-UniformMatrix4fvDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniformMatrix4fv(this.uniformLocation, false, this.matrix4fv);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class UniformVec2fvDataPair
- * @param gl 변수
- */
-var UniformVec2fvDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof UniformVec2fvDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.vec2fv; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-UniformVec2fvDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniform2fv(this.uniformLocation, false, this.vec2fv);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class UniformVec3fvDataPair
- * @param gl 변수
- */
-var UniformVec3fvDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof UniformVec3fvDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.vec3fv; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-UniformVec3fvDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniform3fv(this.uniformLocation, false, this.vec3fv);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class UniformVec4fvDataPair
- * @param gl 변수
- */
-var UniformVec4fvDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof UniformVec4fvDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.vec4fv; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-UniformVec4fvDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniform4fv(this.uniformLocation, false, this.vec4fv);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class Uniform1fDataPair
- * @param gl 변수
- */
-var Uniform1fDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof Uniform1fDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.floatValue; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-Uniform1fDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniform1f(this.uniformLocation, false, this.floatValue);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class Uniform1iDataPair
- * @param gl 변수
- */
-var Uniform1iDataPair = function(gl, uniformName) 
-{
-	if (!(this instanceof Uniform1iDataPair)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name = uniformName;
-	this.uniformLocation;
-	this.intValue; 
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-Uniform1iDataPair.prototype.bindUniform = function() 
-{
-	this.gl.uniform1i(this.uniformLocation, false, this.intValue);
-};
-
-//**********************************************************************************************************************************************************
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class PostFxShader
- * @param gl 변수
- */
-var PostFxShader = function(gl) 
-{
-	if (!(this instanceof PostFxShader)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl = gl;
-	this.name;
-	this.attribLocationCacheObj = {};
-	this.uniformsArray = []; // this array has the same uniforms that "uniformsCacheObj".***
-	this.uniformsCacheObj = {}; // this object has the same uniforms that "uniformsArray".***
-	
-	// shader program.***
-	this.program;
-	this.shader_vertex;
-	this.shader_fragment;
-
-	// attributes.***
-	this.position3_loc;
-	this.color3_loc;
-	this.normal3_loc;
-	this.texCoord2_loc;
-
-	// uniforms matrix.***
-	this.projectionMatrix4_loc; // usually no used.***
-	this.modelViewMatrix4_loc;
-	this.modelViewProjectionMatrix4_loc;
-	this.modelViewMatrix4RelToEye_loc;
-	this.modelViewProjectionMatrix4RelToEye_loc;
-	this.normalMatrix4_loc;
-	this.normalMatrix3_loc;
-	this.RefTransfMatrix;
-
-	// uniform vectors.***
-	this.buildingPosHIGH_loc;
-	this.buildingPosLOW_loc;
-	this.cameraPosHIGH_loc;
-	this.cameraPosLOW_loc;
-	this.noiseScale2_loc;
-	this.kernel16_loc;
-
-	// uniform values.***
-	this.near_loc;
-	this.far_loc;
-	this.fov_loc;
-	this.aspectRatio_loc;
-	this.screenWidth_loc;
-	this.screenHeight_loc;
-
-	// uniform samplers.***
-	this.diffuseTex_loc;
-	this.depthTex_loc;
-	this.noiseTex_loc;
-
-	// blur.***
-	this.texelSize_loc;
-	this.colorTex_loc;
-
-	// Model Reference meshes.***
-	this.useRefTransfMatrix_loc;
-	this.useTexture_loc;
-	this.invertNormals_loc;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param shaderName 변수
- * @returns shader
- */
-PostFxShader.prototype.bindUniforms = function()
-{
-	var uniformsDataPairsCount = this.uniformsArray.length;
-	for (var i=0; i<uniformsDataPairsCount; i++)
-	{
-		this.uniformsArray[i].bindUniform();
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param shaderName 변수
- * @returns shader
- */
-PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
-{
-	var uniformDataPair;//
-	if (uniformType === "Matrix4fv")
-	{
-		uniformDataPair = new UniformMatrix4fvDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	else if (uniformType === "Vec4fv")
-	{
-		uniformDataPair = new UniformVec4fvDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	else if (uniformType === "Vec3fv")
-	{
-		uniformDataPair = new UniformVec3fvDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	else if (uniformType === "Vec2fv")
-	{
-		uniformDataPair = new UniformVec2fvDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	else if (uniformType === "1f")
-	{
-		uniformDataPair = new Uniform1fDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	else if (uniformType === "1i")
-	{
-		uniformDataPair = new Uniform1iDataPair(this.gl, uniformName);
-		this.uniformsArray.push(uniformDataPair);
-		this.uniformsCacheObj[uniformName] = uniformDataPair;
-	}
-	
-	return uniformDataPair;
-};
-
-//*********************************************************************************************************************
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class PostFxShadersManager
- */
-var PostFxShadersManager = function() 
-{
-	if (!(this instanceof PostFxShadersManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.gl;
-	this.pFx_shaders_array = []; // old.***
-	this.shadersCache = {};
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param shaderName 변수
- * @returns shader
- */
-PostFxShadersManager.prototype.newShader = function(shaderName)
-{
-	var shader = new PostFxShader(this.gl);
-	shader.name = shaderName;
-	this.shadersCache[shaderName] = shader;
-	return shader;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param source 변수
- * @param type 변수
- * @param typeString 변수
- * @returns shader
- */
-PostFxShadersManager.prototype.getShader = function(gl, source, type, typeString) 
-{
-	// Source from internet.***
-	var shader = gl.createShader(type);
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
-	{
-		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
-		return false;
-	}
-	return shader;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createDefaultShaders = function(gl) 
-{
-	this.createRenderDepthShader(gl); // 0.***
-	this.createSsaoShader(gl); // 1.***
-	this.createBlurShader(gl); // 2.***
-
-	// Now, create shaders for modelReference geometries.****
-	this.createRenderDepthShaderModelRef(gl); // 3.***
-	this.createSsaoShaderModelRef(gl); // 4.***
-	//this.createBlurShader_ModelRef(gl); // 5.***
-
-	this.createColorSelectionShaderModelRef(gl);// 5.***
-	this.createSimpleDepthShaderModelRef(gl);// 6.***
-
-	this.createRenderDepthShaderLODBuilding(gl);// 7.***
-	this.createSsaoShaderLODBuilding(gl);// 8.***
-
-	this.createRenderDepthShaderLego(gl);// 9.***
-	this.createSsaoShaderLego(gl);// 10.***
-
-	this.createDepthShaderBox(gl); // 11.***
-	this.createSsaoShaderBox(gl); // 12.***
-
-	this.createPngImageShader(gl); // 13.***
-	this.createSilhouetteShaderModelRef(gl); // 14.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createBlurShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var blur_vs_source = ShaderSource.BlurVS;
-	var blur_fs_source = ShaderSource.BlurFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, blur_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-
-	shader.texelSize_loc = gl.getUniformLocation(shader.program, "texelSize");
-	shader.colorTex_loc = gl.getUniformLocation(shader.program, "colorTex");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.SsaoVS;
-	var ssao_fs_source = ShaderSource.SsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.ShowDepthVS;
-	var showDepth_fs_source = ShaderSource.ShowDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Ref Model.***********************************************************************************************************************
-// Ref Model.***********************************************************************************************************************
-// Ref Model.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
-	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.***
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow"); // sceneState.***
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye"); // sceneState.***
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye"); // sceneState.***
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.***
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.***
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	//*********************************************************************************
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near"); // sceneState.***
-	shader.far_loc = gl.getUniformLocation(shader.program, "far"); // sceneState.***
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov"); // sceneState.***
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio"); // sceneState.***
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.***
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.***
-	
-	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 
-	
-	// lighting.
-	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
-	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius");  
-
-	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
-	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
-	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
-
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sceneState) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
-	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Selection shader.***********************************************************************************************************************
-// Selection shader.***********************************************************************************************************************
-// Selection shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.ColorSelectionSsaoVS;
-	var ssao_fs_source = ShaderSource.ColorSelectionSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-};
-
-// SimpleDepth shader.***********************************************************************************************************************
-// SimpleDepth shader.***********************************************************************************************************************
-// SimpleDepth shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) 
-{
-	// no used.!!!!!!!!!!!!!!!
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.SimpleDepthSsaoVS;
-	var ssao_fs_source = ShaderSource.SimpleDepthSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-
-	//shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// LOD 2 Building Shader.***********************************************************************************************************************
-// LOD 2 Building Shader.***********************************************************************************************************************
-// LOD 2 Building Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) 
-{
-	// 8.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
-	var ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
-	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
-
-	//*********************************************************************************
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	//shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
-{
-	// 7.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
-	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Lego Shader.***********************************************************************************************************************
-// Lego Shader.***********************************************************************************************************************
-// Lego Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) 
-{
-	// 10.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.LegoSsaoVS;
-	var ssao_fs_source = ShaderSource.LegoSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
-
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) 
-{
-	// 9.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LegoDepthVS;
-	var showDepth_fs_source = ShaderSource.LegoDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-
-
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
-{
-	// 7.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
-	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// box depth Shader.***********************************************************************************************************************
-// box depth Shader.***********************************************************************************************************************
-// box depth Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createDepthShaderBox = function(gl) 
-{
-	// 7.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.BoxDepthVS;
-	var showDepth_fs_source = ShaderSource.BoxDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// box Shader.***********************************************************************************************************************
-// box Shader.***********************************************************************************************************************
-// box Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) 
-{
-	// 8.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.BoxSsaoVS;
-	var ssao_fs_source = ShaderSource.BoxSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	//shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
-	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
-	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
-	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
-
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
-
-	//*********************************************************************************
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-};
-
-// PNG images shader.**************************************************************************************************
-// PNG images shader.**************************************************************************************************
-// PNG images shader.**************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createPngImageShader = function(gl) 
-{
-	// 13.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.PngImageVS;
-	var ssao_fs_source = ShaderSource.PngImageFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.texture_loc = gl.getUniformLocation(shader.program, "u_texture"); 
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	
-	shader.position3_loc = gl.getAttribLocation(shader.program, "a_position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_texcoord");
-	
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-	
-};
-
-// 14) Silhouette shader.***********************************************************************************************************************
-// 14) Silhouette shader.***********************************************************************************************************************
-// 14) Silhouette shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) 
-{
-	// 14.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.SilhouetteVS;
-	var ssao_fs_source = ShaderSource.SilhouetteFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.RefTransfMatrix = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.camSpacePixelTranslation_loc = gl.getUniformLocation(shader.program, "camSpacePixelTranslation");
-	shader.screenSize_loc = gl.getUniformLocation(shader.program, "screenSize");
-	shader.ProjectionMatrix_loc = gl.getUniformLocation(shader.program, "ProjectionMatrix");
-	shader.ModelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewMatrixRelToEye");
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'use strict';
-
-// An basic example.***********************************************************
-/*
-	var shader_vertex_source="\n\
-		attribute vec3 position;\n\
-		uniform mat4 Pmatrix;\n\
-		uniform mat4 Vmatrix;\n\
-		uniform mat4 Mmatrix;\n\
-		attribute vec3 color; //the color of the point\n\
-		varying vec3 vColor;\n\
-		void main(void) { //pre-built function\n\
-		gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);\n\
-		vColor=color;\n\
-		}";
-
-	var shader_fragment_source="\n\
-		precision mediump float;\n\
-		varying vec3 vColor;\n\
-		void main(void) {\n\
-		gl_FragColor = vec4(vColor, 1.);\n\
-		}";
-		*/
-// End example.-----------------------------------------------------------------
-
-// http://learningwebgl.com/blog/?p=507
-/*
-		http://blogs.agi.com/insight3d/index.php/2008/09/03/precisions-precisions/ // GPU RTE HighValue-LowValue
-		uniform vec3 uViewerHigh;
-		uniform vec3 uViewerLow;
-
-		void main(void)
-		{
-			vec3 highDifference = vec3(gl_Vertex.xyz - uViewerHigh);
-			vec3 lowDifference = vec3(gl_Normal.xyz - uViewerLow);
-			gl_Position = gl_ModelViewProjectionMatrix *
-				 vec4(highDifference + lowDifference, 1.0);
-		}
-		//-----------------------------------------------
-		void CDoubleToTwoFloats::Convert(double doubleValue,
-		float&amp; floatHigh, float&amp; floatLow)
-		{
-			if (doubleValue &gt;= 0.0)
-			{
-				double doubleHigh = floor(doubleValue / 65536.0) * 65536.0;
-				floatHigh = (float)doubleHigh;
-				floatLow = (float)(doubleValue - doubleHigh);
-			}
-			else
-			{
-				double doubleHigh = floor(-doubleValue / 65536.0) * 65536.0;
-				floatHigh = (float)-doubleHigh;
-				floatLow = (float)(doubleValue + doubleHigh);
-			}
-		}
-		//-----------------------------------------------
-		*/
-/*
-		vec4 czm_translateRelativeToEye(vec3 high, vec3 low)\n\
-		{\n\
-			vec3 highDifference = high - czm_encodedCameraPositionMCHigh;\n\
-			vec3 lowDifference = low - czm_encodedCameraPositionMCLow;\n\
-		\n\
-			return vec4(highDifference + lowDifference, 1.0);\n\
-		}\n\
-		*/
-
-/**
- * 조명 입력 및 재질 구성을 기반으로 렌더링 된 각 픽셀의 색상을 계산하기위한 수학적 계산 및 알고리즘을 포함하는 작은 스크립트
- * @class Shader
- */
-var Shader = function() 
-{
-	if (!(this instanceof Shader)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.shader_name;
-	this.shader_vertex_source;
-	this.shader_fragment_source;
-	this.SHADER_PROGRAM;
-
-	this.shader_vertex;
-	this.shader_fragment;
-
-	this._ModelViewProjectionMatrixRelToEye;
-	this._RefTransfMatrix;
-	this._NormalMatrix;
-
-	this._encodedCamPosHIGH;
-	this._encodedCamPosLOW;
-	this._BuildingPosHIGH;
-	this._BuildingPosLOW;
-	this._lightDirection;
-
-	this._color;
-	this._position;
-	this._texcoord;
-	this._normal;
-
-	// test.***
-	this.samplerUniform;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class ShadersManager
- */
-var ShadersManager = function() 
-{
-	if (!(this instanceof ShadersManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.shaders_array = [];
-
-	// Create shaders to render F4D_Format.**********************
-	// 1) Standard shader, that can render light mapping.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param idx = 변수
- * returns shader
- */
-ShadersManager.prototype.getMagoShader = function(idx) 
-{
-	var shader;
-
-	if (idx >= 0 && idx < this.shaders_array.length) 
-	{
-		shader = this.shaders_array[idx];
-	}
-
-	return shader;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.getShader = function(gl, source, type, typeString) 
-{
-	// Source from internet.***
-	var shader = gl.createShader(type);
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
-	{
-		alert("ERROR IN "+typeString+ " SHADER : " + gl.getShaderInfoLog(shader));
-		return false;
-	}
-	return shader;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createDefaultShader = function(gl) 
-{
-	this.createStandardShader(gl);                // 0.***
-	this.createTextureSimpleObjectShader(gl);     // 1.***
-	this.createColorSelectionShader(gl);          // 2.***
-	this.createTextureSimpleObjectA1Shader(gl);   // 3.***
-	this.createCloudShader(gl);                   // 4.***
-	this.createBlendingCubeShader(gl);            // 5.***
-	this.createPCloudShader(gl);                  // 6.***
-	this.createSimpleObjectTexNormalShader(gl); // 7.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createColorSelectionShader = function(gl) 
-{
-	var shader = new Shader();
-	this.shaders_array.push(shader);
-
-	shader.shader_vertex_source = ShaderSource.ColorVS;
-	//http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/
-
-	shader.shader_fragment_source = ShaderSource.ColorFS;
-
-	// https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
-	shader.SHADER_PROGRAM = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	gl.linkProgram(shader.SHADER_PROGRAM);
-
-	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._RefTransfMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "RefTransfMatrix");
-
-	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createTextureSimpleObjectShader = function(gl) 
-{
-	var shader = new Shader();
-	this.shaders_array.push(shader);
-
-	shader.shader_vertex_source = ShaderSource.TextureVS;
-	shader.shader_fragment_source = ShaderSource.TextureFS;
-
-	//http://learningwebgl.com/blog/?p=507
-	//https://gist.github.com/elnaqah/5070979
-	shader.SHADER_PROGRAM = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	gl.linkProgram(shader.SHADER_PROGRAM);
-
-	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._Mmatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "Mmatrix");
-	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-
-	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createTextureSimpleObjectA1Shader = function(gl) 
-{
-	var shader = new Shader();
-	this.shaders_array.push(shader);
-
-	shader.shader_vertex_source = ShaderSource.TextureA1VS;
-	shader.shader_fragment_source = ShaderSource.TextureA1FS;
-
-	//http://learningwebgl.com/blog/?p=507
-	//https://gist.github.com/elnaqah/5070979
-	shader.SHADER_PROGRAM = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	gl.linkProgram(shader.SHADER_PROGRAM);
-
-	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-
-	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createStandardShader = function(gl) 
-{
-	// This shader renders the normal f4d geometry.***
-	var standard_shader = new Shader();
-	this.shaders_array.push(standard_shader);
-
-	standard_shader.shader_vertex_source = ShaderSource.StandardVS;
-	standard_shader.shader_fragment_source = ShaderSource.StandardFS;
-
-	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = gl.createProgram();
-	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	gl.linkProgram(standard_shader.SHADER_PROGRAM);
-
-	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._RefTransfMatrix = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "RefTransfMatrix");
-	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
-	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
-
-	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createCloudShader = function(gl) 
-{
-	// This shader renders the f4d clouds.***
-	var standard_shader = new Shader();
-	this.shaders_array.push(standard_shader);
-
-	standard_shader.shader_vertex_source = ShaderSource.CloudVS;
-	standard_shader.shader_fragment_source = ShaderSource.CloudFS;
-
-	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = gl.createProgram();
-	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	gl.linkProgram(standard_shader.SHADER_PROGRAM);
-
-	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._cloudPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosHIGH");
-	standard_shader._cloudPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "cloudPosLOW");
-
-	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createBlendingCubeShader = function(gl) 
-{
-	// This shader renders the f4d clouds.***
-	var standard_shader = new Shader();
-	this.shaders_array.push(standard_shader);
-
-	standard_shader.shader_vertex_source = ShaderSource.BlendingCubeVS;
-	standard_shader.shader_fragment_source = ShaderSource.BlendingCubeFS;
-
-	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = gl.createProgram();
-	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	gl.linkProgram(standard_shader.SHADER_PROGRAM);
-
-	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-
-	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createPCloudShader = function(gl) 
-{
-	// This shader renders the f4d clouds.***
-	var standard_shader = new Shader();
-	this.shaders_array.push(standard_shader);
-
-	standard_shader.shader_vertex_source = ShaderSource.PointCloudVS;
-	standard_shader.shader_fragment_source = ShaderSource.PointCloudFS;
-
-	// Default ShaderProgram.********************************************************************
-	standard_shader.SHADER_PROGRAM = gl.createProgram();
-	standard_shader.shader_vertex = this.getShader(gl, standard_shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	standard_shader.shader_fragment = this.getShader(gl, standard_shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_vertex);
-	gl.attachShader(standard_shader.SHADER_PROGRAM, standard_shader.shader_fragment);
-	gl.linkProgram(standard_shader.SHADER_PROGRAM);
-
-	standard_shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	standard_shader._encodedCamPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	standard_shader._encodedCamPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	standard_shader._BuildingPosHIGH = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosHIGH");
-	standard_shader._BuildingPosLOW = gl.getUniformLocation(standard_shader.SHADER_PROGRAM, "buildingPosLOW");
-
-	standard_shader._color = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "color");
-	standard_shader._position = gl.getAttribLocation(standard_shader.SHADER_PROGRAM, "position");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-ShadersManager.prototype.createSimpleObjectTexNormalShader = function(gl) 
-{
-	var shader = new Shader();
-	this.shaders_array.push(shader);
-	shader.shader_vertex_source = ShaderSource.TextureNormalVS;
-	shader.shader_fragment_source = ShaderSource.TextureNormalFS;
-
-	//http://learningwebgl.com/blog/?p=507
-	//https://gist.github.com/elnaqah/5070979
-	//https://dannywoodz.wordpress.com/2014/12/14/webgl-from-scratch-directional-lighting-part-1/
-	//http://learningwebgl.com/blog/?p=684 // good.***
-	shader.SHADER_PROGRAM = gl.createProgram();
-	shader.shader_vertex = this.getShader(gl, shader.shader_vertex_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.getShader(gl, shader.shader_fragment_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_vertex);
-	gl.attachShader(shader.SHADER_PROGRAM, shader.shader_fragment);
-	gl.linkProgram(shader.SHADER_PROGRAM);
-
-	shader._encodedCamPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCHigh");
-	shader._encodedCamPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "encodedCameraPositionMCLow");
-	shader._BuildingPosHIGH = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosHIGH");
-	shader._BuildingPosLOW = gl.getUniformLocation(shader.SHADER_PROGRAM, "buildingPosLOW");
-
-	shader._ModelViewProjectionMatrixRelToEye = gl.getUniformLocation(shader.SHADER_PROGRAM, "ModelViewProjectionMatrixRelToEye");
-	shader._NormalMatrix = gl.getUniformLocation(shader.SHADER_PROGRAM, "uNMatrix");
-
-	//shader.SHADER_PROGRAM.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-	shader.samplerUniform = gl.getUniformLocation(shader.SHADER_PROGRAM, "uSampler");
-	shader._lightDirection = gl.getUniformLocation(shader.SHADER_PROGRAM, "uLightingDirection");
-
-	shader._position = gl.getAttribLocation(shader.SHADER_PROGRAM, "position");
-	shader._texcoord = gl.getAttribLocation(shader.SHADER_PROGRAM, "aTextureCoord");
-	shader._normal = gl.getAttribLocation(shader.SHADER_PROGRAM, "aVertexNormal");
-};
-
-//# sourceURL=Shader.js
-
-'use strict';
-var ShaderSource = {};
-ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
-	varying vec4 vColor;\n\
-\n\
-	void main()\n\
-    {\n\
-		gl_FragColor = vColor;\n\
-	}";
-ShaderSource.BlendingCubeVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-attribute vec4 color;\n\
-varying vec4 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 highDifference = -encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = position.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(position.xyz, 1.0);\n\
-\n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.BlurFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-    #endif\n\
-uniform sampler2D colorTex;\n\
-uniform vec2 texelSize;\n\
-varying vec2 vTexCoord; 	 	\n\
-\n\
-void main()\n\
-{\n\
-    vec3 result = vec3(0.0);\n\
-    for (int i = 0; i < 4; ++i) {\n\
-        for (int j = 0; j < 4; ++j) {\n\
-            vec2 offset = vec2(texelSize.x * float(j), texelSize.y * float(i));\n\
-            result += texture2D(colorTex, vTexCoord + offset).rgb;\n\
-        }\n\
-    }\n\
-            \n\
-    gl_FragColor.rgb = vec3(result * 0.0625); \n\
-    gl_FragColor.a = 1.0;\n\
-}\n\
-";
-ShaderSource.BlurVS = "attribute vec4 position;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 modelViewMatrix;  \n\
-\n\
-varying vec2 vTexCoord;\n\
-\n\
-void main()\n\
-{	\n\
-    vTexCoord = texCoord;\n\
-    \n\
-    gl_Position = projectionMatrix * modelViewMatrix * position;\n\
-}\n\
-";
-ShaderSource.BoxDepthFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying float depth;  \n\
-\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-\n\
-void main()\n\
-{     \n\
-    gl_FragData[0] = packDepth(-depth);\n\
-}\n\
-";
-ShaderSource.BoxDepthVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 buildingRotMatrix;  \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform vec3 aditionalPosition;\n\
-\n\
-varying float depth;  \n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.BoxSsaoFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-const int kernelSize = 16;  \n\
-const float radius = 0.5;      \n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{                          \n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-    vec3 normal2 = vNormal;   \n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-        \n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-    vec3 L = normalize(lightPos);\n\
-    float DiffuseFactor = dot(normal2, L);\n\
-    float NdotL = abs(DiffuseFactor);\n\
-    vec3 diffuse = vec3(NdotL);\n\
-    vec3 ambient = vec3(1.0);\n\
-    vec4 textureColor;\n\
-    textureColor = vcolor4;\n\
-\n\
-    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
-    gl_FragColor.a = 1.0;   \n\
-}\n\
-";
-ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-attribute vec4 color4;\n\
-\n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 normalMatrix4;\n\
-uniform mat4 buildingRotMatrix;  \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec4 oneColor4;\n\
-uniform bool bUse1Color;\n\
-uniform vec3 scale;\n\
-uniform bool bScale;\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec2 vTexCoord;  \n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-void main()\n\
-{	\n\
-    vec4 position2 = vec4(position.xyz, 1.0);\n\
-    if(bScale)\n\
-    {\n\
-        position2.x *= scale.x;\n\
-        position2.y *= scale.y;\n\
-        position2.z *= scale.z;\n\
-    }\n\
-    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-   \n\
-    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
-    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
-    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-    if(bUse1Color)\n\
-    {\n\
-        vcolor4 = oneColor4;\n\
-    }\n\
-    else\n\
-    {\n\
-        vcolor4 = color4;\n\
-    }\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.CloudFS = "precision lowp float;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = vec4(vColor, 1.);\n\
-}";
-ShaderSource.CloudVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 cloudPosHIGH;\n\
-uniform vec3 cloudPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-attribute vec3 color;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = cloudPosHIGH;\n\
-    vec3 objPosLow = cloudPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.ColorFS = "precision mediump float;\n\
-uniform int byteColor_r;\n\
-uniform int byteColor_g;\n\
-uniform int byteColor_b;\n\
-\n\
-void main()\n\
-{\n\
-    float byteMaxValue = 255.0;\n\
-\n\
-    gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
-}\n\
-";
-ShaderSource.ColorSelectionSsaoFS = "precision highp float;\n\
-uniform vec4 vColor4Aux;\n\
-\n\
-void main()\n\
-{          \n\
-    gl_FragColor = vColor4Aux;\n\
-}\n\
-";
-ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 buildingRotMatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos;\n\
-	if(refMatrixType == 0)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 1)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 2)\n\
-	{\n\
-		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    gl_PointSize = 10.0;\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.ColorVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform mat4 RefTransfMatrix;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}\n\
-";
-ShaderSource.LegoDepthFS = "#ifdef GL_ES\n\
-precision highp float;\n\
-#endif\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying float depth;  \n\
-\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-\n\
-void main()\n\
-{     \n\
-    gl_FragData[0] = packDepth(-depth);\n\
-}\n\
-";
-ShaderSource.LegoDepthVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 RefTransfMatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform vec3 aditionalPosition;\n\
-\n\
-varying float depth;  \n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-    \n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.LegoSsaoFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-const int kernelSize = 16;  \n\
-const float radius = 0.5;      \n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{                          \n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-    vec3 normal2 = vNormal;   \n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-        \n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-    vec3 L = normalize(lightPos);\n\
-    float DiffuseFactor = dot(normal2, L);\n\
-    float NdotL = abs(DiffuseFactor);\n\
-    vec3 diffuse = vec3(NdotL);\n\
-    vec3 ambient = vec3(1.0);\n\
-    vec4 textureColor;\n\
-    textureColor = vcolor4;\n\
-\n\
-    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
-    gl_FragColor.a = 1.0;   \n\
-}\n\
-";
-ShaderSource.LegoSsaoVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-attribute vec4 color4;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform mat4 normalMatrix4;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec2 vTexCoord;  \n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    vec3 rotatedNormal = mat3(RefTransfMatrix) * normal;\n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
-    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
-    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-\n\
-    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-    vcolor4 = color4;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.LodBuildingDepthFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying float depth;  \n\
-\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-\n\
-void main()\n\
-{     \n\
-    gl_FragData[0] = packDepth(-depth);\n\
-}\n\
-";
-ShaderSource.LodBuildingDepthVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 buildingRotMatrix;  \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform vec3 aditionalPosition;\n\
-\n\
-varying float depth;  \n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-        \n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-    \n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.LodBuildingSsaoFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
-uniform bool textureFlipYAxis;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-const int kernelSize = 16;  \n\
-const float radius = 0.5;      \n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{                          \n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-\n\
-    vec3 normal2 = vNormal;   \n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-        \n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-    vec3 L = normalize(lightPos);\n\
-    float DiffuseFactor = dot(normal2, L);\n\
-    float NdotL = abs(DiffuseFactor);\n\
-    vec3 diffuse = vec3(NdotL);\n\
-    vec3 ambient = vec3(1.0);\n\
-    vec4 textureColor;\n\
-    if(hasTexture)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-    }\n\
-    else\n\
-    {\n\
-        textureColor = vcolor4;\n\
-    }\n\
-    \n\
-    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
-    gl_FragColor.a = 1.0;   \n\
-}\n\
-";
-ShaderSource.LodBuildingSsaoVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-attribute vec4 color4;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform sampler2D diffuseTex;\n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 normalMatrix4;\n\
-uniform mat4 buildingRotMatrix;  \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec4 oneColor4;\n\
-uniform bool bUse1Color;\n\
-uniform bool hasTexture;\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
-\n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-   \n\
-    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
-    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
-    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-\n\
-    if(bUse1Color)\n\
-    {\n\
-        vcolor4 = oneColor4;\n\
-    }\n\
-    else\n\
-    {\n\
-        vcolor4 = color4;\n\
-    }\n\
-    vTexCoord = texCoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
-uniform bool textureFlipYAxis;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-\n\
-varying vec3 diffuseColor;\n\
-uniform vec3 specularColor;\n\
-varying vec3 vertexPos;\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{\n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-\n\
-    vec3 normal2 = vNormal;\n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
-\n\
-    vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
-    vec3 L = normalize(lightPos - vertexPos);\n\
-    float lambertian = max(dot(normal2, L), 0.0);\n\
-    float specular = 0.0;\n\
-    if(lambertian > 0.0)\n\
-    {\n\
-        vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-        vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-        \n\
-        // Compute the specular term\n\
-        float specAngle = max(dot(R, V), 0.0);\n\
-        specular = pow(specAngle, shininessValue);\n\
-    }\n\
-	\n\
-	if(lambertian < 0.5)\n\
-    {\n\
-		lambertian = 0.5;\n\
-	}\n\
-\n\
-    vec4 textureColor;\n\
-    if(hasTexture)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-        if(textureColor.w == 0.0)\n\
-        {\n\
-            discard;\n\
-        }\n\
-    }\n\
-    else{\n\
-        textureColor = vColor4Aux;\n\
-    }\n\
-	\n\
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-\n\
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
-}\n\
-";
-ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
-	attribute vec3 normal;\n\
-	attribute vec2 texCoord;\n\
-	\n\
-	uniform mat4 buildingRotMatrix; \n\
-	uniform mat4 projectionMatrix;  \n\
-	uniform mat4 modelViewMatrix;\n\
-	uniform mat4 modelViewMatrixRelToEye; \n\
-	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-	uniform mat4 RefTransfMatrix;\n\
-	uniform mat4 normalMatrix4;\n\
-	uniform vec3 buildingPosHIGH;\n\
-	uniform vec3 buildingPosLOW;\n\
-	uniform vec3 encodedCameraPositionMCHigh;\n\
-	uniform vec3 encodedCameraPositionMCLow;\n\
-	uniform vec3 aditionalPosition;\n\
-	uniform vec3 refTranslationVec;\n\
-	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-\n\
-	varying vec3 vNormal;\n\
-	varying vec2 vTexCoord;  \n\
-	varying vec3 uAmbientColor;\n\
-	varying vec3 vLightWeighting;\n\
-	varying vec3 vertexPos;\n\
-	\n\
-	void main()\n\
-    {	\n\
-		vec4 rotatedPos;\n\
-		mat3 currentTMat;\n\
-		if(refMatrixType == 0)\n\
-		{\n\
-			rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-			currentTMat = mat3(buildingRotMatrix);\n\
-		}\n\
-		else if(refMatrixType == 1)\n\
-		{\n\
-			rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-			currentTMat = mat3(buildingRotMatrix);\n\
-		}\n\
-		else if(refMatrixType == 2)\n\
-		{\n\
-			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-			currentTMat = mat3(RefTransfMatrix);\n\
-		}\n\
-\n\
-		vec3 objPosHigh = buildingPosHIGH;\n\
-		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
-		vec3 rotatedNormal = currentTMat * normal;\n\
-		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-		uAmbientColor = vec3(0.8);\n\
-		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
-		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
-		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-		vTexCoord = texCoord;\n\
-		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-\n\
-        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	}\n\
-";
-ShaderSource.PngImageFS = "precision mediump float;\n\
-varying vec2 v_texcoord;\n\
-uniform bool textureFlipYAxis;\n\
-uniform sampler2D u_texture;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 textureColor;\n\
-    if(textureFlipYAxis)\n\
-    {\n\
-        textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
-    }\n\
-    else\n\
-    {\n\
-        textureColor = texture2D(u_texture, v_texcoord);\n\
-    }\n\
-    if(textureColor.w < 0.1)\n\
-    {\n\
-        discard;\n\
-    }\n\
-\n\
-    gl_FragColor = textureColor;\n\
-}";
-ShaderSource.PngImageVS = "attribute vec3 a_position;\n\
-attribute vec2 a_texcoord;\n\
-uniform mat4 buildingRotMatrix;  \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec2 v_texcoord;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 position2 = vec4(a_position.xyz, 1.0);\n\
-    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    v_texcoord = a_texcoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.PointCloudFS = "	precision lowp float;\n\
-	varying vec4 vColor;\n\
-\n\
-	void main()\n\
-    {\n\
-		gl_FragColor = vColor;\n\
-	}";
-ShaderSource.PointCloudVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-attribute vec4 color;\n\
-varying vec4 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
-precision highp float;\n\
-#endif\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying float depth;  \n\
-\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-\n\
-void main()\n\
-{     \n\
-    gl_FragData[0] = packDepth(-depth);\n\
-}\n\
-";
-ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 buildingRotMatrix; \n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 RefTransfMatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-\n\
-varying float depth;\n\
-  \n\
-void main()\n\
-{	\n\
-	vec4 rotatedPos;\n\
-\n\
-	if(refMatrixType == 0)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 1)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 2)\n\
-	{\n\
-		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.ShowDepthFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying float depth;  \n\
-varying vec3 vN; \n\
-varying vec4 vVSPos;\n\
-\n\
-// from http://spidergl.org/example.php?id=6\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-\n\
-    return res;  \n\
-}\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragData[0] = packDepth(-depth);\n\
-    gl_FragData[0].r = -depth/far;\n\
-}\n\
-";
-ShaderSource.ShowDepthVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 normalMatrix3;\n\
-uniform mat4 normalMatrix4;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-\n\
-varying vec3 vN;\n\
-varying float depth;  \n\
-varying vec4 vVSPos;\n\
-\n\
-void main()\n\
-{	\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vN = normalize((normalMatrix4 * vec4(normal, 1.0)).xyz);\n\
-    \n\
-    //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-    vVSPos = modelViewMatrixRelToEye * pos4;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.SilhouetteFS = "precision highp float;\n\
-uniform vec4 vColor4Aux;\n\
-\n\
-void main()\n\
-{          \n\
-    gl_FragColor = vColor4Aux;\n\
-}";
-ShaderSource.SilhouetteVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 buildingRotMatrix; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 ModelViewMatrixRelToEye;\n\
-uniform mat4 ProjectionMatrix;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-uniform vec2 camSpacePixelTranslation;\n\
-uniform vec2 screenSize;    \n\
-varying vec2 camSpaceTranslation;\n\
-\n\
-void main()\n\
-{    \n\
-    vec4 rotatedPos;\n\
-	if(refMatrixType == 0)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 1)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 2)\n\
-	{\n\
-		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    vec4 camSpacePos = ModelViewMatrixRelToEye * pos4;\n\
-    vec4 translationVec = ProjectionMatrix * vec4(camSpacePixelTranslation.x*(-camSpacePos.z), camSpacePixelTranslation.y*(-camSpacePos.z), 0.0, 1.0);\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-    gl_Position += translationVec;  \n\
-}";
-ShaderSource.SimpleDepthSsaoFS = "precision highp float;\n\
-const vec4 bitEnc = vec4(1.0,255.0,65025.0,16581375.0);\n\
-const vec4 bitDec = 1.0/bitEnc;\n\
-varying float zDepth;\n\
-\n\
-vec4 EncodeFloatRGBA (float v)\n\
-{\n\
-    vec4 enc = bitEnc * v;\n\
-    enc = fract(enc);\n\
-    enc -= enc.yzww * vec2(1.0/255.0, 0.0).xxxy;\n\
-    return enc;\n\
-}\n\
-\n\
-void main()\n\
-{          \n\
-    vec4 encodedZ = EncodeFloatRGBA(zDepth);\n\
-    gl_FragData[0] = encodedZ;\n\
-}\n\
-";
-ShaderSource.SimpleDepthSsaoVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying float zDepth;\n\
-uniform float far;\n\
-\n\
-void main()\n\
-{	\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    zDepth = (modelViewMatrixRelToEye * pos4).z/far;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.SsaoFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform vec3 kernel[16];   \n\
-\n\
-varying vec2 vTexCoord;   \n\
-\n\
-const int kernelSize = 16;  \n\
-const float radius = 1.0;      \n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{                          \n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
- \n\
-    vec3 normal2 = vNormal;   \n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-\n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-        \n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - (occlusion) / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-    vec3 L = normalize(lightPos);\n\
-    float NdotL = abs(dot(normal2, L));\n\
-    vec3 diffuse = vec3(NdotL);\n\
-    vec3 ambient = vec3(1.0);\n\
-    vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-\n\
-    gl_FragColor.rgb = vec3((textureColor.xyz*0.2 + textureColor.xyz*0.8) * occlusion); // with texture.***\n\
-    gl_FragColor.a = 1.0;   \n\
-}\n\
-";
-ShaderSource.SsaoVS = "attribute vec3 position;\n\
-attribute vec3 normal;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 normalMatrix4;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec2 vTexCoord;  \n\
-\n\
-void main()\n\
-{	\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vNormal = (normalMatrix4 * vec4(-normal.x, -normal.y, -normal.z, 1.0)).xyz;\n\
-    vTexCoord = texCoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}";
-ShaderSource.StandardFS = "precision lowp float;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = vec4(vColor, 1.);\n\
-}";
-ShaderSource.StandardVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform mat4 RefTransfMatrix;\n\
-attribute vec3 color;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
- \n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.TextureA1FS = "precision mediump float;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-uniform sampler2D uSampler;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-}\n\
-";
-ShaderSource.TextureA1VS = "attribute vec3 position;\n\
-attribute vec4 aVertexColor;\n\
-attribute vec2 aTextureCoord;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
- \n\
-    vColor=aVertexColor;\n\
-    vTextureCoord = aTextureCoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.TextureFS = "precision mediump float;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-uniform sampler2D uSampler;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-}";
-ShaderSource.TextureNormalFS = "	precision mediump float;\n\
-	varying vec4 vColor;\n\
-	varying vec2 vTextureCoord;\n\
-	uniform sampler2D uSampler;\n\
-	varying vec3 vLightWeighting;\n\
-\n\
-	void main()\n\
-    {\n\
-		vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-        \n\
-		gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
-	}\n\
-";
-ShaderSource.TextureNormalVS = "attribute vec3 position;\n\
-attribute vec4 aVertexColor;\n\
-attribute vec2 aTextureCoord;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-attribute vec3 aVertexNormal;\n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-uniform mat3 uNMatrix;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    vColor = aVertexColor;\n\
-    vTextureCoord = aTextureCoord;\n\
-    \n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.7, 0.7, 0.7);\n\
-    vec3 uLightingDirection = vec3(0.8, 0.2, -0.9);\n\
-    vec3 directionalLightColor = vec3(0.4, 0.4, 0.4);\n\
-    vec3 transformedNormal = uNMatrix * aVertexNormal;\n\
-    float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}\n\
-";
-ShaderSource.TextureVS = "attribute vec3 position;\n\
-attribute vec4 aVertexColor;\n\
-attribute vec2 aTextureCoord;\n\
-uniform mat4 Mmatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos = Mmatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vColor=aVertexColor;\n\
-    vTextureCoord = aTextureCoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-    \n\
-}";
-
 'use strict';
 
 /**
