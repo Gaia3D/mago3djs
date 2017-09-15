@@ -2461,7 +2461,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var applyOcclusionCulling = neoBuilding.getRenderSettingApplyOcclusionCulling();
 	
 	// if there are no lod0 & lod1 then put the neobuilding to delete model-references data.
-	if (currentVisibleOctrees.length == 0)
+	if (currentVisibleOctrees.length === 0)
 	{
 		this.processQueue.putBuildingsToDeleteModelReferences(neoBuilding, 0);
 	}
@@ -2595,7 +2595,7 @@ MagoManager.prototype.manageQueue = function()
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2604,7 +2604,7 @@ MagoManager.prototype.manageQueue = function()
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
@@ -2624,7 +2624,7 @@ MagoManager.prototype.manageQueue = function()
 				// test else.
 				if (lowestOctree.neoReferencesMotherAndIndices)
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 					{ var hola = 0; }
 				}
 			}
@@ -2633,7 +2633,7 @@ MagoManager.prototype.manageQueue = function()
 		}
 		
 		// if no parsed any octree, then parse any octree of thr queue.
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -2646,7 +2646,7 @@ MagoManager.prototype.manageQueue = function()
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2655,7 +2655,7 @@ MagoManager.prototype.manageQueue = function()
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
@@ -2695,7 +2695,7 @@ MagoManager.prototype.manageQueue = function()
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2704,7 +2704,7 @@ MagoManager.prototype.manageQueue = function()
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
@@ -2724,7 +2724,7 @@ MagoManager.prototype.manageQueue = function()
 				// test else.
 				if (lowestOctree.neoReferencesMotherAndIndices)
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 					{ var hola = 0; }
 				}
 			}
@@ -2732,7 +2732,7 @@ MagoManager.prototype.manageQueue = function()
 			{ break; }
 		}
 		
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -2745,7 +2745,7 @@ MagoManager.prototype.manageQueue = function()
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -2754,7 +2754,7 @@ MagoManager.prototype.manageQueue = function()
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
@@ -2797,12 +2797,12 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse the beta version.
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
@@ -2821,7 +2821,7 @@ MagoManager.prototype.manageQueue = function()
 				// test else.
 				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 					{ var hola = 0; }
 				}
 			}
@@ -2829,7 +2829,7 @@ MagoManager.prototype.manageQueue = function()
 			{ break; }
 		}
 		
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -2846,12 +2846,12 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse the beta version.
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
@@ -2887,18 +2887,18 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList == undefined)
+				if (blocksList === undefined)
 				{ continue; }
 				
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse the beta version.
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
@@ -2917,7 +2917,7 @@ MagoManager.prototype.manageQueue = function()
 				// test else.
 				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 					{ var hola = 0; }
 				}
 			}
@@ -2925,7 +2925,7 @@ MagoManager.prototype.manageQueue = function()
 			{ break; }
 		}
 		
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -2942,12 +2942,12 @@ MagoManager.prototype.manageQueue = function()
 				if (blocksList.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (blocksList.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse the beta version.
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
@@ -2990,7 +2990,7 @@ MagoManager.prototype.manageQueue = function()
 			{ break; }
 		}
 		
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -3089,7 +3089,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			// 4 = parsed.***
 			// now, check if the blocksList is loaded & parsed.***
 			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-			if (blocksList == undefined)
+			if (blocksList === undefined)
 			{ continue; }
 			// 0 = file loading NO started.***
 			if (blocksList.fileLoadState === CODE.fileLoadState.READY) 

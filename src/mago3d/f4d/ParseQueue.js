@@ -22,7 +22,7 @@ var ParseQueue = function()
 ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
 {
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	this.octreesLod0ReferencesToParseMap.set(octree, aValue);
@@ -36,7 +36,7 @@ ParseQueue.prototype.eraseOctreeLod0ReferencesToParse = function(octree)
 ParseQueue.prototype.putOctreeLod0ModelsToParse = function(octree, aValue)
 {
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	this.octreesLod0ModelsToParseMap.set(octree, aValue);
@@ -50,7 +50,7 @@ ParseQueue.prototype.eraseOctreeLod0ModelsToParse = function(octree)
 ParseQueue.prototype.putOctreeLod2LegosToParse = function(octree, aValue)
 {
 	// provisionally "aValue" can be anything.
-	if (aValue == undefined)
+	if (aValue === undefined)
 	{ aValue = 0; }
 	
 	this.octreesLod2LegosToParseMap.set(octree, aValue);
