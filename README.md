@@ -1,6 +1,7 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![Englsh](https://img.shields.io/badge/language-English-orange.svg)](#english)
+[![License](https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](#korean)
+[![Englsh](https://img.shields.io/badge/language-English-orange.svg)](#english)
+[![Japan](https://img.shields.io/badge/language-Japan-red.svg)](#japan)
 
 <a name="korean"></a>
 
@@ -132,10 +133,72 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 
 ##### Public server run
 - <code>C:\git\repository\mago3djs>node server.js --public true</code>
+## LICENSE ##
+[Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
+<br><br>
+[english](#english) <br>
 
+<a name="japan"></a>
+準備中です。
+# mago3DJs
+3次元マルチブロック可視化のためのオープンソースのJavaScriptライブラリ
 
+AEC（Architecture、Engineering、Construction）領域と、伝統的な3次元空間情報（3D GIS）を統合的に管理し、可視化する次世代3次元GISプラットフォームです。室内、糸外の区別なくAECと3D GISをWebブラウザに統合されています。大容量BIM（Building Information Modelling）、JT（Jupiter Tessellation）、3D GISファイルなどを、別のプログラムをインストールすることなく、Webブラウザ上ですぐに見てコラボレーションを行うことができます。
 
+# 特徴
+- AECと3D GISの統合
+- 室内外空間のシームレスな連携
+- Webブラウザ上で駆動され、別のプラグインやアクティブXのインストールが不要
+- オープンソース（Cesium、Web World Wind）をベースに開発され、オープンで拡張性に優れ
+- 初代容量3次元ファイルの効率的な管理と高速レンダリング
+
+# 対応フォーマット形式
+
+- IFC(Industry Foundation Classes)
+- JT(Jupiter Tessellation)
+- OBJ
+- 3DS
+- COLLADA
+
+# 適用事例
+- 南極科学基地のWebベースの3次元設備、基装備管理システム
+- LiveDroneMap
+
+## Development Environment ##
+- [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
+- [eclipse neon(need)](https://www.eclipse.org/downloads/eclipse-packages/)
+&emsp;&emsp;&emsp;&emsp;&emsp; ● [Jsdoc](https://github.com/Gaia3D/mago3djs/wiki/Documentation)
+- [node](https://nodejs.org/ko/download/) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Gulp](https://github.com/Gaia3D/mago3djs/wiki/Build)
+- [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
+- [server settings](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
+
+## Getting Started ###
+
+### インストール
+#### Source Download ####
+- 右側上部のClone or downloadボタンをクリックします。
+- Download ZIPリンクをクリックして、C：\ディレクトリに保存します。
+  - gitを使用している場合はgit clone https://github.com/Gaia3D/mago3djs.git
+- 解凍後確認します。
+  - C:\mago3djs
+
+#### Node install ####
+- [node]（https://nodejs.org/ko/download/）に接続してWindow Install（.msi）64-bitをインストールします。
+- C：\ mago3djsディレクトリに移動します。
+- node Setup
+  - <code>C:\mago3djs> npm install</code>
+  - <code>C:\mago3djs> npm install -g gulp</code>
+
+#### データフォルダリンク ####
+  - <code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code>
+
+####  サーバーの実行
+##### privateサーバーの実行
+- <code>C:\git\repository\mago3djs>node server.js</code>
+
+##### publicサーバーの実行
+- <code>C:\git\repository\mago3djs>node server.js --public true</code>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
