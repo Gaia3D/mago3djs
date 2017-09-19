@@ -194,6 +194,17 @@ BoundingBox.prototype.getCenterPoint = function(result)
 	return result;
 };
 
+/**
+ * 영역박스의 중심점을 구한다.
+ * 
+ * @returns {float} apriximately radius.
+ */
+BoundingBox.prototype.getRadiusAprox = function() 
+{
+	var maxLength = this.getMaxLength();
+	return maxLength/2.0;
+};
+
 
 /**
  * 영역박스와 점과의 교차 여부를 판단
