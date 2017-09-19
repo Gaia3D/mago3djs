@@ -200,7 +200,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
-SmartTile.prototype.makeTree = function(minDegree, magoManager) 
+SmartTile.prototype.makeTreeByMinDegree = function(minDegree, magoManager) 
 {
 	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
 	{ return; }
@@ -228,7 +228,7 @@ SmartTile.prototype.makeTree = function(minDegree, magoManager)
 		// for each subTile that has intercepted buildingSeeds -> makeTree.
 		for (var i=0; i<4; i++)
 		{
-			this.subTiles[i].makeTree(minDegree, magoManager);
+			this.subTiles[i].makeTreeByMinDegree(minDegree, magoManager);
 		}
 		
 	}
@@ -302,15 +302,15 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultIntersectedTilesArray) 
+SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
 {
-	var intersectedTiles = [];
-	this.getFrustumIntersectedTiles(frustum, intersectedTiles);
+	var fullyIntersectedTiles = [];
+	this.getFrustumIntersectedTiles(frustum, fullyIntersectedTiles, resultPartiallyIntersectedTilesArray);
 	
-	var intersectedTilesCount = intersectedTiles.length;
+	var intersectedTilesCount = fullyIntersectedTiles.length;
 	for (var i=0; i<intersectedTilesCount; i++)
 	{
-		intersectedTiles[i].extractLowestTiles(resultIntersectedTilesArray);
+		fullyIntersectedTiles[i].extractLowestTiles(resultFullyIntersectedTilesArray);
 	}
 };
 
@@ -318,7 +318,7 @@ SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultI
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultIntersectedTilesArray) 
+SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
 {	
 	var intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	
@@ -326,7 +326,7 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultInterse
 	{ return; }
 	else if (intersectionType === Constant.INTERSECTION_INSIDE)
 	{
-		resultIntersectedTilesArray.push(this);
+		resultFullyIntersectedTilesArray.push(this);
 		return;
 	}
 	else if (intersectionType === Constant.INTERSECTION_INTERSECT)
@@ -336,11 +336,14 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultInterse
 			for (var i=0; i<this.subTiles.length; i++)
 			{
 				if (this.subTiles[i].sphereExtent)
-				{ this.subTiles[i].getFrustumIntersectedTiles(frustum, resultIntersectedTilesArray); }
+				{ this.subTiles[i].getFrustumIntersectedTiles(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray); }
 			}
 		}
 		else
-		{ resultIntersectedTilesArray.push(this); }
+		{ 
+			if (this.buildingSeedsArray &&  this.buildingSeedsArray.length > 0)
+			{ resultPartiallyIntersectedTilesArray.push(this); } 
+		}
 	}
 };
 

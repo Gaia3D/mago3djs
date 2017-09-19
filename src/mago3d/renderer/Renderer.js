@@ -474,6 +474,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
 					{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
 					
+					
 					//if(indicesCount === 0)
 					//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 				}
@@ -487,7 +488,16 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				//		indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 				//}
 				//else indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-				indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+				if (magoManager.thereAreUrgentOctrees)
+				{
+					indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
+					if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+					{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
+				}
+				else 
+				{
+					indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+				}
 			}
 
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);

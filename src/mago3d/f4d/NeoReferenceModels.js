@@ -240,7 +240,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 	this.neoRefsIndices = undefined;
 	this.blocksList = undefined;
 
-	this.fileLoadState = 0;
+	this.fileLoadState = undefined;
 	this.dataArraybuffer = undefined;
 
 	this.exterior_ocCullOctree = undefined;
