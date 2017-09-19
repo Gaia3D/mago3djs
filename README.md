@@ -49,7 +49,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치합니다.
 - 설치가 끝난 뒤 C:\git\mago3DJS 디렉토리로 이동합니다.
 - mago3DJS에 필요한 node_modules를 Node Package Manager 사용하여 설치합니다.
-- gulp는 global하게 사용하기 위해 npm 옵션 -g를 붙여 설치합니다.
+- gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치합니다.
 
 <pre><code>C:\git\mago3DJS> npm install</code></pre>
 <pre><code>C:\git\mago3DJS> npm install -g gulp</code></pre>
@@ -116,7 +116,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - [node](https://nodejs.org/ko/download/) to install Window Install (.msi) 64-bit.
 - After the installation is complete, go to the C:\git\mago3DJS directory.
 - Use node Package Manager to install node_modules for mago3DJS.
-- gulp installs with npm option -g for global use.
+- gulp installs globally in Terminal to use the module's mockups.
 
 <pre><code>C:\git\mago3DJS> npm install</code></pre>
 <pre><code>C:\git\mago3DJS> npm install -g gulp</code></pre>
@@ -183,7 +183,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
 - インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
 -  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
--  gulpはglobalに使用するためのnpmのオプション-gを付けてインストールします。
+-  gulpは端末内のモジュールのあざ命令を使用するためにGlobalにインストールします。
 
 <pre><code>C:\git\mago3DJS> npm install</code></pre>
 <pre><code>C:\git\mago3DJS> npm install -g gulp</code></pre>
