@@ -31,35 +31,35 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 
 # Getting Started #
 
-### 1. 개발환경 참고 문서 ###
+### 1. 개발환경 ###
  - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
  - [eclipse neon(필수)](https://www.eclipse.org/downloads/eclipse-packages/)
  &emsp;&emsp;&emsp;&emsp;&emsp;&nbsp; ● [Jsdoc](https://github.com/Gaia3D/mago3djs/wiki/Documentation)
  - [node](https://nodejs.org/ko/download/) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Gulp](https://github.com/Gaia3D/mago3djs/wiki/Build)
  - [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
  - [웹서버 설정](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
- - [Cesium-Custermizing](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Custermizing)
+ - [Cesium Update](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Update)
 
 ### 2. 소스 설치 ###
-- git을 사용하여 git clone (https://github.com/Gaia3D/mago3djs.git) 으로 소스를 C:\git\repository\mago3djs 에 설치합니다. <br>
-- eclipse를 실행 후 <code>Project Import File -> import -> General -> Projects from Folder or Archive</code>로 mago3djs를 import합니다.
+- git을 사용하여 git clone (https://github.com/Gaia3D/mago3djs.git) 으로 소스를 C:\mago3djs에 설치합니다. <br>
+- eclipse를 실행 후 <code>Project Import File -> import -> General -> Projects from Folder or Archive</code>로 mago3DJS를 import합니다.
 >git을 사용하지 않을 경우 Download ZIP 링크를 클릭하여 설치합니다.
 
 ### 3. Node 설치 ###
 - [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치합니다.
-- 설치가 끝난 뒤 C:\git\repository\mago3djs 디렉토리로 이동합니다.
+- 설치가 끝난 뒤 C:\mago3djs 디렉토리로 이동합니다.
 - mago3DJS에 필요한 node_modules를 Node Package Manager 사용하여 설치합니다.
 - gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치합니다.
 
-<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
-<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
+<pre><code>C:\mago3djs> npm install</code></pre>
+<pre><code>C:\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. 데이터 폴더 링크 ###
-<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+<pre><code>mklink /d "C:\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. 서버 실행 ###
-<pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
+<pre><code>C:\mago3djs>node server.js </code></pre>
+<pre><code>C:\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
 
 
 ## LICENSE ##
@@ -104,29 +104,29 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
  - [node](https://nodejs.org/ko/download/) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Gulp](https://github.com/Gaia3D/mago3djs/wiki/Build)
  - [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
  - [server settings](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
- - [Cesium-Custermizing](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Custermizing)
+ - [Cesium Update](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Update)
 
 ### 2. Source Download
-- Use git to install the source to C:\git\repository\mago3djs with git clone https://github.com/Gaia3D/mago3djs.git. <br>
-- Run eclipse and import mago3djs into <code> Project Import File -> import -> General -> Projects from Folder or Archive </code>.
+- Use git to install the source to C:\mago3djs with git clone https://github.com/Gaia3D/mago3djs.git. <br>
+- Run eclipse and import mago3DJS into <code> Project Import File -> import -> General -> Projects from Folder or Archive </code>.
 > If you are not using git, click the Download ZIP link to install it.
 
 
 ### 3. Node install ###
 - [node](https://nodejs.org/ko/download/) to install Window Install (.msi) 64-bit.
-- After the installation is complete, go to the C:\git\repository\mago3djs directory.
+- After the installation is complete, go to the C:\mago3djs directory.
 - Use node Package Manager to install node_modules for mago3DJS.
 - gulp installs globally in Terminal to use the module's mockups.
 
-<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
-<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
+<pre><code>C:\mago3djs> npm install</code></pre>
+<pre><code>C:\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. Data folder link
   <pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. Running the server
-<pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
+<pre><code>C:\mago3djs>node server.js </code></pre>
+<pre><code>C:\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
@@ -170,30 +170,30 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - [node](https://nodejs.org/ko/download/) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Gulp](https://github.com/Gaia3D/mago3djs/wiki/Build)
 - [apache 2.4.25 Win64](https://www.apachelounge.com/download/)&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp; ● [eslint](https://github.com/Gaia3D/mago3djs/wiki/%EC%A0%95%EC%A0%81%EA%B2%80%EC%82%AC)
 - [server settings](https://github.com/Gaia3D/mago3djs/wiki/%EC%9B%B9%EC%84%9C%EB%B2%84-%EC%84%A4%EC%A0%95) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; ● [JQuery](https://github.com/Gaia3D/mago3djs/wiki/Third-Party)
-- [Cesium-Custermizing](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Custermizing)
+- [Cesium Update](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Update)
 
 
 ### 2. Source Download
-- gitを使用してgit clone https://github.com/Gaia3D/mago3djs.git にソースをC:\git\repository\mago3djs にインストールします。 <br>
-- eclipseを実行した後、<code> Project Import File  - > import  - > General  - > Projects from Folder or Archive </ code>で mago3djs をimportします。
+- gitを使用してgit clone https://github.com/Gaia3D/mago3djs.git にソースをC:\mago3djsにインストールします。 <br>
+- eclipseを実行した後、<code> Project Import File  - > import  - > General  - > Projects from Folder or Archive </ code>でmago3DJSをimportします。
 > gitを使用しない場合Download ZIPリンクをクリックしてインストールします。
 
 
 ### 3. Node Install ###
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
-- インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
+- インストールが終わった後、C:\mago3djsディレクトリに移動します。
 -  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
 -  gulpは端末内のモジュールのあざ命令を使用するためにGlobalにインストールします。
 
-<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
-<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
+<pre><code>C:\mago3djs> npm install</code></pre>
+<pre><code>C:\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. Data Folder Link ###
-<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+<pre><code>mklink /d "C:\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. Running the server ###
-<pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //サーバーをpublicに実行する場合</code></pre>
+<pre><code>C:\mago3djs>node server.js </code></pre>
+<pre><code>C:\mago3djs>node server.js --public true //サーバーをpublicに実行する場合</code></pre>
 
 
 ## LICENSE ##
