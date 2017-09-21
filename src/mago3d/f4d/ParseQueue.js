@@ -25,11 +25,11 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 	var lowestOctree;
 	var headerVersion;
 	
-	if (this.matrix4SC == undefined)
+	if (this.matrix4SC === undefined)
 	{ this.matrix4SC = new Matrix4(); }
 	
 	var octreesParsedCount = 0;
-	if (maxParsesCount == undefined)
+	if (maxParsesCount === undefined)
 	{ maxParsesCount = 20; }
 	
 	if (this.octreesLod0ReferencesToParseMap.size > 0)
@@ -47,7 +47,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -55,7 +55,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
@@ -74,7 +74,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				// test else.
 				if (lowestOctree.neoReferencesMotherAndIndices)
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState == CODE.fileLoadState.LOADING_FINISHED)
+					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 					{ var hola = 0; }
 				}
 			}
@@ -83,7 +83,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 		}
 		
 		// if no parsed any octree, then parse some octrees of the queue.
-		if (octreesParsedCount == 0)
+		if (octreesParsedCount === 0)
 		{
 			var octreesArray = Array.from(this.octreesLod0ReferencesToParseMap.keys());
 			for (var i=0; i<octreesArray.length; i++)
@@ -96,7 +96,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
 				{ continue; }
 			
-				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState != CODE.fileLoadState.LOADING_FINISHED)
+				if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
@@ -105,7 +105,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-				if (headerVersion[0] == "v")
+				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
 					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
