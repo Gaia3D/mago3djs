@@ -124,6 +124,10 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 			}
 		}
 	}
+	
+	if (octreesParsedCount > 0)
+	{ return true; }
+	else { return false; }
 };
 
 ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
