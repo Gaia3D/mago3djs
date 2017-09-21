@@ -363,8 +363,7 @@ Octree.prototype.getCenterPos = function()
  */
 Octree.prototype.getRadiusAprox = function() 
 {
-	//return Math.abs(this.half_dx*1.2);
-	return Math.abs(this.half_dx*3.0);
+	return Math.abs(this.half_dx*1.5);
 };
 
 /**
@@ -924,9 +923,59 @@ Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z)
  * @param octree 변수
  * @returns result_idx
  */
-Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree) 
+Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree, startIdx, endIdx) 
 {
-	// lineal implementation. In the future use dicotomic search technique.***
+	// this do a dicotomic search of idx in a ordered table.
+	// 1rst, check the range.
+	
+	var range = endIdx - startIdx;
+	if (range < 6)
+	{
+		// in this case do a lineal search.
+		var finished = false;
+		var i = startIdx;
+		var idx;
+		var octreesCount = octreesArray.length;
+		while (!finished && i<=endIdx)
+		{
+			if (octree.squareDistToEye < octreesArray[i].squareDistToEye)
+			{
+				idx = i;
+				finished = true;
+			}
+			i++;
+		}
+		
+		if (finished)
+		{
+			return idx;
+		}
+		else 
+		{
+			return endIdx+1;
+		}
+	}
+	else 
+	{
+		// in this case do the dicotomic search.
+		var middleIdx = startIdx + Math.floor(range/2);
+		var newStartIdx;
+		var newEndIdx;
+		if (octreesArray[middleIdx].squareDistToEye > octree.squareDistToEye)
+		{
+			newStartIdx = startIdx;
+			newEndIdx = middleIdx;
+		}
+		else 
+		{
+			newStartIdx = middleIdx;
+			newEndIdx = endIdx;
+		}
+		return this.getIndexToInsertBySquaredDistToEye(octreesArray, octree, newStartIdx, newEndIdx);
+	}
+	
+	/*
+	// lineal implementation.***
 	var finished = false;
 	var octrees_count = octreesArray.length;
 	var i=0;
@@ -947,6 +996,7 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 	}
 
 	return result_idx;
+	*/
 };
 
 /**
@@ -960,11 +1010,18 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree, eye_x, eye_y, eye_z) 
 {
 	// sorting is from minDist to maxDist.***
-	// http://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index
+	if (result_octreesArray.length > 0)
+	{
+		var startIdx = 0;
+		var endIdx = result_octreesArray.length - 1;
+		var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree, startIdx, endIdx);
 
-	var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree);
-
-	result_octreesArray.splice(insert_idx, 0, octree);
+		result_octreesArray.splice(insert_idx, 0, octree);
+	}
+	else 
+	{
+		result_octreesArray.push(octree);
+	}
 };
 
 /**

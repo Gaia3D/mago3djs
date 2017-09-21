@@ -180,7 +180,15 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		{
 			magoManager.mouse_x = event.layerX,
 			magoManager.mouse_y = event.layerY;
-			if (magoManager.mouseLeftDown) { magoManager.manageMouseDragging(event.layerX, event.layerY); }
+			if (magoManager.mouseLeftDown) 
+			{ 
+				magoManager.manageMouseDragging(event.layerX, event.layerY); 
+				magoManager.cameraMoved();
+			}
+			else if (magoManager.mouseMiddleDown || magoManager.mouseRightDown) 
+			{ 
+				magoManager.cameraMoved();
+			}
 			
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
@@ -284,6 +292,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				if (movement.startPosition.x !== movement.endPosition.x || movement.startPosition.y !== movement.endPosition.y) 
 				{
 					magoManager.manageMouseDragging(movement.startPosition.x, movement.startPosition.y);
+					magoManager.cameraMoved();
 				}
 			}
 			else
@@ -293,7 +302,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				if (magoManager.mouseMiddleDown || magoManager.mouseRightDown)
 				{
 					magoManager.isCameraMoving = true;
-					magoManager.sceneState.camera.setDirty(true);
+					magoManager.cameraMoved();
+					
 				}
 			}
 			
