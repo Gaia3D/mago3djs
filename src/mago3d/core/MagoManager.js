@@ -770,7 +770,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	// for all renderables, prepare data.***
 	var neoBuilding;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
-	if (this.headersRequestedCounter == undefined)
+	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
 	var currentVisibleBlocks = [].concat(this.visibleObjControlerBuildings.currentVisibles0, this.visibleObjControlerBuildings.currentVisibles2);
@@ -5189,7 +5189,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				// If necessary do frustum culling.*************************************************************************
 				if (doFrustumCullingToBuildings)
 				{
-					if (this.boundingSphere_Aux == undefined)
+					if (this.boundingSphere_Aux === undefined)
 					{ this.boundingSphere_Aux = new Sphere(); }
 					
 					this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
@@ -6625,7 +6625,7 @@ MagoManager.prototype.callAPI = function(api)
 				var up = new Cesium.Cartesian3();
 	
 				var cameraCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(camera.position);
-				cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 2.0;
+				cameraCartographic.height = this.scene.globe.getHeight(cameraCartographic) + 1.5;
 	
 				this.scene.globe.ellipsoid.cartographicToCartesian(cameraCartographic, position);
 				var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
@@ -6673,42 +6673,40 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	this.buildingSelected = this.arrayAuxSC[0];
 
 	var collisionPosition = new Point3D();
-	var height = new Point3D();
+	var bottomPosition = new Point3D();
 
 	this.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition);
 	this.renderingFase = !this.renderingFase;
-	this.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight - posY * 0.5, height);
-
-	//this.calculateSelObjMovePlaneAsimetricMode(gl, posX, posY, plane);
-	//collisionPos.set(this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);
-	//plane.setPointAndNormal(this.pointSC2.x, this.pointSC2.y, this.pointSC2.z, 0.0, 0.0, 1.0);
-	//line.setPointAndDir(position.x, position.y, position.z, direction.x, direction.y, direction.z);
-
-	//var pickPosition = this.scene.camera.pickEllipsoid(position, this.scene.globe.ellipsoid);
+	this.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, bottomPosition);
 
 	this.buildingSelected = current_building;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);
 	this.renderingFase = !this.renderingFase;
-	if (distance < 3.5)
-	{ return true; }
-	else
+
+	if (distance > 3.5)
 	{
-		var heightCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(height);
-		var positionCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(position);
-		var tmpAlt = Math.min(positionCartographic.height, heightCartographic.height + 2.0);
-		var tmpLat = Cesium.Math.toDegrees(positionCartographic.latitude);
-		var tmpLon = Cesium.Math.toDegrees(positionCartographic.longitude);
-		if (positionCartographic.height - heightCartographic.height - 1.0 < 0)
-		{
-			tmpAlt = heightCartographic.height + 2.0;
-		}
-		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(collisionPosition));
-		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(position));
-		console.log(this.scene.globe.ellipsoid.cartesianToCartographic(height));
-		console.log(distance);
-		
-		this.cameraFPV.camera.position = Cesium.Cartesian3.fromDegrees(tmpLon, tmpLat, tmpAlt);
+		var bottomPositionCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(bottomPosition);
+		var currentPositionCartographic = this.scene.globe.ellipsoid.cartesianToCartographic(position);
+		var currentHeight = currentPositionCartographic.height;
+		var bottomHeight = bottomPositionCartographic.height + 1.5;
 	
+		if ( bottomHeight < currentHeight )
+		{
+			currentHeight -= 0.2;
+		}
+	
+		if ( bottomHeight > currentHeight || 
+			(bottomHeight < currentHeight && currentHeight - bottomHeight > 1.5))
+		{
+			currentHeight = bottomHeight;
+		}
+		var tmpLat = Cesium.Math.toDegrees(currentPositionCartographic.latitude);
+		var tmpLon = Cesium.Math.toDegrees(currentPositionCartographic.longitude);
+		
+		this.cameraFPV.camera.position = Cesium.Cartesian3.fromDegrees(tmpLon, tmpLat, currentHeight);
+
 		return false; 
 	}
+
+	return true;
 };

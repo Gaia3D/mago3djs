@@ -50,7 +50,7 @@ SmartTile.prototype.newSubTile = function(parentTile)
  */
 SmartTile.prototype.clearBuildingsArray = function() 
 {
-	if (this.buildingsArray == undefined)
+	if (this.buildingsArray === undefined)
 	{ return; }
 	
 	for (var i=0; i<this.buildingsArray.length; i++)
