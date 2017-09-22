@@ -777,9 +777,12 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	for (var i=0, length = currentVisibleBlocks.length; i<length; i++) 
 	{
 		neoBuilding = currentVisibleBlocks[i];
+		
+		if (neoBuilding.buildingId == "testId_P360T")
+		{ var hola = 0; }
 
 		// check if this building is ready to render.***
-		if (!neoBuilding.allFilesLoaded) 
+		//if (!neoBuilding.allFilesLoaded) // no used yet.
 		{
 			// 1) MetaData
 			var metaData = neoBuilding.metaData;
@@ -1092,6 +1095,9 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
+			if (neoBuilding.buildingId == "testId_P360T")
+			{ var hola = 0; }
+
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0))
 			{
 				// any octree is visible.
@@ -2348,6 +2354,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	{
 		neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController();
 	}	
+	
+	if (neoBuilding.buildingId == "testId_P360T")
+	{ var hola = 0; }
 
 	if (this.myFrustumSC === undefined) 
 	{ this.myFrustumSC = new Frustum(); }
@@ -2467,7 +2476,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 		if (!find) 
 		{
-			this.processQueue.putBuildingToDelete(neoBuilding, 0);
+			// if the building is far to camera, then delete it.
+			if (neoBuilding.squaredDistToCam > 100)
+			{ this.processQueue.putBuildingToDelete(neoBuilding, 0); }
 			return false;
 		}
 		else 
@@ -5122,6 +5133,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				if (neoBuilding.buildingId == "testId_U620T")
 				{ var hola = 0; }
+			
+				if (neoBuilding.buildingId == "testId_P360T")
+				{ var hola = 0; }
 				
 				geoLoc = neoBuilding.geoLocDataManager.getGeoLocationData(0);
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
@@ -6305,14 +6319,14 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			}
 			else
 			{
-				if (firstName === "testId")
+				if (buildingSeed.firstName === "testId")
 				{
 					longitude = 128.5894;
 					latitude = 34.90167;
 					altitude = -400.0;
-					//heading = 0;
-					//pitch = 0;
-					//roll = 0;
+					heading = 0;
+					pitch = 0;
+					roll = 0;
 				}
 				else 
 				{
