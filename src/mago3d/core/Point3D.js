@@ -79,6 +79,20 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
 /**
  * 어떤 일을 하고 있습니까?
  * @param px 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.squareDistToPoint = function(point) 
+{
+	var dx = this.x - point.x;
+	var dy = this.y - point.y;
+	var dz = this.z - point.z;
+
+	return dx*dx + dy*dy + dz*dz;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
  * @param py 변수
  * @param pz 변수
  * @returns dx*dx + dy*dy + dz*dz
@@ -102,6 +116,96 @@ Point3D.prototype.squareDistTo = function(x, y, z)
 Point3D.prototype.distTo = function(x, y, z) 
 {
 	return Math.sqrt(this.squareDistTo(x, y, z));
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.distToPoint = function(point) 
+{
+	return Math.sqrt(this.squareDistToPoint(point));
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.distToSphere = function(sphere) 
+{
+	return Math.sqrt(this.squareDistToPoint(sphere.centerPoint)) - sphere.r;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.aproxDistTo = function(pointB, sqrtTable) 
+{
+	var difX = Math.abs(this.x - pointB.x);
+	var difY = Math.abs(this.y - pointB.y);
+	var difZ = Math.abs(this.z - pointB.z);
+	
+	// find the big value.
+	var maxValue, value1, value2;
+	var value1Idx, value2Idx;
+	var aproxDist;
+	
+	if (difX > difY)
+	{
+		if (difX > difZ)
+		{
+			maxValue = difX;
+			value1 = difY/maxValue;
+			value1Idx = Math.floor(value1*10);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			value2Idx = Math.floor(value2*10);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*10);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			value2Idx = Math.floor(value2*10);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+	}
+	else 
+	{
+		if (difY > difZ)
+		{
+			maxValue = difY;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*10);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			value2Idx = Math.floor(value2*10);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*10);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			value2Idx = Math.floor(value2*10);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+	}
 };
 
 /**

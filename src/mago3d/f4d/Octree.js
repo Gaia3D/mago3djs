@@ -22,7 +22,8 @@ var Octree = function(octreeOwner)
 	this.octree_owner;
 	this.octree_level = 0;
 	this.octree_number_name = 0;
-	this.squareDistToEye = 10000.0;
+	this.squareDistToEye = 10000.0; // old.
+	this.distToEye;
 	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
 	this.fileLoadState = CODE.fileLoadState.READY;
 
@@ -414,45 +415,6 @@ Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray)
 			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
 		}
 	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param cesium_cullingVolume 변수
- * @param result_CRefListsArray 변수
- * @param cesium_boundingSphere_scratch 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
- */
-Octree.prototype.getFrustumVisibleCRefListArray = function(cesium_cullingVolume, result_CRefListsArray, cesium_boundingSphere_scratch, eye_x, eye_y, eye_z) 
-{
-	var visibleOctreesArray = [];
-	var sortedOctreesArray = [];
-	var distAux = 0.0;
-
-	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	this.getFrustumVisibleOctrees(cesium_cullingVolume, visibleOctreesArray, cesium_boundingSphere_scratch);
-
-	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = visibleOctreesArray.length;
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
-	}
-
-	for (var i=0; i<visibleOctrees_count; i++) 
-	{
-		sortedOctreesArray[i].getCRefListArray(result_CRefListsArray);
-		//visibleOctreesArray[i].getCRefListArray(result_CRefListsArray);
-	}
-
-	visibleOctreesArray.length = 0;
-	excludedOctArray.length = 0;
-
-	visibleOctreesArray = undefined;
-	excludedOctArray = undefined;
 };
 
 /**
@@ -914,7 +876,7 @@ Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z)
 {
 	this.squareDistToEye = (this.centerPos.x - eye_x)*(this.centerPos.x - eye_x) +
 							(this.centerPos.y - eye_y)*(this.centerPos.y - eye_y) +
-							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z) ;
+							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z);
 };
 
 /**
