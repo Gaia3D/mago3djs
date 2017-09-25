@@ -39,7 +39,7 @@ var NeoBuilding = function()
 	this.octree; // f4d_octree. ***
 
 	// auxiliar vars.
-	this.squaredDistToCam;
+	this.distToCam;
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture;

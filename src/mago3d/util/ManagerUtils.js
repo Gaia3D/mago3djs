@@ -1,26 +1,17 @@
 'use strict';
 
-function ManagerUtils() {};
-
-
-/*
-ManagerUtils.worldPointToGeographicCoords = function(absolutePoint, resultGeographicCoords, magoManager) {
-	if(resultGeographicCoords === undefined)
-		resultGeographicCoords = new GeographicCoord();
+var ManagerUtils = function() 
+{
+	// sqrtTable.
+	this.sqrtTable = [];
+	// make 100 values.
+	var increValue = 0.01;
+	for (var i=0; i<101; i++)
+	{
+		this.sqrtTable[i] = Math.sqrt(1+(increValue*i)*(increValue*i));
+	}
 	
-	if(magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-
-	}
-	else if(magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(absolutePoint.x, absolutePoint.y, absolutePoint.z));
-		resultGeographicCoords.longitude = cartographic.longitude * (180.0/Math.PI);
-		resultGeographicCoords.latitude = cartographic.latitude * (180.0/Math.PI);
-		resultGeographicCoords.altitude = cartographic.height;
-	}
 };
-*/
 
 ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) 
 {
@@ -583,6 +574,99 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[0] = posSplitX.low;
 	resultSplitPoint3fvLow[1] = posSplitY.low;
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
+};
+
+ManagerUtils.calculateAproxDist2D = function(pointA, pointB, sqrtTable)
+{
+	// test function.
+	var difX = Math.abs(pointA.x - pointB.x);
+	var difY = Math.abs(pointA.y - pointB.y);
+	
+	// find the big value.
+	var maxValue, value1;
+	
+	if (difX > difY)
+	{
+		maxValue = difX;
+		value1 = difY/maxValue;
+	}
+	else 
+	{
+		maxValue = difY;
+		value1 = difX/maxValue;
+	}
+	
+	var value1Idx = Math.floor(value1*100);
+	var aproxDist = maxValue * sqrtTable[value1Idx];
+	return aproxDist;
+};
+
+var sqrtTable = new Float32Array(11);
+// make 10 values.
+var increValue = 0.1;
+for (var i=0; i<11; i++)
+{
+	sqrtTable[i] = Math.sqrt(1+(increValue*i)*(increValue*i));
+}
+	
+ManagerUtils.calculateAproxDist3D = function(pointA, pointB)
+{
+	var difX = Math.abs(pointA.x - pointB.x);
+	var difY = Math.abs(pointA.y - pointB.y);
+	var difZ = Math.abs(pointA.z - pointB.z);
+	
+	// find the big value.
+	var maxValue, value1, value2;
+	var value1Idx, value2Idx;
+	var aproxDist;
+	
+	if (difX > difY)
+	{
+		if (difX > difZ)
+		{
+			maxValue = difX;
+			value1 = difY/maxValue;
+			value1Idx = Math.floor(value1*100);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			value2Idx = Math.floor(value2*100);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*100);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			value2Idx = Math.floor(value2*100);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+	}
+	else 
+	{
+		if (difY > difZ)
+		{
+			maxValue = difY;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*100);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			value2Idx = Math.floor(value2*100);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			value1Idx = Math.floor(value1*100);
+			var middleDist = maxValue * sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			value2Idx = Math.floor(value2*100);
+			return (middleDist * sqrtTable[value2Idx]);
+		}
+	}
+	
 };
 /*
 ManagerUtils.getBuildingCurrentPosition = function(renderingMode, neoBuilding) 

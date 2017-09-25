@@ -22,8 +22,10 @@ var Policy = function()
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
 	this.showShadow = false;
-	// far frustum 거리
+	// squared far frustum 거리
 	this.frustumFarSquaredDistance = 5000000;
+	// far frustum
+	this.frustumFarDistance = 2300;
 
 	// highlighting
 	this.highLightedBuildings = [];
@@ -116,6 +118,15 @@ Policy.prototype.getFrustumFarSquaredDistance = function()
 Policy.prototype.setFrustumFarSquaredDistance = function(frustumFarSquaredDistance) 
 {
 	this.frustumFarSquaredDistance = frustumFarSquaredDistance;
+};
+
+Policy.prototype.getFrustumFarDistance = function() 
+{
+	return this.frustumFarDistance;
+};
+Policy.prototype.setFrustumFarDistance = function(frustumFarDistance) 
+{
+	this.frustumFarDistance = frustumFarDistance;
 };
 
 Policy.prototype.getHighLightedBuildings = function() 

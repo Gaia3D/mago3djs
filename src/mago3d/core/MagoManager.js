@@ -145,6 +145,18 @@ var MagoManager = function()
 	this.isLastFrustum = false;
 	this.highLightColor4 = new Float32Array([0.2, 1.0, 0.2, 1.0]);
 	this.thereAreUrgentOctrees = false;
+	
+	// sqrtTable.
+	
+	this.sqrtTable = new Float32Array(11);
+	// make 100 values.
+	var increValue = 0.1;
+	for (var i=0; i<11; i++)
+	{
+		this.sqrtTable[i] = Math.sqrt(1+(increValue*i)*(increValue*i));
+	}
+	
+	this.managerUtil = new ManagerUtils();
 
 	// CURRENTS.********************************************************************
 	this.currentSelectedObj_idx = -1;
@@ -152,6 +164,7 @@ var MagoManager = function()
 	this.currentShader;
 
 	// SPEED TEST.******************************************************************
+	/*
 	this.renderingTime = 0;
 	this.xdo_rendering_time = 0;
 	this.xdo_rendering_time_arrays = 0;
@@ -169,6 +182,7 @@ var MagoManager = function()
 	this.averageRenderingCounter = 0;
 
 	this.testFilesLoaded = false;
+	*/
 
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
@@ -2477,7 +2491,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		if (!find) 
 		{
 			// if the building is far to camera, then delete it.
-			if (neoBuilding.squaredDistToCam > 100)
+			if (neoBuilding.distToCam > 15)
 			{ this.processQueue.putBuildingToDelete(neoBuilding, 0); }
 			return false;
 		}
@@ -4904,7 +4918,7 @@ MagoManager.prototype.getBuildingIdxSortedByDist = function(buildingArray, start
 		var buildingsCount = buildingArray.length;
 		while (!finished && i<=endIdx)
 		{
-			if (neoBuilding.squaredDistToCam < buildingArray[i].squaredDistToCam)
+			if (neoBuilding.distToCam < buildingArray[i].distToCam)
 			{
 				idx = i;
 				finished = true;
@@ -4927,7 +4941,7 @@ MagoManager.prototype.getBuildingIdxSortedByDist = function(buildingArray, start
 		var middleIdx = startIdx + Math.floor(range/2);
 		var newStartIdx;
 		var newEndIdx;
-		if (buildingArray[middleIdx].squaredDistToCam > neoBuilding.squaredDistToCam)
+		if (buildingArray[middleIdx].distToCam > neoBuilding.distToCam)
 		{
 			newStartIdx = startIdx;
 			newEndIdx = middleIdx;
@@ -4964,7 +4978,7 @@ MagoManager.prototype.putBuildingToArraySortedByDist = function(buildingArray, n
 	}
 	
 	/*
-	// provisionally do this.
+	// lineal implementation.
 	var finished = false;
 	var i=0;
 	var idx;
@@ -5074,35 +5088,169 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
+MagoManager.prototype.testAproxDist3D = function()
+{
+	// test: AproxDistance:
+	var distCalculationTimeAmount = 0;
+	var aproxDistCalculationTimeAmount = 0;
+	var squaredDistCalculationTimeAmount = 0;
+	
+	var pointA = new Point3D();
+	var pointB = new Point3D();
+	
+	var difX, difY, difZ;
+	
+	pointA.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+	pointB.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+	
+	var aproxDist, realDist, squaredDist, startTime, endTime;
+	startTime = new Date().getTime();
+	for (var k=0; k<1000000; k++)
+	{
+		//squaredDist = pointA.squareDistToPoint(pointB);
+		difX = pointA.x - pointB.x;
+		difY = pointA.y - pointB.y;
+		difZ = pointA.z - pointB.z;
+		realDist = difX*difX + difY*difY + difZ*difZ;
+	}
+	endTime = new Date().getTime();
+	squaredDistCalculationTimeAmount += (endTime - startTime)/1000;
+	
+	
+	startTime = new Date().getTime();
+	for (var k=0; k<1000000; k++)
+	{
+		//aproxDist = this.calculateAproxDist3D(pointA, pointB);
+		aproxDist = pointA.aproxDistTo(pointB, this.sqrtTable);
+		//aproxDist = this.managerUtil.calculateAproxDist3D(pointA, pointB);
+		//aproxDist = ManagerUtils.calculateAproxDist3D(pointA, pointB);
+	}
+	endTime = new Date().getTime();
+	aproxDistCalculationTimeAmount += (endTime - startTime)/1000;
+	
+	
+	startTime = new Date().getTime();
+	for (var k=0; k<1000000; k++)
+	{
+		realDist = pointA.distToPoint(pointB);
+		//difX = pointA.x - pointB.x;
+		//difY = pointA.y - pointB.y;
+		//difZ = pointA.z - pointB.z;
+		//realDist = Math.sqrt(difX*difX + difY*difY + difZ*difZ );
+	}
+	endTime = new Date().getTime();
+	distCalculationTimeAmount += (endTime - startTime)/1000;
+	
+	// test. check the calculation time difference.
+	distCalculationTimeAmount;
+	aproxDistCalculationTimeAmount;
+	squaredDistCalculationTimeAmount;
+	
+	var ratio = aproxDistCalculationTimeAmount/distCalculationTimeAmount *100;
+	var error = (aproxDist - realDist)/realDist * 100;
+	
+	var hola = 0;
+};
+
+/**
+ * dataKey 이용해서 data 검색
+ * @param dataKey
+ */
+MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
+{
+	// test function.
+	var difX = Math.abs(pointA.x - pointB.x);
+	var difY = Math.abs(pointA.y - pointB.y);
+	var difZ = Math.abs(pointA.z - pointB.z);
+
+	
+	// find the big value.
+	var maxValue, value1, value2;
+	var value1Idx, value2Idx;
+	var aproxDist;
+	var tableValuesCount = 10;
+
+	if (difX > difY)
+	{
+		if (difX > difZ)
+		{
+			maxValue = difX;
+			value1 = difY/maxValue;
+			//value1Idx = Math.floor(value1*100);
+			value1Idx = ~~(value1*tableValuesCount);
+			var middleDist = maxValue * this.sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			//value2Idx = Math.floor(value2*100);
+			value2Idx = ~~(value2*tableValuesCount);
+			return (middleDist * this.sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			//value1Idx = Math.floor(value1*100);
+			value1Idx = ~~(value1*tableValuesCount);
+			var middleDist = maxValue * this.sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			//value2Idx = Math.floor(value2*100);
+			value2Idx = ~~(value2*tableValuesCount);
+			return (middleDist * this.sqrtTable[value2Idx]);
+		}
+	}
+	else 
+	{
+		if (difY > difZ)
+		{
+			maxValue = difY;
+			value1 = difX/maxValue;
+			//value1Idx = Math.floor(value1*100);
+			value1Idx = ~~(value1*tableValuesCount);
+			var middleDist = maxValue * this.sqrtTable[value1Idx];
+			value2 = difZ/middleDist;
+			//value2Idx = Math.floor(value2*100);
+			value2Idx = ~~(value2*tableValuesCount);
+			return (middleDist * this.sqrtTable[value2Idx]);
+		}
+		else 
+		{
+			maxValue = difZ;
+			value1 = difX/maxValue;
+			//value1Idx = Math.floor(value1*100);
+			value1Idx = ~~(value1*tableValuesCount);
+			var middleDist = maxValue * this.sqrtTable[value1Idx];
+			value2 = difY/middleDist;
+			//value2Idx = Math.floor(value2*100);
+			value2Idx = ~~(value2*tableValuesCount);
+			return (middleDist * this.sqrtTable[value2Idx]);
+		}
+	}
+	
+};
+
+/**
+ * dataKey 이용해서 data 검색
+ * @param dataKey
+ */
 MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTilesArray, cameraPosition, frustumVolume, doFrustumCullingToBuildings) 
 {
+	//this.testAproxDist3D();
+	
 	var tilesCount = intersectedLowestTilesArray.length;
 	
 	if (tilesCount === 0)
 	{ return; }
 	
-	var squaredDistToCamera;
-	var lod0_minSquaredDist = 100000;
-	var lod1_minSquaredDist = 1;
-	var lod2_minSquaredDist = 100000*10000;
+	var distToCamera;
 	
-	/*
-	lod0_minSquaredDist = this.magoPolicy.getLod1DistInMeters();
-	lod0_minSquaredDist *= lod0_minSquaredDist;
-	
-	lod2_minSquaredDist = this.magoPolicy.getLod2DistInMeters();
-	lod2_minSquaredDist *= lod2_minSquaredDist;
-	*/
-	
-	var lod3_minSquaredDist = lod2_minSquaredDist * 10;
-	
-	lod0_minSquaredDist = 100000;
+	var lod0_minDist = this.magoPolicy.getLod1DistInMeters();
+	var lod1_minDist = 1;
+	var lod2_minDist = this.magoPolicy.getLod2DistInMeters();
+	var lod3_minDist = lod2_minDist * 10;
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
 	
 	var lowestTile;
-	var tileCenterPos;
 	var buildingSeedsCount;
 	var buildingSeed;
 	var neoBuilding;
@@ -5111,16 +5259,15 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var realBuildingPos;
 	var parentBuilding;
 	var longitude, latitude, altitude, heading, pitch, roll;
-	
+
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = intersectedLowestTilesArray[i];
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
-		
-		tileCenterPos = lowestTile.sphereExtent.centerPoint;
-		squaredDistToCamera = cameraPosition.squareDistTo(tileCenterPos.x, tileCenterPos.y, tileCenterPos.z);
-		if (squaredDistToCamera > lod3_minSquaredDist)
+	
+		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
+		if (distToCamera > lod3_minDist)
 		{ continue; }
 		
 		if (lowestTile.buildingsArray && lowestTile.buildingsArray.length > 0)
@@ -5185,29 +5332,28 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				if (neoBuilding.buildingId === "ctships")
 				{
-					lod0_minSquaredDist = 1000;
-					lod1_minSquaredDist = 1;
-					lod2_minSquaredDist = 10000000*10000;
-					lod3_minSquaredDist = 100000*9;
+					lod0_minDist = 32;
+					lod1_minDist = 1;
+					lod2_minDist = 316000;
+					lod3_minDist = lod2_minDist*10;
 				}
 				
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
-				squaredDistToCamera = cameraPosition.squareDistTo(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-				squaredDistToCamera -= (this.radiusAprox_aux*this.radiusAprox_aux)*2;
-				neoBuilding.squaredDistToCam = squaredDistToCamera;
-				if (squaredDistToCamera > this.magoPolicy.getFrustumFarSquaredDistance())
-				{
-					continue;
-				}
+				if (this.boundingSphere_Aux === undefined)
+				{ this.boundingSphere_Aux = new Sphere(); }
+			
+				this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+				this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
+				
+				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
+				neoBuilding.distToCam = distToCamera;
+			
+				if (distToCamera > this.magoPolicy.getFrustumFarDistance())
+				{ continue; }
 				
 				// If necessary do frustum culling.*************************************************************************
 				if (doFrustumCullingToBuildings)
 				{
-					if (this.boundingSphere_Aux === undefined)
-					{ this.boundingSphere_Aux = new Sphere(); }
-					
-					this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-					this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
 					var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
 					// intersect with Frustum
 					if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
@@ -5219,34 +5365,34 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				if (this.isLastFrustum)
 				{
-					if (squaredDistToCamera < lod0_minSquaredDist) 
+					if (distToCamera < lod0_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
 					}
-					else if (squaredDistToCamera < lod1_minSquaredDist) 
+					else if (distToCamera < lod1_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles1, neoBuilding);
 					}
-					else if (squaredDistToCamera < lod2_minSquaredDist) 
+					else if (distToCamera < lod2_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles2, neoBuilding);
 					}
-					else if (squaredDistToCamera < lod3_minSquaredDist) 
+					else if (distToCamera < lod3_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles3, neoBuilding);
 					}
 				}
 				else
 				{
-					if (squaredDistToCamera < lod1_minSquaredDist) 
+					if (distToCamera < lod1_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles1, neoBuilding);
 					}
-					else if (squaredDistToCamera < lod2_minSquaredDist) 
+					else if (distToCamera < lod2_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles2, neoBuilding);
 					}
-					else if (squaredDistToCamera < lod3_minSquaredDist) 
+					else if (distToCamera < lod3_minDist) 
 					{
 						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles3, neoBuilding);
 					}
