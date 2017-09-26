@@ -22,8 +22,7 @@ var Octree = function(octreeOwner)
 	this.octree_owner;
 	this.octree_level = 0;
 	this.octree_number_name = 0;
-	this.squareDistToEye = 10000.0; // old.
-	this.distToEye;
+	this.distToCamera;
 	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
 	this.fileLoadState = CODE.fileLoadState.READY;
 
@@ -108,7 +107,7 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 	this.octree_owner = undefined;
 	this.octree_level = undefined;
 	this.octree_number_name = undefined;
-	this.squareDistToEye = undefined;
+	this.distToCamera = undefined;
 	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.***
 	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 
@@ -168,8 +167,6 @@ Octree.prototype.deleteLod0GlObjects = function(gl, vboMemManager)
  */
 Octree.prototype.setRenderedFalseToAllReferences = function() 
 {
-
-
 	if (this.neoReferencesMotherAndIndices)
 	{
 		this.neoReferencesMotherAndIndices.setRenderedFalseToAllReferences();
@@ -179,8 +176,6 @@ Octree.prototype.setRenderedFalseToAllReferences = function()
 			this.subOctrees_array[i].setRenderedFalseToAllReferences();
 		}
 	}
-
-
 };
 
 /**
@@ -364,7 +359,7 @@ Octree.prototype.getCenterPos = function()
  */
 Octree.prototype.getRadiusAprox = function() 
 {
-	return Math.abs(this.half_dx*1.5);
+	return this.half_dx*1.5;
 };
 
 /**
@@ -439,8 +434,8 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
 	var visibleOctrees_count = visibleOctreesArray.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
-		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i], eye_x, eye_y, eye_z);
+		visibleOctreesArray[i].setDistToCamera(cameraPosition);
+		this.putOctreeInEyeDistanceSortedArray(sortedOctreesArray, visibleOctreesArray[i]);
 	}
 
 	for (var i=0; i<visibleOctrees_count; i++) 
@@ -462,7 +457,7 @@ Octree.prototype.getFrustumVisibleNeoRefListArray = function(cesium_cullingVolum
  * @param eye_z 변수
  */
 Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	bbox_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+	bbox_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
 {
 	var visibleOctreesArray = [];
 	var distAux = 0.0;
@@ -475,37 +470,37 @@ Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleOb
 	var visibleOctrees_count = visibleOctreesArray.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		visibleOctreesArray[i].setDistToCamera(cameraPosition);
 	}
 
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		if (visibleOctreesArray[i].distToCamera < squaredDistLod0) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		else if (visibleOctreesArray[i].distToCamera < squaredDistLod1) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		else if (visibleOctreesArray[i].distToCamera < squaredDistLod2) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
@@ -515,7 +510,7 @@ Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleOb
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles3, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
 				find = true;
 			}
@@ -536,10 +531,9 @@ Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleOb
  * @param eye_z 변수
  */
 Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+	boundingSphere_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
 {
 	var visibleOctreesArray = [];
-	var distAux = 0.0;
 	var find = false;
 
 	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
@@ -549,37 +543,37 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 	var visibleOctrees_count = visibleOctreesArray.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		visibleOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		visibleOctreesArray[i].setDistToCamera(cameraPosition);
 	}
 
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		if (visibleOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		if (visibleOctreesArray[i].distToCamera < squaredDistLod0) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		else if (visibleOctreesArray[i].distToCamera < squaredDistLod1) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (visibleOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		else if (visibleOctreesArray[i].distToCamera < squaredDistLod2) 
 		{
 			if (visibleOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
 				find = true;
 			}
@@ -596,7 +590,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 		}
 	}
 
-	visibleOctreesArray = null;
+	visibleOctreesArray = undefined;
 	return find;
 };
 
@@ -610,11 +604,15 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
  * @param eye_z 변수
  */
 Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	boundingSphere_scratch, eye_x, eye_y, eye_z, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+	boundingSphere_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
 {
 	var lowestOctreesArray = [];
 	var distAux = 0.0;
 	var find = false;
+	
+	var eye_x = cameraPosition.x;
+	var eye_y = cameraPosition.y;
+	var eye_z = cameraPosition.z;
 
 	this.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
 	
@@ -622,37 +620,37 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 	var visibleOctrees_count = lowestOctreesArray.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		lowestOctreesArray[i].setSquareDistToEye(eye_x, eye_y, eye_z);
+		lowestOctreesArray[i].setDistToCamera(cameraPosition);
 	}
 
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		if (lowestOctreesArray[i].squareDistToEye < squaredDistLod0) 
+		if (lowestOctreesArray[i].distToCamera < squaredDistLod0) 
 		{
 			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles0.push(lowestOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod1) 
+		else if (lowestOctreesArray[i].distToCamera < squaredDistLod1) 
 		{
 			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles1.push(lowestOctreesArray[i]);
 				find = true;
 			}
 		}
-		else if (lowestOctreesArray[i].squareDistToEye < squaredDistLod2) 
+		else if (lowestOctreesArray[i].distToCamera < squaredDistLod2) 
 		{
 			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i], eye_x, eye_y, eye_z); }
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles2.push(lowestOctreesArray[i]);
 				find = true;
 			}
@@ -872,11 +870,10 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
  * @param eye_y 변수
  * @param eye_z 변수
  */
-Octree.prototype.setSquareDistToEye = function(eye_x, eye_y, eye_z) 
+Octree.prototype.setDistToCamera = function(cameraPosition) 
 {
-	this.squareDistToEye = (this.centerPos.x - eye_x)*(this.centerPos.x - eye_x) +
-							(this.centerPos.y - eye_y)*(this.centerPos.y - eye_y) +
-							(this.centerPos.z - eye_z)*(this.centerPos.z - eye_z);
+	// distance to camera as a sphere.
+	this.distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
 };
 
 /**
@@ -900,7 +897,7 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 		var octreesCount = octreesArray.length;
 		while (!finished && i<=endIdx)
 		{
-			if (octree.squareDistToEye < octreesArray[i].squareDistToEye)
+			if (octree.distToCamera < octreesArray[i].distToCamera)
 			{
 				idx = i;
 				finished = true;
@@ -923,7 +920,7 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 		var middleIdx = startIdx + Math.floor(range/2);
 		var newStartIdx;
 		var newEndIdx;
-		if (octreesArray[middleIdx].squareDistToEye > octree.squareDistToEye)
+		if (octreesArray[middleIdx].distToCamera > octree.distToCamera)
 		{
 			newStartIdx = startIdx;
 			newEndIdx = middleIdx;
@@ -965,11 +962,8 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  * @param octree 변수
- * @param eye_x 변수
- * @param eye_y 변수
- * @param eye_z 변수
  */
-Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree, eye_x, eye_y, eye_z) 
+Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree) 
 {
 	// sorting is from minDist to maxDist.***
 	if (result_octreesArray.length > 0)
