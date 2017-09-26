@@ -10,13 +10,12 @@ var GlobeTile = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	var globeTileOwner;
-	var depth;
-	var numberName;
-	var minGeographicCoord;
-	var maxGeographicCoord;
-	var subTilesArray;
-	
+	this.globeTileOwner;
+	this.depth;
+	this.numberName;
+	this.minGeographicCoord;
+	this.maxGeographicCoord;
+	this.subTilesArray;
 };
 
 /**

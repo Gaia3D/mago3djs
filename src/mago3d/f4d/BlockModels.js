@@ -516,7 +516,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			classifiedNorByteSize;
 			classifiedIdxByteSize;
 			
-			var hola = 0;
+			//var hola = 0;
 			
 			// test.
 			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
