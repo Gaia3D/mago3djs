@@ -2377,19 +2377,15 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
-		var squaredDistLod0 = this.magoPolicy.getLod0DistInMeters();
-		var squaredDistLod1 = this.magoPolicy.getLod1DistInMeters();
-		var squaredDistLod2 = this.magoPolicy.getLod2DistInMeters();
-		
-		squaredDistLod0 *= squaredDistLod0;
-		squaredDistLod1 *= squaredDistLod1;
-		squaredDistLod2 *= squaredDistLod2;
+		var distLod0 = this.magoPolicy.getLod0DistInMeters();
+		var distLod1 = this.magoPolicy.getLod1DistInMeters();
+		var distLod2 = this.magoPolicy.getLod2DistInMeters();
 		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
-			squaredDistLod0 = 120000;
-			squaredDistLod1 = 285000;
-			squaredDistLod2 = 500000*1000;
+			distLod0 = 350;
+			distLod1 = 550;
+			distLod2 = 25000;
 		}
 
 		var frustumVolume;
@@ -2431,8 +2427,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
 			neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
 			find = neoBuilding.octree.getBBoxIntersectedLowestOctreesByLOD(	this.myCullingVolumeBBoxSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.myBboxSC,
-				this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-				squaredDistLod0, squaredDistLod1, squaredDistLod2);
+				this.myCameraSC.position, distLod0, distLod1, distLod2);
 			// End provisional.----------------------------------------------------------------																		
 		}
 		else if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -2466,25 +2461,16 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			neoBuilding.currentVisibleOctreesControler.currentVisibles2 = [];
 			neoBuilding.currentVisibleOctreesControler.currentVisibles3 = [];
 			
-			if (neoBuilding.buildingId == "testId_U620T")
-			{ var hola = 0; }
-			
 			if (lod === 2)
 			{
 				neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-					this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-					squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					this.myCameraSC.position, distLod0, distLod1, distLod2);
 				find = true;
 			}
 			else 
 			{
-				//find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				//	this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z,
-				//	squaredDistLod0, squaredDistLod1, squaredDistLod2);
-					
 				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-					this.myCameraSC.position.x + this.myCameraSC.direction.x * 0.5, this.myCameraSC.position.y + this.myCameraSC.direction.y * 0.5, this.myCameraSC.position.z + this.myCameraSC.direction.z * 0.5,
-					squaredDistLod0, squaredDistLod1, squaredDistLod2);
+					this.myCameraSC.position, distLod0, distLod1, distLod2);
 			}
 		}
 
@@ -3186,7 +3172,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 		if (lowestOctree.triPolyhedronsCount === 0) 
 		{ continue; }
 	
-		if (lowestOctree.squareDistToEye < 100)
+		if (lowestOctree.distToCamera < 6)
 		{ isUrgent = true; }
 		else 
 		{ isUrgent = false; }
@@ -3195,7 +3181,10 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 		// if is urgent do another check. Do frustumCulling with lowFovFrustumVolume.
 		if(isUrgent)
 		{
+			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
+				{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
 			var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+			
 			if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY || blocksList.fileLoadState === CODE.fileLoadState.READY)
 			{
 				if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -3207,9 +3196,10 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 					var near = this.scene._frustumCommandsList[this.frustumIdx].near;
 					var far = this.scene._frustumCommandsList[this.frustumIdx].far;
 					var fov = this.scene.frameState.camera.frustum.fov;
-					this.myCameraSC.frustum.fov = fov*0.3; // fov = fovx.***
+					this.myCameraSC.frustum.fov = fov*0.4; // fov = fovx.***
 					this.myCameraSC.near = near;
 					this.myCameraSC.far = far;
+					this.myCameraSC.far = 8;
 					
 					if (this.boundingSphere_Aux === undefined)
 					{
@@ -3240,7 +3230,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 					}
 				}
 			}
-			
+			else{
+				isUrgent = false;
+			}
 		}
 		else{
 			break;
@@ -3295,7 +3287,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 	
 	if(this.thereAreUrgentOctrees)
 		return;
-		*/
+	*/
 	// now, prepare the ocree normally.
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
@@ -5100,18 +5092,19 @@ MagoManager.prototype.testAproxDist3D = function()
 	
 	var difX, difY, difZ;
 	
-	pointA.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
-	pointB.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+	
 	
 	var aproxDist, realDist, squaredDist, startTime, endTime;
 	startTime = new Date().getTime();
 	for (var k=0; k<1000000; k++)
 	{
-		//squaredDist = pointA.squareDistToPoint(pointB);
-		difX = pointA.x - pointB.x;
-		difY = pointA.y - pointB.y;
-		difZ = pointA.z - pointB.z;
-		realDist = difX*difX + difY*difY + difZ*difZ;
+		pointA.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+		pointB.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+		squaredDist = pointA.squareDistToPoint(pointB);
+		//difX = pointA.x - pointB.x;
+		//difY = pointA.y - pointB.y;
+		//difZ = pointA.z - pointB.z;
+		//realDist = difX*difX + difY*difY + difZ*difZ;
 	}
 	endTime = new Date().getTime();
 	squaredDistCalculationTimeAmount += (endTime - startTime)/1000;
@@ -5120,6 +5113,8 @@ MagoManager.prototype.testAproxDist3D = function()
 	startTime = new Date().getTime();
 	for (var k=0; k<1000000; k++)
 	{
+		pointA.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+		pointB.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
 		//aproxDist = this.calculateAproxDist3D(pointA, pointB);
 		aproxDist = pointA.aproxDistTo(pointB, this.sqrtTable);
 		//aproxDist = this.managerUtil.calculateAproxDist3D(pointA, pointB);
@@ -5132,6 +5127,8 @@ MagoManager.prototype.testAproxDist3D = function()
 	startTime = new Date().getTime();
 	for (var k=0; k<1000000; k++)
 	{
+		pointA.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
+		pointB.set(Math.random()*1000.0, Math.random()*1000.0, Math.random()*1000.0);
 		realDist = pointA.distToPoint(pointB);
 		//difX = pointA.x - pointB.x;
 		//difY = pointA.y - pointB.y;
