@@ -806,6 +806,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
  */
 MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) 
 {
+	if (this.myCameraSCX === undefined) 
+	{ this.myCameraSCX = new Camera(); }
+
 	// here updates the modelView and modelViewProjection matrices of the scene.***
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
@@ -886,8 +889,28 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		var cameraPosition = dc.navigatorState.eyePoint;
 		sceneState.camera.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
-		//sceneState.camera.direction.set(scene._camera.direction.x, scene._camera.direction.y, scene._camera.direction.z);
-		//sceneState.camera.up.set(scene._camera.up.x, scene._camera.up.y, scene._camera.up.z);
+		
+		var cameraHeading = dc.navigatorState.heading;
+		var cameraTilt = dc.navigatorState.tilt;
+		
+		// now, calculate camera direction and up from cameraHeading and cameraTilt.
+		var cameraDirection = new Point3D();
+		cameraDirection.set(0, 0, -1);
+		var rotatedCameraDirection = new Point3D();
+		rotatedCameraDirection.set(0, 0, 0);
+		
+		var cameraUp = new Point3D();
+		cameraUp.set(0, 1, 0);
+		var rotatedCameraUp = new Point3D();
+		rotatedCameraUp.set(0, 0, 0);
+		
+		rotatedCameraDirection = sceneState.modelViewMatrixInv.rotatePoint3D(cameraDirection, rotatedCameraDirection);
+		rotatedCameraDirection.unitary();
+		rotatedCameraUp = sceneState.modelViewMatrixInv.rotatePoint3D(cameraUp, rotatedCameraUp);
+		rotatedCameraUp.unitary();
+			
+		sceneState.camera.direction.set(rotatedCameraDirection.x, rotatedCameraDirection.y, rotatedCameraDirection.z);
+		sceneState.camera.up.set(rotatedCameraUp.x, rotatedCameraUp.y, rotatedCameraUp.z);
 		ManagerUtils.calculateSplited3fv([cameraPosition[0], cameraPosition[1], cameraPosition[2]], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 		
 		var viewport = this.wwd.viewport;
@@ -954,7 +977,17 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.drawingBufferWidth = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight = scene.drawingBufferHeight;
 	}
-
+	
+	// set the auxiliar camera.
+	this.myCameraSCX.direction.set(sceneState.camera.direction.x, sceneState.camera.direction.y, sceneState.camera.direction.z);
+	this.myCameraSCX.up.set(sceneState.camera.up.x, sceneState.camera.up.y, sceneState.camera.up.z);
+	this.myCameraSCX.frustum.near = sceneState.camera.frustum.near;
+	this.myCameraSCX.frustum.far = sceneState.camera.frustum.far;
+	this.myCameraSCX.frustum.fovyRad = sceneState.camera.frustum.fovyRad;
+	this.myCameraSCX.frustum.tangentOfHalfFovy = sceneState.camera.frustum.tangentOfHalfFovy;
+	this.myCameraSCX.frustum.fovRad = sceneState.camera.frustum.fovRad;
+	this.myCameraSCX.frustum.aspectRatio = sceneState.camera.frustum.aspectRatio;
+	
 };
 
 /**
@@ -2367,78 +2400,40 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			{ this.myCameraSC2 = new Camera(); }
 			
 			var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
+			
 			this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
+			this.myCameraSC2.direction.set(this.sceneState.camera.direction.x, this.sceneState.camera.direction.y, this.sceneState.camera.direction.z);
+			this.myCameraSC2.up.set(this.sceneState.camera.up.x, this.sceneState.camera.up.y, this.sceneState.camera.up.z);
 			buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSC);
-			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-
-			if (this.myBboxSC === undefined)
-			{ this.myBboxSC = new BoundingBox(); }
-			
-			if (this.myCullingVolumeBBoxSC === undefined)
-			{ this.myCullingVolumeBBoxSC = new BoundingBox(); }
-			
-			// Provisionally use a bbox to frustumCulling.***
-			var radiusAprox = 4000.0;
-			this.myCullingVolumeBBoxSC.minX = this.myCameraSC.position.x - radiusAprox;
-			this.myCullingVolumeBBoxSC.maxX = this.myCameraSC.position.x + radiusAprox;
-			this.myCullingVolumeBBoxSC.minY = this.myCameraSC.position.y - radiusAprox;
-			this.myCullingVolumeBBoxSC.maxY = this.myCameraSC.position.y + radiusAprox;
-			this.myCullingVolumeBBoxSC.minZ = this.myCameraSC.position.z - radiusAprox;
-			this.myCullingVolumeBBoxSC.maxZ = this.myCameraSC.position.z + radiusAprox;
-			
-			
-			// get frustumCulled lowestOctrees classified by distances.************************************************************************************
-			neoBuilding.currentVisibleOctreesControler.currentVisibles0.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles1.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-			neoBuilding.currentVisibleOctreesControler.currentVisibles3.length = 0;
-			find = neoBuilding.octree.getBBoxIntersectedLowestOctreesByLOD(	this.myCullingVolumeBBoxSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.myBboxSC,
-				this.myCameraSC.position, distLod0, distLod1, distLod2);
-			// End provisional.----------------------------------------------------------------																		
+			this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSCX);
 		}
 		else if (this.configInformation.geo_view_library === Constant.CESIUM)
 		{
-			if (this.myCameraSC === undefined) 
-			{ this.myCameraSC = new Cesium.Camera(scene); }
-			
 			var camera = scene.frameState.camera;
-			var near = scene._frustumCommandsList[this.frustumIdx].near;
-			var far = scene._frustumCommandsList[this.frustumIdx].far;
-			var fov = scene.frameState.camera.frustum.fov;
-			this.myCameraSC.frustum.fov = fov; // fov = fovx.***
-			this.myCameraSC = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSC);
-			
-			var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z);
-
-			//this.myCameraSC.frustum.fovy = 0.3;
-			//camera.frustum.far = 2.0;
-			this.myCameraSC.near = near;
-			this.myCameraSC.far = far;
-			var frustumVolume = this.myCameraSC.frustum.computeCullingVolume(this.myCameraSC.position, this.myCameraSC.direction, this.myCameraSC.up);
-
-			for (var i=0, length = frustumVolume.planes.length; i<length; i++)
-			{
-				var plane = frustumVolume.planes[i];
-				this.myFrustumSC.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
-			}
-			
-			neoBuilding.currentVisibleOctreesControler.currentVisibles0 = [];
-			neoBuilding.currentVisibleOctreesControler.currentVisibles1 = [];
-			neoBuilding.currentVisibleOctreesControler.currentVisibles2 = [];
-			neoBuilding.currentVisibleOctreesControler.currentVisibles3 = [];
-			
-			if (lod === 2)
-			{
-				neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-					this.myCameraSC.position, distLod0, distLod1, distLod2);
-				find = true;
-			}
-			else 
-			{
-				find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-					this.myCameraSC.position, distLod0, distLod1, distLod2);
-			}
+			this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSCX);
+			//this.myCameraSCX.frustum.far[0] = far; 
+		}
+		
+		this.myCameraSCX.calculateFrustumPlanes();
+		var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z);
+		
+		this.myFrustumSC.planesArray = this.myCameraSCX.frustum.planesArray;
+		
+		neoBuilding.currentVisibleOctreesControler.currentVisibles0 = [];
+		neoBuilding.currentVisibleOctreesControler.currentVisibles1 = [];
+		neoBuilding.currentVisibleOctreesControler.currentVisibles2 = [];
+		neoBuilding.currentVisibleOctreesControler.currentVisibles3 = [];
+		
+		if (lod === 2)
+		{
+			neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				this.myCameraSCX.position, distLod0, distLod1, distLod2);
+			find = true;
+		}
+		else 
+		{
+			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+				this.myCameraSCX.position, distLod0, distLod1, distLod2);
 		}
 
 		if (!find) 
@@ -2490,7 +2485,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		else
 		{
 			var isExterior = !isCameraInsideOfBuilding;
-			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSC.position.x, this.myCameraSC.position.y, this.myCameraSC.position.z, applyOcclusionCulling);
+			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z, applyOcclusionCulling);
 		}
 		
 		// if the octree has no blocks list ready, then render the lego
