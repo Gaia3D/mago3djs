@@ -88,7 +88,7 @@ TerranTile.prototype.make4subTiles = function()
 {
 	for (var i = 0; i < 4; i++) 
 	{
-		var subTile = this.newSubTerranTile();
+		this.newSubTerranTile();
 	}
 };
 
@@ -170,7 +170,7 @@ TerranTile.prototype.parseFileHeader = function(BR_Project)
 
 	var version_string_length = 5;
 	var intAux_scratch = 0;
-	var auxScratch;
+	//var auxScratch;
 	var header = BR_Project._header;
 	var arrayBuffer = this.fileArrayBuffer;
 	var bytes_readed = this.fileBytesReaded;
@@ -533,7 +533,7 @@ TerranTile.prototype.getIntersectedTiles = function(frustumVolume, intersectedTi
 
 	if (boundingSphere_Aux === undefined) { boundingSphere_Aux = new Cesium.BoundingSphere(); }
 
-	var intersectedPoints_count = 0;
+	//var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
 	boundingSphere_Aux.center.x = this.position.x;
 	boundingSphere_Aux.center.y = this.position.y;

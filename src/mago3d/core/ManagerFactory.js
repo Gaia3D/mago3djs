@@ -27,9 +27,317 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	// 환경 설정
 	MagoConfig.init(serverPolicy, serverData);
 	
-	if (serverPolicy.geo_view_library === null
-			|| serverPolicy.geo_view_library === ''
-			|| serverPolicy.geo_view_library === Constant.CESIUM) 
+	// 카메라 행동 설정
+	function disableCameraMotion(state)
+	{
+		viewer.scene.screenSpaceCameraController.enableRotate = state;
+		viewer.scene.screenSpaceCameraController.enableZoom = state;
+		viewer.scene.screenSpaceCameraController.enableLook = state;
+		viewer.scene.screenSpaceCameraController.enableTilt = state;
+		viewer.scene.screenSpaceCameraController.enableTranslate = state;
+	}
+	
+	// 이벤트 확장
+	function addMouseAction() 
+	{
+		magoManager.handler.setInputAction(function(click) 
+		{
+			magoManager.mouseActionLeftDown(click.position.x, click.position.y);
+		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+
+		magoManager.handler.setInputAction(function(click) 
+		{
+			magoManager.mouseActionMiddleDown(click.position.x, click.position.y);
+		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
+		
+		magoManager.handler.setInputAction(function(click) 
+		{
+			magoManager.mouseActionRightDown(click.position.x, click.position.y);
+		}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
+
+		//var mousePosition;
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			//magoManager.mouseActionMove(movement.endPosition.x, movement.endPosition.y);
+			//mousePosition = movement.endPosition;
+			if (magoManager.mouseLeftDown) 
+			{
+				if (movement.startPosition.x !== movement.endPosition.x || movement.startPosition.y !== movement.endPosition.y) 
+				{
+					magoManager.manageMouseDragging(movement.startPosition.x, movement.startPosition.y);
+					magoManager.cameraMoved();
+				}
+			}
+			else
+			{
+				magoManager.mouseDragging = false;
+				disableCameraMotion(true);
+				if (magoManager.mouseMiddleDown || magoManager.mouseRightDown)
+				{
+					magoManager.isCameraMoving = true;
+					magoManager.cameraMoved();
+					
+				}
+			}
+			
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+		/*
+		// disable wheel for cesium.
+		var handler = magoManager.scene.screenSpaceCameraController._aggregator._eventHandler;
+        handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL);
+        for ( var modifierName in Cesium.KeyboardEventModifier) 
+        {
+            if (Cesium.KeyboardEventModifier.hasOwnProperty(modifierName)) 
+            {
+                var modifier = Cesium.KeyboardEventModifier[modifierName];
+                if (modifier !== undefined) 
+                {
+                    handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL, modifier);
+                }
+            }
+        }
+		
+		// make mago wheel.
+		magoManager.handler.setInputAction(function (wheelZoomAmount) {
+			var cameraHeight, directionToZoom, zoomAmount;
+			if (mousePosition) {
+				cameraHeight = viewer.scene.globe.ellipsoid.cartesianToCartographic(viewer.camera.position).height || Number.MAX_VALUE;
+				directionToZoom = viewer.camera.getPickRay(mousePosition).direction;
+				zoomAmount = wheelZoomAmount * cameraHeight / 1000;
+				
+				if(wheelZoomAmount > magoManager.TEST_maxWheelZoomAmount)
+					magoManager.TEST_maxWheelZoomAmount = wheelZoomAmount;
+				
+				if(zoomAmount > magoManager.TEST_maxZoomAmount)
+					magoManager.TEST_maxZoomAmount = zoomAmount;
+				
+				if(cameraHeight < 1000)
+				{
+					if(wheelZoomAmount > 100)
+						wheelZoomAmount = 100;
+					
+					if(zoomAmount > 80)
+						zoomAmount = 80;
+				}
+				if(directionToZoom.x > 1 || directionToZoom.y > 1 || directionToZoom.z > 1 )
+					var hola =0;
+				
+				viewer.camera.position.x = viewer.camera.position.x + directionToZoom.x * zoomAmount;
+				viewer.camera.position.y = viewer.camera.position.y + directionToZoom.y * zoomAmount;
+				viewer.camera.position.z = viewer.camera.position.z + directionToZoom.z * zoomAmount;
+				//viewer.camera.move(directionToZoom, zoomAmount);
+			}
+		}, Cesium.ScreenSpaceEventType.WHEEL);
+		*/
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
+			// display current mouse position
+			var pickPosition = {lat: null, lon: null, alt: null};
+			var position = magoManager.scene.camera.pickEllipsoid(movement.position);
+			if (position)
+			{
+				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+				pickPosition.lat = Cesium.Math.toDegrees(cartographicPosition.latitude);
+				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
+				pickPosition.alt = cartographicPosition.height;
+			}
+			if (serverPolicy.geo_callback_clickposition !== '') 
+			{
+				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+			}
+	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			magoManager.mouseActionMiddleUp(movement.position.x, movement.position.y);
+	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
+		
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
+	    }, Cesium.ScreenSpaceEventType.RIGHT_UP);
+	}
+
+	// cesium을 구현체로서 이용
+	function initWwwMago(manager, gl) 
+	{
+		//var viewport = manager.wwd.viewport;
+		//manager.selection.init(gl, viewport.width, viewport.height);
+		manager.shadersManager.createDefaultShader(gl);
+		manager.postFxShadersManager.gl = gl;
+		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
+		manager.createDefaultShaders(gl);// A1-Use this.***
+
+		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+		manager.getObjectIndexFile();
+	}
+
+	// cesium을 구현체로서 이용
+	function drawCesium() 
+	{
+		var gl = viewer.scene.context._gl;
+		//viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
+		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
+		viewer.scene.magoManager.postFxShadersManager.gl = gl;
+		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
+		viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
+		viewer.scene.magoManager.scene = viewer.scene;
+
+		// Start postRender version.***********************************************
+		magoManager = viewer.scene.magoManager;
+		scene = viewer.scene;
+		//scene.copyGlobeDepth = true;
+		viewer.scene.globe.depthTestAgainstTerrain = true;
+
+		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+		viewer.scene.magoManager.getObjectIndexFile();
+		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+		addMouseAction();
+		viewer.clock.onTick.addEventListener(function(clock) 
+		{
+			magoManager.cameraFPV.update(magoManager);
+		});
+	}
+
+	// 실제 화면에 object를 rendering 하는 메인 메서드
+	function draw() 
+	{
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
+		{
+			drawCesium();
+		}
+		else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND) 
+		{
+			//initWwwMago();
+		}
+	}
+
+	/**
+	 * background provider
+	 */
+	function backgroundProvider() 
+	{
+		var provider = new Cesium.WebMapServiceImageryProvider({
+			url        : MagoConfig.getPolicy().geo_server_url,
+			layers     : MagoConfig.getPolicy().geo_server_layers,
+			parameters : {
+				service     : MagoConfig.getPolicy().geo_server_parameters_service,
+				version     : MagoConfig.getPolicy().geo_server_parameters_version,
+				request     : MagoConfig.getPolicy().geo_server_parameters_request,
+				transparent : MagoConfig.getPolicy().geo_server_parameters_transparent,
+				//tiled : MagoConfig.getPolicy().backgroundProvider.parameters.tiled,
+				format      : MagoConfig.getPolicy().geo_server_parameters_format
+				//				time : MagoConfig.getPolicy().backgroundProvider.parameters.time,
+				//		    	rand : MagoConfig.getPolicy().backgroundProvider.parameters.rand,
+				//		    	asdf : MagoConfig.getPolicy().backgroundProvider.parameters.asdf
+			}
+			//,proxy: new Cesium.DefaultProxy('/proxy/')
+		});
+
+		//		if(index) viewer.imageryLayers.addImageryProvider(provider, index);
+		viewer.imageryLayers.addImageryProvider(provider);
+	}
+
+	/**
+	 * zoomTo 할 Entity
+	 * @returns entities
+	 */
+	function initEntity() 
+	{
+		return viewer.entities.add({
+			name     : "mago3D",
+			position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
+			box      : {
+				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				fill       : true,
+				material   : Cesium.Color.BLUE,
+				outline    : false
+			}
+		});
+	}
+
+	// terrain 적용 유무를 설정
+	function initTerrain() 
+	{
+		/*		if(MagoConfig.getPolicy().geoConfig.initTerrain.enable) {
+			var terrainProvider = new Cesium.CesiumTerrainProvider({
+				url : MagoConfig.getPolicy().geoConfig.initTerrain.url,
+				requestWaterMask: MagoConfig.getPolicy().geoConfig.initTerrain.requestWaterMask,
+				requestVertexNormals: MagoConfig.getPolicy().geoConfig.initTerrain.requestVertexNormals
+			});
+			viewer.terrainProvider = terrainProvider;
+		}*/
+	}
+
+	// 최초 로딩시 이동할 카메라 위치
+	function initCamera() 
+	{
+		viewer.camera.flyTo({
+			destination: Cesium.Cartesian3.fromDegrees(parseFloat(MagoConfig.getPolicy().geo_init_longitude),
+				parseFloat(MagoConfig.getPolicy().geo_init_latitude),
+				parseFloat(MagoConfig.getPolicy().geo_init_height)),
+			duration: parseInt(MagoConfig.getPolicy().geo_init_duration)
+		});
+	}
+
+	// deploy 타입 적용
+	function initRenderMode() 
+	{
+		var api = new API("renderMode");
+		api.setRenderMode("1");
+		magoManager.callAPI(api);
+
+		if (MagoConfig.getPolicy().geo_time_line_enable === "false") 
+		{
+			// visible <---> hidden
+			$(viewer._animation.container).css("visibility", "hidden");
+			$(viewer._timeline.container).css("visibility", "hidden");
+			viewer.forceResize();
+		}
+	}
+	
+	// pick baseLayer
+	function setDefaultDataset() 
+	{
+		var DEFALUT_IMAGE = "ESRI World Imagery";
+		var DEFALUT_TERRAIN = "STK World Terrain meshes";
+		
+		// search default imageryProvider from baseLayerPicker
+		var imageryProvider = null;
+		var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels; 
+		for (var i in imageryProviderViewModels) 
+		{
+			if (!imageryProviderViewModels.hasOwnProperty(i))	{ continue; }
+
+			var provider = imageryProviderViewModels[i];
+			if (provider.name === DEFALUT_IMAGE) 
+			{
+				imageryProvider = provider;
+				break;
+			}
+		}
+		if (imageryProvider) { viewer.baseLayerPicker.viewModel.selectedImagery = imageryProvider; }
+	  
+		// search default terrainProvider from baseLayerPicker
+		var terrainProvider = null;
+		var terrainProviderViewModels = viewer.baseLayerPicker.viewModel.terrainProviderViewModels;
+		for (var i in terrainProviderViewModels) 
+		{
+			if (!terrainProviderViewModels.hasOwnProperty(i))	{ continue; }
+			var provider = terrainProviderViewModels[i];
+			if (provider.name === DEFALUT_TERRAIN) 
+			{
+				terrainProvider = provider;
+				break;
+			}
+		}
+		if (terrainProvider) { viewer.baseLayerPicker.viewModel.selectedTerrain = terrainProvider; }
+	}
+
+	if (serverPolicy.geo_view_library === null ||
+		serverPolicy.geo_view_library === '' ||
+		serverPolicy.geo_view_library === Constant.CESIUM) 
 	{
 		
 		if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
@@ -196,195 +504,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
 		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
 	}
-	
+
 	// 이미지 경로
 	magoManager.magoPolicy.imagePath = imagePath;
-
-	// 실제 화면에 object를 rendering 하는 메인 메서드
-	function draw() 
-	{
-		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
-		{
-			drawCesium();
-		}
-		else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND) 
-		{
-			//initWwwMago();
-		}
-	}
-	
-	// cesium을 구현체로서 이용
-	function initWwwMago(manager, gl) 
-	{
-		var viewport = manager.wwd.viewport;
-		//manager.selection.init(gl, viewport.width, viewport.height);
-		manager.shadersManager.createDefaultShader(gl);
-		manager.postFxShadersManager.gl = gl;
-		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
-		manager.createDefaultShaders(gl);// A1-Use this.***
-
-		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		manager.getObjectIndexFile();
-	}
-
-	// cesium을 구현체로서 이용
-	function drawCesium() 
-	{
-		var gl = viewer.scene.context._gl;
-		//viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
-		viewer.scene.magoManager.postFxShadersManager.gl = gl;
-		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
-		viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
-		viewer.scene.magoManager.scene = viewer.scene;
-
-		// Start postRender version.***********************************************
-		magoManager = viewer.scene.magoManager;
-		scene = viewer.scene;
-		//scene.copyGlobeDepth = true;
-		viewer.scene.globe.depthTestAgainstTerrain = true;
-
-		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		viewer.scene.magoManager.getObjectIndexFile();
-		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-		addMouseAction();
-		viewer.clock.onTick.addEventListener(function(clock) 
-		{
-			magoManager.cameraFPV.update(magoManager);
-		});
-	}
-
-	// 뭐하는 메서드 인가?
-	function disableCameraMotion(state)
-	{
-		viewer.scene.screenSpaceCameraController.enableRotate = state;
-		viewer.scene.screenSpaceCameraController.enableZoom = state;
-		viewer.scene.screenSpaceCameraController.enableLook = state;
-		viewer.scene.screenSpaceCameraController.enableTilt = state;
-		viewer.scene.screenSpaceCameraController.enableTranslate = state;
-	}
-
-	// 이벤트 확장
-	function addMouseAction() 
-	{
-		magoManager.handler.setInputAction(function(click) 
-		{
-			magoManager.mouseActionLeftDown(click.position.x, click.position.y);
-		}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
-
-		magoManager.handler.setInputAction(function(click) 
-		{
-			magoManager.mouseActionMiddleDown(click.position.x, click.position.y);
-		}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
-		
-		magoManager.handler.setInputAction(function(click) 
-		{
-			magoManager.mouseActionRightDown(click.position.x, click.position.y);
-		}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
-
-		var mousePosition;
-		magoManager.handler.setInputAction(function(movement) 
-		{
-			//magoManager.mouseActionMove(movement.endPosition.x, movement.endPosition.y);
-			mousePosition = movement.endPosition;
-			if (magoManager.mouseLeftDown) 
-			{
-				if (movement.startPosition.x !== movement.endPosition.x || movement.startPosition.y !== movement.endPosition.y) 
-				{
-					magoManager.manageMouseDragging(movement.startPosition.x, movement.startPosition.y);
-					magoManager.cameraMoved();
-				}
-			}
-			else
-			{
-				magoManager.mouseDragging = false;
-				disableCameraMotion(true);
-				if (magoManager.mouseMiddleDown || magoManager.mouseRightDown)
-				{
-					magoManager.isCameraMoving = true;
-					magoManager.cameraMoved();
-					
-				}
-			}
-			
-		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-		/*
-		// disable wheel for cesium.
-		var handler = magoManager.scene.screenSpaceCameraController._aggregator._eventHandler;
-        handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL);
-        for ( var modifierName in Cesium.KeyboardEventModifier) 
-        {
-            if (Cesium.KeyboardEventModifier.hasOwnProperty(modifierName)) 
-            {
-                var modifier = Cesium.KeyboardEventModifier[modifierName];
-                if (modifier !== undefined) 
-                {
-                    handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL, modifier);
-                }
-            }
-        }
-		
-		// make mago wheel.
-		magoManager.handler.setInputAction(function (wheelZoomAmount) {
-			var cameraHeight, directionToZoom, zoomAmount;
-			if (mousePosition) {
-				cameraHeight = viewer.scene.globe.ellipsoid.cartesianToCartographic(viewer.camera.position).height || Number.MAX_VALUE;
-				directionToZoom = viewer.camera.getPickRay(mousePosition).direction;
-				zoomAmount = wheelZoomAmount * cameraHeight / 1000;
-				
-				if(wheelZoomAmount > magoManager.TEST_maxWheelZoomAmount)
-					magoManager.TEST_maxWheelZoomAmount = wheelZoomAmount;
-				
-				if(zoomAmount > magoManager.TEST_maxZoomAmount)
-					magoManager.TEST_maxZoomAmount = zoomAmount;
-				
-				if(cameraHeight < 1000)
-				{
-					if(wheelZoomAmount > 100)
-						wheelZoomAmount = 100;
-					
-					if(zoomAmount > 80)
-						zoomAmount = 80;
-				}
-				if(directionToZoom.x > 1 || directionToZoom.y > 1 || directionToZoom.z > 1 )
-					var hola =0;
-				
-				viewer.camera.position.x = viewer.camera.position.x + directionToZoom.x * zoomAmount;
-				viewer.camera.position.y = viewer.camera.position.y + directionToZoom.y * zoomAmount;
-				viewer.camera.position.z = viewer.camera.position.z + directionToZoom.z * zoomAmount;
-				//viewer.camera.move(directionToZoom, zoomAmount);
-			}
-		}, Cesium.ScreenSpaceEventType.WHEEL);
-		*/
-		magoManager.handler.setInputAction(function(movement) 
-		{
-			magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
-			// display current mouse position
-			var pickPosition = {lat: null, lon: null, alt: null};
-			var position = magoManager.scene.camera.pickEllipsoid(movement.position);
-			if (position)
-			{
-				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
-				pickPosition.lat = Cesium.Math.toDegrees(cartographicPosition.latitude);
-				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
-				pickPosition.alt = cartographicPosition.height;
-			}
-			if (serverPolicy.geo_callback_clickposition !== '') 
-			{
-				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
-			}
-	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
-
-		magoManager.handler.setInputAction(function(movement) 
-		{
-			magoManager.mouseActionMiddleUp(movement.position.x, movement.position.y);
-	    }, Cesium.ScreenSpaceEventType.MIDDLE_UP);
-		
-		magoManager.handler.setInputAction(function(movement) 
-		{
-			magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
-	    }, Cesium.ScreenSpaceEventType.RIGHT_UP);
-	}
 
 	// KeyPressEvents.**************************************
 	document.addEventListener('keydown', function(event) 
@@ -436,130 +558,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
 
 	}, false);
-
-	// world wind 구현체를 이용
-	function drawWorldWind() 
-	{
-	}
-
-	/**
-	 * background provider
-	 */
-	function backgroundProvider() 
-	{
-		var provider = new Cesium.WebMapServiceImageryProvider({
-			url        : MagoConfig.getPolicy().geo_server_url,
-			layers     : MagoConfig.getPolicy().geo_server_layers,
-			parameters : {
-				service     : MagoConfig.getPolicy().geo_server_parameters_service,
-				version     : MagoConfig.getPolicy().geo_server_parameters_version,
-				request     : MagoConfig.getPolicy().geo_server_parameters_request,
-				transparent : MagoConfig.getPolicy().geo_server_parameters_transparent,
-				//tiled : MagoConfig.getPolicy().backgroundProvider.parameters.tiled,
-				format      : MagoConfig.getPolicy().geo_server_parameters_format
-				//				time : MagoConfig.getPolicy().backgroundProvider.parameters.time,
-				//		    	rand : MagoConfig.getPolicy().backgroundProvider.parameters.rand,
-				//		    	asdf : MagoConfig.getPolicy().backgroundProvider.parameters.asdf
-			}
-			//,proxy: new Cesium.DefaultProxy('/proxy/')
-		});
-
-		//		if(index) viewer.imageryLayers.addImageryProvider(provider, index);
-		viewer.imageryLayers.addImageryProvider(provider);
-	}
-
-	/**
-	 * zoomTo 할 Entity
-	 * @returns entities
-	 */
-	function initEntity() 
-	{
-		return viewer.entities.add({
-			name     : "mago3D",
-			position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
-			box      : {
-				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
-				fill       : true,
-				material   : Cesium.Color.BLUE,
-				outline    : false
-			}
-		});
-	}
-
-	// terrain 적용 유무를 설정
-	function initTerrain() 
-	{
-		/*		if(MagoConfig.getPolicy().geoConfig.initTerrain.enable) {
-			var terrainProvider = new Cesium.CesiumTerrainProvider({
-				url : MagoConfig.getPolicy().geoConfig.initTerrain.url,
-				requestWaterMask: MagoConfig.getPolicy().geoConfig.initTerrain.requestWaterMask,
-				requestVertexNormals: MagoConfig.getPolicy().geoConfig.initTerrain.requestVertexNormals
-			});
-			viewer.terrainProvider = terrainProvider;
-		}*/
-	}
-
-	// 최초 로딩시 이동할 카메라 위치
-	function initCamera() 
-	{
-		viewer.camera.flyTo({
-			destination: Cesium.Cartesian3.fromDegrees(parseFloat(MagoConfig.getPolicy().geo_init_longitude),
-				parseFloat(MagoConfig.getPolicy().geo_init_latitude),
-				parseFloat(MagoConfig.getPolicy().geo_init_height)),
-			duration: parseInt(MagoConfig.getPolicy().geo_init_duration)
-		});
-	}
-
-	// deploy 타입 적용
-	function initRenderMode() 
-	{
-		var api = new API("renderMode");
-		api.setRenderMode("1");
-		magoManager.callAPI(api);
-
-		if (MagoConfig.getPolicy().geo_time_line_enable === "false") 
-		{
-			// visible <---> hidden
-			$(viewer._animation.container).css("visibility", "hidden");
-			$(viewer._timeline.container).css("visibility", "hidden");
-			viewer.forceResize();
-		}
-	}
-	
-	// pick baseLayer
-	function setDefaultDataset() 
-	{
-		var DEFALUT_IMAGE = "ESRI World Imagery";
-		var DEFALUT_TERRAIN = "STK World Terrain meshes";
-		
-		// search default imageryProvider from baseLayerPicker
-		var imageryProvider = null;
-		var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels; 
-		for (var i in imageryProviderViewModels) 
-		{
-			var provider = imageryProviderViewModels[i];
-			if (provider.name === DEFALUT_IMAGE) 
-			{
-				imageryProvider = provider;
-				break;
-			}
-		}
-		if (imageryProvider) { viewer.baseLayerPicker.viewModel.selectedImagery = imageryProvider; }
-	  
-		// search default terrainProvider from baseLayerPicker
-		var terrainProvider = null;
-		var terrainProviderViewModels = viewer.baseLayerPicker.viewModel.terrainProviderViewModels;
-		for (var i in terrainProviderViewModels) 
-		{
-			var provider = terrainProviderViewModels[i];
-			if (provider.name === DEFALUT_TERRAIN) 
-			{
-				terrainProvider = provider;
-				break;
-			}
-		}
-		if (terrainProvider) { viewer.baseLayerPicker.viewModel.selectedTerrain = terrainProvider; }
-	}
 	
 	// TODO API 객체를 생성해서 하나의 parameter로 전달하는 방식이 좀 더 깔끔할거 같지만 성능적인 부분에서 조금은 투박할거 같아서 일단 이렇게 처리
 	return {
@@ -639,7 +637,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		mouseMove: function(eventType) 
 		{
 			var camera = viewer.camera;
-			var canvas = viewer.canvas;
+			//var canvas = viewer.canvas;
 			var ellipsoid = scene.globe.ellipsoid;
 			var width = canvas.clientWidth;
 	        var height = canvas.clientHeight;

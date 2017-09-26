@@ -75,14 +75,10 @@ MetaData.prototype.deleteObjects = function()
  * @param arrayBuffer 변수
  * @param readWriter 변수
  */
-MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter, neoBuilding) 
+MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter) 
 {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
-	var auxScratch;
-	//var header = BR_Project._header;
-	//var arrayBuffer = this.fileArrayBuffer;
-	//var bytes_readed = this.fileBytesReaded;
 	var bytes_readed = 0;
 
 	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
@@ -122,9 +118,6 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	}
 	else { bytes_readed += 4; }
 
-	//this.altitude -= 140.0; // TEST.***
-
-	//header._elevation += 70.0; // delete this. TEST.!!!
 	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
 
 	// 6) BoundingBox.************************

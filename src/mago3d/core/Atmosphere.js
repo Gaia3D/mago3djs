@@ -246,7 +246,8 @@ var CircularCloud = function()
  */
 CircularCloud.prototype.getVBOVertexColorFloatArray = function() 
 {
-	var floatArray = this.vertexMatrix.getVBOVertexColorFloatArray(floatArray);
+	var floatArray;
+	floatArray = this.vertexMatrix.getVBOVertexColorFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -271,7 +272,8 @@ CircularCloud.prototype.getVBOIndicesShortArray = function()
  */
 CircularCloud.prototype.getVBOShadowVertexFloatArray = function() 
 {
-	var floatArray = this.shadowVertexMatrix.getVBOVertexFloatArray(floatArray);
+	var floatArray;
+	floatArray = this.shadowVertexMatrix.getVBOVertexFloatArray(floatArray);
 	return floatArray;
 };
 
@@ -393,7 +395,8 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 		splitVelueZ.low ]);
 
 	this.bbox = this.shadowVertexMatrix.getBoundingBox(this.bbox);
-	var cloudPoint3d = this.bbox.getCenterPoint(cloudPoint3d);
+	var cloudPoint3d;
+	cloudPoint3d = this.bbox.getCenterPoint(cloudPoint3d);
 	this.cullingPosition = new Cesium.Cartesian3(cloudPoint3d.x
 			+ this.position.x, cloudPoint3d.y + this.position.y, cloudPoint3d.z
 			+ this.position.z);
