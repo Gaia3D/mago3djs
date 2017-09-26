@@ -40,11 +40,20 @@ Point3D.prototype.copyFrom = function(point3d)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns this.x*this.x + this.y*this.y + this.z*this.z;
+ */
+Point3D.prototype.getSquaredModul = function() 
+{
+	return this.x*this.x + this.y*this.y + this.z*this.z;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  */
 Point3D.prototype.getModul = function() 
 {
-	return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
+	return Math.sqrt(this.getSquaredModul());
 };
 
 /**
