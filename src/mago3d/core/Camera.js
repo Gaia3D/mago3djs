@@ -24,14 +24,7 @@ var Camera = function()
 	this.farCenterPoint = new Point3D();
 	
 	this.farLeftBottomPoint = new Point3D();
-	this.farLeftTopPoint = new Point3D();
-	this.farRightBottomPoint = new Point3D();
 	this.farRightTopPoint = new Point3D();
-	
-	this.nearLeftBottomPoint = new Point3D();
-	this.nearLeftTopPoint = new Point3D();
-	this.nearRightBottomPoint = new Point3D();
-	this.nearRightTopPoint = new Point3D();
 	
 	// directions.
 	this.leftBottomDir = new Point3D();
@@ -90,40 +83,15 @@ Camera.prototype.calculateFrustumPlanes = function()
 		this.farCenterPoint.y - this.right.y*farWidht*0.5 - this.up.y*farHeight*0.5, 
 		this.farCenterPoint.z - this.right.z*farWidht*0.5 - this.up.z*farHeight*0.5);
 								
-	this.farLeftTopPoint.set(this.farLeftBottomPoint.x + this.up.x*farHeight, 
-		this.farLeftBottomPoint.y + this.up.y*farHeight, 
-		this.farLeftBottomPoint.z + this.up.z*farHeight);
-								
-	this.farRightBottomPoint.set(this.farLeftBottomPoint.x + this.right.x*farWidht, 
-		this.farLeftBottomPoint.y + this.right.y*farWidht, 
-		this.farLeftBottomPoint.z + this.right.z*farWidht);
-								
-	this.farRightTopPoint.set(this.farLeftTopPoint.x + this.right.x*farWidht, 
-		this.farLeftTopPoint.y + this.right.y*farWidht, 
-		this.farLeftTopPoint.z + this.right.z*farWidht);
-								
-	// near plane points.						
-	this.nearLeftBottomPoint.set(this.nearCenterPoint.x - this.right.x*nearWidth*0.5 - this.up.x*nearHeight*0.5, 
-		this.nearCenterPoint.y - this.right.y*nearWidth*0.5 - this.up.y*nearHeight*0.5, 
-		this.nearCenterPoint.z - this.right.z*nearWidth*0.5 - this.up.z*nearHeight*0.5);
-	
-	this.nearLeftTopPoint.set(this.nearLeftBottomPoint.x + this.up.x*nearHeight, 
-		this.nearLeftBottomPoint.y + this.up.y*nearHeight, 
-		this.nearLeftBottomPoint.z + this.up.z*nearHeight);
-								
-	this.nearRightBottomPoint.set(this.nearLeftBottomPoint.x + this.right.x*nearWidth, 
-		this.nearLeftBottomPoint.y + this.right.y*nearWidth, 
-		this.nearLeftBottomPoint.z + this.right.z*nearWidth);
-								
-	this.nearRightTopPoint.set(this.nearLeftTopPoint.x + this.right.x*nearWidth, 
-		this.nearLeftTopPoint.y + this.right.y*nearWidth, 
-		this.nearLeftTopPoint.z + this.right.z*nearWidth);
+	this.farRightTopPoint.set(this.farLeftBottomPoint.x + this.right.x*farWidht + this.up.x*farHeight, 
+		this.farLeftBottomPoint.y + this.right.y*farWidht + this.up.y*farHeight, 
+		this.farLeftBottomPoint.z + this.right.z*farWidht + this.up.z*farHeight);				
 	
 	// calculate directions.
-	this.leftBottomDir.set(this.farLeftBottomPoint.x - this.nearLeftBottomPoint.x, this.farLeftBottomPoint.y - this.nearLeftBottomPoint.y, this.farLeftBottomPoint.z - this.nearLeftBottomPoint.z);
+	this.leftBottomDir.set(this.farLeftBottomPoint.x - this.position.x, this.farLeftBottomPoint.y - this.position.y, this.farLeftBottomPoint.z - this.position.z);
 	this.leftBottomDir.unitary(); // no necessary.
 	
-	this.rightTopDir.set(this.farRightTopPoint.x - this.nearRightTopPoint.x, this.farRightTopPoint.y - this.nearRightTopPoint.y, this.farRightTopPoint.z - this.nearRightTopPoint.z);
+	this.rightTopDir.set(this.farRightTopPoint.x - this.position.x, this.farRightTopPoint.y - this.position.y, this.farRightTopPoint.z - this.position.z);
 	this.rightTopDir.unitary(); // no necessary.
 	
 	// near plane.
