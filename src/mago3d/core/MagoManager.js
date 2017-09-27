@@ -2368,12 +2368,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	{ return false; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
-	{
-		neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController();
-	}	
-
-	if (this.myFrustumSC === undefined) 
-	{ this.myFrustumSC = new Frustum(); }
+	{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController(); }	
 
 	if (lod === 0 || lod === 1 || lod === 2)
 	{
@@ -2388,41 +2383,13 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			distLod2 = 25000;
 		}
 
-		var frustumVolume;
 		var find = false;
-			
-		if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-		{
-			if (this.myCameraSC === undefined) 
-			{ this.myCameraSC = new Camera(); }
-			
-			if (this.myCameraSC2 === undefined) 
-			{ this.myCameraSC2 = new Camera(); }
-			
-			var cameraPosition = this.sceneState.dc.navigatorState.eyePoint;
-			
-			this.myCameraSC2.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
-			this.myCameraSC2.direction.set(this.sceneState.camera.direction.x, this.sceneState.camera.direction.y, this.sceneState.camera.direction.z);
-			this.myCameraSC2.up.set(this.sceneState.camera.up.x, this.sceneState.camera.up.y, this.sceneState.camera.up.z);
-			buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
-			this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(this.myCameraSC2, this.myCameraSCX);
-		}
-		else if (this.configInformation.geo_view_library === Constant.CESIUM)
-		{
-			var camera = scene.frameState.camera;
-			this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(camera, this.myCameraSCX);
-			//this.myCameraSCX.frustum.far[0] = far; 
-		}
 		
+		this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
 		this.myCameraSCX.calculateFrustumPlanes();
 		var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z);
-		
-		this.myFrustumSC.planesArray = this.myCameraSCX.frustum.planesArray;
-		
-		neoBuilding.currentVisibleOctreesControler.currentVisibles0 = [];
-		neoBuilding.currentVisibleOctreesControler.currentVisibles1 = [];
-		neoBuilding.currentVisibleOctreesControler.currentVisibles2 = [];
-		neoBuilding.currentVisibleOctreesControler.currentVisibles3 = [];
+
+		neoBuilding.currentVisibleOctreesControler.clear();
 		
 		if (lod === 2)
 		{
@@ -2432,7 +2399,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 		else 
 		{
-			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myFrustumSC, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 				this.myCameraSCX.position, distLod0, distLod1, distLod2);
 		}
 

@@ -49,16 +49,6 @@ Frustum.prototype.intersectionSphere = function(sphere)
 	{ return Constant.INTERSECTION_INSIDE; }
 };
 
-/**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
- */
-Frustum.prototype.calculateFrustumPlanes = function(sphere) 
-{
-	// 1rst, calculate the center points of near and far.
-	// todo:
-	console.log(sphere);
-};
 
 
 
