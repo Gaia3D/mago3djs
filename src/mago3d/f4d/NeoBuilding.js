@@ -53,6 +53,16 @@ var NeoBuilding = function()
  * 어떤 일을 하고 있습니까?
  * @returns {boolean} applyOcclusionCulling
  */
+NeoBuilding.prototype.getGeoLocationData = function() 
+{
+	// provisionally return the 1rst geoLocationData.
+	return this.geoLocDataManager.geoLocationDataArray[0];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {boolean} applyOcclusionCulling
+ */
 NeoBuilding.prototype.getRenderSettingApplyOcclusionCulling = function() 
 {
 	return this.applyOcclusionCulling;
