@@ -932,30 +932,6 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 		}
 		return this.getIndexToInsertBySquaredDistToEye(octreesArray, octree, newStartIdx, newEndIdx);
 	}
-	
-	/*
-	// lineal implementation.***
-	var finished = false;
-	var octrees_count = octreesArray.length;
-	var i=0;
-	var result_idx = 0;
-
-	while (!finished && i<octrees_count) 
-	{
-		if (octreesArray[i].squareDistToEye > octree.squareDistToEye) 
-		{
-			result_idx = i;
-			finished = true;
-		}
-		i++;
-	}
-	if (!finished) 
-	{
-		result_idx = octrees_count;
-	}
-
-	return result_idx;
-	*/
 };
 
 /**

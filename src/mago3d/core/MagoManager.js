@@ -1116,7 +1116,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown && this.isLastFrustum) 
 	{
 		this.visibleObjControlerOctrees.initArrays(); // init.******
-		this.visibleObjControlerOctreesAux.initArrays(); // init.******
 
 		var neoBuilding;
 		// lod 0 & lod 1.
@@ -1125,7 +1124,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
 
-			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 0))
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, 0))
 			{
 				// any octree is visible.
 				this.visibleObjControlerBuildings.currentVisibles0.splice(i, 1);
@@ -1146,7 +1145,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		for (var i=0; i<buildingsCount; i++) 
 		{
 			neoBuilding = this.visibleObjControlerBuildings.currentVisibles2[i];
-			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, this.visibleObjControlerOctreesAux, 2))
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, scene, neoBuilding, this.visibleObjControlerOctrees, 2))
 			{
 				// any octree is visible.
 				this.visibleObjControlerBuildings.currentVisibles2.splice(i, 1);
@@ -1168,20 +1167,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 			//buildingsDeletingModelRefCount++;
 			//if (buildingsDeletingModelRefCount > 10)
 			//{ break; }
-		}
-		
-		// if a LOD0 building has a NO ready lowestOctree, then push this building to the LOD2BuildingsArray.***
-		buildingsCount = this.visibleObjControlerBuildings.currentVisibles0.length;
-		for (var i=0; i<buildingsCount; i++) 
-		{
-			neoBuilding = this.visibleObjControlerBuildings.currentVisibles0[i];
-			if (neoBuilding.currentVisibleOctreesControler === undefined)
-			{ continue; }
-			if (neoBuilding.currentVisibleOctreesControler.currentVisibles2.length > 0)
-			{
-				// then push this neoBuilding to the LOD2BuildingsArray.***
-				this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
-			}
 		}
 		
 		this.manageQueue();
@@ -1470,6 +1455,10 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 
 				if (lowestOctree.lego.fileLoadState === 2) 
 				{ continue; }
+			
+				// test:
+				if (neoBuilding.buildingId == "gangnam_del")
+				{ var hola = 0; }
 				
 				this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
 				idxKey = this.selectionColor.decodeColor3(this.colorAux.r, this.colorAux.g, this.colorAux.b);
@@ -2365,7 +2354,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode_current = function(gl)
  * @param {any} visibleObjControlerOctreesAux 
  * @param {any} lod 
  */
-MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, visibleObjControlerOctreesAux, lod) 
+MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, neoBuilding, visibleObjControlerOctrees, lod) 
 {
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
@@ -2392,19 +2381,21 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		var find = false;
 		
 		this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
-		this.myCameraSCX.calculateFrustumPlanes();
 		var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z);
 
 		neoBuilding.currentVisibleOctreesControler.clear();
 		
 		if (lod === 2)
 		{
+			// in this case is not necessary calculate the frustum planes.
 			neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 				this.myCameraSCX.position, distLod0, distLod1, distLod2);
 			find = true;
 		}
 		else 
 		{
+			// must calculate the frustum planes.
+			this.myCameraSCX.calculateFrustumPlanes();
 			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 				this.myCameraSCX.position, distLod0, distLod1, distLod2);
 		}
@@ -2423,7 +2414,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	}
 	else
 	{
-		// no enter here...
+		// never enter here...
 		neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
 		neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(neoBuilding.currentVisibleOctreesControler.currentVisibles2); // old.
 	}
@@ -2444,8 +2435,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		this.processQueue.eraseBuildingsToDeleteModelReferences(neoBuilding);
 	}
 	
+	var putLowestOctreeToLod2 = false;
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
+		putLowestOctreeToLod2 = false;
 		lowestOctree = currentVisibleOctrees[i];
 		if (lowestOctree.triPolyhedronsCount === 0) 
 		{ continue; }
@@ -2454,6 +2447,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		{
 			lowestOctree.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
 			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+			// if the octree has no neoReferencesMotherAndIndices ready, then render the lego.
+			putLowestOctreeToLod2 = true;
 		}
 		else
 		{
@@ -2461,9 +2456,15 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z, applyOcclusionCulling);
 		}
 		
-		// if the octree has no blocks list ready, then render the lego
+		// if the octree has no blocks list ready, then render the lego.
 		var myBlocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 		if (myBlocksList === undefined || myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			// if the octree has no blocks list ready, then render the lego.
+			putLowestOctreeToLod2 = true;
+		}
+		
+		if (putLowestOctreeToLod2)
 		{
 			neoBuilding.currentVisibleOctreesControler.currentVisibles2.push(lowestOctree);
 		}
@@ -3136,8 +3137,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		if (ssao_idx === 1) 
 		{
 			// 2) ssao render.************************************************************************************************************
-			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
-			if (neoBuildingsCount > 0)
+			var neoBuildingsLOD0Count = visibleObjControlerBuildings.currentVisibles0.length;
+			if (neoBuildingsLOD0Count > 0)
 			{
 				if (this.noiseTexture === undefined) 
 				{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
@@ -3199,7 +3200,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				var renderTexture;
 				if (this.isLastFrustum)
 				{
-					this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
+					this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 				}
 				
 				if (currentShader)
@@ -3209,11 +3210,11 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 					if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 				}
-
 			}
+			
 			// 2) LOD 2 & 3.************************************************************************************************************************************
 			var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
-			if (neoBuildingsCount > 0)
+			if (neoBuildingsCount > 0 || neoBuildingsLOD0Count > 0)
 			{
 				currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
 				shaderProgram = currentShader.program;
@@ -3256,8 +3257,9 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 				gl.activeTexture(gl.TEXTURE2); 
 				gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-
-				this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx);
+				
+				this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles0, this, currentShader, renderTexture, ssao_idx);
+				this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles2, this, currentShader, renderTexture, ssao_idx);
 				
 				if (currentShader)
 				{
@@ -3523,8 +3525,8 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 	var shaderProgram;
 	var renderTexture = false;
 	
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
-	if (neoBuildingsCount > 0)
+	var neoBuildingsLOD0Count = visibleObjControlerBuildings.currentVisibles0.length;
+	if (neoBuildingsLOD0Count > 0)
 	{
 		// LOD 0. Render detailed.***
 		currentShader = this.postFxShadersManager.pFx_shaders_array[3]; // neo depth.***
@@ -3549,7 +3551,7 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 		var minSize = 0.0;
 		if (this.isLastFrustum)
 		{
-			this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
+			this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 		}
 	}
 	if (currentShader)
@@ -3559,7 +3561,7 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 	
 	// 2) LOD 2 & 3.************************************************************************************************************************************
 	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
-	if (neoBuildingsCount > 0)
+	if (neoBuildingsCount > 0 || neoBuildingsLOD0Count > 0)
 	{
 		currentShader = this.postFxShadersManager.pFx_shaders_array[7]; // lodBuilding depth.***
 		shaderProgram = currentShader.program;
@@ -3579,7 +3581,8 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 		gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		
-		this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings, this, currentShader, renderTexture, ssao_idx);
+		this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles0, this, currentShader, renderTexture, ssao_idx);
+		this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerBuildings.currentVisibles2, this, currentShader, renderTexture, ssao_idx);
 
 		//if(currentShader.position3_loc !== -1)gl.disableVertexAttribArray(currentShader.position3_loc);
 	}
