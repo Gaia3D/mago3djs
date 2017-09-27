@@ -15,13 +15,6 @@ var VisibleObjectsController = function()
 	this.currentVisibles1 = [];
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
-	
-	//this.currentRenderables0 = [];
-	//this.currentRenderables1 = [];
-	//this.currentRenderables2 = [];
-	//this.currentRenderables3 = [];
-	
-	//this.currentRenderableRefArray = [];
 };
 
 VisibleObjectsController.prototype.initArrays = function() 
@@ -30,9 +23,12 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles1 = [];
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
-	
-	//this.currentRenderables0 = [];
-	//this.currentRenderables1 = [];
-	//this.currentRenderables2 = [];
-	//this.currentRenderables3 = [];
+};
+
+VisibleObjectsController.prototype.clear = function() 
+{
+	this.currentVisibles0.length = 0;
+	this.currentVisibles1.length = 0;
+	this.currentVisibles2.length = 0;
+	this.currentVisibles3.length = 0;
 };
