@@ -1378,11 +1378,9 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 	if (this.selectionFbo === undefined) 
 	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
 
-	
 	// selection render.
 	this.selectionColor.init(); // selection colors manager.***
-	
-	
+
 	// colorSelection render.
 	this.selectionFbo.bind(); // framebuffer for color selection.***
 	
@@ -2074,6 +2072,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (this.buildingSelected === undefined)
 		{ return; }
 
+		var geoLocationData;
+	
 		// create a XY_plane in the selected_pixel_position.***
 		if (this.selObjMovePlane === undefined) 
 		{
@@ -2081,7 +2081,13 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.renderingFase = -1;
 			this.selObjMovePlane = new Plane();
 			// create a local XY plane.
-			this.selObjMovePlane.setPointAndNormal(0.0, 0.0, 0.0,    0.0, 0.0, 1.0); 
+			// find the pixel position relative to building.
+			var pixelPosWorldCoord = new Point3D();
+			pixelPosWorldCoord = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord);
+			geoLocationData = this.buildingSelected.getGeoLocationData();
+			var pixelPosBuildingCoord = geoLocationData.tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
+			
+			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
 			// selObjMovePlane is a tangent plane to globe in the selected point.
 			this.renderingFase = currentRenderingFase;
 		}
@@ -2131,7 +2137,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difX = this.pointSC.x - this.startMovPoint.x;
 			var difY = this.pointSC.y - this.startMovPoint.y;
 
-			var geoLocationData;
+			
 			geoLocationData = this.buildingSelected.geoLocDataManager.geoLocationDataArray[0];
 			var newLongitude = geoLocationData.geographicCoord.longitude - difX;
 			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
@@ -5943,7 +5949,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	//var structureTypedBuilding;
 	//var buildingGeoLocation;
 	
-	// 1rst, rearrange the "buildingSeedList".
+	// TEST: 1rst, rearrange the "buildingSeedList".
 	buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
 	for (var i=0; i<buildingSeedsCount; i++) 
 	{
@@ -5956,6 +5962,22 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			buildingSeed.firstName = firstName;
 			if (firstName === "testId")
 			{
+				if (buildingNameDivided.length == 2)
+				{
+					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
+					buildingSeed.buildingType = undefined;
+				}
+				else if (buildingNameDivided.length == 3)
+				{
+					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1] + "_" + buildingNameDivided[2];
+					buildingSeed.buildingType = undefined;
+				}
+				else if (buildingNameDivided.length >= 4)
+				{
+					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1] + "_" + buildingNameDivided[2];
+					buildingSeed.buildingType = buildingNameDivided[3];
+				}
+				/*
 				if (buildingNameDivided[2] !== undefined)
 				{
 					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
@@ -5966,6 +5988,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 					buildingSeed.buildingId = buildingNameDivided[1];
 					buildingSeed.buildingType = buildingNameDivided[3];
 				}
+				*/
 			}
 		}
 	}
