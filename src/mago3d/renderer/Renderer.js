@@ -27,7 +27,7 @@ var Renderer = function()
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjControlerBuildings, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
+Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleBuildingsArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
 	var neoBuilding;
 	var minSize = 0.0;
@@ -52,10 +52,10 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
 	gl.frontFace(gl.CCW);
 	
 	// do render.
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles0.length;
+	var neoBuildingsCount = visibleBuildingsArray.length;
 	for (var i=0; i<neoBuildingsCount; i++)
 	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles0[i];
+		neoBuilding = visibleBuildingsArray[i];
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
@@ -110,7 +110,7 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleObjControlerBuildings, magoManager, standardShader, renderTexture, ssao_idx) 
+Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleBuildingsArray, magoManager, standardShader, renderTexture, ssao_idx) 
 {
 	var neoBuilding;
 	//var minSize = 0.0;
@@ -119,20 +119,22 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 	//var isInterior = false; // no used.***
 	var lastExtureId;
 	
-	var neoBuildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
+	var neoBuildingsCount = visibleBuildingsArray.length;
 	for (var i=0; i<neoBuildingsCount; i++)
 	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
+		neoBuilding = visibleBuildingsArray[i];
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
+		{ continue; }
+	
+		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
+		if (lowestOctreesCount == 0)
 		{ continue; }
 		
 		var buildingGeoLocation = neoBuilding.getGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-		
-		
-		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
+
 		for (var j=0; j<lowestOctreesCount; j++) 
 		{
 			lowestOctree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[j];
@@ -723,7 +725,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
-			
+		
+		//test:
+		if (neoReference.objectId == "20417")
+		{ var hola = 0; }
+		
 		if (neoReference.selColor4) 
 		{
 			//if(neoReference.color4.a < 255) // if transparent object, then skip. provisional.***

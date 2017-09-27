@@ -896,6 +896,7 @@ void main()\n\
         else{\n\
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
         }\n\
+		\n\
         if(textureColor.w == 0.0)\n\
         {\n\
             discard;\n\
