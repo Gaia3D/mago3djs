@@ -60,7 +60,7 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleObjC
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		var buildingGeoLocation = neoBuilding.getGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -126,7 +126,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 		
-		var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+		var buildingGeoLocation = neoBuilding.getGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -379,8 +379,16 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					// if no render texture, then use a color.***
 					if (neoReference.color4) 
 					{
-						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-						gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
+						if (magoManager.buildingSelected == neoBuilding)
+						{
+							gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+							gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r*0.35/255.0, neoReference.color4.g*0.35/255.0, neoReference.color4.b*0.35/255.0, neoReference.color4.a/255.0]);
+						}
+						else 
+						{
+							gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+							gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
+						}
 					}
 					else
 					{
@@ -1030,7 +1038,6 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ return; }
 		}
-		
 
 		gl.disableVertexAttribArray(shader.color4_loc);
 
@@ -1054,10 +1061,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		
-	
 	}
-	
 };
 
 /**
