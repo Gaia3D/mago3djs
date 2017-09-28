@@ -1308,6 +1308,23 @@
 			"status": "0",
 			"data_insert_type": "SELF",
 			"insert_date": "2017-06-26 21:06:29.159998"
+		},
+		"ByeolMaJeolDoSa": {
+			"list_counter": 10,
+			"data_id": 999,
+			"data_group_id": 77,
+			"data_group_name": "IFC",
+			"data_key": "ByeolMaJeolDoSa",
+			"data_name": "별마절도사",
+			"latitude": "37.579813075158986",
+			"longitude": "126.97772995695296",
+			"height": "60",
+			"heading": "0",
+			"pitch": "0",
+			"roll": "0",
+			"status": "0",
+			"data_insert_type": "SELF",
+			"insert_date": "2017-06-26 21:06:29.159998"
 		}
 	}
 }

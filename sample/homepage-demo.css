@@ -495,7 +495,7 @@ button.btn.on {
 	position: absolute;
 	left: 50%;
 	margin: 0 auto;
-	margin-left: -200px;
+	margin-left: -320px;
 	border-radius: 0 0 10px 10px;
 	background-color: tomato;
 	z-index: 90;
