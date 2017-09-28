@@ -267,6 +267,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
 		if (neoReference === undefined)
 		{ continue; }
+	
+		if (magoManager.isCameraMoving && neoReference.objectId == "2EyH307pn0$u_3EQJQ48gV")
+		{
+			var hola = 0;
+		}
+		
 		if (neoReference.bRendered === magoManager.renderingFase)
 		{ continue; }
 		if (neoReference.tMatrixAuxArray === undefined)
@@ -276,6 +282,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			continue;
 		}
 
+		// test:
+		if (magoManager.isCameraMoving && neoReference.objectId == "2EyH307pn0$u_3EQJQ48gV")
+		{
+			var hola = 0;
+		}
 		block_idx = neoReference._block_idx;
 		block = neoBuilding.motherBlocksArray[block_idx];
 
@@ -285,7 +296,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		if (maxSizeToRender && (block.radius < maxSizeToRender))
 		{ continue; }
 		
-		if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)
+		if (magoManager.isCameraMoving && block.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
 		{ continue; }
 		
 		// Check if the texture is loaded.
@@ -381,16 +392,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					// if no render texture, then use a color.***
 					if (neoReference.color4) 
 					{
-						if (magoManager.buildingSelected == neoBuilding)
-						{
-							gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-							gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r*0.35/255.0, neoReference.color4.g*0.35/255.0, neoReference.color4.b*0.35/255.0, neoReference.color4.a/255.0]);
-						}
-						else 
-						{
-							gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-							gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
-						}
+						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
+						gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
 					}
 					else
 					{
@@ -599,7 +602,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			if (maxSizeToRender && (block.radius < maxSizeToRender))
 			{ continue; }
 			
-			if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)
+			if (magoManager.isCameraMoving && block.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
 			{ continue; }
 			
 			gl.uniform1i(standardShader.hasTexture_loc, false); //.***

@@ -146,6 +146,9 @@ var MagoManager = function()
 	this.highLightColor4 = new Float32Array([0.2, 1.0, 0.2, 1.0]);
 	this.thereAreUrgentOctrees = false;
 	
+	// small object size.
+	this.smallObjectSize = 0.153;
+	
 	// sqrtTable.
 	
 	this.sqrtTable = new Float32Array(11);
@@ -1369,7 +1372,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 	// colorSelection render.
 	this.selectionFbo.bind(); // framebuffer for color selection.***
 	
-	if (this.selectionFbo.dirty) // todo.
+	//if (this.selectionFbo.dirty) // todo.
 	{
 		this.selectionCandidates.clearCandidates();
 		
@@ -1832,7 +1835,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouse_x = mouseX;
 	this.mouse_y = mouseY;
 	this.mouseLeftDown = true;
-	this.isCameraMoving = true;
+	//this.isCameraMoving = true;
 };
 
 /**
