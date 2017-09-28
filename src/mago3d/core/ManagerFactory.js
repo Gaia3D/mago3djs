@@ -76,7 +76,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				{
 					magoManager.isCameraMoving = true;
 					magoManager.cameraMoved();
-					
 				}
 			}
 			
