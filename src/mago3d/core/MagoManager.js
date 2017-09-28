@@ -5983,18 +5983,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1] + "_" + buildingNameDivided[2];
 					buildingSeed.buildingType = buildingNameDivided[3];
 				}
-				/*
-				if (buildingNameDivided[2] !== undefined)
-				{
-					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
-					buildingSeed.buildingType = buildingNameDivided[2];
-				}
-				else
-				{
-					buildingSeed.buildingId = buildingNameDivided[1];
-					buildingSeed.buildingType = buildingNameDivided[3];
-				}
-				*/
 			}
 		}
 	}
