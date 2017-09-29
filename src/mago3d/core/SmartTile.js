@@ -319,7 +319,10 @@ SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultF
  * @param frustum 변수
  */
 SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
-{	
+{
+	if (this.sphereExtent === undefined)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
 	var intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	
 	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
