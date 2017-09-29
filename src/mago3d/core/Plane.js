@@ -101,6 +101,9 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint)
  */
 Plane.prototype.intersectionSphere = function(sphere) 
 {
+	if (sphere === undefined || sphere.centerPoint === undefined)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
 	var sphereCenter = sphere.centerPoint;
 	
 	// calculate the distance by dotProduct.***

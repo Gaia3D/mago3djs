@@ -52,7 +52,6 @@ var MagoManager = function()
 	this.buildingSelected;
 	this.octreeSelected;
 
-	this.objMovState = 0; // 0 = no started. 1 = mov started.
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
@@ -130,21 +129,16 @@ var MagoManager = function()
 	this.isCameraInsideNeoBuilding = false;
 	this.renderingFase = 0;
 
-	this.renders_counter = 0;
-	this.render_time = 0;
 	this.bPicking = false;
-	this.bObjectMarker = true;
-	this.framesCounter = 0;
-
 	this.scene;
-
 	this.renderingModeTemp = 0; // 0 = assembled mode. 1 = dispersed mode.***
 
-	this.frustumIdx;
 	this.numFrustums;
 	this.isLastFrustum = false;
 	this.highLightColor4 = new Float32Array([0.2, 1.0, 0.2, 1.0]);
 	this.thereAreUrgentOctrees = false;
+	
+	this.hierarchyManager = new HierarchyManager();
 	
 	// small object size.
 	this.smallObjectSize = 0.153;
@@ -361,7 +355,6 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	if (!this.magoPolicy.getMagoEnable()) { return; }
 
 	var isLastFrustum = false;
-	this.frustumIdx = frustumIdx;
 	this.numFrustums = numFrustums;
 	if (frustumIdx === numFrustums-1) 
 	{
@@ -1038,8 +1031,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	}
 
 	//if(!isLastFrustum) return;
-
-	this.frustumIdx = frustumIdx;
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	
@@ -3862,7 +3853,6 @@ MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene
 	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array);
 	//gl.uniformMatrix3fv(currentShader._NormalMatrix, false, this.normalMat3_array);
 
-	this.render_time = 0;
 	if (this.isCameraMoving) 
 	{
 		this.dateSC = new Date();
@@ -4316,154 +4306,6 @@ MagoManager.prototype.deleteNeoBuilding = function(gl, neoBuilding)
 	
 	neoBuilding.deleteObjects(gl, vboMemoryManager);
 	
-};
-
-/**
- * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
- * 
- * @param frustumVolume 변수
- * @param cameraPosition 변수
- */
-MagoManager.prototype.doFrustumCullingNeoBuildings = function(frustumVolume, cameraPosition) 
-{
-	// This makes the visible buildings array.***
-	//---------------------------------------------------------------------------------------------------------
-	// Note: in this function, we do frustum culling and determine the detailedBuilding in same time.***
-	var deleteBuildings = false;
-	this.framesCounter += 1;
-	if (this.framesCounter > 1000)
-	{
-		deleteBuildings = true;
-		this.framesCounter = 0;
-	}
-
-	var squaredDistToCamera;
-	var lod0_minSquaredDist = 100000;
-	var lod1_minSquaredDist = 1;
-	var lod2_minSquaredDist = 100000*10000;
-	var lod3_minSquaredDist = 100000*9;
-
-	this.visibleObjControlerBuildings.currentVisibles0.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles1.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles2.length = 0;
-	this.visibleObjControlerBuildings.currentVisibles3.length = 0;
-
-	var maxNumberOfCalculatingPositions = 100;
-	var currentCalculatingPositionsCount = 0;
-	
-	if (this.boundingSphere_Aux === undefined)
-	{
-		this.boundingSphere_Aux = new Sphere();
-	}
-
-	for (var i=0, length = this.neoBuildingsList.neoBuildingsArray.length; i<length; i++) 
-	{
-		var neoBuilding = this.neoBuildingsList.get(i);
-
-		if (neoBuilding.bbox === undefined)
-		{
-			if (currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
-			{
-				this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
-				currentCalculatingPositionsCount++;
-			}
-			continue;
-		}
-
-		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-
-		var geoLoc = neoBuilding.getGeoLocationData();
-		if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
-		{ continue; }
-
-		//var realBuildingPos = geoLoc.pivotPoint;
-		var bboxCenterPoint = neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-		var realBuildingPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, realBuildingPos);
-		
-		if (neoBuilding.buildingId === "ctships")
-		{
-			lod0_minSquaredDist = 100000000;
-			lod1_minSquaredDist = 1;
-			lod2_minSquaredDist = 10000000*10000;
-			lod3_minSquaredDist = 100000*9;
-		}
-
-		this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0;
-		squaredDistToCamera = cameraPosition.squareDistTo(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-		squaredDistToCamera -= (this.radiusAprox_aux*this.radiusAprox_aux)*2;
-		if (squaredDistToCamera > this.magoPolicy.getFrustumFarSquaredDistance())
-		{
-			if (deleteBuildings)
-			{ 
-				this.deleteNeoBuilding(this.sceneState.gl, neoBuilding); 
-			}
-			continue;
-		}
-			
-		this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-		var ratio = 1.0;
-		if (this.renderingModeTemp === 0)
-		{
-			ratio = 1.2/2.0;
-		}
-		else if (this.renderingModeTemp === 1)
-		{
-			ratio = 4.2/2.0;
-		}
-		else if (this.renderingModeTemp === 2)
-		{
-			ratio = 1.2/2.0;
-		}
-
-		this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * ratio;
-
-		this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
-		
-		var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-		// intersect with Frustum
-		if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
-		{	
-			if (this.isLastFrustum)
-			{
-				if (squaredDistToCamera < lod0_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
-				}
-				else if (squaredDistToCamera < lod1_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles1.push(neoBuilding);
-				}
-				else if (squaredDistToCamera < lod2_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
-				}
-				else if (squaredDistToCamera < lod3_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
-				}
-			}
-			else
-			{
-				if (squaredDistToCamera < lod1_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles1.push(neoBuilding);
-				}
-				else if (squaredDistToCamera < lod2_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles2.push(neoBuilding);
-				}
-				else if (squaredDistToCamera < lod3_minSquaredDist) 
-				{
-					this.visibleObjControlerBuildings.currentVisibles3.push(neoBuilding);
-				}
-			}
-		}
-		else
-		{
-			if (deleteBuildings)
-			{ this.deleteNeoBuilding(this.sceneState.gl, neoBuilding); }
-		}
-	}
 };
 
 /**
@@ -5943,6 +5785,17 @@ MagoManager.prototype.getObjectIndexFile = function()
 };
 
 /**
+ * Test hierachy.
+ */
+MagoManager.prototype.makeHierachyTest = function() 
+{
+	var motherNode = this.hierarchyManager.newMotherNode();
+	
+	//https://code.tutsplus.com/articles/data-structures-with-javascript-tree--cms-23393
+	
+};
+
+/**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 MagoManager.prototype.makeSmartTile = function(buildingSeedList) 
@@ -6082,6 +5935,9 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		smartTile.makeTreeByMinDegree(minDegree, this);
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+	
+	// Test.
+	this.makeHierachyTest();
 };
 
 MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
