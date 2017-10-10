@@ -227,7 +227,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 ### 4.データフォルダリンク
 - [www.mago3d.com/homepage/download](http://www.mago3d.com/homepage/download.do)に接続して下部にあるF4D Converter64bitをC：\ F4DConverterにインストール
 - 管理者権限でコマンドプロンプトを実行して、F4D Conveterインストールディレクトリに移動します。
-- 変換データ格納フォルダ（outputFolder）をC：\ dataに作成し、D：\ demo_dataに変換するデータを置いて実行<br>※F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter) を参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
+- 変換データ格納フォルダ（outputFolder）をC：\dataに作成し、C：\tempに変換するデータを置いて実行<br>※F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter) を参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
 
 - 変わったされたデータを表示するには、data.json、policy.jsonを変更する必要があります。<br>※設定ファイルは、tutorials - > data-tutorials、policy-tutorialsを参照して
   - policy.json - 他の設定を変更する必要がなく、mago3DJSを起動したとき、カメラの位置を指定<pre><code>"geo_init_latitude": "...",
