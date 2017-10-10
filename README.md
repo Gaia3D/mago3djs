@@ -220,14 +220,14 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 # mago3DJS
 3次元マルチブロック可視化のためのオープンソースのJavaScriptライブラリ
 
-AEC（Architecture、Engineering、Construction）領域と、伝統的な3次元空間情報（3D GIS）を統合的に管理し、可視化する次世代3次元GISプラットフォームです。室内、糸外の区別なくAECと3D GISをWebブラウザに統合されています。大容量BIM（Building Information Modelling）、JT（Jupiter Tessellation）、3D GISファイルなどを、別のプログラムをインストールすることなく、Webブラウザ上ですぐに見てコラボレーションを行うことができます。
+AEC（Architecture、Engineering、Construction）領域と、伝統的な3次元空間情報（3D GIS）を統合的に管理し、可視化する次世代3次元GISプラットフォームです。室内、糸外の区別なくAECと3D GISをWebブラウザに統合されています。大容量BIM（Building Information Modelling）、JT（Jupiter Tessellation）、3D GISファイルなどを、別のプログラムをインストールすることなく、Webブラウザ上で操作してコラボレーションを行うことができます。
 
 # 特徴
 - AECと3D GISの統合
 - 室内外空間のシームレスな連携
-- Webブラウザ上で駆動され、別のプラグインやアクティブXのインストールが不要
-- オープンソース（Cesium、Web World Wind）をベースに開発され、オープンで拡張性に優れ
-- 初代容量3次元ファイルの効率的な管理と高速レンダリング
+- Webブラウザ上で駆動され、別のプラグインやActiveXのインストールが不要
+- オープンソース（Cesium、Web World Wind）をベースに開発され、オープンで拡張性に優れる
+- 大容量3次元ファイルの効率的な管理と超高速レンダリング
 
 # 対応フォーマット形式
 
@@ -263,9 +263,9 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 ### 3. Node のインストール ###
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
 - インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
--  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
+- mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
--  gulpは端末内のモジュールのあざ命令を使用するためにGlobalにインストールします。
+- gulpはモジュールを端末の全ユーザーが使用する場合に使用します。
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
 ### 4.データ###
