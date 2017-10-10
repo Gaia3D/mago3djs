@@ -264,7 +264,6 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
 - インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
 -  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
--  gulpはモジュールを端末の全ユーザーが使用する場合に使用します。
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
 - gulpはモジュールを端末の全ユーザーが使用する場合に使用します。
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
@@ -274,8 +273,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - [www.mago3d.com](http://www.mago3d.com/homepage/download.do)に接続します。
 - Installer：F4D Converter 64bit（this installation requires Windows 7 or later）ダウンロードします。
 - C：\ F4DConverterにインストールします。
-- 管理者権限でCommand Line Prompt実行します。
-- F4D ConveterインストールDirectoryに移動します。
+- 管理者権限でコマンドラインプロンプトを実行します。
+- F4D Conveterインストールディレクトリに移動します。
 - 変換データ格納フォルダ（outputFolder）をC：\ dataに作成します。
 - inputFolderに変換するデータを置き、以下を実行します。
 <pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
@@ -289,7 +288,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 
 #### data.json 修正
 - C：\dataに表示するデータのディレクトリを検索します。
-- C：\data\ F4d_xxxxにxxxxがdata_keyなってdata_nameは、dataの名前。
+- C：\data\F4d_xxxx の xxxx は data_key になっており data_name は data の名前になります。
 <pre><code>{
   ...
     "xxxx": { // data unique key
@@ -306,7 +305,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 </code></pre>
 
 ### 5. 実行
-#### node serverを実行し
+#### node serverを実行
 - privateでサーバーを実行する場合
 <pre><code> C:\git\ repository\mago3djs>node server.js</code></pre>
 - publicでサーバーを実行する場合
