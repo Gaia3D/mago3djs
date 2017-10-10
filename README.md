@@ -263,7 +263,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 ### 3. Node のインストール ###
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
 - インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
-- mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
+-  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
+-  gulpはモジュールを端末の全ユーザーが使用する場合に使用します。
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
 - gulpはモジュールを端末の全ユーザーが使用する場合に使用します。
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
