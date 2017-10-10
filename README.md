@@ -52,10 +52,20 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. 데이터 폴더 링크
-- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속하여 F4D Converter 64bit를 C:\F4DConverter 에 설치하고 관리자 권한으로 Command Line Prompt 실행하여 F4D Conveter 설치한 Directory 로 이동
-- 변환 데이터 저장 폴더(outputFolder)를 C:\data 에 생성하고 D:\demo_data에 변환할 데이터를 놓고 실행<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
- ※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조
-- 변한 된 데이터를 표시하려면 data.json을 수정해야합니다. tutorials -> data-tutorials.json을 참고
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속하여 하단에 있는 F4D Converter 64bit를 C:\F4DConverter 에 설치
+- 관리자 권한으로 Command Line Prompt 실행하여 F4D Conveter 설치한 Directory 로 이동
+- 변환할 데이터를 C:\temp에 놓고 변환 데이터 저장 폴더(outputFolder)를 C:\data에 생성하고 실행<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
+- 변한 된 데이터를 표시하려면 data.json, policy.json을 수정해야합니다. <br>
+※설정파일은 tutorials -> data-tutorials, policy-tutorials를 참조
+  - policy.json - 다른 설정을 수정할 필요가 없고, mago3DJS를 시작할때 카메라 위치를 지정<pre><code>"geo_init_latitude": "...",
+"geo_init_longitude": "..."
+</code></pre>
+  - data.json - 변환 된 데이터가 F4D_Sample이면<pre><code>"Sample": {
+    "data_key": "Sample",
+    "data_name": "데이터 이름",
+    ...
+  }
+</code></pre>
 - Data가 제대로 생성되었으면 데이터 폴더 링크를 만들어줍니다.<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. Node Server 실행
@@ -129,10 +139,19 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - gulp installs globally in Terminal to use the module's mockups.<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. Data Folder Link
-- Connect to [www.mago3d.com](http://www.mago3d.com/homepage/download.do) and install F4D Converter 64bit to C:\F4DConverter and execute Command Line Prompt with administrator's permission to install F4D Conveter Go to one Directory
-- Create conversion data storage folder (outputFolder) in C:\data, place data to be converted in D:\demo_data and execute<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
-※ Refer to [F4D Conveter](https://github.com/Gaia3D/F4DConverter) for explanation of F4D Conveter argument.
-- You need to modify data.json to display the changed data. See tutorials -> data-tutorials.json
+- Connect to [www.mago3d.com](http://www.mago3d.com/homepage/download.do) and install F4D Converter 64bit at the bottom to C:\F4DConverter
+- Run Command Line Prompt as administrator and move to F4D Conveter installed directory
+- Place the data to be converted in C:\temp, create the conversion data storage folder (outputFolder) in C:\data and execute<br>※ Refer to [F4D Conveter](https://github.com/Gaia3D/F4DConverter) for explanation of F4D Conveter argument.<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
+- To display changed data, you need to modify data.json, policy.json. <br>
+※ Refer to tutorials -> data-tutorials, policy-tutorials for configuration files.
+
+  - policy.json - no need to modify other settings, specify camera location when starting mago3DJS<pre><code>"geo_init_latitude": "...",
+"geo_init_longitude": "..."</code></pre>
+  - data.json - if the converted data is F4D_Sample <pre><code>"Sample": {
+  "data_key": "Sample",
+  "data_name": "Data Name",
+  ...
+}</code></pre>
 - If the data is properly created, it creates a data folder link.<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. Running Node Server
@@ -206,10 +225,18 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - gulpはモジュールを端末の全ユーザーが使用する場合に使用します。<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
 ### 4.データフォルダリンク
-- [www.mago3d.com](http://www.mago3d.com/homepage/download.do)に接続されてF4D Converter64bit C：\ F4DConverterにインストールし、管理者権限でコマンドラインプロンプトを実行して、F4D Conveterインストールディレクトリに移動します。
-- 変換データ格納フォルダ（outputFolder）をC：\ dataに作成し、D：\ demo_dataに変換するデータを置いて実行<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
-※F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter) を参照
-- 変わったされたデータを表示するには、data.jsonを変更する必要があります。tutorials - > data-tutorials.jsonを参照して
+- [www.mago3d.com/homepage/download](http://www.mago3d.com/homepage/download.do)に接続して下部にあるF4D Converter64bitをC：\ F4DConverterにインストール
+- 管理者権限でコマンドプロンプトを実行して、F4D Conveterインストールディレクトリに移動します。
+- 変換データ格納フォルダ（outputFolder）をC：\ dataに作成し、D：\ demo_dataに変換するデータを置いて実行<br>※F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter) を参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
+
+- 変わったされたデータを表示するには、data.json、policy.jsonを変更する必要があります。<br>※設定ファイルは、tutorials - > data-tutorials、policy-tutorialsを参照して
+  - policy.json - 他の設定を変更する必要がなく、mago3DJSを起動したとき、カメラの位置を指定<pre><code>"geo_init_latitude": "...",
+  "geo_init_longitude": "..."</code></pre>
+  - data.json - 変換されたデータがF4D_Sample場合<pre><code>"Sample": {
+"data_key": "Sample",
+"data_name": "データ名",
+...
+}</code></pre>
 - Dataが正常に作成されている場合、データフォルダーのリンクを作成します。<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
 
 ### 5. Node Serverを実行
