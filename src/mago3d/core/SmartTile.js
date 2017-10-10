@@ -26,7 +26,6 @@ var SmartTile = function(smartTileName)
 	this.subTiles; // array.
 	
 	this.buildingSeedsArray;
-	this.buildingsArray; // old.
 	this.nodesArray; // nodes with geometry data only (lowest nodes).
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
@@ -44,6 +43,21 @@ SmartTile.prototype.newSubTile = function(parentTile)
 	subTile.depth = parentTile.depth + 1;
 	this.subTiles.push(subTile);
 	return subTile;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.clearNodessArray = function() 
+{
+	if (this.nodesArray === undefined)
+	{ return; }
+	
+	for (var i=0; i<this.nodesArray.length; i++)
+	{
+		this.nodesArray[i] = undefined;
+	}
+	this.nodesArray = undefined;
 };
 
 /**
@@ -67,6 +81,8 @@ SmartTile.prototype.clearBuildingsArray = function()
 SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
 	var resultNeoBuilding;
+	var neoBuilding;
+	var node;
 	var hasSubTiles = true;
 	if (this.subTiles === undefined)
 	{ hasSubTiles = false; }
@@ -76,28 +92,30 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 		
 	if (!hasSubTiles)
 	{
-		if (this.buildingsArray)
+		if (this.nodesArray)
 		{
-			var buildingCount = this.buildingsArray.length;
+			var nodesCount = this.nodesArray.length;
 			var find = false;
 			var i=0;
-			while (!find && i<buildingCount) 
+			while (!find && i<nodesCount) 
 			{
+				node = this.nodesArray[i];
+				neoBuilding = node.data.neoBuilding;
 				if (buildingType)
 				{
-					if (this.buildingsArray[i].buildingId === buildingId && this.buildingsArray[i].buildingType === buildingType) 
+					if (neoBuilding.buildingId === buildingId && neoBuilding.buildingType === buildingType) 
 					{
 						find = true;
-						resultNeoBuilding = this.buildingsArray[i];
+						resultNeoBuilding = neoBuilding;
 						return resultNeoBuilding;
 					}
 				}
 				else 
 				{
-					if (this.buildingsArray[i].buildingId === buildingId) 
+					if (neoBuilding.buildingId === buildingId) 
 					{
 						find = true;
-						resultNeoBuilding = this.buildingsArray[i];
+						resultNeoBuilding = neoBuilding;
 						return resultNeoBuilding;
 					}
 				}
@@ -201,8 +219,46 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager) 
+{
+	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
+	{ return; }
+	
+	// if this has "buildingSeedsArray" then make sphereExtent.
+	this.makeSphereExtent(magoManager);
+	
+	// now, if the current depth < targetDepth, then descend.
+	if (this.depth < targetDepth)
+	{
+		// create 4 child smartTiles.
+		for (var i=0; i<4; i++)
+		{ this.newSubTile(this); }
+		
+		// set the sizes to subTiles.
+		this.setSizesToSubTiles();
+		
+		// intercept buildingSeeds for each subTiles.
+		for (var i=0; i<4; i++)
+		{
+			this.subTiles[i].takeIntersectedBuildingSeeds(this.buildingSeedsArray);
+		}
+		
+		// for each subTile that has intercepted buildingSeeds -> makeTree.
+		for (var i=0; i<4; i++)
+		{
+			this.subTiles[i].makeTreeByDepth(targetDepth, magoManager);
+		}
+		
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
 SmartTile.prototype.makeTreeByMinDegree = function(minDegree, magoManager) 
 {
+	// note: minDegree = 0.01deg = 1.105,74m.
 	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
 	{ return; }
 	
