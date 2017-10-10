@@ -43,23 +43,64 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 ### 2. 소스 설치 ###
 - git을 사용하여 git clone (https://github.com/Gaia3D/mago3djs.git) 으로 소스를 C:\git\repository\mago3djs 에 설치합니다. <br>
 - eclipse를 실행 후 <code>Project Import File -> import -> General -> Projects from Folder or Archive</code>로 mago3djs를 import합니다.
->git을 사용하지 않을 경우 Download ZIP 링크를 클릭하여 설치합니다.
+- git을 사용하지 않을 경우 Download ZIP 링크를 클릭하여 설치합니다.
 
 ### 3. Node 설치 ###
 - [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치합니다.
 - 설치가 끝난 뒤 C:\git\repository\mago3djs 디렉토리로 이동합니다.
 - mago3DJS에 필요한 node_modules를 Node Package Manager 사용하여 설치합니다.
-- gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치합니다.
-
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
+- gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치합니다.
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4. 데이터 폴더 링크 ###
+### 4. 데이터 ###
+#### 데이터 변환
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속합니다.
+- Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 다운로드합니다.
+- C:\F4DConverter 에 설치합니다.
+- 관리자 권한으로 Command Line Prompt 실행합니다.
+- F4D Conveter 설치 Directory 로 이동합니다.
+- 변환 데이터 저장 폴더(outputFolder)를 C:\data 에 생성합니다.
+- inputFolder에 변환할 데이터를 놓고, 다음을 실행합니다.
+<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
+>F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조
+
+- C:\data 폴더에 F4D_xxxx 폴더들과, objectIndexFile.ihe 파일 생성을 확인합니다. 파일이 생성되지 않은 경우 로그파일(logTest.txt)를 확인합니다.
+
+#### 데이터 폴더 링크
+- Data가 제대로 생성되었으면 데이터 폴더 링크를 만들어줍니다.
 <pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
 
-### 5. 서버 실행 ###
+#### data.json 수정
+- C:\data 에서 표시할 데이터 디렉토리를 찾습니다.
+- C:\data\F4d_xxxx에 xxxx가 data_key가 되고 data_name은 data이름.
+<pre><code>{
+  ...
+    "xxxx": { // data unique key
+    "data_key": "data unique key",
+    "data_name": "data name",
+    "latitude": "latitude",
+    "longitude": "longitude",
+    "height": "height",
+    "heading": "heading",
+    "pitch": "pitch",
+    "roll": "roll"
+    }
+}
+</code></pre>
+
+### 5. 실행
+#### node server 를 실행
+- private로 서버를 실행할경우
 <pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
+- public로 서버를 실행할경우
+<pre><code>C:\git\repository\mago3djs>node server.js --public true</code></pre>
+
+#### 브라우저 확인
+- Cesium
+<pre><code>http:localhost/sample/cesium.html</code></pre>
+- WorlWind
+<pre><code>http:localhost/sample/worldwind.html</code></pre>
 
 
 ## LICENSE ##
@@ -116,17 +157,57 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - [node](https://nodejs.org/ko/download/) to install Window Install (.msi) 64-bit.
 - After the installation is complete, go to the C:\git\repository\mago3djs directory.
 - Use node Package Manager to install node_modules for mago3DJS.
-- gulp installs globally in Terminal to use the module's mockups.
-
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
+- gulp installs globally in Terminal to use the module's mockups.
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4. Data folder link
-  <pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+### 4. Data
+- Access [www.mago3d.com](http://www.mago3d.com/homepage/download.do).
+- Installer: F4D Converter 64bit (this installation requires Windows 7 or later).
+- Install to C: \ F4DConverter.
+- Run Command Line Prompt with administrator privileges.
+- Go to the F4D Conveter installation directory.
+- Create the conversion data save folder (outputFolder) in C: \ data.
+- Place the data to be converted in the inputFolder, and do the following:
+<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
+> For a description of F4D Conveter argument, refer to [F4D Conveter](https://github.com/Gaia3D/F4DConverter)
 
-### 5. Running the server
-<pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //서버를 public으로 실행할경우</code></pre>
+- Check the creation of F4D_xxxx folders and objectIndexFile.ihe file in C: \ data folder. If the file is not generated, check the log file (logTest.txt).
+
+#### Data folder link
+- If the data is properly created, it creates a data folder link.
+<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+
+#### Edit data.json
+- Find the data directory to display in C: \ data.
+- C:\data\F4d_xxxx where xxxx is the data_key and data_name is the data name.
+<pre><code>{
+  ...
+    "xxxx": { // data unique key
+    "data_key": "data unique key",
+    "data_name": "data name",
+    "latitude": "latitude",
+    "longitude": "longitude",
+    "height": "height",
+    "heading": "heading",
+    "pitch": "pitch",
+    "roll": "roll"
+    }
+}
+</code></pre>
+
+### 5. Execute
+#### run the node server
+- When running the server as private
+<pre><code> C:\git\repository mago3djs>node server.js </code></pre>
+- If you run the server as public
+<pre><code> C:\git\repository\mago3djs>node server.js --public true</code></pre>
+
+#### Browser Confirmation
+- Cesium
+<pre> <code>http:localhost/sample/cesium.html</code></pre>
+- WorlWind
+<pre> <code>http:localhost/sample/worldwind.html</code></pre>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
@@ -163,7 +244,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 
 # Getting Started
 
-### 1. Development Environment
+### 1. 開発環境参考文書
 - [java8](http://www.oracle.com/technetwork/java/javase/downloads/index.html ) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp; ● [Jasmine](https://github.com/Gaia3D/mago3djs/wiki/Test)
 - [eclipse neon(need)](https://www.eclipse.org/downloads/eclipse-packages/)
 &emsp;&emsp;&emsp;&emsp;&emsp; ● [Jsdoc](https://github.com/Gaia3D/mago3djs/wiki/Documentation)
@@ -173,28 +254,68 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - [Cesium-Custermizing](https://github.com/Gaia3D/mago3djs/wiki/Cesium-Custermizing)
 
 
-### 2. Source Download
+### 2. ソースインストール
 - gitを使用してgit clone https://github.com/Gaia3D/mago3djs.git にソースをC:\git\repository\mago3djs にインストールします。 <br>
 - eclipseを実行した後、<code> Project Import File  - > import  - > General  - > Projects from Folder or Archive </ code>で mago3djs をimportします。
 > gitを使用しない場合Download ZIPリンクをクリックしてインストールします。
 
 
-### 3. Node Install ###
+### 3. Node のインストール ###
 - [node](https://nodejs.org/ko/download/) に接続してWindow Install（.msi）64-bitをインストールします。
 - インストールが終わった後、C:\git\mago3DJSディレクトリに移動します。
 -  mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。
--  gulpは端末内のモジュールのあざ命令を使用するためにGlobalにインストールします。
-
 <pre><code>C:\git\repository\mago3djs> npm install</code></pre>
+-  gulpは端末内のモジュールのあざ命令を使用するためにGlobalにインストールします。
 <pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4. Data Folder Link ###
-<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+### 4.データ###
+#### データ変換
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do)に接続します。
+- Installer：F4D Converter 64bit（this installation requires Windows 7 or later）ダウンロードします。
+- C：\ F4DConverterにインストールします。
+- 管理者権限でCommand Line Prompt実行します。
+- F4D ConveterインストールDirectoryに移動します。
+- 変換データ格納フォルダ（outputFolder）をC：\ dataに作成します。
+- inputFolderに変換するデータを置き、以下を実行します。
+<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder D:\demo_data -outputFolder C:\data -log D:\demo_data/logTest.txt -indexing y</code></pre>
+> F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter)を参照
 
-### 5. Running the server ###
-<pre><code>C:\git\repository\mago3djs>node server.js </code></pre>
-<pre><code>C:\git\repository\mago3djs>node server.js --public true //サーバーをpublicに実行する場合</code></pre>
+- C：\ dataフォルダにF4D_xxxxフォルダと、objectIndexFile.iheファイルの作成を確認します。ファイルが生成されていない場合は、ログファイル（logTest.txt）を確認します。
 
+#### データフォルダへのリンク
+- Dataが正常に作成されている場合、データフォルダーのリンクを作成します。
+<pre><code>mklink /d "C：\git\repository\mago3djs\data" "C：\data"</code></pre>
+
+#### data.json 修正
+- C：\dataに表示するデータのディレクトリを検索します。
+- C：\data\ F4d_xxxxにxxxxがdata_keyなってdata_nameは、dataの名前。
+<pre><code>{
+  ...
+    "xxxx": { // data unique key
+    "data_key": "data unique key",
+    "data_name": "data name",
+    "latitude": "latitude",
+    "longitude": "longitude",
+    "height": "height",
+    "heading": "heading",
+    "pitch": "pitch",
+    "roll": "roll"
+    }
+}
+</code></pre>
+
+### 5. 実行
+#### node serverを実行し
+- privateでサーバーを実行する場合
+<pre><code> C:\git\ repository\mago3djs>node server.js</code></pre>
+- publicでサーバーを実行する場合
+<pre><code> C：\git\repository\mago3djs>node server.js--public true</code></pre>
+
+####ブラウザチェック
+- Cesium
+<pre><code>http：localhost/sample/cesium.html</code></pre>
+- WorlWind
+<pre><code>http：localhost/sample/worldwind.html</code></pre>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
