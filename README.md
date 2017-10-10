@@ -150,7 +150,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 ### 2. Source Download
 - Use git to install the source to C:\git\repository\mago3djs with git clone https://github.com/Gaia3D/mago3djs.git. <br>
 - Run eclipse and import mago3djs into <code> Project Import File -> import -> General -> Projects from Folder or Archive </code>.
-> If you are not using git, click the Download ZIP link to install it.
+- If you are not using git, click the Download ZIP link to install it.
 
 
 ### 3. Node install ###
@@ -256,8 +256,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 
 ### 2. ソースインストール
 - gitを使用してgit clone https://github.com/Gaia3D/mago3djs.git にソースをC:\git\repository\mago3djs にインストールします。 <br>
-- eclipseを実行した後、<code> Project Import File  - > import  - > General  - > Projects from Folder or Archive </ code>で mago3djs をimportします。
-> gitを使用しない場合Download ZIPリンクをクリックしてインストールします。
+- eclipseを実行した後、<code> Project Import File  - > import  - > General  - > Projects from Folder or Archive </code>で mago3djs をimportします。
+- gitを使用しない場合Download ZIPリンクをクリックしてインストールします。
 
 
 ### 3. Node のインストール ###
