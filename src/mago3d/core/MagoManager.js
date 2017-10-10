@@ -14,7 +14,6 @@ var MagoManager = function()
 	// F4D Data structure & objects.*****************************************
 	//this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
 	this.terranTile = new TerranTile();// use this.***
-	//this.neoBuildingsList = new NeoBuildingsList(); // old.
 	this.renderer = new Renderer();
 	//this.selection = new Selection();
 	this.selectionCandidates = new SelectionCandidates();
