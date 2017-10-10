@@ -3243,7 +3243,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				for (var b=0; b<visibleNodesLOD0Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles0[b];
-					neoBuilding = node.data.neoBuilding;
+					neoBuilding = node.data["neoBuilding"];
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 					var buildingGeoLocation = neoBuilding.getGeoLocationData();
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
@@ -3260,7 +3260,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				for (var b=0; b<visibleNodesLOD2Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles2[b];
-					neoBuilding = node.data.neoBuilding;
+					neoBuilding = node.data["neoBuilding"];
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
 					var buildingGeoLocation = neoBuilding.getGeoLocationData();
