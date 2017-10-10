@@ -22,13 +22,13 @@ var Renderer = function()
 	this.simpObj_scratch;
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleBuildingsArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
+Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
+	var node;
 	var neoBuilding;
 	var minSize = 0.0;
 	var lowestOctreesCount;
@@ -52,10 +52,11 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleBuil
 	gl.frontFace(gl.CCW);
 	
 	// do render.
-	var neoBuildingsCount = visibleBuildingsArray.length;
-	for (var i=0; i<neoBuildingsCount; i++)
+	var nodesCount = visibleNodesArray.length;
+	for (var i=0; i<nodesCount; i++)
 	{
-		neoBuilding = visibleBuildingsArray[i];
+		node = visibleNodesArray[i];
+		neoBuilding = node.data.neoBuilding;
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
@@ -106,12 +107,14 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleBuil
 	}
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleBuildingsArray, magoManager, standardShader, renderTexture, ssao_idx) 
+Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx) 
 {
+	var node;
 	var neoBuilding;
 	//var minSize = 0.0;
 	var lowestOctreesCount;
@@ -119,10 +122,11 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 	//var isInterior = false; // no used.***
 	var lastExtureId;
 	
-	var neoBuildingsCount = visibleBuildingsArray.length;
-	for (var i=0; i<neoBuildingsCount; i++)
+	var nodesCount = visibleNodesArray.length;
+	for (var i=0; i<nodesCount; i++)
 	{
-		neoBuilding = visibleBuildingsArray[i];
+		node = visibleNodesArray[i];
+		neoBuilding = node.data.neoBuilding;
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 	
@@ -196,6 +200,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		}
 	}
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
