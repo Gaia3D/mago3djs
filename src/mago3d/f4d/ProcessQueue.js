@@ -13,55 +13,57 @@ var ProcessQueue = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.buildingsToDeleteMap = new Map();
-	this.buildingsToDeleteModelReferencesMap = new Map();
+	this.nodesToDeleteMap = new Map();
+	this.nodesToDeleteModelReferencesMap = new Map();
 };
 
-ProcessQueue.prototype.putBuildingsToDeleteModelReferences = function(building, aValue)
+ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 {
-	// this puts the building to the "buildingsToDeleteModelReferencesMap".
+	// this puts the node to the "nodesToDeleteModelReferencesMap".
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
 	
-	this.buildingsToDeleteModelReferencesMap.set(building, aValue);
+	this.nodesToDeleteModelReferencesMap.set(node, aValue);
 };
 
-ProcessQueue.prototype.eraseBuildingsToDeleteModelReferences = function(building)
+ProcessQueue.prototype.eraseNodeToDeleteModelReferences = function(node)
 {
-	// this erases the building from the "buildingsToDeleteModelReferencesMap".
-	this.buildingsToDeleteModelReferencesMap.delete(building);
+	// this erases the node from the "nodesToDeleteModelReferencesMap".
+	this.nodesToDeleteModelReferencesMap.delete(node);
 };
 
-ProcessQueue.prototype.putBuildingToDelete = function(building, aValue)
+ProcessQueue.prototype.putNodeToDelete = function(node, aValue)
 {
-	// this puts the building to the "buildingsToDeleteMap".
+	// this puts the node to the "nodesToDeleteMap".
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
 	
-	this.buildingsToDeleteMap.set(building, aValue);
+	this.nodesToDeleteMap.set(node, aValue);
 };
 
-ProcessQueue.prototype.putBuildingsArrayToDelete = function(buildingsToDeleteArray, aValue)
+ProcessQueue.prototype.putNodesArrayToDelete = function(nodesToDeleteArray, aValue)
 {
-	if (buildingsToDeleteArray === undefined)
+	if (nodesToDeleteArray === undefined)
 	{ return; }
 	
-	// this puts the buildingsToDeleteArray to the "buildingsToDeleteMap".
+	// this puts the nodesToDeleteArray to the "nodesToDeleteArray".
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
 	
-	var buildingsToDeleteCount = buildingsToDeleteArray.length;
-	for (var i=0; i<buildingsToDeleteCount; i++)
+	var nodesToDeleteCount = nodesToDeleteArray.length;
+	for (var i=0; i<nodesToDeleteCount; i++)
 	{
-		this.putBuildingToDelete(buildingsToDeleteArray[i], aValue);
+		this.putNodeToDelete(nodesToDeleteArray[i], aValue);
 	}
 };
 
-ProcessQueue.prototype.eraseBuildingToDelete = function(building)
+ProcessQueue.prototype.eraseNodeToDelete = function(node)
 {
-	// this erases the building from the "buildingsToDeleteMap".
-	this.buildingsToDeleteMap.delete(building);
+	// this erases the node from the "nodesToDeleteMap".
+	this.nodesToDeleteMap.delete(node);
 };
+
+
