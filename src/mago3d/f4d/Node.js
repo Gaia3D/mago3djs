@@ -1,7 +1,6 @@
 'use strict';
 
 /**
- * 블럭 모델
  * @class Node
  */
 var Node = function() 
@@ -11,21 +10,13 @@ var Node = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	// parent.
+	this.parent;
+	
 	// children array.
 	this.children = []; 
 	
-	// attributes jason.
-	this.attributes;
+	// data.
+	this.data;
 };
 
-/**
- * @returns new node.
- */
-/*
-Node.prototype.newChildNode = function() 
-{
-	var childNode = new Node();
-	this.children.push(childNode);
-	return childNode;
-};
-*/

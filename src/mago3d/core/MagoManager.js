@@ -375,7 +375,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 			this.configInformation = MagoConfig.getPolicy();
 		}
 		this.sceneState.gl = scene.context._gl;
-		this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum, frustumIdx, numFrustums);
+		this.startRender(scene, isLastFrustum, frustumIdx, numFrustums);
 	}
 	/*
 	if(isLastFrustum)
@@ -430,7 +430,7 @@ MagoManager.prototype.renderOrdered = function(dc)
 	this.sceneState.gl = dc.currentGlContext;
 	var scene;
 	
-	this.renderNeoBuildingsAsimectricVersion(scene, isLastFrustum, frustumIdx, numFrustums);
+	this.startRender(scene, isLastFrustum, frustumIdx, numFrustums);
 };
 
 /**
@@ -1019,11 +1019,11 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 
 
 /**
- * object index 파일을 읽어서 Frustum Culling으로 화면에 rendering
+ * start rendering.
  * @param scene 변수
  * @param isLastFrustum 변수
  */
-MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLastFrustum, frustumIdx, numFrustums) 
+MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
 {
 	if (this.renderingModeTemp === 0) 
 	{
@@ -1035,7 +1035,6 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 	this.isLastFrustum = isLastFrustum;
 	
 	this.upDateSceneStateMatrices(this.sceneState);
-
 	var gl = this.sceneState.gl;
 
 	if (this.textureAux_1x1 === undefined) 
@@ -1047,6 +1046,7 @@ MagoManager.prototype.renderNeoBuildingsAsimectricVersion = function(scene, isLa
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	
+	// provisional pin textures loading.
 	if (this.pin.texture === undefined)
 	{
 		this.pin.texture = new Texture();
@@ -4687,6 +4687,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		
 		if (lowestTile.buildingsArray && lowestTile.buildingsArray.length > 0)
 		{
+			// the neoBuildings is made.
 			var buildingsCount = lowestTile.buildingsArray.length;
 			for (var j=0; j<buildingsCount; j++)
 			{
@@ -4814,13 +4815,21 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 			buildingSeedsCount = lowestTile.buildingSeedsArray.length;
 			for (var j=0; j<buildingSeedsCount; j++)
 			{
+				var node = new Node();
+				
 				buildingSeed = lowestTile.buildingSeedsArray[j];
 				neoBuilding = new NeoBuilding();
 				
-				if (lowestTile.buildingsArray === undefined)
-				{ lowestTile.buildingsArray = []; }
+				node.data = {"name": "aBuilding", "neoBuilding": neoBuilding};
 				
-				lowestTile.buildingsArray.push(neoBuilding);
+				if (lowestTile.buildingsArray === undefined)// old...
+				{ lowestTile.buildingsArray = []; }
+			
+				if (lowestTile.nodesArray === undefined)
+				{ lowestTile.nodesArray = []; }
+				
+				lowestTile.buildingsArray.push(neoBuilding);// old...
+				lowestTile.nodesArray.push(node);
 				
 				if (neoBuilding.metaData === undefined) 
 				{ neoBuilding.metaData = new MetaData(); }
@@ -4849,7 +4858,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				{
 					if (currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
 					{
-						this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding);
+						this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding); // old.***
 						//this.parseQueue.neoBuildingsHeaderToParseArray.push(neoBuilding);
 						currentCalculatingPositionsCount++;
 					}
@@ -5789,9 +5798,11 @@ MagoManager.prototype.getObjectIndexFile = function()
  */
 MagoManager.prototype.makeHierachyTest = function() 
 {
-	var motherNode = this.hierarchyManager.newMotherNode();
 	
+	var projectTree = this.hierarchyManager.newProjectTree();
 	
+	// testId_F110T_outfitting
+	// testId_F110T_structure
 	
 };
 

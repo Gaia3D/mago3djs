@@ -11,16 +11,16 @@ var HierarchyManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// mother nodes array.
-	this.motherNodesArray = [];
+	// projectTrees array.
+	this.motherProjectTreesArray = [];
 };
 
 /**
- * @returns new node.
+ * @returns new ProjectTree.
  */
-HierarchyManager.prototype.newMotherNode = function() 
+HierarchyManager.prototype.newProjectTree = function() 
 {
-	var motherNode = new Node();
-	this.motherNodesArray.push(motherNode);
-	return motherNode;
+	var projectTree = new ProjectTree();
+	this.motherProjectTreesArray.push(projectTree);
+	return projectTree;
 };

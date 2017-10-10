@@ -26,7 +26,8 @@ var SmartTile = function(smartTileName)
 	this.subTiles; // array.
 	
 	this.buildingSeedsArray;
-	this.buildingsArray;
+	this.buildingsArray; // old.
+	this.nodesArray; // nodes with geometry data only (lowest nodes).
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 };
