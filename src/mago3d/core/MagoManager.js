@@ -1249,7 +1249,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
-		this.drawBuildingNames(this.visibleObjControlerBuildings) ;
+		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
 	
 	this.renderingFase = !this.renderingFase;
@@ -1268,7 +1268,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 /**
  * Draw building names on scene.
  */
-MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings) 
+MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes) 
 {
 	var canvas = document.getElementById("objectLabel");
 	if (canvas === undefined)
@@ -1294,13 +1294,15 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerBuildings)
 
 	// lod2.
 	var gl = this.sceneState.gl;
+	var node;
 	var neoBuilding;
 	var worldPosition;
 	var screenCoord;
-	var buildingsCount = visibleObjControlerBuildings.currentVisibles2.length;
-	for (var i=0; i<buildingsCount; i++)
+	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
+	for (var i=0; i<nodesCount; i++)
 	{
-		neoBuilding = visibleObjControlerBuildings.currentVisibles2[i];
+		node = visibleObjControlerNodes.currentVisibles2[i];
+		neoBuilding = node.data.neoBuilding;
 		//geoLocation = neoBuilding.getGeoLocationData();
 		//worldPosition = geoLocation.position;
 		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
