@@ -3196,6 +3196,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			// 3) now render bboxes.*******************************************************************************************************************
 			if (this.magoPolicy.getShowBoundingBox())
 			{
+				var node;
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 				shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
@@ -3255,12 +3256,12 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 				}
 
-				visibleNodesLOD2Count = this.visibleObjControlerNodes.currentVisibles2.length;
+				var visibleNodesLOD2Count = this.visibleObjControlerNodes.currentVisibles2.length;
 
 				for (var b=0; b<visibleNodesLOD2Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles2[b];
-					neoBuilding = this.visibleObjControlerNodes.currentVisibles2[b];
+					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
 					var buildingGeoLocation = neoBuilding.getGeoLocationData();
