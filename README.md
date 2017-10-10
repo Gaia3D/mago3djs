@@ -145,7 +145,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - To display changed data, you need to modify data.json, policy.json. <br>
 ※ Refer to tutorials -> data-tutorials, policy-tutorials for configuration files.
 
-  - policy.json - no need to modify other settings, specify camera location when starting mago3DJS<pre> <code>"geo_init_latitude": "..."
+  - policy.json - no need to modify other settings, specify camera location when starting mago3DJS<pre><code>"geo_init_latitude": "...",
 "geo_init_longitude": "..."</code></pre>
   - data.json - if the converted data is F4D_Sample <pre><code>"Sample": {
   "data_key": "Sample",
