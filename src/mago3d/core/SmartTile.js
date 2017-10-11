@@ -63,21 +63,6 @@ SmartTile.prototype.clearNodessArray = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-SmartTile.prototype.clearBuildingsArray = function() 
-{
-	if (this.buildingsArray === undefined)
-	{ return; }
-	
-	for (var i=0; i<this.buildingsArray.length; i++)
-	{
-		this.buildingsArray[i] = undefined;
-	}
-	this.buildingsArray = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
 SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
 {
 	var resultNeoBuilding;
