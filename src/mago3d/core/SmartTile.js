@@ -288,7 +288,6 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 	{
 		buildingSeed = buildingSeedsArray[i];
 		
-		//if (this.intersectPoint(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude)) // original.
 		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
 		{
 			buildingSeedsArray.splice(i, 1);
@@ -299,6 +298,18 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 			{ this.buildingSeedsArray = []; }
 			
 			this.buildingSeedsArray.push(buildingSeed);
+			
+			// now, redefine the altitude limits of this tile.
+			var altitude = buildingSeed.geographicCoordOfBBox.altitude;
+			var bboxRadius = buildingSeed.bBox.getRadiusAprox();
+			if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+			{
+				this.minGeographicCoord.altitude = altitude-bboxRadius;
+			}
+			else if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
+			{
+				this.maxGeographicCoord.altitude = altitude+bboxRadius;
+			}
 		}
 	}
 };

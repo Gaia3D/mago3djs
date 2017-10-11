@@ -4559,6 +4559,19 @@ MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
 };
 
 /**
+ * Test hierachy.
+ */
+MagoManager.prototype.makeHierachyTest = function() 
+{
+	var projectTree = this.hierarchyManager.newProjectTree();
+	
+	// testId_F110T_outfitting
+	// testId_F110T_structure
+	
+		
+};
+
+/**
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
@@ -4646,6 +4659,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 					//if (firstName !== "testId")
 					//ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+					//neoBuilding.bboxAbsoluteCenterPos = undefined;
 					continue;
 					
 				}
@@ -4781,232 +4795,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
-MagoManager.prototype.tilesFrustumCullingFinished_current = function(intersectedLowestTilesArray, cameraPosition, frustumVolume, doFrustumCullingToBuildings) 
-{
-	//this.testAproxDist3D();
-	
-	var tilesCount = intersectedLowestTilesArray.length;
-	
-	if (tilesCount === 0)
-	{ return; }
-	
-	var distToCamera;
-	
-	var lod0_minDist = this.magoPolicy.getLod1DistInMeters();
-	var lod1_minDist = 1;
-	var lod2_minDist = this.magoPolicy.getLod2DistInMeters();
-	var lod3_minDist = lod2_minDist * 10;
-
-	var maxNumberOfCalculatingPositions = 100;
-	var currentCalculatingPositionsCount = 0;
-	
-	var lowestTile;
-	var buildingSeedsCount;
-	var buildingSeed;
-	var neoBuilding;
-	var geoLoc;
-	var realBuildingPos;
-	var parentBuilding;
-	var longitude, latitude, altitude, heading, pitch, roll;
-
-	for (var i=0; i<tilesCount; i++)
-	{
-		lowestTile = intersectedLowestTilesArray[i];
-		if (lowestTile.sphereExtent === undefined)
-		{ continue; }
-	
-		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
-		if (distToCamera > lod3_minDist)
-		{ continue; }
-		
-		if (lowestTile.buildingsArray && lowestTile.buildingsArray.length > 0)
-		{
-			// the neoBuildings is made.
-			var buildingsCount = lowestTile.buildingsArray.length;
-			for (var j=0; j<nodesCount; j++)
-			{
-				// determine LOD for each building.
-				neoBuilding = lowestTile.buildingsArray[j];
-				
-				geoLoc = neoBuilding.getGeoLocationData();
-				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
-				{ 
-					if (neoBuilding.metaData.geographicCoord === undefined)
-					{
-						neoBuilding.metaData.geographicCoord = new GeographicCoord();
-			
-						var buildingSeed = lowestTile.getBuildingSeedById(undefined, neoBuilding.buildingId) ;
-						if (buildingSeed)
-						{
-							neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-							neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-							neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-							neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-						}
-						// this building was deleted, so, put this in visibleBuildingsList to load data.
-						//this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
-						//continue;
-					}
-			
-					geoLoc = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
-					longitude = neoBuilding.metaData.geographicCoord.longitude;
-					latitude = neoBuilding.metaData.geographicCoord.latitude;
-					altitude = neoBuilding.metaData.geographicCoord.altitude;
-					heading = neoBuilding.metaData.heading;
-					pitch = neoBuilding.metaData.pitch;
-					roll = neoBuilding.metaData.roll;
-					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, geoLoc, this);
-					
-					parentBuilding = neoBuilding;
-					this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
-					
-					if (neoBuilding.buildingId === "ctships")
-					{
-						// Test:
-						// for this building dont translate the pivot point to the bbox center.***
-						//return;
-					}
-					//if (firstName !== "testId")
-					//ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-					continue;
-					
-				}
-				
-				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord();
-				
-				if (neoBuilding.buildingId === "ctships")
-				{
-					lod0_minDist = 32;
-					lod1_minDist = 1;
-					lod2_minDist = 316000;
-					lod3_minDist = lod2_minDist*10;
-				}
-				
-				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
-				if (this.boundingSphere_Aux === undefined)
-				{ this.boundingSphere_Aux = new Sphere(); }
-			
-				this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-				this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
-				
-				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
-				neoBuilding.distToCam = distToCamera;
-			
-				if (distToCamera > this.magoPolicy.getFrustumFarDistance())
-				{ continue; }
-				
-				// If necessary do frustum culling.*************************************************************************
-				if (doFrustumCullingToBuildings)
-				{
-					var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-					// intersect with Frustum
-					if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
-					{	
-						continue;
-					}
-				}
-				//-------------------------------------------------------------------------------------------
-				
-				if (this.isLastFrustum)
-				{
-					if (distToCamera < lod0_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
-					}
-					else if (distToCamera < lod1_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles1, neoBuilding);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles2, neoBuilding);
-					}
-					else if (distToCamera < lod3_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles3, neoBuilding);
-					}
-				}
-				else
-				{
-					if (distToCamera < lod1_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles1, neoBuilding);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles2, neoBuilding);
-					}
-					else if (distToCamera < lod3_minDist) 
-					{
-						this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles3, neoBuilding);
-					}
-				}
-			}
-		}
-		else
-		{
-			// create the buildings by buildingSeeds.
-			buildingSeedsCount = lowestTile.buildingSeedsArray.length;
-			for (var j=0; j<buildingSeedsCount; j++)
-			{
-				var node = new Node();
-				
-				buildingSeed = lowestTile.buildingSeedsArray[j];
-				neoBuilding = new NeoBuilding();
-				
-				node.data = {"name": "aBuilding", "neoBuilding": neoBuilding};
-				
-				if (lowestTile.buildingsArray === undefined)// old...
-				{ lowestTile.buildingsArray = []; }
-			
-				if (lowestTile.nodesArray === undefined)
-				{ lowestTile.nodesArray = []; }
-				
-				lowestTile.buildingsArray.push(neoBuilding);// old...
-				lowestTile.nodesArray.push(node);
-				
-				if (neoBuilding.metaData === undefined) 
-				{ neoBuilding.metaData = new MetaData(); }
-
-				if (neoBuilding.metaData.geographicCoord === undefined)
-				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-				if (neoBuilding.metaData.bbox === undefined) 
-				{ neoBuilding.metaData.bbox = new BoundingBox(); }
-
-				// create a building and set the location.***
-				neoBuilding.name = buildingSeed.name;
-				neoBuilding.buildingId = buildingSeed.buildingId;
-			
-				neoBuilding.buildingType = "basicBuilding";
-				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
-				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
-				if (neoBuilding.bbox === undefined)
-				{ neoBuilding.bbox = new BoundingBox(); }
-				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-				if (neoBuilding.bbox === undefined)
-				{
-					if (currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
-					{
-						this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding); // old.***
-						//this.parseQueue.neoBuildingsHeaderToParseArray.push(neoBuilding);
-						currentCalculatingPositionsCount++;
-					}
-					continue;
-				}
-			}
-		}
-	}
-};
-
-/**
- * dataKey 이용해서 data 검색
- * @param dataKey
- */
 MagoManager.prototype.flyToBuilding = function(dataKey) 
 {
 	var neoBuilding = this.getBuildingSeedById(null, dataKey);
@@ -5095,92 +4883,6 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	}
 };
 
-
-/**
- * dataKey 이용해서 data 검색
- * @param dataKey
- */
-MagoManager.prototype.flyToBuilding_current = function(dataKey) 
-{
-	var neoBuilding = this.getNeoBuildingById(null, dataKey);
-
-	if (neoBuilding === undefined)
-	{ return; }
-
-	// calculate realPosition of the building.****************************************************************************
-	var realBuildingPos;
-	if (this.renderingModeTemp === 1 || this.renderingModeTemp === 2) // 0 = assembled mode. 1 = dispersed mode.***
-	{
-		if (neoBuilding.geoLocationDataAux === undefined) 
-		{
-			var realTimeLocBlocksList = MagoConfig.getData().alldata;
-			var newLocation = realTimeLocBlocksList[neoBuilding.dataKey];
-			// must calculate the realBuildingPosition (bbox_center_position).***
-
-			if (newLocation) 
-			{
-				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, heading, pitch, roll, neoBuilding.geoLocationDataAux, this);
-				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-				//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-				realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
-			}
-			else 
-			{
-				// use the normal data.***
-				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-				realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
-			}
-		}
-		else 
-		{
-			this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-			//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-			realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
-		}
-	}
-	else 
-	{
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
-		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-		realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-	}
-	// end calculating realPosition of the building.------------------------------------------------------------------------
-
-	if (realBuildingPos === undefined)
-	{ return; }
-
-	//
-	
-	if (this.renderingModeTemp === 0)
-	{ this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0; }
-	if (this.renderingModeTemp === 1)
-	{ this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0; }
-	if (this.renderingModeTemp === 2)
-	{ this.radiusAprox_aux = (neoBuilding.bbox.maxX - neoBuilding.bbox.minX) * 1.2/2.0; }
-
-	if (this.boundingSphere_Aux === undefined)
-	{ this.boundingSphere_Aux = new Sphere(); }
-	
-	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
-
-	//var position = new Cesium.Cartesian3(this.pointSC.x, this.pointSC.y, this.pointSC.z);
-	//var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
-		//var viewer = this.scene.viewer;
-		var seconds = 3;
-		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
-	}
-	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		//this.boundingSphere_Aux.center = realBuildingPos;
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
-		var geographicCoord = buildingGeoLocation.geographicCoord;
-		this.wwd.goToAnimator.travelTime = 3000;
-		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
-	}
-};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -5826,17 +5528,7 @@ MagoManager.prototype.getObjectIndexFile = function()
 		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
-/**
- * Test hierachy.
- */
-MagoManager.prototype.makeHierachyTest = function() 
-{
-	var projectTree = this.hierarchyManager.newProjectTree();
-	
-	// testId_F110T_outfitting
-	// testId_F110T_structure
-	
-};
+
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
@@ -5956,8 +5648,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			}
 			
 			
-			if (buildingSeed.firstName === "testId")
-			{ altitude = -460.0; }
+			//if (buildingSeed.firstName === "testId")
+			//{ altitude = -460.0; }
 			
 			if (buildingSeed.geographicCoord === undefined)
 			{ buildingSeed.geographicCoord = new GeographicCoord(); }
@@ -5979,7 +5671,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			// now calculate the geographicCoord of the center of the bBox.
 			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
 			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this);
+			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			//buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, altitude);
 		}
 		
 		smartTile.buildingSeedsArray = buildingSeedList.buildingSeedArray;
@@ -5987,8 +5680,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 	
-	// Test.
-	this.makeHierachyTest();
 };
 
 MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
