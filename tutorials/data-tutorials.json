@@ -1,11 +1,11 @@
 {
 	"alldata": {
-		"test_id": {
+		"key": {
 			"list_counter": 10,
 			"data_id": 999,
 			"data_group_id": 77,
 			"data_group_name": "3DS",
-			"data_key": "test_id",
+			"data_key": "key",
 			"data_name": "test name",
 			"latitude": "35.66188",
 			"longitude": "139.68535",
