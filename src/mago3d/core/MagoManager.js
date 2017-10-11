@@ -14,7 +14,6 @@ var MagoManager = function()
 	// F4D Data structure & objects.*****************************************
 	//this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
 	this.terranTile = new TerranTile();// use this.***
-	//this.neoBuildingsList = new NeoBuildingsList(); // old.
 	this.renderer = new Renderer();
 	//this.selection = new Selection();
 	this.selectionCandidates = new SelectionCandidates();
@@ -3196,6 +3195,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			// 3) now render bboxes.*******************************************************************************************************************
 			if (this.magoPolicy.getShowBoundingBox())
 			{
+				var node;
 				currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 				shaderProgram = currentShader.program;
 				gl.useProgram(shaderProgram);
@@ -3255,12 +3255,12 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 				}
 
-				visibleNodesLOD2Count = this.visibleObjControlerNodes.currentVisibles2.length;
+				var visibleNodesLOD2Count = this.visibleObjControlerNodes.currentVisibles2.length;
 
 				for (var b=0; b<visibleNodesLOD2Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles2[b];
-					neoBuilding = this.visibleObjControlerNodes.currentVisibles2[b];
+					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
 					var buildingGeoLocation = neoBuilding.getGeoLocationData();
@@ -4397,11 +4397,6 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 		}
 	}
 	
-	//this.visibleObjControlerBuildings.currentVisibles0.length = 0;
-	//this.visibleObjControlerBuildings.currentVisibles1.length = 0;
-	//this.visibleObjControlerBuildings.currentVisibles2.length = 0;
-	//this.visibleObjControlerBuildings.currentVisibles3.length = 0;
-	
 	this.visibleObjControlerNodes.currentVisibles0.length = 0;
 	this.visibleObjControlerNodes.currentVisibles1.length = 0;
 	this.visibleObjControlerNodes.currentVisibles2.length = 0;
@@ -4569,8 +4564,6 @@ MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
  */
 MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTilesArray, cameraPosition, frustumVolume, doFrustumCullingToBuildings) 
 {
-	//this.testAproxDist3D();
-	
 	var tilesCount = intersectedLowestTilesArray.length;
 	
 	if (tilesCount === 0)
@@ -4631,9 +4624,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 							neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 							neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
 						}
-						// this building was deleted, so, put this in visibleBuildingsList to load data.
-						//this.putBuildingToArraySortedByDist(this.visibleObjControlerBuildings.currentVisibles0, neoBuilding);
-						//continue;
 					}
 			
 					geoLoc = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
@@ -4743,14 +4733,10 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				neoBuilding = new NeoBuilding();
 				
 				node.data = {"name": "aBuilding", "neoBuilding": neoBuilding};
-				
-				if (lowestTile.buildingsArray === undefined)// old...
-				{ lowestTile.buildingsArray = []; }
 			
 				if (lowestTile.nodesArray === undefined)
 				{ lowestTile.nodesArray = []; }
 				
-				lowestTile.buildingsArray.push(neoBuilding);// old...
 				lowestTile.nodesArray.push(node);
 				
 				if (neoBuilding.metaData === undefined) 
@@ -5845,7 +5831,6 @@ MagoManager.prototype.getObjectIndexFile = function()
  */
 MagoManager.prototype.makeHierachyTest = function() 
 {
-	
 	var projectTree = this.hierarchyManager.newProjectTree();
 	
 	// testId_F110T_outfitting
@@ -5900,6 +5885,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	
 	// now, make smartTiles.
 	var smartTilesCount = this.smartTileManager.tilesArray.length;
+	var buildingId;
 	for (var a=0; a<smartTilesCount; a++)
 	{
 		var smartTile = this.smartTileManager.tilesArray[a];
@@ -5908,8 +5894,13 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		for (var i=0; i<buildingSeedsCount; i++) 
 		{
 			buildingSeed = buildingSeedList.buildingSeedArray[i];
-					
-			newLocation = realTimeLocBlocksList[buildingSeed.buildingId];
+			buildingId = buildingSeed.buildingId;
+			if (buildingSeed.firstName === "testId")
+			{
+				var buildingNameDivided = buildingSeed.buildingId.split("_");
+				buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
+			}
+			newLocation = realTimeLocBlocksList[buildingId];
 			// must calculate the realBuildingPosition (bbox_center_position).***
 			var longitude;
 			var latitude;
@@ -5931,13 +5922,16 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				// test.***
 				if (buildingSeed.firstName === "testId")
 				{
+					/*
 					longitude = 128.5894;
 					latitude = 34.90167;
 					altitude = -400.0;
 					heading = 0;
 					pitch = 0;
 					roll = 0;
+					*/
 				}
+				
 			}
 			else
 			{
