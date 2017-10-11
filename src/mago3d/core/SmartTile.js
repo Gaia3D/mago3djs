@@ -48,7 +48,7 @@ SmartTile.prototype.newSubTile = function(parentTile)
 /**
  * 어떤 일을 하고 있습니까?
  */
-SmartTile.prototype.clearNodessArray = function() 
+SmartTile.prototype.clearNodesArray = function() 
 {
 	if (this.nodesArray === undefined)
 	{ return; }
@@ -60,12 +60,13 @@ SmartTile.prototype.clearNodessArray = function()
 	this.nodesArray = undefined;
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  */
-SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
+SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId) 
 {
-	var resultNeoBuilding;
+	var resultNode;
 	var neoBuilding;
 	var node;
 	var hasSubTiles = true;
@@ -91,8 +92,8 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 					if (neoBuilding.buildingId === buildingId && neoBuilding.buildingType === buildingType) 
 					{
 						find = true;
-						resultNeoBuilding = neoBuilding;
-						return resultNeoBuilding;
+						resultNode = node;
+						return resultNode;
 					}
 				}
 				else 
@@ -100,8 +101,8 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 					if (neoBuilding.buildingId === buildingId) 
 					{
 						find = true;
-						resultNeoBuilding = neoBuilding;
-						return resultNeoBuilding;
+						resultNode = node;
+						return resultNode;
 					}
 				}
 				i++;
@@ -112,12 +113,25 @@ SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId)
 	{
 		for (var i=0; i<this.subTiles.length; i++)
 		{
-			resultNeoBuilding = this.subTiles[i].getNeoBuildingById(buildingType, buildingId);
-			if (resultNeoBuilding)
-			{ return resultNeoBuilding; }
+			resultNode = this.subTiles[i].getNodeByBuildingId(buildingType, buildingId);
+			if (resultNode)
+			{ return resultNode; }
 		}
 	}
 	
+	return resultNode;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.getNeoBuildingById = function(buildingType, buildingId) 
+{
+	var resultNeoBuilding;
+	var node = this.getNodeByBuildingId(buildingType, buildingId);
+	if (node !== undefined)
+	{ resultNeoBuilding = node.data.neoBuilding; }
+
 	return resultNeoBuilding;
 };
 
@@ -241,45 +255,6 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
-SmartTile.prototype.makeTreeByMinDegree = function(minDegree, magoManager) 
-{
-	// note: minDegree = 0.01deg = 1.105,74m.
-	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
-	{ return; }
-	
-	// if this has "buildingSeedsArray" then make sphereExtent.
-	this.makeSphereExtent(magoManager);
-	
-	// now, if the dimensions of the tile is bigger than "minDegree", then make subTiles.
-	var longitudeRangeDegree = this.getLongitudeRangeDegree();
-	if (longitudeRangeDegree > minDegree)
-	{
-		// create 4 child smartTiles.
-		for (var i=0; i<4; i++)
-		{ this.newSubTile(this); }
-		
-		// set the sizes to subTiles.
-		this.setSizesToSubTiles();
-		
-		// intercept buildingSeeds for each subTiles.
-		for (var i=0; i<4; i++)
-		{
-			this.subTiles[i].takeIntersectedBuildingSeeds(this.buildingSeedsArray);
-		}
-		
-		// for each subTile that has intercepted buildingSeeds -> makeTree.
-		for (var i=0; i<4; i++)
-		{
-			this.subTiles[i].makeTreeByMinDegree(minDegree, magoManager);
-		}
-		
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
- */
 SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray) 
 {
 	var buildingSeed;
@@ -306,10 +281,40 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
 			{
 				this.minGeographicCoord.altitude = altitude-bboxRadius;
 			}
-			else if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
+			if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
 			{
 				this.maxGeographicCoord.altitude = altitude+bboxRadius;
 			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
+SmartTile.prototype.calculateAltitudeLimits = function() 
+{
+	// this function calculates the minAltitude and maxAltitude of the tile.
+	// init the altitudes.
+	this.minGeographicCoord.altitude = 0;
+	this.maxGeographicCoord.altitude = 0;
+	
+	var buildingSeed;
+	var buildingSeedsCount = this.buildingSeedsArray.length;
+	for (var i=0; i<buildingSeedsCount; i++)
+	{
+		buildingSeed = this.buildingSeedsArray[i];
+
+		var altitude = buildingSeed.geographicCoordOfBBox.altitude;
+		var bboxRadius = buildingSeed.bBox.getRadiusAprox();
+		if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+		{
+			this.minGeographicCoord.altitude = altitude-bboxRadius;
+		}
+		if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
+		{
+			this.maxGeographicCoord.altitude = altitude+bboxRadius;
 		}
 	}
 };
