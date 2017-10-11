@@ -4393,7 +4393,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 		if (!lowestTile.isVisible)
 		{
 			this.processQueue.putNodesArrayToDelete(lowestTile.nodesArray);
-			lowestTile.clearNodessArray();
+			lowestTile.clearNodesArray();
 		}
 	}
 	
@@ -4746,7 +4746,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				buildingSeed = lowestTile.buildingSeedsArray[j];
 				neoBuilding = new NeoBuilding();
 				
-				node.data = {"name": "aBuilding", "neoBuilding": neoBuilding};
+				node.data = {"nodeId": buildingSeed.buildingId, "neoBuilding": neoBuilding};
 			
 				if (lowestTile.nodesArray === undefined)
 				{ lowestTile.nodesArray = []; }
