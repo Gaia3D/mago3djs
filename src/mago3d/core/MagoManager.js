@@ -2164,9 +2164,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
 
 		//the movement of an object must multiply by buildingRotMatrix.***
-		var transformedIntersectPoint = new Point3D();
-		transformedIntersectPoint = buildingGeoLocation.tMatrix.rotatePoint3D(intersectionPoint, transformedIntersectPoint); 
-		
 		if (this.objectSelected.moveVectorRelToBuilding === undefined)
 		{ this.objectSelected.moveVectorRelToBuilding = new Point3D(); }
 	
@@ -2184,9 +2181,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difZ = intersectionPoint.z - this.startMovPoint.z;
 
 			this.objectSelected.moveVectorRelToBuilding.set(difX, difY, difZ);
+			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
-		
-		this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 	}
 };
 
@@ -4656,7 +4652,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						//return;
 					}
 					//if (firstName !== "testId")
-					ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+					//ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 					//neoBuilding.bboxAbsoluteCenterPos = undefined;
 					continue;
 					
