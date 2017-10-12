@@ -25,6 +25,7 @@ var MagoManager = function()
 	this.smartTileManager = new SmartTileManager();
 	this.processQueue = new ProcessQueue();
 	this.parseQueue = new ParseQueue();
+	this.hierarchyManager = new HierarchyManager();
 
 	// SSAO.***************************************************
 	this.noiseTexture;
@@ -4558,10 +4559,18 @@ MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
 MagoManager.prototype.makeHierachyTest = function() 
 {
 	var projectTree = this.hierarchyManager.newProjectTree();
-	
+	// this.hierarchyManager
 	// testId_F110T_outfitting
 	// testId_F110T_structure
 	
+	// make a hierarchy test for buildings "testId".
+	var node;
+	var nodesCount = this.hierarchyManager.nodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = this.hierarchyManager.nodesArray[i];
+		
+	}
 		
 };
 
@@ -4732,15 +4741,13 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		else
 		{
 			// create the buildings by buildingSeeds.
-			buildingSeedsCount = lowestTile.buildingSeedsArray.length;
+			buildingSeedsCount = lowestTile.nodeSeedsArray.length;
 			for (var j=0; j<buildingSeedsCount; j++)
 			{
-				var node = new Node();
-				
-				buildingSeed = lowestTile.buildingSeedsArray[j];
+				var node = lowestTile.nodeSeedsArray[j];
 				neoBuilding = new NeoBuilding();
-				
-				node.data = {"nodeId": buildingSeed.buildingId, "neoBuilding": neoBuilding};
+				node.data.neoBuilding = neoBuilding;
+				buildingSeed = node.data.buildingSeed;
 			
 				if (lowestTile.nodesArray === undefined)
 				{ lowestTile.nodesArray = []; }
@@ -5522,8 +5529,6 @@ MagoManager.prototype.getObjectIndexFile = function()
 		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
-
-
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
@@ -5569,107 +5574,112 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		}
 	}
 	
+	// now, make geographic data for each buildingSeed & create nodesArray.
+	var nodesArray = [];
+	buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+	for (var i=0; i<buildingSeedsCount; i++) 
+	{
+		buildingSeed = buildingSeedList.buildingSeedArray[i];
+		buildingId = buildingSeed.buildingId;
+		if (buildingSeed.firstName === "testId")
+		{
+			var buildingNameDivided = buildingSeed.buildingId.split("_");
+			buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
+		}
+		newLocation = realTimeLocBlocksList[buildingId];
+		// must calculate the realBuildingPosition (bbox_center_position).***
+		var longitude;
+		var latitude;
+		var altitude;
+		var heading, pitch, roll;
+			
+
+		if (newLocation) 
+		{
+			buildingSeed.name = newLocation.data_name;
+
+			longitude = parseFloat(newLocation.longitude);
+			latitude = parseFloat(newLocation.latitude);
+			altitude = parseFloat(newLocation.height);
+			heading = parseFloat(newLocation.heading);
+			pitch = parseFloat(newLocation.pitch);
+			roll = parseFloat(newLocation.roll);
+			
+			// test.***
+			if (buildingSeed.firstName === "testId")
+			{
+				/*
+				longitude = 128.5894;
+				latitude = 34.90167;
+				altitude = -400.0;
+				heading = 0;
+				pitch = 0;
+				roll = 0;
+				*/
+			}
+			
+		}
+		else
+		{
+			if (buildingSeed.firstName === "testId")
+			{
+				longitude = 128.5894;
+				latitude = 34.90167;
+				altitude = -460.0;
+				heading = 0;
+				pitch = 0;
+				roll = 0;
+			}
+			else 
+			{
+				longitude = 128.5894;
+				latitude = 35.0;
+				altitude = 50.0;
+				heading = 0;
+				pitch = 0;
+				roll = 0;
+			}
+		}
+
+		//if (buildingSeed.firstName === "testId")
+		//{ altitude = -460.0; }
+		
+		if (buildingSeed.geographicCoord === undefined)
+		{ buildingSeed.geographicCoord = new GeographicCoord(); }
+	
+		if (buildingSeed.rotationsDegree === undefined)
+		{ buildingSeed.rotationsDegree = new Point3D(); }
+	
+		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+		buildingSeed.rotationsDegree.set(pitch, roll, heading);
+		
+		// now calculate the geographic coord of the center of the bbox.
+		if (buildingSeed.geographicCoordOfBBox === undefined) 
+		{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+	
+		// calculate the transformation matrix at (longitude, latitude, altitude).
+		var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, worldCoordPosition, this);
+		var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+		
+		// now calculate the geographicCoord of the center of the bBox.
+		var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+		var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+		buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+
+		// create the node.
+		var node = this.hierarchyManager.newNode();
+		node.data = {"nodeId": buildingSeed.buildingId, "buildingSeed": buildingSeed};
+		nodesArray.push(node);
+	}
+	
 	// now, make smartTiles.
-	var smartTilesCount = this.smartTileManager.tilesArray.length;
+	// there are 2 general smartTiles: AsiaSide & AmericaSide.
+	var smartTilesCount = this.smartTileManager.tilesArray.length; // "smartTilesCount" = 2.
 	var buildingId;
 	for (var a=0; a<smartTilesCount; a++)
 	{
 		var smartTile = this.smartTileManager.tilesArray[a];
-		// "buildingSeedList" is the objectIndexFile.
-		buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
-		for (var i=0; i<buildingSeedsCount; i++) 
-		{
-			buildingSeed = buildingSeedList.buildingSeedArray[i];
-			buildingId = buildingSeed.buildingId;
-			if (buildingSeed.firstName === "testId")
-			{
-				var buildingNameDivided = buildingSeed.buildingId.split("_");
-				buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
-			}
-			newLocation = realTimeLocBlocksList[buildingId];
-			// must calculate the realBuildingPosition (bbox_center_position).***
-			var longitude;
-			var latitude;
-			var altitude;
-			var heading, pitch, roll;
-				
-	
-			if (newLocation) 
-			{
-				buildingSeed.name = newLocation.data_name;
-
-				longitude = parseFloat(newLocation.longitude);
-				latitude = parseFloat(newLocation.latitude);
-				altitude = parseFloat(newLocation.height);
-				heading = parseFloat(newLocation.heading);
-				pitch = parseFloat(newLocation.pitch);
-				roll = parseFloat(newLocation.roll);
-				
-				// test.***
-				if (buildingSeed.firstName === "testId")
-				{
-					/*
-					longitude = 128.5894;
-					latitude = 34.90167;
-					altitude = -400.0;
-					heading = 0;
-					pitch = 0;
-					roll = 0;
-					*/
-				}
-				
-			}
-			else
-			{
-				if (buildingSeed.firstName === "testId")
-				{
-					longitude = 128.5894;
-					latitude = 34.90167;
-					altitude = -400.0;
-					heading = 0;
-					pitch = 0;
-					roll = 0;
-				}
-				else 
-				{
-					longitude = 128.5894;
-					latitude = 35.0;
-					altitude = 50.0;
-					heading = 0;
-					pitch = 0;
-					roll = 0;
-				}
-			}
-			
-			
-			//if (buildingSeed.firstName === "testId")
-			//{ altitude = -460.0; }
-			
-			if (buildingSeed.geographicCoord === undefined)
-			{ buildingSeed.geographicCoord = new GeographicCoord(); }
-		
-			if (buildingSeed.rotationsDegree === undefined)
-			{ buildingSeed.rotationsDegree = new Point3D(); }
-		
-			buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-			buildingSeed.rotationsDegree.set(pitch, roll, heading);
-			
-			// now calculate the geographic coord of the center of the bbox.
-			if (buildingSeed.geographicCoordOfBBox === undefined) 
-			{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
-		
-			// calculate the transformation matrix at (longitude, latitude, altitude).
-			var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, worldCoordPosition, this);
-			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
-			
-			// now calculate the geographicCoord of the center of the bBox.
-			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
-			//buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, altitude);
-		}
-		
-		smartTile.buildingSeedsArray = buildingSeedList.buildingSeedArray;
+		smartTile.nodeSeedsArray = nodesArray;
 		smartTile.makeTreeByDepth(17, this); // depth = 17.
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.

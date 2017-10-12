@@ -11,8 +11,23 @@ var HierarchyManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	// lowest nodes array. initial array to create tiles global distribution.
+	this.nodesArray = [];
+	
 	// projectTrees array.
 	this.motherProjectTreesArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+HierarchyManager.prototype.newNode = function() 
+{
+	var node = new Node();
+	this.nodesArray.push(node);
+	return node;
 };
 
 /**
