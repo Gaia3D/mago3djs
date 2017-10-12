@@ -165,9 +165,17 @@ NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function()
 NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function() 
 {
 	var bboxCenterPoint;
-	var geoLoc = this.geoLocDataManager.geoLocationDataArray[0]; // take the 1rst.
+	var geoLoc = this.getGeoLocationData(); // take the 1rst.
 	bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
+	
+	// Now, must applicate the aditional translation vector. Aditional translation is made when we translate the pivot point.
+	if (geoLoc.pivotPointTraslation)
+	{
+		var traslationVector;
+		traslationVector = geoLoc.tMatrix.rotatePoint3D(geoLoc.pivotPointTraslation, traslationVector );
+		this.bboxAbsoluteCenterPos.add(traslationVector.x, traslationVector.y, traslationVector.z);
+	}
 };
 
 /**

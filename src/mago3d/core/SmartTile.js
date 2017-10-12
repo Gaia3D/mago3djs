@@ -255,8 +255,47 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+SmartTile.prototype.getLowestTileWithNodeInside = function(node) 
+{
+	// this function returns the lowestTile with "node" if exist.
+	if (this.subTiles === undefined)
+	{
+		var find = false;
+		var nodesCount = this.nodesArray.length;
+		var i=0;
+		while (!find && i<nodesCount)
+		{
+			if (node == this.nodesArray[i])
+			{
+				return this;
+			}
+			i++;
+		}
+		return undefined;
+	}
+	else 
+	{	
+		var subTilesCount = this.subTiles.length;
+		var lowestTile;
+		for (var i=0; i<subTilesCount; i++)
+		{
+			lowestTile = this.subTiles[i].getLowestTileWithNodeInside(node);
+			if (lowestTile)
+			{ return lowestTile; }
+		}
+		
+		return undefined;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
 SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray) 
 {
+	// this function intersects the buildingSeeds with this tile.
+	// this function is used only one time when load a initial buildings distributions on the globe.
 	var buildingSeed;
 	var buildingSeedsCount = buildingSeedsArray.length;
 	for (var i=0; i<buildingSeedsCount; i++)

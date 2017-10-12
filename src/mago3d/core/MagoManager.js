@@ -4658,7 +4658,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						//return;
 					}
 					//if (firstName !== "testId")
-					//ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+					ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 					//neoBuilding.bboxAbsoluteCenterPos = undefined;
 					continue;
 					

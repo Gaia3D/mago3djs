@@ -84,6 +84,7 @@ ManagerUtils.getTransformationMatrixInPoint = function(point, resultTMatrix, res
 ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) 
 {
 	// this function NO modifies the geographic coords.***
+	// "newPivotPoint" is in buildingCoords.***
 	// "newPivotPoint" is the desired position of the new origen of coords, for example:
 	// in a building you can desire the center of the bbox as the origin of the coords.***
 	if (geoLocationData === undefined)
@@ -92,27 +93,8 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	var rawTranslation = new Point3D();
 	rawTranslation.set(-newPivotPoint.x, -newPivotPoint.y, -newPivotPoint.z);
 
-	var traslationVector;
-	var realBuildingPos;
-	realBuildingPos = geoLocationData.tMatrix.transformPoint3D(newPivotPoint, realBuildingPos );
-	traslationVector = geoLocationData.tMatrix.rotatePoint3D(rawTranslation, traslationVector );
-	geoLocationData.position.x += traslationVector.x;
-	geoLocationData.position.y += traslationVector.y;
-	geoLocationData.position.z += traslationVector.z;
-	//geoLocationData.positionHIGH;
-	geoLocationData.aditionalTraslation = traslationVector;
-	geoLocationData.positionLOW[0] += traslationVector.x;
-	geoLocationData.positionLOW[1] += traslationVector.y;
-	geoLocationData.positionLOW[2] += traslationVector.z;
-
-	realBuildingPos.x += traslationVector.x;
-	realBuildingPos.y += traslationVector.y;
-	realBuildingPos.z += traslationVector.z;
-
-	if (geoLocationData.pivotPoint === undefined)
-	{ geoLocationData.pivotPoint = new Point3D(); }
-
-	geoLocationData.pivotPoint.set(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+	geoLocationData.pivotPointTraslation = rawTranslation;
+	geoLocationData.doEffectivePivotPointTranslation();
 };
 
 ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
@@ -325,7 +307,8 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	{ resultGeoLocationData.pivotPoint = new Point3D(); }
 
 	resultGeoLocationData.pivotPoint.set(resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z);
-
+	resultGeoLocationData.doEffectivePivotPointTranslation();
+	
 	return resultGeoLocationData;
 };
 
