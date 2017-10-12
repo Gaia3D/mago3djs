@@ -37,16 +37,13 @@ var NeoReference = function()
 	this.color4; //new Color();
 	this.aditionalColor; // used when object color was changed.***
 
-	// 7) selection color.***
-	//this.selColor4; //new Color(); // delete this..***
-
 	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 
-	// 8) movement of the object.***
+	// 7) movement of the object.***
 	this.moveVectorRelToBuilding; // Point3D.***
 	this.moveVector; // Point3D.***
 
-	// 9) check for render.***
+	// 8) check for render.***
 	this.bRendered = false;
 };
 
