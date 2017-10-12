@@ -39,6 +39,7 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
 
+
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		var globe = magoManager.wwd.globe;

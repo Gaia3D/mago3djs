@@ -25,7 +25,8 @@ var SmartTile = function(smartTileName)
 	this.sphereExtent; // cartesian position sphere in worldCoord.
 	this.subTiles; // array.
 	
-	this.buildingSeedsArray;
+	//this.buildingSeedsArray;
+	this.nodeSeedsArray;
 	this.nodesArray; // nodes with geometry data only (lowest nodes).
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
@@ -150,28 +151,31 @@ SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId)
 		
 	if (!hasSubTiles)
 	{
-		if (this.buildingSeedsArray)
+		if (this.nodeSeedsArray)
 		{
-			var buildingCount = this.buildingSeedsArray.length;
+			var buildingCount = this.nodeSeedsArray.length;
 			var find = false;
 			var i=0;
+			var buildingSeed, node;
 			while (!find && i<buildingCount) 
 			{
+				node = this.nodeSeedsArray[i];
+				buildingSeed = node.data.buildingSeed;
 				if (buildingType)
 				{
-					if (this.buildingSeedsArray[i].buildingId === buildingId && this.buildingSeedsArray[i].buildingType === buildingType) 
+					if (buildingSeed.buildingId === buildingId && buildingSeed.buildingType === buildingType) 
 					{
 						find = true;
-						resultNeoBuildingSeed = this.buildingSeedsArray[i];
+						resultNeoBuildingSeed = buildingSeed;
 						return resultNeoBuildingSeed;
 					}
 				}
 				else 
 				{
-					if (this.buildingSeedsArray[i].buildingId === buildingId) 
+					if (buildingSeed.buildingId === buildingId) 
 					{
 						find = true;
-						resultNeoBuildingSeed = this.buildingSeedsArray[i];
+						resultNeoBuildingSeed = buildingSeed;
 						return resultNeoBuildingSeed;
 					}
 				}
@@ -191,6 +195,7 @@ SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId)
 	
 	return resultNeoBuildingSeed;
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -220,10 +225,10 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  */
 SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager) 
 {
-	if (this.buildingSeedsArray === undefined || this.buildingSeedsArray.length === 0)
+	if (this.nodeSeedsArray === undefined || this.nodeSeedsArray.length === 0)
 	{ return; }
 	
-	// if this has "buildingSeedsArray" then make sphereExtent.
+	// if this has "nodeSeedsArray" then make sphereExtent.
 	this.makeSphereExtent(magoManager);
 	
 	// now, if the current depth < targetDepth, then descend.
@@ -239,7 +244,7 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		// intercept buildingSeeds for each subTiles.
 		for (var i=0; i<4; i++)
 		{
-			this.subTiles[i].takeIntersectedBuildingSeeds(this.buildingSeedsArray);
+			this.subTiles[i].takeIntersectedBuildingSeeds(this.nodeSeedsArray, magoManager);
 		}
 		
 		// for each subTile that has intercepted buildingSeeds -> makeTree.
@@ -255,6 +260,7 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+/*
 SmartTile.prototype.getLowestTileWithNodeInside = function(node) 
 {
 	// this function returns the lowestTile with "node" if exist.
@@ -286,31 +292,34 @@ SmartTile.prototype.getLowestTileWithNodeInside = function(node)
 		return undefined;
 	}
 };
+*/
 
 /**
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
-SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray) 
+SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray) 
 {
 	// this function intersects the buildingSeeds with this tile.
 	// this function is used only one time when load a initial buildings distributions on the globe.
 	var buildingSeed;
-	var buildingSeedsCount = buildingSeedsArray.length;
+	var node;
+	var buildingSeedsCount = nodeSeedsArray.length;
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
-		buildingSeed = buildingSeedsArray[i];
+		node = nodeSeedsArray[i];
+		buildingSeed = node.data.buildingSeed;
 		
 		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
 		{
-			buildingSeedsArray.splice(i, 1);
+			nodeSeedsArray.splice(i, 1);
 			i--;
-			buildingSeedsCount = buildingSeedsArray.length;
+			buildingSeedsCount = nodeSeedsArray.length;
 			
-			if (this.buildingSeedsArray === undefined)
-			{ this.buildingSeedsArray = []; }
+			if (this.nodeSeedsArray === undefined)
+			{ this.nodeSeedsArray = []; }
 			
-			this.buildingSeedsArray.push(buildingSeed);
+			this.nodeSeedsArray.push(node);
 			
 			// now, redefine the altitude limits of this tile.
 			var altitude = buildingSeed.geographicCoordOfBBox.altitude;
@@ -331,6 +340,7 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(buildingSeedsArray)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+/*
 SmartTile.prototype.calculateAltitudeLimits = function() 
 {
 	// this function calculates the minAltitude and maxAltitude of the tile.
@@ -356,6 +366,7 @@ SmartTile.prototype.calculateAltitudeLimits = function()
 		}
 	}
 };
+*/
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -380,7 +391,7 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
 {
 	if (this.subTiles === undefined)
 	{
-		if (this.buildingSeedsArray && this.buildingSeedsArray.length > 0)
+		if (this.nodeSeedsArray && this.nodeSeedsArray.length > 0)
 		{
 			resultLowestTilesArray.push(this);
 		}
@@ -440,7 +451,7 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIn
 		}
 		else
 		{ 
-			if (this.buildingSeedsArray &&  this.buildingSeedsArray.length > 0)
+			if (this.nodeSeedsArray &&  this.nodeSeedsArray.length > 0)
 			{ resultPartiallyIntersectedTilesArray.push(this); } 
 		}
 	}
@@ -520,59 +531,6 @@ SmartTile.prototype.getLongitudeRangeDegree = function()
 SmartTile.prototype.getLatitudeRangeDegree = function() 
 {
 	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
- */
-SmartTile.prototype.calculateTileRange = function() 
-{
-	// No used function.
-	if (this.buildingSeedsArray === undefined)
-	{ return; }
-	
-	if (this.minGeographicCoord === undefined)
-	{ this.minGeographicCoord = new GeographicCoord(); }
-	if (this.maxGeographicCoord === undefined)	
-	{ this.maxGeographicCoord = new GeographicCoord(); }
-	
-	var buildingSeed;
-	var longitude, latitude, altitude;
-	var buildingSeedsCount = this.buildingSeedsArray.length;
-	for (var i=0; i<buildingSeedsCount; i++)
-	{
-		buildingSeed = this.buildingSeedsArray[i];
-		longitude = buildingSeed.geographicCoord.longitude;
-		latitude = buildingSeed.geographicCoord.latitude;
-		altitude = buildingSeed.geographicCoord.altitude;
-		
-		if (i === 0)
-		{
-			this.minGeographicCoord.setLonLatAlt(longitude, latitude, altitude);
-			this.maxGeographicCoord.setLonLatAlt(longitude, latitude, altitude);
-		}
-		else 
-		{
-			if (longitude < this.minGeographicCoord.longitude)
-			{ this.minGeographicCoord.longitude = longitude; }
-			
-			if (latitude < this.minGeographicCoord.latitude)
-			{ this.minGeographicCoord.latitude = latitude; }
-			
-			if (altitude < this.minGeographicCoord.altitude)
-			{ this.minGeographicCoord.altitude = altitude; }
-			
-			if (longitude > this.maxGeographicCoord.longitude)
-			{ this.maxGeographicCoord.longitude = longitude; }
-			
-			if (latitude > this.maxGeographicCoord.latitude)
-			{ this.maxGeographicCoord.latitude = latitude; }
-			
-			if (altitude > this.maxGeographicCoord.altitude)
-			{ this.maxGeographicCoord.altitude = altitude; }
-		}
-	}
 };
 
 
