@@ -10,6 +10,15 @@
 	<script type="text/javascript" src="/tutorials/mago3d.js"></script>
 </head>
 <body>
+	<div style="text-align: center; padding-bottom: 10px;">
+		<form id="apiForm" name="apiForm" action="" onsubmit="return false;" >
+			<span>BoundingBox</span>
+			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
+			<label for="showBoundingBox"> 표시 </label>
+			<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);" />
+			<label for="hideBoundingBox"> 비표시 </label>
+		</form>
+	</div>
 	<div id="magoContainer" class="mapWrap"></div>
 <script>
 	var imagePath = "/images/ko";
@@ -42,6 +51,10 @@
 				alert(e.responseText);
 			}
 		});
+	}
+	
+	function changeBoundingBox(isShow) {
+		changeBoundingBoxAPI(isShow);
 	}
 </script>
 </body>
