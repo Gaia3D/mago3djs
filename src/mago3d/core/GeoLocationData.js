@@ -24,10 +24,9 @@ var GeoLocationData = function(geoLocationDataName)
 	
 	this.date; // year - month - day - hour - min - seg - miliseg.***
 	
-	this.position;
-	this.positionHIGH;
-	this.positionLOW;
-
+	this.position;   // Point3D().***
+	this.positionHIGH; // Float32Array[3].***
+	this.positionLOW; // Float32Array[3].***
 	this.pivotPoint; // Point3D().***
 	
 	// F4D Matrix4.****
@@ -39,8 +38,38 @@ var GeoLocationData = function(geoLocationDataName)
 	this.rotMatrixInv; // this contains only rotation.***
 	
 	// Aditional.***
-	this.aditionalTraslation; // no used yet.***
+	this.pivotPointTraslation; // made when translate the pivot point.***
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+GeoLocationData.prototype.doEffectivePivotPointTranslation = function() 
+{
+	// this function adds the "pivotPointTraslation" to the positions.
+	// this function is not for move the building on the globe. This function is only for translate the pivot point of the building.
+	if (this.pivotPointTraslation === undefined)
+	{ return; }
+	
+	var traslationVector;
+	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslation, traslationVector );
+	
+	this.position.x += traslationVector.x;
+	this.position.y += traslationVector.y;
+	this.position.z += traslationVector.z;
+
+	this.positionLOW[0] += traslationVector.x;
+	this.positionLOW[1] += traslationVector.y;
+	this.positionLOW[2] += traslationVector.z;
+
+	if (this.pivotPoint === undefined)
+	{ this.pivotPoint = new Point3D(); }
+
+	this.pivotPoint.set(this.position.x, this.position.y, this.position.z);
+};
+
 
 /**
  * 어떤 일을 하고 있습니까?
