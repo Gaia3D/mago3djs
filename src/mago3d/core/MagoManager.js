@@ -2166,19 +2166,15 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		//the movement of an object must multiply by buildingRotMatrix.***
 		var transformedIntersectPoint = new Point3D();
 		transformedIntersectPoint = buildingGeoLocation.tMatrix.rotatePoint3D(intersectionPoint, transformedIntersectPoint); 
-		intersectionPoint.x = transformedIntersectPoint.x;
-		intersectionPoint.y = transformedIntersectPoint.y;
-		intersectionPoint.z = transformedIntersectPoint.z;
-
-		// register the movement.***
-		if (this.objectSelected.moveVector === undefined)
-		{ this.objectSelected.moveVector = new Point3D(); }
-
+		
+		if (this.objectSelected.moveVectorRelToBuilding === undefined)
+		{ this.objectSelected.moveVectorRelToBuilding = new Point3D(); }
+	
+		// move vector rel to building.
 		if (!this.thereAreStartMovePoint) 
 		{
-
 			this.startMovPoint = intersectionPoint;
-			this.startMovPoint.add(-this.objectSelected.moveVector.x, -this.objectSelected.moveVector.y, -this.objectSelected.moveVector.z);
+			this.startMovPoint.add(-this.objectSelected.moveVectorRelToBuilding.x, -this.objectSelected.moveVectorRelToBuilding.y, -this.objectSelected.moveVectorRelToBuilding.z);
 			this.thereAreStartMovePoint = true;
 		}
 		else 
@@ -2187,8 +2183,10 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difY = intersectionPoint.y - this.startMovPoint.y;
 			var difZ = intersectionPoint.z - this.startMovPoint.z;
 
-			this.objectSelected.moveVector.set(difX, difY, difZ);
+			this.objectSelected.moveVectorRelToBuilding.set(difX, difY, difZ);
 		}
+		
+		this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 	}
 };
 

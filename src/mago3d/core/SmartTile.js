@@ -260,10 +260,9 @@ SmartTile.prototype.getLowestTileWithNodeInside = function(node)
 	// this function returns the lowestTile with "node" if exist.
 	if (this.subTiles === undefined)
 	{
-		var find = false;
 		var nodesCount = this.nodesArray.length;
 		var i=0;
-		while (!find && i<nodesCount)
+		while (i<nodesCount)
 		{
 			if (node == this.nodesArray[i])
 			{
