@@ -43,6 +43,7 @@ var NeoReference = function()
 	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
 
 	// 8) movement of the object.***
+	this.moveVectorRelToBuilding; // Point3D.***
 	this.moveVector; // Point3D.***
 
 	// 9) check for render.***
@@ -67,6 +68,11 @@ NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
 	{ this.tMatrixAuxArray = []; }
 
 	this.tMatrixAuxArray[idxKey] = this._originalMatrix4.getMultipliedByMatrix(matrix, this.tMatrixAuxArray[idxKey]);
+	
+	if (this.moveVectorRelToBuilding)
+	{
+		this.moveVector = matrix.rotatePoint3D(this.moveVectorRelToBuilding, this.moveVector); 
+	}
 };
 
 /**
