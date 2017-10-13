@@ -451,6 +451,18 @@ MagoManager.prototype.isCameraMoved = function(cameraPosition, squareDistUmbral)
 	return camera_was_moved;
 };
 
+
+/**
+ * 카메라가 이동중인지를 확인
+ * @param cameraPosition 변수
+ * @param squareDistUmbral 변수
+ * @returns camera_was_moved
+ */
+MagoManager.prototype.swapRenderingFase = function() 
+{
+	this.renderingFase = !this.renderingFase;
+};
+
 /**
  * 기상 데이터를 그림
  * @param gl 변수
@@ -1172,7 +1184,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
-			this.renderingFase = !this.renderingFase;
+			this.swapRenderingFase();
 		}
 		
 		if (this.magoPolicy.objectInfoViewEnable === true)
@@ -1188,7 +1200,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
-			this.renderingFase = !this.renderingFase;
+			this.swapRenderingFase();
 		}
 	}
 
@@ -1210,6 +1222,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			//this.selectedObjectNotice(currentSelectedBuilding);
 			//console.log("objectId = " + selectedObject.objectId);
 		}
+		
 	}
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1224,7 +1237,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	this.depthFboNeo.unbind();
 	
-	this.renderingFase = !this.renderingFase;
+	this.swapRenderingFase();
 
 	
 	// 2) ssao render.************************************************************************************************************
@@ -1252,7 +1265,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
 	
-	this.renderingFase = !this.renderingFase;
+	this.swapRenderingFase();
 	
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
@@ -1532,6 +1545,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 	resultSelectedArray[1] = this.selectionCandidates.currentOctreeSelected;
 	resultSelectedArray[2] = this.selectionCandidates.currentReferenceSelected;
 	
+	this.swapRenderingFase();
+	
 	return selectedObject;
 };
 
@@ -1639,17 +1654,24 @@ MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixe
 
 	//var current_frustum_near = this.sceneState.camera.frustum.near;
 	var current_frustum_far = this.sceneState.camera.frustum.far;
+	
+	if (this.depthFboNeo) 
+	{
+		this.depthFboNeo.bind(); // bind the existent last depthFramebuffer.
+	}
+	else 
+	{
+		// never enter here.
+		if (this.depthFboNeo === undefined) 
+		{ this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+		this.depthFboNeo.bind(); 
 
-	// framebuffer for color selection.
-	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	this.selectionFbo.bind(); 
-
-	gl.clearColor(1, 1, 1, 1); // white background.***
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
-	gl.disable(gl.BLEND);
-	var ssao_idx = 0;
-	this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, this.visibleObjControlerNodes);
+		gl.clearColor(1, 1, 1, 1); // white background.***
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
+		gl.disable(gl.BLEND);
+		var ssao_idx = 0;
+		this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, this.visibleObjControlerNodes);
+	}
 
 	// Now, read the pixel and find the pixel position.
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
@@ -1662,6 +1684,8 @@ MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixe
 	this.resultRaySC = this.getRayCamSpace(gl, pixelX, pixelY, this.resultRaySC);
 	if (resultPixelPos === undefined)
 	{ resultPixelPos = new Point3D(); }
+
+	this.depthFboNeo.unbind();
 	
 	resultPixelPos.set(this.resultRaySC[0] * realZDepth, this.resultRaySC[1] * realZDepth, this.resultRaySC[2] * realZDepth);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2057,8 +2081,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		// create a XY_plane in the selected_pixel_position.***
 		if (this.selObjMovePlane === undefined) 
 		{
-			var currentRenderingFase = this.renderingFase;
-			this.renderingFase = -1;
 			this.selObjMovePlane = new Plane();
 			// create a local XY plane.
 			// find the pixel position relative to building.
@@ -2068,8 +2090,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var pixelPosBuildingCoord = geoLocationData.tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
 			
 			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
-			// selObjMovePlane is a tangent plane to globe in the selected point.
-			this.renderingFase = currentRenderingFase;
 		}
 
 		if (this.lineSC === undefined)
@@ -6003,12 +6023,12 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	var bottomPosition = new Point3D();
 
 	this.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition);
-	this.renderingFase = !this.renderingFase;
+	this.swapRenderingFase();
 	this.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, bottomPosition);
 
 	this.buildingSelected = current_building;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);
-	this.renderingFase = !this.renderingFase;
+	this.swapRenderingFase();
 
 	if (distance > 3.5)
 	{

@@ -272,13 +272,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
 		if (neoReference === undefined)
 		{ continue; }
-	
-		if (magoManager.isCameraMoving && neoReference.objectId == "2EyH307pn0$u_3EQJQ48gV")
-		{
-			var hola = 0;
-		}
 		
-		if (neoReference.bRendered === magoManager.renderingFase)
+		if (neoReference.renderingFase === magoManager.renderingFase)
 		{ continue; }
 		if (neoReference.tMatrixAuxArray === undefined)
 		{
@@ -287,11 +282,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			continue;
 		}
 
-		// test:
-		if (magoManager.isCameraMoving && neoReference.objectId == "2EyH307pn0$u_3EQJQ48gV")
-		{
-			var hola = 0;
-		}
 		block_idx = neoReference._block_idx;
 		block = neoBuilding.motherBlocksArray[block_idx];
 
@@ -523,7 +513,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 		}
 
-		neoReference.bRendered = !neoReference.bRendered;
+		neoReference.swapRenderingFase();
 		if (magoManager.objectSelected === neoReference)
 		{
 			gl.disable(gl.STENCIL_TEST);
@@ -584,7 +574,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			if (neoReference === undefined) 
 			{ continue; }
 
-			if (neoReference.bRendered === magoManager.renderingFase)
+			if (neoReference.renderingFase === magoManager.renderingFase)
 			{ continue; }
 			
 			if (neoReference.tMatrixAuxArray === undefined)
@@ -680,7 +670,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 				//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 			}
 
-			neoReference.bRendered = !neoReference.bRendered;
+			neoReference.swapRenderingFase();
 		}
 	}
 };
@@ -725,7 +715,10 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
-
+		
+		if (neoReference.renderingFase === magoManager.renderingFase)
+		{ continue; }
+	
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
@@ -742,6 +735,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		}
 
 		this.renderNeoReferenceAsimetricVersionColorSelection(gl, neoReference, neoReferencesMotherAndIndices, neoBuilding, magoManager, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive);
+		
+		neoReference.swapRenderingFase();
 	}
 
 	//gl.enable(gl.DEPTH_TEST);

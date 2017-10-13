@@ -44,7 +44,18 @@ var NeoReference = function()
 	this.moveVector; // Point3D.***
 
 	// 8) check for render.***
-	this.bRendered = false;
+	this.renderingFase = false;
+};
+
+/**
+ * 카메라가 이동중인지를 확인
+ * @param cameraPosition 변수
+ * @param squareDistUmbral 변수
+ * @returns camera_was_moved
+ */
+NeoReference.prototype.swapRenderingFase = function() 
+{
+	this.renderingFase = !this.renderingFase;
 };
 
 /**
