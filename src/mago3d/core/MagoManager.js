@@ -1014,7 +1014,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	{
 		var camera = this.scene.frameState.camera;
 		var currentFrustumFar = camera.frustum.far;
-		camera.frustum.far = 10000;
+		camera.frustum.far = 100000;
 		var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
 
 		for (var i=0; i<6; i++)
@@ -1036,6 +1036,13 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	if (this.renderingModeTemp === 0) 
 	{
 		if (!isLastFrustum) { return; }
+		/*
+		if(numFrustums > 2)
+		{
+			if(frustumIdx == 0 )
+			return;
+		}
+		*/
 	}
 
 	//if(!isLastFrustum) return;
@@ -1184,7 +1191,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
-			this.swapRenderingFase();
 		}
 		
 		if (this.magoPolicy.objectInfoViewEnable === true)
@@ -1200,7 +1206,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			//var objMarker = this.objMarkerManager.newObjectMarker();
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
-			this.swapRenderingFase();
 		}
 	}
 
@@ -2160,10 +2165,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		// create a XY_plane in the selected_pixel_position.***
 		if (this.selObjMovePlane === undefined) 
 		{
-			var currentRenderingFase = this.renderingFase;
-			this.renderingFase = -1;
 			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
-			this.renderingFase = currentRenderingFase;
 		}
 
 		// world ray = camPos + lambda*camDir.***
@@ -2237,10 +2239,14 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		
 		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
 		{
-			distLod0 = 350;
-			distLod1 = 550;
-			distLod2 = 25000;
+			if (distLod0 < 350)
+			{ distLod0 = 350; }
+			if (distLod1 < 550)
+			{ distLod1 = 550; }
+			if (distLod2 < 25000)
+			{ distLod2 = 25000; }
 		}
+		
 
 		var find = false;
 		
@@ -4419,9 +4425,10 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	
 	if (this.fullyIntersectedLowestTilesArray.length > 0)
 	{ var hola= 0 ; }
-	
-	this.tilesFrustumCullingFinished(this.fullyIntersectedLowestTilesArray, cameraPosition, frustumVolume, false);
-	this.tilesFrustumCullingFinished(this.partiallyIntersectedLowestTilesArray, cameraPosition, frustumVolume, true);
+	var bDoFrustumCullingToBuildings = false;
+	this.tilesFrustumCullingFinished(this.fullyIntersectedLowestTilesArray, cameraPosition, frustumVolume, bDoFrustumCullingToBuildings);
+	bDoFrustumCullingToBuildings = true;
+	this.tilesFrustumCullingFinished(this.partiallyIntersectedLowestTilesArray, cameraPosition, frustumVolume, bDoFrustumCullingToBuildings);
 	
 };
 
@@ -4574,27 +4581,6 @@ MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
 };
 
 /**
- * Test hierachy.
- */
-MagoManager.prototype.makeHierachyTest = function() 
-{
-	var projectTree = this.hierarchyManager.newProjectTree();
-	// this.hierarchyManager
-	// testId_F110T_outfitting
-	// testId_F110T_structure
-	
-	// make a hierarchy test for buildings "testId".
-	var node;
-	var nodesCount = this.hierarchyManager.nodesArray.length;
-	for (var i=0; i<nodesCount; i++)
-	{
-		node = this.hierarchyManager.nodesArray[i];
-		
-	}
-		
-};
-
-/**
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
@@ -4680,9 +4666,29 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						// for this building dont translate the pivot point to the bbox center.***
 						//return;
 					}
-					//if (firstName !== "testId")
-					//ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-					//neoBuilding.bboxAbsoluteCenterPos = undefined;
+					
+					// test.
+					/*
+					var nodeIdDivided = node.data.nodeId.split("_");
+					if (nodeIdDivided[0] == "testId")
+					{
+						if(nodeIdDivided[2] == "structure")
+						{
+							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+						}
+						else if(nodeIdDivided[2] == "outfitting")
+						{
+							var parentNode = node.parent;
+							if(parentNode)
+							{
+								parentBuilding = parentNode.data.neoBuilding;
+								this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
+								ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+							}
+						}
+						
+					}
+					*/
 					continue;
 					
 				}
@@ -5496,38 +5502,11 @@ MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, 
 	if (geoLocationData === undefined)
 	{ return; }
 
-	//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-	//ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
-
 	// now, must change the keyMatrix of the references of the octrees.***
 	if (neoBuilding.octree)
 	{
 		neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 	}
-	/*
-	// repeat this for outfitting building.*********************************************************************************************************************
-	// repeat this for outfitting building.*********************************************************************************************************************
-	// repeat this for outfitting building.*********************************************************************************************************************
-	var neoBuildingOutffiting = this.getNeoBuildingById("outfitting", projectIdAndBlockId);
-
-	if (neoBuildingOutffiting === undefined)
-	{ return; }
-
-	// "longitude", "latitude" and "elevation" is from the structure block.***
-	geoLocationData = neoBuildingOutffiting.getGeoLocationData();
-	geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, this);
-	if (geoLocationData === undefined)
-	{ return; }
-
-	//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC); // the centerpoint is taken from structure block.***
-	//ManagerUtils.translatePivotPointGeoLocationData(geoLocationData, this.pointSC );
-
-	// now, must change the keyMatrix of the references of the octrees.***
-	if (neoBuildingOutffiting.octree)
-	{
-		neoBuildingOutffiting.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
-	}
-	*/
 };
 
 /**
@@ -5540,13 +5519,56 @@ MagoManager.prototype.getObjectIndexFile = function()
 	{
 		this.configInformation = MagoConfig.getPolicy();
 	}
-	// old.***
-	//this.readerWriter.getObjectIndexFile(	this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE, this.readerWriter, this.neoBuildingsList, this);
-	
-	// use smartTile. Create one smartTile for all Korea.
+
 	this.buildingSeedList = new BuildingSeedList();
 	this.readerWriter.getObjectIndexFileForSmartTile(
 		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+};
+
+/**
+ * Test hierachy.
+ */
+MagoManager.prototype.makeHierachyTest = function() 
+{
+	var projectTree = this.hierarchyManager.newProjectTree();
+	// this.hierarchyManager
+	// testId_F110T_outfitting
+	// testId_F110T_structure
+	
+	// make a hierarchy test for buildings "testId".
+	var node;
+	var buildingSeed;
+	var buildingIdDivided;
+	var firstName;
+	var secondName;
+	var thirdName;
+	var childNode;
+	var childNodeId;
+			
+	var nodesCount = this.hierarchyManager.nodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = this.hierarchyManager.nodesArray[i];
+		buildingSeed = node.data.buildingSeed;
+		if (buildingSeed.firstName == "testId")
+		{
+			buildingIdDivided = node.data.nodeId.split("_");
+			firstName = buildingIdDivided[0];
+			secondName = buildingIdDivided[1];
+			thirdName = buildingIdDivided[2];
+			
+			if (thirdName == "structure")
+			{
+				childNodeId = firstName+"_"+secondName+"_outfitting";
+				childNode = this.hierarchyManager.getNodeByDataName("nodeId", childNodeId);
+				if (childNode)
+				{
+					node.addChildren(childNode);
+				}
+			}
+		}
+	}
+		
 };
 
 /**
@@ -5554,15 +5576,12 @@ MagoManager.prototype.getObjectIndexFile = function()
  */
 MagoManager.prototype.makeSmartTile = function(buildingSeedList) 
 {
-	// as the heavy industries special method, add new position for buildings.***.***
 	var realTimeLocBlocksList = MagoConfig.getData().alldata;
 	var buildingSeedsCount;
 	var buildingSeed;
 	var newLocation;
-	//var structureTypedBuilding;
-	//var buildingGeoLocation;
 	
-	// TEST: 1rst, rearrange the "buildingSeedList".
+	// 1rst, rearrange the "buildingSeedList".
 	buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
 	for (var i=0; i<buildingSeedsCount; i++) 
 	{
@@ -5628,14 +5647,14 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			// test.***
 			if (buildingSeed.firstName === "testId")
 			{
-				/*
+				
 				longitude = 128.5894;
 				latitude = 34.90167;
-				altitude = -400.0;
+				altitude = -460.0;
 				heading = 0;
 				pitch = 0;
 				roll = 0;
-				*/
+				
 			}
 			
 		}
@@ -5704,6 +5723,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 	
+	// test.
+	this.makeHierachyTest();
 };
 
 MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
