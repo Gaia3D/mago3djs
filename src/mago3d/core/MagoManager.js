@@ -1189,7 +1189,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			pixelPos = new Point3D();
 			pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
 			//var objMarker = this.objMarkerManager.newObjectMarker();
-			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
 		
@@ -1204,7 +1203,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 				pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
 			}
 			//var objMarker = this.objMarkerManager.newObjectMarker();
-			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
 	}
@@ -1231,9 +1229,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	}
 	
 	// 1) The depth render.**********************************************************************************************************************
-	//if(this.currentFramebuffer === null)
-	//	this.currentFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
-	this.depthFboNeo.bind(); // DEPTH START.*****************************************************************************************************
+	this.depthFboNeo.bind(); 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
 	gl.clearColor(0, 0, 0, 1);
@@ -1246,9 +1242,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	
 	// 2) ssao render.************************************************************************************************************
-	//if(this.currentFramebuffer !== null)
-	//this.sceneState.gl.bindFramebuffer(this.sceneState.gl.FRAMEBUFFER, this.currentFramebuffer);
-	
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		;//
@@ -2986,8 +2979,9 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 	//gl.depthFunc(gl.GREATER);
 	//gl.enable(gl.CULL_FACE);
 	gl.depthRange(0.0, 1.0);
-	
+			
 	gl.enable(gl.DEPTH_TEST);
+
 
 	if (ssao_idx === -1) 
 	{
@@ -4902,9 +4896,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	}
 	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		//this.boundingSphere_Aux.center = realBuildingPos;
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
-		var geographicCoord = buildingGeoLocation.geographicCoord;
+		var geographicCoord = neoBuilding.geographicCoordOfBBox;
 		this.wwd.goToAnimator.travelTime = 3000;
 		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
 	}
@@ -6077,4 +6069,4 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	}
 
 	return true;
-};
+};;
