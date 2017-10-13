@@ -472,9 +472,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			{
 				terrainObject = wwd.pickTerrain(pickPoint).terrainObject();
 				var terrainPosition = terrainObject ? terrainObject.position : null;
-				pickPosition.lat = terrainPosition.latitude;
-				pickPosition.lon = terrainPosition.longitude;
-				pickPosition.alt = terrainPosition.altitude;
+				if (terrainPosition !== null)
+				{
+					pickPosition.lat = terrainPosition.latitude;
+					pickPosition.lon = terrainPosition.longitude;
+					pickPosition.alt = terrainPosition.altitude;	
+				}
 			}
 			if (serverPolicy.geo_callback_clickposition !== '') 
 			{

@@ -131,7 +131,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		{ continue; }
 	
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
-		if (lowestOctreesCount == 0)
+		if (lowestOctreesCount === 0)
 		{ continue; }
 		
 		var buildingGeoLocation = neoBuilding.getGeoLocationData();
@@ -722,10 +722,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
-		
-		//test:
-		if (neoReference.objectId == "20417")
-		{ var hola = 0; }
 		
 		if (neoReference.selColor4) 
 		{

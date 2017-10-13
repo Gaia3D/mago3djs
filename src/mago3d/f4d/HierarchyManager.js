@@ -33,7 +33,7 @@ HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue)
 	while (!find && i<nodesCount)
 	{
 		node = this.nodesArray[i];
-		if (node.data[dataName] && node.data[dataName] == dataNameValue)
+		if (node.data[dataName] && node.data[dataName] === dataNameValue)
 		{
 			resultNode = node;
 		}
