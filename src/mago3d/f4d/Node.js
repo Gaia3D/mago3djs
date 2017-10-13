@@ -20,3 +20,33 @@ var Node = function()
 	this.data;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.addChildren = function(children) 
+{
+	children.setParent(this);
+	this.children.push(children);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.setParent = function(parent) 
+{
+	this.parent = parent;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.getRoot = function() 
+{
+	if (this.parent === undefined)
+	{ return this; }
+	else
+	{
+		this.parent.getRoot();
+	}
+};
+
