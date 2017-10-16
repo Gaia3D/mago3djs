@@ -516,7 +516,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
 
-		var geoLocationData = selectedBuilding.geoLocDataManager.geoLocationDataArray[0];
+		var geoLocationData = selectedBuilding.getGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }
 
 		var increDeg = 3.0;

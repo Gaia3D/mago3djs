@@ -51,6 +51,7 @@ var MagoManager = function()
 	this.objectSelected;
 	this.buildingSelected;
 	this.octreeSelected;
+	this.nodeSelected;
 
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
@@ -1213,6 +1214,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerNodes, this.arrayAuxSC);
 		this.buildingSelected = this.arrayAuxSC[0];
 		this.octreeSelected = this.arrayAuxSC[1];
+		this.nodeSelected = this.arrayAuxSC[3];
 		this.arrayAuxSC.length = 0;
 		if (this.buildingSelected !== undefined) 
 		{
@@ -1426,7 +1428,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			{
 				lowestOctree = currentVisibleOctreesControler.currentVisibles0[j];
 				minSize = 0.0;
-				this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, neoBuilding, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
+				this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, node, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
 			}
 			
 			// LOD1.***
@@ -1435,7 +1437,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			{
 				lowestOctree = currentVisibleOctreesControler.currentVisibles1[j];
 				minSize = 0.0;
-				this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, neoBuilding, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
+				this.renderer.renderNeoRefListsAsimetricVersionColorSelection(gl, lowestOctree, node, this, isInterior, currentShader, minSize, refTMatrixIdxKey, glPrimitive);
 			}
 			
 			// LOD2.***
@@ -1463,7 +1465,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 				
 				this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
 				idxKey = this.selectionColor.decodeColor3(this.colorAux.r, this.colorAux.g, this.colorAux.b);
-				this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding);
+				this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding, node);
 				
 				gl.uniform1i(currentShader.hasTexture_loc, false); //.***
 				gl.uniform4fv(currentShader.color4Aux_loc, [this.colorAux.r/255.0, this.colorAux.g/255.0, this.colorAux.b/255.0, 1.0]);
@@ -1508,7 +1510,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 
 					this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
 					idxKey = this.selectionColor.decodeColor3(this.colorAux.r, this.colorAux.g, this.colorAux.b);
-					this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding);
+					this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding, node);
 				
 					gl.uniform1i(currentShader.hasTexture_loc, false); //.***
 					gl.uniform4fv(currentShader.color4Aux_loc, [this.colorAux.r/255.0, this.colorAux.g/255.0, this.colorAux.b/255.0, 1.0]);
@@ -1542,6 +1544,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 	resultSelectedArray[0] = this.selectionCandidates.currentBuildingSelected;
 	resultSelectedArray[1] = this.selectionCandidates.currentOctreeSelected;
 	resultSelectedArray[2] = this.selectionCandidates.currentReferenceSelected;
+	resultSelectedArray[3] = this.selectionCandidates.currentNodeSelected;
 	
 	this.swapRenderingFase();
 	
@@ -4601,6 +4604,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var neoBuilding;
 	var node;
 	var geoLoc;
+	var geoLocDataManager;
 	var realBuildingPos;
 	var parentBuilding;
 	var longitude, latitude, altitude, heading, pitch, roll;
@@ -4623,9 +4627,18 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 			{
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
+				// now, create a geoLocDataManager for node if no exist.
+				if (node.data.geoLocDataManager === undefined)
+				{ node.data.geoLocDataManager = new GeoLocationDataManager(); }
+				geoLocDataManager = node.data.geoLocDataManager;
+				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+					
 				neoBuilding = node.data.neoBuilding;
-				
-				geoLoc = neoBuilding.getGeoLocationData();
+				if (neoBuilding.currentGeoLocation == undefined)
+				{
+					neoBuilding.currentGeoLocation = geoLoc;
+				}
+
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
 					if (neoBuilding.metaData.geographicCoord === undefined)
@@ -4642,7 +4655,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						}
 					}
 			
-					geoLoc = neoBuilding.geoLocDataManager.newGeoLocationData("deploymentLoc");
+					geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
 					longitude = neoBuilding.metaData.geographicCoord.longitude;
 					latitude = neoBuilding.metaData.geographicCoord.latitude;
 					altitude = neoBuilding.metaData.geographicCoord.altitude;
@@ -4650,7 +4663,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					pitch = neoBuilding.metaData.pitch;
 					roll = neoBuilding.metaData.roll;
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, geoLoc, this);
-					
+					neoBuilding.currentGeoLocation = geoLoc;
 					parentBuilding = neoBuilding;
 					this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
 					
@@ -4662,6 +4675,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 					
 					// test.
+					//***********************************************************************************************************
 					/*
 					var nodeIdDivided = node.data.nodeId.split("_");
 					if (nodeIdDivided[0] == "testId")
@@ -4680,8 +4694,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 								ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 							}
 						}
-						
 					}
+					//------------------------------------------------------------------------------------------------------------
 					*/
 					continue;
 					
@@ -5671,9 +5685,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 				roll = 0;
 			}
 		}
-
-		//if (buildingSeed.firstName === "testId")
-		//{ altitude = -460.0; }
 		
 		if (buildingSeed.geographicCoord === undefined)
 		{ buildingSeed.geographicCoord = new GeographicCoord(); }
@@ -5699,7 +5710,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 
 		// create the node.
 		var node = this.hierarchyManager.newNode();
-		node.data = {"nodeId": buildingSeed.buildingId, "buildingSeed": buildingSeed};
+		node.data = {"nodeId"       : buildingSeed.buildingId, 
+			"buildingSeed" : buildingSeed};
 		nodesArray.push(node);
 	}
 	

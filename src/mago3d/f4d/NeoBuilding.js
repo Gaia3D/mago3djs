@@ -20,7 +20,7 @@ var NeoBuilding = function()
 	this.bboxAbsoluteCenterPos;
 
 	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
-	this.geoLocDataManager = new GeoLocationDataManager();
+	this.currentGeoLocation;
 	
 	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; 
@@ -56,7 +56,7 @@ var NeoBuilding = function()
 NeoBuilding.prototype.getGeoLocationData = function() 
 {
 	// provisionally return the 1rst geoLocationData.
-	return this.geoLocDataManager.geoLocationDataArray[0];
+	return this.currentGeoLocation;
 };
 
 /**
@@ -166,6 +166,9 @@ NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function()
 {
 	var bboxCenterPoint;
 	var geoLoc = this.getGeoLocationData(); // take the 1rst.
+	if (geoLoc == undefined)
+	{ var hola = 0; }
+	
 	bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
 	
