@@ -307,8 +307,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				if (neoReference.texture.texId === undefined)
 				{ continue; }
 			}
-			
-			
 		}
 		
 		// Check the color or texture of reference object.
@@ -685,8 +683,9 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
  * @param isInterior 변수
  * @param standardShader 변수
  */
-Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, lowestOctree, neoBuilding, magoManager, isInterior, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive) 
+Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl, lowestOctree, node, magoManager, isInterior, standardShader, maxSizeToRender, refMatrixIdxKey, glPrimitive) 
 {
+	var neoBuilding = node.data.neoBuilding;
 	// render_neoRef
 	var neoReferencesMotherAndIndices = lowestOctree.neoReferencesMotherAndIndices;
 	if (neoReferencesMotherAndIndices === undefined)
@@ -721,7 +720,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	
 		neoReference.selColor4 = magoManager.selectionColor.getAvailableColor(neoReference.selColor4); // new.
 		idxKey = magoManager.selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
-		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding);
+		selCandidates.setCandidates(idxKey, neoReference, lowestOctree, neoBuilding, node);
 		
 		if (neoReference.selColor4) 
 		{

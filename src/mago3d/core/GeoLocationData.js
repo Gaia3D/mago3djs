@@ -256,7 +256,22 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
  */
 GeoLocationDataManager.prototype.getGeoLocationData = function(idx) 
 {
+	if (idx > this.geoLocationDataArray.length - 1)
+	{ return undefined; }
 	return this.geoLocationDataArray[idx];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param idx
+ * @returns this.geoLoactionDataArray[idx]
+ */
+GeoLocationDataManager.prototype.getCurrentGeoLocationData = function() 
+{
+	if (this.geoLocationDataArray.length == 0)
+	{ return undefined; }
+	return this.geoLocationDataArray[0]; // provisionally return the 1rst.
 };
 
 
