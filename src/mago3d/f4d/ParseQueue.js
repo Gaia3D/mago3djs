@@ -52,7 +52,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
-				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				var buildingGeoLocation = neoBuilding.getGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
@@ -101,7 +101,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
-				var buildingGeoLocation = neoBuilding.geoLocDataManager.getGeoLocationData(0);
+				var buildingGeoLocation = neoBuilding.getGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
