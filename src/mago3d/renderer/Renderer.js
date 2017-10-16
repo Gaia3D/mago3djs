@@ -131,7 +131,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		{ continue; }
 	
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
-		if (lowestOctreesCount == 0)
+		if (lowestOctreesCount === 0)
 		{ continue; }
 		
 		var buildingGeoLocation = neoBuilding.getGeoLocationData();

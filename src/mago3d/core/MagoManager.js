@@ -1458,11 +1458,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 
 				if (lowestOctree.lego.fileLoadState === 2) 
 				{ continue; }
-			
-				// test:
-				if (neoBuilding.buildingId == "gangnam_del")
-				{ var hola = 0; }
-				
+					
 				this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
 				idxKey = this.selectionColor.decodeColor3(this.colorAux.r, this.colorAux.g, this.colorAux.b);
 				this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding, node);
@@ -5556,14 +5552,14 @@ MagoManager.prototype.makeHierachyTest = function()
 	{
 		node = this.hierarchyManager.nodesArray[i];
 		buildingSeed = node.data.buildingSeed;
-		if (buildingSeed.firstName == "testId")
+		if (buildingSeed.firstName === "testId")
 		{
 			buildingIdDivided = node.data.nodeId.split("_");
 			firstName = buildingIdDivided[0];
 			secondName = buildingIdDivided[1];
 			thirdName = buildingIdDivided[2];
 			
-			if (thirdName == "structure")
+			if (thirdName === "structure")
 			{
 				childNodeId = firstName+"_"+secondName+"_outfitting";
 				childNode = this.hierarchyManager.getNodeByDataName("nodeId", childNodeId);
@@ -5585,6 +5581,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	var realTimeLocBlocksList = MagoConfig.getData().alldata;
 	var buildingSeedsCount;
 	var buildingSeed;
+	var buildingId;
 	var newLocation;
 	
 	// 1rst, rearrange the "buildingSeedList".
@@ -5600,12 +5597,12 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			buildingSeed.firstName = firstName;
 			if (firstName === "testId")
 			{
-				if (buildingNameDivided.length == 2)
+				if (buildingNameDivided.length === 2)
 				{
 					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
 					buildingSeed.buildingType = undefined;
 				}
-				else if (buildingNameDivided.length == 3)
+				else if (buildingNameDivided.length === 3)
 				{
 					buildingSeed.buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1] + "_" + buildingNameDivided[2];
 					buildingSeed.buildingType = undefined;
@@ -5718,7 +5715,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
 	var smartTilesCount = this.smartTileManager.tilesArray.length; // "smartTilesCount" = 2.
-	var buildingId;
 	for (var a=0; a<smartTilesCount; a++)
 	{
 		var smartTile = this.smartTileManager.tilesArray[a];

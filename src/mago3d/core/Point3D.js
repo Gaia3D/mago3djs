@@ -167,7 +167,6 @@ Point3D.prototype.aproxDistTo = function(pointB, sqrtTable)
 	// find the big value.
 	var maxValue, value1, value2;
 	var value1Idx, value2Idx;
-	var aproxDist;
 	
 	if (difX > difY)
 	{

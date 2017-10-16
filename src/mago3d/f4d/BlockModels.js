@@ -414,9 +414,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		block.idx = blockIdx;
 		motherBlocksArray[blockIdx] = block;
 		
-		if (blockIdx == 1202)
-		{ var hola = 0; }
-
 		// 1rst, read bbox.
 		var bbox = new BoundingBox();
 		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4));
