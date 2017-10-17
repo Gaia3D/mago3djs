@@ -17,7 +17,7 @@ var Node = function()
 	this.children = []; 
 	
 	// data.
-	this.data;
+	this.data; // {}.
 };
 
 /**

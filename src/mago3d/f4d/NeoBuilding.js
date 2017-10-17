@@ -18,7 +18,6 @@ var NeoBuilding = function()
 	this.buildingFileName = "";
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
-	this.geographicCoordOfBBox;
 	
 	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; 

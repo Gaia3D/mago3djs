@@ -2076,7 +2076,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	{
 		if (this.selectionCandidates.currentNodeSelected === undefined)
 		{ return; }
-
+		
 		var geoLocDataManager = this.selectionCandidates.currentNodeSelected.data.geoLocDataManager;
 		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 	
@@ -2413,6 +2413,7 @@ MagoManager.prototype.manageQueue = function()
 	var lowestOctree;
 	var neoBuilding;
 	var headerVersion;
+	var geoLocDataManager;
 	var octreesParsedCount = 0;
 	
 	if (this.matrix4SC === undefined)
@@ -4780,8 +4781,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		else
 		{
 			// create the buildings by buildingSeeds.
-			buildingSeedsCount = lowestTile.nodeSeedsArray.length;
-			for (var j=0; j<buildingSeedsCount; j++)
+			var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
+			for (var j=0; j<nodeSeedsCount; j++)
 			{
 				var node = lowestTile.nodeSeedsArray[j];
 				neoBuilding = new NeoBuilding();
@@ -4830,9 +4831,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
  */
 MagoManager.prototype.flyToBuilding = function(dataKey) 
 {
-	var neoBuilding = this.getBuildingSeedById(null, dataKey);
+	var buildingSeed = this.getBuildingSeedById(null, dataKey);
 
-	if (neoBuilding === undefined)
+	if (buildingSeed === undefined)
 	{ return; }
 
 	// calculate realPosition of the building.****************************************************************************
@@ -4878,7 +4879,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 		
 		//var buildingGeoLocation = neoBuilding.getGeoLocationData();
 		//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-		realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(neoBuilding.geographicCoordOfBBox.longitude, neoBuilding.geographicCoordOfBBox.latitude, neoBuilding.geographicCoordOfBBox.altitude, realBuildingPos, this);
+		realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude, buildingSeed.geographicCoordOfBBox.altitude, realBuildingPos, this);
 	}
 	// end calculating realPosition of the building.------------------------------------------------------------------------
 
@@ -4886,11 +4887,11 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	{ return; }
 
 	if (this.renderingModeTemp === 0)
-	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
 	if (this.renderingModeTemp === 1)
-	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
 	if (this.renderingModeTemp === 2)
-	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
+	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
 
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
@@ -4908,7 +4909,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	}
 	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		var geographicCoord = neoBuilding.geographicCoordOfBBox;
+		var geographicCoord = buildingSeed.geographicCoordOfBBox;
 		this.wwd.goToAnimator.travelTime = 3000;
 		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
 	}
@@ -5537,8 +5538,6 @@ MagoManager.prototype.getObjectIndexFile = function()
  */
 MagoManager.prototype.makeHierachyTest = function() 
 {
-	var projectTree = this.hierarchyManager.newProjectTree();
-	// this.hierarchyManager
 	// testId_F110T_outfitting
 	// testId_F110T_structure
 	
@@ -5713,9 +5712,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
 
 		// create the node.
-		var node = this.hierarchyManager.newNode();
-		node.data = {"nodeId"       : buildingSeed.buildingId, 
-			"buildingSeed" : buildingSeed};
+		var node = this.hierarchyManager.newNode(buildingSeed.buildingId);
+		node.data.buildingSeed = buildingSeed;
 		nodesArray.push(node);
 	}
 	
