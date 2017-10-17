@@ -26,9 +26,10 @@ var Renderer = function()
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
+Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
 	var node;
+	var geoLocDataManager;
 	var neoBuilding;
 	var minSize = 0.0;
 	var lowestOctreesCount;
@@ -56,12 +57,13 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleNode
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleNodesArray[i];
+		geoLocDataManager = node.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 		
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
+		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -115,6 +117,7 @@ Renderer.prototype.renderNeoBuildingsAsimetricVersion = function(gl, visibleNode
 Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx) 
 {
 	var node;
+	var geoLocDataManager;
 	var neoBuilding;
 	//var minSize = 0.0;
 	var lowestOctreesCount;
@@ -126,6 +129,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleNodesArray[i];
+		geoLocDataManager = node.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
@@ -134,7 +138,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		if (lowestOctreesCount === 0)
 		{ continue; }
 		
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
+		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);

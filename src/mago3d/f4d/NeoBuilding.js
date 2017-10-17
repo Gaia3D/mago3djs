@@ -18,9 +18,7 @@ var NeoBuilding = function()
 	this.buildingFileName = "";
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
-
-	// a building can have 1 or more geoLocations (and rotations), throght the time for example.***
-	this.currentGeoLocation;
+	this.geographicCoordOfBBox;
 	
 	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; 
@@ -47,16 +45,6 @@ var NeoBuilding = function()
 	// Render settings.***************************************************
 	// provisionally put this here.
 	this.applyOcclusionCulling;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
- */
-NeoBuilding.prototype.getGeoLocationData = function() 
-{
-	// provisionally return the 1rst geoLocationData.
-	return this.currentGeoLocation;
 };
 
 /**
@@ -147,11 +135,11 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function() 
+NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	if (this.bboxAbsoluteCenterPos === undefined)
 	{
-		this.calculateBBoxCenterPositionWorldCoord();
+		this.calculateBBoxCenterPositionWorldCoord(geoLoc);
 	}
 	
 	return this.bboxAbsoluteCenterPos;
@@ -162,10 +150,10 @@ NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function()
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function() 
+NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var bboxCenterPoint;
-	var geoLoc = this.getGeoLocationData(); // take the 1rst.
+	//var geoLoc = this.getGeoLocationData(); // take the 1rst.
 	if (geoLoc == undefined)
 	{ var hola = 0; }
 	

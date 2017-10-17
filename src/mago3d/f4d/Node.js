@@ -46,7 +46,7 @@ Node.prototype.getRoot = function()
 	{ return this; }
 	else
 	{
-		this.parent.getRoot();
+		return this.parent.getRoot();
 	}
 };
 

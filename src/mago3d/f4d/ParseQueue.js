@@ -24,6 +24,8 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 	var neoBuilding;
 	var lowestOctree;
 	var headerVersion;
+	var node;
+	var geoLocDataManager;
 	
 	if (this.matrix4SC === undefined)
 	{ this.matrix4SC = new Matrix4(); }
@@ -51,8 +53,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
+				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
+				{
+					node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				}
+				geoLocDataManager = node.data.geoLocDataManager;
 				
-				var buildingGeoLocation = neoBuilding.getGeoLocationData();
+				//var buildingGeoLocation = neoBuilding.getGeoLocationData(); // old.***
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
@@ -101,7 +109,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				
-				var buildingGeoLocation = neoBuilding.getGeoLocationData();
+				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
+				{
+					node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				}
+				geoLocDataManager = node.data.geoLocDataManager;
+				
+				//var buildingGeoLocation = neoBuilding.getGeoLocationData(); // old.***
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				//if(headerVersion == "undefinedv.0.0")
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
