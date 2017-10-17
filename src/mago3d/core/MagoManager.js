@@ -1046,7 +1046,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		*/
 	}
 
-	//if(!isLastFrustum) return;
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	
@@ -1308,6 +1307,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	// lod2.
 	var gl = this.sceneState.gl;
 	var node;
+	var geoLocDataManager;
+	var geoLoc;
 	var neoBuilding;
 	var worldPosition;
 	var screenCoord;
@@ -1315,10 +1316,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleObjControlerNodes.currentVisibles2[i];
+		geoLocDataManager = node.data.geoLocDataManager;
+		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 		neoBuilding = node.data.neoBuilding;
-		//geoLocation = neoBuilding.getGeoLocationData();
-		//worldPosition = geoLocation.position;
-		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord();
+		
+		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc);
 		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
 		
 		if (screenCoord.x >= 0 && screenCoord.y >= 0)
@@ -1413,7 +1415,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			node = visibleObjControlerNodes.currentVisibles0[i];
 			neoBuilding = node.data.neoBuilding;
 			
-			var buildingGeoLocation = neoBuilding.getGeoLocationData();
+			var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -1480,7 +1482,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			node = visibleObjControlerNodes.currentVisibles2[i];
 			neoBuilding = node.data.neoBuilding;
 			
-			var buildingGeoLocation = neoBuilding.getGeoLocationData();
+			var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 			
@@ -1622,8 +1624,10 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	if (this.pointSC2 === undefined)
 	{ this.pointSC2 = new Point3D(); }
 	
+	var geoLocDataManager = this.nodeSelected.data.geoLocDataManager;
+	
 	this.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2);
-	var buildingGeoLocation = this.buildingSelected.getGeoLocationData();
+	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
 
 	if (resultSelObjMovePlane === undefined)
@@ -2070,10 +2074,11 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	//var cameraPosition = this.sceneState.camera.position;
 	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
-		if (this.buildingSelected === undefined)
+		if (this.selectionCandidates.currentNodeSelected === undefined)
 		{ return; }
 
-		var geoLocationData;
+		var geoLocDataManager = this.selectionCandidates.currentNodeSelected.data.geoLocDataManager;
+		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 	
 		// create a XY_plane in the selected_pixel_position.***
 		if (this.selObjMovePlane === undefined) 
@@ -2083,7 +2088,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			// find the pixel position relative to building.
 			var pixelPosWorldCoord = new Point3D();
 			pixelPosWorldCoord = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord);
-			geoLocationData = this.buildingSelected.getGeoLocationData();
 			var pixelPosBuildingCoord = geoLocationData.tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
 			
 			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
@@ -2097,10 +2101,9 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		// transform world_ray to building_ray.***
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
-		
-		var buildingGeoLocation = this.buildingSelected.getGeoLocationData();
-		camPosBuilding = buildingGeoLocation.geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-		this.pointSC = buildingGeoLocation.geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
+
+		camPosBuilding = geoLocationData.geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
+		this.pointSC = geoLocationData.geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
 		camDirBuilding.x = this.pointSC.x;
 		camDirBuilding.y = this.pointSC.y;
 		camDirBuilding.z = this.pointSC.z;
@@ -2115,7 +2118,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		
 		if (this.pointSC === undefined)
 		{ this.pointSC = new Point3D(); }
-		this.pointSC = buildingGeoLocation.geoLocMatrix.transformPoint3D(intersectionPoint, this.pointSC);
+		this.pointSC = geoLocationData.geoLocMatrix.transformPoint3D(intersectionPoint, this.pointSC);
 		intersectionPoint.set(this.pointSC.x, this.pointSC.y, this.pointSC.z);
 
 		// register the movement.***
@@ -2134,8 +2137,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difX = this.pointSC.x - this.startMovPoint.x;
 			var difY = this.pointSC.y - this.startMovPoint.y;
 
-			
-			geoLocationData = this.buildingSelected.getGeoLocationData();
 			var newLongitude = geoLocationData.geographicCoord.longitude - difX;
 			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
 			//var newHeight = cartographic.altitude;
@@ -2147,7 +2148,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.y -= difY;
 		}
 		
-		this.buildingSelected.calculateBBoxCenterPositionWorldCoord();
+		this.buildingSelected.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 	}
 	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
@@ -2159,13 +2160,15 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		{
 			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
 		}
+		
+		var geoLocDataManager = this.selectionCandidates.currentNodeSelected.data.geoLocDataManager;
 
 		// world ray = camPos + lambda*camDir.***
 		if (this.lineSC === undefined)
 		{ this.lineSC = new Line(); }
 		
 		this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
-		var buildingGeoLocation = this.buildingSelected.getGeoLocationData();
+		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
 		camPosBuilding = buildingGeoLocation.tMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
@@ -2216,8 +2219,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var neoBuilding = node.data.neoBuilding;
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
-	var buildingGeoLocation = neoBuilding.getGeoLocationData();
-	if (buildingGeoLocation === undefined)
+	var geoLocDataManager = node.data.geoLocDataManager;
+	var nodeGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+	if (nodeGeoLocation === undefined)
 	{ return false; }
 
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
@@ -2242,7 +2246,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 
 		var find = false;
 		
-		this.myCameraSCX = buildingGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
+		this.myCameraSCX = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
 		var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z);
 
 		neoBuilding.currentVisibleOctreesControler.clear();
@@ -2449,8 +2453,9 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
+				node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
 				
-				var buildingGeoLocation = neoBuilding.getGeoLocationData();
+				var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
@@ -2498,8 +2503,13 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
+				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
+				{
+					node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				}
+				geoLocDataManager = node.data.geoLocDataManager;
 				
-				var buildingGeoLocation = neoBuilding.getGeoLocationData();
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
@@ -2991,6 +3001,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		var currentShader;
 		var shaderProgram;
 		var neoBuilding;
+		var node;
+		var geoLocDataManager;
 
 		renderTexture = false;
 		//var lowestOctreeLegosParsingCount = 0;
@@ -3066,7 +3078,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				var renderTexture;
 				if (this.isLastFrustum)
 				{
-					this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
+					this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 				}
 				
 				if (currentShader)
@@ -3137,10 +3149,12 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			}
 			
 			// If there are an object selected, then there are a stencilBuffer.******************************************
-			if (this.buildingSelected && this.objectSelected) // if there are an object selected then there are a building selected.***
+			if (this.nodeSelected && this.objectSelected) // if there are an object selected then there are a building selected.***
 			{
+				node = this.nodeSelected;
+				var geoLocDataManager = node.data.geoLocDataManager;
 				neoBuilding = this.buildingSelected;
-				var buildingGeoLocation = neoBuilding.getGeoLocationData();
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				var neoReferencesMotherAndIndices = this.octreeSelected.neoReferencesMotherAndIndices;
 				var glPrimitive = gl.POINTS;
 				glPrimitive = gl.TRIANGLES;
@@ -3259,7 +3273,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					node = this.visibleObjControlerNodes.currentVisibles0[b];
 					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
-					var buildingGeoLocation = neoBuilding.getGeoLocationData();
+					var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -3277,7 +3291,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
-					var buildingGeoLocation = neoBuilding.getGeoLocationData();
+					var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -3419,7 +3433,7 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 		var minSize = 0.0;
 		if (this.isLastFrustum)
 		{
-			this.renderer.renderNeoBuildingsAsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
+			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 		}
 	}
 	if (currentShader)
@@ -4599,6 +4613,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var buildingSeed;
 	var neoBuilding;
 	var node;
+	var nodeBbox;
 	var geoLoc;
 	var geoLocDataManager;
 	var realBuildingPos;
@@ -4632,7 +4647,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				neoBuilding = node.data.neoBuilding;
 				if (neoBuilding.currentGeoLocation == undefined)
 				{
-					neoBuilding.currentGeoLocation = geoLoc;
+					neoBuilding.currentGeoLocation = geoLoc; // delete this.****
 				}
 
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
@@ -4659,7 +4674,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					pitch = neoBuilding.metaData.pitch;
 					roll = neoBuilding.metaData.roll;
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, geoLoc, this);
-					neoBuilding.currentGeoLocation = geoLoc;
+					neoBuilding.currentGeoLocation = geoLoc; // delete this.****
 					parentBuilding = neoBuilding;
 					this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
 					
@@ -4672,32 +4687,26 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					
 					// test.
 					//***********************************************************************************************************
-					/*
 					var nodeIdDivided = node.data.nodeId.split("_");
 					if (nodeIdDivided[0] == "testId")
 					{
-						if(nodeIdDivided[2] == "structure")
+						var rootNode = node.getRoot();
+						if (rootNode)
 						{
+							// now, calculate the root center of bbox.
+							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
 							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 						}
-						else if(nodeIdDivided[2] == "outfitting")
-						{
-							var parentNode = node.parent;
-							if(parentNode)
-							{
-								parentBuilding = parentNode.data.neoBuilding;
-								this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
-								ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-							}
-						}
+						else
+						{ var hola = 0; }
 					}
 					//------------------------------------------------------------------------------------------------------------
-					*/
+					
 					continue;
 					
 				}
-				
-				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord();
+				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc);
 				
 				if (neoBuilding.buildingId === "ctships")
 				{
@@ -4777,6 +4786,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				var node = lowestTile.nodeSeedsArray[j];
 				neoBuilding = new NeoBuilding();
 				node.data.neoBuilding = neoBuilding;
+				nodeBbox = new BoundingBox();
+				node.data.bbox = nodeBbox;
 				buildingSeed = node.data.buildingSeed;
 			
 				if (lowestTile.nodesArray === undefined)
@@ -4801,22 +4812,13 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
 				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
 				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
 				if (neoBuilding.bbox === undefined)
 				{ neoBuilding.bbox = new BoundingBox(); }
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
 				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-				if (neoBuilding.bbox === undefined)
-				{
-					if (currentCalculatingPositionsCount < maxNumberOfCalculatingPositions)
-					{
-						this.visibleObjControlerBuildings.currentVisibles0.push(neoBuilding); // old.***
-						//this.parseQueue.neoBuildingsHeaderToParseArray.push(neoBuilding);
-						currentCalculatingPositionsCount++;
-					}
-					continue;
-				}
 			}
 		}
 	}
@@ -4835,6 +4837,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 
 	// calculate realPosition of the building.****************************************************************************
 	var realBuildingPos;
+	/*
 	if (this.renderingModeTemp === 1 || this.renderingModeTemp === 2) // 0 = assembled mode. 1 = dispersed mode.***
 	{
 		if (neoBuilding.geoLocationDataAux === undefined) 
@@ -4865,6 +4868,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 		}
 	}
 	else 
+		*/
 	{
 		/*
 		var buildingGeoLocation = neoBuilding.getGeoLocationData();
@@ -4881,8 +4885,6 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	//
-	
 	if (this.renderingModeTemp === 0)
 	{ this.radiusAprox_aux = (neoBuilding.bBox.maxX - neoBuilding.bBox.minX) * 1.2/2.0; }
 	if (this.renderingModeTemp === 1)
@@ -5433,7 +5435,8 @@ MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
-	var geoLocationData = neoBuilding.getGeoLocationData();
+	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	var geoLocationData = node.data.geoLocDataManager.getCurrentGeoLocationData();
 	var latitude = geoLocationData.geographicCoord.latitude;
 	var longitude = geoLocationData.geographicCoord.longitude;
 	var altitude = geoLocationData.geographicCoord.altitude;
@@ -5449,7 +5452,8 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
-	var geoLocationData = neoBuilding.getGeoLocationData();
+	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	var geoLocationData = node.data.geoLocDataManager.getCurrentGeoLocationData();
 	var dividedName = neoBuilding.buildingId.split("_");
 	var dataKey = dividedName[0];
 	if (dividedName[1] !== undefined) { dataKey = dividedName[0] + "_" + dividedName[1]; }
@@ -5494,17 +5498,18 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
  */
 MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) 
 {
-	//var neoBuilding = this.getNeoBuildingById("structure", projectIdAndBlockId); // original for heavyIndustries.***
-	var neoBuilding = this.getNeoBuildingById(undefined, projectIdAndBlockId);
+	var node = this.hierarchyManager.getNodeByDataName("nodeId", projectIdAndBlockId);
 
-	if (neoBuilding === undefined)
+	if (node === undefined)
 	{ return; }
-	var geoLocationData = neoBuilding.getGeoLocationData();
+	var neoBuilding = node.data.neoBuilding;
+	var geoLocDatamanager = node.data.geoLocDataManager;
+	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, this);
 	if (geoLocationData === undefined)
 	{ return; }
 
-	// now, must change the keyMatrix of the references of the octrees.***
+	// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
 	if (neoBuilding.octree)
 	{
 		neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
@@ -5570,7 +5575,9 @@ MagoManager.prototype.makeHierachyTest = function()
 			}
 		}
 	}
-		
+	
+	// now create megaStructure joining 4 structures.
+	
 };
 
 /**
@@ -5650,14 +5657,14 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 			// test.***
 			if (buildingSeed.firstName === "testId")
 			{
-				
+				/*
 				longitude = 128.5894;
 				latitude = 34.90167;
 				altitude = -460.0;
 				heading = 0;
 				pitch = 0;
 				roll = 0;
-				
+				*/
 			}
 			
 		}

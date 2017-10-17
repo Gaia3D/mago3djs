@@ -519,7 +519,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
 
-		var geoLocationData = selectedBuilding.getGeoLocationData();
+		var nodeSelected = magoManager.selectionCandidates.currentNodeSelected;
+		var geoLocationData = nodeSelected.data.geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }
 
 		var increDeg = 3.0;
