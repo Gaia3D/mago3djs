@@ -50,3 +50,37 @@ Node.prototype.getRoot = function()
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.extractNodesByDataName = function(nodesArray, dataname) 
+{
+	if (this.data[dataname])
+	{
+		nodesArray.push(this);
+	}
+	
+	var childrenCount = this.children.length;
+	for (var i=0; i<childrenCount; i++)
+	{
+		this.children[i].extractNodesByDataName(nodesArray, dataname);
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

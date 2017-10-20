@@ -13,6 +13,7 @@ var ReaderWriter = function()
 
 	//this.geometryDataPath = "/F4D_GeometryData";
 	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
+	this.geometrySubDataPath;
 	this.viArraysContainer = new VertexIdxVBOArraysContainer();
 	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
 	//var simpleBuildingImage = new Image();
@@ -50,6 +51,24 @@ var ReaderWriter = function()
 	this.zSC;
 	this.point3dSC = new Point3D();
 	this.bboxSC = new BoundingBox();
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ */
+ReaderWriter.prototype.getCurrentDataPath = function() 
+{
+	var currentDataPath;
+	if (this.geometrySubDataPath !== undefined && this.geometrySubDataPath !== "")
+	{
+		currentDataPath = this.geometryDataPath + this.geometrySubDataPath;
+	}
+	else
+	{
+		currentDataPath = this.geometryDataPath;
+	}
+	
+	return currentDataPath;
 };
 
 /**
