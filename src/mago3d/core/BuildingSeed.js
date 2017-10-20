@@ -34,7 +34,7 @@ var BuildingSeedList = function()
 	this.minGeographicCoord; // longitude, latitude, altitude.
 	this.maxGeographicCoord; // longitude, latitude, altitude.
 	
-	this.dataArrayBuffer;
+	this.dataArrayBuffer; // binary data.
 };
 
 /**

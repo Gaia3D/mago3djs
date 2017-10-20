@@ -774,7 +774,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 {
 	// for all renderables, prepare data.***
 	var neoBuilding;
-	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var geometryDataPath = this.readerWriter.getCurrentDataPath();
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
@@ -2792,7 +2792,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 {
 	//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 
-	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var geometryDataPath = this.readerWriter.getCurrentDataPath();
 	var buildingFolderName;
 	var neoBuilding;
 
@@ -2887,7 +2887,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 
 	//var lowestOctreeLegosParsingCount = 0;
 	//var maxLowestOctreeLegosParsingCount = 90;
-	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var geometryDataPath = this.readerWriter.getCurrentDataPath();
 	var neoBuilding;
 	var buildingFolderName;
 
@@ -2940,7 +2940,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 			{
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
 				var buildingFolderName = neoBuilding.buildingFileName;
-				var filePath_inServer = this.readerWriter.geometryDataPath + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
+				var filePath_inServer = this.readerWriter.getCurrentDataPath() + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 			}
 		}
@@ -3805,8 +3805,8 @@ MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene
 			{
 				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
 				{
-					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
+					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
+					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 
 					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
 					this.backGround_fileReadings_count ++;
@@ -3979,8 +3979,8 @@ MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene
 			{
 				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
 				{
-					//filePath_scratch = this.readerWriter.geometryDataPath +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
+					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
+					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
 
 					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
 					this.backGround_fileReadings_count ++;
@@ -4995,7 +4995,7 @@ MagoManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, fru
 			if (this.backGround_fileReadings_count < max_tileFilesReading) 
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
+				filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
 				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -5095,7 +5095,7 @@ MagoManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, fru
 			if (this.backGround_fileReadings_count < max_tileFilesReading) 
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
+				filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
 				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -5159,7 +5159,7 @@ MagoManager.prototype.doFrustumCullingTerranTileServiceFormat = function(gl, fru
 			if (this.backGround_fileReadings_count < max_tileFilesReading) 
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = this.readerWriter.geometryDataPath + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
+				filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D_TERRAINTILES + tileNumberNameString + ".til";
 				this.readerWriter.getTileArrayBuffer(gl, filePath_scratch, this.terranTileSC, this.readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -5494,18 +5494,49 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 {
 	if (node === undefined)
 	{ return; }
-	var neoBuilding = node.data.neoBuilding;
-	var geoLocDatamanager = node.data.geoLocDataManager;
-	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
-	geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, this);
-	if (geoLocationData === undefined)
-	{ return; }
 
-	// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
-	if (neoBuilding.octree)
+	// 1rst, finde the rootNode.
+	var nodeRoot;
+	nodeRoot = node.getRoot();
+	
+	// now, extract all buildings of the nodeRoot.
+	var nodesArray = [];
+	nodeRoot.extractNodesByDataName(nodesArray, "neoBuilding");
+	
+	var aNode;
+	var nodesCount = nodesArray.length;
+	for (var i=0; i<nodesCount; i++)
 	{
-		neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
+		aNode = nodesArray[i];
+		var geoLocDatamanager = aNode.data.geoLocDataManager;
+		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, this);
+		if (geoLocationData === undefined)
+		{ continue; }
+
+		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
+		//var neoBuilding = node.data.neoBuilding; // old.***
+		var neoBuilding = aNode.data.neoBuilding;
+		if (neoBuilding.octree)
+		{
+			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
+		}
 	}
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
+MagoManager.prototype.getObjectIndexFileTEST = function(geometrySubDataPath) 
+{
+	if (this.configInformation === undefined)
+	{
+		this.configInformation = MagoConfig.getPolicy();
+	}
+
+	this.buildingSeedList = new BuildingSeedList();
+	this.readerWriter.getObjectIndexFileForSmartTile(
+		this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
 };
 
 /**
@@ -5521,7 +5552,8 @@ MagoManager.prototype.getObjectIndexFile = function()
 
 	this.buildingSeedList = new BuildingSeedList();
 	this.readerWriter.getObjectIndexFileForSmartTile(
-		this.readerWriter.geometryDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+		this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+		
 };
 
 /**
@@ -5573,9 +5605,324 @@ MagoManager.prototype.makeHierachyTest = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
+MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap) 
+{
+	var attributes = undefined;
+	var children = undefined;
+	var data_group_id = undefined;
+	var data_group_name = undefined;
+	var data_id = undefined;
+	var data_key = undefined;
+	var data_name = undefined;
+	var heading = undefined;
+	var height = undefined;
+	var latitude = undefined;
+	var longitude = undefined;
+	var pitch = undefined;
+	var roll = undefined;
+	
+	if (jasonObject.attributes !== undefined)
+	{
+		attributes = jasonObject.attributes;
+	}
+	if (jasonObject.children !== undefined)
+	{
+		children = jasonObject.children;
+	}
+	if (jasonObject.data_group_id !== undefined)
+	{
+		data_group_id = jasonObject.data_group_id;
+	}
+	if (jasonObject.data_group_name !== undefined)
+	{
+		data_group_name = jasonObject.data_group_name;
+	}
+	if (jasonObject.data_id !== undefined)
+	{
+		data_id = jasonObject.data_id;
+	}
+	if (jasonObject.data_key !== undefined)
+	{
+		data_key = jasonObject.data_key;
+	}
+	if (jasonObject.data_name !== undefined)
+	{
+		data_name = jasonObject.data_name;
+	}
+	if (jasonObject.heading !== undefined)
+	{
+		heading = jasonObject.heading;
+	}
+	if (jasonObject.height !== undefined)
+	{
+		height = jasonObject.height;
+	}
+	if (jasonObject.latitude !== undefined)
+	{
+		latitude = jasonObject.latitude;
+	}
+	if (jasonObject.longitude !== undefined)
+	{
+		longitude = jasonObject.longitude;
+	}
+	if (jasonObject.pitch !== undefined)
+	{
+		pitch = jasonObject.pitch;
+	}
+	if (jasonObject.roll !== undefined)
+	{
+		roll = jasonObject.roll;
+	}
+	
+	// now make the node.
+	var buildingId;
+	var buildingSeed;
+	var node;
+	var bbox;
+	var childJason;
+	var childNode;
+	var childrenCount;
+	if (attributes != undefined)
+	{
+		buildingId = data_key;
+		node = this.hierarchyManager.newNode(buildingId);
+		if (attributes.isPhysical)
+		{
+			// find the buildingSeed.
+			buildingSeed = buildingSeedMap.get(buildingId);
+			if (buildingSeed)
+			{
+				node.data.buildingSeed = buildingSeed;
+				resultPhysicalNodesArray.push(node);
+			}
+			else 
+			{
+				var hola = 0;
+			}
+		}
+
+		if (longitude && latitude)
+		{
+			// this is root node.
+			if (height === undefined)
+			{ height = 0; }
+			
+			node.data.geographicCoord = new GeographicCoord();
+			node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
+			
+			if (node.data.rotationsDegree === undefined)
+			{ node.data.rotationsDegree = new Point3D(); }
+			node.data.rotationsDegree.set(pitch, roll, heading);
+			
+			if (buildingSeed !== undefined)
+			{
+				if (buildingSeed.geographicCoord === undefined)
+				{ buildingSeed.geographicCoord = new GeographicCoord(); }
+			
+				if (buildingSeed.rotationsDegree === undefined)
+				{ buildingSeed.rotationsDegree = new Point3D(); }
+		
+				buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				buildingSeed.rotationsDegree.set(pitch, roll, heading);
+				
+				// now calculate the geographic coord of the center of the bbox.
+				if (buildingSeed.geographicCoordOfBBox === undefined) 
+				{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+			
+				// calculate the transformation matrix at (longitude, latitude, height).
+				var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
+				var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+				
+				// now calculate the geographicCoord of the center of the bBox.
+				var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+				buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			}
+		}
+		
+		bbox = new BoundingBox();
+		node.data.bbox = bbox;
+
+		if (children !== undefined)
+		{
+			childrenCount = children.length;
+			for (var i=0; i<childrenCount; i++)
+			{
+				childJason = children[i];
+				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap);
+				
+				// if childNode has "geographicCoord" then the childNode is in reality a root.
+				if (childNode.data.geographicCoord === undefined)
+				{
+					node.addChildren(childNode);
+				}
+			}
+			
+		}
+		else 
+		{
+		    // there are no children.
+			if (node.data.buildingSeed)
+			{ node.data.bbox.copyFrom(node.data.buildingSeed.bBox); }
+		}
+
+		// once finished with children, then make bbox of the node.
+		
+	}
+	return node;
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
+MagoManager.prototype.calculateBoundingBoxesNodes = function() 
+{
+	var node;
+	var nodeRoot;
+	var buildingSeed;
+	var longitude, latitude, height;
+	var heading, pitch, roll;
+	
+	// 1rst, calculate boundingBoxes of buildingSeeds of nodes.
+	var nodesCount = this.hierarchyManager.nodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = this.hierarchyManager.nodesArray[i];
+		buildingSeed = node.data.buildingSeed;
+		if (buildingSeed)
+		{
+			nodeRoot = node.getRoot();
+			
+			longitude = nodeRoot.data.geographicCoord.longitude; 
+			latitude = nodeRoot.data.geographicCoord.latitude; 
+			height = nodeRoot.data.geographicCoord.altitude;
+			
+			heading = nodeRoot.data.rotationsDegree.z;
+			pitch = nodeRoot.data.rotationsDegree.x;
+			roll = nodeRoot.data.rotationsDegree.y;
+			
+			//node.data.geographicCoord = nodeRoot.data.geographicCoord;
+			if (buildingSeed.geographicCoord === undefined)
+			{ buildingSeed.geographicCoord = new GeographicCoord(); }
+		
+			if (buildingSeed.rotationsDegree === undefined)
+			{ buildingSeed.rotationsDegree = new Point3D(); }
+
+			buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
+			buildingSeed.rotationsDegree.set(pitch, roll, heading);
+			
+			// now calculate the geographic coord of the center of the bbox.
+			if (buildingSeed.geographicCoordOfBBox === undefined) 
+			{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+		
+			// calculate the transformation matrix at (longitude, latitude, height).
+			var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
+			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+			
+			// now calculate the geographicCoord of the center of the bBox.
+			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+		}
+	}
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
 MagoManager.prototype.makeSmartTile = function(buildingSeedList) 
 {
-	var realTimeLocBlocksList = MagoConfig.getData().alldata;
+	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
+	var realTimeLocBlocksList = MagoConfig.getData();
+	var buildingSeedsCount;
+	var buildingSeed;
+	var buildingId;
+	var newLocation;
+
+	
+	// now, read all hierarchyJason and make the hierarchy tree.
+	var physicalNodesArray = []; // put here the nodes that has geometry data.
+	// make a buildingSeedMap.
+	var buildingSeedMap = new Map();
+	var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+	for (var i=0; i<buildingSeedsCount; i++)
+	{
+		buildingSeed = buildingSeedList.buildingSeedArray[i];
+		buildingId = buildingSeed.buildingId;
+		buildingSeedMap.set(buildingId, buildingSeed);
+	}
+	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap);
+	this.calculateBoundingBoxesNodes();
+	
+	// old.***
+	// now, make geographic data for each buildingSeed & create nodesArray.
+	/*
+	buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+	for (var i=0; i<buildingSeedsCount; i++) 
+	{
+		buildingSeed = buildingSeedList.buildingSeedArray[i];
+		buildingId = buildingSeed.buildingId;
+		if (buildingSeed.firstName === "testId")
+		{
+			var buildingNameDivided = buildingSeed.buildingId.split("_");
+			buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
+		}
+		newLocation = realTimeLocBlocksList[buildingId];
+		// must calculate the realBuildingPosition (bbox_center_position).***
+		var longitude;
+		var latitude;
+		var altitude;
+		var heading, pitch, roll;
+		
+		if (buildingSeed.geographicCoord === undefined)
+		{ buildingSeed.geographicCoord = new GeographicCoord(); }
+	
+		if (buildingSeed.rotationsDegree === undefined)
+		{ buildingSeed.rotationsDegree = new Point3D(); }
+	
+		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+		buildingSeed.rotationsDegree.set(pitch, roll, heading);
+		
+		// now calculate the geographic coord of the center of the bbox.
+		if (buildingSeed.geographicCoordOfBBox === undefined) 
+		{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+	
+		// calculate the transformation matrix at (longitude, latitude, altitude).
+		var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, worldCoordPosition, this);
+		var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+		
+		// now calculate the geographicCoord of the center of the bBox.
+		var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+		var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+		buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+
+		// create the node.
+		var node = this.hierarchyManager.newNode(buildingSeed.buildingId);
+		node.data.buildingSeed = buildingSeed;
+		nodesArray.push(node);
+	}
+	*/
+	// now, make smartTiles.
+	// there are 2 general smartTiles: AsiaSide & AmericaSide.
+	var smartTilesCount = this.smartTileManager.tilesArray.length; // "smartTilesCount" = 2.
+	for (var a=0; a<smartTilesCount; a++)
+	{
+		var smartTile = this.smartTileManager.tilesArray[a];
+		smartTile.nodeSeedsArray = physicalNodesArray;
+		smartTile.makeTreeByDepth(17, this); // depth = 17.
+	}
+	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+	
+	// test.
+	//this.makeHierachyTest();
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
+MagoManager.prototype.makeSmartTile_current = function(buildingSeedList) 
+{
+	var realTimeLocBlocksList = MagoConfig.getData().alldata; 
 	var buildingSeedsCount;
 	var buildingSeed;
 	var buildingId;
