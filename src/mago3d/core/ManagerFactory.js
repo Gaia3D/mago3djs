@@ -32,19 +32,36 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			serverPolicy.geo_view_library === '' ||
 			serverPolicy.geo_view_library === Constant.CESIUM) 
 		{
+			if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') {
+				var imageryProvider = new Cesium.WebMapServiceImageryProvider({
+					url        : serverPolicy.geo_server_url,
+					layers     : serverPolicy.geo_server_layers,
+					parameters : {
+						service     : serverPolicy.geo_server_parameters_service,
+							 version     : serverPolicy.geo_server_parameters_version,
+							 request     : serverPolicy.geo_server_parameters_request,
+							 transparent : serverPolicy.geo_server_parameters_transparent,
+							 format      : serverPolicy.geo_server_parameters_format
+					}//,
+					//proxy: new Cesium.DefaultProxy('/proxy/')
+				});
+				var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
+				if (viewer === null) { viewer = new Cesium.Viewer(containerId, options); }
+			} else {
+				if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
+				// 기본 지도 설정
+				setDefaultDataset();
+			}
 			
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
-
-			// 기본 지도 설정
-			setDefaultDataset();
-
 			viewer.scene.magoManager = new MagoManager();
 			viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 			viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 			//viewer.camera.frustum.near = 0.1;
 
-			// background provider 적용
-			if (serverPolicy.geo_server_enable === "true") { backgroundProvider(); }
+			// Layers 추가 적용
+			if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_add_url !== null && serverPolicy.geo_server_add_url !== '') { 
+				addImageryLayers(); 
+			}
 			
 			draw();
 			// build을 rendering 할 위치
@@ -66,24 +83,61 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 			// set to canvas the current gl.***
 			var canvas = document.getElementById(containerId);
-			// Create the World Window.
-			var wwd = new WorldWind.WorldWindow(containerId);
-			//wwd.depthBits = 32;
 			
-			var layers = [
-				{layer: new WorldWind.BMNGLayer(), enabled: true},
-				{layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-				{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-				{layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
-				{layer: new WorldWind.CompassLayer(), enabled: false},
-				{layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-				{layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-			];
+			var wwd;
+			if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') {
+				wwd = new WorldWind.WorldWindow(containerId, new WorldWind.ZeroElevationModel());
+				// Web Map Service information
+				var serviceAddress = serverPolicy.geo_server_url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
-			for (var l = 0; l < layers.length; l++) 
-			{
-				layers[l].layer.enabled = layers[l].enabled;
-				wwd.addLayer(layers[l].layer);
+				// Named layer displaying Average Temperature data
+				var layerName = "mago3d";
+
+				// Called asynchronously to parse and create the WMS layer
+				var createLayer = function (xmlDom) 
+				{
+					// Create a WmsCapabilities object from the XML DOM
+					var wms = new WorldWind.WmsCapabilities(xmlDom);
+					// Retrieve a WmsLayerCapabilities object by the desired layer name
+					var wmsLayerCapabilities = wms.getNamedLayer(layerName);
+					// Form a configuration object from the WmsLayerCapability object
+					var wmsConfig = WorldWind.WmsLayer.formLayerConfiguration(wmsLayerCapabilities);
+					// Modify the configuration objects title property to a more user friendly title
+					wmsConfig.title = "imageProvider";
+					// Create the WMS Layer from the configuration object
+					var wmsLayer = new WorldWind.WmsLayer(wmsConfig);
+
+					// Add the layers to WorldWind and update the layer manager
+					wwd.addLayer(wmsLayer);
+				};
+
+				// Called if an error occurs during WMS Capabilities document retrieval
+				var logError = function (jqXhr, text, exception) 
+				{
+					console.log("There was a failure retrieving the capabilities document: " + text + " exception: " + exception);
+				};
+
+				$.get(serviceAddress).done(createLayer).fail(logError);
+			} else {
+				// Create the World Window.
+				wwd = new WorldWind.WorldWindow(containerId);
+				//wwd.depthBits = 32;
+				
+				var layers = [
+					{layer: new WorldWind.BMNGLayer(), enabled: true},
+					{layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+					{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+					{layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
+					{layer: new WorldWind.CompassLayer(), enabled: false},
+					{layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+					{layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+				];
+	
+				for (var l = 0; l < layers.length; l++) 
+				{
+					layers[l].layer.enabled = layers[l].enabled;
+					wwd.addLayer(layers[l].layer);
+				}
 			}
 
 			// Now set up to handle highlighting.
@@ -401,20 +455,20 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 	}
 
 	/**
-	 * background provider
+	 * add Layers
 	 */
-	function backgroundProvider() 
+	function addImageryLayers() 
 	{
 		var provider = new Cesium.WebMapServiceImageryProvider({
-			url        : MagoConfig.getPolicy().geo_server_url,
-			layers     : MagoConfig.getPolicy().geo_server_layers,
+			url        : MagoConfig.getPolicy().geo_server_add_url,
+			layers     : MagoConfig.getPolicy().geo_server_add_layers,
 			parameters : {
-				service     : MagoConfig.getPolicy().geo_server_parameters_service,
-				version     : MagoConfig.getPolicy().geo_server_parameters_version,
-				request     : MagoConfig.getPolicy().geo_server_parameters_request,
-				transparent : MagoConfig.getPolicy().geo_server_parameters_transparent,
+				service     : MagoConfig.getPolicy().geo_server_add_parameters_service,
+				version     : MagoConfig.getPolicy().geo_server_add_parameters_version,
+				request     : MagoConfig.getPolicy().geo_server_add_parameters_request,
+				transparent : MagoConfig.getPolicy().geo_server_add_parameters_transparent,
 				//tiled : MagoConfig.getPolicy().backgroundProvider.parameters.tiled,
-				format      : MagoConfig.getPolicy().geo_server_parameters_format
+				format      : MagoConfig.getPolicy().geo_server_add_parameters_format
 				//				time : MagoConfig.getPolicy().backgroundProvider.parameters.time,
 				//		    	rand : MagoConfig.getPolicy().backgroundProvider.parameters.rand,
 				//		    	asdf : MagoConfig.getPolicy().backgroundProvider.parameters.asdf
