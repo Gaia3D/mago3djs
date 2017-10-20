@@ -637,7 +637,7 @@
 	
 	function startMogoUI() {
 		intervalCount++;
-		if(managerFactory != null) {
+		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
 			initJqueryCalendar();
 			// Label 표시
 			changeLabel(false);
