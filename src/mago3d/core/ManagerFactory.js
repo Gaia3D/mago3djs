@@ -20,12 +20,200 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 	var magoManager = null;
 	var scene = null;
+	var magoManagerState = CODE.magoManagerState.INIT;
 	
 	//var startMousePosition = null;
 	//var nowMousePosition = null;
 
 	// 환경 설정
 	MagoConfig.init(serverPolicy, serverData);
+	
+	if (serverPolicy.geo_view_library === null ||
+			serverPolicy.geo_view_library === '' ||
+			serverPolicy.geo_view_library === Constant.CESIUM) 
+		{
+			
+			if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
+
+			// 기본 지도 설정
+			setDefaultDataset();
+
+			viewer.scene.magoManager = new MagoManager();
+			viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
+			viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
+			//viewer.camera.frustum.near = 0.1;
+
+			// background provider 적용
+			if (serverPolicy.geo_server_enable === "true") { backgroundProvider(); }
+			
+			draw();
+			// build을 rendering 할 위치
+			initEntity();
+			// terrain 적용 여부
+			/*if() {
+				initTerrain();
+			}*/
+			// 최초 로딩시 카메라 이동 여부
+			if (serverPolicy.geo_init_camera_enable === "true") { initCamera(); }
+			// render Mode 적용
+			initRenderMode();
+		}
+		else if (serverPolicy.geo_view_library === Constant.WORLDWIND) 
+		{
+			
+			// Tell World Wind to log only warnings and errors.
+			WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+
+			// set to canvas the current gl.***
+			var canvas = document.getElementById(containerId);
+			// Create the World Window.
+			var wwd = new WorldWind.WorldWindow(containerId);
+			//wwd.depthBits = 32;
+			
+			var layers = [
+				{layer: new WorldWind.BMNGLayer(), enabled: true},
+				{layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+				{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+				{layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
+				{layer: new WorldWind.CompassLayer(), enabled: false},
+				{layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+				{layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+			];
+
+			for (var l = 0; l < layers.length; l++) 
+			{
+				layers[l].layer.enabled = layers[l].enabled;
+				wwd.addLayer(layers[l].layer);
+			}
+
+			// Now set up to handle highlighting.
+			//var highlightController = new WorldWind.HighlightController(wwd);
+
+			magoManager = new MagoManager();
+			magoManager.wwd = wwd;
+			magoManager.sceneState.textureFlipYAxis = true;
+			
+			var newRenderableLayer = new WorldWind.RenderableLayer();
+			newRenderableLayer.displayName = "F4D tiles";
+			newRenderableLayer.inCurrentFrame = true; // Test.***
+			wwd.addLayer(newRenderableLayer);
+			
+			//newRenderableLayer.addRenderable(f4d_wwwLayer);// old.***
+			newRenderableLayer.addRenderable(magoManager);
+			// End Create a layer to hold the f4dBuildings.-------------------------------------------------------
+
+			var gl = wwd.drawContext.currentGlContext;
+			initWwwMago(magoManager, gl);
+
+			// Click event. 
+			// The common gesture-handling function.
+			var handleClick = function (recognizer) 
+			{
+				// Obtain the event location.
+				//magoManager.mouse_x = event.layerX,
+				//magoManager.mouse_y = event.layerY;
+				//magoManager.bPicking = true;
+				
+				// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+				// relative to the upper left corner of the canvas rather than the upper left corner of the page.
+				//var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
+
+				// If only one thing is picked and it is the terrain, use a go-to animator to go to the picked location.
+				/*
+				if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
+					var position = pickList.objects[0].position;
+					//wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
+					//wwd.goTo(new WorldWind.Position(37.48666, 127.05618, 500));
+					wwd.goToOriented(new WorldWind.Position(37.48666, 127.05618, 500.0), 120.0, 80.0);
+				}
+				*/
+			};
+
+			// Listen for mouse clicks.
+			var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
+			clickRecognizer.button = 0;  //left mouse button
+			
+			var mouseDownEvent = function(event) 
+			{
+				if (event.button === 0) 
+				{ 
+					magoManager.mouseActionLeftDown(event.layerX, event.layerY); 
+				}
+				else if (event.button === 1) 
+				{ 
+					magoManager.mouseActionMiddleDown(event.layerX, event.layerY); 
+				}
+				else if (event.button === 2) 
+				{ 
+					magoManager.mouseActionRightDown(event.layerX, event.layerY); 
+				}
+			};
+			wwd.addEventListener("mousedown", mouseDownEvent, false);
+			
+			var mouseUpEvent = function(event) 
+			{
+				if (event.button === 0) 
+				{ 
+					magoManager.mouseActionLeftUp(event.layerX, event.layerY);
+				}
+				else if (event.button === 1) 
+				{ 
+					magoManager.mouseActionMiddleUp(event.layerX, event.layerY);
+				}
+				else if (event.button === 2) 
+				{ 
+					magoManager.mouseActionRightUp(event.layerX, event.layerY);
+				}
+
+				// display current mouse position
+				
+				var terrainObject;
+				var pickPosition = {lat: null, lon: null, alt: null};
+				var pickPoint = wwd.canvasCoordinates(event.layerX, event.layerY);
+				if (pickPoint[0] >= 0 && pickPoint[0] < wwd.canvas.width &&
+					pickPoint[1] >= 0 && pickPoint[1] < wwd.canvas.height)
+				{
+					terrainObject = wwd.pickTerrain(pickPoint).terrainObject();
+					var terrainPosition = terrainObject ? terrainObject.position : null;
+					if (terrainPosition !== null)
+					{
+						pickPosition.lat = terrainPosition.latitude;
+						pickPosition.lon = terrainPosition.longitude;
+						pickPosition.alt = terrainPosition.altitude;	
+					}
+				}
+				if (serverPolicy.geo_callback_clickposition !== '') 
+				{
+					clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+				}
+				
+			};
+			wwd.addEventListener("mouseup", mouseUpEvent, false);
+			
+			var mouseMoveEvent = function(event) 
+			{
+				magoManager.mouse_x = event.layerX,
+				magoManager.mouse_y = event.layerY;
+				if (magoManager.mouseLeftDown) 
+				{ 
+					magoManager.manageMouseDragging(event.layerX, event.layerY); 
+					magoManager.cameraMoved();
+				}
+				else if (magoManager.mouseMiddleDown || magoManager.mouseRightDown) 
+				{ 
+					magoManager.cameraMoved();
+				}
+				
+			};
+			wwd.addEventListener("mousemove", mouseMoveEvent, false);
+		
+			wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
+			wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
+		}
+
+		// 이미지 경로
+		magoManager.magoPolicy.imagePath = imagePath;
+		magoManagerState = CODE.magoManagerState.READY;
 	
 	// 카메라 행동 설정
 	function disableCameraMotion(state)
@@ -334,192 +522,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		if (terrainProvider) { viewer.baseLayerPicker.viewModel.selectedTerrain = terrainProvider; }
 	}
 
-	if (serverPolicy.geo_view_library === null ||
-		serverPolicy.geo_view_library === '' ||
-		serverPolicy.geo_view_library === Constant.CESIUM) 
-	{
-		
-		if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
-
-		// 기본 지도 설정
-		setDefaultDataset();
-
-		viewer.scene.magoManager = new MagoManager();
-		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
-		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
-		//viewer.camera.frustum.near = 0.1;
-
-		// background provider 적용
-		if (serverPolicy.geo_server_enable === "true") { backgroundProvider(); }
-		
-		draw();
-		// build을 rendering 할 위치
-		initEntity();
-		// terrain 적용 여부
-		/*if() {
-			initTerrain();
-		}*/
-		// 최초 로딩시 카메라 이동 여부
-		if (serverPolicy.geo_init_camera_enable === "true") { initCamera(); }
-		// render Mode 적용
-		initRenderMode();
-	}
-	else if (serverPolicy.geo_view_library === Constant.WORLDWIND) 
-	{
-		
-		// Tell World Wind to log only warnings and errors.
-		WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
-
-		// set to canvas the current gl.***
-		var canvas = document.getElementById(containerId);
-		// Create the World Window.
-		var wwd = new WorldWind.WorldWindow(containerId);
-		//wwd.depthBits = 32;
-		
-		var layers = [
-			{layer: new WorldWind.BMNGLayer(), enabled: true},
-			{layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-			{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-			{layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
-			{layer: new WorldWind.CompassLayer(), enabled: false},
-			{layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-			{layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-		];
-
-		for (var l = 0; l < layers.length; l++) 
-		{
-			layers[l].layer.enabled = layers[l].enabled;
-			wwd.addLayer(layers[l].layer);
-		}
-
-		// Now set up to handle highlighting.
-		//var highlightController = new WorldWind.HighlightController(wwd);
-
-		magoManager = new MagoManager();
-		magoManager.wwd = wwd;
-		magoManager.sceneState.textureFlipYAxis = true;
-		
-		var newRenderableLayer = new WorldWind.RenderableLayer();
-		newRenderableLayer.displayName = "F4D tiles";
-		newRenderableLayer.inCurrentFrame = true; // Test.***
-		wwd.addLayer(newRenderableLayer);
-		
-		//newRenderableLayer.addRenderable(f4d_wwwLayer);// old.***
-		newRenderableLayer.addRenderable(magoManager);
-		// End Create a layer to hold the f4dBuildings.-------------------------------------------------------
-
-		var gl = wwd.drawContext.currentGlContext;
-		initWwwMago(magoManager, gl);
-
-		// Click event. 
-		// The common gesture-handling function.
-		var handleClick = function (recognizer) 
-		{
-			// Obtain the event location.
-			//magoManager.mouse_x = event.layerX,
-			//magoManager.mouse_y = event.layerY;
-			//magoManager.bPicking = true;
-			
-			// Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
-			// relative to the upper left corner of the canvas rather than the upper left corner of the page.
-			//var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
-
-			// If only one thing is picked and it is the terrain, use a go-to animator to go to the picked location.
-			/*
-			if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
-				var position = pickList.objects[0].position;
-				//wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
-				//wwd.goTo(new WorldWind.Position(37.48666, 127.05618, 500));
-				wwd.goToOriented(new WorldWind.Position(37.48666, 127.05618, 500.0), 120.0, 80.0);
-			}
-			*/
-		};
-
-		// Listen for mouse clicks.
-		var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
-		clickRecognizer.button = 0;  //left mouse button
-		
-		var mouseDownEvent = function(event) 
-		{
-			if (event.button === 0) 
-			{ 
-				magoManager.mouseActionLeftDown(event.layerX, event.layerY); 
-			}
-			else if (event.button === 1) 
-			{ 
-				magoManager.mouseActionMiddleDown(event.layerX, event.layerY); 
-			}
-			else if (event.button === 2) 
-			{ 
-				magoManager.mouseActionRightDown(event.layerX, event.layerY); 
-			}
-		};
-		wwd.addEventListener("mousedown", mouseDownEvent, false);
-		
-		var mouseUpEvent = function(event) 
-		{
-			if (event.button === 0) 
-			{ 
-				magoManager.mouseActionLeftUp(event.layerX, event.layerY);
-			}
-			else if (event.button === 1) 
-			{ 
-				magoManager.mouseActionMiddleUp(event.layerX, event.layerY);
-			}
-			else if (event.button === 2) 
-			{ 
-				magoManager.mouseActionRightUp(event.layerX, event.layerY);
-			}
-
-			// display current mouse position
-			
-			var terrainObject;
-			var pickPosition = {lat: null, lon: null, alt: null};
-			var pickPoint = wwd.canvasCoordinates(event.layerX, event.layerY);
-			if (pickPoint[0] >= 0 && pickPoint[0] < wwd.canvas.width &&
-				pickPoint[1] >= 0 && pickPoint[1] < wwd.canvas.height)
-			{
-				terrainObject = wwd.pickTerrain(pickPoint).terrainObject();
-				var terrainPosition = terrainObject ? terrainObject.position : null;
-				if (terrainPosition !== null)
-				{
-					pickPosition.lat = terrainPosition.latitude;
-					pickPosition.lon = terrainPosition.longitude;
-					pickPosition.alt = terrainPosition.altitude;	
-				}
-			}
-			if (serverPolicy.geo_callback_clickposition !== '') 
-			{
-				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
-			}
-			
-		};
-		wwd.addEventListener("mouseup", mouseUpEvent, false);
-		
-		var mouseMoveEvent = function(event) 
-		{
-			magoManager.mouse_x = event.layerX,
-			magoManager.mouse_y = event.layerY;
-			if (magoManager.mouseLeftDown) 
-			{ 
-				magoManager.manageMouseDragging(event.layerX, event.layerY); 
-				magoManager.cameraMoved();
-			}
-			else if (magoManager.mouseMiddleDown || magoManager.mouseRightDown) 
-			{ 
-				magoManager.cameraMoved();
-			}
-			
-		};
-		wwd.addEventListener("mousemove", mouseMoveEvent, false);
-	
-		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
-		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
-	}
-
-	// 이미지 경로
-	magoManager.magoPolicy.imagePath = imagePath;
-
 	// KeyPressEvents.**************************************
 	document.addEventListener('keydown', function(event) 
 	{
@@ -646,6 +648,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		// 선택 블락 이동
 		move: function() 
 		{
+		},
+		// magoManager 상태
+		getMagoManagerState: function() {
+			return magoManagerState;
 		},
 		mouseMove: function(eventType) 
 		{
