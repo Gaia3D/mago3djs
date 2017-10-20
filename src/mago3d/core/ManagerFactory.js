@@ -347,6 +347,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 		viewer.scene.magoManager = new MagoManager();
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
+		//viewer.camera.frustum.near = 0.1;
 
 		// background provider 적용
 		if (serverPolicy.geo_server_enable === "true") { backgroundProvider(); }
@@ -436,15 +437,22 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 
 		// Listen for mouse clicks.
 		var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
+		clickRecognizer.button = 0;  //left mouse button
 		
 		var mouseDownEvent = function(event) 
 		{
 			if (event.button === 0) 
-			{ magoManager.mouseActionLeftDown(event.layerX, event.layerY); }
+			{ 
+				magoManager.mouseActionLeftDown(event.layerX, event.layerY); 
+			}
 			else if (event.button === 1) 
-			{ magoManager.mouseActionMiddleDown(event.layerX, event.layerY); }
+			{ 
+				magoManager.mouseActionMiddleDown(event.layerX, event.layerY); 
+			}
 			else if (event.button === 2) 
-			{ magoManager.mouseActionRightDown(event.layerX, event.layerY); }
+			{ 
+				magoManager.mouseActionRightDown(event.layerX, event.layerY); 
+			}
 		};
 		wwd.addEventListener("mousedown", mouseDownEvent, false);
 		
@@ -464,6 +472,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			}
 
 			// display current mouse position
+			
 			var terrainObject;
 			var pickPosition = {lat: null, lon: null, alt: null};
 			var pickPoint = wwd.canvasCoordinates(event.layerX, event.layerY);
@@ -483,6 +492,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			{
 				clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
 			}
+			
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 		
@@ -558,7 +568,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 			currentRoll -= increDeg;
 		}
 
-		magoManager.changeLocationAndRotation(selectedBuilding.buildingId, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
+		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
 
 	}, false);
 	

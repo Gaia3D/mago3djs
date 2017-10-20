@@ -34,6 +34,15 @@ Matrix4.prototype.Identity = function()
  * 어떤 일을 하고 있습니까?
  * @returns rowMajor_matrix
  */
+Matrix4.prototype.deleteObjects = function() 
+{
+	this._floatArrays = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns rowMajor_matrix
+ */
 Matrix4.prototype.getRowMajorMatrix = function() 
 {
 	var rowMajor_matrix = new Float32Array(16);

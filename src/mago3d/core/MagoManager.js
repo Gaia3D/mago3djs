@@ -782,7 +782,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
 		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
-		
 		// check if this building is ready to render.***
 		//if (!neoBuilding.allFilesLoaded) // no used yet.
 		{
@@ -1823,7 +1822,8 @@ MagoManager.prototype.setCameraMotion = function(state)
 {
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		this.wwd.navigator.panRecognizer.enable = state;
+		this.wwd.navigator.panRecognizer.enabled = state;
+		this.wwd.navigator.primaryDragRecognizer.enabled = state;
 	}
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
@@ -1876,7 +1876,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		}
 	}
 	
-	this.enableCameraMotion(true);
+	this.setCameraMotion(true);
 };
 
 /**
@@ -1908,7 +1908,7 @@ MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY)
 	this.selObjMovePlane = undefined;
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
-	this.enableCameraMotion(false);
+	this.setCameraMotion(false);
 };
 
 /**
@@ -1938,7 +1938,7 @@ MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY)
 {
 	/*
 	this.isCameraMoving = false;
-	this.enableCameraMotion(false);
+	this.setCameraMotion(false);
 	*/
 };
 
@@ -1964,7 +1964,7 @@ MagoManager.prototype.mouseActionMove = function(mouseX, mouseY)
 	else
 	{
 		this.mouseDragging = false;
-		this.enableCameraMotion(false);
+		this.setCameraMotion(false);
 		if (this.mouseMiddleDown)
 		{
 			this.isCameraMoving = true;
@@ -1972,22 +1972,6 @@ MagoManager.prototype.mouseActionMove = function(mouseX, mouseY)
 	}
 };
 
-// 뭐하는 메서드 인가?
-MagoManager.prototype.enableCameraMotion = function(state)
-{
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		this.scene.screenSpaceCameraController.enableRotate = state;
-		this.scene.screenSpaceCameraController.enableZoom = state;
-		this.scene.screenSpaceCameraController.enableLook = state;
-		this.scene.screenSpaceCameraController.enableTilt = state;
-		this.scene.screenSpaceCameraController.enableTranslate = state;
-	}
-	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		;//
-	}
-};
 
 /**
  * 선택 객체를 asimetric mode 로 이동
@@ -1999,68 +1983,60 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 {
 	this.sceneState.camera.setDirty(true);
 	
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	// distinguish 2 modes.******************************************************
+	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // blocks move.***
 	{
-		// distinguish 2 modes.******************************************************
-		if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // blocks move.***
+		if (this.buildingSelected !== undefined) 
 		{
-			if (this.buildingSelected !== undefined) 
-			{
-				// move the selected object.***
-				this.mouse_x = mouseX;
-				this.mouse_y = mouseY;
+			// move the selected object.***
+			this.mouse_x = mouseX;
+			this.mouse_y = mouseY;
 
-				// 1rst, check if there are objects to move.***
-				if (this.mustCheckIfDragging) 
+			// 1rst, check if there are objects to move.***
+			if (this.mustCheckIfDragging) 
+			{
+				if (this.isDragging()) 
 				{
-					if (this.isDragging()) 
-					{
-						this.mouseDragging = true;
-						this.setCameraMotion(false);
-					}
-					this.mustCheckIfDragging = false;
+					this.mouseDragging = true;
+					this.setCameraMotion(false);
 				}
-			}
-			else 
-			{
-				this.isCameraMoving = true; // if no object is selected.***
+				this.mustCheckIfDragging = false;
 			}
 		}
-		else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
+		else 
 		{
-			if (this.objectSelected !== undefined) 
-			{
-				// move the selected object.***
-				this.mouse_x = mouseX;
-				this.mouse_y = mouseY;
-
-				// 1rst, check if there are objects to move.***
-				if (this.mustCheckIfDragging) 
-				{
-					if (this.isDragging()) 
-					{
-						this.mouseDragging = true;
-						this.setCameraMotion(false);
-					}
-					this.mustCheckIfDragging = false;
-				}
-			}
-			else 
-			{
-				this.isCameraMoving = true; // if no object is selected.***
-			}
+			this.isCameraMoving = true; // if no object is selected.***
 		}
-		//---------------------------------------------------------------------------------
-		this.isCameraMoving = true; // test.***
-		if (this.mouseDragging) 
-		{
-			this.moveSelectedObjectAsimetricMode(this.sceneState.gl);
-		}
-
 	}
-	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
+	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
-		;//
+		if (this.objectSelected !== undefined) 
+		{
+			// move the selected object.***
+			this.mouse_x = mouseX;
+			this.mouse_y = mouseY;
+
+			// 1rst, check if there are objects to move.***
+			if (this.mustCheckIfDragging) 
+			{
+				if (this.isDragging()) 
+				{
+					this.mouseDragging = true;
+					this.setCameraMotion(false);
+				}
+				this.mustCheckIfDragging = false;
+			}
+		}
+		else 
+		{
+			this.isCameraMoving = true; // if no object is selected.***
+		}
+	}
+	//---------------------------------------------------------------------------------
+	this.isCameraMoving = true; // test.***
+	if (this.mouseDragging) 
+	{
+		this.moveSelectedObjectAsimetricMode(this.sceneState.gl);
 	}
 };
 
@@ -2141,7 +2117,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
 			//var newHeight = cartographic.altitude;
 
-			this.changeLocationAndRotation(this.buildingSelected.buildingId, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+			this.changeLocationAndRotationNode(this.selectionCandidates.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
 			this.displayLocationAndRotation(this.buildingSelected);
 			
 			this.startMovPoint.x -= difX;
@@ -2269,7 +2245,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		if (!find) 
 		{
 			// if the building is far to camera, then delete it.
-			if (neoBuilding.distToCam > 15)
+			if (neoBuilding.distToCam > 40)
 			{ this.processQueue.putNodeToDelete(node, 0); }
 			return false;
 		}
@@ -2373,6 +2349,7 @@ MagoManager.prototype.manageQueue = function()
 	for (var i=0; i<maxDeleteNodesCount; i++)
 	{
 		node = nodesToDeleteArray[i];
+
 		neoBuilding = node.data.neoBuilding;
 		this.processQueue.eraseNodeToDelete(node);
 		this.deleteNeoBuilding(gl, neoBuilding);
@@ -2387,6 +2364,7 @@ MagoManager.prototype.manageQueue = function()
 	for (var i=0; i<nodesToDeleteArray; i++)
 	{
 		node = nodesToDeleteModelReferencesArray[i];
+
 		neoBuilding = node.data.neoBuilding;
 		this.processQueue.eraseNodeToDeleteModelReferences(neoBuilding);
 		if (neoBuilding === undefined)
@@ -4698,8 +4676,11 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
 							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 						}
-						else
-						{ var hola = 0; }
+						//if(rootNode !== node)
+						//{
+						//	node.data.geoLocDataManager.deleteObjects();
+						//	node.data.geoLocDataManager = rootNode.data.geoLocDataManager;
+						//}
 					}
 					//------------------------------------------------------------------------------------------------------------
 					
@@ -5500,7 +5481,17 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) 
 {
 	var node = this.hierarchyManager.getNodeByDataName("nodeId", projectIdAndBlockId);
+	if (node === undefined)
+	{ return; }
+	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll) ;
+	
+};
 
+/**
+ * 변환 행렬
+ */
+MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll) 
+{
 	if (node === undefined)
 	{ return; }
 	var neoBuilding = node.data.neoBuilding;
