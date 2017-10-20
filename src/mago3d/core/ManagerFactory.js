@@ -89,7 +89,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverData, ima
 				wwd = new WorldWind.WorldWindow(containerId, new WorldWind.ZeroElevationModel());
 				
 				// Web Map Service information
-				var serviceAddress = "http://localhost:9999/geoserver/mago3d/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+				var serviceAddress = serverPolicy.geo_server_url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
 				// Named layer displaying Average Temperature data
 				var layerName = "mago3d";
