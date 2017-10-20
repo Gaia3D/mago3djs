@@ -635,7 +635,7 @@
 	
 	function startMogoUI() {
 		intervalCount++;
-		if(managerFactory != null) {
+		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
 			initJqueryCalendar();
 			// Label 표시
 			changeLabel(false);
@@ -652,7 +652,7 @@
 			changeViewMode(false);
 
 			clearInterval(timerId);
-			console.log(" managerFactory != null, intervalCount = " + intervalCount);
+			console.log(" managerFactory != null, managerFactory.getMagoManagerState() = " + managerFactory.getMagoManagerState() + ", intervalCount = " + intervalCount);
 			return;
 		}
 		console.log("--------- intervalCount = " + intervalCount);
