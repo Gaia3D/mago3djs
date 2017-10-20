@@ -27,7 +27,7 @@ var GeoLocationData = function(geoLocationDataName)
 	this.position;   // Point3D().***
 	this.positionHIGH; // Float32Array[3].***
 	this.positionLOW; // Float32Array[3].***
-	this.pivotPoint; // Point3D().***
+	this.pivotPoint; // Point3D().*** // Actually position = pivotPoint.
 	
 	// F4D Matrix4.****
 	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
@@ -39,6 +39,60 @@ var GeoLocationData = function(geoLocationDataName)
 	
 	// Aditional.***
 	this.pivotPointTraslation; // made when translate the pivot point.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+GeoLocationData.prototype.deleteObjects = function() 
+{
+	this.name = undefined;
+	if (this.geographicCoord)
+	{ this.geographicCoord.deleteObjects(); }
+	this.geographicCoord = undefined;
+	
+	this.heading = undefined;
+	this.pitch = undefined;
+	this.roll = undefined;
+	
+	this.date = undefined; 
+	
+	if (this.position)
+	{ this.position.deleteObjects(); }  
+	this.position = undefined;
+	this.positionHIGH = undefined;
+	this.positionLOW = undefined; 
+	if (this.pivotPoint)
+	{ this.pivotPoint.deleteObjects(); }  
+	this.pivotPoint = undefined;
+	
+	// F4D Matrix4.****
+	if (this.geoLocMatrix)
+	{ this.geoLocMatrix.deleteObjects(); }
+	if (this.geoLocMatrixInv)
+	{ this.geoLocMatrixInv.deleteObjects(); }
+	if (this.tMatrix)
+	{ this.tMatrix.deleteObjects(); } 
+	if (this.tMatrixInv)
+	{ this.tMatrixInv.deleteObjects(); } 
+	if (this.rotMatrix)
+	{ this.rotMatrix.deleteObjects(); }  
+	if (this.rotMatrixInv)
+	{ this.rotMatrixInv.deleteObjects(); } 
+	
+	this.geoLocMatrix = undefined;
+	this.geoLocMatrixInv = undefined; 
+	this.tMatrix = undefined;     
+	this.tMatrixInv = undefined;  
+	this.rotMatrix = undefined;   
+	this.rotMatrixInv = undefined; 
+	
+	// Aditional.***
+	if (this.pivotPointTraslation)
+	{ this.pivotPointTraslation.deleteObjects(); }
+	this.pivotPointTraslation = undefined;
 };
 
 /**
@@ -229,7 +283,26 @@ var GeoLocationDataManager = function()
 	}
 	
 	this.geoLocationDataArray = [];
-	this.geoLocationDataCache = {}; // use this.***
+	//this.geoLocationDataCache = {}; // use this.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocationName 변수
+ * @returns geoLocationData
+ */
+GeoLocationDataManager.prototype.deleteObjects = function() 
+{
+	if (this.geoLocationDataArray)
+	{
+		for (var i=0; i<this.geoLocationDataArray.length; i++)
+		{
+			this.geoLocationDataArray[i].deleteObjects();
+			this.geoLocationDataArray[i] = undefined;
+		}
+		this.geoLocationDataArray = undefined;
+	}
 };
 
 /**
@@ -244,7 +317,7 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
 	{ geoLocationName = "noName" + this.geoLocationDataArray.length.toString(); }
 	var geoLocationData = new GeoLocationData(geoLocationName);
 	this.geoLocationDataArray.push(geoLocationData);
-	this.geoLocationDataCache[geoLocationName] = geoLocationData;
+	//this.geoLocationDataCache[geoLocationName] = geoLocationData;
 	return geoLocationData;
 };
 
