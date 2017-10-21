@@ -1306,11 +1306,36 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	// lod2.
 	var gl = this.sceneState.gl;
 	var node;
+	var nodeRoot;
 	var geoLocDataManager;
 	var geoLoc;
 	var neoBuilding;
 	var worldPosition;
 	var screenCoord;
+	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = visibleObjControlerNodes.currentVisibles2[i];
+		nodeRoot = node.getRoot();
+
+		geoLocDataManager = nodeRoot.data.geoLocDataManager;
+		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		//neoBuilding = node.data.neoBuilding;
+		worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
+		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+		
+		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		{
+			ctx.font = "13px Arial";
+			ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+			ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+
+			//ctx.font = "9px Arial";
+			//ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+			//ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
+		}
+	}
+	/*
 	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
 	for (var i=0; i<nodesCount; i++)
 	{
@@ -1333,6 +1358,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 		}
 	}
+	*/
 	ctx.restore();
 };
 
@@ -2124,7 +2150,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.y -= difY;
 		}
 		
-		this.buildingSelected.calculateBBoxCenterPositionWorldCoord(geoLocationData);
+		//this.buildingSelected.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 	}
 	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
@@ -4592,6 +4618,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var buildingSeed;
 	var neoBuilding;
 	var node;
+	var nodeRoot;
 	var nodeBbox;
 	var geoLoc;
 	var geoLocDataManager;
@@ -4617,10 +4644,12 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 			{
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
+				nodeRoot = node.getRoot();
 				// now, create a geoLocDataManager for node if no exist.
-				if (node.data.geoLocDataManager === undefined)
-				{ node.data.geoLocDataManager = new GeoLocationDataManager(); }
-				geoLocDataManager = node.data.geoLocDataManager;
+				if (nodeRoot.data.geoLocDataManager === undefined)
+				{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
+				node.data.geoLocDataManager = nodeRoot.data.geoLocDataManager;
+				geoLocDataManager = nodeRoot.data.geoLocDataManager;
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
@@ -4667,7 +4696,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					// test.
 					//***********************************************************************************************************
 					var nodeIdDivided = node.data.nodeId.split("_");
-					if (nodeIdDivided[0] == "testId")
+					//if (nodeIdDivided[0] == "testId")
 					{
 						var rootNode = node.getRoot();
 						if (rootNode)
@@ -5521,6 +5550,7 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 		{
 			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 		}
+		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 	}
 };
 
@@ -5699,6 +5729,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			{
 				var hola = 0;
 			}
+			
+			node.data.isMain = attributes.isMain;
 		}
 
 		if (longitude && latitude)
@@ -5765,9 +5797,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			if (node.data.buildingSeed)
 			{ node.data.bbox.copyFrom(node.data.buildingSeed.bBox); }
 		}
-
-		// once finished with children, then make bbox of the node.
-		
 	}
 	return node;
 };
@@ -5823,6 +5852,43 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
 			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
 			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+		}
+	}
+	
+	// now, must calculate the bbox of the root nodes.
+	var rootNodesArray = [];
+	var nodesArray = [];
+	this.hierarchyManager.getRootNodes(rootNodesArray);
+	var bboxStarted = false;
+	
+	var rootNodesCount = rootNodesArray.length;
+	for (var i=0; i<rootNodesCount; i++)
+	{
+		nodeRoot = rootNodesArray[i];
+		nodesArray.length = 0; // init.***
+		nodeRoot.extractNodesByDataName(nodesArray, "buildingSeed");
+		// now, take nodes that is "isMain" = true.
+		bboxStarted = false;
+		nodesCount =  nodesArray.length;
+		for (var j=0; j<nodesCount; j++)
+		{
+			node = nodesArray[j];
+			if (node.data.isMain)
+			{
+				buildingSeed = node.data.buildingSeed;
+				if (buildingSeed)
+				{
+					if (bboxStarted === false)
+					{
+						nodeRoot.data.bbox.copyFrom(buildingSeed.bBox);
+						bboxStarted = true;
+					}
+					else 
+					{
+						nodeRoot.data.bbox.addBox(buildingSeed.bBox);
+					}
+				}
+			}
 		}
 	}
 };

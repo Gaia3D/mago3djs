@@ -48,6 +48,31 @@ HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
+HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray) 
+{
+	if (resultRootNodesArray === undefined)
+	{ resultRootNodesArray = []; }
+	
+	var nodesCount = this.nodesArray.length;
+	var node;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = this.nodesArray[i];
+		if (node.parent === undefined)
+		{
+			resultRootNodesArray.push(node);
+		}
+		i++;
+	}
+	
+	return resultRootNodesArray;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
 HierarchyManager.prototype.newNode = function(id) 
 {
 	var node = new Node();
