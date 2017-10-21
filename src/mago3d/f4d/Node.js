@@ -55,6 +55,7 @@ Node.prototype.getRoot = function()
  */
 Node.prototype.extractNodesByDataName = function(nodesArray, dataname) 
 {
+	// this function extracts nodes that has a data named dataname, including children.
 	if (this.data[dataname])
 	{
 		nodesArray.push(this);
@@ -67,7 +68,44 @@ Node.prototype.extractNodesByDataName = function(nodesArray, dataname)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
+{
+	if (this.bboxAbsoluteCenterPos === undefined)
+	{
+		this.calculateBBoxCenterPositionWorldCoord(geoLoc);
+	}
+	
+	return this.bboxAbsoluteCenterPos;
+};
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
+{
+	var bboxCenterPoint;
+	//var geoLoc = this.getGeoLocationData(); // take the 1rst.
+	if (geoLoc == undefined)
+	{ var hola = 0; }
+	
+	bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
+	
+	// Now, must applicate the aditional translation vector. Aditional translation is made when we translate the pivot point.
+	if (geoLoc.pivotPointTraslation)
+	{
+		var traslationVector;
+		traslationVector = geoLoc.tMatrix.rotatePoint3D(geoLoc.pivotPointTraslation, traslationVector );
+		this.bboxAbsoluteCenterPos.add(traslationVector.x, traslationVector.y, traslationVector.z);
+	}
+};
 
 
 
