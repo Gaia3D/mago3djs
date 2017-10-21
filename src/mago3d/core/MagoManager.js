@@ -5551,6 +5551,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 		}
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
+		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.***
+		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
 	}
 };
 
@@ -5789,7 +5791,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					node.addChildren(childNode);
 				}
 			}
-			
 		}
 		else 
 		{
