@@ -443,7 +443,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		//viewer.scene.magoManager.getObjectIndexFile();
 		if(serverData !== null && serverData !== '') {
-			viewer.scene.magoManager.readerWriter.geometrySubDataPath = serverData.attributes.nodePath;
+			viewer.scene.magoManager.readerWriter.geometrySubDataPath = "/" + serverData.data_key;
 			viewer.scene.magoManager.getObjectIndexFileTEST(viewer.scene.magoManager.readerWriter.geometrySubDataPath);
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
