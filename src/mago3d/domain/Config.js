@@ -25,6 +25,7 @@ MagoConfig.getData = function()
  */
 MagoConfig.init = function(serverPolicy, serverDataKey, serverData) 
 {
+	// map에 data 와 objectIndexFile 두가지를 저장해야 할거 같다. key는 objectIndexFile 은 prefix를 붙이자.
 	this.dataMap = new Map();
 	this.serverPolicy = serverPolicy;
 	if(serverDataKey !== null && serverDataKey !== '') {
