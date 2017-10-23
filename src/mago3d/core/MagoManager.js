@@ -5582,9 +5582,20 @@ MagoManager.prototype.getObjectIndexFileTEST = function(geometrySubDataPath)
 };
 
 /**
+ * object index 파일을 읽음
+ */
+MagoManager.prototype.loadObjectIndexFile = function(type, fileName) 
+{
+	var fullFileName = "/" + fileName;
+	// TODO
+	// 여기에... objectIndexFile을 가져와서 node 처리를 한 후에.... 다음 에 넘겨줘야 함.
+	var obectIndexData = null;
+	MagoConfig.setObjectIndex(type, fileName, obectIndexData);
+};
+
+/**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-
 MagoManager.prototype.getObjectIndexFile = function() 
 {
 	if (this.configInformation === undefined)

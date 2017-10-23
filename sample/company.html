@@ -595,6 +595,7 @@
 
 	menuSlideControl("homeMenu");
 	var imagePath = "/images/ko";
+	var jsonUrl = "/sample/";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
@@ -627,7 +628,7 @@
 	// mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
-			url: "/sample/policy-company.json",
+			url: jsonUrl + "policy-company.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -644,8 +645,7 @@
 			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, imagePath);	
 		} else {
 			$.ajax({
-				//url: "/sample/2119_deploy.json",
-				url: "/sample/" + serverPolicy.geo_data_default_value,
+				url: jsonUrl + serverPolicy.geo_data_default_value,
 				type: "GET",
 				dataType: "json",
 				success: function(serverData){
@@ -1179,13 +1179,15 @@
 	$("#drawAppendData").click(function() {
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
-			console.log("########## drawAppendData value = " + value);
+			var dataUrl = jsonUrl + value + ".json";
+			drawData("append", dataUrl, value);
 		});
 	});
 	$("#drawNewData").click(function() {
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
-			console.log("########## drawNewData value = " + value);
+			var dataUrl = jsonUrl + value + ".json";
+			drawData("new", dataUrl, value);
 		});
 	});
 </script>
