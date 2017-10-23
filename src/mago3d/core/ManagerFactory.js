@@ -727,49 +727,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 		},
 		mouseMove: function(eventType) 
 		{
-			var camera = viewer.camera;
-			//var canvas = viewer.canvas;
-			var ellipsoid = scene.globe.ellipsoid;
-			var width = canvas.clientWidth;
-	        var height = canvas.clientHeight;
-
-	        // Coordinate (0.0, 0.0) will be where the mouse was clicked.
-			/*	        var x = (nowMousePosition.x - startMousePosition.x) / width;
-	        var y = -(nowMousePosition.y - startMousePosition.y) / height;
-
-	        var lookFactor = 0.05;
-	        camera.lookRight(x * lookFactor);
-	        camera.lookUp(y * lookFactor);*/
-
-		    // Change movement speed based on the distance of the camera to the surface of the ellipsoid.
-		    var cameraHeight = ellipsoid.cartesianToCartographic(camera.position).height;
-		    var moveRate = (cameraHeight) / 100.0;
-		    
-		    // 보정을 위한 값
-		    var reviseValue = 0;
-		    if (parseInt(moveRate) >= 300) { reviseValue = parseInt(moveRate) * 50; }
-		    else if (parseInt(moveRate) >= 20 && parseInt(moveRate) < 300) { reviseValue = parseInt(moveRate) * 30; }
-		    else { reviseValue = parseInt(moveRate) * 10; }
-		    if (reviseValue === 0) { reviseValue = 5; }
-		    
-		    console.log("moveRate = " + moveRate + ", reviseValue = " + reviseValue);
-		    moveRate = moveRate + reviseValue;
-		    
-		    switch (eventType) 
-			{
-		    	case "moveForward" : camera.moveForward(moveRate);
-		    		break;
-		    	case "moveBackward" : camera.moveBackward(moveRate);
-	    			break;
-		    	case "moveRight" : camera.moveRight(moveRate);
-		    		break;
-		    	case "moveLeft" : camera.moveLeft(moveRate);
-		    		break;
-		    	case "moveUp" : camera.moveUp(moveRate);
-	    			break;
-		    	case "moveDown" : camera.moveDown(moveRate);
-	    			break;
-		    }
+			
 		}
 	};
 };
