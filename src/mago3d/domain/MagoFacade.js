@@ -403,6 +403,9 @@ function searchDataAPI(dataKey)
  * @param dataName target data 이름, data 파일과 objectIndexFile을 이 이름으로 가져옴
  */
 function drawData(type, dataUrl, dataName) {
+	if(MagoConfig.isDataExist(dataName)) return;
+	
+	console.log("not exist. dataName = " + dataName);
 	var fileName = null;
 	$.ajax({
 		url: dataUrl,
@@ -417,7 +420,7 @@ function drawData(type, dataUrl, dataName) {
 			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 		}
 	});
-	
+		
 	managerFactory.loadObjectIndexFile(type, fileName);
 }
 

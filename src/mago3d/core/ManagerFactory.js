@@ -7,12 +7,12 @@
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
  * @param serverPolicy policy json object
- * @param serverDataKey json object map에 저장하기 위한 key
- * @param serverData data json object
+ * @param serverDataKeyArray json object map에 저장하기 위한 key
+ * @param serverDataArray data json object
  * @param imagePath 이미지 경로
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, serverData, imagePath) 
+var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyArray, serverDataArray, objectIndexFilePathArray, imagePath) 
 {
 	if (!(this instanceof ManagerFactory)) 
 	{
@@ -27,7 +27,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 	//var nowMousePosition = null;
 
 	// 환경 설정
-	MagoConfig.init("new", serverPolicy, serverDataKey, serverData);
+	MagoConfig.init("new", serverPolicy, serverDataKeyArray, serverDataArray);
 	
 	if (serverPolicy.geo_view_library === null ||
 			serverPolicy.geo_view_library === '' ||
@@ -442,9 +442,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		//viewer.scene.magoManager.getObjectIndexFile();
-		if(serverData !== null && serverData !== '') {
-			viewer.scene.magoManager.readerWriter.geometrySubDataPath = "/" + serverData.data_key;
-			viewer.scene.magoManager.getObjectIndexFileTEST(viewer.scene.magoManager.readerWriter.geometrySubDataPath);
+		if(serverDataKeyArray !== null && serverDataKeyArray.length > 0) {
+			viewer.scene.magoManager.getObjectIndexFileTEST(serverDataKeyArray, objectIndexFilePathArray);
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();

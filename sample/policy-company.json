@@ -22,7 +22,10 @@
 	"password_exception_char": "\u003c\u003e\u0026\u0027\"",
 	"geo_view_library": "cesium",
 	"geo_data_path": "/data",
-	"geo_data_default_value": "2119_fullship.json",
+	"geo_data_default_value": [
+		"2119_fullship.json",
+		"2119_deploy.json"
+	],
 	"geo_cull_face_enable": "false",
 	"geo_time_line_enable": "false",
 	"geo_init_camera_enable": "true",
