@@ -27,7 +27,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 	//var nowMousePosition = null;
 
 	// 환경 설정
-	MagoConfig.init(type, serverPolicy, serverDataKey, serverData);
+	MagoConfig.init("new", serverPolicy, serverDataKey, serverData);
 	
 	if (serverPolicy.geo_view_library === null ||
 			serverPolicy.geo_view_library === '' ||
