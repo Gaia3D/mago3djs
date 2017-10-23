@@ -20,10 +20,15 @@ MagoConfig.getData = function()
  * 환경설정 세팅
  * 
  * @param serverPolicy mago3d policy(json)
+ * @param serverDataKey data 정보를 map 저장할 key name
  * @param serverData data 정보(json)
  */
-MagoConfig.init = function(serverPolicy, serverData) 
+MagoConfig.init = function(serverPolicy, serverDataKey, serverData) 
 {
+	this.dataMap = new Map();
 	this.serverPolicy = serverPolicy;
-	this.serverData = serverData;
+	if(serverDataKey !== null && serverDataKey !== '') {
+		this.dataMap.set(serverDataKey, serverData);
+		this.serverData = serverData;
+	}
 };
