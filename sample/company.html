@@ -1193,17 +1193,21 @@
 	}
 	
 	$("#drawAppendData").click(function() {
+		var index = 0;
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
 			var dataUrl = jsonUrl + value + ".json";
-			drawData("append", dataUrl, value);
+			drawData("append", index, dataUrl, value);
+			index++;
 		});
 	});
 	$("#drawNewData").click(function() {
+		var index = 0;
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
 			var dataUrl = jsonUrl + value + ".json";
-			drawData("new", dataUrl, value);
+			drawData("new", index, dataUrl, value);
+			index++;
 		});
 	});
 </script>

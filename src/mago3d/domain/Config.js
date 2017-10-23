@@ -27,14 +27,12 @@ MagoConfig.isDataExist = function(key)
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setData = function(type, key, value) 
+MagoConfig.setData = function(type, index, key, value) 
 {
-	if(type === "new") {
+	if(type === "new" && index === 0) {
 		this.dataMap.clear();
-		this.dataMap.set(key, value);
-	} else if(type === "append") {
-		this.dataMap.set(key, value);
-	}		
+	}
+	this.dataMap.set(key, value);
 };
 
 /**
@@ -66,12 +64,7 @@ MagoConfig.isObjectIndexExist = function(projectId)
 MagoConfig.setObjectIndex = function(type, projectId, value) 
 {
 	var key = "objectIndex_" + projectId;
-	if(type === "new") {
-		this.dataMap.clear();
-		this.dataMap.set(key, value);
-	} else if(type === "append") {
-		this.dataMap.set(key, value);
-	}	
+	this.dataMap.set(key, value);
 };
 
 /**
