@@ -27,7 +27,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 	//var nowMousePosition = null;
 
 	// 환경 설정
-	MagoConfig.init(serverPolicy, serverDataKey, serverData);
+	MagoConfig.init("new", serverPolicy, serverDataKey, serverData);
 	
 	if (serverPolicy.geo_view_library === null ||
 			serverPolicy.geo_view_library === '' ||
@@ -652,9 +652,14 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKey, 
 				return result;
 			}
 		},
-		// 초기화 api
-		init: function() 
+		// data를 읽음
+		loadData: function() 
 		{
+		},
+		// objectIndexFile을 읽음
+		loadObjectIndexFile: function(type, fileName) 
+		{
+			magoManager
 		},
 		// flyTo
 		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 
