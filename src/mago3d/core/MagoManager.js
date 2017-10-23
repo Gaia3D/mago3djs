@@ -1213,6 +1213,11 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.buildingSelected = this.arrayAuxSC[0];
 		this.octreeSelected = this.arrayAuxSC[1];
 		this.nodeSelected = this.arrayAuxSC[3];
+		if(this.nodeSelected)
+			this.rootNodeSelected = this.nodeSelected.getRoot();
+		else
+			this.rootNodeSelected = undefined;
+			
 		this.arrayAuxSC.length = 0;
 		if (this.buildingSelected !== undefined) 
 		{
@@ -1806,9 +1811,15 @@ MagoManager.prototype.isDragging = function()
 		this.arrayAuxSC.length = 0;
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerNodes, this.arrayAuxSC);
 		var currentBuildingSelected = this.arrayAuxSC[0];
+		var currentNodeSelected = this.arrayAuxSC[3];
+		var currentRootNodeSelected;
+		if(currentNodeSelected)
+		{
+			currentRootNodeSelected = currentNodeSelected.getRoot();
+		}
 		this.arrayAuxSC.length = 0;
 
-		if (currentBuildingSelected === this.buildingSelected) 
+		if (currentRootNodeSelected === this.rootNodeSelected) 
 		{
 			return true;
 		}
@@ -5599,52 +5610,6 @@ MagoManager.prototype.getObjectIndexFile = function()
 };
 
 /**
- * Test hierachy.
- */
-MagoManager.prototype.makeHierachyTest = function() 
-{
-	// testId_F110T_outfitting
-	// testId_F110T_structure
-	
-	// make a hierarchy test for buildings "testId".
-	var node;
-	var buildingSeed;
-	var buildingIdDivided;
-	var firstName;
-	var secondName;
-	var thirdName;
-	var childNode;
-	var childNodeId;
-			
-	var nodesCount = this.hierarchyManager.nodesArray.length;
-	for (var i=0; i<nodesCount; i++)
-	{
-		node = this.hierarchyManager.nodesArray[i];
-		buildingSeed = node.data.buildingSeed;
-		if (buildingSeed.firstName === "testId")
-		{
-			buildingIdDivided = node.data.nodeId.split("_");
-			firstName = buildingIdDivided[0];
-			secondName = buildingIdDivided[1];
-			thirdName = buildingIdDivided[2];
-			
-			if (thirdName === "structure")
-			{
-				childNodeId = firstName+"_"+secondName+"_outfitting";
-				childNode = this.hierarchyManager.getNodeByDataName("nodeId", childNodeId);
-				if (childNode)
-				{
-					node.addChildren(childNode);
-				}
-			}
-		}
-	}
-	
-	// now create megaStructure joining 4 structures.
-	
-};
-
-/**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap) 
@@ -5989,9 +5954,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList)
 		smartTile.makeTreeByDepth(17, this); // depth = 17.
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
-	
-	// test.
-	//this.makeHierachyTest();
+
 };
 
 /**
@@ -6142,9 +6105,7 @@ MagoManager.prototype.makeSmartTile_current = function(buildingSeedList)
 		smartTile.makeTreeByDepth(17, this); // depth = 17.
 	}
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
-	
-	// test.
-	this.makeHierachyTest();
+
 };
 
 MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
