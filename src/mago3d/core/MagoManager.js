@@ -3021,7 +3021,9 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		if (ssao_idx === 1) 
 		{
 			// 2) ssao render.************************************************************************************************************
+			
 			var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
+			
 			if (nodesLOD0Count > 0)
 			{
 				if (this.noiseTexture === undefined) 
