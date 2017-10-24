@@ -399,17 +399,21 @@ function searchDataAPI(dataKey)
  * 데이터를 Rendering
  * 
  * @param type new clear 후 새로 그림, append = 추가하여 그림
+ * @param index index
  * @param dataUrl data를 가져올 url
  * @param dataName target data 이름, data 파일과 objectIndexFile을 이 이름으로 가져옴
  */
-function drawData(type, dataUrl, dataName) {
+function drawData(type, index, dataUrl, dataName) {
+	if(MagoConfig.isDataExist(dataName)) return;
+	
+	console.log("not exist. dataName = " + dataName);
 	var fileName = null;
 	$.ajax({
 		url: dataUrl,
 		type: "GET",
 		dataType: "json",
 		success: function(serverData){
-			MagoConfig.setData(type, dataName, serverData)
+			MagoConfig.setData(type, index, dataName, serverData)
 			fileName = serverData.data_key;
 		},
 		error: function(e){
@@ -417,7 +421,7 @@ function drawData(type, dataUrl, dataName) {
 			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 		}
 	});
-	
+		
 	managerFactory.loadObjectIndexFile(type, fileName);
 }
 

@@ -5574,8 +5574,9 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.getObjectIndexFileTEST = function(geometrySubDataPath) 
+MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, objectIndexFilePathArray) 
 {
+	// 손책임님 계속
 	if (this.configInformation === undefined)
 	{
 		this.configInformation = MagoConfig.getPolicy();

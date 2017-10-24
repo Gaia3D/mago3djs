@@ -641,21 +641,37 @@
 	}
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
-		if(serverPolicy.geo_data_default_value === null || serverPolicy.geo_data_default_value === '') {
+		if(serverPolicy.geo_data_default_value === null || serverPolicy.geo_data_default_value.length < 1) {
 			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, imagePath);	
 		} else {
-			$.ajax({
-				url: jsonUrl + serverPolicy.geo_data_default_value,
-				type: "GET",
-				dataType: "json",
-				success: function(serverData){
-					managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverPolicy.geo_data_default_value, serverData, imagePath);
-				},
-				error: function(e){
-					alert(e.responseText);
-				}
-			});
+			var dataDefaultValueArray = serverPolicy.geo_data_default_value;
+			var dataKeyArray = new Array(dataDefaultValueArray.length);
+			var dataArray = new Array(dataDefaultValueArray.length);
+			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
+			for(var i=0; i<dataDefaultValueArray.length; i++) {
+				dataKeyArray[i] = dataDefaultValueArray[i];
+				$.ajax({
+					url: jsonUrl + dataDefaultValueArray[i],
+					type: "GET",
+					dataType: "json",
+					success: function(serverData){
+						dataArray[i] = serverData;
+						objectIndexFilePathArray[i] = serverData.data_key;
+						if(i === dataDefaultValueArray.length) {
+							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
+						}
+					},
+					error: function(e){
+						alert(e.responseText);
+					}
+				});
+			}
+			
 		}
+	}
+	
+	function createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath) {
+		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
 	}
 	
 	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
@@ -1177,17 +1193,21 @@
 	}
 	
 	$("#drawAppendData").click(function() {
+		var index = 0;
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
 			var dataUrl = jsonUrl + value + ".json";
-			drawData("append", dataUrl, value);
+			drawData("append", index, dataUrl, value);
+			index++;
 		});
 	});
 	$("#drawNewData").click(function() {
+		var index = 0;
 		$("input[name=renderingFileName]:checked").each(function() {
 			var value = $(this).val();
 			var dataUrl = jsonUrl + value + ".json";
-			drawData("new", dataUrl, value);
+			drawData("new", index, dataUrl, value);
+			index++;
 		});
 	});
 </script>
