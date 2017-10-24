@@ -649,6 +649,7 @@
 			var dataArray = new Array(dataDefaultValueArray.length);
 			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
 			
+			var dataCount = 0;
 			dataDefaultValueArray.forEach(function(fileName, index) {
 				dataKeyArray[index] = fileName;
 				$.ajax({
@@ -659,7 +660,8 @@
 						console.log("index = " + index + ", data = " + serverData);
 						dataArray[index] = serverData;
 						objectIndexFilePathArray[index] = serverData.data_key;
-						if(index === (dataDefaultValueArray.length - 1)) {
+						dataCount++; 
+						if(dataCount === dataDefaultValueArray.length) {
 							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
 						}
 					},
