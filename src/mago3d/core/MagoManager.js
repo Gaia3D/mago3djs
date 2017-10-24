@@ -1213,10 +1213,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.buildingSelected = this.arrayAuxSC[0];
 		this.octreeSelected = this.arrayAuxSC[1];
 		this.nodeSelected = this.arrayAuxSC[3];
-		if(this.nodeSelected)
-			this.rootNodeSelected = this.nodeSelected.getRoot();
+		if (this.nodeSelected)
+		{ this.rootNodeSelected = this.nodeSelected.getRoot(); }
 		else
-			this.rootNodeSelected = undefined;
+		{ this.rootNodeSelected = undefined; }
 			
 		this.arrayAuxSC.length = 0;
 		if (this.buildingSelected !== undefined) 
@@ -1234,17 +1234,15 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	}
 	
 	// 1) The depth render.**********************************************************************************************************************
-	this.depthFboNeo.bind(); 
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
+	this.depthFboNeo.bind(); 
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	this.depthFboNeo.unbind();
-	
 	this.swapRenderingFase();
-
 	
 	// 2) ssao render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
@@ -1261,15 +1259,14 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	ssao_idx = 1;
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
+	this.swapRenderingFase();
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
-	
-	this.swapRenderingFase();
-	
+
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		//this.wwd.drawContext.bindFramebuffer(null);
@@ -1485,10 +1482,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 				if (lowestOctree.lego === undefined) 
 				{ continue; }
 
-				if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY) 
-				{ continue; }
-
-				if (lowestOctree.lego.fileLoadState === 2) 
+				if (lowestOctree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
 				{ continue; }
 					
 				this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
@@ -1513,6 +1507,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			neoBuilding = node.data.neoBuilding;
 			
 			var buildingGeoLocation = node.data.geoLocDataManager.getCurrentGeoLocationData();
+			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 			
@@ -1813,7 +1808,7 @@ MagoManager.prototype.isDragging = function()
 		var currentBuildingSelected = this.arrayAuxSC[0];
 		var currentNodeSelected = this.arrayAuxSC[3];
 		var currentRootNodeSelected;
-		if(currentNodeSelected)
+		if (currentNodeSelected)
 		{
 			currentRootNodeSelected = currentNodeSelected.getRoot();
 		}
@@ -3461,10 +3456,9 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 		{
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 		}
-	}
-	if (currentShader)
-	{
-		//if(currentShader.position3_loc !== -1)gl.disableVertexAttribArray(currentShader.position3_loc);
+		
+		if (currentShader.position3_loc !== -1)
+		{ gl.disableVertexAttribArray(currentShader.position3_loc); }
 	}
 	
 	// 2) LOD 2 & 3.************************************************************************************************************************************
@@ -3492,12 +3486,8 @@ MagoManager.prototype.depthRenderLowestOctreeAsimetricVersion = function(gl, ssa
 		this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx);
 		this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, ssao_idx);
 
-		//if(currentShader.position3_loc !== -1)gl.disableVertexAttribArray(currentShader.position3_loc);
-	}
-	
-	if (currentShader)
-	{
-		//if(currentShader.position3_loc !== -1)gl.disableVertexAttribArray(currentShader.position3_loc);
+		if (currentShader.position3_loc !== -1)
+		{ gl.disableVertexAttribArray(currentShader.position3_loc); }
 	}
 };
 
@@ -4738,7 +4728,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					
 				}
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-				realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc);
+				//realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc); // original.***
+				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 				
 				if (neoBuilding.buildingId === "ctships")
 				{
@@ -5574,6 +5565,9 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.***
 		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
+		
+		aNode.bboxAbsoluteCenterPos = undefined; // provisional.***
+		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
 	}
 };
 
