@@ -29,10 +29,12 @@ MagoConfig.isDataExist = function(key)
  */
 MagoConfig.setData = function(type, index, key, value) 
 {
-	if(type === "new" && index === 0) {
+	if (type === "new" && index === 0) 
+	{
 		this.dataMap.clear();
 	}
-	if(!this.isDataExist(key)) {
+	if (!this.isDataExist(key)) 
+	{
 		this.dataMap.set(key, value);
 	}
 };
@@ -66,7 +68,8 @@ MagoConfig.isObjectIndexFileExist = function(projectId)
 MagoConfig.setObjectIndexFile = function(type, projectId, value) 
 {
 	var key = "objectIndexFile_" + projectId;
-	if(!this.isObjectIndexFileExist(key)) {
+	if (!this.isObjectIndexFileExist(key)) 
+	{
 		this.dataMap.set(key, value);
 	}
 };
@@ -83,12 +86,16 @@ MagoConfig.init = function(type, serverPolicy, serverDataKeyArray, serverDataArr
 	// map에 data 와 objectIndexFile 두가지를 저장해야 할거 같다. key는 objectIndexFile 은 prefix를 붙이자.
 	this.dataMap = new Map();
 	this.serverPolicy = serverPolicy;
-	if(serverDataKeyArray !== null && serverDataKeyArray.length > 0) {
-		if(type === "new") {
+	if (serverDataKeyArray !== null && serverDataKeyArray.length > 0) 
+	{
+		if (type === "new") 
+		{
 			this.dataMap.clear();
 		}
-		for(var i=0; i<serverDataKeyArray.length; i++) {
-			if(!this.isDataExist(serverDataKeyArray[i])) {
+		for (var i=0; i<serverDataKeyArray.length; i++) 
+		{
+			if (!this.isDataExist(serverDataKeyArray[i])) 
+			{
 				this.dataMap.set(serverDataKeyArray[i], serverDataArray[i]);
 			}
 		}

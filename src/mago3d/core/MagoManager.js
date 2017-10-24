@@ -774,13 +774,20 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 {
 	// for all renderables, prepare data.***
 	var neoBuilding;
-	var geometryDataPath = this.readerWriter.getCurrentDataPath();
+	var node, rootNode;
+	var projectFolderName;
+	
+	//var geometryDataPath = this.readerWriter.getCurrentDataPath();
+	var geometryDataPath = this.readerWriter.geometryDataPath;
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
 	var currentVisibleNodes = [].concat(this.visibleObjControlerNodes.currentVisibles0, this.visibleObjControlerNodes.currentVisibles2);
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
+		node = currentVisibleNodes[i];
+		projectFolderName = node.data.projectFolderName;
+		
 		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 		// check if this building is ready to render.***
 		//if (!neoBuilding.allFilesLoaded) // no used yet.
@@ -796,7 +803,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 					return;
 				}
 				
-				var neoBuildingHeaderPath = geometryDataPath + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+				var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 				this.headersRequestedCounter = 0;
 			}
@@ -2824,8 +2831,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 {
 	//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 
-	var geometryDataPath = this.readerWriter.getCurrentDataPath();
+	var geometryDataPath = this.readerWriter.geometryDataPath;
 	var buildingFolderName;
+	var projectFolderName;
 	var neoBuilding;
 
 	// LOD0 & LOD1
@@ -2853,6 +2861,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 		{ continue; }
 	
 		buildingFolderName = neoBuilding.buildingFileName;
+		projectFolderName = neoBuilding.projectFolderName;
 		
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 		{
@@ -2869,7 +2878,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
 
 			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-			var references_folderPath = geometryDataPath + "/" + buildingFolderName + "/References";
+			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
 			//continue; 
@@ -2889,7 +2898,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 			// must read blocksList.***
 			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-			var blocks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Models";
+			var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
 			var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 			this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, this);
 			continue;
@@ -2919,7 +2928,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 
 	//var lowestOctreeLegosParsingCount = 0;
 	//var maxLowestOctreeLegosParsingCount = 90;
-	var geometryDataPath = this.readerWriter.getCurrentDataPath();
+	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var projectFolderName;
 	var neoBuilding;
 	var buildingFolderName;
 
@@ -2948,7 +2958,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		if (neoBuilding === undefined)
 		{ continue; }
-		
+	
+		projectFolderName = neoBuilding.projectFolderName;
 		buildingFolderName = neoBuilding.buildingFileName;
 
 		// && lowestOctree.neoRefsList_Array.length === 0)
@@ -2958,7 +2969,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 			if (!this.fileRequestControler.isFullPlus(extraCount))
 			{
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var bricks_folderPath = geometryDataPath + "/" + buildingFolderName + "/Bricks";
+				var bricks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Bricks";
 				var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
 				this.readerWriter.getOctreeLegoArraybuffer(filePathInServer, lowestOctree, this);
 			}
@@ -2972,7 +2983,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 			{
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
 				var buildingFolderName = neoBuilding.buildingFileName;
-				var filePath_inServer = this.readerWriter.getCurrentDataPath() + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
+				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 			}
 		}
@@ -4842,6 +4853,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
 				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+				if (node.data.projectFolderName === undefined)
+				{ var hola = 0; }
+				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
 		}
 	}
@@ -5585,7 +5599,7 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 	this.buildingSeedList = new BuildingSeedList();
 	var fileName;
 	var objectsIndexFilesCount = objectIndexFilePathArray.length;
-	for(var i=0; i<objectsIndexFilesCount; i++)
+	for (var i=0; i<objectsIndexFilesCount; i++)
 	{
 		this.readerWriter.geometrySubDataPath = objectIndexFilePathArray[i];
 		fileName = this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
@@ -5624,7 +5638,7 @@ MagoManager.prototype.getObjectIndexFile = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap) 
+MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap, projectFolderName) 
 {
 	var attributes = undefined;
 	var children = undefined;
@@ -5705,6 +5719,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	{
 		buildingId = data_key;
 		node = this.hierarchyManager.newNode(buildingId);
+		node.data.projectFolderName = projectFolderName;
 		if (attributes.isPhysical)
 		{
 			// find the buildingSeed.
@@ -5770,7 +5785,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			for (var i=0; i<childrenCount; i++)
 			{
 				childJason = children[i];
-				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap);
+				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName);
 				
 				// if childNode has "geographicCoord" then the childNode is in reality a root.
 				if (childNode.data.geographicCoord === undefined)
@@ -5905,7 +5920,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName)
 		buildingId = buildingSeed.buildingId;
 		buildingSeedMap.set(buildingId, buildingSeed);
 	}
-	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap);
+	var projectFolderName = realTimeLocBlocksList.data_key;
+	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName);
 	this.calculateBoundingBoxesNodes();
 	
 	// old.***

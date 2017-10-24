@@ -403,20 +403,23 @@ function searchDataAPI(dataKey)
  * @param dataUrl data를 가져올 url
  * @param dataName target data 이름, data 파일과 objectIndexFile을 이 이름으로 가져옴
  */
-function drawData(type, index, dataUrl, dataName) {
-	if(MagoConfig.isDataExist(dataName)) return;
+function drawData(type, index, dataUrl, dataName) 
+{
+	if (MagoConfig.isDataExist(dataName)) { return; }
 	
 	console.log("not exist. dataName = " + dataName);
 	var fileName = null;
 	$.ajax({
-		url: dataUrl,
-		type: "GET",
-		dataType: "json",
-		success: function(serverData){
-			MagoConfig.setData(type, index, dataName, serverData)
+		url      : dataUrl,
+		type     : "GET",
+		dataType : "json",
+		success  : function(serverData)
+		{
+			MagoConfig.setData(type, index, dataName, serverData);
 			fileName = serverData.data_key;
 		},
-		error: function(e){
+		error: function(e)
+		{
 			//alert(JS_MESSAGE["ajax.error.message"]);
 			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 		}
