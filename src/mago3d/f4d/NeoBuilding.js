@@ -314,7 +314,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 					var gl = magoManager.sceneState.gl;
 					neoReference.texture.texId = gl.createTexture();
 					// Load the texture.***
-					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+					var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
 					var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 
 					this.texturesLoaded.push(neoReference.texture);
@@ -352,7 +352,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			var gl = magoManager.sceneState.gl;
 			neoReference.texture.texId = gl.createTexture();
 			// Load the texture.***
-			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
 			var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
 
 			this.texturesLoaded.push(neoReference.texture);
