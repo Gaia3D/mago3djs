@@ -61,7 +61,7 @@ ReaderWriter.prototype.getCurrentDataPath = function()
 	var currentDataPath;
 	if (this.geometrySubDataPath !== undefined && this.geometrySubDataPath !== "")
 	{
-		currentDataPath = this.geometryDataPath + this.geometrySubDataPath;
+		currentDataPath = this.geometryDataPath + "/" + this.geometrySubDataPath;
 	}
 	else
 	{
@@ -760,7 +760,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList) 
+ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList, jsonName) 
 {
 	console.log(" object Index File = " + fileName);
 	loadWithXhr(fileName).done(function(response) 
@@ -771,9 +771,9 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 			buildingSeedList.dataArrayBuffer = arrayBuffer;
 			buildingSeedList.parseBuildingSeedArrayBuffer();
 			
-			magoManager.makeSmartTile(buildingSeedList);
+			magoManager.makeSmartTile(buildingSeedList, jsonName);
 			arrayBuffer = null;
-			//magoManager.createDeploymentGeoLocationsForHeavyIndustries();
+			//MagoConfig.setObjectIndex("append", );
 		}
 		else 
 		{

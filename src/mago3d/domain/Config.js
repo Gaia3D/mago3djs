@@ -41,9 +41,9 @@ MagoConfig.setData = function(type, index, key, value)
  * objectIndexFile 을 map에 찾아서 돌려줌
  * @param projectId 프로젝트 id
  */
-MagoConfig.getObjectIndex = function(projectId) 
+MagoConfig.getObjectIndexFile = function(projectId) 
 {
-	var key = "objectIndex_" + projectId;
+	var key = "objectIndexFile_" + projectId;
 	return this.dataMap.get(key);
 };
 
@@ -51,9 +51,9 @@ MagoConfig.getObjectIndex = function(projectId)
  * objectIndex가 map에 존재 하는지를 판단
  * @param key
  */
-MagoConfig.isObjectIndexExist = function(projectId) 
+MagoConfig.isObjectIndexFileExist = function(projectId) 
 {
-	var key = "objectIndex_" + projectId;
+	var key = "objectIndexFile_" + projectId;
 	return this.dataMap.has(key);
 };
 
@@ -63,10 +63,10 @@ MagoConfig.isObjectIndexExist = function(projectId)
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setObjectIndex = function(type, projectId, value) 
+MagoConfig.setObjectIndexFile = function(type, projectId, value) 
 {
-	var key = "objectIndex_" + projectId;
-	if(!this.isObjectIndexExist(key)) {
+	var key = "objectIndexFile_" + projectId;
+	if(!this.isObjectIndexFileExist(key)) {
 		this.dataMap.set(key, value);
 	}
 };

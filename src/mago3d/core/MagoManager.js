@@ -5583,8 +5583,14 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 	}
 
 	this.buildingSeedList = new BuildingSeedList();
-	this.readerWriter.getObjectIndexFileForSmartTile(
-		this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
+	var fileName;
+	var objectsIndexFilesCount = objectIndexFilePathArray.length;
+	for(var i=0; i<objectsIndexFilesCount; i++)
+	{
+		this.readerWriter.geometrySubDataPath = objectIndexFilePathArray[i];
+		fileName = this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, serverDataKeyArray[i]);
+	}
 };
 
 /**
@@ -5878,10 +5884,10 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeSmartTile = function(buildingSeedList) 
+MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName) 
 {
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
-	var realTimeLocBlocksList = MagoConfig.getData("2119_deploy.json");
+	var realTimeLocBlocksList = MagoConfig.getData(jsonName);
 	var buildingSeedsCount;
 	var buildingSeed;
 	var buildingId;
