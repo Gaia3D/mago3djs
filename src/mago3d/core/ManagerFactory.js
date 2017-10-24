@@ -442,7 +442,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		//viewer.scene.magoManager.getObjectIndexFile();
-		if(serverDataKeyArray !== null && serverDataKeyArray.length > 0) {
+		if (serverDataKeyArray !== null && serverDataKeyArray.length > 0) 
+		{
 			viewer.scene.magoManager.getObjectIndexFileTEST(serverDataKeyArray, objectIndexFilePathArray);
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
@@ -598,8 +599,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 		if (selectedBuilding === undefined) 	{ return; }
 
 		var nodeSelected = magoManager.selectionCandidates.currentNodeSelected;
-		if(nodeSelected === undefined)
-			return;
+		if (nodeSelected === undefined)
+		{ return; }
 		
 		var geoLocationData = nodeSelected.data.geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }

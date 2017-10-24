@@ -15,7 +15,7 @@ var HierarchyManager = function()
 	this.nodesArray = [];
 	
 	// projectTrees array.
-	this.motherProjectTreesArray = [];
+	//this.motherProjectTreesArray = [];
 };
 
 /**
