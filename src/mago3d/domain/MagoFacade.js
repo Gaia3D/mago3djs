@@ -408,7 +408,7 @@ function drawData(type, index, dataUrl, dataName)
 	if (MagoConfig.isDataExist(dataName)) { return; }
 	
 	console.log("not exist. dataName = " + dataName);
-	var fileName = null;
+	var objectIndexFilePath = null;
 	$.ajax({
 		url      : dataUrl,
 		type     : "GET",
@@ -416,15 +416,15 @@ function drawData(type, index, dataUrl, dataName)
 		success  : function(serverData)
 		{
 			MagoConfig.setData(type, index, dataName, serverData);
-			fileName = serverData.data_key;
+			objectIndexFilePath = serverData.data_key;
 		},
-		error: function(e)
+		error:function(request,status,error)
 		{
 			//alert(JS_MESSAGE["ajax.error.message"]);
 			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 		}
 	});
 		
-	managerFactory.loadObjectIndexFile(type, fileName);
+	managerFactory.loadObjectIndexFile(type, objectIndexFilePath);
 }
 
