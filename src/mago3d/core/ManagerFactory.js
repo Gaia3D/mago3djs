@@ -598,6 +598,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 		if (selectedBuilding === undefined) 	{ return; }
 
 		var nodeSelected = magoManager.selectionCandidates.currentNodeSelected;
+		if(nodeSelected === undefined)
+			return;
+		
 		var geoLocationData = nodeSelected.data.geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }
 
