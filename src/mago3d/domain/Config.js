@@ -32,7 +32,9 @@ MagoConfig.setData = function(type, index, key, value)
 	if(type === "new" && index === 0) {
 		this.dataMap.clear();
 	}
-	this.dataMap.set(key, value);
+	if(!this.isDataExist(key)) {
+		this.dataMap.set(key, value);
+	}
 };
 
 /**
@@ -64,7 +66,9 @@ MagoConfig.isObjectIndexExist = function(projectId)
 MagoConfig.setObjectIndex = function(type, projectId, value) 
 {
 	var key = "objectIndex_" + projectId;
-	this.dataMap.set(key, value);
+	if(!this.isObjectIndexExist(key)) {
+		this.dataMap.set(key, value);
+	}
 };
 
 /**
@@ -84,7 +88,9 @@ MagoConfig.init = function(type, serverPolicy, serverDataKeyArray, serverDataArr
 			this.dataMap.clear();
 		}
 		for(var i=0; i<serverDataKeyArray.length; i++) {
-			this.dataMap.set(serverDataKeyArray[i], serverDataArray[i]);
+			if(!this.isDataExist(serverDataKeyArray[i])) {
+				this.dataMap.set(serverDataKeyArray[i], serverDataArray[i]);
+			}
 		}
 	}
 };
