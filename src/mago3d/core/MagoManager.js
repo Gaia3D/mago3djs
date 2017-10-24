@@ -5881,7 +5881,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 MagoManager.prototype.makeSmartTile = function(buildingSeedList) 
 {
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
-	var realTimeLocBlocksList = MagoConfig.getData("2119_deploy");
+	var realTimeLocBlocksList = MagoConfig.getData("2119_deploy.json");
 	var buildingSeedsCount;
 	var buildingSeed;
 	var buildingId;
