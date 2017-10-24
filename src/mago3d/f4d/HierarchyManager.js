@@ -13,6 +13,7 @@ var HierarchyManager = function()
 
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
+	this.nodesMap = new Map();
 	
 	// projectTrees array.
 	//this.motherProjectTreesArray = [];
@@ -25,6 +26,8 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue) 
 {
+	return this.nodesMap.get(dataNameValue);
+	/*
 	var nodesCount = this.nodesArray.length;
 	var i=0;
 	var find = false;
@@ -41,6 +44,7 @@ HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue)
 	}
 	
 	return resultNode;
+	*/
 };
 
 /**
@@ -78,6 +82,7 @@ HierarchyManager.prototype.newNode = function(id)
 	var node = new Node();
 	node.data = {"nodeId": id};
 	this.nodesArray.push(node);
+	this.nodesMap.set(id, node);
 	return node;
 };
 
