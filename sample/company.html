@@ -648,16 +648,18 @@
 			var dataKeyArray = new Array(dataDefaultValueArray.length);
 			var dataArray = new Array(dataDefaultValueArray.length);
 			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
-			for(var i=0; i<dataDefaultValueArray.length; i++) {
-				dataKeyArray[i] = dataDefaultValueArray[i];
+			
+			dataDefaultValueArray.forEach(function(fileName, index) {
+				dataKeyArray[index] = fileName;
 				$.ajax({
-					url: jsonUrl + dataDefaultValueArray[i],
+					url: jsonUrl + fileName,
 					type: "GET",
 					dataType: "json",
 					success: function(serverData){
-						dataArray[i] = serverData;
-						objectIndexFilePathArray[i] = serverData.data_key;
-						if(i === dataDefaultValueArray.length) {
+						console.log("index = " + index + ", data = " + serverData);
+						dataArray[index] = serverData;
+						objectIndexFilePathArray[index] = serverData.data_key;
+						if(index === (dataDefaultValueArray.length - 1)) {
 							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
 						}
 					},
@@ -665,8 +667,7 @@
 						alert(e.responseText);
 					}
 				});
-			}
-			
+			});
 		}
 	}
 	
@@ -1193,21 +1194,17 @@
 	}
 	
 	$("#drawAppendData").click(function() {
-		var index = 0;
-		$("input[name=renderingFileName]:checked").each(function() {
+		$("input[name=renderingFileName]:checked").each(function(index) {
 			var value = $(this).val();
-			var dataUrl = jsonUrl + value + ".json";
+			var dataUrl = jsonUrl + value;
 			drawData("append", index, dataUrl, value);
-			index++;
 		});
 	});
 	$("#drawNewData").click(function() {
-		var index = 0;
-		$("input[name=renderingFileName]:checked").each(function() {
+		$("input[name=renderingFileName]:checked").each(function(index) {
 			var value = $(this).val();
-			var dataUrl = jsonUrl + value + ".json";
+			var dataUrl = jsonUrl + value;
 			drawData("new", index, dataUrl, value);
-			index++;
 		});
 	});
 </script>
