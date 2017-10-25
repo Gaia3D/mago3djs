@@ -133,6 +133,7 @@ var MagoManager = function()
 
 	this.numFrustums;
 	this.isLastFrustum = false;
+	this.currentFrustumIdx = 0;
 	this.highLightColor4 = new Float32Array([0.2, 1.0, 0.2, 1.0]);
 	this.thereAreUrgentOctrees = false;
 	
@@ -354,6 +355,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 
 	var isLastFrustum = false;
 	this.numFrustums = numFrustums;
+	this.currentFrustumIdx = frustumIdx;
 	if (frustumIdx === numFrustums-1) 
 	{
 		isLastFrustum = true;
@@ -1020,16 +1022,35 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var camera = this.scene.frameState.camera;
-		var currentFrustumFar = camera.frustum.far;
-		camera.frustum.far = 100000;
+		//var keepNear = camera.frustum.near;
+		//var keepFar = camera.frustum.far;
+		
+		this.sceneState.camera.frustum.far[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far; 
+		this.sceneState.camera.frustum.near[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
+		var currentFrustumFar = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far;
+		var currentFrustumNear = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
+		
+		// *****************************************************************************************
+		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
+		resultCamera.direction.set(camera.direction.x, camera.direction.y, camera.direction.z);
+		resultCamera.up.set(camera.up.x, camera.up.y, camera.up.z);
+		resultCamera.frustum.near[0] = currentFrustumNear;
+		resultCamera.frustum.far[0] = currentFrustumFar;
+		resultCamera.calculateFrustumPlanes();
+		//------------------------------------------------------------------------------------------
+		
+		/*
+		camera.frustum.far = currentFrustumFar;
+		camera.frustum.near = currentFrustumNear;
 		var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
-
 		for (var i=0; i<6; i++)
 		{
 			var plane = cesiumFrustum.planes[i];
 			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
 		}
-		camera.frustum.far = currentFrustumFar;
+		camera.frustum.near = keepNear;
+		camera.frustum.far = keepFar;
+		*/
 	}
 };
 
@@ -1042,14 +1063,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 {
 	if (this.renderingModeTemp === 0) 
 	{
-		if (!isLastFrustum) { return; }
-		/*
-		if(numFrustums > 2)
+		//if (!isLastFrustum) { return; }
+		if (numFrustums > 2)
 		{
-			if(frustumIdx == 0 )
-			return;
+			if (frustumIdx === 0 )
+			{ return; }
 		}
-		*/
 	}
 
 	this.numFrustums = numFrustums;
@@ -1108,7 +1127,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		if (this.isLastFrustum)
+		//if (this.isLastFrustum)
 		{
 			//if(this.sceneState.camera.getDirty())
 			{
@@ -1119,7 +1138,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
 				//this.sceneState.camera.setDirty(false);
 			}
-			this.prepareNeoBuildingsAsimetricVersion(gl);
+			if (this.isLastFrustum)
+			{ this.prepareNeoBuildingsAsimetricVersion(gl); }
 		}
 	}
 	
@@ -1147,12 +1167,14 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			}
 		}
 		var fileRequestExtraCount = 1;
-		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
+		if (this.isLastFrustum)
+		{ this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); }
 		//fileRequestExtraCount = 2;
 		fileRequestExtraCount = this.visibleObjControlerOctrees.currentVisibles0.length;
 		if (fileRequestExtraCount > 2)
 		{ fileRequestExtraCount = 2; }
-		this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
+		if (this.isLastFrustum)
+		{ this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); } 
 		
 		// lod 2.
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
@@ -1168,7 +1190,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			}
 		}
 		fileRequestExtraCount = 2;
-		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount);
+		if (this.isLastFrustum)
+		{ this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); }
 		
 		
 		// in this point, put octrees of lod2 to the deletingQueue to delete the lod0 data.
@@ -1180,7 +1203,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			this.processQueue.putNodeToDeleteModelReferences(node, 0);
 		}
 		
-		this.manageQueue();
+		if (this.isLastFrustum)
+		{ this.manageQueue(); }
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -1321,12 +1345,22 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	var neoBuilding;
 	var worldPosition;
 	var screenCoord;
+	
+	// 1rst, collect rootNodes.
+	var rootNodesMap = new Map();
 	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleObjControlerNodes.currentVisibles2[i];
 		nodeRoot = node.getRoot();
-
+		rootNodesMap.set(nodeRoot, nodeRoot);
+	}
+	
+	var rootNodesArray = Array.from(rootNodesMap.keys());
+	var nodesCount = rootNodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		nodeRoot = rootNodesArray[i];
 		geoLocDataManager = nodeRoot.data.geoLocDataManager;
 		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 		//neoBuilding = node.data.neoBuilding;
@@ -1338,12 +1372,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			ctx.font = "13px Arial";
 			ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
 			ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-
-			//ctx.font = "9px Arial";
-			//ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
-			//ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
 		}
 	}
+	
+	rootNodesMap.clear();
+
 	/*
 	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
 	for (var i=0; i<nodesCount; i++)
@@ -3401,8 +3434,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				gl.disableVertexAttribArray(currentShader.position3_loc);
 				
 			}
-			
-			
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3415,7 +3446,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		}
 		
 	}
-
 };
 
 
@@ -4749,6 +4779,11 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					lod2_minDist = 316000;
 					lod3_minDist = lod2_minDist*10;
 				}
+				
+				if (neoBuilding.buildingId === "2119_C92GC_C930C_o")
+				{ var hola = 0; }
+				if (neoBuilding.buildingId === "Goliath")
+				{ var hola = 0; }
 				
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
