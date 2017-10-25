@@ -418,7 +418,7 @@ function drawData(type, index, dataUrl, dataName)
 			MagoConfig.setData(type, index, dataName, serverData);
 			objectIndexFilePath = serverData.data_key;
 		},
-		error:function(request,status,error)
+		error: function(request, status, error)
 		{
 			//alert(JS_MESSAGE["ajax.error.message"]);
 			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
