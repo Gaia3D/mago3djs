@@ -1135,7 +1135,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	// 1) LOD 0.*********************************************************************************************************************
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown && this.isLastFrustum) 
 	{
-		//if(this.numFrustums - this.currentFrustumIdx -1 === 1)
+		//if(this.isFirstFrustum())
 		this.visibleObjControlerOctrees.initArrays(); // init.******
 
 		var neoBuilding;
@@ -4414,6 +4414,20 @@ MagoManager.prototype.putBuildingToArraySortedByDist = function(buildingArray, n
  * @param frustumVolume 변수
  * @param cameraPosition 변수
  */
+MagoManager.prototype.isFirstFrustum = function() 
+{
+	if (this.numFrustums - this.currentFrustumIdx - 1 === 1)
+		return true;
+	else
+		return false;
+};
+
+/**
+ * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
+ * 
+ * @param frustumVolume 변수
+ * @param cameraPosition 변수
+ */
 MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, cameraPosition) 
 {
 	// This makes the visible buildings array.
@@ -4430,7 +4444,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	{ this.lastIntersectedLowestTilesArray = []; }
 
 	// save the last frustumCulled lowestTiles to delete if necessary.
-	if (this.numFrustums - this.currentFrustumIdx - 1 == 1)
+	if (this.isFirstFrustum())
 	{ this.lastIntersectedLowestTilesArray.length = 0; } // init only if is the 1rst frustum.***
 	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.fullyIntersectedLowestTilesArray);
 	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.partiallyIntersectedLowestTilesArray);
@@ -5707,8 +5721,10 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 MagoManager.prototype.loadObjectIndexFile = function(type, fileName) 
 {
 	var fullFileName = "/" + fileName;
-	// TODO
-	// 여기에... objectIndexFile을 가져와서 node 처리를 한 후에.... 다음 에 넘겨줘야 함.
+	// 
+	this.readerWriter.geometrySubDataPath = undefined;
+	//var fileName = this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	
 	var obectIndexData = null;
 	MagoConfig.setObjectIndex(type, fileName, obectIndexData);
 };
