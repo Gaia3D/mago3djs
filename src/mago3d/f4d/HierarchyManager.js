@@ -15,8 +15,25 @@ var HierarchyManager = function()
 	this.nodesArray = [];
 	this.nodesMap = new Map();
 	
-	// projectTrees array.
-	//this.motherProjectTreesArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
+{
+	var rootNodesArray = [];
+	this.getRootNodes(rootNodesArray);
+	
+	var rootNodesCount = rootNodesArray.length;
+	var rootNode;
+	for(var i=0; i<rootNodesCount; i++)
+	{
+		rootNode = rootNodesArray[i];
+		rootNode.deleteObjects(gl, vboMemoryManager);
+	}
 };
 
 /**
@@ -27,24 +44,6 @@ var HierarchyManager = function()
 HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue) 
 {
 	return this.nodesMap.get(dataNameValue);
-	/*
-	var nodesCount = this.nodesArray.length;
-	var i=0;
-	var find = false;
-	var node;
-	var resultNode;
-	while (!find && i<nodesCount)
-	{
-		node = this.nodesArray[i];
-		if (node.data[dataName] && node.data[dataName] === dataNameValue)
-		{
-			resultNode = node;
-		}
-		i++;
-	}
-	
-	return resultNode;
-	*/
 };
 
 /**

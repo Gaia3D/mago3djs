@@ -23,6 +23,53 @@ var Node = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
+{
+	this.parent = undefined;
+	if(this.data)
+	{
+		if(this.data.neoBuilding)
+		{
+			this.data.neoBuilding.deleteObjects(gl, vboMemoryManager);
+			this.data.neoBuilding = undefined;
+		}
+		
+		if(node.data.geographicCoord)
+		{
+			node.data.geographicCoord.deleteObjects();
+			node.data.geographicCoord = undefined;
+		}
+		
+		if(node.data.rotationsDegree)
+		{
+			node.data.rotationsDegree.deleteObjects();
+			node.data.rotationsDegree = undefined;
+		}
+		
+		if(node.data.bbox)
+		{
+			node.data.bbox.deleteObjects();
+			node.data.bbox = undefined;
+		}
+		
+		this.data = undefined;
+	}
+	
+	if(this.children)
+	{
+		var childrenCount = this.children.length;
+		for(var i=0; i<childrenCount; i++)
+		{
+			this.children[i].deleteObjects(gl, vboMemoryManager);
+			this.children[i] = undefined;
+		}
+		this.children = undefined;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Node.prototype.addChildren = function(children) 
 {
 	children.setParent(this);

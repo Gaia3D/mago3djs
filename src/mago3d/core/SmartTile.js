@@ -25,11 +25,63 @@ var SmartTile = function(smartTileName)
 	this.sphereExtent; // cartesian position sphere in worldCoord.
 	this.subTiles; // array.
 	
-	//this.buildingSeedsArray;
 	this.nodeSeedsArray;
 	this.nodesArray; // nodes with geometry data only (lowest nodes).
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTile.prototype.deleteObjects = function() 
+{
+	this.name = undefined;
+	this.depth = undefined;
+	this.minGeographicCoord.deleteObjects(); 
+	this.maxGeographicCoord.deleteObjects(); 
+	this.minGeographicCoord = undefined; 
+	this.maxGeographicCoord = undefined; 
+	this.sphereExtent.deleteObjects();
+	this.sphereExtent = undefined;
+	
+	// now, erase nodeSeeds.
+	if(this.nodeSeedsArray)
+	{
+		var nodeSeedsCount = this.nodeSeedsArray.length;
+		for(var i=0; i<nodeSeedsCount; i++)
+		{
+			// no delete the nodeObjects. nodeObjects must be deleted by hierarchyManager.
+			this.nodeSeedsArray[i] = undefined;
+		}
+		this.nodeSeedsArray = undefined;
+	}
+	
+	// now, erase nodes.
+	if(this.nodesArray)
+	{
+		var nodesCount = this.nodesArray.length;
+		for(var i=0; i<nodesCount; i++)
+		{
+			// no delete the nodeObjects. nodeObjects must be deleted by hierarchyManager.
+			this.nodesArray[i] = undefined;
+		}
+		this.nodesArray = undefined;
+	}
+	
+	this.isVisible = undefined;
+	
+	// delete children.
+	if(this.subTiles)
+	{
+		var subTilesCount = this.subTiles.length;
+		for(var i=0; i<subTilesCount; i++)
+		{
+			this.subTiles[i].deleteObjects();
+			this.subTiles[i] = undefined;
+		}
+		this.subTiles = undefined;
+	}
 };
 
 /**
@@ -65,6 +117,7 @@ SmartTile.prototype.clearNodesArray = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+ /*
 SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId) 
 {
 	var resultNode;
@@ -122,6 +175,7 @@ SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId)
 	
 	return resultNode;
 };
+*/
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -549,10 +603,20 @@ var SmartTileManager = function()
 	}
 	
 	this.tilesArray = []; // has 2 tiles (Asia side and America side).
+	this.createMainTiles();
+};
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+SmartTileManager.prototype.createMainTiles = function() 
+{
 	// tile 1 : longitude {-180, 0}, latitude {-90, 90}
 	// tile 2 : longitude {0, 180},  latitude {-90, 90}
 	
+	// America side.
 	var tile1 = this.newSmartTile("AmericaSide");
 	if (tile1.minGeographicCoord === undefined)
 	{ tile1.minGeographicCoord = new GeographicCoord(); }
@@ -563,6 +627,7 @@ var SmartTileManager = function()
 	tile1.minGeographicCoord.setLonLatAlt(-180, -90, 0);
 	tile1.maxGeographicCoord.setLonLatAlt(0, 90, 0);
 	
+	// Asia side.
 	var tile2 = this.newSmartTile("AsiaSide");
 	if (tile2.minGeographicCoord === undefined)
 	{ tile2.minGeographicCoord = new GeographicCoord(); }
@@ -579,8 +644,44 @@ var SmartTileManager = function()
  * @class GeoLocationData
  * @param geoLocData 변수
  */
+SmartTileManager.prototype.deleteTiles = function() 
+{
+	// this function deletes all children tiles.
+	if(this.tilesArray)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for(var i=0; i<tilesCount; i++)
+		{
+			this.tilesArray[i].deleteObjects();
+			this.tilesArray[i] = undefined;
+		}
+		this.tilesArray.length = 0;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+SmartTileManager.prototype.resetTiles = function() 
+{
+	this.deleteTiles();
+	
+	// now create the main tiles.
+	this.createMainTiles();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
 SmartTileManager.prototype.newSmartTile = function(smartTileName) 
 {
+	if(this.tilesArray === undefined)
+		this.tilesArray = [];
+	
 	var smartTile = new SmartTile(smartTileName);
 	this.tilesArray.push(smartTile);
 	return smartTile;
