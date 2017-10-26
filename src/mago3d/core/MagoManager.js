@@ -1022,35 +1022,21 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var camera = this.scene.frameState.camera;
-		//var keepNear = camera.frustum.near;
-		//var keepFar = camera.frustum.far;
-		
+
 		this.sceneState.camera.frustum.far[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far; 
 		this.sceneState.camera.frustum.near[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
 		var currentFrustumFar = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far;
 		var currentFrustumNear = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
 		
-		// *****************************************************************************************
+		//currentFrustumFar = 50000;
+		//currentFrustumNear = 0.1;
+
 		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
 		resultCamera.direction.set(camera.direction.x, camera.direction.y, camera.direction.z);
 		resultCamera.up.set(camera.up.x, camera.up.y, camera.up.z);
 		resultCamera.frustum.near[0] = currentFrustumNear;
 		resultCamera.frustum.far[0] = currentFrustumFar;
 		resultCamera.calculateFrustumPlanes();
-		//------------------------------------------------------------------------------------------
-		
-		/*
-		camera.frustum.far = currentFrustumFar;
-		camera.frustum.near = currentFrustumNear;
-		var cesiumFrustum = camera.frustum.computeCullingVolume(camera.position, camera.direction, camera.up);
-		for (var i=0; i<6; i++)
-		{
-			var plane = cesiumFrustum.planes[i];
-			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.x, plane.y, plane.z, plane.w);
-		}
-		camera.frustum.near = keepNear;
-		camera.frustum.far = keepFar;
-		*/
 	}
 };
 
@@ -1149,6 +1135,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	// 1) LOD 0.*********************************************************************************************************************
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown && this.isLastFrustum) 
 	{
+		//if(this.numFrustums - this.currentFrustumIdx -1 === 1)
 		this.visibleObjControlerOctrees.initArrays(); // init.******
 
 		var neoBuilding;
@@ -2268,6 +2255,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var geoLocDataManager = node.data.geoLocDataManager;
+	var rootNode = node.getRoot();
+	var rootGeoLocDataManager = node.data.geoLocDataManager;
+	var rootGeoLoc = rootGeoLocDataManager.getCurrentGeoLocationData();
+	
 	var nodeGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 	if (nodeGeoLocation === undefined)
 	{ return false; }
@@ -2289,6 +2280,10 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			{ distLod1 = 550; }
 			if (distLod2 < 25000)
 			{ distLod2 = 25000; }
+		}
+		if (neoBuilding.buildingId === "Goliath")
+		{
+			var hola = 0;
 		}
 		
 
@@ -4435,7 +4430,8 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	{ this.lastIntersectedLowestTilesArray = []; }
 
 	// save the last frustumCulled lowestTiles to delete if necessary.
-	this.lastIntersectedLowestTilesArray.length = 0;
+	if (this.numFrustums - this.currentFrustumIdx - 1 == 1)
+	{ this.lastIntersectedLowestTilesArray.length = 0; } // init only if is the 1rst frustum.***
 	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.fullyIntersectedLowestTilesArray);
 	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.partiallyIntersectedLowestTilesArray);
 	
@@ -4475,7 +4471,7 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	for (var i=0; i<lastLowestTilesCount; i++)
 	{
 		lowestTile = this.lastIntersectedLowestTilesArray[i];
-		if (!lowestTile.isVisible)
+		if (!lowestTile.isVisible && this.isLastFrustum)
 		{
 			this.processQueue.putNodesArrayToDelete(lowestTile.nodesArray);
 			lowestTile.clearNodesArray();
@@ -4648,6 +4644,62 @@ MagoManager.prototype.calculateAproxDist3D = function(pointA, pointB)
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
+MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowestTile) 
+{
+	// create the buildings by buildingSeeds.
+	var node;
+	var neoBuilding;
+	var nodeBbox;
+	var buildingSeed;
+	
+	var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
+	for (var j=0; j<nodeSeedsCount; j++)
+	{
+		node = lowestTile.nodeSeedsArray[j];
+		neoBuilding = new NeoBuilding();
+		node.data.neoBuilding = neoBuilding;
+		nodeBbox = new BoundingBox();
+		node.data.bbox = nodeBbox;
+		buildingSeed = node.data.buildingSeed;
+	
+		if (lowestTile.nodesArray === undefined)
+		{ lowestTile.nodesArray = []; }
+		
+		lowestTile.nodesArray.push(node);
+		
+		if (neoBuilding.metaData === undefined) 
+		{ neoBuilding.metaData = new MetaData(); }
+
+		if (neoBuilding.metaData.geographicCoord === undefined)
+		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+		if (neoBuilding.metaData.bbox === undefined) 
+		{ neoBuilding.metaData.bbox = new BoundingBox(); }
+
+		// create a building and set the location.***
+		neoBuilding.name = buildingSeed.name;
+		neoBuilding.buildingId = buildingSeed.buildingId;
+	
+		neoBuilding.buildingType = "basicBuilding";
+		neoBuilding.buildingFileName = buildingSeed.buildingFileName;
+		neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+		neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+		nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+		if (neoBuilding.bbox === undefined)
+		{ neoBuilding.bbox = new BoundingBox(); }
+		neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+		neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+		neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+		neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+		if (node.data.projectFolderName === undefined)
+		{ var hola = 0; }
+		neoBuilding.projectFolderName = node.data.projectFolderName;
+	}
+};
+/**
+ * dataKey 이용해서 data 검색
+ * @param dataKey
+ */
 MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTilesArray, cameraPosition, frustumVolume, doFrustumCullingToBuildings) 
 {
 	var tilesCount = intersectedLowestTilesArray.length;
@@ -4687,6 +4739,11 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > lod3_minDist)
 		{ continue; }
+	
+		if (lowestTile.nodesArray === undefined || lowestTile.nodesArray.length === 0)
+		{
+			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
+		}
 		
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
 		{
@@ -4850,6 +4907,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		{
 			// create the buildings by buildingSeeds.
 			var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
+			/*
 			for (var j=0; j<nodeSeedsCount; j++)
 			{
 				var node = lowestTile.nodeSeedsArray[j];
@@ -4892,6 +4950,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				{ var hola = 0; }
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
+			*/
 		}
 	}
 };
@@ -5943,7 +6002,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName)
 	var buildingId;
 	var newLocation;
 
-	
 	// now, read all hierarchyJason and make the hierarchy tree.
 	var physicalNodesArray = []; // put here the nodes that has geometry data.
 	// make a buildingSeedMap.
@@ -5959,60 +6017,15 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName)
 	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName);
 	this.calculateBoundingBoxesNodes();
 	
-	// old.***
-	// now, make geographic data for each buildingSeed & create nodesArray.
-	/*
-	buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
-	for (var i=0; i<buildingSeedsCount; i++) 
-	{
-		buildingSeed = buildingSeedList.buildingSeedArray[i];
-		buildingId = buildingSeed.buildingId;
-		if (buildingSeed.firstName === "testId")
-		{
-			var buildingNameDivided = buildingSeed.buildingId.split("_");
-			buildingId = buildingNameDivided[0] + "_" + buildingNameDivided[1];
-		}
-		newLocation = realTimeLocBlocksList[buildingId];
-		// must calculate the realBuildingPosition (bbox_center_position).***
-		var longitude;
-		var latitude;
-		var altitude;
-		var heading, pitch, roll;
-		
-		if (buildingSeed.geographicCoord === undefined)
-		{ buildingSeed.geographicCoord = new GeographicCoord(); }
-	
-		if (buildingSeed.rotationsDegree === undefined)
-		{ buildingSeed.rotationsDegree = new Point3D(); }
-	
-		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-		buildingSeed.rotationsDegree.set(pitch, roll, heading);
-		
-		// now calculate the geographic coord of the center of the bbox.
-		if (buildingSeed.geographicCoordOfBBox === undefined) 
-		{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
-	
-		// calculate the transformation matrix at (longitude, latitude, altitude).
-		var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, worldCoordPosition, this);
-		var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
-		
-		// now calculate the geographicCoord of the center of the bBox.
-		var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-		var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-		buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
-
-		// create the node.
-		var node = this.hierarchyManager.newNode(buildingSeed.buildingId);
-		node.data.buildingSeed = buildingSeed;
-		nodesArray.push(node);
-	}
-	*/
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
 	var smartTilesCount = this.smartTileManager.tilesArray.length; // "smartTilesCount" = 2.
 	for (var a=0; a<smartTilesCount; a++)
 	{
 		var smartTile = this.smartTileManager.tilesArray[a];
+		if (smartTile.nodeSeedsArray === undefined)
+		{ smartTile.nodeSeedsArray = []; }
+		
 		smartTile.nodeSeedsArray = physicalNodesArray;
 		smartTile.makeTreeByDepth(17, this); // depth = 17.
 	}
