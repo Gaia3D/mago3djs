@@ -4753,12 +4753,12 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > lod3_minDist)
 		{ continue; }
-	
+		/*
 		if (lowestTile.nodesArray === undefined || lowestTile.nodesArray.length === 0)
 		{
 			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
 		}
-		
+		*/
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
 		{
 			// the neoBuildings is made.
@@ -4921,7 +4921,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		{
 			// create the buildings by buildingSeeds.
 			var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
-			/*
+			
 			for (var j=0; j<nodeSeedsCount; j++)
 			{
 				var node = lowestTile.nodeSeedsArray[j];
@@ -4964,7 +4964,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				{ var hola = 0; }
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
-			*/
+			
 		}
 	}
 };
@@ -5709,8 +5709,8 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 	var objectsIndexFilesCount = objectIndexFilePathArray.length;
 	for (var i=0; i<objectsIndexFilesCount; i++)
 	{
-		this.readerWriter.geometrySubDataPath = objectIndexFilePathArray[i];
-		fileName = this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+		var geometrySubDataPath = objectIndexFilePathArray[i];
+		fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
 		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, serverDataKeyArray[i]);
 	}
 };
@@ -5723,13 +5723,15 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
  */
 MagoManager.prototype.loadObjectIndexFile = function(type, dataName, objectIndexFilePath) 
 {
-	var fullFileName = "/" + fileName;
-	// 
-	this.readerWriter.geometrySubDataPath = undefined;
-	//var fileName = this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-	
-	var obectIndexData = null;
-	MagoConfig.setObjectIndex(type, fileName, obectIndexData);
+	if(type === "new")
+	{
+		// in this case delete all existent projects.
+		this.smartTileManager.resetTiles();
+		this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+	}
+	this.buildingSeedList = new BuildingSeedList();
+	var fileName = this.readerWriter.geometryDataPath + "/" + objectIndexFilePath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, dataName);
 };
 
 /**
