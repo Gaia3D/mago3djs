@@ -427,7 +427,7 @@ function drawData(type, dataNameArray, dataUrlArray)
 					objectIndexFilePath = serverData.data_key;
 					keyMap.set(dataName, dataName);
 					keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + objectIndexFilePath, objectIndexFilePath);
-					managerFactory.loadObjectIndexFile(type, dataName, objectIndexFilePath);
+					managerFactory.loadObjectIndexFile(dataName, objectIndexFilePath);
 				},
 				error: function(request, status, error)
 				{
