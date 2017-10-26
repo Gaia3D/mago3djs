@@ -21,6 +21,27 @@ var BuildingSeed = function()
 };
 
 /**
+ * 어떤 일을 하고 있습니까?
+ */
+BuildingSeed.prototype.deleteObjects = function() 
+{
+	this.fisrtName = undefined;
+	this.name = undefined;
+	this.buildingId = undefined;
+	this.buildingFileName = undefined;
+	
+	this.geographicCoord.deleteObjects(); 
+	this.rotationsDegree.deleteObjects();
+	this.bBox.deleteObjects();           
+	this.geographicCoordOfBBox.deleteObjects(); 
+	
+	this.geographicCoord = undefined; 
+	this.rotationsDegree = undefined;
+	this.bBox = undefined;           
+	this.geographicCoordOfBBox = undefined; 
+};
+
+/**
  * buildings seed list
  * @class BuildingSeedList
  */
@@ -35,6 +56,31 @@ var BuildingSeedList = function()
 	this.maxGeographicCoord; // longitude, latitude, altitude.
 	
 	this.dataArrayBuffer; // binary data.
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BuildingSeedList.prototype.deleteObjects = function() 
+{
+	this.minGeographicCoord.deleteObjects(); 
+	this.maxGeographicCoord.deleteObjects(); 
+	
+	this.minGeographicCoord = undefined; 
+	this.maxGeographicCoord = undefined;
+	
+	if(this.buildingSeedArray)
+	{
+		var buildingSeedsCount = this.buildingSeedArray.length;
+		for(var i=0; i<buildingSeedsCount; i++)
+		{
+			this.buildingSeedArray[i].deleteObjects();
+			this.buildingSeedArray[i] = undefined;
+		}
+		this.buildingSeedArray = undefined;
+	}
+	
+	this.dataArrayBuffer = undefined;
 };
 
 /**
