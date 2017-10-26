@@ -399,30 +399,47 @@ function searchDataAPI(dataKey)
  * 데이터를 Rendering
  * 
  * @param type new clear 후 새로 그림, append = 추가하여 그림
- * @param index index
- * @param dataUrl data를 가져올 url
- * @param dataName target data 이름, data 파일과 objectIndexFile을 이 이름으로 가져옴
+ * @param dataNameArray target data 이름 배열
+ * @param dataUrlArray data를 가져올 url 배열
+ * @param 
  */
-function drawData(type, index, dataUrl, dataName) 
+function drawData(type, dataNameArray, dataUrlArray) 
 {
-	if (MagoConfig.isDataExist(dataName)) { return; }
+	if(dataNameArray.length <= 0) return;
 	
-	console.log("not exist. dataName = " + dataName);
-	var objectIndexFilePath = null;
-	$.ajax({
-		url      : dataUrl,
-		type     : "GET",
-		dataType : "json",
-		success  : function(serverData)
+	var keyMap = new Map();
+	dataNameArray.forEach(function(dataName, index) {
+		if(MagoConfig.isDataExist(dataName))
 		{
-			MagoConfig.setData(type, index, dataName, serverData);
-			objectIndexFilePath = serverData.data_key;
-			managerFactory.loadObjectIndexFile(type, dataName, objectIndexFilePath);
-		},
-		error: function(request, status, error)
-		{
-			//alert(JS_MESSAGE["ajax.error.message"]);
-			console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			var data = MagoConfig.getData(dataName);
+			keyMap.set(dataName, dataName);
+			keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + data.data_key, data.data_key);
+		} else {
+			console.log("not exist. dataName = " + dataName);
+			var objectIndexFilePath = null;
+			$.ajax({
+				url      : dataUrlArray[index],
+				type     : "GET",
+				dataType : "json",
+				success  : function(serverData)
+				{
+					MagoConfig.setData(dataName, serverData);
+					objectIndexFilePath = serverData.data_key;
+					keyMap.set(dataName, dataName);
+					keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + objectIndexFilePath, objectIndexFilePath);
+					managerFactory.loadObjectIndexFile(type, dataName, objectIndexFilePath);
+				},
+				error: function(request, status, error)
+				{
+					//alert(JS_MESSAGE["ajax.error.message"]);
+					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				}
+			});
+		}
+		
+		// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
+		if(type === "new" && dataNameArray.length == (index + 1)) {
+			MagoConfig.clearUnSelectedData(keyMap);
 		}
 	});
 }

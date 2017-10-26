@@ -23,3 +23,5 @@ CODE.moveMode = {
 	"OBJECT" : "1",
 	"NONE"   : "2"
 };
+
+CODE.OBJECT_INDEX_FILE_PREFIX = "objectIndexFile_";
