@@ -639,14 +639,13 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverPolicy.geo_data_default_value === null || serverPolicy.geo_data_default_value.length < 1) {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, imagePath);	
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);	
 		} else {
 			var dataDefaultValueArray = serverPolicy.geo_data_default_value;
 			var dataKeyArray = new Array(dataDefaultValueArray.length);
 			var dataArray = new Array(dataDefaultValueArray.length);
 			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
 			
-			var dataCount = 0;
 			dataDefaultValueArray.forEach(function(fileName, index) {
 				dataKeyArray[index] = fileName;
 				$.ajax({
@@ -657,8 +656,7 @@
 						console.log("index = " + index + ", data = " + serverData);
 						dataArray[index] = serverData;
 						objectIndexFilePathArray[index] = serverData.data_key;
-						dataCount++; 
-						if(dataCount === dataDefaultValueArray.length) {
+						if(dataDefaultValueArray.length === (index + 1)) {
 							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
 						}
 					},
@@ -1193,17 +1191,27 @@
 	}
 	
 	$("#drawAppendData").click(function() {
+		var checkCount = $("input[name=renderingFileName]:checked").length;
+		var dataNameArray = new Array(checkCount);
+		var dataUrlArray = new Array(checkCount);
 		$("input[name=renderingFileName]:checked").each(function(index) {
-			var value = $(this).val();
-			var dataUrl = jsonUrl + value;
-			drawData("append", index, dataUrl, value);
+			dataNameArray[index] = $(this).val();
+			dataUrlArray[index] = jsonUrl + $(this).val();
+			if(checkCount === (index + 1)) {
+				drawData("append", dataNameArray, dataUrlArray);
+			}
 		});
 	});
 	$("#drawNewData").click(function() {
+		var checkCount = $("input[name=renderingFileName]:checked").length;
+		var dataNameArray = new Array(checkCount);
+		var dataUrlArray = new Array(checkCount);
 		$("input[name=renderingFileName]:checked").each(function(index) {
-			var value = $(this).val();
-			var dataUrl = jsonUrl + value;
-			drawData("new", index, dataUrl, value);
+			dataNameArray[index] = $(this).val();
+			dataUrlArray[index] = jsonUrl + $(this).val();
+			if(checkCount === (index + 1)) {
+				drawData("new", dataNameArray, dataUrlArray);
+			}
 		});
 	});
 </script>

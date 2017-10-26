@@ -23,16 +23,11 @@ MagoConfig.isDataExist = function(key)
 
 /**
  * data 를 map에 저장
- * @param type new = clear 후 새로 그림, append = 추가하여 그림
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setData = function(type, index, key, value) 
+MagoConfig.setData = function(key, value) 
 {
-	if (type === "new" && index === 0) 
-	{
-		this.dataMap.clear();
-	}
 	if (!this.isDataExist(key)) 
 	{
 		this.dataMap.set(key, value);
@@ -45,7 +40,7 @@ MagoConfig.setData = function(type, index, key, value)
  */
 MagoConfig.getObjectIndexFile = function(projectId) 
 {
-	var key = "objectIndexFile_" + projectId;
+	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
 	return this.dataMap.get(key);
 };
 
@@ -55,19 +50,18 @@ MagoConfig.getObjectIndexFile = function(projectId)
  */
 MagoConfig.isObjectIndexFileExist = function(projectId) 
 {
-	var key = "objectIndexFile_" + projectId;
+	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
 	return this.dataMap.has(key);
 };
 
 /**
  * objectIndexFile 을 map에 저장
- * @param type new = clear 후 새로 그림, append = 추가하여 그림
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setObjectIndexFile = function(type, projectId, value) 
+MagoConfig.setObjectIndexFile = function(projectId, value) 
 {
-	var key = "objectIndexFile_" + projectId;
+	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
 	if (!this.isObjectIndexFileExist(key)) 
 	{
 		this.dataMap.set(key, value);
@@ -81,17 +75,13 @@ MagoConfig.setObjectIndexFile = function(type, projectId, value)
  * @param serverDataKeyArray data 정보를 map 저장할 key name
  * @param serverDataArray data 정보(json)
  */
-MagoConfig.init = function(type, serverPolicy, serverDataKeyArray, serverDataArray) 
+MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray) 
 {
 	// map에 data 와 objectIndexFile 두가지를 저장해야 할거 같다. key는 objectIndexFile 은 prefix를 붙이자.
 	this.dataMap = new Map();
 	this.serverPolicy = serverPolicy;
 	if (serverDataKeyArray !== null && serverDataKeyArray.length > 0) 
 	{
-		if (type === "new") 
-		{
-			this.dataMap.clear();
-		}
 		for (var i=0; i<serverDataKeyArray.length; i++) 
 		{
 			if (!this.isDataExist(serverDataKeyArray[i])) 
@@ -101,3 +91,16 @@ MagoConfig.init = function(type, serverPolicy, serverDataKeyArray, serverDataArr
 		}
 	}
 };
+
+/**
+ * check 되지 않은 데이터들을 삭제함
+ * @param key map에 저장될 key
+ * @param value map에 저장될 value
+ */
+MagoConfig.clearUnSelectedData = function(keyMap) {
+	for(var key of this.dataMap.keys()) {
+		if(!keyMap.has(key)) {
+			this.dataMap.delete(key);
+		}
+	}
+}
