@@ -216,7 +216,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 	// calculate an aproximate radius.
 	var cornerPoint;
 	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
-	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
+	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.3;
 };
 
 /**
@@ -235,12 +235,15 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 	if (this.depth < targetDepth)
 	{
 		// create 4 child smartTiles.
-		for (var i=0; i<4; i++)
-		{ this.newSubTile(this); }
+		if (this.subTiles === undefined || this.subTiles.length === 0)
+		{
+			for (var i=0; i<4; i++)
+			{ this.newSubTile(this); }
+		}
 		
-		// set the sizes to subTiles.
+		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
 		this.setSizesToSubTiles();
-		
+
 		// intercept buildingSeeds for each subTiles.
 		for (var i=0; i<4; i++)
 		{

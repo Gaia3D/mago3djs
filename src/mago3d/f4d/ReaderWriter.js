@@ -59,11 +59,13 @@ var ReaderWriter = function()
 ReaderWriter.prototype.getCurrentDataPath = function() 
 {
 	var currentDataPath;
+	
 	if (this.geometrySubDataPath !== undefined && this.geometrySubDataPath !== "")
 	{
 		currentDataPath = this.geometryDataPath + "/" + this.geometrySubDataPath;
 	}
 	else
+		
 	{
 		currentDataPath = this.geometryDataPath;
 	}
