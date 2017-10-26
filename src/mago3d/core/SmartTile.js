@@ -38,11 +38,17 @@ SmartTile.prototype.deleteObjects = function()
 {
 	this.name = undefined;
 	this.depth = undefined;
-	this.minGeographicCoord.deleteObjects(); 
-	this.maxGeographicCoord.deleteObjects(); 
+	if(this.minGeographicCoord)
+		this.minGeographicCoord.deleteObjects(); 
+		
+	if(this.maxGeographicCoord)
+		this.maxGeographicCoord.deleteObjects(); 
+	
 	this.minGeographicCoord = undefined; 
 	this.maxGeographicCoord = undefined; 
-	this.sphereExtent.deleteObjects();
+	if(this.sphereExtent)
+		this.sphereExtent.deleteObjects();
+	
 	this.sphereExtent = undefined;
 	
 	// now, erase nodeSeeds.
