@@ -34,22 +34,22 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 			this.data.neoBuilding = undefined;
 		}
 		
-		if(node.data.geographicCoord)
+		if(this.data.geographicCoord)
 		{
-			node.data.geographicCoord.deleteObjects();
-			node.data.geographicCoord = undefined;
+			this.data.geographicCoord.deleteObjects();
+			this.data.geographicCoord = undefined;
 		}
 		
-		if(node.data.rotationsDegree)
+		if(this.data.rotationsDegree)
 		{
-			node.data.rotationsDegree.deleteObjects();
-			node.data.rotationsDegree = undefined;
+			this.data.rotationsDegree.deleteObjects();
+			this.data.rotationsDegree = undefined;
 		}
 		
-		if(node.data.bbox)
+		if(this.data.bbox)
 		{
-			node.data.bbox.deleteObjects();
-			node.data.bbox = undefined;
+			this.data.bbox.deleteObjects();
+			this.data.bbox = undefined;
 		}
 		
 		this.data = undefined;

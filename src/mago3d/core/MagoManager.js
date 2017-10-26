@@ -5725,6 +5725,8 @@ MagoManager.prototype.loadObjectIndexFile = function(type, dataName, objectIndex
 {
 	if(type === "new")
 	{
+		// 1rst must clear the processQueue.
+		
 		// in this case delete all existent projects.
 		this.smartTileManager.resetTiles();
 		this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
