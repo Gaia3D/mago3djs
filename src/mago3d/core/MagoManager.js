@@ -5717,18 +5717,11 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 
 /**
  * object index 파일을 읽음
- * @param type append or new
  * @param dataName map에 저장되어 있는 key
  * @param objectIndexFilePath /로 부터 project 경로
  */
-MagoManager.prototype.loadObjectIndexFile = function(type, dataName, objectIndexFilePath) 
+MagoManager.prototype.loadObjectIndexFile = function(dataName, objectIndexFilePath) 
 {
-	if(type === "new")
-	{
-		// in this case delete all existent projects.
-		this.smartTileManager.resetTiles();
-		this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
-	}
 	this.buildingSeedList = new BuildingSeedList();
 	var fileName = this.readerWriter.geometryDataPath + "/" + objectIndexFilePath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, dataName);
