@@ -417,7 +417,7 @@ function drawData(type, index, dataUrl, dataName)
 		{
 			MagoConfig.setData(type, index, dataName, serverData);
 			objectIndexFilePath = serverData.data_key;
-			managerFactory.loadObjectIndexFile(type, objectIndexFilePath);
+			managerFactory.loadObjectIndexFile(type, dataName, objectIndexFilePath);
 		},
 		error: function(request, status, error)
 		{

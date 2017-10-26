@@ -5717,8 +5717,11 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKeyArray, obje
 
 /**
  * object index 파일을 읽음
+ * @param type append or new
+ * @param dataName map에 저장되어 있는 key
+ * @param objectIndexFilePath /로 부터 project 경로
  */
-MagoManager.prototype.loadObjectIndexFile = function(type, fileName) 
+MagoManager.prototype.loadObjectIndexFile = function(type, dataName, objectIndexFilePath) 
 {
 	var fullFileName = "/" + fileName;
 	// 
