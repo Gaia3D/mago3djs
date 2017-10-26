@@ -359,7 +359,7 @@ Octree.prototype.getCenterPos = function()
  */
 Octree.prototype.getRadiusAprox = function() 
 {
-	return this.half_dx*1.5;
+	return this.half_dx*1.7;
 };
 
 /**

@@ -202,7 +202,6 @@ BoundingBox.prototype.getCenterPoint = function(result)
 BoundingBox.prototype.getRadiusAprox = function() 
 {
 	var maxLength = this.getMaxLength();
-	//return maxLength/2.0;
 	return maxLength/1.5;
 };
 
