@@ -660,9 +660,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 		{
 		},
 		// objectIndexFile을 읽음
-		loadObjectIndexFile: function(type, dataName, objectIndexFilePath) 
+		loadObjectIndexFile: function(dataName, objectIndexFilePath) 
 		{
-			magoManager.loadObjectIndexFile(type, dataName, objectIndexFilePath);
+			magoManager.loadObjectIndexFile(dataName, objectIndexFilePath);
 		},
 		// flyTo
 		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 
