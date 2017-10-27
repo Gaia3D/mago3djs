@@ -107,6 +107,7 @@ MagoConfig.clearUnSelectedData = function(keyMap)
 			if (key.indexOf(CODE.OBJECT_INDEX_FILE_PREFIX) >= 0) 
 			{
 				// in this case delete all existent projects.
+				MagoManager.TestA();
 				//this.smartTileManager.resetTiles();
 				//this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
 			}
