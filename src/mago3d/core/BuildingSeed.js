@@ -69,10 +69,10 @@ BuildingSeedList.prototype.deleteObjects = function()
 	this.minGeographicCoord = undefined; 
 	this.maxGeographicCoord = undefined;
 	
-	if(this.buildingSeedArray)
+	if (this.buildingSeedArray)
 	{
 		var buildingSeedsCount = this.buildingSeedArray.length;
-		for(var i=0; i<buildingSeedsCount; i++)
+		for (var i=0; i<buildingSeedsCount; i++)
 		{
 			this.buildingSeedArray[i].deleteObjects();
 			this.buildingSeedArray[i] = undefined;

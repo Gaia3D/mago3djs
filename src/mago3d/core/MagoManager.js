@@ -3205,6 +3205,14 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 					if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 				}
+				
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				gl.activeTexture(gl.TEXTURE2); 
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				
 			}
 			
 			// If there are an object selected, then there are a stencilBuffer.******************************************
@@ -3367,6 +3375,14 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 					if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 				}
+				
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				gl.activeTexture(gl.TEXTURE2); 
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				
 			}
 			
 			// 4) Render ObjectMarkers.********************************************************************************************************
@@ -4417,9 +4433,9 @@ MagoManager.prototype.putBuildingToArraySortedByDist = function(buildingArray, n
 MagoManager.prototype.isFirstFrustum = function() 
 {
 	if (this.numFrustums - this.currentFrustumIdx - 1 === 1)
-		return true;
+	{ return true; }
 	else
-		return false;
+	{ return false; }
 };
 
 /**

@@ -97,11 +97,15 @@ MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray)
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.clearUnSelectedData = function(keyMap) {
-	for(var key of this.dataMap.keys()) {
-		if(!keyMap.has(key)) {
+MagoConfig.clearUnSelectedData = function(keyMap) 
+{
+	for (var key of this.dataMap.keys()) 
+	{
+		if (!keyMap.has(key)) 
+		{
 			// obectIndexFile_로 시작하는 key만 아래 처리함
-			if(key.indexOf(CODE.OBJECT_INDEX_FILE_PREFIX) >= 0) {
+			if (key.indexOf(CODE.OBJECT_INDEX_FILE_PREFIX) >= 0) 
+			{
 				// in this case delete all existent projects.
 				//this.smartTileManager.resetTiles();
 				//this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
@@ -109,4 +113,4 @@ MagoConfig.clearUnSelectedData = function(keyMap) {
 			this.dataMap.delete(key);
 		}
 	}
-}
+};

@@ -38,24 +38,24 @@ SmartTile.prototype.deleteObjects = function()
 {
 	this.name = undefined;
 	this.depth = undefined;
-	if(this.minGeographicCoord)
-		this.minGeographicCoord.deleteObjects(); 
+	if (this.minGeographicCoord)
+	{ this.minGeographicCoord.deleteObjects(); } 
 		
-	if(this.maxGeographicCoord)
-		this.maxGeographicCoord.deleteObjects(); 
+	if (this.maxGeographicCoord)
+	{ this.maxGeographicCoord.deleteObjects(); } 
 	
 	this.minGeographicCoord = undefined; 
 	this.maxGeographicCoord = undefined; 
-	if(this.sphereExtent)
-		this.sphereExtent.deleteObjects();
+	if (this.sphereExtent)
+	{ this.sphereExtent.deleteObjects(); }
 	
 	this.sphereExtent = undefined;
 	
 	// now, erase nodeSeeds.
-	if(this.nodeSeedsArray)
+	if (this.nodeSeedsArray)
 	{
 		var nodeSeedsCount = this.nodeSeedsArray.length;
-		for(var i=0; i<nodeSeedsCount; i++)
+		for (var i=0; i<nodeSeedsCount; i++)
 		{
 			// no delete the nodeObjects. nodeObjects must be deleted by hierarchyManager.
 			this.nodeSeedsArray[i] = undefined;
@@ -64,10 +64,10 @@ SmartTile.prototype.deleteObjects = function()
 	}
 	
 	// now, erase nodes.
-	if(this.nodesArray)
+	if (this.nodesArray)
 	{
 		var nodesCount = this.nodesArray.length;
-		for(var i=0; i<nodesCount; i++)
+		for (var i=0; i<nodesCount; i++)
 		{
 			// no delete the nodeObjects. nodeObjects must be deleted by hierarchyManager.
 			this.nodesArray[i] = undefined;
@@ -78,10 +78,10 @@ SmartTile.prototype.deleteObjects = function()
 	this.isVisible = undefined;
 	
 	// delete children.
-	if(this.subTiles)
+	if (this.subTiles)
 	{
 		var subTilesCount = this.subTiles.length;
-		for(var i=0; i<subTilesCount; i++)
+		for (var i=0; i<subTilesCount; i++)
 		{
 			this.subTiles[i].deleteObjects();
 			this.subTiles[i] = undefined;
@@ -123,7 +123,7 @@ SmartTile.prototype.clearNodesArray = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
- /*
+/*
 SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId) 
 {
 	var resultNode;
@@ -653,10 +653,10 @@ SmartTileManager.prototype.createMainTiles = function()
 SmartTileManager.prototype.deleteTiles = function() 
 {
 	// this function deletes all children tiles.
-	if(this.tilesArray)
+	if (this.tilesArray)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
-		for(var i=0; i<tilesCount; i++)
+		for (var i=0; i<tilesCount; i++)
 		{
 			this.tilesArray[i].deleteObjects();
 			this.tilesArray[i] = undefined;
@@ -685,8 +685,8 @@ SmartTileManager.prototype.resetTiles = function()
  */
 SmartTileManager.prototype.newSmartTile = function(smartTileName) 
 {
-	if(this.tilesArray === undefined)
-		this.tilesArray = [];
+	if (this.tilesArray === undefined)
+	{ this.tilesArray = []; }
 	
 	var smartTile = new SmartTile(smartTileName);
 	this.tilesArray.push(smartTile);
