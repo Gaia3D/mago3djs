@@ -799,15 +799,16 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 			{
 				if (this.fileRequestControler.isFullHeaders())	{ return; }
+				/*
 				if (this.headersRequestedCounter <2)
 				{
 					this.headersRequestedCounter ++;
 					return;
 				}
-				
+				*/
 				var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
-				this.headersRequestedCounter = 0;
+				//this.headersRequestedCounter = 0;
 			}
 		}
 	}
@@ -2304,7 +2305,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		else 
 		{
 			// must calculate the frustum planes.
+			//var keepFar = this.myCameraSCX.frustum.far;
+			//this.myCameraSCX.frustum.far = distLod0;
 			this.myCameraSCX.calculateFrustumPlanes();
+			
+			// 1rst, check if there are octrees very close.
+			
 			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 				this.myCameraSCX.position, distLod0, distLod1, distLod2);
 		}
