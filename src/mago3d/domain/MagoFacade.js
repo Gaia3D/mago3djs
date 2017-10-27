@@ -434,7 +434,8 @@ function drawData(type, dataNameArray, dataUrlArray)
 					managerFactory.loadObjectIndexFile(dataName, objectIndexFilePath);
 					
 					// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
-					if(type === "new" && dataNameArray.length == (dataCount + 1))		{
+					if (type === "new" && dataNameArray.length === (dataCount + 1))		
+					{
 						MagoConfig.clearUnSelectedData(keyMap);
 					}
 				},

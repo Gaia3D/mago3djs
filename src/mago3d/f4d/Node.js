@@ -138,9 +138,6 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var bboxCenterPoint;
-	//var geoLoc = this.getGeoLocationData(); // take the 1rst.
-	if (geoLoc == undefined)
-	{ var hola = 0; }
 	
 	bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
