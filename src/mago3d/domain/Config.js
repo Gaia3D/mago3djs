@@ -21,6 +21,11 @@ MagoConfig.isDataExist = function(key)
 	return this.dataMap.has(key);
 };
 
+MagoConfig.deleteData = function(key) 
+{
+	return this.dataMap.delete(key);
+};
+
 /**
  * data 를 map에 저장
  * @param key map에 저장될 key
@@ -52,6 +57,12 @@ MagoConfig.isObjectIndexFileExist = function(projectId)
 {
 	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
 	return this.dataMap.has(key);
+};
+
+MagoConfig.deleteObjectIndexFile = function(projectId) 
+{
+	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
+	return this.dataMap.delete(key);
 };
 
 /**
@@ -86,13 +97,15 @@ MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray)
 		{
 			if (!this.isDataExist(serverDataKeyArray[i])) 
 			{
-				this.dataMap.set(serverDataKeyArray[i], serverDataArray[i]);
+				this.setData(serverDataKeyArray[i], serverDataArray[i]);
+				this.setObjectIndexFile(serverDataArray[i].data_key, serverDataArray[i].data_key);
 			}
 		}
 	}
 };
 
 /**
+ * TODO 이건 나중에 활요. 사용하지 않음
  * check 되지 않은 데이터들을 삭제함
  * @param key map에 저장될 key
  * @param value map에 저장될 value

@@ -20,6 +20,9 @@ function API(apiName)
 
 	// api 이름
 	this.apiName = apiName;
+	
+	// data 전체 이름. json 파일의 이름
+	this.dataName = null;
 	// project id
 	this.projectId = null;
 	// block id
@@ -109,6 +112,15 @@ API.prototype.setMagoEnable = function(magoEnable)
 API.prototype.getAPIName = function() 
 {
 	return this.apiName;
+};
+
+API.prototype.getDataName = function() 
+{
+	return this.dataName;
+};
+API.prototype.setDataName = function(dataName) 
+{
+	this.dataName = dataName;
 };
 
 API.prototype.getProjectId = function() 
