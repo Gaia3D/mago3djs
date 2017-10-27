@@ -437,6 +437,7 @@ function drawData(type, dataNameArray, dataUrlArray)
 					objectIndexFilePath = serverData.data_key;
 					keyMap.set(dataName, dataName);
 					keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + objectIndexFilePath, objectIndexFilePath);
+					MagoConfig.setObjectIndexFile(objectIndexFilePath, objectIndexFilePath);
 					managerFactory.loadObjectIndexFile(dataName, objectIndexFilePath);
 					
 					// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
