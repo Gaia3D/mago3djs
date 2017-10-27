@@ -408,6 +408,7 @@ function drawData(type, dataNameArray, dataUrlArray)
 	if(dataNameArray.length <= 0) return;
 	
 	var keyMap = new Map();
+	var dataCount = 0;
 	dataNameArray.forEach(function(dataName, index) {
 		if(MagoConfig.isDataExist(dataName))
 		{
@@ -438,9 +439,10 @@ function drawData(type, dataNameArray, dataUrlArray)
 		}
 		
 		// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
-		if(type === "new" && dataNameArray.length == (index + 1)) {
+		if(type === "new" && dataNameArray.length == (dataCount + 1)) {
 			MagoConfig.clearUnSelectedData(keyMap);
 		}
+		dataCount++;
 	});
 }
 
