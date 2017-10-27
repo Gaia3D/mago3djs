@@ -421,6 +421,7 @@ function drawData(type, dataNameArray, dataUrlArray)
 			{
 				MagoConfig.clearUnSelectedData(keyMap);
 			}
+			dataCount++;
 		}
 		else 
 		{
@@ -443,6 +444,7 @@ function drawData(type, dataNameArray, dataUrlArray)
 					{
 						MagoConfig.clearUnSelectedData(keyMap);
 					}
+					dataCount++;
 				},
 				error: function(request, status, error)
 				{
@@ -451,8 +453,6 @@ function drawData(type, dataNameArray, dataUrlArray)
 				}
 			});
 		}
-		
-		dataCount++;
 	});
 }
 
