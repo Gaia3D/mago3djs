@@ -342,8 +342,10 @@ GeoLocationDataManager.prototype.getGeoLocationData = function(idx)
  */
 GeoLocationDataManager.prototype.getCurrentGeoLocationData = function() 
 {
-	if (this.geoLocationDataArray.length == 0)
-	{ return undefined; }
+	if (this.geoLocationDataArray.length === 0)
+	{
+		return undefined;
+	}
 	return this.geoLocationDataArray[0]; // provisionally return the 1rst.
 };
 

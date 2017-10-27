@@ -646,8 +646,10 @@
 			var dataArray = new Array(dataDefaultValueArray.length);
 			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
 			
+			var dataCount = 0;
 			dataDefaultValueArray.forEach(function(fileName, index) {
 				dataKeyArray[index] = fileName;
+				console.log("url = " + jsonUrl + fileName);
 				$.ajax({
 					url: jsonUrl + fileName,
 					type: "GET",
@@ -656,9 +658,10 @@
 						console.log("index = " + index + ", data = " + serverData);
 						dataArray[index] = serverData;
 						objectIndexFilePathArray[index] = serverData.data_key;
-						if(dataDefaultValueArray.length === (index + 1)) {
+						if(dataDefaultValueArray.length === (dataCount + 1)) {
 							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
 						}
+						dataCount++;
 					},
 					error: function(e){
 						alert(e.responseText);
@@ -1194,24 +1197,28 @@
 		var checkCount = $("input[name=renderingFileName]:checked").length;
 		var dataNameArray = new Array(checkCount);
 		var dataUrlArray = new Array(checkCount);
+		var dataCount = 0;
 		$("input[name=renderingFileName]:checked").each(function(index) {
 			dataNameArray[index] = $(this).val();
 			dataUrlArray[index] = jsonUrl + $(this).val();
-			if(checkCount === (index + 1)) {
+			if(checkCount === (dataCount + 1)) {
 				drawData("append", dataNameArray, dataUrlArray);
 			}
+			dataCount++;
 		});
 	});
 	$("#drawNewData").click(function() {
 		var checkCount = $("input[name=renderingFileName]:checked").length;
 		var dataNameArray = new Array(checkCount);
 		var dataUrlArray = new Array(checkCount);
+		var dataCount = 0;
 		$("input[name=renderingFileName]:checked").each(function(index) {
 			dataNameArray[index] = $(this).val();
 			dataUrlArray[index] = jsonUrl + $(this).val();
-			if(checkCount === (index + 1)) {
+			if(checkCount === (dataCount + 1)) {
 				drawData("new", dataNameArray, dataUrlArray);
 			}
+			dataCount++;
 		});
 	});
 </script>

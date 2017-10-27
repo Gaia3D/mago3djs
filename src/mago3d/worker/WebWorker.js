@@ -22,6 +22,49 @@ var compRefList_array_background;
 var geoModifier = new GeometryModifier();
 // End test son.-------------------------------------------------
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param e 변수
+ */
+function possibleCameraPositionChanged(e) 
+{
+	var compRefList_Container = e.data[0];
+	var interiorCompRefList_Container = e.data[1];
+	var camPos = e.data[2];
+	//var compRefList_array = e.data[2];
+
+	var eye_x = camPos.x;
+	var eye_y = camPos.y;
+	var eye_z = camPos.z;
+
+	var interior_visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
+	var visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
+	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
+	//var interior_visibleCompRefLists = interiorCompRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
+	//var visibleCompRefLists = compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
+	//var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
+
+	return total_visibleCompRefLists;
+	/*
+	// 1rst, frustum culling.*******************
+	var projectsList = e.data[0];
+	var cullingVolume = e.data[1];
+	//var projects_list = getFrustumIntersectedProjectBuildings(projectsList, cullingVolume);
+
+
+	var squaredDist = lastCamPos.squareDistTo(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+	if(squaredDist > squareDistUmbral)
+	{
+		// Camera position changed.***
+		lastCamPos.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
+
+	}
+	else{
+		// Camera doesnt moved.***
+	}
+	*/
+}
+
 onmessage = function(e) 
 {
 	console.log('Message received from main script');
@@ -100,49 +143,6 @@ function getFrustumIntersectedProjectBuildings(projectsList, cullingVolume)
 	return buildings_array;
 };
 */
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param e 변수
- */
-function possibleCameraPositionChanged(e) 
-{
-	var compRefList_Container = e.data[0];
-	var interiorCompRefList_Container = e.data[1];
-	var camPos = e.data[2];
-	//var compRefList_array = e.data[2];
-
-	var eye_x = camPos.x;
-	var eye_y = camPos.y;
-	var eye_z = camPos.z;
-
-	var interior_visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(interiorCompRefList_Container, eye_x, eye_y, eye_z);
-	var visibleCompRefLists = geoModifier.compoundReferencesListContainerGetVisibleCompRefObjectsList(compRefList_Container, eye_x, eye_y, eye_z);
-	var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
-	//var interior_visibleCompRefLists = interiorCompRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
-	//var visibleCompRefLists = compRefList_Container.get_visibleCompRefObjectsList(eye_x, eye_y, eye_z); // Cannot use alien functions.***
-	//var total_visibleCompRefLists = visibleCompRefLists.concat(interior_visibleCompRefLists);
-
-	return total_visibleCompRefLists;
-	/*
-	// 1rst, frustum culling.*******************
-	var projectsList = e.data[0];
-	var cullingVolume = e.data[1];
-	//var projects_list = getFrustumIntersectedProjectBuildings(projectsList, cullingVolume);
-
-
-	var squaredDist = lastCamPos.squareDistTo(currentCamPos.x, currentCamPos.y, currentCamPos.z);
-	if(squaredDist > squareDistUmbral)
-	{
-		// Camera position changed.***
-		lastCamPos.set(currentCamPos.x, currentCamPos.y, currentCamPos.z);
-
-	}
-	else{
-		// Camera doesnt moved.***
-	}
-	*/
-}
 
 /*
 // An example.***

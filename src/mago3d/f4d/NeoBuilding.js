@@ -152,9 +152,6 @@ NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
 NeoBuilding.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var bboxCenterPoint;
-	//var geoLoc = this.getGeoLocationData(); // take the 1rst.
-	if (geoLoc == undefined)
-	{ var hola = 0; }
 	
 	bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);

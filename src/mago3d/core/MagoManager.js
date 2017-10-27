@@ -4798,7 +4798,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
-				if (neoBuilding.currentGeoLocation == undefined)
+				if (neoBuilding.currentGeoLocation === undefined)
 				{
 					neoBuilding.currentGeoLocation = geoLoc; // delete this.****
 				}
@@ -5845,7 +5845,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var childJason;
 	var childNode;
 	var childrenCount;
-	if (attributes != undefined)
+	if (attributes !== undefined)
 	{
 		buildingId = data_key;
 		node = this.hierarchyManager.newNode(buildingId);
