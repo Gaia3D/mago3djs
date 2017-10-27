@@ -2853,6 +2853,17 @@ MagoManager.prototype.manageQueue = function()
 	}
 };
 
+/**
+ * LOD0, LOD1 에 대한 F4D ModelData, ReferenceData 를 요청
+ * 
+ * @param {any} gl 
+ * @param {any} scene 
+ * @param {any} neoBuilding 
+ */
+MagoManager.prototype.TestA = function() 
+{
+	var hola = 0;
+};
 
 /**
  * LOD0, LOD1 에 대한 F4D ModelData, ReferenceData 를 요청
