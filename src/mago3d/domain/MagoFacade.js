@@ -405,16 +405,19 @@ function searchDataAPI(dataKey)
  */
 function drawData(type, dataNameArray, dataUrlArray) 
 {
-	if(dataNameArray.length <= 0) return;
+	if (dataNameArray.length <= 0) { return; }
 	
 	var keyMap = new Map();
-	dataNameArray.forEach(function(dataName, index) {
-		if(MagoConfig.isDataExist(dataName))
+	dataNameArray.forEach(function(dataName, index) 
+	{
+		if (MagoConfig.isDataExist(dataName))
 		{
 			var data = MagoConfig.getData(dataName);
 			keyMap.set(dataName, dataName);
 			keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + data.data_key, data.data_key);
-		} else {
+		}
+		else 
+		{
 			console.log("not exist. dataName = " + dataName);
 			var objectIndexFilePath = null;
 			$.ajax({
@@ -438,7 +441,8 @@ function drawData(type, dataNameArray, dataUrlArray)
 		}
 		
 		// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
-		if(type === "new" && dataNameArray.length == (index + 1)) {
+		if (type === "new" && dataNameArray.length == (index + 1)) 
+		{
 			MagoConfig.clearUnSelectedData(keyMap);
 		}
 	});

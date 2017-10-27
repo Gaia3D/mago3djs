@@ -26,27 +26,27 @@ var Node = function()
 Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
 {
 	this.parent = undefined;
-	if(this.data)
+	if (this.data)
 	{
-		if(this.data.neoBuilding)
+		if (this.data.neoBuilding)
 		{
 			this.data.neoBuilding.deleteObjects(gl, vboMemoryManager);
 			this.data.neoBuilding = undefined;
 		}
 		
-		if(this.data.geographicCoord)
+		if (this.data.geographicCoord)
 		{
 			this.data.geographicCoord.deleteObjects();
 			this.data.geographicCoord = undefined;
 		}
 		
-		if(this.data.rotationsDegree)
+		if (this.data.rotationsDegree)
 		{
 			this.data.rotationsDegree.deleteObjects();
 			this.data.rotationsDegree = undefined;
 		}
 		
-		if(this.data.bbox)
+		if (this.data.bbox)
 		{
 			this.data.bbox.deleteObjects();
 			this.data.bbox = undefined;
@@ -55,10 +55,10 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 		this.data = undefined;
 	}
 	
-	if(this.children)
+	if (this.children)
 	{
 		var childrenCount = this.children.length;
-		for(var i=0; i<childrenCount; i++)
+		for (var i=0; i<childrenCount; i++)
 		{
 			this.children[i].deleteObjects(gl, vboMemoryManager);
 			this.children[i] = undefined;
