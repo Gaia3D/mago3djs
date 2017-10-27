@@ -416,6 +416,11 @@ function drawData(type, dataNameArray, dataUrlArray)
 			var data = MagoConfig.getData(dataName);
 			keyMap.set(dataName, dataName);
 			keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + data.data_key, data.data_key);
+			// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
+			if (type === "new" && dataNameArray.length === (dataCount + 1))		
+			{
+				MagoConfig.clearUnSelectedData(keyMap);
+			}
 		}
 		else 
 		{
