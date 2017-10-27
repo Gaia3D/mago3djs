@@ -29,7 +29,7 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 	
 	var rootNodesCount = rootNodesArray.length;
 	var rootNode;
-	for(var i=0; i<rootNodesCount; i++)
+	for (var i=0; i<rootNodesCount; i++)
 	{
 		rootNode = rootNodesArray[i];
 		rootNode.deleteObjects(gl, vboMemoryManager);
