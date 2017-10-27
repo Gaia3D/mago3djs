@@ -6527,6 +6527,12 @@ MagoManager.prototype.callAPI = function(api)
 			}
 			this.cameraFPV.release();
 		}
+	} else if (apiName === "drawAppendData")
+	{
+		// api.getDataName, api.getProjectId
+	} else if (apiName === "drawDeleteData")
+	{
+		// api.getProjectId
 	}
 };
 

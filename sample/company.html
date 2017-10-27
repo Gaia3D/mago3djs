@@ -45,8 +45,8 @@
 			<label for="decoration">decoration</label>
 		</li>
 		<li>
-			<button id="drawAppendData" name="drawAppendData">추가 표시</button>
-			<button id="drawNewData" name="drawNewData">clear 후 신규 표시</button>
+			<button id="drawAppendData" name="drawAppendData">표시</button>
+			<button id="drawDeleteData" name="drawDeleteData">비표시</button>
 		</li>
 	</ul>
 	
@@ -693,7 +693,7 @@
 			$("#insertIssueEnableButton").text("Issue 등록 활성화 상태");
 			insertIssueEnable = true;
 		}
-		changeInsertIssueModeAPI(insertIssueEnable);
+		changeInsertIssueModeAPI(managerFactory, insertIssueEnable);
 	});
 	
 	// issue input layer call back function
@@ -729,7 +729,8 @@
 					if(msg.result == "success") {
 						alert(JS_MESSAGE["insert"]);
 						// pin image를 그림
-						drawInsertIssueImageAPI(1, msg.issue.issue_id, msg.issue.issue_type, $("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
+						drawInsertIssueImageAPI(managerFactory, 1, msg.issue.issue_id, msg.issue.issue_type, 
+								$("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
 					} else {
 						alert(JS_MESSAGE[msg.result]);
 					}
@@ -749,7 +750,7 @@
 			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
 			insertIssueEnable = false;
 			
-			changeInsertIssueStateAPI(0);
+			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
@@ -885,7 +886,7 @@
 			}
 		}
 		// 이슈 등록 비활성화 상태
-		changeInsertIssueStateAPI(0);
+		changeInsertIssueStateAPI(managerFactory, 0);
 	});
 	
 	// 검색 메뉴 시작
@@ -947,7 +948,7 @@
 	});
 	
 	function flyToBounding(dataKey) {
-		searchDataAPI(dataKey);
+		searchDataAPI(managerFactory, dataKey);
 	}
 	
 	// API 메뉴시작
@@ -991,7 +992,8 @@
 	// 변환행렬
 	$("#changeLocationAndRotationAPI").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
-		changeLocationAndRotationAPI(	$("#move_data_key").val(), $("#move_latitude").val(), $("#move_longitude").val(), 
+		changeLocationAndRotationAPI(managerFactory, 
+										$("#move_data_key").val(), $("#move_latitude").val(), $("#move_longitude").val(), 
 										$("#move_height").val(), $("#move_heading").val(), $("#move_pitch").val(), $("#move_roll").val());
 	});
 	function changeLocationAndRotationCheck() {
@@ -1052,7 +1054,7 @@
 						if(issueList != null && issueList.length > 0) {
 							for(i=0; i<issueList.length; i++ ) {
 								var issue = issueList[i];
-								drawInsertIssueImageAPI(0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
+								drawInsertIssueImageAPI(managerFactory, 0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
 							}
 						}
 					} else {
@@ -1065,38 +1067,38 @@
 				}
 			});
 		}
-		changeNearGeoIssueListViewModeAPI(isShow);
+		changeNearGeoIssueListViewModeAPI(managerFactory, isShow);
 	}
 	
 	// 설정 메뉴 시작
 	// Label 표시
 	function changeLabel(isShow) {
 		$("input:radio[name='labelInfo']:radio[value='" + isShow + "']").prop("checked", true);
-		changeLabelAPI(isShow);
+		changeLabelAPI(managerFactory, isShow);
 	}
 	// object info 표시
 	function changeObjectInfoViewMode(isShow) {
 		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);
-		changeObjectInfoViewModeAPI(isShow);
+		changeObjectInfoViewModeAPI(managerFactory, isShow);
 	}
 	// boundingBox 표시/비표시
 	function changeBoundingBox(isShow) {
 		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
-		changeBoundingBoxAPI(isShow);
+		changeBoundingBoxAPI(managerFactory, isShow);
 	}
 	// 마우스 클릭 객체 이동 모드 변경
 	function changeMouseMove(mouseMoveMode) {
 		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
-		changeMouseMoveAPI(mouseMoveMode);
+		changeMouseMoveAPI(managerFactory, mouseMoveMode);
 	}
 	// Object Occlusion culling
 	$("#changeOcclusionCullingButton").click(function () {
-		changeOcclusionCullingAPI(($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
+		changeOcclusionCullingAPI(managerFactory, ($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
 	});
 	// 카메라 모드 전환
 	function changeViewMode(isFPVMode) {
 		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);
-		changeFPVModeAPI(isFPVMode);
+		changeFPVModeAPI(managerFactory, isFPVMode);
 	}
 	function initJqueryCalendar() {
 		$( ".date" ).datepicker({ 
@@ -1175,15 +1177,15 @@
 	
 	// LOD 설정
 	$("#changeLodButton").click(function() {
-		changeLodAPI($("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
+		changeLodAPI(managerFactory, $("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
 	});
 	// Lighting 설정
 	$("#changeLightingButton").click(function() {
-		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
+		changeLightingAPI(managerFactory, $("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
 	});
 	// Ssadradius 설정
 	$("#changeSsadRadiusButton").click(function() {
-		changeSsadRadiusAPI($("#geo_ssao_radius").val());
+		changeSsadRadiusAPI(managerFactory, $("#geo_ssao_radius").val());
 	});
 
 	// click poisition call back function
@@ -1202,12 +1204,12 @@
 			dataNameArray[index] = $(this).val();
 			dataUrlArray[index] = jsonUrl + $(this).val();
 			if(checkCount === (dataCount + 1)) {
-				drawData("append", dataNameArray, dataUrlArray);
+				drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
 			}
 			dataCount++;
 		});
 	});
-	$("#drawNewData").click(function() {
+	$("#drawDeleteData").click(function() {
 		var checkCount = $("input[name=renderingFileName]:checked").length;
 		var dataNameArray = new Array(checkCount);
 		var dataUrlArray = new Array(checkCount);
@@ -1216,7 +1218,7 @@
 			dataNameArray[index] = $(this).val();
 			dataUrlArray[index] = jsonUrl + $(this).val();
 			if(checkCount === (dataCount + 1)) {
-				drawData("new", dataNameArray, dataUrlArray);
+				drawDeleteDataAPI(managerFactory, dataNameArray, dataUrlArray);
 			}
 			dataCount++;
 		});
