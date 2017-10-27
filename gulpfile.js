@@ -10,7 +10,10 @@ var rimraf = require('rimraf');
 var glslStripComments = require('glsl-strip-comments');
 var stripDebug = require('gulp-strip-debug');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
+var uglifyjs = require('uglify-es');	// for ES6 support 
+var composer = require('gulp-uglify/composer');
+var uglify = composer(uglifyjs, console);
+
 //var minify = require('gulp-minify');
 //var imagemin = require('gulp-imagemin');
 //var sourcemaps = require('gulp-sourcemaps');
