@@ -432,6 +432,11 @@ function drawData(type, dataNameArray, dataUrlArray)
 					keyMap.set(dataName, dataName);
 					keyMap.set(CODE.OBJECT_INDEX_FILE_PREFIX + objectIndexFilePath, objectIndexFilePath);
 					managerFactory.loadObjectIndexFile(dataName, objectIndexFilePath);
+					
+					// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
+					if(type === "new" && dataNameArray.length == (dataCount + 1))		{
+						MagoConfig.clearUnSelectedData(keyMap);
+					}
 				},
 				error: function(request, status, error)
 				{
@@ -441,10 +446,6 @@ function drawData(type, dataNameArray, dataUrlArray)
 			});
 		}
 		
-		// 맨 마지막에는 map에서 지우는 처리를 하러 가자.
-		if(type === "new" && dataNameArray.length == (dataCount + 1))		{
-			MagoConfig.clearUnSelectedData(keyMap);
-		}
 		dataCount++;
 	});
 }
