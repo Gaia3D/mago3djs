@@ -1406,6 +1406,26 @@ MagoManager.prototype.cameraMoved = function()
 };
 
 /**
+ * @returns 
+ */
+MagoManager.prototype.getNodeGeoLocDataManager = function(node) 
+{
+	if (node === undefined)
+	{ return undefined; }
+	
+	// provisionally take the geoLocDatamanager from the rootNode.
+	//var rootNode = node.getRoot();
+	
+	var closestRootNode = node.getClosestParentWithData("geoLocDataManager");
+	
+	if (closestRootNode.data === undefined)
+	{ return undefined; }
+	
+	var rootNodeGeoLocDataManager = closestRootNode.data.geoLocDataManager;
+	return rootNodeGeoLocDataManager;
+};
+
+/**
  * Selects an object of the current visible objects that's under mouse.
  * @param {GL} gl.
  * @param {int} mouseX Screen x position of the mouse.
@@ -1469,10 +1489,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		for (var i=0; i<nodesLOD0Count; i++)
 		{
 			node = visibleObjControlerNodes.currentVisibles0[i];
-			rootNode= node.getRoot();
 			neoBuilding = node.data.neoBuilding;
-			
-			var buildingGeoLocation = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+			var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -1534,10 +1552,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 		for (var i=0; i<nodesLOD2Count; i++)
 		{
 			node = visibleObjControlerNodes.currentVisibles2[i];
-			rootNode= node.getRoot();
 			neoBuilding = node.data.neoBuilding;
-			
-			var buildingGeoLocation = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+			var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -1680,8 +1696,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	if (this.pointSC2 === undefined)
 	{ this.pointSC2 = new Point3D(); }
 	
-	var rootNodeSelected = this.nodeSelected.getRoot();
-	var geoLocDataManager = rootNodeSelected.data.geoLocDataManager;
+	var geoLocDataManager = this.getNodeGeoLocDataManager(this.nodeSelected);
 	
 	this.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2);
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
@@ -2117,8 +2132,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (this.selectionCandidates.currentNodeSelected === undefined)
 		{ return; }
 		
-		var selectedRootNode = this.selectionCandidates.currentNodeSelected.getRoot();
-		var geoLocDataManager = selectedRootNode.data.geoLocDataManager;
+		var geoLocDataManager = this.getNodeGeoLocDataManager(this.selectionCandidates.currentNodeSelected);
 		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 	
 		// create a XY_plane in the selected_pixel_position.***
@@ -2202,8 +2216,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
 		}
 		
-		var selectedRootNode = this.selectionCandidates.currentNodeSelected.getRoot();
-		var geoLocDataManager = selectedRootNode.data.geoLocDataManager;
+		var geoLocDataManager = this.getNodeGeoLocDataManager(this.selectionCandidates.currentNodeSelected);
 
 		// world ray = camPos + lambda*camDir.***
 		if (this.lineSC === undefined)
@@ -2261,9 +2274,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var neoBuilding = node.data.neoBuilding;
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
-	var rootNode = node.getRoot();
-	//var geoLocDataManager = node.data.geoLocDataManager;
-	var rootGeoLocDataManager = rootNode.data.geoLocDataManager;
+	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
 	var rootGeoLoc = rootGeoLocDataManager.getCurrentGeoLocationData();
 	
 	//var nodeGeoLocation = geoLocDataManager.getCurrentGeoLocationData(); // original.***
@@ -2524,9 +2535,8 @@ MagoManager.prototype.manageQueue = function()
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-				rootNode = node.getRoot();
 				
-				var buildingGeoLocation = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+				var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
 				this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
 				if (headerVersion[0] === "v")
@@ -2577,9 +2587,8 @@ MagoManager.prototype.manageQueue = function()
 				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
 				{
 					node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-					rootNode = node.getRoot();
 				}
-				geoLocDataManager = rootNode.data.geoLocDataManager;
+				geoLocDataManager = this.getNodeGeoLocDataManager(node);
 				
 				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -3252,8 +3261,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			if (this.nodeSelected && this.objectSelected) // if there are an object selected then there are a building selected.***
 			{
 				node = this.nodeSelected;
-				rootNode = node.getRoot();
-				var geoLocDataManager = rootNode.data.geoLocDataManager;
+				var geoLocDataManager = this.getNodeGeoLocDataManager(node);
 				neoBuilding = this.buildingSelected;
 				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 				var neoReferencesMotherAndIndices = this.octreeSelected.neoReferencesMotherAndIndices;
@@ -3372,10 +3380,9 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				for (var b=0; b<visibleNodesLOD0Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles0[b];
-					rootNode = node.getRoot();
 					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
-					var buildingGeoLocation = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+					var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -3390,11 +3397,10 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				for (var b=0; b<visibleNodesLOD2Count; b++)
 				{
 					node = this.visibleObjControlerNodes.currentVisibles2[b];
-					rootNode = node.getRoot();
 					neoBuilding = node.data.neoBuilding;
 					gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 
-					var buildingGeoLocation = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+					var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 					gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 					gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
@@ -4861,37 +4867,22 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
 					
 					if (neoBuilding.buildingId === "ctships")
-					{
-						// Test:
-						// for this building dont translate the pivot point to the bbox center.***
-						//return;
-					}
+					{ ; }
 					
 					// test.
 					//***********************************************************************************************************
-					var nodeIdDivided = node.data.nodeId.split("_");
-					//if (nodeIdDivided[0] == "testId")
+					var rootNode = node.getRoot();
+					if (rootNode)
 					{
-						var rootNode = node.getRoot();
-						if (rootNode)
-						{
-							// now, calculate the root center of bbox.
-							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
-							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-						}
-						//if(rootNode !== node)
-						//{
-						//	node.data.geoLocDataManager.deleteObjects();
-						//	node.data.geoLocDataManager = rootNode.data.geoLocDataManager;
-						//}
+						// now, calculate the root center of bbox.
+						this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
+						ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 					}
 					//------------------------------------------------------------------------------------------------------------
-					
 					continue;
 					
 				}
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-				//realBuildingPos = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc); // original.***
 				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 				
 				if (neoBuilding.buildingId === "ctships")
@@ -4931,40 +4922,21 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 				}
 				//-------------------------------------------------------------------------------------------
-				
-				if (this.isLastFrustum)
+				if (distToCamera < lod0_minDist) 
 				{
-					if (distToCamera < lod0_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
-					}
-					else if (distToCamera < lod1_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
-					}
-					else if (distToCamera < lod3_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
-					}
+					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
 				}
-				else
+				else if (distToCamera < lod1_minDist) 
 				{
-					if (distToCamera < lod1_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
-					}
-					else if (distToCamera < lod3_minDist) 
-					{
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
-					}
+					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+				}
+				else if (distToCamera < lod2_minDist) 
+				{
+					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+				}
+				else if (distToCamera < lod3_minDist) 
+				{
+					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
 				}
 			}
 		}
@@ -5634,8 +5606,7 @@ MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
 	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-	var rootNode = node.getRoot();
-	var geoLocationData = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+	var geoLocationData = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 	var latitude = geoLocationData.geographicCoord.latitude;
 	var longitude = geoLocationData.geographicCoord.longitude;
 	var altitude = geoLocationData.geographicCoord.altitude;
@@ -5652,8 +5623,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-	var rootNode = node.getRoot();
-	var geoLocationData = rootNode.data.geoLocDataManager.getCurrentGeoLocationData();
+	var geoLocationData = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 	var dividedName = neoBuilding.buildingId.split("_");
 	var dataKey = dividedName[0];
 	if (dividedName[1] !== undefined) { dataKey = dividedName[0] + "_" + dividedName[1]; }
@@ -5722,20 +5692,17 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	nodeRoot.extractNodesByDataName(nodesArray, "neoBuilding");
 	
 	var aNode;
-	var aNodeRoot;
 	var nodesCount = nodesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
 		aNode = nodesArray[i];
-		aNodeRoot = aNode.getRoot();
-		var geoLocDatamanager = aNodeRoot.data.geoLocDataManager;
+		var geoLocDatamanager = this.getNodeGeoLocDataManager(aNode);
 		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, this);
 		if (geoLocationData === undefined)
 		{ continue; }
 
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
-		//var neoBuilding = node.data.neoBuilding; // old.***
 		var neoBuilding = aNode.data.neoBuilding;
 		if (neoBuilding.octree)
 		{
