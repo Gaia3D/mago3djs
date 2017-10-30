@@ -100,15 +100,17 @@ Node.prototype.getRoot = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.getClosestParentWithLocation = function() 
+Node.prototype.getClosestParentWithData = function(dataName) 
 {
-	if (this.data)
+	if (this.data && this.data[dataName])
 	{
-		
+		return this;
 	}
 	else 
 	{
-		
+		if (this.parent)
+		{ return this.parent.getClosestParentWithData(dataName); }
+		else { return undefined; }
 	}
 };
 
