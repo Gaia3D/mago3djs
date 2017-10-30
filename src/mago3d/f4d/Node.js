@@ -100,6 +100,21 @@ Node.prototype.getRoot = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+Node.prototype.getClosestParentWithLocation = function() 
+{
+	if (this.data)
+	{
+		
+	}
+	else 
+	{
+		
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Node.prototype.extractNodesByDataName = function(nodesArray, dataname) 
 {
 	// this function extracts nodes that has a data named dataname, including children.

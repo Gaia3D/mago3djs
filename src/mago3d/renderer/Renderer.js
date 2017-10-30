@@ -29,6 +29,7 @@ var Renderer = function()
 Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, lod, refMatrixIdxKey) 
 {
 	var node;
+	var rootNode;
 	var geoLocDataManager;
 	var neoBuilding;
 	var minSize = 0.0;
@@ -57,7 +58,9 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleNodesArray[i];
-		geoLocDataManager = node.data.geoLocDataManager;
+		rootNode = node.getRoot();
+		
+		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
@@ -117,6 +120,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx) 
 {
 	var node;
+	var rootNode;
 	var geoLocDataManager;
 	var neoBuilding;
 	//var minSize = 0.0;
@@ -129,7 +133,8 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = visibleNodesArray[i];
-		geoLocDataManager = node.data.geoLocDataManager;
+		rootNode = node.getRoot();
+		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }

@@ -25,6 +25,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 	var lowestOctree;
 	var headerVersion;
 	var node;
+	var rootNode;
 	var geoLocDataManager;
 	
 	if (this.matrix4SC === undefined)
@@ -56,8 +57,9 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
 				{
 					node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+					rootNode = node.getRoot();
 				}
-				geoLocDataManager = node.data.geoLocDataManager;
+				geoLocDataManager = rootNode.data.geoLocDataManager;
 				
 				//var buildingGeoLocation = neoBuilding.getGeoLocationData(); // old.***
 				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
@@ -112,8 +114,9 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
 				{
 					node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+					rootNode = node.getRoot();
 				}
-				geoLocDataManager = node.data.geoLocDataManager;
+				geoLocDataManager = rootNode.data.geoLocDataManager;
 				
 				//var buildingGeoLocation = neoBuilding.getGeoLocationData(); // old.***
 				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
