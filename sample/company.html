@@ -38,14 +38,13 @@
 	<ul id="homeMenuContent" class="menuList">
 		<li>
 			기본
-			<input type="checkbox" id="chk_all" name="chk_all" />
 			<ul>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="defaultShip" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">fullship 2119</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_deploy" name="defaultShip" value="2119_deploy.json" />
+					<input type="checkbox" id="2119_deploy" name="createStepsShip" value="2119_deploy.json" />
 					<label for="2119_deploy">deploy 2119</label>
 				</li>
 			</ul>
@@ -54,7 +53,7 @@
 			설비시설
 			<ul>
 				<li>
-					<input type="checkbox" id="decoration" name="decoration" value="decoration.json" />
+					<input type="checkbox" id="decoration" name="createStepsShip" value="decoration.json" />
 					<label for="decoration">decoration</label>
 				</li>
 			</ul>
@@ -1259,30 +1258,23 @@
 		});
 	}
 	
-	// 전체 선택 
-	$("#chk_all").click(function() {
-		$(":checkbox[name=defaultShip]").prop("checked", this.checked);
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("defaultShip");
-	});
-	
 	// fullship
 	$("#2119_fullship").click(function() {
 		// 
 		clearAllDataAPI(managerFactory);
-		drawCheckedData("defaultShip");
+		drawCheckedData("createStepsShip");
 	});
 	
 	// deploy
 	$("#2119_deploy").click(function() {
 		clearAllDataAPI(managerFactory);
-		drawCheckedData("defaultShip");
+		drawCheckedData("createStepsShip");
 	});
 	
 	// decoration
 	$("#decoration").click(function() {
 		clearAllDataAPI(managerFactory);
-		drawCheckedData("decoration");
+		drawCheckedData("createStepsShip");
 	});
 	
 	// 2119_sampleBlocks
