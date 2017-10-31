@@ -1418,6 +1418,9 @@ MagoManager.prototype.getNodeGeoLocDataManager = function(node)
 	
 	var closestRootNode = node.getClosestParentWithData("geoLocDataManager");
 	
+	if (closestRootNode === undefined)
+	{ return undefined; }
+
 	if (closestRootNode.data === undefined)
 	{ return undefined; }
 	
@@ -6375,6 +6378,15 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "drawDeleteData")
 	{
+		// deselect.
+		this.selectionCandidates.clearCandidates();
+		this.selectionCandidates.clearCurrents();
+		this.objectSelected = undefined;
+		this.octreeSelected = undefined;
+		this.buildingSelected = undefined;
+		this.nodeSelected = undefined;
+		
+		
 		var projectFolderName = api.getProjectId();
 		
 		// 1rst, must erase from processQueue and parseQueue. pendent.
