@@ -66,14 +66,6 @@
 					<label for="2119_sampleBlocks">2119 sample Blocks</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_PERemained1" name="createStepsShip" value="2119_PERemained1.json" />
-					<label for="2119_PERemained1">2119 PE Remained1</label>
-				</li>
-				<li>
-					<input type="checkbox" id="2119_PERemained2" name="createStepsShip" value="2119_PERemained2.json" />
-					<label for="2119_PERemained2">2119 PE Remained2</label>
-				</li>
-				<li>
 					<input type="checkbox" id="2119_PEConstructed" name="createStepsShip" value="2119_PEConstructed.json" />
 					<label for="2119_PEConstructed">2119 PE Constructed</label>
 				</li>
@@ -82,8 +74,16 @@
 					<label for="2119_fullShipUnderConstruction1">2119 fullShip UnderConstruction1</label>
 				</li>
 				<li>
+					<input type="checkbox" id="2119_PERemained1" name="createStepsShip" value="2119_PERemained1.json" />
+					<label for="2119_PERemained1">2119 PE Remained1</label>
+				</li>
+				<li>
 					<input type="checkbox" id="2119_fullShipUnderConstruction2" name="createStepsShip" value="2119_fullShipUnderConstruction2.json" />
 					<label for="2119_fullShipUnderConstruction2">2119 fullShip UnderConstruction2</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_PERemained2" name="createStepsShip" value="2119_PERemained2.json" />
+					<label for="2119_PERemained2">2119 PE Remained2</label>
 				</li>
 				<li>
 					<input type="checkbox" id="2119_fullShipCompleted" name="createStepsShip" value="2119_fullShipCompleted.json" />
@@ -1282,16 +1282,6 @@
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
-	// 2119_PERemained1
-	$("#2119_PERemained1").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_PERemained2
-	$("#2119_PERemained2").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
 	// 2119_PEConstructed
 	$("#2119_PEConstructed").click(function() {
 		clearAllDataAPI(managerFactory);
@@ -1302,8 +1292,18 @@
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
+	// 2119_PERemained1
+	$("#2119_PERemained1").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
 	// 2119_fullShipUnderConstruction2
 	$("#2119_fullShipUnderConstruction2").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_PERemained2
+	$("#2119_PERemained2").click(function() {
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
