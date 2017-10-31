@@ -59,7 +59,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 					node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
 					rootNode = node.getRoot();
 				}
+				
+				if(rootNode.data == undefined)
+					continue;
+				
 				geoLocDataManager = rootNode.data.geoLocDataManager;
+				
+				if(geoLocDataManager === undefined)
+					continue;
 				
 				//var buildingGeoLocation = neoBuilding.getGeoLocationData(); // old.***
 				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
