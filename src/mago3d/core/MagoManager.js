@@ -6395,10 +6395,8 @@ MagoManager.prototype.deleteAll = function ()
 	this.octreeSelected = undefined;
 	this.buildingSelected = undefined;
 	this.nodeSelected = undefined;
-
-	var projectFolderName = api.getProjectId();
 	
-	// 1rst, must erase from processQueue and parseQueue. pendent.
+	// 1rst, must erase from processQueue and parseQueue. 
 	this.parseQueue.clearAll();
 	this.processQueue.clearAll();
 	
