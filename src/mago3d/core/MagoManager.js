@@ -5617,7 +5617,10 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
 	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-	var geoLocationData = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
+	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
+	if(geoLocDatamanager == undefined)
+		return;
+	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var dividedName = neoBuilding.buildingId.split("_");
 	var dataKey = dividedName[0];
 	if (dividedName[1] !== undefined) { dataKey = dividedName[0] + "_" + dividedName[1]; }
