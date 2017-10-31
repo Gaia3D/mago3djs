@@ -6392,6 +6392,10 @@ MagoManager.prototype.callAPI = function(api)
 		//var projectFolderName = api.getProjectId();
 		//this.getObjectIndexFileTEST(dataJson, projectFolderName);
 	}
+	else if (apiName === "clearAllData")
+	{
+		// 화면에 있는 모든 데이터를 삭제
+	}
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)

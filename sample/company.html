@@ -37,16 +37,60 @@
 	
 	<ul id="homeMenuContent" class="menuList">
 		<li>
-			<input type="checkbox" id="ship_fullship_2119" name="renderingFileName" value="2119_fullship.json" />
-			<label for="ship_2119_fullship">fullship 2119</label>
-			<input type="checkbox" id="ship_2119_deploy" name="renderingFileName" value="2119_deploy.json" />
-			<label for="ship_2119_deploy">deploy 2119</label>
-			<input type="checkbox" id="decoration" name="renderingFileName" value="decoration.json" />
-			<label for="decoration">decoration</label>
+			기본
+			<input type="checkbox" id="chk_all" name="chk_all" />
+			<ul>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">fullship 2119</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_deploy" name="renderingFileName" value="2119_deploy.json" />
+					<label for="2119_deploy">deploy 2119</label>
+				</li>
+			</ul>
 		</li>
 		<li>
-			<button id="drawAppendData" name="drawAppendData">표시</button>
-			<button id="drawDeleteData" name="drawDeleteData">비표시</button>
+			설비시설
+			<ul>
+				<li>
+					<input type="checkbox" id="decoration" name="renderingFileName" value="decoration.json" />
+					<label for="decoration">decoration</label>
+				</li>
+			</ul>
+		</li>
+		<li>
+			탑재데모
+			<ul>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">1번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">2번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">3번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">4번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">5번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">6번</label>
+				</li>
+				<li>
+					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<label for="2119_fullship">7번</label>
+				</li>
+			</ul>
 		</li>
 	</ul>
 	
@@ -1195,7 +1239,17 @@
 		$("#positionAltitude").val(position.alt);
 	}
 	
-	$("#drawAppendData").click(function() {
+	// 모든 데이터 비표시
+	function clearAllData() {
+		clearAllDataAPI();
+	}
+	
+	// 전체 선택 
+	$("#chk_all").click(function() {
+		$(":checkbox[name=renderingFileName]").prop("checked", this.checked);
+	});
+	
+	/* $("#drawAppendData").click(function() {
 		var checkCount = $("input[name=renderingFileName]:checked").length;
 		var dataNameArray = new Array(checkCount);
 		var dataUrlArray = new Array(checkCount);
@@ -1222,7 +1276,7 @@
 			}
 			dataCount++;
 		});
-	});
+	}); */
 </script>
 </body>
 </html>

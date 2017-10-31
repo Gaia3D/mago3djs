@@ -345,6 +345,18 @@ function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
 }
 
 /**
+ * 화면에 있는 모든 데이터를 삭제, 비표시
+ */
+function clearAllDataAPI()
+{	
+	var api = new API("clearAllData");
+	if (managerFactoryInstance !== null) 
+	{
+		managerFactoryInstance.callAPI(api);
+	}
+}
+
+/**
  * pin image를 그림
  * @param {Property} managerFactoryInstance
  * @param {Property} drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
