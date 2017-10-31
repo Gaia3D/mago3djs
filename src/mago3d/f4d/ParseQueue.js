@@ -190,5 +190,29 @@ ParseQueue.prototype.eraseOctreeLod2LegosToParse = function(octree)
 	this.octreesLod2LegosToParseMap.delete(octree);
 };
 
+ParseQueue.prototype.clearAll = function()
+{
+	this.octreesLod0ReferencesToParseMap.clear();
+	this.octreesLod0ModelsToParseMap.clear();
+	this.octreesLod2LegosToParseMap.clear();
+	
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

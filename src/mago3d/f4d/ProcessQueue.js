@@ -66,4 +66,10 @@ ProcessQueue.prototype.eraseNodeToDelete = function(node)
 	this.nodesToDeleteMap.delete(node);
 };
 
+ProcessQueue.prototype.clearAll = function()
+{
+	this.nodesToDeleteMap.clear();
+	this.nodesToDeleteModelReferencesMap.clear();
+};
+
 

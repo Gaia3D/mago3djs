@@ -24,6 +24,20 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
+	this.nodesMap.clear();
+	
+	var nodesCount = this.nodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		if (this.nodesArray[i])
+		{
+			this.nodesArray[i].deleteObjects(gl, vboMemoryManager);
+			this.nodesArray[i] = undefined;
+		}
+	}
+	this.nodesArray.length = 0;
+	/*
+	
 	var rootNodesArray = [];
 	this.getRootNodes(rootNodesArray);
 	
@@ -33,7 +47,10 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 	{
 		rootNode = rootNodesArray[i];
 		rootNode.deleteObjects(gl, vboMemoryManager);
+		rootNode = undefined;
 	}
+	rootNodesArray.length = 0;
+	*/
 };
 
 /**
@@ -69,6 +86,31 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 	}
 	
 	return resultRootNodesArray;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+HierarchyManager.prototype.getNodesWithData = function(dataName, resultNodesArray) 
+{
+	if (resultNodesArray === undefined)
+	{ resultNodesArray = []; }
+	
+	var nodesCount = this.nodesArray.length;
+	var node;
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = this.nodesArray[i];
+		if (node.data && node.data[dataName])
+		{
+			resultNodesArray.push(node);
+		}
+		i++;
+	}
+	
+	return resultNodesArray;
 };
 
 /**
