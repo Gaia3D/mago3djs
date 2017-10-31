@@ -6378,36 +6378,35 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "drawDeleteData")
 	{
-		// deselect.
-		this.selectionCandidates.clearCandidates();
-		this.selectionCandidates.clearCurrents();
-		this.objectSelected = undefined;
-		this.octreeSelected = undefined;
-		this.buildingSelected = undefined;
-		this.nodeSelected = undefined;
-		
-		
-		var projectFolderName = api.getProjectId();
-		
-		// 1rst, must erase from processQueue and parseQueue. pendent.
-		this.parseQueue.clearAll();
-		this.processQueue.clearAll();
-		
-		// reset tiles.
-		this.smartTileManager.resetTiles();
-		
-		// delete nodes.
-		this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
-		
-		// create projects.
-		//var dataJson = api.getDataName();
-		//var projectFolderName = api.getProjectId();
-		//this.getObjectIndexFileTEST(dataJson, projectFolderName);
+		this.deleteAll();
 	}
 	else if (apiName === "clearAllData")
 	{
-		// 화면에 있는 모든 데이터를 삭제
+		this.deleteAll();
 	}
+};
+
+MagoManager.prototype.deleteAll = function ()
+{
+	// deselect.
+	this.selectionCandidates.clearCandidates();
+	this.selectionCandidates.clearCurrents();
+	this.objectSelected = undefined;
+	this.octreeSelected = undefined;
+	this.buildingSelected = undefined;
+	this.nodeSelected = undefined;
+
+	var projectFolderName = api.getProjectId();
+	
+	// 1rst, must erase from processQueue and parseQueue. pendent.
+	this.parseQueue.clearAll();
+	this.processQueue.clearAll();
+	
+	// reset tiles.
+	this.smartTileManager.resetTiles();
+	
+	// delete nodes.
+	this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)
