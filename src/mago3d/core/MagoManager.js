@@ -2446,11 +2446,11 @@ MagoManager.prototype.manageQueue = function()
 		{ continue; }
 
 		neoBuilding = node.data.neoBuilding;
+		this.processQueue.eraseNodeToDelete(node);
 		
 		if (neoBuilding == undefined)
 		{ continue; }
 	
-		this.processQueue.eraseNodeToDelete(node);
 		this.deleteNeoBuilding(gl, neoBuilding);
 	}
 	nodesToDeleteArray = [];
@@ -4799,7 +4799,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var geoLoc;
 	var geoLocDataManager;
 	var realBuildingPos;
-	var parentBuilding;
 	var longitude, latitude, altitude, heading, pitch, roll;
 
 	for (var i=0; i<tilesCount; i++)
@@ -4811,12 +4810,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > lod3_minDist)
 		{ continue; }
-		/*
-		if (lowestTile.nodesArray === undefined || lowestTile.nodesArray.length === 0)
-		{
-			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
-		}
-		*/
+
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
 		{
 			// the neoBuildings is made.
@@ -4833,10 +4827,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
-				if (neoBuilding.currentGeoLocation === undefined)
-				{
-					neoBuilding.currentGeoLocation = geoLoc; // delete this.****
-				}
 
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
@@ -4862,9 +4852,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					pitch = neoBuilding.metaData.pitch;
 					roll = neoBuilding.metaData.roll;
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, geoLoc, this);
-					neoBuilding.currentGeoLocation = geoLoc; // delete this.****
-					parentBuilding = neoBuilding;
-					this.pointSC = parentBuilding.bbox.getCenterPoint(this.pointSC);
+					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					
 					if (neoBuilding.buildingId === "ctships")
 					{ ; }
@@ -5683,9 +5671,10 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	if (node === undefined)
 	{ return; }
 
-	// 1rst, finde the rootNode.
+	// 1rst, find the rootNode.
 	var nodeRoot;
-	nodeRoot = node.getRoot();
+	//nodeRoot = node.getRoot(); // original.***
+	nodeRoot = node.getClosestParentWithData("geoLocDataManager");
 	
 	// now, extract all buildings of the nodeRoot.
 	var nodesArray = [];
@@ -5963,7 +5952,8 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 		buildingSeed = node.data.buildingSeed;
 		if (buildingSeed)
 		{
-			nodeRoot = node.getRoot();
+			//nodeRoot = node.getRoot(); // old.***
+			nodeRoot = node.getClosestParentWithData("geographicCoord");
 			
 			longitude = nodeRoot.data.geographicCoord.longitude; 
 			latitude = nodeRoot.data.geographicCoord.latitude; 
@@ -6001,7 +5991,8 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 	// now, must calculate the bbox of the root nodes.
 	var rootNodesArray = [];
 	var nodesArray = [];
-	this.hierarchyManager.getRootNodes(rootNodesArray);
+	this.hierarchyManager.getRootNodes(rootNodesArray); // original.***
+	//this.hierarchyManager.getNodesWithData("geographicCoord", rootNodesArray);
 	var bboxStarted = false;
 	
 	var rootNodesCount = rootNodesArray.length;
@@ -6385,8 +6376,21 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "drawDeleteData")
 	{
 		var projectFolderName = api.getProjectId();
+		
+		// 1rst, must erase from processQueue and parseQueue. pendent.
+		this.parseQueue.clearAll();
+		this.processQueue.clearAll();
+		
+		// reset tiles.
 		this.smartTileManager.resetTiles();
-		//this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+		
+		// delete nodes.
+		this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+		
+		// create projects.
+		//var dataJson = api.getDataName();
+		//var projectFolderName = api.getProjectId();
+		//this.getObjectIndexFileTEST(dataJson, projectFolderName);
 	}
 };
 
