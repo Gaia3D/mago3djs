@@ -5597,7 +5597,10 @@ MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
 	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
-	var geoLocationData = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
+	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
+	if(geoLocDatamanager == undefined)
+		return;
+	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var latitude = geoLocationData.geographicCoord.latitude;
 	var longitude = geoLocationData.geographicCoord.longitude;
 	var altitude = geoLocationData.geographicCoord.altitude;
