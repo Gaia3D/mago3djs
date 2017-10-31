@@ -41,11 +41,11 @@
 			<input type="checkbox" id="chk_all" name="chk_all" />
 			<ul>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="defaultShipMode" value="2119_fullship.json" />
 					<label for="2119_fullship">fullship 2119</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_deploy" name="renderingFileName" value="2119_deploy.json" />
+					<input type="checkbox" id="2119_deploy" name="defaultShipMode" value="2119_deploy.json" />
 					<label for="2119_deploy">deploy 2119</label>
 				</li>
 			</ul>
@@ -54,7 +54,7 @@
 			설비시설
 			<ul>
 				<li>
-					<input type="checkbox" id="decoration" name="renderingFileName" value="decoration.json" />
+					<input type="checkbox" id="decoration" name="decoration" value="decoration.json" />
 					<label for="decoration">decoration</label>
 				</li>
 			</ul>
@@ -1247,6 +1247,33 @@
 	// 전체 선택 
 	$("#chk_all").click(function() {
 		$(":checkbox[name=renderingFileName]").prop("checked", this.checked);
+	});
+	
+	// fullship
+	$("#2119_fullship").click(function() {
+		var dataNameArray = new Array(1);
+		var dataUrlArray = new Array();
+		dataNameArray[0] = $(this).val();
+		dataUrlArray[0] = jsonUrl + $(this).val();
+		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+	});
+	
+	// deploy
+	$("#2119_deploy").click(function() {
+		var dataNameArray = new Array(1);
+		var dataUrlArray = new Array();
+		dataNameArray[0] = $(this).val();
+		dataUrlArray[0] = jsonUrl + $(this).val();
+		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+	});
+	
+	// decoration
+	$("#decoration").click(function() {
+		var dataNameArray = new Array(1);
+		var dataUrlArray = new Array();
+		dataNameArray[0] = $(this).val();
+		dataUrlArray[0] = jsonUrl + $(this).val();
+		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
 	});
 	
 	/* $("#drawAppendData").click(function() {
