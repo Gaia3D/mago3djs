@@ -346,12 +346,14 @@ function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
 
 /**
  * 화면에 있는 모든 데이터를 삭제, 비표시
+ * @param {Property} managerFactoryInstance
  */
-function clearAllDataAPI()
+function clearAllDataAPI(managerFactoryInstance)
 {	
 	var api = new API("clearAllData");
 	if (managerFactoryInstance !== null) 
 	{
+		MagoConfig.clearAllData();
 		managerFactoryInstance.callAPI(api);
 	}
 }

@@ -41,11 +41,11 @@
 			<input type="checkbox" id="chk_all" name="chk_all" />
 			<ul>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="defaultShipMode" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="defaultShip" value="2119_fullship.json" />
 					<label for="2119_fullship">fullship 2119</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_deploy" name="defaultShipMode" value="2119_deploy.json" />
+					<input type="checkbox" id="2119_deploy" name="defaultShip" value="2119_deploy.json" />
 					<label for="2119_deploy">deploy 2119</label>
 				</li>
 			</ul>
@@ -63,31 +63,31 @@
 			탑재데모
 			<ul>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">1번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">2번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">3번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">4번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">5번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">6번</label>
 				</li>
 				<li>
-					<input type="checkbox" id="2119_fullship" name="renderingFileName" value="2119_fullship.json" />
+					<input type="checkbox" id="2119_fullship" name="createStepsShip" value="2119_fullship.json" />
 					<label for="2119_fullship">7번</label>
 				</li>
 			</ul>
@@ -1241,40 +1241,51 @@
 	
 	// 모든 데이터 비표시
 	function clearAllData() {
-		clearAllDataAPI();
+		clearAllDataAPI(managerFactory);
+	}
+	
+	function drawCheckedData(checkboxName) {
+		var checkCount = $("input[name='" + checkboxName + "']:checked").length;
+		var dataNameArray = new Array(checkCount);
+		var dataUrlArray = new Array(checkCount);
+		var dataCount = 0;
+		$("input[name='" + checkboxName + "']:checked").each(function(index) {
+			dataNameArray[index] = $(this).val();
+			dataUrlArray[index] = jsonUrl + $(this).val();
+			if(checkCount === (dataCount + 1)) {
+				drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+			}
+			dataCount++;
+		});
 	}
 	
 	// 전체 선택 
 	$("#chk_all").click(function() {
-		$(":checkbox[name=renderingFileName]").prop("checked", this.checked);
+		$(":checkbox[name=defaultShip]").prop("checked", this.checked);
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("defaultShip");
 	});
 	
 	// fullship
 	$("#2119_fullship").click(function() {
-		var dataNameArray = new Array(1);
-		var dataUrlArray = new Array();
-		dataNameArray[0] = $(this).val();
-		dataUrlArray[0] = jsonUrl + $(this).val();
-		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+		// 
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("defaultShip");
 	});
 	
 	// deploy
 	$("#2119_deploy").click(function() {
-		var dataNameArray = new Array(1);
-		var dataUrlArray = new Array();
-		dataNameArray[0] = $(this).val();
-		dataUrlArray[0] = jsonUrl + $(this).val();
-		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("defaultShip");
 	});
 	
 	// decoration
 	$("#decoration").click(function() {
-		var dataNameArray = new Array(1);
-		var dataUrlArray = new Array();
-		dataNameArray[0] = $(this).val();
-		dataUrlArray[0] = jsonUrl + $(this).val();
-		drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("decoration");
 	});
+	
+	// createStepsShip
 	
 	/* $("#drawAppendData").click(function() {
 		var checkCount = $("input[name=renderingFileName]:checked").length;

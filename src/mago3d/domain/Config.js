@@ -105,6 +105,14 @@ MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray)
 };
 
 /**
+ * 모든 데이터를 삭제함
+ */
+MagoConfig.clearAllData = function() 
+{
+	this.dataMap.clear();
+}
+	
+/**
  * TODO 이건 나중에 활요. 사용하지 않음
  * check 되지 않은 데이터들을 삭제함
  * @param key map에 저장될 key
