@@ -163,10 +163,10 @@
 					 "data_id" : 0,
 					 "data_key" : "WeldingMachine_Blue",
 					 "data_name" : "WeldingMachine_Blue",
-					 "heading" : 97.5,
-					   "height" : 40.0,
-					   "latitude" : 34.91036421619133,
-					   "longitude" : 128.59727401506876,
+					 "heading" : 0.0,
+					   "height" : -9.0,
+					   "latitude" : 34.899647897872505,
+					   "longitude" : 128.60905502731697,
 					   "pitch" : 0.0,
 					   "roll" : 0.0
 				}
