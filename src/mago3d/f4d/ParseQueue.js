@@ -58,8 +58,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				{
 					//node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
 					node = neoBuilding.nodeOwner;
-					rootNode = node.getRoot();
+					if(node)
+						rootNode = node.getRoot();
+					else
+						rootNode = undefined;
 				}
+				
+				if(rootNode === undefined)
+					continue;
 				
 				if (rootNode.data == undefined)
 				{ continue; }
