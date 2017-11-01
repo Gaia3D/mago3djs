@@ -58,7 +58,7 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue) 
+HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue, resultNodesArray) 
 {
 	return this.nodesMap.get(dataNameValue);
 };

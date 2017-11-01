@@ -2537,7 +2537,8 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
-				node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				//node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				node = neoBuilding.nodeOwner;
 				
 				var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 				headerVersion = neoBuilding.getHeaderVersion();
@@ -2589,7 +2590,8 @@ MagoManager.prototype.manageQueue = function()
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
 				{
-					node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+					//node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+					node = neoBuilding.nodeOwner;
 				}
 				geoLocDataManager = this.getNodeGeoLocDataManager(node);
 				
@@ -2955,6 +2957,10 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
 			//continue; 
 		}
+		//else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		//{
+		//	this.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
+		//}
 		
 		// 4 = parsed.***
 		// now, check if the blocksList is loaded & parsed.***
@@ -4732,6 +4738,7 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		neoBuilding = new NeoBuilding();
+		neoBuilding.nodeOwner = node;
 		node.data.neoBuilding = neoBuilding;
 		nodeBbox = new BoundingBox();
 		node.data.bbox = nodeBbox;
@@ -5596,10 +5603,11 @@ MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
-	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	//var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId); // original.***
+	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
-	if(geoLocDatamanager == undefined)
-		return;
+	if (geoLocDatamanager == undefined)
+	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var latitude = geoLocationData.geographicCoord.latitude;
 	var longitude = geoLocationData.geographicCoord.longitude;
@@ -5616,10 +5624,11 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
-	var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	//var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
-	if(geoLocDatamanager == undefined)
-		return;
+	if (geoLocDatamanager == undefined)
+	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var dividedName = neoBuilding.buildingId.split("_");
 	var dataKey = dividedName[0];
@@ -5665,7 +5674,8 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
  */
 MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) 
 {
-	var node = this.hierarchyManager.getNodeByDataName("nodeId", projectIdAndBlockId);
+	//var node = this.hierarchyManager.getNodeByDataName("nodeId", projectIdAndBlockId);
+	var node = neoBuilding.nodeOwner;
 	if (node === undefined)
 	{ return; }
 	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll) ;
@@ -6402,14 +6412,22 @@ MagoManager.prototype.deleteAll = function ()
 	this.buildingSelected = undefined;
 	this.nodeSelected = undefined;
 	
-	// 1rst, must erase from processQueue and parseQueue. 
+	// erase from processQueue and parseQueue. 
 	this.parseQueue.clearAll();
 	this.processQueue.clearAll();
+	
+	// clear current visibles.
+	if (this.visibleObjControlerBuildings)
+	{ this.visibleObjControlerBuildings.clear(); }
+	if (this.visibleObjControlerNodes)
+	{ this.visibleObjControlerNodes.clear(); }
+	if (this.visibleObjControlerOctrees)
+	{ this.visibleObjControlerOctrees.clear(); }
 	
 	// reset tiles.
 	this.smartTileManager.resetTiles();
 	
-	// delete nodes.
+	// finally delete nodes.
 	this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
 };
 
