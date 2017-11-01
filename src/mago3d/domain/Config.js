@@ -110,7 +110,7 @@ MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray)
 MagoConfig.clearAllData = function() 
 {
 	this.dataMap.clear();
-}
+};
 	
 /**
  * TODO 이건 나중에 활요. 사용하지 않음
