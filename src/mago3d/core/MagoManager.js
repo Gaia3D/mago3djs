@@ -2957,10 +2957,10 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
 			//continue; 
 		}
-		//else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-		//{
-		//	this.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
-		//}
+		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			this.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
+		}
 		
 		// 4 = parsed.***
 		// now, check if the blocksList is loaded & parsed.***
