@@ -129,6 +129,9 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 						rootNode = undefined;
 				}
 				
+				if(rootNode === undefined)
+					continue;
+				
 				if (rootNode.data === undefined)
 				{ continue; }
 				
