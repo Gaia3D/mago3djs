@@ -102,8 +102,8 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 
 	this.deleteObjectsModelReferences(gl, vboMemoryManager);
 	
-	if(this.nodeOwner)
-		this.nodeOwner = undefined;
+	//if(this.nodeOwner)
+	//	this.nodeOwner = undefined;
 
 	// The octree.
 	if (this.octree !== undefined)
