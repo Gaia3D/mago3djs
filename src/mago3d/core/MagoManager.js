@@ -12,10 +12,8 @@ var MagoManager = function()
 	}
 
 	// F4D Data structure & objects.*****************************************
-	//this.bRBuildingProjectsList = new BRBuildingProjectsList(); // Old. Provisionally for old f4d projects.*** !!!
 	this.terranTile = new TerranTile();// use this.***
 	this.renderer = new Renderer();
-	//this.selection = new Selection();
 	this.selectionCandidates = new SelectionCandidates();
 	this.shadersManager = new ShadersManager();
 	this.postFxShadersManager = new PostFxShadersManager();
@@ -62,6 +60,8 @@ var MagoManager = function()
 	
 	this.configInformation;
 	this.cameraFPV = new FirstPersonView();
+	this.myCameraSCX;
+	this.lightCam;
 
 	this.kernel = [ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,
@@ -158,27 +158,6 @@ var MagoManager = function()
 	this.currentSelectedObj_idx = -1;
 	this.currentByteColorPicked = new Uint8Array(4);
 	this.currentShader;
-
-	// SPEED TEST.******************************************************************
-	/*
-	this.renderingTime = 0;
-	this.xdo_rendering_time = 0;
-	this.xdo_rendering_time_arrays = 0;
-
-	this.amountRenderTime = 0;
-	this.xdo_amountRenderTime = 0;
-	this.xdo_amountRenderTime_arrays = 0;
-
-	this.averageRenderTime = 0;
-	this.xdo_averageRenderTime = 0;
-	this.xdo_averageRenderTime_arrays = 0;
-
-	this.allBuildingsLoaded = false;
-	this.renderingCounter = 0;
-	this.averageRenderingCounter = 0;
-
-	this.testFilesLoaded = false;
-	*/
 
 	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
 	this.pointSC= new Point3D();
@@ -409,15 +388,7 @@ MagoManager.prototype.renderOrdered = function(dc)
 {
 	// Function for WebWorldWind.*********************************************************************************************************
 	// Function for WebWorldWind.*********************************************************************************************************
-	// Provisional function.***
-	//this.render_F4D_compRefListWWW(dc, this._compRefList_Container._compRefsList_Array, this, this.f4d_shadersManager);
-	/*
-	var projectionMatrix = WorldWind.Matrix.fromIdentity();
-	var viewport = this.wwd.viewport;
-	projectionMatrix.setToPerspectiveProjection(viewport.width, viewport.height, 0.1, this.wwd.navigator.farDistance);
-    dc.navigatorState = new WorldWind.NavigatorState(dc.navigatorState.modelview, projectionMatrix, viewport, dc.navigatorState.heading, dc.navigatorState.tilt);
-	*/
-	//this.render_Tiles(dc);
+
 	if (this.configInformation === undefined)
 	{
 		this.configInformation = MagoConfig.getPolicy();
@@ -956,6 +927,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// * if this is in Cesium:
 		var scene = this.scene;
 		var uniformState = scene._context.uniformState;
+		
 		//var uniformState = scene._context._us;
 		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
@@ -1002,6 +974,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	this.myCameraSCX.frustum.tangentOfHalfFovy = sceneState.camera.frustum.tangentOfHalfFovy;
 	this.myCameraSCX.frustum.fovRad = sceneState.camera.frustum.fovRad;
 	this.myCameraSCX.frustum.aspectRatio = sceneState.camera.frustum.aspectRatio;
+	
 	
 };
 
@@ -1252,6 +1225,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 	}
 	
+	// lightDepthRender.***
+	
+	
 	// 1) The depth render.**********************************************************************************************************************
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
@@ -1288,10 +1264,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		//this.wwd.drawContext.bindFramebuffer(null);
-		//this.wwd.drawContext.bindProgram(wwwCurrentProgram);
 		gl.activeTexture(gl.TEXTURE0);
-		//gl.bindTexture(gl.TEXTURE_2D, wwwCurrentTexture);
 		this.wwd.drawContext.redrawRequested = true;
 	}
 };
@@ -2956,10 +2929,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
 			//continue; 
-		}
-		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-		{
-			this.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
 		}
 		
 		// 4 = parsed.***
