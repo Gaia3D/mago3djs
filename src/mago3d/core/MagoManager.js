@@ -6357,9 +6357,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "drawAppendData")
 	{
-		var dataJson = api.getDataName();
-		var projectFolderName = api.getProjectId();
-		this.getObjectIndexFileTEST(dataJson, projectFolderName);
+		DrawAPI.drawAppendData(api, this);
 	}
 	else if (apiName === "drawDeleteData")
 	{
