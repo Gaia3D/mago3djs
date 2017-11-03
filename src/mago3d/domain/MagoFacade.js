@@ -414,75 +414,39 @@ function searchDataAPI(managerFactoryInstance, dataKey)
 }
 
 /**
+ * 환경 설정 data map에 key 값의 존재 유무를 판별
+ * @param key 검색 키
+ * @param 
+ */
+function isDataExistAPI(key) {
+	if (MagoConfig.isDataExist(key)) return true;
+	else return false;
+}
+
+/**
  * 데이터를 Rendering
  * @param {Property} managerFactoryInstance
  * @param dataNameArray target data 이름 배열
  * @param dataUrlArray data를 가져올 url 배열
+ * @param dataArray data를 배열
+ * @param objectIndexFilePathArray objectIndexFile 배열
  * @param 
  */
-function drawAppendDataAPI(managerFactoryInstance, dataNameArray, dataUrlArray) 
+function drawAppendDataAPI(managerFactoryInstance, dataNameArray, dataUrlArray, dataArray, objectIndexFilePathArray) 
 {
 	if (dataNameArray.length <= 0) { return; }
 	
 	var api = new API("drawAppendData");
 	dataNameArray.forEach(function(dataName, index) 
 	{
-		if (!MagoConfig.isDataExist(dataName))
+		if (managerFactoryInstance !== null) 
 		{
-			console.log("not exist. dataName = " + dataName);
-			var objectIndexFilePath = null;
-			$.ajax({
-				url      : dataUrlArray[index],
-				type     : "GET",
-				dataType : "json",
-				success  : function(serverData)
-				{
-					MagoConfig.setData(dataName, serverData);
-					MagoConfig.setObjectIndexFile(serverData.data_key, serverData.data_key);
-					
-					if (managerFactoryInstance !== null) 
-					{
-						api.setDataName(dataName);
-						api.setProjectId(serverData.data_key);
-						managerFactoryInstance.callAPI(api);
-					}
-				},
-				error: function(request, status, error)
-				{
-					//alert(JS_MESSAGE["ajax.error.message"]);
-					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-				}
-			});
-		}
-	});
-}
-
-/**
- * 데이터를 Rendering
- * @param {Property} managerFactoryInstance
- * @param type append = 추가, delete = 삭제
- * @param dataNameArray target data 이름 배열
- * @param dataUrlArray data를 가져올 url 배열
- * @param 
- */
-function drawDeleteDataAPI(managerFactoryInstance, dataNameArray, dataUrlArray) 
-{
-	if (dataNameArray.length <= 0) { return; }
-	
-	var api = new API("drawDeleteData");
-	dataNameArray.forEach(function(dataName, index) 
-	{
-		if (MagoConfig.isDataExist(dataName))
-		{
-			var data = MagoConfig.getData(dataName);
-			MagoConfig.deleteData(dataName);
-			MagoConfig.deleteObjectIndexFile(data.data_key);
+			MagoConfig.setData(dataName, dataArray[index]);
+			MagoConfig.setObjectIndexFile(objectIndexFilePathArray[index], objectIndexFilePathArray[index]);
 			
-			if (managerFactoryInstance !== null) 
-			{
-				api.setProjectId(data.data_key);
-				managerFactoryInstance.callAPI(api);
-			}
+			api.setDataName(dataName);
+			api.setProjectId(dataArray[index].data_key);
+			managerFactoryInstance.callAPI(api);
 		}
 	});
 }
