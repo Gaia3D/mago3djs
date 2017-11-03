@@ -31,6 +31,21 @@ var Color = function()
  * @param blue 변수
  * @param alpha 변수
  */
+Color.prototype.copyFrom = function(color) 
+{
+	this.r = color.r;
+	this.g = color.g;
+	this.b = color.b;
+	this.a = color.a;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param red 변수
+ * @param green 변수
+ * @param blue 변수
+ * @param alpha 변수
+ */
 Color.prototype.deleteObjects = function() 
 {
 	this.r = undefined;

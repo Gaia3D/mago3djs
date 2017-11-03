@@ -19,6 +19,41 @@ var VertexList = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertex
  */
+VertexList.prototype.deleteObjects = function() 
+{
+	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
+	{
+		this.vertexArray[i].deleteObjects();
+		this.vertexArray[i] = undefined;
+	}
+	this.vertexArray = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertex
+ */
+VertexList.prototype.copyFrom = function(vertexList) 
+{
+	// first reset vertexArray.
+	this.deleteObjects();
+	this.vertexArray = [];
+	
+	var vertex;
+	var myVertex;
+	var vertexCount = vertexList.getVertexCount();
+	for (var i=0; i<vertexCount; i++)
+	{
+		vertex = vertexList.getVertex(i);
+		myVertex = this.newVertex();
+		myVertex.copyFrom(vertex);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertex
+ */
 VertexList.prototype.newVertex = function() 
 {
 	var vertex = new Vertex();

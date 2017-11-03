@@ -22,6 +22,20 @@ var VertexMatrix = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
+VertexMatrix.prototype.deleteObjects = function() 
+{
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
+	{
+		this.vertexListsArray[i].deleteObjects();
+		this.vertexListsArray[i] = undefined;
+	}
+	this.vertexListsArray = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 VertexMatrix.prototype.newVertexList = function() 
 {
 	var vertexList = new VertexList();
@@ -43,6 +57,51 @@ VertexMatrix.prototype.getVertexList = function(idx)
 	else 
 	{
 		return undefined;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexListArray[idx]
+ */
+VertexMatrix.prototype.extrude = function(profile, extrusionVector, extrusionDist, extrudeSegmentsCount) 
+{
+	// reset the vertexMatrix.
+	this.deleteObjects();
+	this.vertexListsArray = [];
+	
+	if (extrudeSegmentsCount === undefined)
+	{ extrudeSegmentsCount = 1; }
+	
+	// 1rst, copy the profile in the 1rst vertexList of vertexMatrix.
+	var firstVertexList = this.newVertexList();
+	firstVertexList.copyFrom(profile);
+	var vertexCount = firstVertexList.getVertexCount();
+	
+	// now make extrude profiles segment by segment.
+	var segmentDist = extrusionDist/extrudeSegmentsCount;
+	var currentExtrudeDist;
+	var vertexList;
+	var topVertex;
+	var topPosition;
+	var baseVertex;
+	var basePosition;
+	for (var i=0; i<extrudeSegmentsCount; i++)
+	{
+		currentExtrudeDist = segmentDist *(1+i);
+		vertexList = this.newVertexList();
+		for (var j=0; j<vertexCount; j++)
+		{
+			baseVertex = firstVertexList.getVertex(j);
+			basePosition = baseVertex.point3d;
+			topVertex = vertexList.newVertex();
+			if (topVertex.point3d === undefined)
+			{ topVertex.point3d = new Point3D(); }
+			
+			topPosition = topVertex.point3d;
+			topPosition.set(basePosition.x + extrusionVector.x * currentExtrudeDist, basePosition.y + extrusionVector.y * currentExtrudeDist, basePosition.z + extrusionVector.z * currentExtrudeDist );
+		}
 	}
 };
 
