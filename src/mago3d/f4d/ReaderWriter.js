@@ -14,9 +14,6 @@ var ReaderWriter = function()
 	//this.geometryDataPath = "/F4D_GeometryData";
 	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
 	this.geometrySubDataPath;
-	this.viArraysContainer = new VertexIdxVBOArraysContainer();
-	this.byteColorsVBOArraysContainer = new ByteColorsVBOArraysContainer();
-	//var simpleBuildingImage = new Image();
 
 	this.j_counter;
 	this.k_counter;

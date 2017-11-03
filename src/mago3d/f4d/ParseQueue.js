@@ -58,14 +58,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				{
 					//node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
 					node = neoBuilding.nodeOwner;
-					if(node)
-						rootNode = node.getRoot();
+					if (node)
+					{ rootNode = node.getRoot(); }
 					else
-						rootNode = undefined;
+					{ rootNode = undefined; }
 				}
 				
-				if(rootNode === undefined)
-					continue;
+				if (rootNode === undefined)
+				{ continue; }
 				
 				if (rootNode.data == undefined)
 				{ continue; }
@@ -129,14 +129,14 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				{
 					//node = magoManager.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
 					node = neoBuilding.nodeOwner;
-					if(node)
-						rootNode = node.getRoot();
+					if (node)
+					{ rootNode = node.getRoot(); }
 					else
-						rootNode = undefined;
+					{ rootNode = undefined; }
 				}
 				
-				if(rootNode === undefined)
-					continue;
+				if (rootNode === undefined)
+				{ continue; }
 				
 				if (rootNode.data === undefined)
 				{ continue; }
