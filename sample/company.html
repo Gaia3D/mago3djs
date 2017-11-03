@@ -1247,14 +1247,39 @@
 		var checkCount = $("input[name='" + checkboxName + "']:checked").length;
 		var dataNameArray = new Array(checkCount);
 		var dataUrlArray = new Array(checkCount);
+		var dataArray = new Array(checkCount);
+		var objectIndexFilePathArray = new Array(checkCount);
 		var dataCount = 0;
 		$("input[name='" + checkboxName + "']:checked").each(function(index) {
-			dataNameArray[index] = $(this).val();
-			dataUrlArray[index] = jsonUrl + $(this).val();
-			if(checkCount === (dataCount + 1)) {
-				drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
+			var dataName = $(this).val();
+			if (!isDataExistAPI(dataName))
+			{
+				$.ajax({
+					url      : jsonUrl + dataName,
+					type     : "GET",
+					dataType : "json",
+					success  : function(serverData)
+					{
+						dataNameArray[index] = dataName;
+						dataUrlArray[index] = jsonUrl + dataName;
+						dataArray[index] = serverData;
+						objectIndexFilePathArray[index] = serverData.data_key;
+											
+						if(checkCount === (dataCount + 1)) {
+							drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray, dataArray, objectIndexFilePathArray);
+						}
+						dataCount++;
+					},
+					error: function(request, status, error)
+					{
+						//alert(JS_MESSAGE["ajax.error.message"]);
+						console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+					}
+				});
+			} else {
+				console.log("########## data Exist. name = " + dataName);
+				dataCount++;
 			}
-			dataCount++;
 		});
 	}
 	
