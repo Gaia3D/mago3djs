@@ -129,7 +129,6 @@ var MagoManager = function()
 
 	this.bPicking = false;
 	this.scene;
-	this.renderingModeTemp = 0; // 0 = assembled mode. 1 = dispersed mode.***
 
 	this.numFrustums;
 	this.isLastFrustum = false;
@@ -1021,14 +1020,11 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
  */
 MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
 {
-	if (this.renderingModeTemp === 0) 
+	//if (!isLastFrustum) { return; }
+	if (numFrustums > 2)
 	{
-		//if (!isLastFrustum) { return; }
-		if (numFrustums > 2)
-		{
-			if (frustumIdx === 0 )
-			{ return; }
-		}
+		if (frustumIdx === 0 )
+		{ return; }
 	}
 
 	this.numFrustums = numFrustums;
@@ -5022,12 +5018,7 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	if (this.renderingModeTemp === 0)
-	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
-	if (this.renderingModeTemp === 1)
-	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
-	if (this.renderingModeTemp === 2)
-	{ this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0; }
+	this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0;
 
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
@@ -6072,10 +6063,6 @@ MagoManager.prototype.callAPI = function(api)
 	if (apiName === "changeMagoState") 
 	{
 		this.magoPolicy.setMagoEnable(api.getMagoEnable());
-	}
-	else if (apiName === "changeRender") 
-	{
-		this.renderingModeTemp = api.getRenderMode();
 	}
 	else if (apiName === "searchData") 
 	{

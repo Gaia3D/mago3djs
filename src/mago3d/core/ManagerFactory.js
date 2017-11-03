@@ -290,7 +290,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 	function initRenderMode() 
 	{
 		var api = new API("renderMode");
-		api.setRenderMode("1");
 		magoManager.callAPI(api);
 
 		if (MagoConfig.getPolicy().geo_time_line_enable === "false") 

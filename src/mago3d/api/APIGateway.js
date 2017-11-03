@@ -18,22 +18,7 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 	{
 		managerFactoryInstance.callAPI(api);
 	}
-}
-
-/**
- * render mode
- * @param {Property} managerFactoryInstance 
- * @param {Property} renderMode 0 = 호선, 1 = 지번전개
- */
-function changeRenderAPI(managerFactoryInstance, renderMode) 
-{
-	var api = new API("changeRender");
-	api.setRenderMode(renderMode);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
-}
+};
 
 /**
  * outfitting 표시/비표시
