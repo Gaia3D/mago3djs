@@ -16,9 +16,77 @@ var Vertex = function()
 	}
 	
 	this.point3d = new Point3D();
-	this.normal;
-	this.texCoord;
-	this.color4;
+	this.normal; // class: Point3D.
+	this.texCoord; // class: Point2D.
+	this.color4; // class: Color.
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Vertex.prototype.deleteObjects = function() 
+{
+	if (this.point3d)
+	{ this.point3d.deleteObjects(); }
+	if (this.normal)
+	{ this.normal.deleteObjects(); }
+	if (this.texCoord)
+	{ this.texCoord.deleteObjects(); }
+	if (this.color4)
+	{ this.color4.deleteObjects(); }
+	
+	this.point3d = undefined;
+	this.normal = undefined;
+	this.texCoord = undefined;
+	this.color4 = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Vertex.prototype.copyFrom = function(vertex) 
+{
+	// copy position if exist.
+	if (vertex.point3d)
+	{
+		if (this.point3d === undefined)
+		{ this.point3d = new Point3D(); }
+		
+		this.point3d.copyFrom(vertex.point3d);
+	}
+	
+	// copy normal if exist.
+	if (vertex.normal)
+	{
+		if (this.normal === undefined)
+		{ this.normal = new Point3D(); }
+		
+		this.normal.copyFrom(vertex.normal);
+	}
+	
+	// copy texCoord if exist.
+	if (vertex.texCoord)
+	{
+		if (this.texCoord === undefined)
+		{ this.texCoord = new Point2D(); }
+		
+		this.texCoord.copyFrom(vertex.texCoord);
+	}
+	
+	// copy color4 if exist.
+	if (vertex.color4)
+	{
+		if (this.color4 === undefined)
+		{ this.color4 = new Color(); }
+		
+		this.color4.copyFrom(vertex.color4);
+	}
 };
 
 /**

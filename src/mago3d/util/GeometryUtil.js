@@ -41,21 +41,7 @@ ByteColor.prototype.set = function(byteRed, byteGreen, byteBlue)
 	this.ByteB = byteBlue;
 };
 
-/**
-* 어떤 일을 하고 있습니까?
-* @class Point2D
-*/
-var Point2D = function() 
-{
-	if (!(this instanceof Point2D)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
 
-	this.x = 0.0;
-	this.y = 0.0;
-	this.IdxInIist; // delete this.***
-};
 
 /**
  * 어떤 일을 하고 있습니까?
