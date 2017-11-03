@@ -403,9 +403,10 @@ function searchDataAPI(managerFactoryInstance, dataKey)
  * @param key 검색 키
  * @param 
  */
-function isDataExistAPI(key) {
-	if (MagoConfig.isDataExist(key)) return true;
-	else return false;
+function isDataExistAPI(key) 
+{
+	if (MagoConfig.isDataExist(key)) { return true; }
+	else { return false; }
 }
 
 /**

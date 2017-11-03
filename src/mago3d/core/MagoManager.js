@@ -62,6 +62,7 @@ var MagoManager = function()
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
 	this.lightCam;
+	this.magoGeometryTest;
 
 	this.kernel = [ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,
@@ -1252,6 +1253,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.renderLowestOctreeAsimetricVersion(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	this.swapRenderingFase();
 	
+	// 3) test mago geometries.***********************************************************************************************************
+	this.renderMagoGeometries();
+	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
@@ -1265,6 +1269,16 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	}
 };
 
+/**
+ * Draw building names on scene.
+ */
+MagoManager.prototype.renderMagoGeometries = function() 
+{
+	if (this.magoGeometryTest == undefined)
+	{
+		this.magoGeometryTest = new ParametricMesh();
+	}
+};
 
 /**
  * Draw building names on scene.
