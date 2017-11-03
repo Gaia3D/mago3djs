@@ -40,8 +40,6 @@ function API(apiName)
 	// drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
 	this.drawType = 0;
 
-	// fullship = 0, deploy = 1
-	this.renderMode = 0;
 	// 위도
 	this.latitude = 0;
 	// 경도
@@ -183,15 +181,6 @@ API.prototype.getDataKey = function()
 API.prototype.setDataKey = function(dataKey) 
 {
 	this.dataKey = dataKey;
-};
-
-API.prototype.getRenderMode = function() 
-{
-	return this.renderMode;
-};
-API.prototype.setRenderMode = function(renderMode) 
-{
-	this.renderMode = renderMode;
 };
 
 API.prototype.getLatitude = function() 
