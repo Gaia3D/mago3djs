@@ -13,8 +13,8 @@ var ParametricMesh = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.profile; // class: VertexList. use as auxiliar.
-	this.vertexMatrix; // class: VertexMatrix.
+	this.profilesList; // class: ProfilesList.
+	this.trianglesMatrix;
 };
 
 /**
@@ -22,15 +22,20 @@ var ParametricMesh = function()
  */
 ParametricMesh.prototype.extrude = function(profile, extrusionVector, extrusionDist, extrudeSegmentsCount) 
 {
-	if (this.vertexMatrix === undefined)
+	if (this.profilesList === undefined)
 	{
-		this.vertexMatrix = new VertexMatrix();
+		this.profilesList = new ProfilesList();
 	}
 	
 	if (extrudeSegmentsCount === undefined)
 	{ extrudeSegmentsCount = 1; }
 	
-	// reset the vertexMatrix.
-	this.vertexMatrix.extrude(profile, extrusionVector, extrusionDist, extrudeSegmentsCount);
+	// 1rst, make a profilesList extrude.
+	this.profilesList.deleteObjects(); // init.
+	this.profilesList.extrude(profile, extrusionVector, extrusionDist, extrudeSegmentsCount);
+	
+	// now, make the bottomCap, topCap, and lateral triangles.
+	this.trianglesMatrix = new TrianglesMatrix();
+	
 	
 };

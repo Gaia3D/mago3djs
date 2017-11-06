@@ -19,6 +19,7 @@ var Vertex = function()
 	this.normal; // class: Point3D.
 	this.texCoord; // class: Point2D.
 	this.color4; // class: Color.
+	this.outHalfEdge; // class: HalfEdge.
 };
 
 /**
