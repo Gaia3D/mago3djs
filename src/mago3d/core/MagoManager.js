@@ -1281,28 +1281,29 @@ MagoManager.prototype.renderMagoGeometries = function()
 		
 		// make a extrude object.***
 		// create a profile.
-		var profile = new VertexList();
+		var profile = new Profile();
 		var extrusionVector = new Point3D();
 		extrusionVector.set(0.0, 0.0, 1.0);
 		var extrusionDist = 10.0;
 		
 		// make a concave profile ( a "L" shape).***
-		var vertex = profile.newVertex();
+		var outer = profile.getOuter();
+		var vertex = outer.newVertex();
 		vertex.setPosition(1.0, 0.0, 0.0);
 		
-		vertex = profile.newVertex();
+		vertex = outer.newVertex();
 		vertex.setPosition(1.0, 3.0, 0.0);
 		
-		vertex = profile.newVertex();
+		vertex = outer.newVertex();
 		vertex.setPosition(3.0, 3.0, 0.0);
 		
-		vertex = profile.newVertex();
+		vertex = outer.newVertex();
 		vertex.setPosition(3.0, 5.0, 0.0);
 		
-		vertex = profile.newVertex();
+		vertex = outer.newVertex();
 		vertex.setPosition(0.0, 5.0, 0.0);
 		
-		vertex = profile.newVertex();
+		vertex = outer.newVertex();
 		vertex.setPosition(0.0, 0.0, 0.0);
 		
 		// now extrude or revolve.***
