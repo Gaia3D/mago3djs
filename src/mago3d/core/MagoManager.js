@@ -5735,29 +5735,20 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
  */
 MagoManager.prototype.getObjectIndexFileTEST = function(projectIdArray, projectDataFolderArray) 
 {
-	this.buildingSeedList = new BuildingSeedList();
-	var fileName;
-	var geometrySubDataPath = projectDataFolderArray;
-	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, projectIdArray);
-
-	/*
-	// 손책임님 계속
 	if (this.configInformation === undefined)
 	{
 		this.configInformation = MagoConfig.getPolicy();
 	}
-
-	this.buildingSeedList = new BuildingSeedList();
-	var fileName;
-	var objectsIndexFilesCount = objectIndexFilePathArray.length;
-	for (var i=0; i<objectsIndexFilesCount; i++)
+	
+	var projectsCount = projectIdArray.length;
+	for (var i=0; i<projectsCount; i++)
 	{
-		var geometrySubDataPath = objectIndexFilePathArray[i];
+		this.buildingSeedList = new BuildingSeedList();
+		var fileName;
+		var geometrySubDataPath = projectDataFolderArray[i];
 		fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, serverDataKeyArray[i]);
+		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, CODE.PROJECT_ID_PREFIX + projectIdArray[i]);
 	}
-	*/
 };
 
 /**
