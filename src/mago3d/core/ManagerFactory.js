@@ -196,7 +196,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		//viewer.scene.magoManager.getObjectIndexFile();
 		if (projectIdArray !== null && projectIdArray.length > 0) 
 		{
-			viewer.scene.magoManager.getObjectIndexFileTEST(projectIdArray, projectDataFolderArray);
+			for(var i=0; i<projectIdArray.length; i++) {
+				viewer.scene.magoManager.getObjectIndexFileTEST(projectIdArray[i], projectDataFolderArray[i]);
+			}
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();

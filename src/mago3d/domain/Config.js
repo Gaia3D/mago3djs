@@ -92,6 +92,7 @@ MagoConfig.setProjectDataFolder = function(projectDataFolder, value)
 MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
 	this.dataMap = new Map();
+	this.commandCacheMap = new Map();
 	this.serverPolicy = serverPolicy;
 	if (projectIdArray !== null && projectIdArray.length > 0) 
 	{

@@ -12,12 +12,11 @@
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeMagoState");
 	api.setMagoEnable(isShow);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 };
 
 /**
@@ -27,12 +26,11 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
  */
 function changeOutFittingAPI(managerFactoryInstance, isShow) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeOutFitting");
 	api.setShowOutFitting(isShow);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -42,12 +40,11 @@ function changeOutFittingAPI(managerFactoryInstance, isShow)
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeLabel");
 	api.setShowLabelInfo(isShow);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -57,12 +54,11 @@ function changeLabelAPI(managerFactoryInstance, isShow)
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeBoundingBox");
 	api.setShowBoundingBox(isShow);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -72,12 +68,11 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  */
 function changeShadowAPI(managerFactoryInstance, isShow) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeShadow");
 	api.setShowShadow(isShow);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -87,12 +82,11 @@ function changeShadowAPI(managerFactoryInstance, isShow)
  */
 function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changefrustumFarDistance");
 	api.setFrustumFarDistance(frustumFarDistance);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -104,14 +98,13 @@ function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance)
  */
 function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, objectIds) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeHighLighting");
 	api.setProjectId(projectId);
 	api.setBlockIds(blockIds);
 	api.setObjectIds(objectIds);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -124,15 +117,14 @@ function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, obje
  */
 function changeColorAPI(managerFactoryInstance, projectId, blockIds, objectIds, color) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeColor");
 	api.setProjectId(projectId);
 	api.setBlockIds(blockIds);
 	api.setObjectIds(objectIds);
 	api.setColor(color);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -148,6 +140,8 @@ function changeColorAPI(managerFactoryInstance, projectId, blockIds, objectIds, 
  */
 function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude, longitude, height, heading, pitch, roll) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeLocationAndRotation");
 	api.setDataKey(data_key);
 	api.setLatitude(latitude);
@@ -156,10 +150,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -169,12 +160,11 @@ function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude
  */
 function changeMouseMoveAPI(managerFactoryInstance, mouseMoveMode) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeMouseMove");
 	api.setMouseMoveMode(mouseMoveMode);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -184,12 +174,11 @@ function changeMouseMoveAPI(managerFactoryInstance, mouseMoveMode)
  */
 function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeInsertIssueMode");
 	api.setIssueInsertEnable(flag);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -199,12 +188,11 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
  */
 function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeObjectInfoViewMode");
 	api.setObjectInfoViewEnable(flag);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -215,13 +203,12 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
  */
 function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeOcclusionCulling");
 	api.setOcclusionCullingEnable(flag);
 	api.setDataKey(dataKey);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -231,12 +218,11 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
  */
 function changeFPVModeAPI(managerFactoryInstance, flag)
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeFPVMode");
 	api.setFPVMode(flag);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -246,12 +232,11 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
  */
 function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeNearGeoIssueListViewMode");
 	api.setNearGeoIssueListEnable(flag);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -262,12 +247,11 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
  */
 function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeInsertIssueState");
 	api.setInsertIssueState(insertIssueState);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -280,15 +264,14 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
  */
 function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeLod");
 	api.setLod0DistInMeters(lod0DistInMeters);
 	api.setLod1DistInMeters(lod1DistInMeters);
 	api.setLod2DistInMeters(lod2DistInMeters);
 	api.setLod3DistInMeters(lod3DistInMeters);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -302,16 +285,15 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
  */
 function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeLighting");
 	api.setAmbientReflectionCoef(ambientReflectionCoef);
 	api.setDiffuseReflectionCoef(diffuseReflectionCoef);
 	api.setSpecularReflectionCoef(specularReflectionCoef);
 	api.setAmbientColor(ambientColor);
 	api.setSpecularColor(specularColor);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -321,12 +303,11 @@ function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffus
  */
 function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("changeSsadRadius");
 	api.setSsaoRadius(ssaoRadius);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -335,12 +316,11 @@ function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
  */
 function clearAllDataAPI(managerFactoryInstance)
 {	
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("clearAllData");
-	if (managerFactoryInstance !== null) 
-	{
-		MagoConfig.clearAllData();
-		managerFactoryInstance.callAPI(api);
-	}
+	MagoConfig.clearAllData();
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -356,6 +336,8 @@ function clearAllDataAPI(managerFactoryInstance)
  */
 function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("drawInsertIssueImage");
 	api.setDrawType(drawType);
 	api.setIssueId(issue_id);
@@ -364,10 +346,7 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);
 	api.setElevation(height);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -377,10 +356,9 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
  */
 function mouseMoveAPI(managerFactoryInstance, eventType) 
 {
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.mouseMove(eventType);
-	}
+	if (managerFactoryInstance === null) return; 
+	
+	managerFactoryInstance.mouseMove(eventType);
 }
 
 /**
@@ -390,12 +368,11 @@ function mouseMoveAPI(managerFactoryInstance, eventType)
  */
 function searchDataAPI(managerFactoryInstance, dataKey) 
 {
+	if (managerFactoryInstance === null) return; 
+	
 	var api = new API("searchData");
 	api.setDataKey(dataKey);
-	if (managerFactoryInstance !== null) 
-	{
-		managerFactoryInstance.callAPI(api);
-	}
+	managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -412,27 +389,26 @@ function isDataExistAPI(key)
 /**
  * 데이터를 Rendering
  * @param {Property} managerFactoryInstance
- * @param dataNameArray target data 이름 배열
- * @param dataUrlArray data를 가져올 url 배열
- * @param dataArray data를 배열
- * @param objectIndexFilePathArray objectIndexFile 배열
+ * @param projectIdArray 프로젝트 이름들
+ * @param projectDataArray 프로젝트 데이터들
+ * @param projectDataFolderArray 프로젝트 f4d 파일 경로
  * @param 
  */
-function drawAppendDataAPI(managerFactoryInstance, dataNameArray, dataUrlArray, dataArray, objectIndexFilePathArray) 
+function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataArray, projectDataFolderArray) 
 {
-	if (dataNameArray.length <= 0) { return; }
+	if (managerFactoryInstance === null) return; 
+	
+	if (projectIdArray.length <= 0) { return; }
 	
 	var api = new API("drawAppendData");
-	dataNameArray.forEach(function(dataName, index) 
+	projectIdArray.forEach(function(dataName, index) 
 	{
-		if (managerFactoryInstance !== null) 
-		{
-			MagoConfig.setData(dataName, dataArray[index]);
-			MagoConfig.setObjectIndexFile(objectIndexFilePathArray[index], objectIndexFilePathArray[index]);
 			
-			api.setDataName(dataName);
-			api.setProjectId(dataArray[index].data_key);
-			managerFactoryInstance.callAPI(api);
-		}
+		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + dataName, projectDataArray[index]);
+		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolderArray[index], projectDataFolderArray[index]);
+		
+		api.setProjectId(dataName);
+		api.setProjectDataFolder(projectDataFolderArray[index]);
+		managerFactoryInstance.callAPI(api);
 	});
 }

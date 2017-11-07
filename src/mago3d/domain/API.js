@@ -21,10 +21,9 @@ function API(apiName)
 	// api 이름
 	this.apiName = apiName;
 	
-	// data 전체 이름. json 파일의 이름
-	this.dataName = null;
 	// project id
 	this.projectId = null;
+	this.projectDataFolder = null;
 	// block id
 	this.blockId = null;
 	// blockIds
@@ -112,15 +111,6 @@ API.prototype.getAPIName = function()
 	return this.apiName;
 };
 
-API.prototype.getDataName = function() 
-{
-	return this.dataName;
-};
-API.prototype.setDataName = function(dataName) 
-{
-	this.dataName = dataName;
-};
-
 API.prototype.getProjectId = function() 
 {
 	return this.projectId;
@@ -128,6 +118,15 @@ API.prototype.getProjectId = function()
 API.prototype.setProjectId = function(projectId) 
 {
 	this.projectId = projectId;
+};
+
+API.prototype.getProjectDataFolder = function() 
+{
+	return this.projectDataFolder;
+};
+API.prototype.setProjectDataFolder = function(projectDataFolder) 
+{
+	this.projectDataFolder = projectDataFolder;
 };
 
 API.prototype.getBlockId = function() 

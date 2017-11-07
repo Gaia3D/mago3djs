@@ -9,7 +9,5 @@ var DrawAPI = {};
 
 DrawAPI.drawAppendData = function(api, magoManager) 
 {
-	var dataJson = api.getDataName();
-	var projectFolderName = api.getProjectId();
-	magoManager.getObjectIndexFileTEST(dataJson, projectFolderName);
+	magoManager.getObjectIndexFileTEST(api.getProjectId(), api.getProjectDataFolder());
 };

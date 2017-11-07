@@ -5733,22 +5733,18 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.getObjectIndexFileTEST = function(projectIdArray, projectDataFolderArray) 
+MagoManager.prototype.getObjectIndexFileTEST = function(projectId, projectDataFolder) 
 {
 	if (this.configInformation === undefined)
 	{
 		this.configInformation = MagoConfig.getPolicy();
 	}
 	
-	var projectsCount = projectIdArray.length;
-	for (var i=0; i<projectsCount; i++)
-	{
-		this.buildingSeedList = new BuildingSeedList();
-		var fileName;
-		var geometrySubDataPath = projectDataFolderArray[i];
-		fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, CODE.PROJECT_ID_PREFIX + projectIdArray[i]);
-	}
+	this.buildingSeedList = new BuildingSeedList();
+	var fileName;
+	var geometrySubDataPath = projectDataFolder;
+	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, CODE.PROJECT_ID_PREFIX + projectId);
 };
 
 /**

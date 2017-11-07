@@ -697,8 +697,8 @@
 		} else {
 			var defaultProjectArray = serverPolicy.geo_data_default_projects;
 			var projectIdArray = new Array(defaultProjectArray.length);
-			var dataArray = new Array(defaultProjectArray.length);
-			var dataFolderArray = new Array(defaultProjectArray.length);
+			var projectDataArray = new Array(defaultProjectArray.length);
+			var projectDataFolderArray = new Array(defaultProjectArray.length);
 			
 			var dataCount = 0;
 			defaultProjectArray.forEach(function(projectId, index) {
@@ -710,10 +710,10 @@
 					dataType: "json",
 					success: function(serverData){
 						console.log("index = " + index + ", data = " + serverData);
-						dataArray[index] = serverData;
-						dataFolderArray[index] = serverData.data_key;
+						projectDataArray[index] = serverData;
+						projectDataFolderArray[index] = serverData.data_key;
 						if(defaultProjectArray.length === (dataCount + 1)) {
-							createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath);
+							createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
 						}
 						dataCount++;
 					},
@@ -725,8 +725,8 @@
 		}
 	}
 	
-	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath) {
-		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath);
+	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
+		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
 	}
 	
 	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
@@ -1256,14 +1256,13 @@
 	
 	function drawCheckedData(checkboxName) {
 		var checkCount = $("input[name='" + checkboxName + "']:checked").length;
-		var dataNameArray = new Array(checkCount);
-		var dataUrlArray = new Array(checkCount);
-		var dataArray = new Array(checkCount);
-		var objectIndexFilePathArray = new Array(checkCount);
+		var projectIdArray = new Array(checkCount);
+		var projectDataArray = new Array(checkCount);
+		var projectDataFolderArray = new Array(checkCount);
 		var dataCount = 0;
 		$("input[name='" + checkboxName + "']:checked").each(function(index) {
 			var dataName = $(this).val();
-			if (!isDataExistAPI(dataName))
+			if (!isDataExistAPI(CODE.PROJECT_ID_PREFIX + dataName))
 			{
 				$.ajax({
 					url      : dataInformationUrl + dataName,
@@ -1271,13 +1270,12 @@
 					dataType : "json",
 					success  : function(serverData)
 					{
-						dataNameArray[index] = dataName;
-						dataUrlArray[index] = dataInformationUrl + dataName;
-						dataArray[index] = serverData;
-						objectIndexFilePathArray[index] = serverData.data_key;
+						projectIdArray[index] = dataName;
+						projectDataArray[index] = serverData;
+						projectDataFolderArray[index] = serverData.data_key;
 											
 						if(checkCount === (dataCount + 1)) {
-							drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray, dataArray, objectIndexFilePathArray);
+							drawAppendDataAPI(managerFactory, projectIdArray, projectDataArray, projectDataFolderArray);
 						}
 						dataCount++;
 					},
@@ -1288,6 +1286,7 @@
 					}
 				});
 			} else {
+				// TODO 이 부분은 조금 수정을 해야 할지도 모르겠다. 데이터는 cache로 있지만 아직 새로 로딩을 해야 하는 경우 배열로 이름을 넘겨줘야 하지 않나?
 				console.log("########## data Exist. name = " + dataName);
 				dataCount++;
 			}
