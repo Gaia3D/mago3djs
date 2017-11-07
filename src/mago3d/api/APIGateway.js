@@ -156,14 +156,42 @@ function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude
 /**
  * 마우스 클릭 객체 이동 대상 변경
  * @param {Property} managerFactoryInstance
- * @param {Property} mouseMoveMode 0 = All, 1 = object, 2 = None
+ * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
  */
-function changeMouseMoveAPI(managerFactoryInstance, mouseMoveMode) 
+function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
 	if (managerFactoryInstance === null) return; 
 	
-	var api = new API("changeMouseMove");
-	api.setMouseMoveMode(mouseMoveMode);
+	var api = new API("changeObjectMove");
+	api.setObjectMoveMode(objectMoveMode);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * 마우스로 이동한 객체 정보를 브라우저내 저장
+ * @param {Property} managerFactoryInstance
+ * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
+ */
+function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
+{
+	if (managerFactoryInstance === null) return; 
+	
+	var api = new API("saveObjectMove");
+	api.setObjectMoveMode(objectMoveMode);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * 브라우저내 모든 마우스 이동 정보를 삭제
+ * @param {Property} managerFactoryInstance
+ * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
+ */
+function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
+{
+	if (managerFactoryInstance === null) return; 
+	
+	var api = new API("deleteAllObjectMove");
+	api.setObjectMoveMode(objectMoveMode);
 	managerFactoryInstance.callAPI(api);
 }
 

@@ -67,7 +67,7 @@ function API(apiName)
 	// frustum culling 가시 거리(M단위)
 	this.frustumFarDistance = 0;
 	// move mode 
-	this.mouseMoveMode = CODE.moveMode.NONE;
+	this.objectMoveMode = CODE.moveMode.NONE;
 	// 이슈 등록 표시
 	this.issueInsertEnable = false;
 	// object 정보 표시
@@ -299,13 +299,13 @@ API.prototype.setFrustumFarDistance = function(frustumFarDistance)
 	this.frustumFarDistance = frustumFarDistance;
 };
 
-API.prototype.getMouseMoveMode = function() 
+API.prototype.getObjectMoveMode = function() 
 {
-	return this.mouseMoveMode;
+	return this.objectMoveMode;
 };
-API.prototype.setMouseMoveMode = function(mouseMoveMode) 
+API.prototype.setObjectMoveMode = function(objectMoveMode) 
 {
-	this.mouseMoveMode = mouseMoveMode;
+	this.objectMoveMode = objectMoveMode;
 };
 
 API.prototype.getIssueInsertEnable = function() 

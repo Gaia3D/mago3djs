@@ -463,12 +463,15 @@
 		</div>
 		<div>
 			<h3>Selecting And Moving</h3>
-			<input type="radio" id="mouseNoneMove" name="mouseMoveMode" value="2" onclick="changeMouseMove('2');"/>
-			<label for="mouseNoneMove"> None </label>
-			<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
-			<label for="mouseAllMove"> ALL </label>
-			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
-			<label for="mouseObjectMove"> Object </label>
+			<input type="radio" id="objectNoneMove" name="objectMoveMode" value="2" onclick="changeObjectMove('2');"/>
+			<label for="objectNoneMove"> None </label>
+			<input type="radio" id="mouseAllMove" name="objectMoveMode" value="0" onclick="changeObjectMove('0');"/>
+			<label for="objectAllMove"> ALL </label>
+			<input type="radio" id="objectMove" name="objectMoveMode" value="1" onclick="changeObjectMove('1');"/>
+			<label for="objectMove"> Object </label>
+			
+			<button type="button" id="saveObjectMoveButton" class="btn">저장</button>
+			<button type="button" id="deleteAllObjectMoveButton" class="btn">전체 삭제</button>
 		</div>
 		<div>
 			<h3>Object Occlusion Culling</h3>
@@ -687,7 +690,7 @@
 			// BoundingBox
 			changeBoundingBox(false);
 			// Selecting And Moving
-			changeMouseMove("2");
+			changeObjectMove("2");
 			// slider, color-picker
 			initRendering();
 			
@@ -1033,7 +1036,9 @@
 			return false;
 		}
 		var searchResult = searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
-		alert(searchResult);
+		if(searchResult === "-1") {
+			alert(searchResult);			
+		}
 	});
 	
 	function flyToBounding(dataKey) {
@@ -1176,10 +1181,27 @@
 		changeBoundingBoxAPI(managerFactory, isShow);
 	}
 	// 마우스 클릭 객체 이동 모드 변경
-	function changeMouseMove(mouseMoveMode) {
-		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
-		changeMouseMoveAPI(managerFactory, mouseMoveMode);
+	function changeObjectMove(objectMoveMode) {
+		$("input:radio[name='objectMoveMode']:radio[value='" + objectMoveMode + "']").prop("checked", true);
+		changeObjectMoveAPI(managerFactory, objectMoveMode);
 	}
+	// 마우스 클릭 객체 이동 모드 변경 저장
+	$("#saveObjectMoveButton").click(function () {
+		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
+		if(objectMoveMode === "2") {
+			alert("None 모드일 경우 저장할 수 없습니다.");
+			return;
+		}
+		saveObjectMoveAPI(objectMoveMode);
+	});
+	// 마우스 클릭 객체 이동 모드 변경 삭제
+	$("#deleteAllObjectMoveButton").click(function () {
+		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
+		if(confirm("삭제 하시겠습니까?")) {
+			deleteAllObjectMoveAPI(objectMoveMode);
+		}
+	});
+	
 	// Object Occlusion culling
 	$("#changeOcclusionCullingButton").click(function () {
 		changeOcclusionCullingAPI(managerFactory, ($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
@@ -1381,6 +1403,11 @@
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
+	
+	// general callback alert function
+	function showApiResult(result) {
+		alert(result);
+	}
 </script>
 </body>
 </html>

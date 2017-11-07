@@ -1865,7 +1865,7 @@ MagoManager.prototype.isDragging = function()
 	// test function.***
 	var gl = this.sceneState.gl;
 
-	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL)	// Moving all
+	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL)	// Moving all
 	{
 		this.arrayAuxSC.length = 0;
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerNodes, this.arrayAuxSC);
@@ -1887,7 +1887,7 @@ MagoManager.prototype.isDragging = function()
 			return false;
 		}
 	}
-	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // Moving object
+	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // Moving object
 	{
 		this.arrayAuxSC.length = 0;
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.visibleObjControlerNodes, this.arrayAuxSC);
@@ -2080,7 +2080,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	this.sceneState.camera.setDirty(true);
 	
 	// distinguish 2 modes.******************************************************
-	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // blocks move.***
+	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // blocks move.***
 	{
 		if (this.buildingSelected !== undefined) 
 		{
@@ -2104,7 +2104,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			this.isCameraMoving = true; // if no object is selected.***
 		}
 	}
-	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
+	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
 		if (this.objectSelected !== undefined) 
 		{
@@ -2144,7 +2144,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
 {
 	//var cameraPosition = this.sceneState.camera.position;
-	if (this.magoPolicy.mouseMoveMode === CODE.moveMode.ALL) // buildings move.***
+	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
 		if (this.selectionCandidates.currentNodeSelected === undefined)
 		{ return; }
@@ -2222,7 +2222,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		
 		//this.buildingSelected.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 	}
-	else if (this.magoPolicy.mouseMoveMode === CODE.moveMode.OBJECT) // objects move.***
+	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
 		if (this.objectSelected === undefined)
 		{ return; }
@@ -5011,7 +5011,10 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 	var buildingSeed = this.getBuildingSeedById(null, dataKey);
 
 	if (buildingSeed === undefined)
-	{ return; }
+	{ 
+		apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, "-1");
+		return; 
+	}
 
 	// calculate realPosition of the building.****************************************************************************
 	var realBuildingPos;
@@ -6178,10 +6181,6 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.magoPolicy.setHideBuildings(api.gethideBuilds());
 	}
-	else if (apiName === "move") 
-	{
-		;
-	}
 	else if (apiName === "changeOutFitting") 
 	{
 		this.magoPolicy.setShowOutFitting(api.getShowOutFitting());
@@ -6230,9 +6229,17 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		return this.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
 	}
-	else if (apiName === "changeMouseMove") 
+	else if (apiName === "changeObjectMove") 
 	{
-		this.magoPolicy.setMouseMoveMode(api.getMouseMoveMode());
+		this.magoPolicy.setObjectMoveMode(api.getObjectMoveMode());
+	}
+	else if (apiName === "saveObjectMove") 
+	{
+		//api.getObjectMoveMode();
+	}
+	else if (apiName === "deleteAllObjectMove") 
+	{
+		//api.getObjectMoveMode();
 	}
 	else if (apiName === "changeInsertIssueMode") 
 	{
