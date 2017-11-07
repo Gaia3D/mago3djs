@@ -6086,7 +6086,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "searchData") 
 	{
-		this.flyToBuilding(api.getDataKey());
+		this.flyToBuilding(api.getProjectId, api.getDataKey());
 	}
 	else if (apiName === "changeHighLighting") 
 	{

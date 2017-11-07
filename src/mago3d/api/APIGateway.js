@@ -364,13 +364,15 @@ function mouseMoveAPI(managerFactoryInstance, eventType)
 /**
  * 데이터 검색
  * @param {Property} managerFactoryInstance
+ * @param {Property} projectId 데이터 고유키
  * @param {Property} dataKey 데이터 고유키
  */
-function searchDataAPI(managerFactoryInstance, dataKey) 
+function searchDataAPI(managerFactoryInstance, projectId, dataKey) 
 {
 	if (managerFactoryInstance === null) return; 
 	
 	var api = new API("searchData");
+	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	managerFactoryInstance.callAPI(api);
 }

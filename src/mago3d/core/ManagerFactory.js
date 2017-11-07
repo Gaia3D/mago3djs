@@ -652,7 +652,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		callAPI: function(api) 
 		{
 			var result = magoManager.callAPI(api);
-			if (api.getAPIName() === "getLocationAndRotation") 
+			if (api.getAPIName() === "getLocationAndRotation" 
+				|| api.getAPIName() === "searchData" ) 
 			{
 				return result;
 			}

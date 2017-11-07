@@ -222,6 +222,31 @@
 	
 	<div id="apiMenuContent" class="apiWrap">
 		<div>
+			<h3>로컬(Browser) 검색</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="localSearchProjectId">프로젝트 </label>
+					<select id="localSearchProjectId" name="localSearchProjectId" class="select">
+						<option value="2119_fullShipCompleted.json">2119 fullShipCompleted</option>
+						<option value="2119_PERemained2.json">2119 PERemained2</option>
+						<option value="2119_fullShipUnderConstruction2.json">2119 fullShipUnderConstruction2</option>
+						<option value="2119_PERemained1.json">2119 PERemained1</option>
+						<option value="2119_fullShipUnderConstruction1.json">2119 fullShipUnderConstruction1</option>
+						<option value="2119_PEConstructed.json">2119 PEConstructed</option>
+						<option value="2119_sampleBlocks.json">2119 sampleBlocks</option>
+						<option value="decoration.json">decoration</option>
+						<option value="2119_deploy.json">2119 deploy</option>
+						<option value="2119_fullship.json">2119 fullship</option>
+					</select>
+				</li>
+				<li>
+					<label for="localSearchDataKey">Data Key</label>
+					<input type="text" id="localSearchDataKey" name="localSearchDataKey" size="25" />
+					<button type="button" id="localSearch" class="btn">검색</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
 			<h3>Location and Rotation</h3>
 			<ul class="apiLoca">
 				<li>
@@ -962,7 +987,7 @@
 			if(searchType === "data_name") {
 				content = content 
 				+ 	"<li>"
-				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('kangbukSport_del');\">바로가기</button>"
+				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('3ds.json', 'kangbukSport_del');\">바로가기</button>"
 				+ 	"	<div class=\"info\">"		
 				+ 	"		<p class=\"title\">"			
 				+ 	"			<span>3DS 통합 가시화</span>kangbukSport_del"
@@ -999,6 +1024,16 @@
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
 		}
+	});
+	
+	$("#localSearch").click(function() {
+		if ($.trim($("#localSearchDataKey").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#localSearchDataKey").focus();
+			return false;
+		}
+		var searchResult = searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
+		alert(searchResult);
 	});
 	
 	function flyToBounding(dataKey) {
