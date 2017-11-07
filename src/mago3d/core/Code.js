@@ -24,4 +24,5 @@ CODE.moveMode = {
 	"NONE"   : "2"
 };
 
-CODE.OBJECT_INDEX_FILE_PREFIX = "objectIndexFile_";
+CODE.PROJECT_ID_PREFIX = "projectId_";
+CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";

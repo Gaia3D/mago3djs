@@ -5733,13 +5733,13 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKey, projectFolderName) 
+MagoManager.prototype.getObjectIndexFileTEST = function(projectIdArray, projectDataFolderArray) 
 {
 	this.buildingSeedList = new BuildingSeedList();
 	var fileName;
-	var geometrySubDataPath = projectFolderName;
+	var geometrySubDataPath = projectDataFolderArray;
 	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, serverDataKey);
+	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, projectIdArray);
 
 	/*
 	// 손책임님 계속
@@ -5758,18 +5758,6 @@ MagoManager.prototype.getObjectIndexFileTEST = function(serverDataKey, projectFo
 		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, serverDataKeyArray[i]);
 	}
 	*/
-};
-
-/**
- * object index 파일을 읽음
- * @param dataName map에 저장되어 있는 key
- * @param objectIndexFilePath /로 부터 project 경로
- */
-MagoManager.prototype.loadObjectIndexFile = function(dataName, objectIndexFilePath) 
-{
-	this.buildingSeedList = new BuildingSeedList();
-	var fileName = this.readerWriter.geometryDataPath + "/" + objectIndexFilePath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, dataName);
 };
 
 /**

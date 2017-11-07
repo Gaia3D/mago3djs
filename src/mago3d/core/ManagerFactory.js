@@ -7,12 +7,13 @@
  * @param viewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * @param containerId 뷰에서 표시할 위치 id
  * @param serverPolicy policy json object
- * @param serverDataKeyArray json object map에 저장하기 위한 key
- * @param serverDataArray data json object
+ * @param projectIdArray json object map에 저장하기 위한 key
+ * @param projectDataArray data json object
+ * @param projectDataFolderArray f4d data folder path
  * @param imagePath 이미지 경로
  * @return api
  */
-var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyArray, serverDataArray, objectIndexFilePathArray, imagePath) 
+var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) 
 {
 	if (!(this instanceof ManagerFactory)) 
 	{
@@ -27,7 +28,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 	//var nowMousePosition = null;
 
 	// 환경 설정
-	MagoConfig.init(serverPolicy, serverDataKeyArray, serverDataArray);
+	MagoConfig.init(serverPolicy, projectIdArray, projectDataArray);
 	
 	// 카메라 행동 설정
 	function disableCameraMotion(state)
@@ -193,9 +194,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		//viewer.scene.magoManager.getObjectIndexFile();
-		if (serverDataKeyArray !== null && serverDataKeyArray.length > 0) 
+		if (projectIdArray !== null && projectIdArray.length > 0) 
 		{
-			viewer.scene.magoManager.getObjectIndexFileTEST(serverDataKeyArray, objectIndexFilePathArray);
+			viewer.scene.magoManager.getObjectIndexFileTEST(projectIdArray, projectDataFolderArray);
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
@@ -654,15 +655,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 				return result;
 			}
 		},
-		// data를 읽음
-		loadData: function() 
-		{
-		},
-		// objectIndexFile을 읽음
-		loadObjectIndexFile: function(dataName, objectIndexFilePath) 
-		{
-			magoManager.loadObjectIndexFile(dataName, objectIndexFilePath);
-		},
 		// flyTo
 		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 
 		{
@@ -694,43 +686,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, serverDataKeyAr
 				magoManager.callAPI(api);
 			}
 		},
-		// 블락 및 부재 검색 api
-		search: function(blockId) 
-		{
-		},
-		// 블락 및 부재 검색 api
-		renderMode: function(renderMode) 
-		{
-		},
-		// 선택 블락 highlighting
-		highlighting: function(blockId) 
-		{
-		},
-		// 선택 블락 color 변경
-		setColor: function() 
-		{
-		},
-		// 선택 블락 표시
-		show: function() 
-		{
-			draw();
-		},
-		// 선택 블락 숨기기
-		hide: function() 
-		{
-		},
-		// 선택 블락 이동
-		move: function() 
-		{
-		},
 		// magoManager 상태
 		getMagoManagerState: function() 
 		{
 			return magoManagerState;
-		},
-		mouseMove: function(eventType) 
-		{
-			
 		}
 	};
 };

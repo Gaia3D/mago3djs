@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 환경 설정 클래스. json 으로 할까 고민도 했지만 우선은 이 형태로 하기로 함
+ * mago3D 전체 환경 설정을 관리
  * @class MagoConfig
  */
 var MagoConfig = {};
@@ -40,65 +40,67 @@ MagoConfig.setData = function(key, value)
 };
 
 /**
- * objectIndexFile 을 map에 찾아서 돌려줌
- * @param projectId 프로젝트 id
+ * F4D Converter 실행 결과물이 저장된 project data folder 명을 획득
+ * @param projectDataFolder data folder
  */
-MagoConfig.getObjectIndexFile = function(projectId) 
+MagoConfig.getProjectDataFolder = function(projectDataFolder) 
 {
-	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
+	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return this.dataMap.get(key);
 };
 
 /**
- * objectIndex가 map에 존재 하는지를 판단
- * @param key
+ * project map에 data folder명의 존재 유무를 검사
+ * @param projectDataFolder
  */
-MagoConfig.isObjectIndexFileExist = function(projectId) 
+MagoConfig.isProjectDataFolderExist = function(projectDataFolder) 
 {
-	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
+	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return this.dataMap.has(key);
 };
 
-MagoConfig.deleteObjectIndexFile = function(projectId) 
+/**
+ * project data folder명을 map에서 삭제
+ * @param projectDataFolder
+ */
+MagoConfig.deleteProjectDataFolder = function(projectDataFolder) 
 {
-	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
+	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return this.dataMap.delete(key);
 };
 
 /**
- * objectIndexFile 을 map에 저장
- * @param key map에 저장될 key
+ * project data folder명을 map에서 삭제
+ * @param projectDataFolder map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setObjectIndexFile = function(projectId, value) 
+MagoConfig.setProjectDataFolder = function(projectDataFolder, value) 
 {
-	var key = CODE.OBJECT_INDEX_FILE_PREFIX + projectId;
-	if (!this.isObjectIndexFileExist(key)) 
+	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
+	if (!this.isProjectDataFolderExist(key)) 
 	{
 		this.dataMap.set(key, value);
 	}
 };
 
 /**
- * 환경설정 세팅
- * @param type new = clear 후 새로 그림, append = 추가하여 그림
+ * 환경설정 초기화
  * @param serverPolicy mago3d policy(json)
- * @param serverDataKeyArray data 정보를 map 저장할 key name
- * @param serverDataArray data 정보(json)
+ * @param projectIdArray data 정보를 map 저장할 key name
+ * @param projectDataArray data 정보(json)
  */
-MagoConfig.init = function(serverPolicy, serverDataKeyArray, serverDataArray) 
+MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
-	// map에 data 와 objectIndexFile 두가지를 저장해야 할거 같다. key는 objectIndexFile 은 prefix를 붙이자.
 	this.dataMap = new Map();
 	this.serverPolicy = serverPolicy;
-	if (serverDataKeyArray !== null && serverDataKeyArray.length > 0) 
+	if (projectIdArray !== null && projectIdArray.length > 0) 
 	{
-		for (var i=0; i<serverDataKeyArray.length; i++) 
+		for (var i=0; i<projectIdArray.length; i++) 
 		{
-			if (!this.isDataExist(serverDataKeyArray[i])) 
+			if (!this.isDataExist(CODE.PROJECT_ID_PREFIX + projectIdArray[i])) 
 			{
-				this.setData(serverDataKeyArray[i], serverDataArray[i]);
-				this.setObjectIndexFile(serverDataArray[i].data_key, serverDataArray[i].data_key);
+				this.setData(CODE.PROJECT_ID_PREFIX + projectIdArray[i], projectDataArray[i]);
+				this.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataArray[i].data_key, projectDataArray[i].data_key);
 			}
 		}
 	}
@@ -115,8 +117,7 @@ MagoConfig.clearAllData = function()
 /**
  * TODO 이건 나중에 활요. 사용하지 않음
  * check 되지 않은 데이터들을 삭제함
- * @param key map에 저장될 key
- * @param value map에 저장될 value
+ * @param keyMap 비교할 맵
  */
 MagoConfig.clearUnSelectedData = function(keyMap) 
 {
@@ -124,13 +125,10 @@ MagoConfig.clearUnSelectedData = function(keyMap)
 	{
 		if (!keyMap.has(key)) 
 		{
-			// obectIndexFile_로 시작하는 key만 아래 처리함
-			if (key.indexOf(CODE.OBJECT_INDEX_FILE_PREFIX) >= 0) 
+			// data folder path가 존재하면....
+			if (key.indexOf(CODE.PROJECT_DATA_FOLDER_PREFIX) >= 0) 
 			{
-				// in this case delete all existent projects.
-				MagoManager.TestA();
-				//this.smartTileManager.resetTiles();
-				//this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+				// 지우는 처리가 있어야 함
 			}
 			this.dataMap.delete(key);
 		}

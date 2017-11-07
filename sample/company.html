@@ -646,7 +646,7 @@
 
 	menuSlideControl("homeMenu");
 	var imagePath = "/images/ko";
-	var jsonUrl = "/sample/";
+	var dataInformationUrl = "/sample/";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
@@ -679,7 +679,7 @@
 	// mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
-			url: jsonUrl + "policy-company.json",
+			url: dataInformationUrl + "policy-company.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -692,28 +692,28 @@
 	}
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
-		if(serverPolicy.geo_data_default_value === null || serverPolicy.geo_data_default_value.length < 1) {
+		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
 			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);	
 		} else {
-			var dataDefaultValueArray = serverPolicy.geo_data_default_value;
-			var dataKeyArray = new Array(dataDefaultValueArray.length);
-			var dataArray = new Array(dataDefaultValueArray.length);
-			var objectIndexFilePathArray = new Array(dataDefaultValueArray.length);
+			var defaultProjectArray = serverPolicy.geo_data_default_projects;
+			var projectIdArray = new Array(defaultProjectArray.length);
+			var dataArray = new Array(defaultProjectArray.length);
+			var dataFolderArray = new Array(defaultProjectArray.length);
 			
 			var dataCount = 0;
-			dataDefaultValueArray.forEach(function(fileName, index) {
-				dataKeyArray[index] = fileName;
-				console.log("url = " + jsonUrl + fileName);
+			defaultProjectArray.forEach(function(projectId, index) {
+				projectIdArray[index] = projectId;
+				console.log("url = " + dataInformationUrl + projectId);
 				$.ajax({
-					url: jsonUrl + fileName,
+					url: dataInformationUrl + projectId,
 					type: "GET",
 					dataType: "json",
 					success: function(serverData){
 						console.log("index = " + index + ", data = " + serverData);
 						dataArray[index] = serverData;
-						objectIndexFilePathArray[index] = serverData.data_key;
-						if(dataDefaultValueArray.length === (dataCount + 1)) {
-							createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
+						dataFolderArray[index] = serverData.data_key;
+						if(defaultProjectArray.length === (dataCount + 1)) {
+							createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath);
 						}
 						dataCount++;
 					},
@@ -725,8 +725,8 @@
 		}
 	}
 	
-	function createManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath) {
-		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, dataKeyArray, dataArray, objectIndexFilePathArray, imagePath);
+	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath) {
+		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, dataArray, dataFolderArray, imagePath);
 	}
 	
 	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
@@ -1266,13 +1266,13 @@
 			if (!isDataExistAPI(dataName))
 			{
 				$.ajax({
-					url      : jsonUrl + dataName,
+					url      : dataInformationUrl + dataName,
 					type     : "GET",
 					dataType : "json",
 					success  : function(serverData)
 					{
 						dataNameArray[index] = dataName;
-						dataUrlArray[index] = jsonUrl + dataName;
+						dataUrlArray[index] = dataInformationUrl + dataName;
 						dataArray[index] = serverData;
 						objectIndexFilePathArray[index] = serverData.data_key;
 											
@@ -1296,7 +1296,6 @@
 	
 	// fullship
 	$("#2119_fullship").click(function() {
-		// 
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
@@ -1348,35 +1347,6 @@
 		clearAllDataAPI(managerFactory);
 		drawCheckedData("createStepsShip");
 	});
-	
-	/* $("#drawAppendData").click(function() {
-		var checkCount = $("input[name=renderingFileName]:checked").length;
-		var dataNameArray = new Array(checkCount);
-		var dataUrlArray = new Array(checkCount);
-		var dataCount = 0;
-		$("input[name=renderingFileName]:checked").each(function(index) {
-			dataNameArray[index] = $(this).val();
-			dataUrlArray[index] = jsonUrl + $(this).val();
-			if(checkCount === (dataCount + 1)) {
-				drawAppendDataAPI(managerFactory, dataNameArray, dataUrlArray);
-			}
-			dataCount++;
-		});
-	});
-	$("#drawDeleteData").click(function() {
-		var checkCount = $("input[name=renderingFileName]:checked").length;
-		var dataNameArray = new Array(checkCount);
-		var dataUrlArray = new Array(checkCount);
-		var dataCount = 0;
-		$("input[name=renderingFileName]:checked").each(function(index) {
-			dataNameArray[index] = $(this).val();
-			dataUrlArray[index] = jsonUrl + $(this).val();
-			if(checkCount === (dataCount + 1)) {
-				drawDeleteDataAPI(managerFactory, dataNameArray, dataUrlArray);
-			}
-			dataCount++;
-		});
-	}); */
 </script>
 </body>
 </html>
