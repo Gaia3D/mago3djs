@@ -196,7 +196,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		//viewer.scene.magoManager.getObjectIndexFile();
 		if (projectIdArray !== null && projectIdArray.length > 0) 
 		{
-			for(var i=0; i<projectIdArray.length; i++) {
+			for (var i=0; i<projectIdArray.length; i++) 
+			{
 				viewer.scene.magoManager.getObjectIndexFileTEST(projectIdArray[i], projectDataFolderArray[i]);
 			}
 		}

@@ -2551,7 +2551,7 @@ MagoManager.prototype.manageQueue = function()
 				{ continue; }
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
-				//node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+				//node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
 				node = neoBuilding.nodeOwner;
 				
 				var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
@@ -2604,7 +2604,7 @@ MagoManager.prototype.manageQueue = function()
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				if (node === undefined || node.data.nodeId !== neoBuilding.buildingId)
 				{
-					//node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+					//node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
 					node = neoBuilding.nodeOwner;
 				}
 				geoLocDataManager = this.getNodeGeoLocDataManager(node);
@@ -5006,16 +5006,26 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
-MagoManager.prototype.flyToBuilding = function(dataKey) 
+MagoManager.prototype.flyToBuilding = function(projectId, dataKey) 
 {
-	var buildingSeed = this.getBuildingSeedById(null, dataKey);
+	//var buildingSeed = this.getBuildingSeedById(null, dataKey); // old.***
 
-	if (buildingSeed === undefined)
-	{ return; }
+	//if (buildingSeed === undefined)
+	//{ return; }
+
+	var node = this.hierarchyManager.getNodeByDataName(projectId, "nodeId", dataKey);
+	if (node === undefined)
+	{ return -1; }
+	
+	var nodeRoot = node.getRoot();
+	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	var realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 
 	// calculate realPosition of the building.****************************************************************************
-	var realBuildingPos;
 	/*
+	var realBuildingPos;
+	
 	if (this.renderingModeTemp === 1 || this.renderingModeTemp === 2) // 0 = assembled mode. 1 = dispersed mode.***
 	{
 		if (neoBuilding.geoLocationDataAux === undefined) 
@@ -5056,14 +5066,14 @@ MagoManager.prototype.flyToBuilding = function(dataKey)
 		
 		//var buildingGeoLocation = neoBuilding.getGeoLocationData();
 		//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-		realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude, buildingSeed.geographicCoordOfBBox.altitude, realBuildingPos, this);
+		//realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude, buildingSeed.geographicCoordOfBBox.altitude, realBuildingPos, this);
 	}
 	// end calculating realPosition of the building.------------------------------------------------------------------------
 
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	this.radiusAprox_aux = (buildingSeed.bBox.maxX - buildingSeed.bBox.minX) * 1.2/2.0;
+	this.radiusAprox_aux = (nodeRoot.data.bbox.maxX - nodeRoot.data.bbox.minX) * 1.2/2.0;
 
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
@@ -5608,7 +5618,7 @@ MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
 
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
-	//var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId); // original.***
+	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue); // original.***
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
 	if (geoLocDatamanager == undefined)
@@ -5629,7 +5639,7 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
 	//var projectIdAndBlockId = neoBuilding.buildingId;
-	//var node = this.hierarchyManager.getNodeByDataName("nodeId", neoBuilding.buildingId);
+	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
 	if (geoLocDatamanager == undefined)
@@ -5679,7 +5689,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
  */
 MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) 
 {
-	//var node = this.hierarchyManager.getNodeByDataName("nodeId", projectIdAndBlockId);
+	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
 	var node = neoBuilding.nodeOwner;
 	if (node === undefined)
 	{ return; }
@@ -5744,7 +5754,7 @@ MagoManager.prototype.getObjectIndexFileTEST = function(projectId, projectDataFo
 	var fileName;
 	var geometrySubDataPath = projectDataFolder;
 	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
-	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, CODE.PROJECT_ID_PREFIX + projectId);
+	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, projectId);
 };
 
 /**
@@ -5766,7 +5776,7 @@ MagoManager.prototype.getObjectIndexFile = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap, projectFolderName) 
+MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId) 
 {
 	var attributes = undefined;
 	var children = undefined;
@@ -5846,8 +5856,12 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	if (attributes !== undefined)
 	{
 		buildingId = data_key;
-		node = this.hierarchyManager.newNode(buildingId);
+		node = this.hierarchyManager.newNode(buildingId, projectId);
+		// set main data of the node.
 		node.data.projectFolderName = projectFolderName;
+		node.data.projectId = projectId;
+		node.data.attributes = attributes;
+		
 		if (attributes.isPhysical)
 		{
 			// find the buildingSeed.
@@ -5913,7 +5927,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			for (var i=0; i<childrenCount; i++)
 			{
 				childJason = children[i];
-				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName);
+				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId);
 				
 				// if childNode has "geographicCoord" then the childNode is in reality a root.
 				if (childNode.data.geographicCoord === undefined)
@@ -5991,7 +6005,6 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 	var rootNodesArray = [];
 	var nodesArray = [];
 	this.hierarchyManager.getRootNodes(rootNodesArray); // original.***
-	//this.hierarchyManager.getNodesWithData("geographicCoord", rootNodesArray);
 	var bboxStarted = false;
 	
 	var rootNodesCount = rootNodesArray.length;
@@ -6029,10 +6042,11 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName) 
+MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId) 
 {
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
-	var realTimeLocBlocksList = MagoConfig.getData(jsonName);
+	// "projectId" = json file name.
+	var realTimeLocBlocksList = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
 	var buildingSeedsCount;
 	var buildingSeed;
 	var buildingId;
@@ -6050,7 +6064,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, jsonName)
 		buildingSeedMap.set(buildingId, buildingSeed);
 	}
 	var projectFolderName = realTimeLocBlocksList.data_key;
-	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName);
+	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
 	this.calculateBoundingBoxesNodes();
 	
 	// now, make smartTiles.
@@ -6086,7 +6100,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "searchData") 
 	{
-		this.flyToBuilding(api.getProjectId, api.getDataKey());
+		return this.flyToBuilding(api.getProjectId(), api.getDataKey());
 	}
 	else if (apiName === "changeHighLighting") 
 	{
