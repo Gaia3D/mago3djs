@@ -12,7 +12,7 @@
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeMagoState");
 	api.setMagoEnable(isShow);
@@ -26,7 +26,7 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
  */
 function changeOutFittingAPI(managerFactoryInstance, isShow) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeOutFitting");
 	api.setShowOutFitting(isShow);
@@ -40,7 +40,7 @@ function changeOutFittingAPI(managerFactoryInstance, isShow)
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeLabel");
 	api.setShowLabelInfo(isShow);
@@ -54,7 +54,7 @@ function changeLabelAPI(managerFactoryInstance, isShow)
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeBoundingBox");
 	api.setShowBoundingBox(isShow);
@@ -68,7 +68,7 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  */
 function changeShadowAPI(managerFactoryInstance, isShow) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeShadow");
 	api.setShowShadow(isShow);
@@ -82,7 +82,7 @@ function changeShadowAPI(managerFactoryInstance, isShow)
  */
 function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changefrustumFarDistance");
 	api.setFrustumFarDistance(frustumFarDistance);
@@ -98,7 +98,7 @@ function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance)
  */
 function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, objectIds) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeHighLighting");
 	api.setProjectId(projectId);
@@ -117,7 +117,7 @@ function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, obje
  */
 function changeColorAPI(managerFactoryInstance, projectId, blockIds, objectIds, color) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeColor");
 	api.setProjectId(projectId);
@@ -140,7 +140,7 @@ function changeColorAPI(managerFactoryInstance, projectId, blockIds, objectIds, 
  */
 function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude, longitude, height, heading, pitch, roll) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeLocationAndRotation");
 	api.setDataKey(data_key);
@@ -160,7 +160,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude
  */
 function changeMouseMoveAPI(managerFactoryInstance, mouseMoveMode) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeMouseMove");
 	api.setMouseMoveMode(mouseMoveMode);
@@ -174,7 +174,7 @@ function changeMouseMoveAPI(managerFactoryInstance, mouseMoveMode)
  */
 function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeInsertIssueMode");
 	api.setIssueInsertEnable(flag);
@@ -188,7 +188,7 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
  */
 function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeObjectInfoViewMode");
 	api.setObjectInfoViewEnable(flag);
@@ -203,7 +203,7 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
  */
 function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeOcclusionCulling");
 	api.setOcclusionCullingEnable(flag);
@@ -218,7 +218,7 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
  */
 function changeFPVModeAPI(managerFactoryInstance, flag)
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeFPVMode");
 	api.setFPVMode(flag);
@@ -232,7 +232,7 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
  */
 function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeNearGeoIssueListViewMode");
 	api.setNearGeoIssueListEnable(flag);
@@ -247,7 +247,7 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
  */
 function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeInsertIssueState");
 	api.setInsertIssueState(insertIssueState);
@@ -264,7 +264,7 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
  */
 function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeLod");
 	api.setLod0DistInMeters(lod0DistInMeters);
@@ -285,7 +285,7 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
  */
 function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeLighting");
 	api.setAmbientReflectionCoef(ambientReflectionCoef);
@@ -303,7 +303,7 @@ function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffus
  */
 function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeSsadRadius");
 	api.setSsaoRadius(ssaoRadius);
@@ -316,7 +316,7 @@ function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
  */
 function clearAllDataAPI(managerFactoryInstance)
 {	
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("clearAllData");
 	MagoConfig.clearAllData();
@@ -336,7 +336,7 @@ function clearAllDataAPI(managerFactoryInstance)
  */
 function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("drawInsertIssueImage");
 	api.setDrawType(drawType);
@@ -356,7 +356,7 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
  */
 function mouseMoveAPI(managerFactoryInstance, eventType) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	managerFactoryInstance.mouseMove(eventType);
 }
@@ -369,7 +369,7 @@ function mouseMoveAPI(managerFactoryInstance, eventType)
  */
 function searchDataAPI(managerFactoryInstance, projectId, dataKey) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("searchData");
 	api.setProjectId(projectId);
@@ -398,7 +398,7 @@ function isDataExistAPI(key)
  */
 function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataArray, projectDataFolderArray) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	if (projectIdArray.length <= 0) { return; }
 	

@@ -759,7 +759,7 @@ ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWr
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
  */
-ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList, jsonName) 
+ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList, projectId) 
 {
 	console.log(" object Index File = " + fileName);
 	loadWithXhr(fileName).done(function(response) 
@@ -770,13 +770,13 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 			buildingSeedList.dataArrayBuffer = arrayBuffer;
 			buildingSeedList.parseBuildingSeedArrayBuffer();
 			
-			magoManager.makeSmartTile(buildingSeedList, jsonName);
+			magoManager.makeSmartTile(buildingSeedList, projectId);
 			arrayBuffer = null;
 			//MagoConfig.setObjectIndex("append", );
 		}
 		else 
 		{
-			//			blocksList.fileLoadState = 500;
+			// blocksList.fileLoadState = 500;
 		}
 	}).fail(function(status) 
 	{
