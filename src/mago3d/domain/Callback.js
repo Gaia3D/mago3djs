@@ -12,9 +12,9 @@
  * @param roll
  * @param
  */
-function apiResultCallback(functionName, result) 
+function apiResultCallback(functionName, apiName, result) 
 {
-	window[functionName](result);
+	window[functionName](apiName, result);
 }
 
 /**

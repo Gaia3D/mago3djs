@@ -1402,8 +1402,12 @@
 	});
 	
 	// general callback alert function
-	function showApiResult(result) {
-		alert(result);
+	function showApiResult(apiName, result) {
+		if(apiName === "searchData") {
+			if(result === "-1") {
+				alert(" 아직 로딩하지 않은 정보 입니다. 로딩 후 검색해 주십시오. ");
+			}
+		}
 	}
 </script>
 </body>

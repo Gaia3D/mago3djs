@@ -5004,9 +5004,11 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 
 /**
  * dataKey 이용해서 data 검색
+ * @param apiName api 이름
+ * @param projectId project id
  * @param dataKey
  */
-MagoManager.prototype.flyToBuilding = function(projectId, dataKey) 
+MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey) 
 {
 	//var buildingSeed = this.getBuildingSeedById(null, dataKey); // old.***
 
@@ -5015,7 +5017,10 @@ MagoManager.prototype.flyToBuilding = function(projectId, dataKey)
 
 	var node = this.hierarchyManager.getNodeByDataName(projectId, "nodeId", dataKey);
 	if (node === undefined)
-	{ return -1; }
+	{ 
+		apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+		return; 
+	}
 	
 	var nodeRoot = node.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
@@ -6100,7 +6105,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "searchData") 
 	{
-		return this.flyToBuilding(api.getProjectId(), api.getDataKey());
+		return this.flyToBuilding(apiName, api.getProjectId(), api.getDataKey());
 	}
 	else if (apiName === "changeHighLighting") 
 	{
