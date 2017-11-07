@@ -1035,10 +1035,7 @@
 			$("#localSearchDataKey").focus();
 			return false;
 		}
-		var searchResult = searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
-		if(searchResult === "-1") {
-			alert(searchResult);			
-		}
+		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
 	});
 	
 	function flyToBounding(dataKey) {

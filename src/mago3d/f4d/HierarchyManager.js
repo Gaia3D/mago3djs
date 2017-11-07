@@ -1,5 +1,7 @@
 'use strict';
 
+
+
 /**
  * 블럭 모델
  * @class HierarchyManager
@@ -13,8 +15,8 @@ var HierarchyManager = function()
 
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
-	this.nodesMap = new Map();
-	
+	//this.nodesMap = new Map(); // old.***
+	this.projectsMap = new Map();
 };
 
 /**
@@ -24,7 +26,7 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
-	this.nodesMap.clear();
+	this.projectsMap.clear();
 	
 	var nodesCount = this.nodesArray.length;
 	for (var i=0; i<nodesCount; i++)
@@ -36,21 +38,6 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 		}
 	}
 	this.nodesArray.length = 0;
-	/*
-	
-	var rootNodesArray = [];
-	this.getRootNodes(rootNodesArray);
-	
-	var rootNodesCount = rootNodesArray.length;
-	var rootNode;
-	for (var i=0; i<rootNodesCount; i++)
-	{
-		rootNode = rootNodesArray[i];
-		rootNode.deleteObjects(gl, vboMemoryManager);
-		rootNode = undefined;
-	}
-	rootNodesArray.length = 0;
-	*/
 };
 
 /**
@@ -58,9 +45,25 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.getNodeByDataName = function(dataName, dataNameValue, resultNodesArray) 
+HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
-	return this.nodesMap.get(dataNameValue);
+	var nodesMap = this.getNodesMap(projectId);
+	
+	if (nodesMap === undefined)
+	{ return undefined; }
+	
+	var resultNode;
+	
+	for (var value of nodesMap.values()) 
+	{
+		if (value.data[dataName] === dataNameValue)
+		{
+			resultNode = value;
+			break;
+		}
+	}
+	
+	return resultNode;
 };
 
 /**
@@ -93,37 +96,51 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.getNodesWithData = function(dataName, resultNodesArray) 
+/*
+HierarchyManager.prototype.newNodesMap = function(projectId) 
 {
-	if (resultNodesArray === undefined)
-	{ resultNodesArray = []; }
-	
-	var nodesCount = this.nodesArray.length;
-	var node;
-	for (var i=0; i<nodesCount; i++)
+	// 1rst, check if exist.
+	var nodesMap = this.projectsMap.get(projectId);
+	if(nodesMap === undefined)
 	{
-		node = this.nodesArray[i];
-		if (node.data && node.data[dataName])
-		{
-			resultNodesArray.push(node);
-		}
-		i++;
+		nodesMap = new Map();
+		this.projectsMap.set(projectId, nodesMap);
 	}
-	
-	return resultNodesArray;
+	return nodesMap;
 };
+*/
 
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.newNode = function(id) 
+HierarchyManager.prototype.getNodesMap = function(projectId) 
 {
+	// 1rst, check if exist.
+	var nodesMap = this.projectsMap.get(projectId);
+	if (nodesMap === undefined)
+	{
+		nodesMap = new Map();
+		this.projectsMap.set(projectId, nodesMap);
+	}
+	return nodesMap;
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+HierarchyManager.prototype.newNode = function(id, projectId) 
+{
+	var nodesMap = this.getNodesMap(projectId);
+	
 	var node = new Node();
 	node.data = {"nodeId": id};
 	this.nodesArray.push(node);
-	this.nodesMap.set(id, node);
+	nodesMap.set(id, node);
 	return node;
 };
 
