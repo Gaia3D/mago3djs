@@ -378,6 +378,31 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
 }
 
 /**
+ * 해당 프로젝트를 로딩하고 이동하기
+ * @param {Property} managerFactoryInstance
+ * @param {Property} projectId project id
+ * @param {Property} latitude 데이터 고유키
+ * @param {Property} longitude 데이터 고유키
+ * @param {Property} height 데이터 고유키
+ * @param {Property} duration 이동하는 시간
+ */
+function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) {
+	if (managerFactoryInstance === null) { return; } 
+	
+	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	
+	var api = new API("gotoProject");
+	api.setProjectId(projectId);
+	api.setProjectDataFolder(projectDataFolder);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(height);
+	api.setElevation(height);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
  * @param {Property} managerFactoryInstance
  * @param {Property} eventType 어떤 마우스 동작을 원하는지를 구분
@@ -414,6 +439,16 @@ function isDataExistAPI(key)
 {
 	if (MagoConfig.isDataExist(key)) { return true; }
 	else { return false; }
+}
+
+/**
+ * 환경 설정 data map에서 key 값을 취득
+ * @param key 검색 키
+ * @param 
+ */
+function getDataAPI(key) 
+{
+	return MagoConfig.getData(key);
 }
 
 /**

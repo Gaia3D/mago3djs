@@ -546,15 +546,14 @@
 	</div>
 </div>
 
-<!-- <ul class="shortcut">
-	<li onclick="flyTo(null, null, '126.60856869381428', '37.58199267183209', '550', '3')">3DS 통합 가시화</li>
-	<li onclick="flyTo(null, null, '126.97772995695296', '37.57981', '80', '3')">IFC(Cultural Assets)</li>
-	<li onclick="flyTo(null, null, '-58.784', '-62.2232', '220', '5')">IFC</li>
-	<li onclick="flyTo(null, null, '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
-	<li onclick="flyTo(null, null, '126.598426', '37.440778', '630', '3')">Sea Port</li>
-	<li onclick="flyTo(null, null, '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
-	<li onclick="flyTo(null, null, '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
-</ul> -->
+<ul class="shortcut">
+	<li onclick="gotoProject('2119_fullship.json', '126.60856869381428', '37.58199267183209', '550', '3')">2119 fullship</li>
+	<li onclick="gotoProject('2119_deploy.json', '126.97772995695296', '37.57981', '80', '3')">2119 deploy</li>
+	<li onclick="gotoProject('decoration.json', '-58.784', '-62.2232', '220', '5')">decoration</li>
+	<li onclick="gotoProject('2119_PERemained1.json', '126.738134', '37.663559', '150', '3')">2119 PERemained1</li>
+	<li onclick="gotoProject('2119_PERemained2.json', '126.598426', '37.440778', '630', '3')">2119 PERemained2</li>
+	<li onclick="gotoProject('2119_fullShipUnderConstruction2.json', '126.799403', '37.568150', '370', '3')">2119 fullShipUnderConstruction2</li>
+</ul>
 
 <div id="magoContainer" class="mapWrap">
 </div>
@@ -568,9 +567,9 @@
 <script type="text/javascript" src="/src/mago3d/core/Box.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/BuildingSeed.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Camera.js"></script>
-<script type="text/javascript" src="/src/mago3d/core/Code.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/Code.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Color.js"></script>
-<script type="text/javascript" src="/src/mago3d/core/Constant.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/Constant.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FirstPersonView.js"></script>
@@ -757,8 +756,25 @@
 		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
 	}
 	
-	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
-		managerFactory.flyTo(issueId, issueType, longitude, latitude, height, duration);
+	function gotoProject(projectId, longitude, latitude, height, duration) {
+		console.log("url = " + dataInformationUrl + projectId);
+		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		if (projectData === null || projectData === undefined) {
+			$.ajax({
+				url: dataInformationUrl + projectId,
+				type: "GET",
+				dataType: "json",
+				success: function(serverData){
+					gotoProjectAPI(managerFactory, projectId, serverData, serverData.data_key, longitude, latitude, height, duration);		
+				},
+				error:function(request,status,error){
+			        console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				}
+			});
+		} else {
+			gotoProjectAPI(managerFactory, projectId, projectData, projectData.data_key, longitude, latitude, height, duration);	
+		}
+		
 		// 현재 좌표를 저장
 		$("#now_latitude").val(latitude);
 		$("#now_longitude").val(longitude);

@@ -51,6 +51,8 @@ function API(apiName)
 	this.pitch = 0;
 	// roll
 	this.roll = 0;
+	// duration
+	this.duration = 0;
 
 	// 색깔
 	this.color = 0;
@@ -447,4 +449,13 @@ API.prototype.getFPVMode = function()
 API.prototype.setFPVMode = function(value)
 {
 	this.FPVMode = value;
+};
+
+API.prototype.getDuration = function()
+{
+	return this.duration;
+};
+API.prototype.setDuration = function(duration)
+{
+	this.duration = duration;
 };

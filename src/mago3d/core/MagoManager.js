@@ -6343,6 +6343,13 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.deleteAll();
 	}
+	else if (apiName === "gotoProject")
+	{
+		// 프로젝트를 로딩하고...... 저 위치로 이동해 주세요.
+		// magoFactory.flyTo 참조하고.... cesium, worldwind 둘다 구현할것
+		// json은...... MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId, projectData); 하면 나옴
+		// api.getProjectId(), api.getProjectDataFolder(), api.getLatitude(), api.getLongitude(), api.getElevation(), api.getDuration()
+	}
 };
 
 MagoManager.prototype.deleteAll = function ()
