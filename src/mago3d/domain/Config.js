@@ -139,7 +139,20 @@ MagoConfig.clearMovingHistory = function()
 /**
  * object 이동 내용 이득을 취득
  */
-MagoConfig.getMovingHistory = function(projectId, data_key, objectIndexOrder, changeHistory)
+MagoConfig.getMovingHistoryObjects = function(projectId, data_key)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.movingHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// data_key 별 map을 검사
+	var dataKeyMap = projectIdMap.get(data_key);
+	return dataKeyMap;
+};
+
+/**
+ * object 이동 내용 이득을 취득
+ */
+MagoConfig.getMovingHistoryObject = function(projectId, data_key, objectIndexOrder)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
