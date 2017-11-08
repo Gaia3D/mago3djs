@@ -1930,6 +1930,32 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
  */
 MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
 {
+	if(this.objectMoved)
+	{
+		// now save the change movement history.
+		var changeHistory = new ChangeHistory();
+		var refMove = changeHistory.getReferenceObjectAditionalMovement();
+		refMove.set(this.objectSelected.moveVector.x, this.objectSelected.moveVector.y, this.objectSelected.moveVector.z);
+		var nodeSelected = this.selectionCandidates.currentNodeSelected;
+		if(nodeSelected === undefined)
+			return;
+		
+		var rootNodeSelected = nodeSelected.getRoot();
+		if(rootNodeSelected === undefined)
+			return;
+
+		var projectId = rootNodeSelected.data.nodeId;
+		var dataKey = nodeSelected.data.nodeId;
+		var objectIndex = this.objectSelected._id;
+		
+		changeHistory.setProjectId(projectId);
+		changeHistory.setDataKey(dataKey);
+		changeHistory.setObjectIndexOrder(objectIndex);
+		MagoConfig.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
+		
+		this.objectMoved = false;
+	}
+	
 	this.isCameraMoving = false;
 	this.mouseLeftDown = false;
 	this.mouseDragging = false;
@@ -2249,6 +2275,9 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.objectSelected.moveVectorRelToBuilding.set(difX, difY, difZ);
 			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
+		
+		this.objectMoved = true;
+		
 	}
 };
 
@@ -3065,6 +3094,60 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
  * @param neoRefLists_array 변수
  */
 
+MagoManager.prototype.checkChangesHistory = function(nodesArray) 
+{
+	var nodesCount = nodesArray.length;
+	var node;
+	var rootNode;	
+	var projectId;
+	var dataKey;
+	var moveHistoryMap;
+	var objectIndexOrder;
+	var neoBuilding;
+	var refObject;
+	var moveVector;
+	
+	for(var i=0; i<nodesCount; i++)
+	{
+		node = nodesArray[i];
+		rootNode = node.getRoot();
+		if(rootNode === undefined)
+			continue;
+		
+		projectId = rootNode.data.nodeId;
+		dataKey = node.data.nodeId;
+		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
+		if(moveHistoryMap)
+		{
+			neoBuilding = node.data.neoBuilding;
+			for (var changeHistory of moveHistoryMap.values()) 
+			{
+				objectIndexOrder = changeHistory.getObjectIndexOrder();
+				refObject = neoBuilding.getReferenceObject(objectIndexOrder);
+				if(refObject === undefined)
+					continue;
+				
+				if(refObject.moveVector === undefined)
+					refObject.moveVector = new Point3D();
+				
+				moveVector = changeHistory.getReferenceObjectAditionalMovement();
+				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+			}
+		}
+	}
+}
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
+ * @param scene 변수
+ * @param shader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ * @param neoRefLists_array 변수
+ */
+
 MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPosition, shader, renderTexture, ssao_idx, visibleObjControlerNodes) 
 {
 	// ssao_idx = -1 -> pickingMode.***
@@ -3105,6 +3188,9 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			// 2) ssao render.************************************************************************************************************
 			
 			var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
+			
+			// check changesHistory.
+			this.checkChangesHistory(visibleObjControlerNodes.currentVisibles0);
 			
 			if (nodesLOD0Count > 0)
 			{
@@ -6198,9 +6284,9 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "saveObjectMove") 
 	{
-//		var changeHistory = new ChangeHistory();
-//		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
-//		MagoConfig.saveMovingHistory(api.getProjectId(), api.getDataKey(), api.getObjectIndexOrder(), changeHistory);
+	//		var changeHistory = new ChangeHistory();
+	//		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
+	//		MagoConfig.saveMovingHistory(api.getProjectId(), api.getDataKey(), api.getObjectIndexOrder(), changeHistory);
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
