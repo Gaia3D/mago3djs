@@ -5008,6 +5008,31 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
  * @param projectId project id
  * @param dataKey
  */
+MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration) 
+{
+	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
+	{
+		this.scene.camera.flyTo({
+			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+				parseFloat(latitude),
+				parseFloat(altitude) + 10),
+			duration: parseInt(duration)
+		});
+	}
+	else 
+	{
+		this.wwd.goToAnimator.travelTime = duration * 1000;
+		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
+	}		
+
+};
+
+/**
+ * dataKey 이용해서 data 검색
+ * @param apiName api 이름
+ * @param projectId project id
+ * @param dataKey
+ */
 MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey) 
 {
 	var node = this.hierarchyManager.getNodeByDataName(projectId, "nodeId", dataKey);
@@ -6347,8 +6372,13 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		// 프로젝트를 로딩하고...... 저 위치로 이동해 주세요.
 		// magoFactory.flyTo 참조하고.... cesium, worldwind 둘다 구현할것
-		// json은...... MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId, projectData); 하면 나옴
+		// json은...... MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId); 하면 나옴
 		// api.getProjectId(), api.getProjectDataFolder(), api.getLatitude(), api.getLongitude(), api.getElevation(), api.getDuration()
+		var projectId = api.getProjectId();
+		var projectDataFolder = api.getProjectDataFolder();
+		this.getObjectIndexFileTEST(projectId, projectDataFolder);
+		
+		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
 	}
 };
 
