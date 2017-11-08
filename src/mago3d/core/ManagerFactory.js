@@ -347,6 +347,17 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		serverPolicy.geo_view_library === '' ||
 		serverPolicy.geo_view_library === Constant.CESIUM) 
 	{
+		// webgl lost events.******************************************
+		var canvas = document.getElementById(containerId);
+		canvas.addEventListener('webglcontextlost', function(e) {
+			console.log(e);
+		}, false);
+		
+		canvas.addEventListener('webglcontextrestored', function(e) {
+		  console.log(e); 
+		}, false);
+		//-------------------------------------------------------------
+
 		if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
 		{
 			var imageryProvider = new Cesium.WebMapServiceImageryProvider({
