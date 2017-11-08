@@ -6222,11 +6222,14 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "saveObjectMove") 
 	{
-		//api.getObjectMoveMode();
+		var changeHistory = new ChangeHistory();
+		//changeHistory.setProjectId("");
+		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
+		MagoConfig.saveMovingHistory(changeHistory);
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
-		//api.getObjectMoveMode();
+		MagoConfig.clearMovingHistory();
 	}
 	else if (apiName === "changeInsertIssueMode") 
 	{
