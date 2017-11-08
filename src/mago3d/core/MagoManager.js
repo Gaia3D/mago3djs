@@ -1254,7 +1254,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries();
+	//this.renderMagoGeometries(); TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1379,30 +1379,6 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	rootNodesMap.clear();
 
-	/*
-	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
-	for (var i=0; i<nodesCount; i++)
-	{
-		node = visibleObjControlerNodes.currentVisibles2[i];
-		geoLocDataManager = node.data.geoLocDataManager;
-		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		neoBuilding = node.data.neoBuilding;
-		
-		worldPosition = neoBuilding.getBBoxCenterPositionWorldCoord(geoLoc);
-		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
-		
-		if (screenCoord.x >= 0 && screenCoord.y >= 0)
-		{
-			ctx.font = "13px Arial";
-			ctx.strokeText(neoBuilding.name, screenCoord.x, screenCoord.y);
-			ctx.fillText(neoBuilding.name, screenCoord.x, screenCoord.y);
-
-			ctx.font = "9px Arial";
-			ctx.strokeText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
-			ctx.fillText("("+neoBuilding.buildingId+")", screenCoord.x, screenCoord.y+lineHeight);
-		}
-	}
-	*/
 	ctx.restore();
 };
 
@@ -6370,10 +6346,6 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "gotoProject")
 	{
-		// 프로젝트를 로딩하고...... 저 위치로 이동해 주세요.
-		// magoFactory.flyTo 참조하고.... cesium, worldwind 둘다 구현할것
-		// json은...... MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId); 하면 나옴
-		// api.getProjectId(), api.getProjectDataFolder(), api.getLatitude(), api.getLongitude(), api.getElevation(), api.getDuration()
 		var projectId = api.getProjectId();
 		if(!this.hierarchyManager.existProject(projectId))
 		{

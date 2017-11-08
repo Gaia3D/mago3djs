@@ -26,6 +26,11 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
+	for (var value of this.projectsMap.values()) 
+	{
+		value.clear();
+	}
+	
 	this.projectsMap.clear();
 	
 	var nodesCount = this.nodesArray.length;
