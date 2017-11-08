@@ -92,7 +92,12 @@ MagoConfig.setProjectDataFolder = function(projectDataFolder, value)
 MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
 	this.dataMap = new Map();
-	this.commandCacheMap = new Map();
+	
+	this.selectHistoryArray = new Array();
+	this.movingHistoryArray = new Array();
+	this.colorHistoryArray = new Array();
+	this.rotationHistoryArray = new Array();
+	
 	this.serverPolicy = serverPolicy;
 	if (projectIdArray !== null && projectIdArray.length > 0) 
 	{
@@ -113,6 +118,38 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 MagoConfig.clearAllData = function() 
 {
 	this.dataMap.clear();
+};
+
+/**
+ * 모든 선택 히스토리 삭제
+ */
+MagoConfig.selectHistory = function() 
+{
+	this.selectHistoryArray = [];
+};
+
+/**
+ * 모든 이동 히스토리 삭제
+ */
+MagoConfig.clearMovingHistory = function() 
+{
+	this.movingHistoryArray = [];
+};
+
+/**
+ * 모든 색깔변경 히스토리 삭제
+ */
+MagoConfig.clearColorHistory = function() 
+{
+	this.colorHistoryArray = [];
+};
+
+/**
+ * 모든 rotation 히스토리 삭제
+ */
+MagoConfig.clearRotationHistory = function() 
+{
+	this.rotationHistoryArray = [];
 };
 	
 /**

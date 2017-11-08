@@ -652,12 +652,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		// api gateway 역할
 		callAPI: function(api) 
 		{
-			var result = magoManager.callAPI(api);
-			if (api.getAPIName() === "getLocationAndRotation" 
-				|| api.getAPIName() === "searchData" ) 
-			{
-				return result;
-			}
+			magoManager.callAPI(api);
 		},
 		// flyTo
 		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 

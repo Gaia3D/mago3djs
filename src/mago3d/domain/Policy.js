@@ -36,7 +36,7 @@ var Policy = function()
 	// show/hide
 	this.hideBuildings = [];
 	// move mode
-	this.mouseMoveMode = CODE.moveMode.NONE;
+	this.objectMoveMode = CODE.moveMode.NONE;
 	// 이슈 등록 표시
 	this.issueInsertEnable = false;
 	// object 정보 표시
@@ -165,13 +165,13 @@ Policy.prototype.setHideBuildings = function(hideBuildings)
 	this.hideBuildings = hideBuildings;
 };
 
-Policy.prototype.getMouseMoveMode = function() 
+Policy.prototype.getObjectMoveMode = function() 
 {
-	return this.mouseMoveMode;
+	return this.objectMoveMode;
 };
-Policy.prototype.setMouseMoveMode = function(mouseMoveMode) 
+Policy.prototype.setObjectMoveMode = function(objectMoveMode) 
 {
-	this.mouseMoveMode = mouseMoveMode;
+	this.objectMoveMode = objectMoveMode;
 };
 
 Policy.prototype.getIssueInsertEnable = function() 

@@ -1,6 +1,23 @@
 'use strict';
 
 /**
+ * api 
+ * @param data_key
+ * @param objectId
+ * @param latitude
+ * @param longitude
+ * @param elevation
+ * @param heading
+ * @param pitch
+ * @param roll
+ * @param
+ */
+function apiResultCallback(functionName, apiName, result) 
+{
+	window[functionName](apiName, result);
+}
+
+/**
  * 선택한 object 정보를 화면에 표시
  * @param data_key
  * @param objectId
