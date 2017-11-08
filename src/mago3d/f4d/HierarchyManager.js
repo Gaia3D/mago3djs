@@ -115,6 +115,16 @@ HierarchyManager.prototype.newNodesMap = function(projectId)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
+HierarchyManager.prototype.existProject = function(projectId) 
+{
+	return this.projectsMap.has(projectId);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
 HierarchyManager.prototype.getNodesMap = function(projectId) 
 {
 	// 1rst, check if exist.
