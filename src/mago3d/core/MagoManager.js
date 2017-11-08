@@ -6375,8 +6375,11 @@ MagoManager.prototype.callAPI = function(api)
 		// json은...... MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId); 하면 나옴
 		// api.getProjectId(), api.getProjectDataFolder(), api.getLatitude(), api.getLongitude(), api.getElevation(), api.getDuration()
 		var projectId = api.getProjectId();
-		var projectDataFolder = api.getProjectDataFolder();
-		this.getObjectIndexFileTEST(projectId, projectDataFolder);
+		if(!this.hierarchyManager.existProject(projectId))
+		{
+			var projectDataFolder = api.getProjectDataFolder();
+			this.getObjectIndexFileTEST(projectId, projectDataFolder);
+		}
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
 	}
