@@ -378,6 +378,27 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
 }
 
 /**
+ * 해당 프로젝트를 로딩하고 이동하기
+ * @param {Property} managerFactoryInstance
+ * @param {Property} projectId project id
+ * @param {Property} latitude 데이터 고유키
+ * @param {Property} longitude 데이터 고유키
+ * @param {Property} height 데이터 고유키
+ * @param {Property} duration 이동하는 시간
+ */
+function gotoProjectAPI(managerFactoryInstance, projectId, longitude, latitude, height, duration) {
+	if (managerFactoryInstance === null) { return; } 
+	
+	var api = new API("gotoProject");
+	api.setProjectId(projectId);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(height);
+	api.setElevation(height);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
  * @param {Property} managerFactoryInstance
  * @param {Property} eventType 어떤 마우스 동작을 원하는지를 구분
