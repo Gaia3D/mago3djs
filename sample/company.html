@@ -757,7 +757,24 @@
 	}
 	
 	function gotoProject(projectId, longitude, latitude, height, duration) {
-		gotoProjectAPI(managerFactory, projectId, longitude, latitude, height, duration);
+		console.log("url = " + dataInformationUrl + projectId);
+		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		if (projectData === null || projectData === undefined) {
+			$.ajax({
+				url: dataInformationUrl + projectId,
+				type: "GET",
+				dataType: "json",
+				success: function(serverData){
+					gotoProjectAPI(managerFactory, projectId, serverData, serverData.data_key, longitude, latitude, height, duration);		
+				},
+				error:function(request,status,error){
+			        console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				}
+			});
+		} else {
+			gotoProjectAPI(managerFactory, projectId, projectData, projectData.data_key, longitude, latitude, height, duration);	
+		}
+		
 		// 현재 좌표를 저장
 		$("#now_latitude").val(latitude);
 		$("#now_longitude").val(longitude);

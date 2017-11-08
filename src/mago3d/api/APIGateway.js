@@ -386,11 +386,15 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
  * @param {Property} height 데이터 고유키
  * @param {Property} duration 이동하는 시간
  */
-function gotoProjectAPI(managerFactoryInstance, projectId, longitude, latitude, height, duration) {
+function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) {
 	if (managerFactoryInstance === null) { return; } 
+	
+	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
 	var api = new API("gotoProject");
 	api.setProjectId(projectId);
+	api.setProjectDataFolder(projectDataFolder);
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);
 	api.setElevation(height);
@@ -435,6 +439,16 @@ function isDataExistAPI(key)
 {
 	if (MagoConfig.isDataExist(key)) { return true; }
 	else { return false; }
+}
+
+/**
+ * 환경 설정 data map에서 key 값을 취득
+ * @param key 검색 키
+ * @param 
+ */
+function getDataAPI(key) 
+{
+	return MagoConfig.getData(key);
 }
 
 /**
