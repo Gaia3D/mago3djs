@@ -174,7 +174,7 @@ function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode)
  */
 function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("saveObjectMove");
 	api.setObjectMoveMode(objectMoveMode);
@@ -188,7 +188,7 @@ function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode)
  */
 function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
-	if (managerFactoryInstance === null) return; 
+	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("deleteAllObjectMove");
 	api.setObjectMoveMode(objectMoveMode);
@@ -386,7 +386,8 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
  * @param {Property} height 데이터 고유키
  * @param {Property} duration 이동하는 시간
  */
-function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) {
+function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) 
+{
 	if (managerFactoryInstance === null) { return; } 
 	
 	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
