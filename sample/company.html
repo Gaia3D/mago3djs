@@ -570,6 +570,7 @@
 <script type="text/javascript" src="/src/mago3d/domain/Code.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Color.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Constant.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/ChangeHistory.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FirstPersonView.js"></script>
@@ -1205,13 +1206,13 @@
 			alert("None 모드일 경우 저장할 수 없습니다.");
 			return;
 		}
-		saveObjectMoveAPI(objectMoveMode);
+		saveObjectMoveAPI(managerFactory, objectMoveMode);
 	});
 	// 마우스 클릭 객체 이동 모드 변경 삭제
 	$("#deleteAllObjectMoveButton").click(function () {
 		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
 		if(confirm("삭제 하시겠습니까?")) {
-			deleteAllObjectMoveAPI(objectMoveMode);
+			deleteAllObjectMoveAPI(managerFactory, objectMoveMode);
 		}
 	});
 	
