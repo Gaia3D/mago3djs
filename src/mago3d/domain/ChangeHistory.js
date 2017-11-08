@@ -31,6 +31,7 @@ var ChangeHistory = function()
 	
 	// referenceObject aditional movement.
 	this.refObjectAditionalMove;
+	this.refObjectAditionalMoveRelToBuilding;
 	
 	// 위도
 	this.latitude = 0;
@@ -56,6 +57,14 @@ ChangeHistory.prototype.getReferenceObjectAditionalMovement = function()
 		this.refObjectAditionalMove = new Point3D();
 	
 	return this.refObjectAditionalMove;
+};
+
+ChangeHistory.prototype.getReferenceObjectAditionalMovementRelToBuilding = function() 
+{
+	if(this.refObjectAditionalMoveRelToBuilding === undefined)
+		this.refObjectAditionalMoveRelToBuilding = new Point3D();
+	
+	return this.refObjectAditionalMoveRelToBuilding;
 };
 
 ChangeHistory.prototype.getProjectId = function() 
