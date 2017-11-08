@@ -123,7 +123,7 @@ MagoConfig.clearAllData = function()
 /**
  * 모든 선택 히스토리 삭제
  */
-MagoConfig.selectHistory = function() 
+MagoConfig.clearSelectHistory = function() 
 {
 	this.selectHistoryArray = [];
 };
@@ -134,6 +134,22 @@ MagoConfig.selectHistory = function()
 MagoConfig.clearMovingHistory = function() 
 {
 	this.movingHistoryArray = [];
+};
+
+/**
+ * 모든 이동 내용 이득을 취득
+ */
+MagoConfig.getMovingHistory = function() 
+{
+	this.movingHistoryArray;
+};
+
+/**
+ * 이동 내용을 저장
+ */
+MagoConfig.saveMovingHistory = function(changeHistory) 
+{
+	this.movingHistoryArray.push(changeHistory);
 };
 
 /**
