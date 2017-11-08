@@ -5008,11 +5008,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
  */
 MagoManager.prototype.flyToBuilding = function(projectId, dataKey) 
 {
-	//var buildingSeed = this.getBuildingSeedById(null, dataKey); // old.***
-
-	//if (buildingSeed === undefined)
-	//{ return; }
-
 	var node = this.hierarchyManager.getNodeByDataName(projectId, "nodeId", dataKey);
 	if (node === undefined)
 	{ return -1; }
@@ -5022,66 +5017,17 @@ MagoManager.prototype.flyToBuilding = function(projectId, dataKey)
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 
-	// calculate realPosition of the building.****************************************************************************
-	/*
-	var realBuildingPos;
-	
-	if (this.renderingModeTemp === 1 || this.renderingModeTemp === 2) // 0 = assembled mode. 1 = dispersed mode.***
-	{
-		if (neoBuilding.geoLocationDataAux === undefined) 
-		{
-			var realTimeLocBlocksList = MagoConfig.getData().alldata;
-			var newLocation = realTimeLocBlocksList[neoBuilding.dataKey];
-			// must calculate the realBuildingPosition (bbox_center_position).***
-
-			if (newLocation) 
-			{
-				neoBuilding.geoLocationDataAux = ManagerUtils.calculateGeoLocationData(newLocation.LONGITUDE, newLocation.LATITUDE, newLocation.ELEVATION, heading, pitch, roll, neoBuilding.geoLocationDataAux, this);
-				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-				//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-				realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
-			}
-			else 
-			{
-				// use the normal data.***
-				this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-				realBuildingPos = neoBuilding.transfMat.transformPoint3D(this.pointSC, realBuildingPos );
-			}
-		}
-		else 
-		{
-			this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-			//realBuildingPos = neoBuilding.geoLocationDataAux.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-			realBuildingPos = neoBuilding.geoLocationDataAux.pivotPoint;
-		}
-	}
-	else 
-		*/
-	{
-		/*
-		var buildingGeoLocation = neoBuilding.getGeoLocationData();
-		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-		realBuildingPos = buildingGeoLocation.tMatrix.transformPoint3D(this.pointSC, realBuildingPos );
-		*/
-		
-		//var buildingGeoLocation = neoBuilding.getGeoLocationData();
-		//this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-		//realBuildingPos = ManagerUtils.geographicCoordToWorldPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude, buildingSeed.geographicCoordOfBBox.altitude, realBuildingPos, this);
-	}
-	// end calculating realPosition of the building.------------------------------------------------------------------------
-
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	this.radiusAprox_aux = (nodeRoot.data.bbox.maxX - nodeRoot.data.bbox.minX) * 1.2/2.0;
+	//this.radiusAprox_aux = (nodeRoot.data.bbox.maxX - nodeRoot.data.bbox.minX) * 1.2/2.0;
+	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
 
-	//var position = new Cesium.Cartesian3(this.pointSC.x, this.pointSC.y, this.pointSC.z);
-	//var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
