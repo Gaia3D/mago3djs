@@ -180,7 +180,7 @@ MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, c
 	var dataKeyMap = projectIdMap.get(data_key);
 	if(dataKeyMap === undefined) {
 		dataKeyMap = new Map();
-		this.projectIdMap.set(data_key, dataKeyMap);
+		projectIdMap.set(data_key, dataKeyMap);
 	}
 	
 	// objectIndexOrder 를 저장

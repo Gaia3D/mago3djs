@@ -29,6 +29,9 @@ var ChangeHistory = function()
 	// objectIndexOrder
 	this.objectIndexOrder = 0;
 	
+	// referenceObject aditional movement.
+	this.refObjectAditionalMove;
+	
 	// 위도
 	this.latitude = 0;
 	// 경도
@@ -45,7 +48,15 @@ var ChangeHistory = function()
 	this.duration = 0;
 	// 색깔
 	this.color = 0;
-	};
+};
+
+ChangeHistory.prototype.getReferenceObjectAditionalMovement = function() 
+{
+	if(this.refObjectAditionalMove === undefined)
+		this.refObjectAditionalMove = new Point3D();
+	
+	return this.refObjectAditionalMove;
+};
 
 ChangeHistory.prototype.getProjectId = function() 
 {
