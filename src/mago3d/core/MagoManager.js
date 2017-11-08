@@ -6198,10 +6198,9 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "saveObjectMove") 
 	{
-		var changeHistory = new ChangeHistory();
-		//changeHistory.setProjectId("");
-		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
-		MagoConfig.saveMovingHistory(changeHistory);
+//		var changeHistory = new ChangeHistory();
+//		changeHistory.setObjectMoveMode(api.getObjectMoveMode());
+//		MagoConfig.saveMovingHistory(api.getProjectId(), api.getDataKey(), api.getObjectIndexOrder(), changeHistory);
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
