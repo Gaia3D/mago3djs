@@ -22,10 +22,13 @@ var ChangeHistory = function()
 	this.projectId = null;
 	// project data folder
 	this.projectDataFolder = null;
-	// objectId
-	this.objectId = null;
 	// data_key
 	this.dataKey = null;	
+	// objectId
+	this.objectId = null;
+	// objectIndexOrder
+	this.objectIndexOrder = 0;
+	
 	// 위도
 	this.latitude = 0;
 	// 경도
@@ -62,6 +65,15 @@ ChangeHistory.prototype.setProjectDataFolder = function(projectDataFolder)
 	this.projectDataFolder = projectDataFolder;
 };
 
+ChangeHistory.prototype.getDataKey = function() 
+{
+	return this.dataKey;
+};
+ChangeHistory.prototype.setDataKey = function(dataKey) 
+{
+	this.dataKey = dataKey;
+};
+
 ChangeHistory.prototype.getObjectId = function() 
 {
 	return this.objectId;
@@ -71,13 +83,13 @@ ChangeHistory.prototype.setObjectId = function(objectId)
 	this.objectId = objectId;
 };
 
-ChangeHistory.prototype.getDataKey = function() 
+ChangeHistory.prototype.getObjectIndexOrder = function() 
 {
-	return this.dataKey;
+	return this.objectIndexOrder;
 };
-ChangeHistory.prototype.setDataKey = function(dataKey) 
+ChangeHistory.prototype.setObjectIndexOrder = function(objectIndexOrder) 
 {
-	this.dataKey = dataKey;
+	this.objectIndexOrder = objectIndexOrder;
 };
 
 ChangeHistory.prototype.getLatitude = function() 
