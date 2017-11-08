@@ -399,7 +399,7 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
 	api.setLatitude(latitude);
 	api.setLongitude(longitude);
 	api.setElevation(height);
-	api.setElevation(height);
+	api.setDuration(duration);
 	managerFactoryInstance.callAPI(api);
 }
 
