@@ -1173,7 +1173,7 @@
 	// 변환행렬
 	$("#changeLocationAndRotation").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
-		changeLocationAndRotationAPI(managerFactory, $("#moveProjectId").val()
+		changeLocationAndRotationAPI(managerFactory, $("#moveProjectId").val(),
 										$("#moveDataKey").val(), $("#moveLatitude").val(), $("#moveLongitude").val(), 
 										$("#moveHeight").val(), $("#moveHeading").val(), $("#movePitch").val(), $("#moveRoll").val());
 	});
