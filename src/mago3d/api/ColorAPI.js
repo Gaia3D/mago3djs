@@ -9,53 +9,45 @@ var ColorAPI = {};
 ColorAPI.changeColor = function(api, magoManager) 
 {
 	var projectId = api.getProjectId();
+	var dataKey = api.getDataKey();
 	var objectIds = api.getObjectIds();
+	var property = api.getProperty();
+	var color = api.getColor().split(",");
+	var rgbColor = [ color[0]/255, color[1]/255, color[2]/255 ] ;
+	
 	var isExistObjectIds = false;
 	if (objectIds !== null && objectIds.length !== 0) 
 	{
 		isExistObjectIds = true;
 	}
-	var colorBuilds = [];
 	
-		if (isExistObjectIds) 
-		{
-			for (var j=0, objectCount = objectIds.length; j<objectCount; j++) 
-			{
-				var projectLayer = new ProjectLayer();
-				projectLayer.setProjectId(projectId);
-				projectLayer.setBlockId(blockIds[i].trim());
-				projectLayer.setObjectId(objectIds[j].trim());
-				colorBuilds.push(projectLayer);
-			}
-		}
-		else 
-		{
-			var projectLayer = new ProjectLayer();
-			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i].trim());
-			projectLayer.setObjectId(null);
-			colorBuilds.push(projectLayer);
-		}
-	
-	this.magoPolicy.setColorBuildings(colorBuilds);
-
-	var rgbColor = api.getColor().split(",");
-	var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
-	this.magoPolicy.setColor(rgbArray);
-	
-	var buildingsCount = colorBuilds.length;
-	for (var i=0; i<buildingsCount; i++)
+	var changeHistorys = [];
+	if (isExistObjectIds) 
 	{
-		//var projectAndBlockId = projectId + "_" + blockIds[i]; // old.***
-		var projectAndBlockId = colorBuilds[i].projectId + "_" + colorBuilds[i].blockId;
-		if (colorBuilds[i].objectId === null)
+		for (var i=0, objectCount = objectIds.length; i<objectCount; i++) 
 		{
-			this.buildingColorChanged(projectAndBlockId, rgbArray);
+			var changeHistory = new ChangeHistory();
+			changeHistory.setProjectId(projectId);
+			changeHistory.setDataKey(dataKey);
+			changeHistory.setObjectId(objectIds[i]);
+			changeHistory.setProperty(property);
+			changeHistory.setRgbColor(rgbColor);
+			
+			changeHistorys.push(changeHistory);
 		}
-		else
-		{
-			this.objectColorChanged(projectAndBlockId, colorBuilds[i].objectId, rgbArray);
-		}
-		
 	}
+	else 
+	{
+		var changeHistory = new ChangeHistory();
+		changeHistory.setProjectId(projectId);
+		changeHistory.setDataKey(dataKey);
+		changeHistory.setObjectId(null);
+		changeHistory.setProperty(property);
+		changeHistory.setRgbColor(rgbColor);
+		
+		changeHistorys.push(changeHistory);
+	}
+	
+	// 여기 구현
+	// property 값이 isMain=true 와 같이 들어 갑니다. isMain을 뽑아서.... node에서 찾아서.... true 로 다 바꿔야 합니다.
 };
