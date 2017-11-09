@@ -6331,19 +6331,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLocationAndRotation") 
 	{
-		// 변환 행렬
-		// find the building.***
-		var buildingId = api.getDataKey();
-		var buildingType = "structure";
-		var building = this.getNeoBuildingByTypeId(buildingType, buildingId);
-
-		this.changeLocationAndRotation(api.getDataKey(),
-			parseFloat(api.getLatitude()),
-			parseFloat(api.getLongitude()),
-			parseFloat(api.getElevation()),
-			parseFloat(api.getHeading()),
-			parseFloat(api.getPitch()),
-			parseFloat(api.getRoll()));
+		LocationAndRotationAPI.changeLocationAndRotation(api, this);
 	}
 	else if (apiName === "getLocationAndRotation") 
 	{

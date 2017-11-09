@@ -96,7 +96,7 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 	this.selectHistoryMap = new Map();
 	this.movingHistoryMap = new Map();
 	this.colorHistoryMap = new Map();
-	this.rotationHistoryMap = new Map();
+	this.locationAndRotationHistoryMap = new Map();
 	
 	this.serverPolicy = serverPolicy;
 	if (projectIdArray !== null && projectIdArray.length > 0) 
@@ -129,6 +129,74 @@ MagoConfig.clearSelectHistory = function()
 };
 
 /**
+ * 모든 object 선택 내용 이력을 취득
+ */
+MagoConfig.getSelectHistoryObjects = function(projectId, dataKey)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.selectHistoryMap.get(projectId);
+	if (projectIdMap === undefined) { return undefined; }
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	return dataKeyMap;
+};
+
+/**
+ * object 선택 내용 이력을 취득
+ */
+MagoConfig.getSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.selectHistoryMap.get(projectId);
+	if (projectIdMap === undefined) { return undefined; }
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	if (dataKeyMap === undefined) { return undefined; }
+	// objectIndexOrder 를 저장
+	return dataKeyMap.get(objectIndexOrder);
+};
+
+/**
+ * object 선택 내용을 저장
+ */
+MagoConfig.saveSelectHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.selectHistoryMap.get(projectId);
+	if (projectIdMap === undefined) 
+	{
+		projectIdMap = new Map();
+		this.selectHistoryMap.set(projectId, projectIdMap);
+	}
+	
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	if (dataKeyMap === undefined) 
+	{
+		dataKeyMap = new Map();
+		projectIdMap.set(dataKey, dataKeyMap);
+	}
+	
+	// objectIndexOrder 를 저장
+	dataKeyMap.set(objectIndexOrder, changeHistory);
+};
+
+/**
+ * object 선택 내용을 삭제
+ */
+MagoConfig.deleteSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.selectHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	if(dataKeyMap === undefined) return undefined;
+	// objectIndexOrder 를 저장
+	return dataKeyMap.delete(objectIndexOrder);
+};
+
+/**
  * 모든 이동 히스토리 삭제
  */
 MagoConfig.clearMovingHistory = function() 
@@ -137,28 +205,28 @@ MagoConfig.clearMovingHistory = function()
 };
 
 /**
- * object 이동 내용 이득을 취득
+ * object 이동 내용 이력을 취득
  */
-MagoConfig.getMovingHistoryObjects = function(projectId, data_key)
+MagoConfig.getMovingHistoryObjects = function(projectId, dataKey)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
 	if (projectIdMap === undefined) { return undefined; }
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	return dataKeyMap;
 };
 
 /**
- * object 이동 내용 이득을 취득
+ * object 이동 내용 이력을 취득
  */
-MagoConfig.getMovingHistoryObject = function(projectId, data_key, objectIndexOrder)
+MagoConfig.getMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
 	if (projectIdMap === undefined) { return undefined; }
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if (dataKeyMap === undefined) { return undefined; }
 	// objectIndexOrder 를 저장
 	return dataKeyMap.get(objectIndexOrder);
@@ -167,7 +235,7 @@ MagoConfig.getMovingHistoryObject = function(projectId, data_key, objectIndexOrd
 /**
  * object 이동 내용을 저장
  */
-MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, changeHistory) 
+MagoConfig.saveMovingHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
@@ -177,12 +245,12 @@ MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, c
 		this.movingHistoryMap.set(projectId, projectIdMap);
 	}
 	
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if (dataKeyMap === undefined) 
 	{
 		dataKeyMap = new Map();
-		projectIdMap.set(data_key, dataKeyMap);
+		projectIdMap.set(dataKey, dataKeyMap);
 	}
 	
 	// objectIndexOrder 를 저장
@@ -192,16 +260,21 @@ MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, c
 /**
  * object 이동 내용을 삭제
  */
-MagoConfig.deleteMovingHistoryObject = function(projectId, data_key, objectIndexOrder)
+MagoConfig.deleteMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
 	if(projectIdMap === undefined) return undefined;
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if(dataKeyMap === undefined) return undefined;
 	// objectIndexOrder 를 저장
 	return dataKeyMap.delete(objectIndexOrder);
+};
+
+MagoConfig.getAllColorHistory = function() 
+{
+	return this.colorHistoryMap;
 };
 
 /**
@@ -215,26 +288,26 @@ MagoConfig.clearColorHistory = function()
 /**
  * 모든 색깔 변경 이력을 획득
  */
-MagoConfig.getColorHistorys = function(projectId, data_key)
+MagoConfig.getColorHistorys = function(projectId, dataKey)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
 	if(projectIdMap === undefined) return undefined;
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	return dataKeyMap;
 };
 
 /**
  * 색깝 변경 이력을 획득
  */
-MagoConfig.getColorHistory = function(projectId, data_key, objectId)
+MagoConfig.getColorHistory = function(projectId, dataKey, objectId)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
 	if(projectIdMap === undefined) return undefined;
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if(dataKeyMap === undefined) return undefined;
 	// objectId 를 저장
 	return dataKeyMap.get(objectId);
@@ -243,7 +316,7 @@ MagoConfig.getColorHistory = function(projectId, data_key, objectId)
 /**
  * 색깝 변경 내용을 저장
  */
-MagoConfig.saveColorHistory = function(projectId, data_key, objectId, changeHistory) 
+MagoConfig.saveColorHistory = function(projectId, dataKey, objectId, changeHistory) 
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
@@ -252,15 +325,15 @@ MagoConfig.saveColorHistory = function(projectId, data_key, objectId, changeHist
 		this.colorHistoryMap.set(projectId, projectIdMap);
 	}
 	
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if(dataKeyMap === undefined) {
 		dataKeyMap = new Map();
-		projectIdMap.set(data_key, dataKeyMap);
+		projectIdMap.set(dataKey, dataKeyMap);
 	}
 
 	if(objectId === null || objectId === "") {
-		dataKeyMap.set(data_key, changeHistory);
+		dataKeyMap.set(dataKey, changeHistory);
 	} else {
 		dataKeyMap.set(objectId, changeHistory);
 	}
@@ -269,24 +342,92 @@ MagoConfig.saveColorHistory = function(projectId, data_key, objectId, changeHist
 /**
  * 색깔 변경 이력을 삭제
  */
-MagoConfig.deleteColorHistory = function(projectId, data_key, objectIndexOrder)
+MagoConfig.deleteColorHistory = function(projectId, dataKey, objectId)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
 	if(projectIdMap === undefined) return undefined;
-	// data_key 별 map을 검사
-	var dataKeyMap = projectIdMap.get(data_key);
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
 	if(dataKeyMap === undefined) return undefined;
 	// objectIndexOrder 를 저장
-	return dataKeyMap.delete(objectIndexOrder);
+	return dataKeyMap.delete(objectId);
 };
 
 /**
- * 모든 rotation 히스토리 삭제
+ * 모든 색깔변경 히스토리 삭제
  */
-MagoConfig.clearRotationHistory = function() 
+MagoConfig.clearColorHistory = function() 
 {
-	this.rotationHistoryMap.clear();
+	this.colorHistoryMap.clear();
+};
+
+/**
+ * 모든 location and rotation 이력을 획득
+ */
+MagoConfig.getLocationAndRotationHistorys = function(projectId, dataKey)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.locationAndRotationHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	return dataKeyMap;
+};
+
+/**
+ * location and rotation 이력을 획득
+ */
+MagoConfig.getLocationAndRotationHistory = function(projectId, dataKey)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.locationAndRotationHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	
+	return dataKeyMap;
+};
+
+/**
+ * location and rotation 내용을 저장
+ */
+MagoConfig.saveLocationAndRotationHistory = function(projectId, dataKey, changeHistory) 
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.locationAndRotationHistoryMap.get(projectId);
+	if(projectIdMap === undefined) {
+		projectIdMap = new Map();
+		this.locationAndRotationHistoryMap.set(projectId, projectIdMap);
+	}
+	
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.get(dataKey);
+	if(dataKeyMap === undefined) {
+		dataKeyMap = new Map();
+	}
+
+	dataKeyMap.set(dataKey, changeHistory);
+};
+
+/**
+ * location and rotation 이력을 삭제
+ */
+MagoConfig.deleteLocationAndRotationHistory = function(projectId, dataKey)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.locationAndRotationHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// dataKey 별 map을 검사
+	var dataKeyMap = projectIdMap.delete(dataKey);
+};
+
+/**
+ * 모든 location and rotation 히스토리 삭제
+ */
+MagoConfig.clearLocationAndRotationHistory = function() 
+{
+	this.locationAndRotationHistoryMap.clear();
 };
 	
 /**

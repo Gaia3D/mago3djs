@@ -34,17 +34,17 @@ var ChangeHistory = function()
 	this.refObjectAditionalMoveRelToBuilding;
 	
 	// 위도
-	this.latitude = 0;
+	this.latitude = 0.0;
 	// 경도
-	this.longitude = 0;
+	this.longitude = 0.0;
 	// 높이
-	this.elevation = 0;
+	this.elevation = 0.0;
 	// heading
-	this.heading = 0;
+	this.heading = 0.0;
 	// pitch
-	this.pitch = 0;
+	this.pitch = 0.0;
 	// roll
-	this.roll = 0;
+	this.roll = 0.0;
 	// duration
 	this.duration = 0;
 	// 색깔
