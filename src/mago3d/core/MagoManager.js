@@ -1932,7 +1932,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
  * @param gl 변수
  * @param scene 변수
  */
-MagoManager.prototype.changeHistoryObjectMovement = function(refObject, node) 
+MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node) 
 {
 	var changeHistory = new ChangeHistory();
 	var refMove = changeHistory.getReferenceObjectAditionalMovement();
@@ -1948,12 +1948,8 @@ MagoManager.prototype.changeHistoryObjectMovement = function(refObject, node)
 	refMoveRelToBuilding.set(refObject.moveVectorRelToBuilding.x, refObject.moveVectorRelToBuilding.y, refObject.moveVectorRelToBuilding.z);
 	if (node === undefined)
 	{ return; }
-	
-	var rootNodeSelected = node.getRoot();
-	if (rootNodeSelected === undefined)
-	{ return; }
 
-	var projectId = rootNodeSelected.data.nodeId;
+	var projectId = node.data.projectId;
 	var dataKey = node.data.nodeId;
 	var objectIndex = refObject._id;
 	
@@ -1977,7 +1973,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		if (nodeSelected === undefined)
 		{ return; }
 		
-		this.changeHistoryObjectMovement(this.objectSelected, nodeSelected);
+		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
 	
 	this.isCameraMoving = false;
@@ -2300,9 +2296,12 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
 		
-		this.changeHistoryObjectMovement(this.objectSelected, this.selectionCandidates.currentNodeSelected) ;
-		this.objectMoved = false;
-		//this.objectMoved = true;
+		var projectId = this.selectionCandidates.currentNodeSelected.data.projectId;
+		var data_key = this.selectionCandidates.currentNodeSelected.data.nodeId;
+		var objectIndexOrder = this.objectSelected._id;
+		
+		MagoConfig.deleteMovingHistoryObject(projectId, data_key, objectIndexOrder);
+		this.objectMoved = true; // this provoques that on leftMouseUp -> saveHistoryObjectMovement
 		
 	}
 };
@@ -3136,6 +3135,7 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 	var geoLocdataManager;
 	var geoLoc;
 	
+	// check movement of objects.
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = nodesArray[i];
@@ -3145,7 +3145,7 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 		
 		geoLocdataManager = this.getNodeGeoLocDataManager(rootNode);
 		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
-		projectId = rootNode.data.nodeId;
+		projectId = node.data.projectId;
 		dataKey = node.data.nodeId;
 		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
 		if (moveHistoryMap)
@@ -3178,6 +3178,10 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 			}
 		}
 	}
+	
+	// check color change.
+	//ColorAPI
+	
 };
 
 /**
@@ -6210,7 +6214,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeColor") 
 	{
 		var changeHistorys = ColorAPI.changeColor(api, this);
-		
+		var hola = 0;
 //		this.magoPolicy.colorBuildings.length = 0;
 //		var projectId = api.getProjectId();
 //		var objectIds = null;
