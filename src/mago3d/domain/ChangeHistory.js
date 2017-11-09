@@ -49,6 +49,8 @@ var ChangeHistory = function()
 	this.duration = 0;
 	// 색깔
 	this.color = 0;
+	// color rgb
+	this.rgbColor = [];
 };
 
 ChangeHistory.prototype.getReferenceObjectAditionalMovement = function() 
@@ -173,6 +175,14 @@ ChangeHistory.prototype.getColor = function()
 ChangeHistory.prototype.setColor = function(color) 
 {
 	this.color = color;
+};
+ChangeHistory.prototype.getRgbColor = function() 
+{
+	return this.rgbColor;
+};
+ChangeHistory.prototype.setRgbColor = function(rgbColor) 
+{
+	this.rgbColor = rgbColor;
 };
 
 ChangeHistory.prototype.getDuration = function()
