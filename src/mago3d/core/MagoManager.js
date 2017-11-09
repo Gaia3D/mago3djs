@@ -3248,7 +3248,9 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 						
 					}
 				}
-				var hola = 0;
+				else{
+					
+				}
 			}
 		}
 	}
