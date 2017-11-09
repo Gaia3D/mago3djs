@@ -1031,8 +1031,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	
-	this.upDateSceneStateMatrices(this.sceneState);
 	var gl = this.sceneState.gl;
+	
+	if(gl.isContextLost())
+	{ return; }
+	
+	this.upDateSceneStateMatrices(this.sceneState);
 
 	if (this.textureAux_1x1 === undefined) 
 	{
@@ -3198,8 +3202,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 	gl.depthRange(0.0, 1.0);
 			
 	gl.enable(gl.DEPTH_TEST);
-
-
+	
 	if (ssao_idx === -1) 
 	{
 		// is selection.***
@@ -3225,7 +3228,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		if (ssao_idx === 1) 
 		{
 			// 2) ssao render.************************************************************************************************************
-			
 			var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 			
 			// check changesHistory.
@@ -3237,8 +3239,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
 
 				currentShader = this.postFxShadersManager.pFx_shaders_array[4];
-
 				shaderProgram = currentShader.program;
+				
 				gl.useProgram(shaderProgram);
 				
 				gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -3317,6 +3319,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			{
 				currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
 				shaderProgram = currentShader.program;
+			
 				gl.useProgram(shaderProgram);
 				gl.enableVertexAttribArray(currentShader.position3_loc);
 				gl.enableVertexAttribArray(currentShader.normal3_loc);
