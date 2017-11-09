@@ -164,9 +164,6 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 			if (neoBuilding === undefined)
 			{ continue; }
 
-			if (neoBuilding.buildingType === "outfitting")
-			{ continue; }
-
 			// if the building is highlighted, the use highlight oneColor4.*********************
 			if (ssao_idx === 1)
 			{

@@ -3119,7 +3119,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
  * @param neoRefLists_array 변수
  */
 
-MagoManager.prototype.checkChangesHistory = function(nodesArray) 
+MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray) 
 {
 	var nodesCount = nodesArray.length;
 	var node;
@@ -3127,6 +3127,7 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 	var projectId;
 	var dataKey;
 	var moveHistoryMap;
+	var colorChangedHistoryMap;
 	var objectIndexOrder;
 	var neoBuilding;
 	var refObject;
@@ -3147,6 +3148,8 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
 		projectId = node.data.projectId;
 		dataKey = node.data.nodeId;
+		
+		// objects movement.
 		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
 		if (moveHistoryMap)
 		{
@@ -3175,6 +3178,77 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 				
 				// if was no rotated, then set the moveVector of the changeHistory.
 				//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
+ * @param scene 변수
+ * @param shader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ * @param neoRefLists_array 변수
+ */
+
+MagoManager.prototype.checkChangesHistoryColors = function(nodesArray) 
+{
+	var nodesCount = nodesArray.length;
+	var node;
+	var rootNode;	
+	var projectId;
+	var dataKey;
+	var moveHistoryMap;
+	var colorChangedHistoryMap;
+	var objectIndexOrder;
+	var neoBuilding;
+	var refObject;
+	var moveVector;
+	var moveVectorRelToBuilding;
+	var geoLocdataManager;
+	var geoLoc;
+	
+	// check movement of objects.
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = nodesArray[i];
+		rootNode = node.getRoot();
+		if (rootNode === undefined)
+		{ continue; }
+		
+		geoLocdataManager = this.getNodeGeoLocDataManager(rootNode);
+		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
+		projectId = node.data.projectId;
+		dataKey = node.data.nodeId;
+		
+		
+		colorChangedHistoryMap = MagoConfig.getColorHistorys(projectId, dataKey);
+		if(colorChangedHistoryMap)
+		{
+			neoBuilding = node.data.neoBuilding;
+			for (var changeHistory of colorChangedHistoryMap.values()) 
+			{
+				if(changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
+				{
+					if(changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+					{
+						// change color for all node.
+						neoBuilding.isColorChanged = true;
+						if(neoBuilding.aditionalColor === undefined)
+							neoBuilding.aditionalColor = new Color();
+						
+						neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+					}
+					else{
+						// there are properties.
+						
+						
+					}
+				}
+				var hola = 0;
 			}
 		}
 	}
@@ -3233,12 +3307,13 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		{
 			// 2) ssao render.************************************************************************************************************
 			var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-			
-			// check changesHistory.
-			this.checkChangesHistory(visibleObjControlerNodes.currentVisibles0);
-			
+
 			if (nodesLOD0Count > 0)
 			{
+				// check changesHistory.
+				this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
+				this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
+			
 				if (this.noiseTexture === undefined) 
 				{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
 
@@ -3321,6 +3396,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
 			if (nodesLOD2Count > 0 || nodesLOD0Count > 0)
 			{
+				this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
 				currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
 				shaderProgram = currentShader.program;
 			
@@ -6213,61 +6289,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeColor") 
 	{
-		var changeHistorys = ColorAPI.changeColor(api, this);
-		var hola = 0;
-//		this.magoPolicy.colorBuildings.length = 0;
-//		var projectId = api.getProjectId();
-//		var objectIds = null;
-//		var isExistObjectIds = false;
-//		if (api.getObjectIds() !== null && api.getObjectIds().length !== 0) 
-//		{
-//			objectIds = api.getObjectIds().split(",");
-//			isExistObjectIds = true;
-//		}
-//		var colorBuilds = [];
-//		for (var i=0, count = blockIds.length; i<count; i++) 
-//		{
-//			if (isExistObjectIds) 
-//			{
-//				for (var j=0, objectCount = objectIds.length; j<objectCount; j++) 
-//				{
-//					var projectLayer = new ProjectLayer();
-//					projectLayer.setProjectId(projectId);
-//					projectLayer.setBlockId(blockIds[i].trim());
-//					projectLayer.setObjectId(objectIds[j].trim());
-//					colorBuilds.push(projectLayer);
-//				}
-//			}
-//			else 
-//			{
-//				var projectLayer = new ProjectLayer();
-//				projectLayer.setProjectId(projectId);
-//				projectLayer.setBlockId(blockIds[i].trim());
-//				projectLayer.setObjectId(null);
-//				colorBuilds.push(projectLayer);
-//			}
-//		}
-//		this.magoPolicy.setColorBuildings(colorBuilds);
-//
-//		var rgbColor = api.getColor().split(",");
-//		var rgbArray = [ rgbColor[0]/255, rgbColor[1]/255, rgbColor[2]/255 ] ;
-//		this.magoPolicy.setColor(rgbArray);
-//		
-//		var buildingsCount = colorBuilds.length;
-//		for (var i=0; i<buildingsCount; i++)
-//		{
-//			//var projectAndBlockId = projectId + "_" + blockIds[i]; // old.***
-//			var projectAndBlockId = colorBuilds[i].projectId + "_" + colorBuilds[i].blockId;
-//			if (colorBuilds[i].objectId === null)
-//			{
-//				this.buildingColorChanged(projectAndBlockId, rgbArray);
-//			}
-//			else
-//			{
-//				this.objectColorChanged(projectAndBlockId, colorBuilds[i].objectId, rgbArray);
-//			}
-//			
-//		}
+		ColorAPI.changeColor(api, this);
 	}
 	else if (apiName === "show") 
 	{

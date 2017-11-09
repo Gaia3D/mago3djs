@@ -27,6 +27,8 @@ var NeoBuilding = function()
 	this.currentVisibleOctreesControler; //  class VisibleObjectsControler;
 	
 	// Aditional Color.***************************************************
+	this.isHighLighted;
+	this.isColorChanged;
 	this.aditionalColor; // use for colorChanged.***
 
 	// Textures loaded.***************************************************
