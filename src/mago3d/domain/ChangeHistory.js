@@ -51,6 +51,8 @@ var ChangeHistory = function()
 	this.color = 0;
 	// color rgb
 	this.rgbColor = [];
+	// 속성
+	this.property = null;
 };
 
 ChangeHistory.prototype.getReferenceObjectAditionalMovement = function() 
@@ -183,6 +185,15 @@ ChangeHistory.prototype.getRgbColor = function()
 ChangeHistory.prototype.setRgbColor = function(rgbColor) 
 {
 	this.rgbColor = rgbColor;
+};
+
+ChangeHistory.prototype.getProperty = function() 
+{
+	return this.property;
+};
+ChangeHistory.prototype.setProperty = function(property) 
+{
+	this.property = property;
 };
 
 ChangeHistory.prototype.getDuration = function()

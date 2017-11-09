@@ -294,33 +294,48 @@
 			<h3>Location and Rotation</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="move_data_key">Data Key</label>
-					<input type="text" id="move_data_key" name="move_data_key" size="25" />
+					<label for="moveProjectId">프로젝트 </label>
+					<select id="moveProjectId" name="moveProjectId" class="select">
+						<option value="2119_fullShipCompleted.json">2119 fullShipCompleted</option>
+						<option value="2119_PERemained2.json">2119 PERemained2</option>
+						<option value="2119_fullShipUnderConstruction2.json">2119 fullShipUnderConstruction2</option>
+						<option value="2119_PERemained1.json">2119 PERemained1</option>
+						<option value="2119_fullShipUnderConstruction1.json">2119 fullShipUnderConstruction1</option>
+						<option value="2119_PEConstructed.json">2119 PEConstructed</option>
+						<option value="2119_sampleBlocks.json">2119 sampleBlocks</option>
+						<option value="decoration.json">decoration</option>
+						<option value="2119_deploy.json">2119 deploy</option>
+						<option value="2119_fullship.json">2119 fullship</option>
+					</select>
 				</li>
 				<li>
-					<label for="move_latitude">위도 </label>
-					<input type="text" id="move_latitude" name="move_latitude" size="25"/>
+					<label for="moveDataKey">Data Key</label>
+					<input type="text" id="moveDataKey" name="moveDataKey" size="25" />
 				</li>
 				<li>
-					<label for="move_longitude">경도 </label>
-					<input type="text" id="move_longitude" name="move_longitude" size="25"/>
+					<label for="moveLatitude">위도 </label>
+					<input type="text" id="moveLatitude" name="moveLatitude" size="25"/>
 				</li>
 				<li>
-					<label for="move_height">높이 </label>
-					<input type="text" id="move_height" name="move_height" size="25" />
+					<label for="moveLongitude">경도 </label>
+					<input type="text" id="moveLongitude" name="moveLongitude" size="25"/>
 				</li>
 				<li>
-					<label for="move_heading">HEADING </label>
-					<input type="text" id="move_heading" name="move_heading" size="25" />
+					<label for="moveHeight">높이 </label>
+					<input type="text" id="moveHeight" name="moveHeight" size="25" />
 				</li>
 				<li>
-					<label for="move_pitch">PITCH </label>
-					<input type="text" id="move_pitch" name="move_pitch" size="25" />
+					<label for="moveHeading">HEADING </label>
+					<input type="text" id="moveHeading" name="moveHeading" size="25" />
 				</li>
 				<li>
-					<label for="move_roll">ROLL </label>
-					<input type="text" id="move_roll" name="move_roll" size="25" />
-					<button type="button" id="changeLocationAndRotationAPI" class="btn">변환</button> 
+					<label for="movePitch">PITCH </label>
+					<input type="text" id="movePitch" name="movePitch" size="25" />
+				</li>
+				<li>
+					<label for="moveRoll">ROLL </label>
+					<input type="text" id="moveRoll" name="moveRoll" size="25" />
+					<button type="button" id="changeLocationAndRotation" class="btn">변환</button> 
 				</li>
 			</ul>
 		</div>
@@ -1156,46 +1171,46 @@
 	});
 	
 	// 변환행렬
-	$("#changeLocationAndRotationAPI").click(function() {
+	$("#changeLocationAndRotation").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
-		changeLocationAndRotationAPI(managerFactory, 
-										$("#move_data_key").val(), $("#move_latitude").val(), $("#move_longitude").val(), 
-										$("#move_height").val(), $("#move_heading").val(), $("#move_pitch").val(), $("#move_roll").val());
+		changeLocationAndRotationAPI(managerFactory, $("#moveProjectId").val()
+										$("#moveDataKey").val(), $("#moveLatitude").val(), $("#moveLongitude").val(), 
+										$("#moveHeight").val(), $("#moveHeading").val(), $("#movePitch").val(), $("#moveRoll").val());
 	});
 	function changeLocationAndRotationCheck() {
-		if ($.trim($("#move_data_key").val()) === ""){
+		if ($.trim($("#moveDataKey").val()) === ""){
 			alert("Data Key를 입력해 주세요.");
-			$("#move_data_key").focus();
+			$("#moveDataKey").focus();
 			return false;
 		}
-		if ($.trim($("#move_latitude").val()) === ""){
+		if ($.trim($("#moveLatitude").val()) === ""){
 			alert("위도를 입력해 주세요.");
-			$("#move_latitude").focus();
+			$("#moveLatitude").focus();
 			return false;
 		}
-		if ($.trim($("#move_longitude").val()) === ""){
+		if ($.trim($("#moveLongitude").val()) === ""){
 			alert("경도를 입력해 주세요.");
-			$("#move_longitude").focus();
+			$("#moveLongitude").focus();
 			return false;
 		}
-		if ($.trim($("#move_height").val()) === ""){
+		if ($.trim($("#moveHeight").val()) === ""){
 			alert("높이를 입력해 주세요.");
-			$("#move_height").focus();
+			$("#moveHeight").focus();
 			return false;
 		}
-		if ($.trim($("#move_heading").val()) === ""){
+		if ($.trim($("#moveHeading").val()) === ""){
 			alert("heading을 입력해 주세요.");
-			$("#move_heading").focus();
+			$("#moveHeading").focus();
 			return false;
 		}
-		if ($.trim($("#move_pitch").val()) === ""){
+		if ($.trim($("#movePitch").val()) === ""){
 			alert("pitch를 입력해 주세요.");
-			$("#move_pitch").focus();
+			$("#movePitch").focus();
 			return false;
 		}
-		if ($.trim($("#move_roll").val()) === ""){
+		if ($.trim($("#moveRoll").val()) === ""){
 			alert("roll를 입력해 주세요.");
-			$("#move_roll").focus();
+			$("#moveRoll").focus();
 			return false;
 		}
 		return true;
