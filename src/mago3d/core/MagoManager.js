@@ -1928,32 +1928,45 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
  * @param gl 변수
  * @param scene 변수
  */
+MagoManager.prototype.changeHistoryObjectMovement = function(refObject, node) 
+{
+	var changeHistory = new ChangeHistory();
+	var refMove = changeHistory.getReferenceObjectAditionalMovement();
+	var refMoveRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
+	refMove.set(refObject.moveVector.x, refObject.moveVector.y, refObject.moveVector.z);
+	refMoveRelToBuilding.set(refObject.moveVectorRelToBuilding.x, refObject.moveVectorRelToBuilding.y, refObject.moveVectorRelToBuilding.z);
+	if(node === undefined)
+		return;
+	
+	var rootNodeSelected = node.getRoot();
+	if(rootNodeSelected === undefined)
+		return;
+
+	var projectId = rootNodeSelected.data.nodeId;
+	var dataKey = node.data.nodeId;
+	var objectIndex = refObject._id;
+	
+	changeHistory.setProjectId(projectId);
+	changeHistory.setDataKey(dataKey);
+	changeHistory.setObjectIndexOrder(objectIndex);
+	MagoConfig.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
 MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
 {
 	if(this.objectMoved)
 	{
-		// now save the change movement history.
-		var changeHistory = new ChangeHistory();
-		var refMove = changeHistory.getReferenceObjectAditionalMovement();
-		refMove.set(this.objectSelected.moveVector.x, this.objectSelected.moveVector.y, this.objectSelected.moveVector.z);
+		this.objectMoved = false;
 		var nodeSelected = this.selectionCandidates.currentNodeSelected;
 		if(nodeSelected === undefined)
 			return;
 		
-		var rootNodeSelected = nodeSelected.getRoot();
-		if(rootNodeSelected === undefined)
-			return;
-
-		var projectId = rootNodeSelected.data.nodeId;
-		var dataKey = nodeSelected.data.nodeId;
-		var objectIndex = this.objectSelected._id;
-		
-		changeHistory.setProjectId(projectId);
-		changeHistory.setDataKey(dataKey);
-		changeHistory.setObjectIndexOrder(objectIndex);
-		MagoConfig.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
-		
-		this.objectMoved = false;
+		this.changeHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
 	
 	this.isCameraMoving = false;
@@ -2276,7 +2289,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
 		
-		this.objectMoved = true;
+		this.changeHistoryObjectMovement(this.objectSelected, this.selectionCandidates.currentNodeSelected) ;
+		//this.objectMoved = true;
 		
 	}
 };
@@ -3106,6 +3120,7 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 	var neoBuilding;
 	var refObject;
 	var moveVector;
+	var moveVectorRelToBuilding;
 	
 	for(var i=0; i<nodesCount; i++)
 	{
@@ -3130,8 +3145,13 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 				if(refObject.moveVector === undefined)
 					refObject.moveVector = new Point3D();
 				
+				if(refObject.moveVectorRelToBuilding === undefined)
+					refObject.moveVectorRelToBuilding = new Point3D();
+				
 				moveVector = changeHistory.getReferenceObjectAditionalMovement();
+				moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
 				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+				refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
 			}
 		}
 	}
