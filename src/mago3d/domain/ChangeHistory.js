@@ -55,16 +55,16 @@ var ChangeHistory = function()
 
 ChangeHistory.prototype.getReferenceObjectAditionalMovement = function() 
 {
-	if(this.refObjectAditionalMove === undefined)
-		this.refObjectAditionalMove = new Point3D();
+	if (this.refObjectAditionalMove === undefined)
+	{ this.refObjectAditionalMove = new Point3D(); }
 	
 	return this.refObjectAditionalMove;
 };
 
 ChangeHistory.prototype.getReferenceObjectAditionalMovementRelToBuilding = function() 
 {
-	if(this.refObjectAditionalMoveRelToBuilding === undefined)
-		this.refObjectAditionalMoveRelToBuilding = new Point3D();
+	if (this.refObjectAditionalMoveRelToBuilding === undefined)
+	{ this.refObjectAditionalMoveRelToBuilding = new Point3D(); }
 	
 	return this.refObjectAditionalMoveRelToBuilding;
 };
