@@ -200,6 +200,18 @@ function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 }
 
 /**
+ * 브라우저내 모든 색깔 변경 이력을 삭제
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function deleteAllChangeColorAPI(managerFactoryInstance) 
+{
+	if (managerFactoryInstance === null) { return; } 
+	
+	var api = new API("deleteAllChangeColor");
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 이슈 등록 활성화 유무
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} flag true = 활성화, false = 비활성화
