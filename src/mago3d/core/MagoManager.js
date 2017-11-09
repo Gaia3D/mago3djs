@@ -3206,10 +3206,6 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 	var objectIndexOrder;
 	var neoBuilding;
 	var refObject;
-	var moveVector;
-	var moveVectorRelToBuilding;
-	var geoLocdataManager;
-	var geoLoc;
 	
 	// check movement of objects.
 	for (var i=0; i<nodesCount; i++)
@@ -3219,12 +3215,9 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		if (rootNode === undefined)
 		{ continue; }
 		
-		geoLocdataManager = this.getNodeGeoLocDataManager(rootNode);
-		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
 		projectId = node.data.projectId;
 		dataKey = node.data.nodeId;
-		
-		
+
 		colorChangedHistoryMap = MagoConfig.getColorHistorys(projectId, dataKey);
 		if(colorChangedHistoryMap)
 		{
@@ -3244,8 +3237,25 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 					}
 					else{
 						// there are properties.
-						
-						
+						var nodesArray = [];
+						node.extractNodes(nodesArray);
+						var nodesCount = nodesArray.length;
+						var aNode;
+						for(var i=0; i<nodesCount; i++)
+						{
+							aNode = nodesArray[i];
+							var propertyKey = changeHistory.propertyKey;
+							var propertyValue = changeHistory.propertyValue;
+							// 1rst, check if this has the same "key" and same "value".
+							if(aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+							{
+								neoBuilding.isColorChanged = true;
+								if(neoBuilding.aditionalColor === undefined)
+									neoBuilding.aditionalColor = new Color();
+								
+								neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							}
+						}
 					}
 				}
 				else{
@@ -3254,10 +3264,23 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 			}
 		}
 	}
-	
-	// check color change.
-	//ColorAPI
-	
+	/*
+	colorChangedHistoryMap = MagoConfig.colorHistoryMap;
+	if(colorChangedHistoryMap)
+	{
+		// now check nodes that is no physical.
+		for (var changeHistory of colorChangedHistoryMap.values()) 
+		{
+			var projectId = changeHistory.projectId;
+			var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+			var aNode = nodesMap.get(changeHistory.dataKey);
+			if(aNode)
+			{
+				var hola = 0;
+			}
+		}
+	}
+	*/
 };
 
 /**
