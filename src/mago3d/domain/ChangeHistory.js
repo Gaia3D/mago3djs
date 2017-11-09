@@ -53,6 +53,8 @@ var ChangeHistory = function()
 	this.rgbColor = [];
 	// 속성
 	this.property = null;
+	this.propertyKey = null;
+	this.propertyValue = null;
 };
 
 ChangeHistory.prototype.getReferenceObjectAditionalMovement = function() 
@@ -194,6 +196,22 @@ ChangeHistory.prototype.getProperty = function()
 ChangeHistory.prototype.setProperty = function(property) 
 {
 	this.property = property;
+};
+ChangeHistory.prototype.getPropertyKey = function() 
+{
+	return this.propertyKey;
+};
+ChangeHistory.prototype.setPropertyKey = function(propertyKey) 
+{
+	this.propertyKey = propertyKey;
+};
+ChangeHistory.prototype.getPropertyValue = function() 
+{
+	return this.propertyValue;
+};
+ChangeHistory.prototype.setPropertyValue = function(propertyValue) 
+{
+	this.propertyValue = propertyValue;
 };
 
 ChangeHistory.prototype.getDuration = function()

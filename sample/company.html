@@ -1165,15 +1165,17 @@
 			$("#colorDataKey").focus();
 			return false;
 		}
+		
 		var objectIds = null;
-		if($("#colorObjectIds").val() !== null) objectIds = $("#colorObjectIds").val().split(",");
+		var colorObjectIds = $("#colorObjectIds").val();
+		if(colorObjectIds !== null && colorObjectIds !=="") objectIds = colorObjectIds.split(",");
 		changeColorAPI(managerFactory, $("#colorProjectId").val(), $("#colorDataKey").val(), objectIds, $("#colorProperty").val(), $("#updateColor").val());
 	});
 	
 	// 변환행렬
 	$("#changeLocationAndRotation").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
-		changeLocationAndRotationAPI(managerFactory, $("#moveProjectId").val(),
+		changeLocationAndRotationAPI(	managerFactory, $("#moveProjectId").val(),
 										$("#moveDataKey").val(), $("#moveLatitude").val(), $("#moveLongitude").val(), 
 										$("#moveHeight").val(), $("#moveHeading").val(), $("#movePitch").val(), $("#moveRoll").val());
 	});
