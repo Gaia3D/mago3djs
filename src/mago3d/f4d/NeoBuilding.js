@@ -52,8 +52,8 @@ var NeoBuilding = function()
  */
 NeoBuilding.prototype.getReferenceObject = function(refObjectIndex) 
 {
-	if(this.motherNeoReferencesArray === undefined)
-		return undefined;
+	if (this.motherNeoReferencesArray === undefined)
+	{ return undefined; }
 	return this.motherNeoReferencesArray[refObjectIndex];
 };
 

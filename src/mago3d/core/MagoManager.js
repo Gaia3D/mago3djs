@@ -1933,14 +1933,21 @@ MagoManager.prototype.changeHistoryObjectMovement = function(refObject, node)
 	var changeHistory = new ChangeHistory();
 	var refMove = changeHistory.getReferenceObjectAditionalMovement();
 	var refMoveRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
+	
+	if (refObject.moveVector === undefined)
+	{ refObject.moveVector = new Point3D(); }
+	
+	if (refObject.moveVectorRelToBuilding === undefined)
+	{ refObject.moveVectorRelToBuilding = new Point3D(); }
+	
 	refMove.set(refObject.moveVector.x, refObject.moveVector.y, refObject.moveVector.z);
 	refMoveRelToBuilding.set(refObject.moveVectorRelToBuilding.x, refObject.moveVectorRelToBuilding.y, refObject.moveVectorRelToBuilding.z);
-	if(node === undefined)
-		return;
+	if (node === undefined)
+	{ return; }
 	
 	var rootNodeSelected = node.getRoot();
-	if(rootNodeSelected === undefined)
-		return;
+	if (rootNodeSelected === undefined)
+	{ return; }
 
 	var projectId = rootNodeSelected.data.nodeId;
 	var dataKey = node.data.nodeId;
@@ -1959,12 +1966,12 @@ MagoManager.prototype.changeHistoryObjectMovement = function(refObject, node)
  */
 MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
 {
-	if(this.objectMoved)
+	if (this.objectMoved)
 	{
 		this.objectMoved = false;
 		var nodeSelected = this.selectionCandidates.currentNodeSelected;
-		if(nodeSelected === undefined)
-			return;
+		if (nodeSelected === undefined)
+		{ return; }
 		
 		this.changeHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
@@ -2290,6 +2297,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		}
 		
 		this.changeHistoryObjectMovement(this.objectSelected, this.selectionCandidates.currentNodeSelected) ;
+		this.objectMoved = false;
 		//this.objectMoved = true;
 		
 	}
@@ -3121,41 +3129,52 @@ MagoManager.prototype.checkChangesHistory = function(nodesArray)
 	var refObject;
 	var moveVector;
 	var moveVectorRelToBuilding;
+	var geoLocdataManager;
+	var geoLoc;
 	
-	for(var i=0; i<nodesCount; i++)
+	for (var i=0; i<nodesCount; i++)
 	{
 		node = nodesArray[i];
 		rootNode = node.getRoot();
-		if(rootNode === undefined)
-			continue;
+		if (rootNode === undefined)
+		{ continue; }
 		
+		geoLocdataManager = this.getNodeGeoLocDataManager(rootNode);
+		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
 		projectId = rootNode.data.nodeId;
 		dataKey = node.data.nodeId;
 		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
-		if(moveHistoryMap)
+		if (moveHistoryMap)
 		{
 			neoBuilding = node.data.neoBuilding;
 			for (var changeHistory of moveHistoryMap.values()) 
 			{
 				objectIndexOrder = changeHistory.getObjectIndexOrder();
 				refObject = neoBuilding.getReferenceObject(objectIndexOrder);
-				if(refObject === undefined)
-					continue;
+				if (refObject === undefined)
+				{ continue; }
 				
-				if(refObject.moveVector === undefined)
-					refObject.moveVector = new Point3D();
+				if (refObject.moveVector === undefined)
+				{ refObject.moveVector = new Point3D(); }
 				
-				if(refObject.moveVectorRelToBuilding === undefined)
-					refObject.moveVectorRelToBuilding = new Point3D();
+				if (refObject.moveVectorRelToBuilding === undefined)
+				{ refObject.moveVectorRelToBuilding = new Point3D(); }
 				
 				moveVector = changeHistory.getReferenceObjectAditionalMovement();
 				moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
-				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
 				refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+				
+				// now check if the building was rotated.
+				// if was rotated then recalculate the move vector.
+				refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
+				
+				// if was no rotated, then set the moveVector of the changeHistory.
+				//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
 			}
 		}
 	}
-}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -6455,7 +6474,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "gotoProject")
 	{
 		var projectId = api.getProjectId();
-		if(!this.hierarchyManager.existProject(projectId))
+		if (!this.hierarchyManager.existProject(projectId))
 		{
 			var projectDataFolder = api.getProjectDataFolder();
 			this.getObjectIndexFileTEST(projectId, projectDataFolder);

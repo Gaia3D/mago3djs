@@ -143,7 +143,7 @@ MagoConfig.getMovingHistoryObjects = function(projectId, data_key)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
-	if(projectIdMap === undefined) return undefined;
+	if (projectIdMap === undefined) { return undefined; }
 	// data_key 별 map을 검사
 	var dataKeyMap = projectIdMap.get(data_key);
 	return dataKeyMap;
@@ -156,10 +156,10 @@ MagoConfig.getMovingHistoryObject = function(projectId, data_key, objectIndexOrd
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
-	if(projectIdMap === undefined) return undefined;
+	if (projectIdMap === undefined) { return undefined; }
 	// data_key 별 map을 검사
 	var dataKeyMap = projectIdMap.get(data_key);
-	if(dataKeyMap === undefined) return undefined;
+	if (dataKeyMap === undefined) { return undefined; }
 	// objectIndexOrder 를 저장
 	return dataKeyMap.get(objectIndexOrder);
 };
@@ -171,14 +171,16 @@ MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, c
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.movingHistoryMap.get(projectId);
-	if(projectIdMap === undefined) {
+	if (projectIdMap === undefined) 
+	{
 		projectIdMap = new Map();
 		this.movingHistoryMap.set(projectId, projectIdMap);
 	}
 	
 	// data_key 별 map을 검사
 	var dataKeyMap = projectIdMap.get(data_key);
-	if(dataKeyMap === undefined) {
+	if (dataKeyMap === undefined) 
+	{
 		dataKeyMap = new Map();
 		projectIdMap.set(data_key, dataKeyMap);
 	}
