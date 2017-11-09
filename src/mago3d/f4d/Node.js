@@ -134,6 +134,21 @@ Node.prototype.extractNodesByDataName = function(nodesArray, dataname)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.extractNodes = function(nodesArray) 
+{
+	// this function extracts nodes that has a data named dataname, including children.
+	nodesArray.push(this);
+	
+	var childrenCount = this.children.length;
+	for (var i=0; i<childrenCount; i++)
+	{
+		this.children[i].extractNodes(nodesArray);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param texture 변수
  * @returns texId
  */
