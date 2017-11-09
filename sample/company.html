@@ -247,6 +247,31 @@
 			</ul>
 		</div>
 		<div>
+			<h3>가시화</h3>
+			<ul class="apiLoca">
+				<li>
+					<input type="radio" id="showProperty" name="propertyInfo" value="true" onclick="changePropertyRendering(true);" />
+					<label for="showLabel"> 표시 </label>
+					<input type="radio" id="hideProperty" name="propertyInfo" value="false" onclick="changePropertyRendering(false);"/>
+					<label for="hideLabel"> 비표시 </label>
+				</li>
+				<li>
+					<label for="propertyProjectId">프로젝트 </label>
+					<select id="propertyProjectId" name="propertyProjectId" class="select">
+						<option value="2119_fullShipCompleted.json">2119 fullShipCompleted</option>
+						<option value="2119_PERemained2.json">2119 PERemained2</option>
+						<option value="2119_PERemained1.json">2119 PERemained1</option>
+						<option value="2119_PEConstructed.json">2119 PEConstructed</option>
+						<option value="2119_sampleBlocks.json">2119 sampleBlocks</option>
+						<option value="decoration.json">decoration</option>
+						<option value="2119_deploy.json">2119 deploy</option>
+						<option value="2119_fullship.json">2119 fullship</option>
+					</select>
+					<button type="button" id="changeProperty" class="btn">변경</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
 			<h3>색깔 변경</h3>
 			<ul class="apiLoca">
 				<li>
@@ -1122,21 +1147,21 @@
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(data_key, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
-			$("#move_data_key").val(data_key);
-			$("#move_latitude").val(latitude);
-			$("#move_longitude").val(longitude);
-			$("#move_height").val(height);
-			$("#move_heading").val(heading);
-			$("#move_pitch").val(pitch);
-			$("#move_roll").val(roll);
+			$("#moveDataKey").val(dataKey);
+			$("#moveLatitude").val(latitude);
+			$("#moveLongitude").val(longitude);
+			$("#moveHeight").val(height);
+			$("#moveHeading").val(heading);
+			$("#movePitch").val(pitch);
+			$("#moveRoll").val(roll);
 			
 			$.toast({
 			    heading: 'Click Object Info',
 			    text: [
-			        'dataKey : ' + data_key, 
+			        'dataKey : ' + dataKey, 
 			        'objectId : ' + objectId,
 			        'latitude : ' + latitude,
 			        'longitude : ' + longitude,
@@ -1152,7 +1177,7 @@
 			});
 			
 			// occlusion culling
-			$("#occlusion_culling_data_key").val(data_key);
+			$("#occlusion_culling_data_key").val(dataKey);
 			// 현재 좌표를 저장
 			$("#now_latitude").val(latitude);
 			$("#now_longitude").val(longitude);
