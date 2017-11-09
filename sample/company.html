@@ -247,6 +247,50 @@
 			</ul>
 		</div>
 		<div>
+			<h3>색깔 변경</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="colorProjectId">프로젝트 </label>
+					<select id="colorProjectId" name="colorProjectId" class="select">
+						<option value="2119_fullShipCompleted.json">2119 fullShipCompleted</option>
+						<option value="2119_PERemained2.json">2119 PERemained2</option>
+						<option value="2119_fullShipUnderConstruction2.json">2119 fullShipUnderConstruction2</option>
+						<option value="2119_PERemained1.json">2119 PERemained1</option>
+						<option value="2119_fullShipUnderConstruction1.json">2119 fullShipUnderConstruction1</option>
+						<option value="2119_PEConstructed.json">2119 PEConstructed</option>
+						<option value="2119_sampleBlocks.json">2119 sampleBlocks</option>
+						<option value="decoration.json">decoration</option>
+						<option value="2119_deploy.json">2119 deploy</option>
+						<option value="2119_fullship.json">2119 fullship</option>
+					</select>
+				</li>
+				<li>
+					<label for="colorDataKey">Data Key</label>
+					<input type="text" id="colorDataKey" name="colorDataKey" size="30" />
+				</li>
+				<li>
+					<label for="colorObjectIds">Object Id</label>
+					<input type="text" id="colorObjectIds" name="colorObjectIds" placeholder="   , 구분" size="30" />
+				</li>
+				<li>
+					<label for="colorProperty">속성</label>
+					<input type="text" id="colorProperty" name="colorProperty" size="30" placeholder="isMain=true" />
+				</li>
+				<li>
+					<label for="updateColor">색깔</label>
+					<select id="updateColor" name="updateColor" class="select">
+						<option value="255,0,0"> 빨강 </option>
+						<option value="255,255,0"> 노랑 </option>
+						<option value="0,255,0"> 녹색 </option>
+						<option value="0,0,255"> 파랑 </option>
+						<option value="255,0,255"> 분홍 </option>
+						<option value="0,0,0"> 검정 </option>
+					</select>
+					<button type="button" id="changeColor" class="btn">변경</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
 			<h3>Location and Rotation</h3>
 			<ul class="apiLoca">
 				<li>
@@ -533,7 +577,7 @@
 		<div>
 			<h3><label for="geo_ssao_radius">SSAO Radius</label></h3>
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
-			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
+			<button type="button" id="changeSsaoRadiusButton" class="btn">변경</button>
 		</div>
 		
 		<div>
@@ -609,9 +653,10 @@
 <script type="text/javascript" src="/src/mago3d/domain/Callback.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Config.js"></script>
 <script type="text/javascript" src="/src/mago3d/api/APIGateway.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/ColorAPI.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/DrawAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Policy.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/ProjectLayer.js"></script>
-<script type="text/javascript" src="/src/mago3d/api/DrawAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/Accessor.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/BlockModels.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/HierarchyManager.js"></script>
@@ -1097,6 +1142,19 @@
 			$("#now_longitude").val(longitude);
 		}
 	}
+	
+	// 색변경
+	$("#changeColor").click(function(e) {
+		if ($.trim($("#colorDataKey").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#colorDataKey").focus();
+			return false;
+		}
+		var objectIds = null;
+		if($("#colorObjectIds").val() !== null) objectIds = $("#colorObjectIds").val().split(",");
+		changeColorAPI(managerFactory, $("#colorProjectId").val(), $("#colorDataKey").val(), objectIds, $("#colorProperty").val(), $("#updateColor").val());
+	});
+	
 	// 변환행렬
 	$("#changeLocationAndRotationAPI").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
@@ -1310,8 +1368,8 @@
 		changeLightingAPI(managerFactory, $("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
 	});
 	// Ssadradius 설정
-	$("#changeSsadRadiusButton").click(function() {
-		changeSsadRadiusAPI(managerFactory, $("#geo_ssao_radius").val());
+	$("#changeSsaoRadiusButton").click(function() {
+		changeSsaoRadiusAPI(managerFactory, $("#geo_ssao_radius").val());
 	});
 
 	// click poisition call back function

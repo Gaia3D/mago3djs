@@ -188,6 +188,21 @@ MagoConfig.saveMovingHistory = function(projectId, data_key, objectIndexOrder, c
 };
 
 /**
+ * object 이동 내용을 삭제
+ */
+MagoConfig.deleteMovingHistoryObject = function(projectId, data_key, objectIndexOrder)
+{
+	// projectId 별 map을 검사
+	var projectIdMap = this.movingHistoryMap.get(projectId);
+	if(projectIdMap === undefined) return undefined;
+	// data_key 별 map을 검사
+	var dataKeyMap = projectIdMap.get(data_key);
+	if(dataKeyMap === undefined) return undefined;
+	// objectIndexOrder 를 저장
+	return dataKeyMap.delete(objectIndexOrder);
+};
+
+/**
  * 모든 색깔변경 히스토리 삭제
  */
 MagoConfig.clearColorHistory = function() 

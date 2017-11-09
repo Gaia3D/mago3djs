@@ -54,6 +54,8 @@ function API(apiName)
 	// duration
 	this.duration = 0;
 
+	// 속성
+	this.property = null;
 	// 색깔
 	this.color = 0;
 	// structs = MSP, outfitting = MOP
@@ -236,6 +238,15 @@ API.prototype.getRoll = function()
 API.prototype.setRoll = function(roll) 
 {
 	this.roll = roll;
+};
+
+API.prototype.getProperty = function() 
+{
+	return this.property;
+};
+API.prototype.setProperty = function(property) 
+{
+	this.property = property;
 };
 
 API.prototype.getColor = function() 

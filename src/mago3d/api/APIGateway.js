@@ -7,8 +7,8 @@
  */
 /**
  * mago3d 활성화/비활성화
- * @param {Property} managerFactoryInstance 
- * @param {Property} isShow true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance 
+ * @param {boolean} isShow true = 활성화, false = 비활성화
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
@@ -21,8 +21,8 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 
 /**
  * outfitting 표시/비표시
- * @param {Property} managerFactoryInstance  
- * @param {Property} isShow true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance  
+ * @param {boolean} isShow true = 활성화, false = 비활성화
  */
 function changeOutFittingAPI(managerFactoryInstance, isShow) 
 {
@@ -35,8 +35,8 @@ function changeOutFittingAPI(managerFactoryInstance, isShow)
 
 /**
  * Label 표시/비표시
- * @param {Property} managerFactoryInstance 
- * @param {Property} isShow true = 표시, false = 비표시
+ * @param {ManagerFactory} managerFactoryInstance 
+ * @param {boolean} isShow true = 표시, false = 비표시
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
@@ -49,8 +49,8 @@ function changeLabelAPI(managerFactoryInstance, isShow)
 
 /**
  * boundingBox 표시/비표시
- * @param {Property} managerFactoryInstance
- * @param {Property} isShow true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} isShow true = 활성화, false = 비활성화
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
@@ -63,8 +63,8 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
 
 /**
  * 그림자 표시/비표시
- * @param {Property} managerFactoryInstance
- * @param {Property} isShow true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} isShow true = 활성화, false = 비활성화
  */
 function changeShadowAPI(managerFactoryInstance, isShow) 
 {
@@ -77,8 +77,8 @@ function changeShadowAPI(managerFactoryInstance, isShow)
 
 /**
  * frustum culling 가시 거리
- * @param {Property} managerFactoryInstance
- * @param {Property} frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {number} frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
  */
 function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance) 
 {
@@ -91,10 +91,10 @@ function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance)
 
 /**
  * highlighting
- * @param {Property} managerFactoryInstance
- * @param {Property} projectId 프로젝트 아이디
- * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
- * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId 프로젝트 아이디
+ * @param {string} blockIds block id. 복수개의 경우 , 로 입력
+ * @param {string} objectIds object id. 복수개의 경우 , 로 입력
  */
 function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, objectIds) 
 {
@@ -109,34 +109,36 @@ function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, obje
 
 /**
  * color 변경
- * @param {Property} managerFactoryInstance
- * @param {Property} projectId 프로젝트 아이디
- * @param {Property} blockIds block id. 복수개의 경우 , 로 입력
- * @param {Property} objectIds object id. 복수개의 경우 , 로 입력
- * @param {Property} color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId 프로젝트 아이디
+ * @param {string} dataKey data key
+ * @param {string} objectIds object id. 복수개의 경우 , 로 입력
+ * @param {string} property 속성값 예)isMain=true
+ * @param {string} color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
  */
-function changeColorAPI(managerFactoryInstance, projectId, blockIds, objectIds, color) 
+function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, property, color) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new API("changeColor");
 	api.setProjectId(projectId);
-	api.setBlockIds(blockIds);
+	api.setDataKey(dataKey);
 	api.setObjectIds(objectIds);
+	api.setProperty(property);
 	api.setColor(color);
 	managerFactoryInstance.callAPI(api);
 }
 
 /**
  * location and rotation 변경
- * @param {Property} managerFactoryInstance
- * @param {Property} data_key
- * @param {Property} latitude 위도
- * @param {Property} longitude 경도
- * @param {Property} height 높이
- * @param {Property} heading 좌, 우
- * @param {Property} pitch 위, 아래
- * @param {Property} roll 좌, 우 기울기
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} data_key
+ * @param {string} latitude 위도
+ * @param {string} longitude 경도
+ * @param {string} height 높이
+ * @param {string} heading 좌, 우
+ * @param {string} pitch 위, 아래
+ * @param {string} roll 좌, 우 기울기
  */
 function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude, longitude, height, heading, pitch, roll) 
 {
@@ -155,8 +157,8 @@ function changeLocationAndRotationAPI(managerFactoryInstance, data_key, latitude
 
 /**
  * 마우스 클릭 객체 이동 대상 변경
- * @param {Property} managerFactoryInstance
- * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
 function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
@@ -169,8 +171,8 @@ function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 
 /**
  * 마우스로 이동한 객체 정보를 브라우저내 저장
- * @param {Property} managerFactoryInstance
- * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
 function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
@@ -183,8 +185,8 @@ function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 
 /**
  * 브라우저내 모든 마우스 이동 정보를 삭제
- * @param {Property} managerFactoryInstance
- * @param {Property} objectMoveMode 0 = All, 1 = object, 2 = None
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
 function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
 {
@@ -197,8 +199,8 @@ function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 
 /**
  * 이슈 등록 활성화 유무
- * @param {Property} managerFactoryInstance
- * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
  */
 function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
 {
@@ -211,8 +213,8 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
 
 /**
  * object 정보 표시 활성화 유무
- * @param {Property} managerFactoryInstance
- * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
  */
 function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
 {
@@ -225,9 +227,9 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
 
 /**
  * Object Occlusion culling
- * @param {Property} managerFactoryInstance
- * @param {Property} flag true = 활성화, false = 비활성화
- * @param {Property} dataKey
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {string} dataKey
  */
 function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
 {
@@ -241,8 +243,8 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
 
 /**
  * 1인칭, 3인칭 모드 개발중...
- * @param {Property} managerFactoryInstance
- * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
  */
 function changeFPVModeAPI(managerFactoryInstance, flag)
 {
@@ -255,8 +257,8 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
 
 /**
  * 현재 위치 근처 issue list. false인 경우 clear
- * @param {Property} managerFactoryInstance
- * @param {Property} flag true = 활성화, false = 비활성화
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
  */
 function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
 {
@@ -270,8 +272,8 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
 /**
  * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
  * issue 등록 geo 정보 관련 상태 변경
- * @param {Property} managerFactoryInstance
- * @param {Property} insertIssueState 이슈 등록 좌표 상태
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} insertIssueState 이슈 등록 좌표 상태
  */
 function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState) 
 {
@@ -284,11 +286,11 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
 
 /**
  * LOD 설정을 변경
- * @param {Property} managerFactoryInstance
- * @param {Property} lod0DistInMeters
- * @param {Property} lod1DistInMeters
- * @param {Property} lod2DistInMeters
- * @param {Property} lod3DistInMeters
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} lod0DistInMeters
+ * @param {string} lod1DistInMeters
+ * @param {string} lod2DistInMeters
+ * @param {string} lod3DistInMeters
  */
 function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
 {
@@ -304,12 +306,12 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
 
 /**
  * Lighting 설정
- * @param {Property} managerFactoryInstance
- * @param {Property} ambientReflectionCoef
- * @param {Property} diffuseReflectionCoef
- * @param {Property} specularReflectionCoef
- * @param {Property} ambientColor
- * @param {Property} specularColor
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} ambientReflectionCoef
+ * @param {string} diffuseReflectionCoef
+ * @param {string} specularReflectionCoef
+ * @param {string} ambientColor
+ * @param {string} specularColor
  */
 function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
 {
@@ -325,22 +327,22 @@ function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffus
 }
 
 /**
- * SSAD Radius 설정
- * @param {Property} managerFactoryInstance
- * @param {Property} ssaoRadius
+ * SSAO Radius 설정
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} ssaoRadius
  */
-function changeSsadRadiusAPI(managerFactoryInstance, ssaoRadius)
+function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeSsadRadius");
+	var api = new API("changeSsaoRadius");
 	api.setSsaoRadius(ssaoRadius);
 	managerFactoryInstance.callAPI(api);
 }
 
 /**
  * 화면에 있는 모든 데이터를 삭제, 비표시
- * @param {Property} managerFactoryInstance
+ * @param {ManagerFactory} managerFactoryInstance
  */
 function clearAllDataAPI(managerFactoryInstance)
 {	
@@ -353,14 +355,14 @@ function clearAllDataAPI(managerFactoryInstance)
 
 /**
  * pin image를 그림
- * @param {Property} managerFactoryInstance
- * @param {Property} drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
- * @param {Property} issue_id 이슈 고유키
- * @param {Property} issue_type 이슈 고유키
- * @param {Property} data_key 데이터 고유키
- * @param {Property} latitude 데이터 고유키
- * @param {Property} longitude 데이터 고유키
- * @param {Property} height 데이터 고유키
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} drawType 이미지를 그리는 유형 0 : DB, 1 : 이슈등록
+ * @param {string} issue_id 이슈 고유키
+ * @param {string} issue_type 이슈 고유키
+ * @param {string} data_key 데이터 고유키
+ * @param {string} latitude 데이터 고유키
+ * @param {string} longitude 데이터 고유키
+ * @param {string} height 데이터 고유키
  */
 function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
 {
@@ -379,12 +381,12 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
 
 /**
  * 해당 프로젝트를 로딩하고 이동하기
- * @param {Property} managerFactoryInstance
- * @param {Property} projectId project id
- * @param {Property} latitude 데이터 고유키
- * @param {Property} longitude 데이터 고유키
- * @param {Property} height 데이터 고유키
- * @param {Property} duration 이동하는 시간
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project id
+ * @param {string} latitude 데이터 고유키
+ * @param {string} longitude 데이터 고유키
+ * @param {string} height 데이터 고유키
+ * @param {string} duration 이동하는 시간
  */
 function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) 
 {
@@ -405,8 +407,8 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
 
 /**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
- * @param {Property} managerFactoryInstance
- * @param {Property} eventType 어떤 마우스 동작을 원하는지를 구분
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} eventType 어떤 마우스 동작을 원하는지를 구분
  */
 function mouseMoveAPI(managerFactoryInstance, eventType) 
 {
@@ -417,9 +419,9 @@ function mouseMoveAPI(managerFactoryInstance, eventType)
 
 /**
  * 데이터 검색
- * @param {Property} managerFactoryInstance
- * @param {Property} projectId 데이터 고유키
- * @param {Property} dataKey 데이터 고유키
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId 데이터 고유키
+ * @param {string} dataKey 데이터 고유키
  */
 function searchDataAPI(managerFactoryInstance, projectId, dataKey) 
 {
@@ -433,7 +435,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
 
 /**
  * 환경 설정 data map에 key 값의 존재 유무를 판별
- * @param key 검색 키
+ * @param {string} key 검색 키
  * @param 
  */
 function isDataExistAPI(key) 
@@ -444,7 +446,7 @@ function isDataExistAPI(key)
 
 /**
  * 환경 설정 data map에서 key 값을 취득
- * @param key 검색 키
+ * @param {string} key 검색 키
  * @param 
  */
 function getDataAPI(key) 
@@ -454,10 +456,10 @@ function getDataAPI(key)
 
 /**
  * 데이터를 Rendering
- * @param {Property} managerFactoryInstance
- * @param projectIdArray 프로젝트 이름들
- * @param projectDataArray 프로젝트 데이터들
- * @param projectDataFolderArray 프로젝트 f4d 파일 경로
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {Object[]} projectIdArray 프로젝트 이름들
+ * @param {Object[]} projectDataArray 프로젝트 데이터들
+ * @param {Object[]} projectDataFolderArray 프로젝트 f4d 파일 경로
  * @param 
  */
 function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataArray, projectDataFolderArray) 

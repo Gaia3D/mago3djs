@@ -6169,7 +6169,6 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.magoPolicy.colorBuildings.length = 0;
 		var projectId = api.getProjectId();
-		var blockIds = api.getBlockIds().split(",");
 		var objectIds = null;
 		var isExistObjectIds = false;
 		if (api.getObjectIds() !== null && api.getObjectIds().length !== 0) 
@@ -6359,7 +6358,7 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
 		this.magoPolicy.setSpecularColor(api.getSpecularColor());
 	}
-	else if (apiName === "changeSsadRadius")
+	else if (apiName === "changeSsaoRadius")
 	{
 		this.magoPolicy.setSsaoRadius(api.getSsaoRadius());
 	}	
