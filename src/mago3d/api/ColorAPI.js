@@ -12,6 +12,13 @@ ColorAPI.changeColor = function(api, magoManager)
 	var dataKey = api.getDataKey();
 	var objectIds = api.getObjectIds();
 	var property = api.getProperty();
+	var propertyKey = null;
+	var propertyValue = null;
+	if(property !== null && property !== "") {
+		var properties = property.split("=");
+		propertyKey = properties[0];
+		propertyValue = properties[1];
+	}
 	var color = api.getColor().split(",");
 	var rgbColor = [ color[0]/255, color[1]/255, color[2]/255 ] ;
 	
@@ -31,6 +38,8 @@ ColorAPI.changeColor = function(api, magoManager)
 			changeHistory.setDataKey(dataKey);
 			changeHistory.setObjectId(objectIds[i]);
 			changeHistory.setProperty(property);
+			changeHistory.setPropertyKey(propertyKey);
+			changeHistory.setPropertyValue(propertyValue);
 			changeHistory.setRgbColor(rgbColor);
 			
 			changeHistorys.push(changeHistory);
@@ -43,6 +52,8 @@ ColorAPI.changeColor = function(api, magoManager)
 		changeHistory.setDataKey(dataKey);
 		changeHistory.setObjectId(null);
 		changeHistory.setProperty(property);
+		changeHistory.setPropertyKey(propertyKey);
+		changeHistory.setPropertyValue(propertyValue);
 		changeHistory.setRgbColor(rgbColor);
 		
 		changeHistorys.push(changeHistory);
