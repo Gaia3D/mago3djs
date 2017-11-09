@@ -228,7 +228,7 @@ MagoConfig.getColorHistorys = function(projectId, data_key)
 /**
  * 색깝 변경 이력을 획득
  */
-MagoConfig.getColorHistory = function(projectId, data_key, objectIndexOrder)
+MagoConfig.getColorHistory = function(projectId, data_key, objectId)
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
@@ -236,14 +236,14 @@ MagoConfig.getColorHistory = function(projectId, data_key, objectIndexOrder)
 	// data_key 별 map을 검사
 	var dataKeyMap = projectIdMap.get(data_key);
 	if(dataKeyMap === undefined) return undefined;
-	// objectIndexOrder 를 저장
-	return dataKeyMap.get(objectIndexOrder);
+	// objectId 를 저장
+	return dataKeyMap.get(objectId);
 };
 
 /**
  * 색깝 변경 내용을 저장
  */
-MagoConfig.saveColorHistory = function(projectId, data_key, objectIndexOrder, changeHistory) 
+MagoConfig.saveColorHistory = function(projectId, data_key, objectId, changeHistory) 
 {
 	// projectId 별 map을 검사
 	var projectIdMap = this.colorHistoryMap.get(projectId);
@@ -259,8 +259,9 @@ MagoConfig.saveColorHistory = function(projectId, data_key, objectIndexOrder, ch
 		projectIdMap.set(data_key, dataKeyMap);
 	}
 	
-	// objectIndexOrder 를 저장
-	dataKeyMap.set(objectIndexOrder, changeHistory);
+	// objectId 를 저장
+	if(objectId !== null && objectId !== undefined)
+		dataKeyMap.set(objectId, changeHistory);
 };
 
 /**

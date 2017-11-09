@@ -47,7 +47,12 @@ ColorAPI.changeColor = function(api, magoManager)
 		
 		changeHistorys.push(changeHistory);
 	}
-	
-	// 여기 구현
-	// property 값이 isMain=true 와 같이 들어 갑니다. isMain을 뽑아서.... node에서 찾아서.... true 로 다 바꿔야 합니다.
+
+	var changeHistory;
+	var historiesCount = changeHistorys.length;
+	for(var i=0; i<historiesCount; i++)
+	{
+		changeHistory = changeHistorys[i];
+		MagoConfig.saveColorHistory(projectId, dataKey, changeHistory.getObjectId(), changeHistory);
+	}
 };
