@@ -287,6 +287,7 @@
 						<option value="0,0,0"> 검정 </option>
 					</select>
 					<button type="button" id="changeColor" class="btn">변경</button> 
+					<button type="button" id="deleteAllChangeColor" class="btn">전체 삭제</button>
 				</li>
 			</ul>
 		</div>
@@ -1170,6 +1171,12 @@
 		var colorObjectIds = $("#colorObjectIds").val();
 		if(colorObjectIds !== null && colorObjectIds !=="") objectIds = colorObjectIds.split(",");
 		changeColorAPI(managerFactory, $("#colorProjectId").val(), $("#colorDataKey").val(), objectIds, $("#colorProperty").val(), $("#updateColor").val());
+	});
+	// 색깔 변경 이력 삭제
+	$("#deleteAllChangeColor").click(function () {
+		if(confirm("삭제 하시겠습니까?")) {
+			deleteAllChangeColorAPI(managerFactory);
+		}
 	});
 	
 	// 변환행렬

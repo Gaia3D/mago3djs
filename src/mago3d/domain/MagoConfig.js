@@ -258,10 +258,12 @@ MagoConfig.saveColorHistory = function(projectId, data_key, objectId, changeHist
 		dataKeyMap = new Map();
 		projectIdMap.set(data_key, dataKeyMap);
 	}
-	
-	// objectId 를 저장
-	if(objectId !== null && objectId !== undefined)
+
+	if(objectId === null || objectId === "") {
+		dataKeyMap.set(data_key, changeHistory);
+	} else {
 		dataKeyMap.set(objectId, changeHistory);
+	}
 };
 
 /**

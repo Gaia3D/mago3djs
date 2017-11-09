@@ -6363,6 +6363,10 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		MagoConfig.clearMovingHistory();
 	}
+	else if (apiName === "deleteAllChangeColor") 
+	{
+		MagoConfig.clearColorHistory();
+	}
 	else if (apiName === "changeInsertIssueMode") 
 	{
 		this.magoPolicy.setIssueInsertEnable(api.getIssueInsertEnable());
