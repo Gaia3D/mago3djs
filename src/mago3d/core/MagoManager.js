@@ -5892,20 +5892,16 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
  */
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
-	//var projectIdAndBlockId = neoBuilding.buildingId;
-	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
 	if (geoLocDatamanager == undefined)
 	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
-	var dividedName = neoBuilding.buildingId.split("_");
-	var dataKey = dividedName[0];
-	if (dividedName[1] !== undefined) { dataKey = dividedName[0] + "_" + dividedName[1]; }
-	
+	var dataKey = node.data.nodeId;
+
 	if (MagoConfig.getPolicy().geo_callback_enable === "true") 
 	{
-		if (this.objMarkerSC === undefined) { return; }
+		//if (this.objMarkerSC === undefined) { return; }
 		var objectId = null;
 		if (this.objectSelected !== undefined) { objectId = this.objectSelected.objectId; }
 		
@@ -5915,9 +5911,9 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 			selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
 				dataKey,
 				objectId,
-				this.objMarkerSC.geoLocationData.geographicCoord.latitude,
-				this.objMarkerSC.geoLocationData.geographicCoord.longitude,
-				this.objMarkerSC.geoLocationData.geographicCoord.altitude,
+				geoLocationData.geographicCoord.latitude,
+				geoLocationData.geographicCoord.longitude,
+				geoLocationData.geographicCoord.altitude,
 				geoLocationData.heading,
 				geoLocationData.pitch,
 				geoLocationData.roll);
@@ -5931,9 +5927,9 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
 				dataKey,
 				objectId,
-				this.objMarkerSC.geoLocationData.geographicCoord.latitude,
-				this.objMarkerSC.geoLocationData.geographicCoord.longitude,
-				(parseFloat(this.objMarkerSC.geoLocationData.geographicCoord.altitude)));
+				geoLocationData.geographicCoord.latitude,
+				geoLocationData.geographicCoord.longitude,
+				(parseFloat(geoLocationData.geographicCoord.altitude)));
 		}
 	}
 };
@@ -5941,14 +5937,16 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectIdAndBlockId, latitude, longitude, elevation, heading, pitch, roll) 
+MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll) 
 {
-	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue);
-	var node = neoBuilding.nodeOwner;
-	if (node === undefined)
-	{ return; }
-	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll) ;
-	
+	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+	if(nodesMap)
+	{
+		var node = nodesMap.get(dataKey);
+		if (node === undefined)
+		{ return; }
+		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll);
+	}
 };
 
 /**
