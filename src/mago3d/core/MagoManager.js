@@ -6562,6 +6562,12 @@ MagoManager.prototype.callAPI = function(api)
 			this.cameraFPV.release();
 		}
 	}
+	else if (apiName === "changePropertyRendering") 
+	{
+//		api.getShowShadow();
+//		api.getProjectId();
+//		api.getProperty();
+	}	
 	else if (apiName === "drawAppendData")
 	{
 		DrawAPI.drawAppendData(api, this);

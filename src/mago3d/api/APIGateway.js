@@ -62,6 +62,21 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
 }
 
 /**
+ * 속성값에 의한 가시화 유무설정
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} isShow true = 표시, false = 비표시
+ */
+function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) {
+	if (managerFactoryInstance === null) { return; } 
+		
+	var api = new API("changePropertyRendering");
+	api.setShowShadow(isShow);
+	api.setProjectId(projectId);
+	api.setProperty(property);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 그림자 표시/비표시
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} isShow true = 활성화, false = 비활성화
