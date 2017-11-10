@@ -6360,31 +6360,6 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		return this.flyToBuilding(apiName, api.getProjectId(), api.getDataKey());
 	}
-	else if (apiName === "changeHighLighting") 
-	{
-		this.magoPolicy.highLightedBuildings.length = 0;
-		var projectId = api.getProjectId();
-		var blockIds = api.getBlockIds().split(",");
-		var objectIds = null;
-		var isExistObjectIds = false;
-		if (api.getObjectIds() !== null && api.getObjectIds().length !== 0) 
-		{
-			objectIds = api.getObjectIds().split(",");
-			isExistObjectIds = true;
-		}
-		var hightedBuilds = [];
-		for (var i=0, count = blockIds.length; i<count; i++) 
-		{
-			var projectLayer = new ProjectLayer();
-			projectLayer.setProjectId(projectId);
-			projectLayer.setBlockId(blockIds[i].trim());
-			if (isExistObjectIds) { projectLayer.setObjectId(objectIds[i].trim()); }
-			else { projectLayer.setObjectId(null); }
-			hightedBuilds.push(projectLayer);
-		}
-		this.magoPolicy.setHighLightedBuildings(hightedBuilds);
-		this.highLightBuildings();
-	}
 	else if (apiName === "changeColor") 
 	{
 		ColorAPI.changeColor(api, this);
@@ -6428,10 +6403,6 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeLocationAndRotation") 
 	{
 		LocationAndRotationAPI.changeLocationAndRotation(api, this);
-	}
-	else if (apiName === "getLocationAndRotation") 
-	{
-		return this.getNeoBuildingByTypeId("structure", api.getProjectId() + "_" + api.getBlockId());
 	}
 	else if (apiName === "changeObjectMove") 
 	{
