@@ -15,7 +15,6 @@ var HierarchyManager = function()
 
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
-	//this.nodesMap = new Map(); // old.***
 	this.projectsMap = new Map();
 };
 
@@ -95,25 +94,6 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 	
 	return resultRootNodesArray;
 };
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-/*
-HierarchyManager.prototype.newNodesMap = function(projectId) 
-{
-	// 1rst, check if exist.
-	var nodesMap = this.projectsMap.get(projectId);
-	if(nodesMap === undefined)
-	{
-		nodesMap = new Map();
-		this.projectsMap.set(projectId, nodesMap);
-	}
-	return nodesMap;
-};
-*/
 
 /**
  * 어떤 일을 하고 있습니까?
