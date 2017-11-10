@@ -21,6 +21,7 @@ var NeoBuilding = function()
 	
 	// References and Models.*********************************************
 	this.motherNeoReferencesArray = []; 
+	this.motherNeoReferencesMap; 
 	this.motherBlocksArray = []; 
 	
 	// Current visible objects.*******************************************
@@ -63,6 +64,43 @@ NeoBuilding.prototype.getReferenceObject = function(refObjectIndex)
  * 어떤 일을 하고 있습니까?
  * @returns {boolean} applyOcclusionCulling
  */
+NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId) 
+{
+	if(this.motherNeoReferencesMap === undefined)
+	{ return undefined; }
+
+	var refObject = this.motherNeoReferencesMap.get(objectId);
+	return refObject;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {boolean} applyOcclusionCulling
+ */
+NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx) 
+{
+	if (this.motherNeoReferencesArray === undefined)
+	{ this.motherNeoReferencesArray = []; }
+
+	this.motherNeoReferencesArray[refObjectIdx] = refObject;
+	
+	// Additionally, make a objects map.
+	if(this.motherNeoReferencesMap === undefined)
+		this.motherNeoReferencesMap = new Map();
+	
+	var objectsArray = this.motherNeoReferencesMap.get(refObject.objectId);
+	if(objectsArray === undefined)
+		objectsArray = [];
+	
+	objectsArray.push(refObject);
+	
+	this.motherNeoReferencesMap.set(refObject.objectId, objectsArray);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {boolean} applyOcclusionCulling
+ */
 NeoBuilding.prototype.getRenderSettingApplyOcclusionCulling = function() 
 {
 	return this.applyOcclusionCulling;
@@ -84,6 +122,10 @@ NeoBuilding.prototype.setRenderSettingApplyOcclusionCulling = function(applyOccl
  */
 NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManager) 
 {
+	// 1rst, clear this.motherNeoReferencesMap.
+	if(this.motherNeoReferencesMap)
+		this.motherNeoReferencesMap.clear();
+	
 	var blocksCount = this.motherBlocksArray.length;
 	for (var i=0; i<blocksCount; i++)
 	{

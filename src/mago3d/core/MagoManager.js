@@ -2590,12 +2590,12 @@ MagoManager.prototype.manageQueue = function()
 				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding, this.matrix4SC, this);
 				}
 				else 
 				{
 					// parse vesioned.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding, this.matrix4SC, this);
 				}
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
@@ -2645,12 +2645,12 @@ MagoManager.prototype.manageQueue = function()
 				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding, this.matrix4SC, this);
 				}
 				else 
 				{
 					// parse vesioned.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, this);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, this.readerWriter, neoBuilding, this.matrix4SC, this);
 				}
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
@@ -3262,7 +3262,20 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 				else 
 				{
 					// change color for an object.
-					
+					var objectId = changeHistory.objectId;
+					var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+					if(objectsArray)
+					{
+						var objectsCount = objectsArray.length;
+						for(var j=0; j<objectsCount; j++)
+						{
+							var object = objectsArray[j];
+							if(object.aditionalColor === undefined)
+								object.aditionalColor = new Color();
+							
+							object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+						}
+					}
 				}
 			}
 		}

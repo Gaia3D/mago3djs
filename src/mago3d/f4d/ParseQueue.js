@@ -82,12 +82,12 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 				}
 				else 
 				{
 					// parse vesioned.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 				}
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
@@ -153,12 +153,12 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				if (headerVersion[0] === "v")
 				{
 					// parse beta version.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 				}
 				else 
 				{
 					// parse vesioned.
-					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherNeoReferencesArray, this.matrix4SC, magoManager);
+					lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 				}
 				lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
