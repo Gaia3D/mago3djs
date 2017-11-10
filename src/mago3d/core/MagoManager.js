@@ -1117,6 +1117,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		var neoBuilding;
 		var node;
 		// lod 0 & lod 1.
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
 		var nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
 		for (var i=0; i<nodesCount; i++) 
 		{
@@ -1131,7 +1133,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		}
 		var fileRequestExtraCount = 1;
 		
-		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
+		
 		if (this.isLastFrustum)
 		{ 
 			this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
@@ -1140,7 +1142,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		fileRequestExtraCount = this.visibleObjControlerOctrees.currentVisibles0.length;
 		if (fileRequestExtraCount > 2)
 		{ fileRequestExtraCount = 2; }
-		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
+		
 		if (this.isLastFrustum)
 		{ 
 			this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
@@ -3110,7 +3112,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 			{
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
 				var buildingFolderName = neoBuilding.buildingFileName;
-				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.bmp";
+				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 			}
 		}
