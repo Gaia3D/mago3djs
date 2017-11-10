@@ -76,24 +76,6 @@ function changeShadowAPI(managerFactoryInstance, isShow)
 	managerFactoryInstance.callAPI(api);
 }
 
-///**
-// * highlighting
-// * @param {ManagerFactory} managerFactoryInstance
-// * @param {string} projectId 프로젝트 아이디
-// * @param {string} blockIds block id. 복수개의 경우 , 로 입력
-// * @param {string} objectIds object id. 복수개의 경우 , 로 입력
-// */
-//function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, objectIds) 
-//{
-//	if (managerFactoryInstance === null) { return; } 
-//	
-//	var api = new API("changeHighLighting");
-//	api.setProjectId(projectId);
-//	api.setBlockIds(blockIds);
-//	api.setObjectIds(objectIds);
-//	managerFactoryInstance.callAPI(api);
-//}
-
 /**
  * color 변경
  * @param {ManagerFactory} managerFactoryInstance
