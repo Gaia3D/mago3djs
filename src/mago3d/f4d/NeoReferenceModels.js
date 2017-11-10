@@ -297,7 +297,7 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
@@ -328,11 +328,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
 
-		this.motherNeoRefsList = motherNeoReferencesArray;
-		if (motherNeoReferencesArray[neoRef._id] !== undefined)
+		this.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+		if (this.motherNeoRefsList[neoRef._id] !== undefined)
 		{
 			// pass this neoReference because exist in the motherNeoReferencesArray.***
-			neoRef = motherNeoReferencesArray[neoRef._id];
+			neoRef = this.motherNeoRefsList[neoRef._id];
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
 			
@@ -464,8 +464,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 		}
 		else
 		{
-
-			motherNeoReferencesArray[neoRef._id] = neoRef;
+			
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
 			
@@ -478,6 +477,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 		
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
+			
+			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
 			// 2) Block's Idx.***
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -687,7 +688,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, motherNeoReferencesArray, tMatrix4, magoManager) 
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
@@ -711,12 +712,13 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		// 1) Id.***
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
-
-		this.motherNeoRefsList = motherNeoReferencesArray;
-		if (motherNeoReferencesArray[neoRef._id] !== undefined)
+		
+		
+		this.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+		if (this.motherNeoRefsList[neoRef._id] !== undefined)
 		{
 			// pass this neoReference because exist in the motherNeoReferencesArray.***
-			neoRef = motherNeoReferencesArray[neoRef._id];
+			neoRef = this.motherNeoRefsList[neoRef._id];
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
 			
@@ -845,8 +847,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		}
 		else
 		{
-
-			motherNeoReferencesArray[neoRef._id] = neoRef;
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
 			
@@ -859,6 +859,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
+			
+			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
 			// 2) Block's Idx.***
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;

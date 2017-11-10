@@ -287,6 +287,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
 			continue;
 		}
+		
+		// test.******************************************************
+		if(neoReference.objectId === "A420C-PA01-P1")
+		{
+			var hola = 0;
+		}
 
 		block_idx = neoReference._block_idx;
 		block = neoBuilding.motherBlocksArray[block_idx];
