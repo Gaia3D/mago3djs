@@ -1167,6 +1167,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		if (this.isLastFrustum)
 		{ this.manageQueue(); }
+	
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -1229,6 +1232,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	// lightDepthRender.***
 	
 	
+			
 	// 1) The depth render.**********************************************************************************************************************
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
@@ -3439,8 +3443,6 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		// Test render in lego.***
 		if (ssao_idx === 0) 
 		{
-			this.checkPropertyFilters(visibleObjControlerNodes.currentVisibles0);
-			this.checkPropertyFilters(visibleObjControlerNodes.currentVisibles2);
 			gl.disable(gl.BLEND);
 			this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, visibleObjControlerNodes);
 		}
@@ -5825,33 +5827,6 @@ MagoManager.prototype.doFrustumCullingClouds = function(frustumVolume, visibleBu
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.highLightBuildings = function()
-{
-	// 1rst, init highlightiedBuildings.***
-	var buildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
-	for (var i=0; i<buildingsCount; i++)
-	{
-		this.neoBuildingsList.neoBuildingsArray[i].isHighLighted = false;
-	}
-
-	var buildingType = "structure";
-	//var buildingType = "MSP"; khj(0331)
-	var highLightingBuildingsCount = this.magoPolicy.highLightedBuildings.length;
-	for (var i=0; i<highLightingBuildingsCount; i++)
-	{
-		var highLightedBuildingId = this.magoPolicy.highLightedBuildings[i];
-		var highLightedBuilding = this.neoBuildingsList.getNeoBuildingByTypeId(buildingType, highLightedBuildingId.projectId + "_" + highLightedBuildingId.blockId);
-		if (highLightedBuilding)
-		{
-			highLightedBuilding.isHighLighted = true;
-		}
-		//var hola = 0;
-	}
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
 MagoManager.prototype.renderModeChanged = function()
 {
 	if (this.renderModeTemp === 0)
@@ -5867,56 +5842,6 @@ MagoManager.prototype.renderModeChanged = function()
 		;//
 	}
 
-};
-
-MagoManager.prototype.buildingColorChanged = function(projectAndBlockId, color)
-{
-	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
-	
-	if (neoBuilding)
-	{
-		if (neoBuilding.aditionalColor === undefined)
-		{
-			neoBuilding.aditionalColor = new Color();
-		}
-		neoBuilding.isColorChanged = true;
-		neoBuilding.aditionalColor.setRGB(color[0], color[1], color[2]);
-	}
-};
-
-MagoManager.prototype.objectColorChanged = function(projectAndBlockId, objectId, color)
-{
-	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
-	
-	if (neoBuilding)
-	{
-		var neoReference;
-		var neoReferencesCount = neoBuilding.motherNeoReferencesArray.length;
-		var found = false;
-		var i = 0;
-		while (!found && i<neoReferencesCount)
-		{
-			if (neoBuilding.motherNeoReferencesArray[i])
-			{
-				if (neoBuilding.motherNeoReferencesArray[i].objectId === objectId)
-				{
-					neoReference = neoBuilding.motherNeoReferencesArray[i];
-					found = true;
-				}
-			}
-			i++;
-		}
-		
-		if (neoReference)
-		{
-			if (neoReference.aditionalColor === undefined)
-			{
-				neoReference.aditionalColor = new Color();
-			}
-			
-			neoReference.aditionalColor.setRGB(color[0], color[1], color[2]);
-		}
-	}
 };
 
 MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
@@ -6443,7 +6368,7 @@ MagoManager.prototype.callAPI = function(api)
 			hightedBuilds.push(projectLayer);
 		}
 		this.magoPolicy.setHighLightedBuildings(hightedBuilds);
-		this.highLightBuildings();
+		//this.highLightBuildings();
 	}
 	else if (apiName === "changeColor") 
 	{
