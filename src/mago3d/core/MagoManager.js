@@ -1033,7 +1033,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 	var gl = this.sceneState.gl;
 	
-	if(gl.isContextLost())
+	if (gl.isContextLost())
 	{ return; }
 	
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -3219,68 +3219,124 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		dataKey = node.data.nodeId;
 
 		colorChangedHistoryMap = MagoConfig.getColorHistorys(projectId, dataKey);
-		if(colorChangedHistoryMap)
+		if (colorChangedHistoryMap)
 		{
 			neoBuilding = node.data.neoBuilding;
 			for (var changeHistory of colorChangedHistoryMap.values()) 
 			{
-				if(changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
+				if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
 				{
-					if(changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+					if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 					{
 						// change color for all node.
 						neoBuilding.isColorChanged = true;
-						if(neoBuilding.aditionalColor === undefined)
-							neoBuilding.aditionalColor = new Color();
+						if (neoBuilding.aditionalColor === undefined)
+						{ neoBuilding.aditionalColor = new Color(); }
 						
 						neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 					}
-					else{
+					else 
+					{
 						// there are properties.
 						var nodesArray = [];
 						node.extractNodes(nodesArray);
 						var nodesCount = nodesArray.length;
 						var aNode;
-						for(var i=0; i<nodesCount; i++)
+						for (var i=0; i<nodesCount; i++)
 						{
 							aNode = nodesArray[i];
 							var propertyKey = changeHistory.propertyKey;
 							var propertyValue = changeHistory.propertyValue;
 							// 1rst, check if this has the same "key" and same "value".
-							if(aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+							if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
 							{
 								neoBuilding.isColorChanged = true;
-								if(neoBuilding.aditionalColor === undefined)
-									neoBuilding.aditionalColor = new Color();
+								if (neoBuilding.aditionalColor === undefined)
+								{ neoBuilding.aditionalColor = new Color(); }
 								
 								neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 							}
 						}
 					}
 				}
-				else{
+				else 
+				{
+					// change color for an object.
 					
 				}
 			}
 		}
 	}
-	/*
-	colorChangedHistoryMap = MagoConfig.colorHistoryMap;
-	if(colorChangedHistoryMap)
+	
+	var allColorHistoryMap = MagoConfig.getAllColorHistory();
+	if (allColorHistoryMap)
 	{
-		// now check nodes that is no physical.
-		for (var changeHistory of colorChangedHistoryMap.values()) 
+		for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
 		{
-			var projectId = changeHistory.projectId;
-			var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-			var aNode = nodesMap.get(changeHistory.dataKey);
-			if(aNode)
+			// now check nodes that is no physical.
+			for (var changeHistoryMap of colorChangedHistoryMap.values()) 
 			{
-				var hola = 0;
+				for (var changeHistory of changeHistoryMap.values()) 
+				{
+					var projectId = changeHistory.projectId;
+					var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+					var aNode = nodesMap.get(changeHistory.dataKey);
+					if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
+					{
+						// must check if there are filters.
+						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+						{
+							// this is a no physical node, so must check children.
+							var nodesArray = [];
+							aNode.extractNodes(nodesArray);
+							var nodesCount = nodesArray.length;
+							for (var i=0; i<nodesCount; i++)
+							{
+								var aNode2 = nodesArray[i];
+								neoBuilding = aNode2.data.neoBuilding;
+								if (neoBuilding)
+								{
+									neoBuilding.isColorChanged = true;
+									if (neoBuilding.aditionalColor === undefined)
+									{ neoBuilding.aditionalColor = new Color(); }
+									
+									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+								}
+							}
+						}
+						else 
+						{
+							
+							var propertyKey = changeHistory.propertyKey;
+							var propertyValue = changeHistory.propertyValue;
+								
+							// this is a no physical node, so must check children.
+							var nodesArray = [];
+							aNode.extractNodes(nodesArray);
+							var nodesCount = nodesArray.length;
+							for (var i=0; i<nodesCount; i++)
+							{
+								var aNode2 = nodesArray[i];
+								neoBuilding = aNode2.data.neoBuilding;
+								if (neoBuilding)
+								{
+									if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+									{
+										neoBuilding.isColorChanged = true;
+										if (neoBuilding.aditionalColor === undefined)
+										{ neoBuilding.aditionalColor = new Color(); }
+										
+										neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
-	*/
+	
 };
 
 /**
