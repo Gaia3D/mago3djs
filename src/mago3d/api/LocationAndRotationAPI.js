@@ -23,13 +23,13 @@ LocationAndRotationAPI.changeLocationAndRotation = function(api, magoManager)
 	changeHistory.setRoll(parseFloat(api.getRoll()));
 	
 	magoManager.changeLocationAndRotation(	api.getProjectId(),
-											api.getDataKey(),
-											parseFloat(api.getLatitude()),
-											parseFloat(api.getLongitude()),
-											parseFloat(api.getElevation()),
-											parseFloat(api.getHeading()),
-											parseFloat(api.getPitch()),
-											parseFloat(api.getRoll()));
+		api.getDataKey(),
+		parseFloat(api.getLatitude()),
+		parseFloat(api.getLongitude()),
+		parseFloat(api.getElevation()),
+		parseFloat(api.getHeading()),
+		parseFloat(api.getPitch()),
+		parseFloat(api.getRoll()));
 	
 	// MagoConfig에 저장......?
 };
