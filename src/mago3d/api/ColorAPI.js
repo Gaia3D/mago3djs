@@ -14,7 +14,8 @@ ColorAPI.changeColor = function(api, magoManager)
 	var property = api.getProperty();
 	var propertyKey = null;
 	var propertyValue = null;
-	if(property !== null && property !== "") {
+	if (property !== null && property !== "") 
+	{
 		var properties = property.split("=");
 		propertyKey = properties[0];
 		propertyValue = properties[1];
@@ -61,7 +62,7 @@ ColorAPI.changeColor = function(api, magoManager)
 
 	var changeHistory;
 	var historiesCount = changeHistorys.length;
-	for(var i=0; i<historiesCount; i++)
+	for (var i=0; i<historiesCount; i++)
 	{
 		changeHistory = changeHistorys[i];
 		MagoConfig.saveColorHistory(projectId, dataKey, changeHistory.getObjectId(), changeHistory);
