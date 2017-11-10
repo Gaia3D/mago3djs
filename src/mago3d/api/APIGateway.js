@@ -20,20 +20,6 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 };
 
 /**
- * outfitting 표시/비표시
- * @param {ManagerFactory} managerFactoryInstance  
- * @param {boolean} isShow true = 활성화, false = 비활성화
- */
-function changeOutFittingAPI(managerFactoryInstance, isShow) 
-{
-	if (managerFactoryInstance === null) { return; } 
-	
-	var api = new API("changeOutFitting");
-	api.setShowOutFitting(isShow);
-	managerFactoryInstance.callAPI(api);
-}
-
-/**
  * Label 표시/비표시
  * @param {ManagerFactory} managerFactoryInstance 
  * @param {boolean} isShow true = 표시, false = 비표시
@@ -87,38 +73,6 @@ function changeShadowAPI(managerFactoryInstance, isShow)
 	
 	var api = new API("changeShadow");
 	api.setShowShadow(isShow);
-	managerFactoryInstance.callAPI(api);
-}
-
-/**
- * frustum culling 가시 거리
- * @param {ManagerFactory} managerFactoryInstance
- * @param {number} frustumFarDistance frustum 거리. 내부적으로는 입력값의 제곱이 사용됨
- */
-function changeFrustumFarDistanceAPI(managerFactoryInstance, frustumFarDistance) 
-{
-	if (managerFactoryInstance === null) { return; } 
-	
-	var api = new API("changefrustumFarDistance");
-	api.setFrustumFarDistance(frustumFarDistance);
-	managerFactoryInstance.callAPI(api);
-}
-
-/**
- * highlighting
- * @param {ManagerFactory} managerFactoryInstance
- * @param {string} projectId 프로젝트 아이디
- * @param {string} blockIds block id. 복수개의 경우 , 로 입력
- * @param {string} objectIds object id. 복수개의 경우 , 로 입력
- */
-function changeHighLightingAPI(managerFactoryInstance, projectId, blockIds, objectIds) 
-{
-	if (managerFactoryInstance === null) { return; } 
-	
-	var api = new API("changeHighLighting");
-	api.setProjectId(projectId);
-	api.setBlockIds(blockIds);
-	api.setObjectIds(objectIds);
 	managerFactoryInstance.callAPI(api);
 }
 
