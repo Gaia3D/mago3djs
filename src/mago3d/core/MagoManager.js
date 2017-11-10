@@ -1097,6 +1097,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 				this.upDateCamera(this.myCameraSCX);
 				this.doFrustumCullingSmartTiles(this.myCameraSCX.frustum, cameraPosition);
+				
 				//this.sceneState.camera.setDirty(false);
 			}
 			if (this.isLastFrustum)
@@ -1129,14 +1130,21 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			}
 		}
 		var fileRequestExtraCount = 1;
+		
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
 		if (this.isLastFrustum)
-		{ this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); }
+		{ 
+			this.prepareVisibleOctreesSortedByDistanceLOD2(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
+		}
 		//fileRequestExtraCount = 2;
 		fileRequestExtraCount = this.visibleObjControlerOctrees.currentVisibles0.length;
 		if (fileRequestExtraCount > 2)
 		{ fileRequestExtraCount = 2; }
+		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
 		if (this.isLastFrustum)
-		{ this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); } 
+		{ 
+			this.prepareVisibleOctreesSortedByDistance(gl, scene, this.visibleObjControlerOctrees, fileRequestExtraCount); 
+		} 
 		
 		// lod 2.
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
@@ -1167,9 +1175,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		if (this.isLastFrustum)
 		{ this.manageQueue(); }
-	
-		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
-		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
