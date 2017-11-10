@@ -225,6 +225,13 @@ ParseQueue.prototype.clearAll = function()
 	
 };
 
+ParseQueue.prototype.eraseAny = function(octree)
+{
+	this.eraseOctreeLod0ReferencesToParse(octree);
+	this.eraseOctreeLod0ModelsToParse(octree);
+	this.eraseOctreeLod2LegosToParse(octree);
+};
+
 
 
 
