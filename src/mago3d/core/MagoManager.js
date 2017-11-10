@@ -3185,13 +3185,58 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
- * @param scene 변수
- * @param shader 변수
- * @param renderTexture 변수
- * @param ssao_idx 변수
- * @param neoRefLists_array 변수
+ */
+
+MagoManager.prototype.checkPropertyFilters = function(nodesArray) 
+{
+	if(this.propertyFilterSC === undefined)
+		return;
+	
+	var nodesCount = nodesArray.length;
+	var node;	
+	var projectId;
+	var propertyKey = this.propertyFilterSC.propertyKey;
+	var propertyValue = this.propertyFilterSC.propertyValue;
+	var visible = this.propertyFilterSC.visible;
+	
+	for (var i=0; i<nodesCount; i++)
+	{
+		node = nodesArray[i];
+		projectId = node.data.projectId;
+		if(projectId === this.propertyFilterSC.projectId)
+		{
+			if(node.data.attributes)
+			{
+				if(node.data.attributes[propertyKey] !== undefined && node.data.attributes[propertyKey].toString() === propertyValue)
+				{
+					if(visible === "true")
+					{
+						// do nothing.
+					}
+					else{
+						nodesArray.splice(i, 1);
+						i--;
+						nodesCount = nodesArray.length;
+					}
+				}
+				else{
+					if(visible === "true")
+					{
+						nodesArray.splice(i, 1);
+						i--;
+						nodesCount = nodesArray.length;
+					}
+					else{
+						// do nothing.
+					}
+				}
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 
 MagoManager.prototype.checkChangesHistoryColors = function(nodesArray) 
@@ -3394,11 +3439,14 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 		// Test render in lego.***
 		if (ssao_idx === 0) 
 		{
+			this.checkPropertyFilters(visibleObjControlerNodes.currentVisibles0);
+			this.checkPropertyFilters(visibleObjControlerNodes.currentVisibles2);
 			gl.disable(gl.BLEND);
 			this.depthRenderLowestOctreeAsimetricVersion(gl, ssao_idx, visibleObjControlerNodes);
 		}
 		if (ssao_idx === 1) 
 		{
+			
 			// 2) ssao render.************************************************************************************************************
 			var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 
@@ -3407,6 +3455,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				// check changesHistory.
 				this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 				this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
+				
 			
 				if (this.noiseTexture === undefined) 
 				{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
@@ -3491,6 +3540,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			if (nodesLOD2Count > 0 || nodesLOD0Count > 0)
 			{
 				this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
+				
+				
 				currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
 				shaderProgram = currentShader.program;
 			
@@ -3630,7 +3681,10 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				// render bbox for neoBuildingSelected.
 				var selectedNodesArray = [];
 				selectedNodesArray.push(this.nodeSelected);
-				this.renderBoundingBoxesNodes(gl, selectedNodesArray);
+				if(this.colorSC === undefined)
+					this.colorSC = new Color();
+				this.colorSC.setRGB(0.8, 1.0, 1.0);
+				this.renderBoundingBoxesNodes(gl, selectedNodesArray, this.colorSC);
 			}
 			
 			// 3) now render bboxes.*******************************************************************************************************************
@@ -3725,7 +3779,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
  * @param neoRefLists_array 변수
  */
 
-MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray) 
+MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color) 
 {
 	var node;
 	var currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
@@ -3753,7 +3807,13 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray)
 	gl.uniform1i(currentShader.bScale_loc, true);
 
 	gl.uniform1i(currentShader.bUse1Color_loc, true);
-	gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 1.0]); //.***
+	if(color)
+	{
+		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
+	}
+	else{
+		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 1.0]); //.***
+	}
 
 	gl.uniform1i(currentShader.depthTex_loc, 0);
 	gl.uniform1i(currentShader.noiseTex_loc, 1);
@@ -6581,9 +6641,22 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changePropertyRendering") 
 	{
-//		api.getShowShadow();
-//		api.getProjectId();
-//		api.getProperty();
+		var visible = api.getShowShadow();
+		var projectId = api.getProjectId();
+		var property = api.getProperty();
+		var splittedWords = property.split("=");
+		var propertyKey = splittedWords[0];
+		var propertyValue = splittedWords[1];
+		
+		if(this.propertyFilterSC === undefined)
+			this.propertyFilterSC = {};
+		
+		this.propertyFilterSC.visible = visible;
+		this.propertyFilterSC.projectId = projectId;
+		this.propertyFilterSC.propertyKey = propertyKey;
+		this.propertyFilterSC.propertyValue = propertyValue;
+			
+		var hola = 0;
 	}	
 	else if (apiName === "drawAppendData")
 	{
