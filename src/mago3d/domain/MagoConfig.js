@@ -131,6 +131,14 @@ MagoConfig.clearSelectHistory = function()
 /**
  * 모든 object 선택 내용 이력을 취득
  */
+MagoConfig.getAllSelectHistory = function()
+{
+	return this.selectHistoryMap;
+};
+
+/**
+ * project 별 해당 키에 해당하는 모든 object 선택 내용 이력을 취득
+ */
 MagoConfig.getSelectHistoryObjects = function(projectId, dataKey)
 {
 	// projectId 별 map을 검사
@@ -205,7 +213,15 @@ MagoConfig.clearMovingHistory = function()
 };
 
 /**
- * object 이동 내용 이력을 취득
+ * 모든 object 선택 내용 이력을 취득
+ */
+MagoConfig.getAllMovingHistory = function()
+{
+	return this.movingHistoryMap;
+};
+
+/**
+ * project별 입력키 값과 일치하는 object 이동 내용 이력을 취득
  */
 MagoConfig.getMovingHistoryObjects = function(projectId, dataKey)
 {
@@ -272,6 +288,9 @@ MagoConfig.deleteMovingHistoryObject = function(projectId, dataKey, objectIndexO
 	return dataKeyMap.delete(objectIndexOrder);
 };
 
+/**
+ * 모든 색깔 변경 이력을 획득
+ */
 MagoConfig.getAllColorHistory = function() 
 {
 	return this.colorHistoryMap;
@@ -286,7 +305,7 @@ MagoConfig.clearColorHistory = function()
 };
 
 /**
- * 모든 색깔 변경 이력을 획득
+ * project별 키에 해당하는 모든 색깔 변경 이력을 획득
  */
 MagoConfig.getColorHistorys = function(projectId, dataKey)
 {
@@ -368,7 +387,15 @@ MagoConfig.clearColorHistory = function()
 };
 
 /**
- * 모든 location and rotation 이력을 획득
+ * 모든 location and rotation 변경 이력을 획득
+ */
+MagoConfig.getAllLocationAndRotationHistory = function() 
+{
+	return this.locationAndRotationHistoryMap;
+};
+
+/**
+ * 프로젝트별 해당 키 값을 갖는 모든 location and rotation 이력을 획득
  */
 MagoConfig.getLocationAndRotationHistorys = function(projectId, dataKey)
 {
