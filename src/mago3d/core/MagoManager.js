@@ -1411,7 +1411,8 @@ MagoManager.prototype.cameraMoved = function()
 };
 
 /**
- * @returns 
+ * @param {Object} node
+ * @returns {Object}
  */
 MagoManager.prototype.getNodeGeoLocDataManager = function(node) 
 {
