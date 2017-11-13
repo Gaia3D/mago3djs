@@ -1191,6 +1191,10 @@
 	// 속성 가시화
 	$("#changePropertyRendering").click(function(e) {
 		var isShow = $(':radio[name="propertyRendering"]:checked').val();
+		if(isShow === undefined){
+			alert("표시/비표시 를 선택하여 주십시오..");
+			return false;
+		}
 		if ($.trim($("#propertyRenderingWord").val()) === ""){
 			alert("속성값을 입력해 주세요.");
 			$("#propertyRenderingWord").focus();
