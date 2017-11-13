@@ -52,7 +52,8 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} isShow true = 표시, false = 비표시
  */
-function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) {
+function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) 
+{
 	if (managerFactoryInstance === null) { return; } 
 		
 	var api = new API("changePropertyRendering");
