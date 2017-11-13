@@ -3200,8 +3200,8 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 
 MagoManager.prototype.checkPropertyFilters = function(nodesArray) 
 {
-	if(this.propertyFilterSC === undefined)
-		return;
+	if (this.propertyFilterSC === undefined)
+	{ return; }
 	
 	var nodesCount = nodesArray.length;
 	var node;	
@@ -3214,30 +3214,33 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 	{
 		node = nodesArray[i];
 		projectId = node.data.projectId;
-		if(projectId === this.propertyFilterSC.projectId)
+		if (projectId === this.propertyFilterSC.projectId)
 		{
-			if(node.data.attributes)
+			if (node.data.attributes)
 			{
-				if(node.data.attributes[propertyKey] !== undefined && node.data.attributes[propertyKey].toString() === propertyValue)
+				if (node.data.attributes[propertyKey] !== undefined && node.data.attributes[propertyKey].toString() === propertyValue)
 				{
-					if(visible === "true")
+					if (visible === "true")
 					{
 						// do nothing.
 					}
-					else{
+					else
+					{
 						nodesArray.splice(i, 1);
 						i--;
 						nodesCount = nodesArray.length;
 					}
 				}
-				else{
-					if(visible === "true")
+				else
+				{
+					if (visible === "true")
 					{
 						nodesArray.splice(i, 1);
 						i--;
 						nodesCount = nodesArray.length;
 					}
-					else{
+					else 
+					{
 						// do nothing.
 					}
 				}
@@ -3320,14 +3323,14 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 					// change color for an object.
 					var objectId = changeHistory.objectId;
 					var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if(objectsArray)
+					if (objectsArray)
 					{
 						var objectsCount = objectsArray.length;
-						for(var j=0; j<objectsCount; j++)
+						for (var j=0; j<objectsCount; j++)
 						{
 							var object = objectsArray[j];
-							if(object.aditionalColor === undefined)
-								object.aditionalColor = new Color();
+							if (object.aditionalColor === undefined)
+							{ object.aditionalColor = new Color(); }
 							
 							object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 						}
@@ -3617,7 +3620,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 			// If there are an object selected, then there are a stencilBuffer.******************************************
 			if (this.nodeSelected) // if there are an object selected then there are a building selected.***
 			{
-				if(this.objectSelected)
+				if (this.objectSelected)
 				{
 					node = this.nodeSelected;
 					var geoLocDataManager = this.getNodeGeoLocDataManager(node);
@@ -3690,8 +3693,8 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				// render bbox for neoBuildingSelected.
 				var selectedNodesArray = [];
 				selectedNodesArray.push(this.nodeSelected);
-				if(this.colorSC === undefined)
-					this.colorSC = new Color();
+				if (this.colorSC === undefined)
+				{ this.colorSC = new Color(); }
 				this.colorSC.setRGB(0.8, 1.0, 1.0);
 				this.renderBoundingBoxesNodes(gl, selectedNodesArray, this.colorSC);
 			}
@@ -3816,11 +3819,12 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	gl.uniform1i(currentShader.bScale_loc, true);
 
 	gl.uniform1i(currentShader.bUse1Color_loc, true);
-	if(color)
+	if (color)
 	{
 		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
 	}
-	else{
+	else 
+	{
 		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 1.0]); //.***
 	}
 
@@ -5938,7 +5942,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll) 
 {
 	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-	if(nodesMap)
+	if (nodesMap)
 	{
 		var node = nodesMap.get(dataKey);
 		if (node === undefined)
@@ -6551,8 +6555,8 @@ MagoManager.prototype.callAPI = function(api)
 		var propertyKey = splittedWords[0];
 		var propertyValue = splittedWords[1];
 		
-		if(this.propertyFilterSC === undefined)
-			this.propertyFilterSC = {};
+		if (this.propertyFilterSC === undefined)
+		{ this.propertyFilterSC = {}; }
 		
 		this.propertyFilterSC.visible = visible;
 		this.propertyFilterSC.projectId = projectId;

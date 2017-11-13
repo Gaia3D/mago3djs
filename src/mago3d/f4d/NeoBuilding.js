@@ -66,7 +66,7 @@ NeoBuilding.prototype.getReferenceObject = function(refObjectIndex)
  */
 NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId) 
 {
-	if(this.motherNeoReferencesMap === undefined)
+	if (this.motherNeoReferencesMap === undefined)
 	{ return undefined; }
 
 	var refObject = this.motherNeoReferencesMap.get(objectId);
@@ -85,12 +85,12 @@ NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx)
 	this.motherNeoReferencesArray[refObjectIdx] = refObject;
 	
 	// Additionally, make a objects map.
-	if(this.motherNeoReferencesMap === undefined)
-		this.motherNeoReferencesMap = new Map();
+	if (this.motherNeoReferencesMap === undefined)
+	{ this.motherNeoReferencesMap = new Map(); }
 	
 	var objectsArray = this.motherNeoReferencesMap.get(refObject.objectId);
-	if(objectsArray === undefined)
-		objectsArray = [];
+	if (objectsArray === undefined)
+	{ objectsArray = []; }
 	
 	objectsArray.push(refObject);
 	
@@ -123,8 +123,8 @@ NeoBuilding.prototype.setRenderSettingApplyOcclusionCulling = function(applyOccl
 NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManager) 
 {
 	// 1rst, clear this.motherNeoReferencesMap.
-	if(this.motherNeoReferencesMap)
-		this.motherNeoReferencesMap.clear();
+	if (this.motherNeoReferencesMap)
+	{ this.motherNeoReferencesMap.clear(); }
 	
 	var blocksCount = this.motherBlocksArray.length;
 	for (var i=0; i<blocksCount; i++)
