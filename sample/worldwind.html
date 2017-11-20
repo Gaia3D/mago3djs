@@ -808,13 +808,13 @@
 			var dataCount = 0;
 			defaultProjectArray.forEach(function(projectId, index) {
 				projectIdArray[index] = projectId;
-				console.log("url = " + dataInformationUrl + projectId);
+				//console.log("url = " + dataInformationUrl + projectId);
 				$.ajax({
 					url: dataInformationUrl + projectId,
 					type: "GET",
 					dataType: "json",
 					success: function(serverData){
-						console.log("index = " + index + ", data = " + serverData);
+						//console.log("index = " + index + ", data = " + serverData);
 						projectDataArray[index] = serverData;
 						projectDataFolderArray[index] = serverData.data_key;
 						if(defaultProjectArray.length === (dataCount + 1)) {
@@ -835,7 +835,6 @@
 	}
 	
 	function gotoProject(projectId, longitude, latitude, height, duration) {
-		console.log("url = " + dataInformationUrl + projectId);
 		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
 		if (projectData === null || projectData === undefined) {
 			$.ajax({
@@ -858,7 +857,6 @@
 	}
 	
 	function gotoIssue(projectId, issueId, issueType, longitude, latitude, height, duration) {
-		console.log("url = " + dataInformationUrl + projectId);
 		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
 		if (projectData === null || projectData === undefined) {
 			$.ajax({
