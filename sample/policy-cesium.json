@@ -22,6 +22,9 @@
 	"password_exception_char": "\u003c\u003e\u0026\u0027\"",
 	"geo_view_library": "cesium",
 	"geo_data_path": "/data",
+	"geo_data_default_projects": [
+		"3ds.json", "ifc_cultural_assets.json", "ifc_mep.json", "ifc.json", "ifc_japan.json", "sea_port.json", "collada.json"
+	],
 	"geo_cull_face_enable": "false",
 	"geo_time_line_enable": "false",
 	"geo_init_camera_enable": "true",
@@ -29,6 +32,8 @@
 	"geo_init_longitude": "126.60856869381428",
 	"geo_init_height": "550",
 	"geo_init_duration": 3,
+	"geo_init_default_terrain": "",
+	"geo_init_default_fov": 0,
 	"geo_lod0": "22",
 	"geo_lod1": "70",
 	"geo_lod2": "22360",
@@ -54,6 +59,7 @@
 	"geo_server_add_parameters_transparent": "true",
 	"geo_server_add_parameters_format": "image/png",
 	"geo_callback_enable": "true",
+	"geo_callback_apiresult": "showApiResult",
 	"geo_callback_selectedobject": "showSelectedObject",
 	"geo_callback_insertissue": "showInsertIssueLayer",
 	"geo_callback_clickposition": "showClickPosition",

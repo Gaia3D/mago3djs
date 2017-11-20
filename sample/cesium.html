@@ -183,36 +183,140 @@
 	
 	<div id="apiMenuContent" class="apiWrap">
 		<div>
+			<h3>로컬(Browser) 검색</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="localSearchProjectId">프로젝트 </label>
+					<select id="localSearchProjectId" name="localSearchProjectId" class="select">
+						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
+				</li>
+				<li>
+					<label for="localSearchDataKey">Data Key</label>
+					<input type="text" id="localSearchDataKey" name="localSearchDataKey" size="23" />
+					<button type="button" id="localSearch" class="btn">검색</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
+			<h3>속성 가시화</h3>
+			<ul class="apiLoca">
+				<li>
+					<input type="radio" id="showPropertyRendering" name="propertyRendering" value="true" />
+					<label for="showLabel"> 표시 </label>
+					<input type="radio" id="hidePropertyRendering" name="propertyRendering" value="false" />
+					<label for="hideLabel"> 비표시 </label>
+				</li>
+				<li>
+					<label for="propertyRenderingProjectId">프로젝트 </label>
+					<select id="propertyRenderingProjectId" name="propertyRenderingProjectId" class="select">
+						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
+				</li>
+				<li>
+					<label for="propertyRenderingWord">속성</label>
+					<input type="text" id="propertyRenderingWord" name="propertyRenderingWord" size="23" placeholder="isMain=true" />
+					<button type="button" id="changePropertyRendering" class="btn">변경</button> 
+				</li>
+			</ul>
+		</div>
+		<div>
+			<h3>색깔 변경</h3>
+			<ul class="apiLoca">
+				<li>
+					<label for="colorProjectId">프로젝트 </label>
+					<select id="colorProjectId" name="colorProjectId" class="select">
+						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
+				</li>
+				<li>
+					<label for="colorDataKey">Data Key</label>
+					<input type="text" id="colorDataKey" name="colorDataKey" size="30" />
+				</li>
+				<li>
+					<label for="colorObjectIds">Object Id</label>
+					<input type="text" id="colorObjectIds" name="colorObjectIds" placeholder="   , 구분" size="30" />
+				</li>
+				<li>
+					<label for="colorProperty">속성</label>
+					<input type="text" id="colorProperty" name="colorProperty" size="30" placeholder="isMain=true" />
+				</li>
+				<li>
+					<label for="updateColor">색깔</label>
+					<select id="updateColor" name="updateColor" class="select">
+						<option value="255,0,0"> 빨강 </option>
+						<option value="255,255,0"> 노랑 </option>
+						<option value="0,255,0"> 녹색 </option>
+						<option value="0,0,255"> 파랑 </option>
+						<option value="255,0,255"> 분홍 </option>
+						<option value="0,0,0"> 검정 </option>
+					</select>
+					<button type="button" id="changeColor" class="btn">변경</button> 
+					<button type="button" id="deleteAllChangeColor" class="btn">전체 삭제</button>
+				</li>
+			</ul>
+		</div>
+		<div>
 			<h3>Location and Rotation</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="move_data_key">Data Key</label>
-					<input type="text" id="move_data_key" name="move_data_key" size="25" />
+					<label for="moveProjectId">프로젝트 </label>
+					<select id="moveProjectId" name="moveProjectId" class="select">
+						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
 				</li>
 				<li>
-					<label for="move_latitude">위도 </label>
-					<input type="text" id="move_latitude" name="move_latitude" size="25"/>
+					<label for="moveDataKey">Data Key</label>
+					<input type="text" id="moveDataKey" name="moveDataKey" size="25" />
 				</li>
 				<li>
-					<label for="move_longitude">경도 </label>
-					<input type="text" id="move_longitude" name="move_longitude" size="25"/>
+					<label for="moveLatitude">위도 </label>
+					<input type="text" id="moveLatitude" name="moveLatitude" size="25"/>
 				</li>
 				<li>
-					<label for="move_height">높이 </label>
-					<input type="text" id="move_height" name="move_height" size="25" />
+					<label for="moveLongitude">경도 </label>
+					<input type="text" id="moveLongitude" name="moveLongitude" size="25"/>
 				</li>
 				<li>
-					<label for="move_heading">HEADING </label>
-					<input type="text" id="move_heading" name="move_heading" size="25" />
+					<label for="moveHeight">높이 </label>
+					<input type="text" id="moveHeight" name="moveHeight" size="25" />
 				</li>
 				<li>
-					<label for="move_pitch">PITCH </label>
-					<input type="text" id="move_pitch" name="move_pitch" size="25" />
+					<label for="moveHeading">HEADING </label>
+					<input type="text" id="moveHeading" name="moveHeading" size="25" />
 				</li>
 				<li>
-					<label for="move_roll">ROLL </label>
-					<input type="text" id="move_roll" name="move_roll" size="25" />
-					<button type="button" id="changeLocationAndRotationAPI" class="btn">변환</button> 
+					<label for="movePitch">PITCH </label>
+					<input type="text" id="movePitch" name="movePitch" size="25" />
+				</li>
+				<li>
+					<label for="moveRoll">ROLL </label>
+					<input type="text" id="moveRoll" name="moveRoll" size="18" />
+					<button type="button" id="changeLocationAndRotation" class="btn">변환</button> 
 				</li>
 			</ul>
 		</div>
@@ -399,12 +503,15 @@
 		</div>
 		<div>
 			<h3>Selecting And Moving</h3>
-			<input type="radio" id="mouseNoneMove" name="mouseMoveMode" value="2" onclick="changeMouseMove('2');"/>
-			<label for="mouseNoneMove"> None </label>
-			<input type="radio" id="mouseAllMove" name="mouseMoveMode" value="0" onclick="changeMouseMove('0');"/>
-			<label for="mouseAllMove"> ALL </label>
-			<input type="radio" id="mouseObjectMove" name="mouseMoveMode" value="1" onclick="changeMouseMove('1');"/>
-			<label for="mouseObjectMove"> Object </label>
+			<input type="radio" id="objectNoneMove" name="objectMoveMode" value="2" onclick="changeObjectMove('2');"/>
+			<label for="objectNoneMove"> None </label>
+			<input type="radio" id="mouseAllMove" name="objectMoveMode" value="0" onclick="changeObjectMove('0');"/>
+			<label for="objectAllMove"> ALL </label>
+			<input type="radio" id="objectMove" name="objectMoveMode" value="1" onclick="changeObjectMove('1');"/>
+			<label for="objectMove"> Object </label>
+			
+			<button type="button" id="saveObjectMoveButton" class="btn">저장</button>
+			<button type="button" id="deleteAllObjectMoveButton" class="btn">전체 삭제</button>
 		</div>
 		<div>
 			<h3>Object Occlusion Culling</h3>
@@ -500,7 +607,7 @@
 		<div>
 			<h3><label for="geo_ssao_radius">SSAO Radius</label></h3>
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
-			<button type="button" id="changeSsadRadiusButton" class="btn">변경</button>
+			<button type="button" id="changeSsaoRadiusButton" class="btn">변경</button>
 		</div>
 		
 		<div>
@@ -514,13 +621,13 @@
 </div>
 
 <ul class="shortcut">
-	<li onclick="flyTo(null, null, '126.60856869381428', '37.58199267183209', '550', '3')">3DS 통합 가시화</li>
-	<li onclick="flyTo(null, null, '126.97772995695296', '37.57981', '80', '3')">IFC(Cultural Assets)</li>
-	<li onclick="flyTo(null, null, '-58.784', '-62.2232', '220', '5')">IFC</li>
-	<li onclick="flyTo(null, null, '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
-	<li onclick="flyTo(null, null, '126.598426', '37.440778', '630', '3')">Sea Port</li>
-	<li onclick="flyTo(null, null, '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
-	<li onclick="flyTo(null, null, '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
+	<li onclick="gotoProject('3ds.json', '126.60856869381428', '37.58199267183209', '550', '3')">3DS 통합 가시화</li>
+	<li onclick="gotoProject('ifc_cultural_assets.json', '126.97772995695296', '37.57981', '80', '3')">IFC(Cultural Assets)</li>
+	<li onclick="gotoProject('ifc.json', '-58.784', '-62.2232', '220', '5')">IFC</li>
+	<li onclick="gotoProject('ifc_mep.json', '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
+	<li onclick="gotoProject('sea_port.json', '126.598426', '37.440778', '630', '3')">Sea Port</li>
+	<li onclick="gotoProject('collada.json', '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
+	<li onclick="gotoProject('ifc_japan.json', '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
 </ul>
 
 <div id="magoContainer" class="mapWrap">
@@ -538,6 +645,7 @@
 <script type="text/javascript" src="/src/mago3d/domain/Code.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Color.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Constant.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/ChangeHistory.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FBO.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FileRequestControler.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/FirstPersonView.js"></script>
@@ -574,10 +682,12 @@
 <script type="text/javascript" src="/src/mago3d/core/VBOMemoryManager.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/API.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Callback.js"></script>
-<script type="text/javascript" src="/src/mago3d/domain/Config.js"></script>
+<script type="text/javascript" src="/src/mago3d/domain/MagoConfig.js"></script>
 <script type="text/javascript" src="/src/mago3d/api/APIGateway.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/ColorAPI.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/DrawAPI.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/LocationAndRotationAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Policy.js"></script>
-<script type="text/javascript" src="/src/mago3d/domain/ProjectLayer.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/Accessor.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/BlockModels.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/HierarchyManager.js"></script>
@@ -639,6 +749,7 @@
 	var FPVModeFlag = false;
 
 	var imagePath = "/images/ko";
+	var dataInformationUrl = "/sample/";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
@@ -654,7 +765,7 @@
 			// BoundingBox
 			changeBoundingBox(false);
 			// Selecting And Moving
-			changeMouseMove("2");
+			changeObjectMove("2");
 			// slider, color-picker
 			initRendering();
 			
@@ -671,7 +782,7 @@
 	// mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
-			url: "/sample/policy-cesium.json",
+			url: dataInformationUrl + "policy-cesium.json",
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
@@ -684,21 +795,62 @@
 	}
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
-		$.ajax({
-			url: "/sample/data.json",
-			type: "GET",
-			dataType: "json",
-			success: function(serverData){
-				managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, serverData, imagePath);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
+		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);	
+		} else {
+			var defaultProjectArray = serverPolicy.geo_data_default_projects;
+			var projectIdArray = new Array(defaultProjectArray.length);
+			var projectDataArray = new Array(defaultProjectArray.length);
+			var projectDataFolderArray = new Array(defaultProjectArray.length);
+			
+			var dataCount = 0;
+			defaultProjectArray.forEach(function(projectId, index) {
+				projectIdArray[index] = projectId;
+				console.log("url = " + dataInformationUrl + projectId);
+				$.ajax({
+					url: dataInformationUrl + projectId,
+					type: "GET",
+					dataType: "json",
+					success: function(serverData){
+						console.log("index = " + index + ", data = " + serverData);
+						projectDataArray[index] = serverData;
+						projectDataFolderArray[index] = serverData.data_key;
+						if(defaultProjectArray.length === (dataCount + 1)) {
+							createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+						}
+						dataCount++;
+					},
+					error: function(e){
+						alert(e.responseText);
+					}
+				});
+			});
+		}
 	}
 	
-	function flyTo(issueId, issueType, longitude, latitude, height, duration) {
-		managerFactory.flyTo(issueId, issueType, longitude, latitude, height, duration);
+	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
+		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+	}
+	
+	function gotoProject(projectId, longitude, latitude, height, duration) {
+		console.log("url = " + dataInformationUrl + projectId);
+		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		if (projectData === null || projectData === undefined) {
+			$.ajax({
+				url: dataInformationUrl + projectId,
+				type: "GET",
+				dataType: "json",
+				success: function(serverData){
+					gotoProjectAPI(managerFactory, projectId, serverData, serverData.data_key, longitude, latitude, height, duration);		
+				},
+				error:function(request,status,error){
+			        console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				}
+			});
+		} else {
+			gotoProjectAPI(managerFactory, projectId, projectData, projectData.data_key, longitude, latitude, height, duration);	
+		}
+		
 		// 현재 좌표를 저장
 		$("#now_latitude").val(latitude);
 		$("#now_longitude").val(longitude);
@@ -715,7 +867,7 @@
 			$("#insertIssueEnableButton").text("Issue 등록 활성화 상태");
 			insertIssueEnable = true;
 		}
-		changeInsertIssueModeAPI(insertIssueEnable);
+		changeInsertIssueModeAPI(managerFactory, insertIssueEnable);
 	});
 	
 	// issue input layer call back function
@@ -751,7 +903,8 @@
 					if(msg.result == "success") {
 						alert(JS_MESSAGE["insert"]);
 						// pin image를 그림
-						drawInsertIssueImageAPI(1, msg.issue.issue_id, msg.issue.issue_type, $("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
+						drawInsertIssueImageAPI(managerFactory, 1, msg.issue.issue_id, msg.issue.issue_type, 
+								$("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
 					} else {
 						alert(JS_MESSAGE[msg.result]);
 					}
@@ -771,7 +924,7 @@
 			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
 			insertIssueEnable = false;
 			
-			changeInsertIssueStateAPI(0);
+			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
@@ -907,7 +1060,7 @@
 			}
 		}
 		// 이슈 등록 비활성화 상태
-		changeInsertIssueStateAPI(0);
+		changeInsertIssueStateAPI(managerFactory, 0);
 	});
 	
 	// 검색 메뉴 시작
@@ -929,7 +1082,7 @@
 			if(searchType === "data_name") {
 				content = content 
 				+ 	"<li>"
-				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('kangbukSport_del');\">바로가기</button>"
+				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('3ds.json', 'kangbukSport_del');\">바로가기</button>"
 				+ 	"	<div class=\"info\">"		
 				+ 	"		<p class=\"title\">"			
 				+ 	"			<span>3DS 통합 가시화</span>kangbukSport_del"
@@ -968,27 +1121,36 @@
 		}
 	});
 	
+	$("#localSearch").click(function() {
+		if ($.trim($("#localSearchDataKey").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#localSearchDataKey").focus();
+			return false;
+		}
+		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
+	});
+	
 	function flyToBounding(dataKey) {
-		searchDataAPI(dataKey);
+		searchDataAPI(managerFactory, dataKey);
 	}
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(data_key, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
-			$("#move_data_key").val(data_key);
-			$("#move_latitude").val(latitude);
-			$("#move_longitude").val(longitude);
-			$("#move_height").val(height);
-			$("#move_heading").val(heading);
-			$("#move_pitch").val(pitch);
-			$("#move_roll").val(roll);
+			$("#moveDataKey").val(dataKey);
+			$("#moveLatitude").val(latitude);
+			$("#moveLongitude").val(longitude);
+			$("#moveHeight").val(height);
+			$("#moveHeading").val(heading);
+			$("#movePitch").val(pitch);
+			$("#moveRoll").val(roll);
 			
 			$.toast({
 			    heading: 'Click Object Info',
 			    text: [
-			        'dataKey : ' + data_key, 
+			        'dataKey : ' + dataKey, 
 			        'objectId : ' + objectId,
 			        'latitude : ' + latitude,
 			        'longitude : ' + longitude,
@@ -1004,52 +1166,89 @@
 			});
 			
 			// occlusion culling
-			$("#occlusion_culling_data_key").val(data_key);
+			$("#occlusion_culling_data_key").val(dataKey);
 			// 현재 좌표를 저장
 			$("#now_latitude").val(latitude);
 			$("#now_longitude").val(longitude);
 		}
 	}
+	
+	// 속성 가시화
+	$("#changePropertyRendering").click(function(e) {
+		var isShow = $(':radio[name="propertyRendering"]:checked').val();
+		if(isShow === undefined){
+			alert("표시/비표시 를 선택하여 주십시오..");
+			return false;
+		}
+		if ($.trim($("#propertyRenderingWord").val()) === ""){
+			alert("속성값을 입력해 주세요.");
+			$("#propertyRenderingWord").focus();
+			return false;
+		}
+		changePropertyRenderingAPI(managerFactory, isShow, $("#propertyRenderingProjectId").val(), $("#propertyRenderingWord").val());
+	});
+	
+	// 색변경
+	$("#changeColor").click(function(e) {
+		if ($.trim($("#colorDataKey").val()) === ""){
+			alert("Data Key를 입력해 주세요.");
+			$("#colorDataKey").focus();
+			return false;
+		}
+		
+		var objectIds = null;
+		var colorObjectIds = $("#colorObjectIds").val();
+		if(colorObjectIds !== null && colorObjectIds !=="") objectIds = colorObjectIds.split(",");
+		changeColorAPI(managerFactory, $("#colorProjectId").val(), $("#colorDataKey").val(), objectIds, $("#colorProperty").val(), $("#updateColor").val());
+	});
+	// 색깔 변경 이력 삭제
+	$("#deleteAllChangeColor").click(function () {
+		if(confirm("삭제 하시겠습니까?")) {
+			deleteAllChangeColorAPI(managerFactory);
+		}
+	});
+	
 	// 변환행렬
-	$("#changeLocationAndRotationAPI").click(function() {
+	$("#changeLocationAndRotation").click(function() {
 		if(!changeLocationAndRotationCheck()) return false;
-		changeLocationAndRotationAPI(	$("#move_data_key").val(), $("#move_latitude").val(), $("#move_longitude").val(), 
-										$("#move_height").val(), $("#move_heading").val(), $("#move_pitch").val(), $("#move_roll").val());
+		changeLocationAndRotationAPI(	managerFactory, $("#moveProjectId").val(),
+										$("#moveDataKey").val(), $("#moveLatitude").val(), $("#moveLongitude").val(), 
+										$("#moveHeight").val(), $("#moveHeading").val(), $("#movePitch").val(), $("#moveRoll").val());
 	});
 	function changeLocationAndRotationCheck() {
-		if ($.trim($("#move_data_key").val()) === ""){
+		if ($.trim($("#moveDataKey").val()) === ""){
 			alert("Data Key를 입력해 주세요.");
-			$("#move_data_key").focus();
+			$("#moveDataKey").focus();
 			return false;
 		}
-		if ($.trim($("#move_latitude").val()) === ""){
+		if ($.trim($("#moveLatitude").val()) === ""){
 			alert("위도를 입력해 주세요.");
-			$("#move_latitude").focus();
+			$("#moveLatitude").focus();
 			return false;
 		}
-		if ($.trim($("#move_longitude").val()) === ""){
+		if ($.trim($("#moveLongitude").val()) === ""){
 			alert("경도를 입력해 주세요.");
-			$("#move_longitude").focus();
+			$("#moveLongitude").focus();
 			return false;
 		}
-		if ($.trim($("#move_height").val()) === ""){
+		if ($.trim($("#moveHeight").val()) === ""){
 			alert("높이를 입력해 주세요.");
-			$("#move_height").focus();
+			$("#moveHeight").focus();
 			return false;
 		}
-		if ($.trim($("#move_heading").val()) === ""){
+		if ($.trim($("#moveHeading").val()) === ""){
 			alert("heading을 입력해 주세요.");
-			$("#move_heading").focus();
+			$("#moveHeading").focus();
 			return false;
 		}
-		if ($.trim($("#move_pitch").val()) === ""){
+		if ($.trim($("#movePitch").val()) === ""){
 			alert("pitch를 입력해 주세요.");
-			$("#move_pitch").focus();
+			$("#movePitch").focus();
 			return false;
 		}
-		if ($.trim($("#move_roll").val()) === ""){
+		if ($.trim($("#moveRoll").val()) === ""){
 			alert("roll를 입력해 주세요.");
-			$("#move_roll").focus();
+			$("#moveRoll").focus();
 			return false;
 		}
 		return true;
@@ -1074,7 +1273,7 @@
 						if(issueList != null && issueList.length > 0) {
 							for(i=0; i<issueList.length; i++ ) {
 								var issue = issueList[i];
-								drawInsertIssueImageAPI(0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
+								drawInsertIssueImageAPI(managerFactory, 0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
 							}
 						}
 					} else {
@@ -1087,38 +1286,56 @@
 				}
 			});
 		}
-		changeNearGeoIssueListViewModeAPI(isShow);
+		changeNearGeoIssueListViewModeAPI(managerFactory, isShow);
 	}
 	
 	// 설정 메뉴 시작
 	// Label 표시
 	function changeLabel(isShow) {
 		$("input:radio[name='labelInfo']:radio[value='" + isShow + "']").prop("checked", true);
-		changeLabelAPI(isShow);
+		changeLabelAPI(managerFactory, isShow);
 	}
 	// object info 표시
 	function changeObjectInfoViewMode(isShow) {
 		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);
-		changeObjectInfoViewModeAPI(isShow);
+		changeObjectInfoViewModeAPI(managerFactory, isShow);
 	}
 	// boundingBox 표시/비표시
 	function changeBoundingBox(isShow) {
 		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
-		changeBoundingBoxAPI(isShow);
+		changeBoundingBoxAPI(managerFactory, isShow);
 	}
 	// 마우스 클릭 객체 이동 모드 변경
-	function changeMouseMove(mouseMoveMode) {
-		$("input:radio[name='mouseMoveMode']:radio[value='" + mouseMoveMode + "']").prop("checked", true);
-		changeMouseMoveAPI(mouseMoveMode);
+	function changeObjectMove(objectMoveMode) {
+		$("input:radio[name='objectMoveMode']:radio[value='" + objectMoveMode + "']").prop("checked", true);
+		changeObjectMoveAPI(managerFactory, objectMoveMode);
 	}
+	// 마우스 클릭 객체 이동 모드 변경 저장
+	$("#saveObjectMoveButton").click(function () {
+		alert("준비중 입니다.");
+		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
+		if(objectMoveMode === "2") {
+			alert("None 모드일 경우 저장할 수 없습니다.");
+			return;
+		}
+		saveObjectMoveAPI(managerFactory, objectMoveMode);
+	});
+	// 마우스 클릭 객체 이동 모드 변경 삭제
+	$("#deleteAllObjectMoveButton").click(function () {
+		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
+		if(confirm("삭제 하시겠습니까?")) {
+			deleteAllObjectMoveAPI(managerFactory, objectMoveMode);
+		}
+	});
+	
 	// Object Occlusion culling
 	$("#changeOcclusionCullingButton").click(function () {
-		changeOcclusionCullingAPI(($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
+		changeOcclusionCullingAPI(managerFactory, ($(':radio[name="occlusionCulling"]:checked').val() === "true"), $("#occlusion_culling_data_key").val());		
 	});
 	// 카메라 모드 전환
 	function changeViewMode(isFPVMode) {
 		$("input:radio[name='viewMode']:radio[value='" + isFPVMode + "']").prop("checked", true);
-		changeFPVModeAPI(isFPVMode);
+		changeFPVModeAPI(managerFactory, isFPVMode);
 	}
 	function initJqueryCalendar() {
 		$( ".date" ).datepicker({ 
@@ -1197,15 +1414,15 @@
 	
 	// LOD 설정
 	$("#changeLodButton").click(function() {
-		changeLodAPI($("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
+		changeLodAPI(managerFactory, $("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
 	});
 	// Lighting 설정
 	$("#changeLightingButton").click(function() {
-		changeLightingAPI(	$("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
+		changeLightingAPI(managerFactory, $("#geo_ambient_reflection_coef").val(), $("#geo_diffuse_reflection_coef").val(), $("#geo_specular_reflection_coef").val(), null, null);
 	});
 	// Ssadradius 설정
-	$("#changeSsadRadiusButton").click(function() {
-		changeSsadRadiusAPI($("#geo_ssao_radius").val());
+	$("#changeSsaoRadiusButton").click(function() {
+		changeSsaoRadiusAPI(managerFactory, $("#geo_ssao_radius").val());
 	});
 
 	// click poisition call back function
@@ -1213,6 +1430,113 @@
 		$("#positionLatitude").val(position.lat);
 		$("#positionLongitude").val(position.lon);
 		$("#positionAltitude").val(position.alt);
+	}
+	
+	// 모든 데이터 비표시
+	function clearAllData() {
+		clearAllDataAPI(managerFactory);
+	}
+	
+	function drawCheckedData(checkboxName) {
+		var checkCount = $("input[name='" + checkboxName + "']:checked").length;
+		var projectIdArray = new Array(checkCount);
+		var projectDataArray = new Array(checkCount);
+		var projectDataFolderArray = new Array(checkCount);
+		var dataCount = 0;
+		$("input[name='" + checkboxName + "']:checked").each(function(index) {
+			var dataName = $(this).val();
+			if (!isDataExistAPI(CODE.PROJECT_ID_PREFIX + dataName))
+			{
+				$.ajax({
+					url      : dataInformationUrl + dataName,
+					type     : "GET",
+					dataType : "json",
+					success  : function(serverData)
+					{
+						projectIdArray[index] = dataName;
+						projectDataArray[index] = serverData;
+						projectDataFolderArray[index] = serverData.data_key;
+											
+						if(checkCount === (dataCount + 1)) {
+							drawAppendDataAPI(managerFactory, projectIdArray, projectDataArray, projectDataFolderArray);
+						}
+						dataCount++;
+					},
+					error: function(request, status, error)
+					{
+						//alert(JS_MESSAGE["ajax.error.message"]);
+						console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+					}
+				});
+			} else {
+				// TODO 이 부분은 조금 수정을 해야 할지도 모르겠다. 데이터는 cache로 있지만 아직 새로 로딩을 해야 하는 경우 배열로 이름을 넘겨줘야 하지 않나?
+				console.log("########## data Exist. name = " + dataName);
+				dataCount++;
+			}
+		});
+	}
+	
+	// fullship
+	$("#2119_fullship").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	
+	// deploy
+	$("#2119_deploy").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	
+	// decoration
+	$("#decoration").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	
+	// 2119_sampleBlocks
+	$("#2119_sampleBlocks").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_PEConstructed
+	$("#2119_PEConstructed").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_fullShipUnderConstruction1
+	$("#2119_fullShipUnderConstruction1").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_PERemained1
+	$("#2119_PERemained1").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_fullShipUnderConstruction2
+	$("#2119_fullShipUnderConstruction2").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_PERemained2
+	$("#2119_PERemained2").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	// 2119_fullShipCompleted
+	$("#2119_fullShipCompleted").click(function() {
+		clearAllDataAPI(managerFactory);
+		drawCheckedData("createStepsShip");
+	});
+	
+	// general callback alert function
+	function showApiResult(apiName, result) {
+		if(apiName === "searchData") {
+			if(result === "-1") {
+				alert(" 아직 로딩하지 않은 정보 입니다. 로딩 후 검색해 주십시오. ");
+			}
+		}
 	}
 </script>
 </body>

@@ -1,0 +1,32 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "ifc_mep"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_group_id": 9,
+			"data_group_name": "IFC",
+			"data_id": 1060,
+			"data_key": "Sample_MEP",
+			"data_name": "Sample_MEP",
+			"heading": 63,
+			"height": 50,
+			"latitude": 37.663059,
+			"longitude": 126.738134,
+			"pitch": 0,
+			"roll": 0
+		}
+	],
+	"data_group_id": 0,
+	"data_group_name": "ifc_mep",
+	"data_id": 0,
+	"data_key": "ifc_mep",
+	"data_name": "ifc_mep"
+}
