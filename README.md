@@ -54,7 +54,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 ### 4. F4D Converter 설치
 - [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
 - Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
-- Install Path: <code>C:\F4DConverter\ </code>
+- Install Path: C:\F4DConverter\
 
 ### 5. 데이터 변환
 - 변한된 데이터(outputFolder)를 저장할 디렉토리를 생성<br>
@@ -201,7 +201,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 ### 4. F4D Converter Install
 - [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
 - Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
-- Install Path: <code>C:\F4DConverter\ </code>
+- Install Path: C:\F4DConverter\ 
 
 ### 5. Data Conversion
 - Create a directory to store the changed data(outputFolder) <br>
@@ -349,7 +349,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 ### 4. F4D Converterインストール
 - [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
 - Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
-- Install Path: <code>C:\F4DConverter\ </code>
+- Install Path: C:\F4DConverter\ 
 
 ### 5. データ変換
 - 変わったデータ（outputFolder）を格納するディレクトリを作成し<br>
