@@ -31,6 +31,8 @@
 	"geo_init_longitude": "128.5973",
 	"geo_init_height": "250",
 	"geo_init_duration": 3,
+	"geo_init_default_terrain": "",
+	"geo_init_default_fov": 0,
 	"geo_lod0": "22",
 	"geo_lod1": "70",
 	"geo_lod2": "22360",
