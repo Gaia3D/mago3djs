@@ -24,10 +24,6 @@ function API(apiName)
 	// project id
 	this.projectId = null;
 	this.projectDataFolder = null;
-	// block id
-	this.blockId = null;
-	// blockIds
-	this.blockIds = null;
 	// objectIds
 	this.objectIds = null;
 	// data_key
@@ -131,24 +127,6 @@ API.prototype.getProjectDataFolder = function()
 API.prototype.setProjectDataFolder = function(projectDataFolder) 
 {
 	this.projectDataFolder = projectDataFolder;
-};
-
-API.prototype.getBlockId = function() 
-{
-	return this.blockId;
-};
-API.prototype.setBlockId = function(blockId) 
-{
-	this.blockId = blockId;
-};
-
-API.prototype.getBlockIds = function() 
-{
-	return this.blockIds;
-};
-API.prototype.setBlockIds = function(blockIds) 
-{
-	this.blockIds = blockIds;
 };
 
 API.prototype.getObjectIds = function() 
