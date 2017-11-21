@@ -65,11 +65,11 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 <br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\프로젝트명 -log C:\demo_data/logTest.txt -indexing y</code></pre>
 - 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
   - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
-  <code>C:\mago3djs</code>
-  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  <code>C:\git\repository\mago3djs</code>
+  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
 
 ### 6. 설정 파일 수정
-두 가지의 설정파일을 추가한다. (data.json, policy.json)
+두 가지의 설정파일을 수정한다. (data.json, policy.json)
 #### data.json
 - 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children 그외 위치 정보를 저장하는 영역
 - json의 root 노드의 data_key는 data 폴더 아래 프로젝트명과 일치
