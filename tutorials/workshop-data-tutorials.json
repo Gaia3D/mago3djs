@@ -1,72 +1,52 @@
 {
-	"alldata": {
-		"hakdongPark_s": {
-			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_key": "hakdongPark_s",
-			"data_name": "hakdongPark_s",
-			"latitude": "35.6617",
-			"longitude": "139.6863",
-			"height": "90",
-			"heading": "100",
-			"pitch": "0.0",
-			"roll": "0.0",
-			"status": "0",
-			"data_insert_type": "SELF",
-			"insert_date": "2017-06-26 21:06:29.159998"
+	"attributes" : {
+		"isPhysical" : false,
+		"nodeType" : "root",
+		"projectType" : "workshop"
+	},
+	"children" : [
+		{
+			"attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			},
+			"children" : [
+			],
+			"data_group_id" : 0,
+			"data_group_name" : "temporary",
+			"data_id" : 0,
+			"data_key" : "hakdongPark_s",
+			"data_name" : "학생 1조 실습 홍덕 건물",
+			"latitude": 37.5835,
+			"longitude": 126.6075,
+			"height": 40,
+			"heading" : 0,
+			"pitch" : 0.0,
+			"roll" : 0.0
 		},
-		"PCv2_RVT2018": {
-			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_key": "PCv2_RVT2018",
-			"data_name": "橋(はし)",
-			"latitude": "35.6629",
-			"longitude": "139.6843",
-			"height": "10",
-			"heading": "-20",
-			"pitch": "0",
-			"roll": "0",
-			"status": "0",
-			"data_insert_type": "SELF",
-			"insert_date": "2017-06-26 21:06:29.159998"
-		},
-		"Tekla Training Modell": {
-			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_key": "Tekla Training Modell",
-			"data_name": "ビルディング",
-			"latitude": "35.6618",
-			"longitude": "139.6843",
-			"height": "75",
-			"heading": "70",
-			"pitch": "0",
-			"roll": "0",
-			"status": "0",
-			"data_insert_type": "SELF",
-			"insert_date": "2017-06-26 21:06:29.159998"
-		},
-		"TunelSection_2018": {
-			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_key": "TunelSection_2018",
-			"data_name": "トンネル",
-			"latitude": "35.66188",
-			"longitude": "139.68535",
-			"height": "74",
-			"heading": "-18",
-			"pitch": "0",
-			"roll": "0",
-			"status": "0",
-			"data_insert_type": "SELF",
-			"insert_date": "2017-06-26 21:06:29.159998"
+		{
+			"attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			},
+			"children" : [
+			],
+			"data_group_id" : 0,
+			"data_group_name" : "temporary",
+			"data_id" : 0,
+			"data_key" : "musicHall",
+			"data_name" : "학생 2조 실습 음악홀",
+			"latitude": 37.583754532032326,
+			"longitude": 126.60931061270068,
+			"height": 30,
+			"heading" : 0.0,
+			"pitch" : 0.0,
+			"roll" : 0.0
 		}
-	}
+	],
+	"data_group_id" : 0,
+	"data_group_name" : "workshop",
+	"data_id" : 0,
+	"data_key" : "workshop",
+	"data_name" : "workshop"
 }

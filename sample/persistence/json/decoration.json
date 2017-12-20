@@ -1,0 +1,193 @@
+{
+   "attributes" : {
+      "isPhysical" : false,
+      "nodeType" : "root",
+      "projectType" : "decoration"
+   },
+   "children" : [
+		{
+			"attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_2DOCK",
+			 "data_name" : "decoration_2DOCK",
+			 "heading" : 181.5,
+			   "height" : 1.0,
+			   "latitude" : 34.90837058653858,
+			   "longitude" : 128.589715888321,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_Drill_Ship_7000m_center",
+			 "data_name" : "decoration_Drill_Ship_7000m_center",
+			 "heading" : 7.5,
+			   "height" : 0.0,
+			   "latitude" : 34.910555876551086,
+			   "longitude" : 128.59938328837208,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_Goliath",
+			 "data_name" : "decoration_Goliath",
+			 "heading" : 0.0,
+			   "height" : 40.0,
+			   "latitude" : 34.90248683618875,
+			   "longitude" : 128.5917818556848,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_LLC_30TON_NO23_DOWN",
+			 "data_name" : "decoration_LLC_30TON_NO23_DOWN",
+			 "heading" : 94.5,
+			   "height" : 25.0,
+			   "latitude" : 34.90642378561333,
+			   "longitude" : 128.59506868161952,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_LLC_30TON_NO21_UP",
+			 "data_name" : "decoration_LLC_30TON_NO21_UP",
+			 "heading" : 94.5,
+			   "height" : 25.0,
+			   "latitude" : 34.90642378561333,
+			   "longitude" : 128.59506868161952,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_PipeFactory",
+			 "data_name" : "decoration_PipeFactory",
+			 "heading" : 1.0,
+			   "height" : 5.0,
+			   "latitude" : 34.899647897872505,
+			   "longitude" : 128.60905502731697,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_supportOffice",
+			 "data_name" : "decoration_supportOffice",
+			 "heading" : 4.5,
+			   "height" : 17.0,
+			   "latitude" : 34.89653955757309,
+			   "longitude" : 128.59988055686466,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_TTC_20Ton_No48_UP",
+			 "data_name" : "decoration_TTC_20Ton_No48_UP",
+			 "heading" : 97.5,
+			   "height" : 10.0,
+			   "latitude" : 34.90581810739693,
+			   "longitude" : 128.5954018080845,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		},
+		{
+			 "attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			 },
+			 "children" : [
+			 
+			 ],
+			 "data_group_id" : 0,
+			 "data_group_name" : "temporary",
+			 "data_id" : 0,
+			 "data_key" : "decoration_WeldingMachine_Blue",
+			 "data_name" : "decoration_WeldingMachine_Blue",
+			 "heading" : 0.0,
+			   "height" : -9.0,
+			   "latitude" : 34.899647897872505,
+			   "longitude" : 128.60905502731697,
+			   "pitch" : 0.0,
+			   "roll" : 0.0
+		}
+	],
+	"data_group_id" : 0,
+	 "data_group_name" : "temporary",
+	 "data_id" : 0,
+	 "data_key" : "decoration",
+	 "data_name" : "decoration"
+}

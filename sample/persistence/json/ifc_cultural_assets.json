@@ -1,0 +1,32 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "ifc_cultural_assets"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_group_id": 77,
+			"data_group_name": "IFC",
+			"data_id": 999,
+			"data_key": "ByeolMaJeolDoSa",
+			"data_name": "병마 절도사",
+			"heading": 0,
+			"height": 60,
+			"latitude": 37.579813075158986,
+			"longitude": 126.97772995695296,
+			"pitch": 0,
+			"roll": 0
+		}
+	],
+	"data_group_id": 0,
+	"data_group_name": "ifc_cultural_assets",
+	"data_id": 0,
+	"data_key": "ifc_cultural_assets",
+	"data_name": "ifc_cultural_assets"
+}

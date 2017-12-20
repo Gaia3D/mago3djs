@@ -764,7 +764,7 @@
 
 	menuSlideControl("homeMenu");
 	var imagePath = "/images/ko";
-	var dataInformationUrl = "/sample/";
+	var dataInformationUrl = "/sample/persistence/json/";
 	magoStart(null, "magoContainer", null, null);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
@@ -821,13 +821,13 @@
 			var dataCount = 0;
 			defaultProjectArray.forEach(function(projectId, index) {
 				projectIdArray[index] = projectId;
-				console.log("url = " + dataInformationUrl + projectId);
+				//console.log("url = " + dataInformationUrl + projectId);
 				$.ajax({
 					url: dataInformationUrl + projectId,
 					type: "GET",
 					dataType: "json",
 					success: function(serverData){
-						console.log("index = " + index + ", data = " + serverData);
+						//console.log("index = " + index + ", data = " + serverData);
 						projectDataArray[index] = serverData;
 						projectDataFolderArray[index] = serverData.data_key;
 						if(defaultProjectArray.length === (dataCount + 1)) {
@@ -848,7 +848,7 @@
 	}
 	
 	function gotoProject(projectId, longitude, latitude, height, duration) {
-		console.log("url = " + dataInformationUrl + projectId);
+		//console.log("url = " + dataInformationUrl + projectId);
 		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
 		if (projectData === null || projectData === undefined) {
 			$.ajax({
@@ -1191,6 +1191,10 @@
 	// 속성 가시화
 	$("#changePropertyRendering").click(function(e) {
 		var isShow = $(':radio[name="propertyRendering"]:checked').val();
+		if(isShow === undefined){
+			alert("표시/비표시 를 선택하여 주십시오..");
+			return false;
+		}
 		if ($.trim($("#propertyRenderingWord").val()) === ""){
 			alert("속성값을 입력해 주세요.");
 			$("#propertyRenderingWord").focus();

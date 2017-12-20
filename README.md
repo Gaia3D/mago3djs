@@ -51,31 +51,91 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - mago3DJS에 필요한 node_modules를 Node Package Manager 사용하여 설치<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
 - gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4. 데이터 폴더 링크
-- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속하여 하단에 있는 F4D Converter 64bit를 C:\F4DConverter 에 설치
-- 관리자 권한으로 Command Line Prompt 실행하여 F4D Conveter 설치한 Directory 로 이동
-- 변환할 데이터를 C:\temp에 놓고 변환 데이터 저장 폴더(outputFolder)를 C:\data에 생성하고 실행<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
-- 변한 된 데이터를 표시하려면 data.json, policy.json을 수정해야합니다. <br>
-※설정파일은 tutorials -> data-tutorials, policy-tutorials를 참조
-  - policy.json - 다른 설정을 수정할 필요가 없고, mago3DJS를 시작할때 카메라 위치를 지정<pre><code>"geo_init_latitude": "...",
-"geo_init_longitude": "..."
-</code></pre>
-  - data.json - 변환 된 데이터가 F4D_Sample이면<pre><code>"Sample": {
-    "data_key": "Sample",
-    "data_name": "데이터 이름",
-    ...
-  }
-</code></pre>
-- Data가 제대로 생성되었으면 데이터 폴더 링크를 만들어줍니다.<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+### 4. F4D Converter 설치
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
+- Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
+- Install Path: C:\F4DConverter\
 
-### 5. Node Server 실행
+### 5. 데이터 변환
+- 변한된 데이터(outputFolder)를 저장할 디렉토리를 생성<br>
+<code>C:\data\프로젝트명 (root folder인 data 폴더 아래 프로젝트 별로 디렉토리를 생성)</code>
+- 변환할 데이터를 C:\demo_data(inputFolder)에 저장
+- 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행한 다음 F4D Converter가 설치된 디렉토리로 이동
+- 다음을 실행
+<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\프로젝트명 -log C:\demo_data/logTest.txt -indexing y</code></pre>
+- 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
+  - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
+  <code>C:\git\repository\mago3djs</code>
+  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+
+### 6. 설정 파일 수정
+두 가지의 설정파일을 수정한다. (data.json, policy.json)
+#### data.json
+- 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children 그외 위치 정보를 저장하는 영역
+- json의 root 노드의 data_key는 data 폴더 아래 프로젝트명과 일치
+<pre><code>{
+    //attributes영역
+    "attributes" : {
+      "isPhysical" : false,
+      "nodeType": "root",
+      "projectType": "프로젝트 타입"
+    },
+    //자식 노드 영역
+    "children" : [
+    ],
+    //위치 정보 영역
+    "data_group_id" : 0,
+    "data_group_name" : "데이터 그룹명",
+    "data_id" : 0,
+    "data_key" : "프로젝트명",
+    "data_name" : "프로젝트명"
+}</code></pre>
+- <code>C:\data\프로젝트명</code> 에서 Rendering 할 디렉토리를 찾음
+- 디렉토리명에서 F4D_이후의 글자가 고유 식별자
+- data.json 파일에서 children의 data_key 값을 고유 식별자로 수정
+- lattiude, longitude, height, heading, pitch, roll 값을 적당한 값으로 수정
+<pre><code>//자식 노드 영역
+"children" : [
+   {
+     "attributes" : {
+     "isPhysical" : true,
+     "nodeType" : "..."
+     },
+     "children" : [
+     ],
+     "data_group_id" : 0,
+     "data_group_name" : "데이터 그룹명",
+     "data_id" : 0,
+     "data_key" : "고유 식별자",
+     "data_name" : "데이터 이름",
+     "latitude" : 위도 입력,
+     "longitude" : 경도 입력,
+     "height" : 높이 입력,
+     "heading" : heading 입력,
+     "pitch" : pitch 입력,
+     "roll" : roll 입력
+  }
+]
+</code></pre>
+
+#### policy.json
+  - 초기화시 로딩할 project, Init Camera Latitude, Longitude, CallBack Function, Geo Server 설정
+  - 페이지 초기화시 로딩할 프로젝트 설정 key값 입력, 복수개의 프로젝트 로딩을 원하는 경우 <code> , </code>로 추가
+  <pre><code>"geo_data_default_projects": [
+    "data.json"
+]</code></pre>
+
+  - 웹 페이지 시작시 이동할 위치(lattiude, longitude)를 수정
+  <pre><code>"geo_init_latitude": "위도 입력",
+"geo_init_longitude": "경도 입력"</code></pre>
+
+### 7. Node Server 실행
 <pre><code>// private로 서버를 실행할경우
 C:\git\repository\mago3djs>node server.js
 // public로 서버를 실행할경우
-C:\git\repository\mago3djs>node server.js --public true
-</code></pre>
+C:\git\repository\mago3djs>node server.js --public true</code></pre>
 
-### 6. 브라우저 확인
+### 8. 브라우저 확인
 <pre><code>// Cesium
 http:localhost/sample/cesium.html
 // WorlWind
@@ -132,36 +192,98 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - If you are not using git, click the Download ZIP link to install it.
 
 
-### 3. Node install ###
+### 3. Node Install ###
 - [node](https://nodejs.org/ko/download/) to install Window Install (.msi) 64-bit.
 - After the installation is complete, go to the C:\git\repository\mago3djs directory.
 - Use node Package Manager to install node_modules for mago3DJS.<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
 - gulp installs globally in Terminal to use the module's mockups.<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4. Data Folder Link
-- Connect to [www.mago3d.com](http://www.mago3d.com/homepage/download.do) and install F4D Converter 64bit at the bottom to C:\F4DConverter
-- Run Command Line Prompt as administrator and move to F4D Conveter installed directory
-- Place the data to be converted in C:\temp, create the conversion data storage folder (outputFolder) in C:\data and execute<br>※ Refer to [F4D Conveter](https://github.com/Gaia3D/F4DConverter) for explanation of F4D Conveter argument.<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
-- To display changed data, you need to modify data.json, policy.json. <br>
-※ Refer to tutorials -> data-tutorials, policy-tutorials for configuration files.
+### 4. F4D Converter Install
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
+- Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
+- Install Path: C:\F4DConverter\ 
 
-  - policy.json - no need to modify other settings, specify camera location when starting mago3DJS<pre><code>"geo_init_latitude": "...",
-"geo_init_longitude": "..."</code></pre>
-  - data.json - if the converted data is F4D_Sample <pre><code>"Sample": {
-  "data_key": "Sample",
-  "data_name": "Data Name",
-  ...
+### 5. Data Conversion
+- Create a directory to store the changed data(outputFolder) <br>
+<code>C:\data\projectname (Create a directory for each project under the data folder, the root folder)</code>
+- Save the data to be converted to C:\demo_data(inputFolder)
+- Run Command Line Prompt (cmd.exe) as an administrator and move to the directory where F4D Converter is installed
+- Run
+<br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\projectname -log C:\demo_data/logTest.txt -indexing y</code></pre>
+- Create Symbolic Link to use transformed F4D files as web service in mago3D JS project
+  - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project
+  <code>C:\mago3djs</code>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+
+### 6. Edit Configuration File
+Add two configuration files. (data.json, policy.json)
+#### data.json
+- It is divided into three major areas. Attributes to store attribute values, children to store child node information, other area to store location information
+- The data_key of the root node of json matches the project name under the data folder
+<pre><code>{
+    //attributes area
+    "attributes" : {
+      "isPhysical" : false,
+      "nodeType": "root",
+      "projectType": "project Type"
+    },
+    //Child node area
+    "children" : [
+    ],
+    //Location information area
+    "data_group_id" : 0,
+    "data_group_name" : "Data group name",
+    "data_id" : 0,
+    "data_key" : "Project name",
+    "data_name" : "Project name"
 }</code></pre>
-- If the data is properly created, it creates a data folder link.<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+- <code>C:\data\projectname</code>to find the directory to render
+- The characters after F4D_ in the directory name are unique identifiers
+- Modify the data_key value of children from the data.json file to a unique identifier
+- Modify latitude, longitude, height, heading, pitch, and roll values to appropriate values
+<pre><code>//Child node area
+"children" : [
+   {
+     "attributes" : {
+     "isPhysical" : true,
+     "nodeType" : "..."
+     },
+     "children" : [
+     ],
+     "data_group_id" : 0,
+     "data_group_name" : "Data group name",
+     "data_id" : 0,
+     "data_key" : "Unique identifier",
+     "data_name" : "Data name",
+     "latitude" : Enter latitude,
+     "longitude" : Enter longitude,
+     "height" : Enter height,
+     "heading" : Enter heading,
+     "pitch" : Enter pitch,
+     "roll" : Enter roll
+  }
+]
+</code></pre>
 
-### 5. Running Node Server
+#### policy.json
+  - Project to be loaded at initialization, Init Camera Latitude, Longitude, CallBack Function, Geo Server setup
+  - Enter key value to load when initializing page, <code> , </code> if you want to load multiple projects
+  <pre><code>"geo_data_default_projects": [
+    "data.json"
+]</code></pre>
+
+  - Fix location (lattiude, longitude) to move when web page starts
+  <pre><code>"geo_init_latitude": "Enter latitude",
+"geo_init_longitude": "Enter longitude"</code></pre>
+
+### 7. Running Node Server
 <pre><code>// If you run the server privately
 C:\git\repository\mago3djs>node server.js
 // If you run the server as public
 C:\git\repository\mago3djs>node server.js --public true
 </code></pre>
 
-### 6. Browser verification
+### 8. Browser verification
 <pre><code>// Cesium
 http:localhost/sample/cesium.html
 // WorlWind
@@ -224,28 +346,92 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - mago3DJSに必要なnode_modulesをNode Package Managerを使用してインストールします。<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
 - gulpはモジュールを端末の全ユーザーが使用する場合に使用します。<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
-### 4.データフォルダリンク
-- [www.mago3d.com/homepage/download](http://www.mago3d.com/homepage/download.do)に接続して下部にあるF4D Converter64bitをC：\ F4DConverterにインストール
-- 管理者権限でコマンドプロンプトを実行して、F4D Conveterインストールディレクトリに移動します。
-- 変換データ格納フォルダ（outputFolder）をC：\dataに作成し、C：\tempに変換するデータを置いて実行<br>※F4D Conveter argument関連の説明は、[F4D Conveter](https://github.com/Gaia3D/F4DConverter) を参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\temp -outputFolder C:\data -log C:\temp/logTest.txt -indexing y</code></pre>
+### 4. F4D Converterインストール
+- [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
+- Installer : F4D Converter 64bit (this installation requires Windows 7 or later) 설치
+- Install Path: C:\F4DConverter\ 
 
-- 変わったされたデータを表示するには、data.json、policy.jsonを変更する必要があります。<br>※設定ファイルは、tutorials - > data-tutorials、policy-tutorialsを参照して
-  - policy.json - 他の設定を変更する必要がなく、mago3DJSを起動したとき、カメラの位置を指定<pre><code>"geo_init_latitude": "...",
-  "geo_init_longitude": "..."</code></pre>
-  - data.json - 変換されたデータがF4D_Sample場合<pre><code>"Sample": {
-"data_key": "Sample",
-"data_name": "データ名",
-...
+### 5. データ変換
+- 変わったデータ（outputFolder）を格納するディレクトリを作成し<br>
+<code>C:\data\プロジェクト名（root folderであるdataフォルダの下のプロジェクトごとにディレクトリを作成）</code>
+- 変換するデータをC:\demo_data(inputFolder)に保存
+- 管理者権限でCommand Line Prompt（cmd.exe）を実行し、F4D Converterがインストールされてディレクトリに移動
+- 次を実行し
+<br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\プロジェクト名 -log C:\demo_data/logTest.txt -indexing y</code></pre>
+- 変換完了F4Dファイルをmago3D JSプロジェクトでは、Webサービスとして利用できるようにSymbolic Linkを作成
+  - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動
+  <code>C:\mago3djs</code>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+
+### 6. 設定ファイルを変更する
+二種類の設定ファイルを追加します。 (data.json, policy.json)
+#### data.json
+- 大きく3つのエリアに分けられる。属性値を格納するattributes、子ノードの情報を格納するchildrenその他の位置情報を格納する領域
+- jsonのrootノードのdata_keyはdataフォルダの下のプロジェクト名と一致
+<pre><code>{
+    //attributes領域
+    "attributes" : {
+      "isPhysical" : false,
+      "nodeType": "root",
+      "projectType": "プロジェクトのタイプ"
+    },
+    //子ノードの領域
+    "children" : [
+    ],
+    //位置情報領域
+    "data_group_id" : 0,
+    "data_group_name" : "データグループ名",
+    "data_id" : 0,
+    "data_key" : "プロジェクト名",
+    "data_name" : "プロジェクト名"
 }</code></pre>
-- Dataが正常に作成されている場合、データフォルダーのリンクを作成します。<pre><code>mklink /d "C:\git\repository\mago3djs\data" "C:\data"</code></pre>
+- <code>C:\data\プロジェクト名</code>でRenderingするディレクトリを捜す
+- ディレクトリ名でF4D_以降の文字が一意の識別子
+- data.jsonファイルからchildrenのdata_key値を一意の識別子として修正
+- latitude、longitude、height、heading、pitch、roll値を適切な値に変更
+<pre><code>//子ノードの領域
+"children" : [
+   {
+     "attributes" : {
+     "isPhysical" : true,
+     "nodeType" : "..."
+     },
+     "children" : [
+     ],
+     "data_group_id" : 0,
+     "data_group_name" : "データグループ名",
+     "data_id" : 0,
+     "data_key" : "一意の識別子",
+     "data_name" : "データ名",
+     "latitude" : 緯度の入力,
+     "longitude" : 硬度入力,
+     "height" : 高入力,
+     "heading" : heading入力,
+     "pitch" : pitch入力,
+     "roll" : roll入力
+  }
+]
+</code></pre>
 
-### 5. Node Serverを実行
+#### policy.json
+  - 初期化時にロードすることがproject、Init Camera Latitude、Longitude、CallBack Function、Geo Server設定
+  - ページの初期化時にロードすることがプロジェクトの設定のkeyの値の入力、複数のプロジェクトのロードをしたい場合は、<code> 、</code>に追加
+  <pre><code>"geo_data_default_projects": [
+    "data.json"
+]</code></pre>
+
+  - Webページの開始時に移動先（lattiude、longitude）を修正
+  <pre><code>"geo_init_latitude": "緯度の入力",
+"geo_init_longitude": "硬度入力"</code></pre>
+
+
+### 7. Node Serverを実行
 <pre><code>//privateでサーバーを実行する場合
 C:\git\ repository\mago3djs>node server.js
 //publicでサーバーを実行する場合
 C：\git\repository\mago3djs>node server.js--public true</code></pre>
 
-### 6. Browser verification
+### 8. Browser verification
 <pre><code>// Cesium
 http:localhost/sample/cesium.html
 // WorlWind
