@@ -53,10 +53,12 @@ var Policy = function()
 	this.colorChangedObjectId;
 	
 	// LOD1
-	this.lod0DistInMeters = 22;
-	this.lod1DistInMeters = 70;
-	this.lod2DistInMeters = 22360;
-	this.lod3DistInMeters = 60000;
+	this.lod0DistInMeters = 2;
+	this.lod1DistInMeters = 5;
+	this.lod2DistInMeters = 60;
+	this.lod3DistInMeters = 200;
+	this.lod4DistInMeters = 1000;
+	this.lod5DistInMeters = 50000;
 	
 	// Lighting
 	this.ambientReflectionCoef = 0.2;
@@ -248,7 +250,22 @@ Policy.prototype.setLod3DistInMeters = function(lod3DistInMeters)
 {
 	this.lod3DistInMeters = lod3DistInMeters;
 };
-
+Policy.prototype.getLod4DistInMeters = function() 
+{
+	return this.lod4DistInMeters;
+};
+Policy.prototype.setLod4DistInMeters = function(lod4DistInMeters) 
+{
+	this.lod4DistInMeters = lod4DistInMeters;
+};
+Policy.prototype.getLod5DistInMeters = function() 
+{
+	return this.lod5DistInMeters;
+};
+Policy.prototype.setLod5DistInMeters = function(lod5DistInMeters) 
+{
+	this.lod5DistInMeters = lod5DistInMeters;
+};
 Policy.prototype.getAmbientReflectionCoef = function() 
 {
 	return this.ambientReflectionCoef;

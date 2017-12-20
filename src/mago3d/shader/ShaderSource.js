@@ -638,7 +638,7 @@ varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 \n\
 const int kernelSize = 16;  \n\
-const float radius = 0.5;      \n\
+uniform float radius;      \n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -693,7 +693,7 @@ void main()\n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
                                 \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+    vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
     vec3 L = normalize(lightPos);\n\
     float DiffuseFactor = dot(normal2, L);\n\
     float NdotL = abs(DiffuseFactor);\n\

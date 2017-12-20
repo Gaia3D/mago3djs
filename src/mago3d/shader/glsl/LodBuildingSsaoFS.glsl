@@ -24,7 +24,7 @@ varying vec3 vLightWeighting;
 varying vec4 vcolor4;
 
 const int kernelSize = 16;  
-const float radius = 0.5;      
+uniform float radius;      
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -79,7 +79,7 @@ void main()
         
     occlusion = 1.0 - occlusion / float(kernelSize);
                                 
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);
+    vec3 lightPos = vec3(0.0, 0.0, 20.0);
     vec3 L = normalize(lightPos);
     float DiffuseFactor = dot(normal2, L);
     float NdotL = abs(DiffuseFactor);
