@@ -1571,8 +1571,10 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		if (screenCoord.x >= 0 && screenCoord.y >= 0)
 		{
 			ctx.font = "13px Arial";
-			ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-			ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+			//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+			//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+			ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
 		}
 	}
 	
@@ -6149,23 +6151,6 @@ MagoManager.prototype.renderModeChanged = function()
 
 };
 
-MagoManager.prototype.policyColorChanged = function(projectAndBlockId, objectId)
-{
-	// old.***
-	var neoBuilding = this.getNeoBuildingById("structure", projectAndBlockId);
-
-	// 1rst, init colorChanged.***
-	var buildingsCount = this.neoBuildingsList.neoBuildingsArray.length;
-	for (var i=0; i<buildingsCount; i++)
-	{
-		this.neoBuildingsList.neoBuildingsArray[i].isColorChanged = false;
-	}
-
-	neoBuilding.isColorChanged = true;
-	this.magoPolicy.colorChangedObjectId = objectId;
-
-};
-
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
 	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue); // original.***
@@ -6408,6 +6393,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		// set main data of the node.
 		node.data.projectFolderName = projectFolderName;
 		node.data.projectId = projectId;
+		node.data.data_name = data_name;
 		node.data.attributes = attributes;
 		
 		if (attributes.isPhysical)
@@ -6743,23 +6729,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "drawInsertIssueImage") 
 	{
-		// pin 을 표시
-		if (this.objMarkerSC === undefined || api.getDrawType() === 0) 
-		{
-			this.objMarkerSC = new ObjectMarker();
-			this.objMarkerSC.geoLocationData.geographicCoord = new GeographicCoord();
-			ManagerUtils.calculateGeoLocationData(parseFloat(api.getLongitude()), parseFloat(api.getLatitude()), parseFloat(api.getElevation()), 
-				undefined, undefined, undefined, this.objMarkerSC.geoLocationData, this);
-		}
-		
-		var objMarker = this.objMarkerManager.newObjectMarker();
-		
-		this.objMarkerSC.issue_id = api.getIssueId();
-		this.objMarkerSC.issue_type = api.getIssueType();
-		this.objMarkerSC.geoLocationData.geographicCoord.setLonLatAlt(parseFloat(api.getLongitude()), parseFloat(api.getLatitude()), parseFloat(api.getElevation()));
-		
-		objMarker.copyFrom(this.objMarkerSC);
-		this.objMarkerSC = undefined;
+		DrawAPI.drawInsertIssueImage(api, this);
 	}
 	else if (apiName === "changeInsertIssueState")
 	{
@@ -6881,6 +6851,23 @@ MagoManager.prototype.callAPI = function(api)
 		}
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
+	}
+	else if (apiName === "gotoIssue")
+	{
+		var projectId = api.getProjectId();
+		if (!this.hierarchyManager.existProject(projectId))
+		{
+			var projectDataFolder = api.getProjectDataFolder();
+			this.getObjectIndexFileTEST(projectId, projectDataFolder);
+		}
+		
+		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
+		
+		// pin을 그림
+		if (api.getIssueId() !== null && api.getIssueType() !== undefined) 
+		{
+			DrawAPI.drawInsertIssueImage(api, this);
+		}
 	}
 };
 

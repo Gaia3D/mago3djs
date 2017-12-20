@@ -390,6 +390,37 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
 }
 
 /**
+ * 해당 프로젝트를 로딩하고 Issue 등록 지점으로 이동하기
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project id
+ * @param {string} issueId issue id
+ * @param {string} issueType issue type
+ * @param {string} latitude 데이터 고유키
+ * @param {string} longitude 데이터 고유키
+ * @param {string} height 데이터 고유키
+ * @param {string} duration 이동하는 시간
+ */
+function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, issueId, issueType, longitude, latitude, height, duration)
+{
+	if (managerFactoryInstance === null) { return; } 
+	
+	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	
+	var api = new API("gotoIssue");
+	api.setProjectId(projectId);
+	api.setProjectDataFolder(projectDataFolder);
+	api.setIssueId(issueId);
+	api.setIssueType(issueType);
+	api.setLatitude(latitude);
+	api.setLongitude(longitude);
+	api.setElevation(height);
+	api.setDuration(duration);
+	managerFactoryInstance.callAPI(api);
+}
+
+
+/**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} eventType 어떤 마우스 동작을 원하는지를 구분
