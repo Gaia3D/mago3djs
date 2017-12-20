@@ -12,8 +12,8 @@ var Profile = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.outer; // one vertexList.
-	this.inners; // vertexLists array.
+	this.outer; // one vertexList. no.
+	this.inners; // vertexLists array. no.
 };
 
 /**

@@ -15,6 +15,22 @@ var ProcessQueue = function()
 
 	this.nodesToDeleteMap = new Map();
 	this.nodesToDeleteModelReferencesMap = new Map();
+	this.nodesToDeleteLessThanLod3Map = new Map();
+};
+
+ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.nodesToDeleteLessThanLod3Map.set(node, aValue);
+};
+
+ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
+{
+	// this erases the node from the "nodesToDeleteLessThanLod3Map".
+	return this.nodesToDeleteLessThanLod3Map.delete(node);
 };
 
 ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
@@ -30,7 +46,7 @@ ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 ProcessQueue.prototype.eraseNodeToDeleteModelReferences = function(node)
 {
 	// this erases the node from the "nodesToDeleteModelReferencesMap".
-	this.nodesToDeleteModelReferencesMap.delete(node);
+	return this.nodesToDeleteModelReferencesMap.delete(node);
 };
 
 ProcessQueue.prototype.putNodeToDelete = function(node, aValue)
@@ -63,7 +79,7 @@ ProcessQueue.prototype.putNodesArrayToDelete = function(nodesToDeleteArray, aVal
 ProcessQueue.prototype.eraseNodeToDelete = function(node)
 {
 	// this erases the node from the "nodesToDeleteMap".
-	this.nodesToDeleteMap.delete(node);
+	return this.nodesToDeleteMap.delete(node);
 };
 
 ProcessQueue.prototype.clearAll = function()
