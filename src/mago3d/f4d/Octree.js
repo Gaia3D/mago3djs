@@ -34,6 +34,7 @@ var Octree = function(octreeOwner)
 
 	this.subOctrees_array = [];
 	this.neoReferencesMotherAndIndices; // Asimetric mode.***
+	this.lowestOctrees_array; // pre extract lowestOctrees for speedUp, if this is motherOctree.***
 
 	// now, for legoStructure.***
 	this.lego;
@@ -531,7 +532,7 @@ Octree.prototype.getBBoxIntersectedLowestOctreesByLOD = function(bbox, visibleOb
  * @param eye_z 변수
  */
 Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
-	boundingSphere_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
+	boundingSphere_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2) 
 {
 	var visibleOctreesArray = [];
 	var find = false;
@@ -596,6 +597,34 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.getMinDistToCamera = function(cameraPosition)
+{
+	// this function returns the minDistToCamera of the lowestOctrees.***
+	var minDistToCam = 1000000.0;
+	
+	if (this.lowestOctrees_array === undefined)
+	{
+		this.lowestOctrees_array = [];
+		this.extractLowestOctreesIfHasTriPolyhedrons(this.lowestOctrees_array);
+	}
+	
+	var distToCamera;
+	var lowestOctree;
+	var lowestOctreesCount = this.lowestOctrees_array.length;
+	for (var i=0; i<lowestOctreesCount; i++)
+	{
+		lowestOctree = this.lowestOctrees_array[i];
+		distToCamera = lowestOctree.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
+		if (distToCamera < minDistToCam)
+		{ minDistToCam = distToCamera; }
+	}
+	
+	return minDistToCam;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param cullingVolume 변수
  * @param result_NeoRefListsArray 변수
  * @param boundingSphere_scratch 변수
@@ -606,62 +635,64 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees, globalVisibleObjControlerOctrees,
 	boundingSphere_scratch, cameraPosition, squaredDistLod0, squaredDistLod1, squaredDistLod2 ) 
 {
-	var lowestOctreesArray = [];
 	var distAux = 0.0;
 	var find = false;
 	
 	var eye_x = cameraPosition.x;
 	var eye_y = cameraPosition.y;
 	var eye_z = cameraPosition.z;
-
-	this.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	if (this.lowestOctrees_array === undefined)
+	{
+		this.lowestOctrees_array = [];
+		this.extractLowestOctreesIfHasTriPolyhedrons(this.lowestOctrees_array);
+	}
 	
 	// Now, we must sort the subOctrees near->far from eye.***
-	var visibleOctrees_count = lowestOctreesArray.length;
+	var visibleOctrees_count = this.lowestOctrees_array.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		lowestOctreesArray[i].setDistToCamera(cameraPosition);
+		this.lowestOctrees_array[i].setDistToCamera(cameraPosition);
 	}
 
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
-		if (lowestOctreesArray[i].distToCamera < squaredDistLod0) 
+		if (this.lowestOctrees_array[i].distToCamera < squaredDistLod0) 
 		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			if (this.lowestOctrees_array[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, lowestOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles0.push(lowestOctreesArray[i]);
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, this.lowestOctrees_array[i]); }
+				visibleObjControlerOctrees.currentVisibles0.push(this.lowestOctrees_array[i]);
 				find = true;
 			}
 		}
-		else if (lowestOctreesArray[i].distToCamera < squaredDistLod1) 
+		else if (this.lowestOctrees_array[i].distToCamera < squaredDistLod1) 
 		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			if (this.lowestOctrees_array[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, lowestOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles1.push(lowestOctreesArray[i]);
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, this.lowestOctrees_array[i]); }
+				visibleObjControlerOctrees.currentVisibles1.push(this.lowestOctrees_array[i]);
 				find = true;
 			}
 		}
-		else if (lowestOctreesArray[i].distToCamera < squaredDistLod2) 
+		else if (this.lowestOctrees_array[i].distToCamera < squaredDistLod2) 
 		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			if (this.lowestOctrees_array[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles2.push(lowestOctreesArray[i]);
+				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, this.lowestOctrees_array[i]); }
+				visibleObjControlerOctrees.currentVisibles2.push(this.lowestOctrees_array[i]);
 				find = true;
 			}
 		}
 		else 
 		{
-			if (lowestOctreesArray[i].triPolyhedronsCount > 0) 
+			if (this.lowestOctrees_array[i].triPolyhedronsCount > 0) 
 			{
 				if (globalVisibleObjControlerOctrees)
-				{ globalVisibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]); }
-				visibleObjControlerOctrees.currentVisibles3.push(lowestOctreesArray[i]);
+				{ globalVisibleObjControlerOctrees.currentVisibles3.push(this.lowestOctrees_array[i]); }
+				visibleObjControlerOctrees.currentVisibles3.push(this.lowestOctrees_array[i]);
 				find = true;
 			}
 		}
@@ -873,7 +904,9 @@ Octree.prototype.getFrustumVisibleOctrees = function(cesium_cullingVolume, resul
 Octree.prototype.setDistToCamera = function(cameraPosition) 
 {
 	// distance to camera as a sphere.
-	this.distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
+	var distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
+	this.distToCamera = distToCamera;
+	return distToCamera;
 };
 
 /**

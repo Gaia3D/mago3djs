@@ -779,6 +779,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl)
 	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
 	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
 	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius"); 
 };
 
 /**

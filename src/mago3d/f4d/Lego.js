@@ -17,6 +17,8 @@ var Lego = function()
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArrayBuffer;
 	this.selColor4;
+	this.texture;
+	this.textureName;
 };
 
 /**
@@ -51,6 +53,13 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
 		this.selColor4.deleteObjects();
 		this.selColor4 = undefined;
 	}
+	
+	this.textureName = undefined;
+	if (this.texture)
+	{
+		this.texture.deleteObjects(gl);
+	}
+	this.texture = undefined;
 };
 
 /**

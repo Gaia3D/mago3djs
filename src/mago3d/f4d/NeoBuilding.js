@@ -39,10 +39,15 @@ var NeoBuilding = function()
 	this.octree; // f4d_octree. ***
 
 	// auxiliar vars.
-	this.distToCam;
+	this.distToCam; // used to sort neoBuildings by distance to cam, and other things.***
+	this.currentLod;
 
 	// The simple building.***********************************************
-	this.simpleBuilding3x3Texture;
+	this.simpleBuilding3x3Texture; // old version.***
+	
+	// In version 001, there are 5 lods.***
+	// actually oldMeshes are lego object.***
+	this.lodMeshesArray; // here stores lod3mesh, lod4mesh and lod5mesh.***
 	
 	// Render settings.***************************************************
 	// provisionally put this here.
@@ -185,6 +190,22 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 		}
 	}
 	this.texturesLoaded = undefined;
+	
+	// delete lod3, lod4, lod5.***
+	if (this.lodMeshesArray)
+	{
+		var lodMeshesCount = this.lodMeshesArray.length;
+		for (var i=0; i<lodMeshesCount; i++)
+		{
+			if (this.lodMeshesArray[i])
+			{
+				this.lodMeshesArray[i].deleteObjects(gl, vboMemoryManager);
+				this.lodMeshesArray[i] = undefined;
+			}
+		}
+		this.lodMeshesArray.length = 0;
+	}
+	this.lodMeshesArray = undefined;
 };
 
 /**

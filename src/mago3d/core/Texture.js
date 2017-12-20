@@ -19,10 +19,14 @@ var Texture = function()
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
-Texture.prototype.deleteObjects = function()
+Texture.prototype.deleteObjects = function(gl)
 {
 	this.textureTypeName = undefined;
 	this.textureImageFileName = undefined;
+	if (this.texId)
+	{
+		gl.deleteTexture(this.texId);
+	}
 	this.texId = undefined;
 	this.fileLoadState = undefined;
 };
