@@ -1022,7 +1022,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			var ver1 = neoBuilding.metaData.version[2];
 			var ver2 = neoBuilding.metaData.version[4];
 			
-			if (ver0 === 0 && ver1 === 0 && ver2 === 1)
+			if (ver0 === '0' && ver1 === '0' && ver2 === '1')
 			{
 				// read materials list.
 				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1049,6 +1049,10 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 						var texture = new Texture();
 						texture.textureTypeName = textureTypeName;
 						texture.textureImageFileName = textureImageFileName;
+						
+						if(neoBuilding.texturesLoaded === undefined)
+							neoBuilding.texturesLoaded = [];
+						
 						neoBuilding.texturesLoaded.push(texture);
 					}
 				}
@@ -1284,7 +1288,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	
 	if (extension === "tga" || extension === "TGA" || extension === "Tga")
 	{
-		//texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		loadWithXhr(filePath_inServer).done(function(response) 
 		{
 			var arrayBuffer = response;

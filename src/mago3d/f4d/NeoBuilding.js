@@ -183,11 +183,11 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 		{
 			if (this.texturesLoaded[i])
 			{
-				gl.deleteTexture(this.texturesLoaded[i].texId);
-				this.texturesLoaded[i].deleteObjects();
+				this.texturesLoaded[i].deleteObjects(gl);
 			}
 			this.texturesLoaded[i] = undefined;
 		}
+		this.texturesLoaded.length = 0;
 	}
 	this.texturesLoaded = undefined;
 	
@@ -367,6 +367,8 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
+	var texture = undefined;
+	
 	if (this.metaData.version[0] === "v")
 	{
 		// this is the version beta.
@@ -407,44 +409,40 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 				}
 			}
 		}
+		
+		return neoReference.texture.fileLoadState;
 	}
-	else if (this.metaData.version[0] === 0 && this.metaData.version[2] === 0 && this.metaData.version[4] === 1 )
+	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '1' )
 	{
-		if (magoManager.backGround_fileReadings_count > 10) 
-		{ return; }
+		if(neoReference.texture === undefined)
+		{
+			// provisionally use materialId as textureId.
+			var textureId = neoReference.materialId;
+			texture = this.texturesLoaded[textureId];
+			neoReference.texture = texture;
 			
-		// provisionally use materialId as textureId.
-		var textureId = neoReference.materialId;
-		var texture = this.texturesLoaded[textureId];
-		
-		if (texture === undefined)
-		{
-			//texture = new Texture();
-			//texture.fileLoadState = CODE.fileLoadState.READY
-			//this.texturesLoaded[textureId] = texture;
-		}
-		
-		if (texture.fileLoadState === CODE.fileLoadState.READY) 
-		{
-			var gl = magoManager.sceneState.gl;
-			neoReference.texture.texId = gl.createTexture();
-			// Load the texture.***
-			var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
-			var filePath_inServer = geometryDataPath + "/" + this.buildingFileName + "/Images_Resized/" + neoReference.texture.textureImageFileName;
-
-			this.texturesLoaded.push(neoReference.texture);
-			magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, neoReference.texture, this, magoManager);
-			magoManager.backGround_fileReadings_count ++;
-		}
-		else 
-		{
-			if (texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			if(texture.texId === undefined && texture.textureImageFileName !== "")
 			{
-				neoReference.texture = texture;
+				if (magoManager.backGround_fileReadings_count > 10) 
+				{ return undefined; }
+	
+				if (texture.fileLoadState === CODE.fileLoadState.READY) 
+				{
+					var gl = magoManager.sceneState.gl;
+					texture.texId = gl.createTexture();
+					// Load the texture.***
+					var projectFolderName = this.projectFolderName;
+					var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
+					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + this.buildingFileName + "/Images_Resized/" + texture.textureImageFileName;
+
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, texture, this, magoManager);
+					magoManager.backGround_fileReadings_count ++;
+				}
 			}
 		}
+		
+		return neoReference.texture.fileLoadState;
 	}
 	
-	return neoReference.texture.fileLoadState;
 };
 
