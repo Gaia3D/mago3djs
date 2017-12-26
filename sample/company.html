@@ -98,7 +98,7 @@
 			최신 Issue 10개 표시
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="flyTo('133', 'ISSUE_TYPE_MODIFY', '126.60660443089857', '37.582788710510506', '30.075205419163662', '2')">바로가기</button>
+			<button type="button" title="바로가기" onclick="gotoIssue('3ds.json', '133', 'ISSUE_TYPE_MODIFY', '126.60660443089857', '37.582788710510506', '30.075205419163662', '2')">바로가기</button>
 			<div class="info">
 				<p class="title">
 					<span>3DS 통합 가시화</span>
@@ -112,7 +112,7 @@
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="flyTo('129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2')">바로가기</button>
+			<button type="button" title="바로가기" onclick="gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2')">바로가기</button>
 			<div class="info">
 				<p class="title">
 					<span>3DS 통합 가시화</span>
@@ -126,7 +126,7 @@
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="flyTo('128', 'ISSUE_TYPE_BUGGER', '126.60860404195267', '37.58308164273416', '39.60458358315561', '2')">바로가기</button>
+			<button type="button" title="바로가기" onclick="gotoIssue('ifc_mep.json', '128', 'ISSUE_TYPE_BUGGER', '126.60860404195267', '37.58308164273416', '39.60458358315561', '2')">바로가기</button>
 			<div class="info">
 				<p class="title">
 					<span>IFC(MEP)</span>
@@ -140,7 +140,7 @@
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="flyTo('127', 'ISSUE_TYPE_ETC', '126.60828025652438', '37.58302423952313', '39.61857390681989', '2')">바로가기</button>
+			<button type="button" title="바로가기" onclick="gotoIssue('sea_port.json', '127', 'ISSUE_TYPE_ETC', '126.60828025652438', '37.58302423952313', '39.61857390681989', '2')">바로가기</button>
 			<div class="info">
 				<p class="title">
 					<span>Sea Port</span>
@@ -159,8 +159,8 @@
 	<div id="searchMenuContent" class="searchWrap">
 		<table>
 			<tr style="height: 35px;">
-				<td style="width: 80px;"><label for="data_group_id">데이터 그룹</label></td>
-				<td><select id="data_group_id" name="data_group_id" class="select">
+				<td style="width: 80px;"><label for="project_id">프로젝트</label></td>
+				<td><select id="project_id" name="project_id" class="select">
 						<option value=""> 전체 </option>
 						<option value="1">3DS 통합 가시화</option>
 						<option value="2">Collada 통합 가시화</option>
@@ -400,11 +400,11 @@
 		<table>
 			<tr style="height: 35px;">
 				<td style="width: 100px;" nowrap="nowrap">
-					<label for="data_group_id">데이터 그룹</label>
+					<label for="project_id">프로젝트</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
-					<select id="data_group_id" name="data_group_id" class="select">
+					<select id="project_id" name="project_id" class="select">
 						<option value="1">3DS 통합 가시화</option>
 						<option value="2">Collada 통합 가시화</option>
 						<option value="3">IFC</option>
@@ -867,8 +867,7 @@
 		}
 		
 		// 현재 좌표를 저장
-		$("#now_latitude").val(latitude);
-		$("#now_longitude").val(longitude);
+		saveCurrentLocation(latitude, longitude);
 	}
 	
 	// issue 위치 버튼을 클릭 했을 경우
@@ -895,8 +894,7 @@
 			$("#height").val(height);
 			
 			// 현재 좌표를 저장
-			$("#now_latitude").val(latitude);
-			$("#now_longitude").val(longitude);
+			saveCurrentLocation(latitude, longitude);
 		}
 	}
 	
@@ -996,7 +994,7 @@
 								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
 								+ 	"	<div class=\"info\">"
 								+ 	"		<p class=\"title\">"
-								+ 	"			<span>" + issue.data_group_name + "</span>"
+								+ 	"			<span>" + issue.project_name + "</span>"
 								+ 				issue.title
 								+ 	"		</p>"
 								+ 	"		<ul class=\"tag\">"
@@ -1097,7 +1095,7 @@
 			if(searchType === "data_name") {
 				content = content 
 				+ 	"<li>"
-				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"flyToBounding('3ds.json', 'kangbukSport_del');\">바로가기</button>"
+				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"localSearch('3ds.json', 'kangbukSport_del');\">바로가기</button>"
 				+ 	"	<div class=\"info\">"		
 				+ 	"		<p class=\"title\">"			
 				+ 	"			<span>3DS 통합 가시화</span>kangbukSport_del"
@@ -1113,7 +1111,7 @@
 				content = content 
 				+ 	"<li>"
 				+ 	"	<button type=\"button\" title=\"바로가기\"" 
-				+ 	"	onclick=\"flyTo('129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2');\">바로가기</button>"
+				+ 	"	onclick=\"gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2');\">바로가기</button>"
 				+ 	"	<div class=\"info\">"
 				+ 	"		<p class=\"title\">"
 				+ 	"			<span>3DS 통합 가시화</span>test"
@@ -1145,8 +1143,8 @@
 		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
 	});
 	
-	function flyToBounding(dataKey) {
-		searchDataAPI(managerFactory, dataKey);
+	function localSearch(projectId, dataKey) {
+		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
 	}
 	
 	// API 메뉴시작
@@ -1183,8 +1181,7 @@
 			// occlusion culling
 			$("#occlusion_culling_data_key").val(dataKey);
 			// 현재 좌표를 저장
-			$("#now_latitude").val(latitude);
-			$("#now_longitude").val(longitude);
+			saveCurrentLocation(latitude, longitude);
 		}
 	}
 	
@@ -1552,6 +1549,12 @@
 				alert(" 아직 로딩하지 않은 정보 입니다. 로딩 후 검색해 주십시오. ");
 			}
 		}
+	}
+	
+	function saveCurrentLocation(latitude, longitude) {
+		// 현재 좌표를 저장
+		$("#now_latitude").val(latitude);
+		$("#now_longitude").val(longitude);
 	}
 </script>
 </body>
