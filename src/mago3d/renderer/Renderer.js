@@ -341,6 +341,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	var current_tex_id;
 	//var current_vbo_id;
 	//var textureBinded = false;
+	var texFileLoadState;
 
 	gl.activeTexture(gl.TEXTURE2); // ...***
 	if (renderTexture) 
@@ -397,10 +398,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		//if(renderTexture)
 		{
 			//if (neoReference.texture !== undefined || neoReference.materialId != -1)
-			if (neoReference.texture !== undefined)
+			if (neoReference.hasTexture)// && neoReference.texture !== undefined)
 			{
 				// note: in the future use only "neoReference.materialId".
-				if (neoBuilding.manageNeoReferenceTexture(neoReference, magoManager) !== CODE.fileLoadState.LOADING_FINISHED)
+				texFileLoadState = neoBuilding.manageNeoReferenceTexture(neoReference, magoManager);
+				if (texFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
+			
+				if (neoReference.texture === undefined)
 				{ continue; }
 			
 				if (neoReference.texture.texId === undefined)
@@ -461,6 +466,9 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			}
 			else
 			{
+				if(neoReference.objectId === "20046")
+					var hola = 0;
+				
 				if (renderTexture && neoReference.hasTexture) 
 				{
 					if (neoReference.texture !== undefined && neoReference.texture.texId !== undefined) 

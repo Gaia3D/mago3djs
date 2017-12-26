@@ -1182,6 +1182,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		{
 			// inverse "for" because delete 1rst farest.***
 			node = this.visibleObjControlerNodes.currentVisibles3[i];
+			neoBuilding = node.data.neoBuilding;
+			if(neoBuilding && neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
+					var hola = 0;
+				
 			if (!this.processQueue.nodesToDeleteLessThanLod3Map.has(node))
 			{
 				this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
@@ -1189,6 +1193,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			}
 			if (nodesPutted > 10)
 			{ break; }
+			//if(this.processQueue.nodesToDeleteLessThanLod3Map.length > 10)
+			//{ break; }
 		}
 		
 		// lod3, lod4, lod5.***
@@ -2736,6 +2742,7 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// now, delete lod0, lod1, lod2.***
+	/*
 	var deletedCount = 0;
 	var nodesToDeleteLod2Lod4Lod5Array = Array.from(this.processQueue.nodesToDeleteLessThanLod3Map.keys());
 	var nodesCount = nodesToDeleteLod2Lod4Lod5Array.length;
@@ -2750,22 +2757,25 @@ MagoManager.prototype.manageQueue = function()
 			neoBuilding = node.data.neoBuilding;
 			if (neoBuilding === undefined)
 			{ continue; }
-
+		
+			if(neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
+				var hola = 0;
+			
 			if (neoBuilding.octree !== undefined)
 			{ 
-				neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
-				if (neoBuilding.octree.lego)
-				{
-					neoBuilding.octree.lego.deleteObjects(gl, this.vboMemoryManager);
-					neoBuilding.octree.lego = undefined;
-				}
+				neoBuilding.octree.deleteLod2GlObjects(gl, this.vboMemoryManager);
+				//if (neoBuilding.octree.lego)
+				//{
+				//	neoBuilding.octree.lego.deleteObjects(gl, this.vboMemoryManager);
+				//	neoBuilding.octree.lego = undefined;
+				//}
 				
 				// delete the textureLod2.***
-				//if(neoBuilding.simpleBuilding3x3Texture)
-				//{
-				//	neoBuilding.simpleBuilding3x3Texture.deleteObjects(gl);
-				//	neoBuilding.simpleBuilding3x3Texture = undefined;
-				//}
+				if(neoBuilding.simpleBuilding3x3Texture)
+				{
+					neoBuilding.simpleBuilding3x3Texture.deleteObjects(gl);
+					neoBuilding.simpleBuilding3x3Texture = undefined;
+				}
 			}
 			neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
 			deletedCount++;
@@ -2774,6 +2784,7 @@ MagoManager.prototype.manageQueue = function()
 			{ break; }
 		}
 	}
+	*/
 	
 	
 	// parse pendent data.**********************************************************************************
@@ -5603,16 +5614,26 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				{ var hola = 0; }
 				if (neoBuilding.buildingId === "Goliath")
 				{ var hola = 0; }
-				
-				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
-				if (this.boundingSphere_Aux === undefined)
-				{ this.boundingSphere_Aux = new Sphere(); }
 			
-				this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-				this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
+				if(neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
+					var hola = 0;
+			
+				// test.***
+				//if(neoBuilding.octree)
+				//{
+				//	var cameraPosition = this.sceneState.camera.position;
+				//	distToCamera = neoBuilding.octree.getMinDistToCamera(cameraPosition);
+				//}
+				//else{
+					this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
+					if (this.boundingSphere_Aux === undefined)
+					{ this.boundingSphere_Aux = new Sphere(); }
 				
-				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
-				
+					this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+					this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
+					
+					distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
+				//}
 				neoBuilding.distToCam = distToCamera;
 			
 				if (distToCamera > this.magoPolicy.getFrustumFarDistance())
