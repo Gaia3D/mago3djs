@@ -119,8 +119,8 @@
 	<div id="searchMenuContent" class="searchWrap">
 		<table>
 			<tr style="height: 35px;">
-				<td style="width: 80px;"><label for="data_group_id">데이터 그룹</label></td>
-				<td><select id="data_group_id" name="data_group_id" class="select">
+				<td style="width: 80px;"><label for="project_id">프로젝트</label></td>
+				<td><select id="project_id" name="project_id" class="select">
 						<option value=""> 전체 </option>
 						<option value="1">3DS 통합 가시화</option>
 						<option value="2">Collada 통합 가시화</option>
@@ -350,11 +350,11 @@
 		<table>
 			<tr style="height: 35px;">
 				<td style="width: 100px;" nowrap="nowrap">
-					<label for="data_group_id">데이터 그룹</label>
+					<label for="project_id">프로젝트</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
-					<select id="data_group_id" name="data_group_id" class="select">
+					<select id="project_id" name="project_id" class="select">
 						<option value="1">3DS 통합 가시화</option>
 						<option value="2">Collada 통합 가시화</option>
 						<option value="3">IFC</option>
@@ -1002,7 +1002,7 @@
 								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
 								+ 	"	<div class=\"info\">"
 								+ 	"		<p class=\"title\">"
-								+ 	"			<span>" + issue.data_group_name + "</span>"
+								+ 	"			<span>" + issue.project_name + "</span>"
 								+ 				issue.title
 								+ 	"		</p>"
 								+ 	"		<ul class=\"tag\">"
