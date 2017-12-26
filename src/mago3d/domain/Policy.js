@@ -55,7 +55,7 @@ var Policy = function()
 	// LOD1
 	this.lod0DistInMeters = 2;
 	this.lod1DistInMeters = 5;
-	this.lod2DistInMeters = 60;
+	this.lod2DistInMeters = 40;
 	this.lod3DistInMeters = 200;
 	this.lod4DistInMeters = 1000;
 	this.lod5DistInMeters = 50000;
