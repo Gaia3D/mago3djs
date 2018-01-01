@@ -165,16 +165,16 @@ OcclusionCullingOctreeCell.prototype.intersectsWithPoint3D = function(x, y, z)
  */
 OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z) 
 {
-	if (this._ocCulling_Cell_owner === null) 
+	if (this._ocCulling_Cell_owner === undefined) 
 	{
 		// This is the mother_cell.***
 		if (!this.intersectsWithPoint3D(x, y, z)) 
 		{
-			return null;
+			return undefined;
 		}
 	}
 	
-	var intersectedSubBox = null;
+	var intersectedSubBox = undefined;
 	var subBoxes_count = this._subBoxesArray.length;
 	if (subBoxes_count > 0) 
 	{
@@ -182,7 +182,7 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 		var center_y = (this.minY + this.maxY)/2.0;
 		var center_z = (this.minZ + this.maxZ)/2.0;
 		
-		var intersectedSubBox_aux = null;
+		var intersectedSubBox_aux = undefined;
 		var intersectedSubBox_idx;
 		if (x<center_x) 
 		{
@@ -241,7 +241,7 @@ OcclusionCullingOctreeCell.prototype.getIndicesVisiblesForEye = function(eye_x, 
 {
 	var intersectedSubBox = this.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
 	
-	if (intersectedSubBox !== null && intersectedSubBox._indicesArray.length > 0) 
+	if (intersectedSubBox !== undefined && intersectedSubBox._indicesArray.length > 0) 
 	{
 		result_visibleIndicesArray = intersectedSubBox._indicesArray;
 		if (result_modelReferencedGroup)
@@ -301,6 +301,9 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		for (var i=0; i<objects_count; i++) 
 		{
 			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+			if(objects_idxInList < 0)
+				var hola = 0;
+			
 			this._indicesArray.push(objects_idxInList);
 		}
 	}
