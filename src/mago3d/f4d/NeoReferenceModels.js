@@ -182,10 +182,45 @@ NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(id
 	}
 };
 
-NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(isExterior, eye_x, eye_y, eye_z, applyOcclusionCulling) 
+NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(eye_x, eye_y, eye_z, applyOcclusionCulling) 
 {
 	if (applyOcclusionCulling === undefined)
 	{ applyOcclusionCulling = true; }
+
+	// check if is interior.***
+	var isExterior = false;
+	if (this.interior_ocCullOctree !== undefined)
+	{
+		var thisHasOcCullData = false;
+		if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
+		{ thisHasOcCullData = true; }
+	
+		if (thisHasOcCullData && applyOcclusionCulling)
+		{
+			//if (this.currentVisibleMRG === undefined)
+			//{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
+			
+			var intersectedSubBox = this.interior_ocCullOctree.getIntersectedSubBoxByPoint3D(eye_x, eye_y, eye_z);
+			if (intersectedSubBox !== undefined && intersectedSubBox._indicesArray.length > 0) 
+			{
+				this.currentVisibleIndices = intersectedSubBox._indicesArray;
+				//if (result_modelReferencedGroup)
+				//{
+				//	result_modelReferencedGroup = this.modelReferencedGroupsList;
+				//}
+				isExterior = false;
+			}
+			else{
+				isExterior = true;
+			}
+		}
+		else
+		{
+			// In this case there are no occlusionCulling data.
+			this.currentVisibleIndices = this.neoRefsIndices;
+			this.currentVisibleMRG = this.modelReferencedGroupsList;
+		}
+	}
 	
 	if (isExterior)
 	{
@@ -203,29 +238,6 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(i
 				this.currentVisibleIndices = this.exterior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
 			}
 			else 
-			{
-				// In this case there are no occlusionCulling data.
-				this.currentVisibleIndices = this.neoRefsIndices;
-				this.currentVisibleMRG = this.modelReferencedGroupsList;
-			}
-		}
-	}
-	else
-	{
-		if (this.interior_ocCullOctree !== undefined)
-		{
-			var thisHasOcCullData = false;
-			if (this.interior_ocCullOctree._subBoxesArray && this.interior_ocCullOctree._subBoxesArray.length > 0)
-			{ thisHasOcCullData = true; }
-		
-			if (thisHasOcCullData && applyOcclusionCulling)
-			{
-				if (this.currentVisibleMRG === undefined)
-				{ this.currentVisibleMRG = new ModelReferencedGroupsList(); }
-				
-				this.currentVisibleIndices = this.interior_ocCullOctree.getIndicesVisiblesForEye(eye_x, eye_y, eye_z, this.currentVisibleIndices, this.currentVisibleMRG);
-			}
-			else
 			{
 				// In this case there are no occlusionCulling data.
 				this.currentVisibleIndices = this.neoRefsIndices;

@@ -2558,7 +2558,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		var find = false;
 		
 		this.myCameraSCX = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
-		var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z);
+		//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z); // old.***
 
 		neoBuilding.currentVisibleOctreesControler.clear();
 		
@@ -2640,8 +2640,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 		else
 		{
-			var isExterior = !isCameraInsideOfBuilding;
-			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(isExterior, this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z, applyOcclusionCulling);
+			lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z, applyOcclusionCulling);
 		}
 		
 		// if the octree has no blocks list ready, then render the lego.
@@ -6758,10 +6757,22 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLod")
 	{
-		this.magoPolicy.setLod0DistInMeters(api.getLod0DistInMeters());
-		this.magoPolicy.setLod1DistInMeters(api.getLod1DistInMeters());
-		this.magoPolicy.setLod2DistInMeters(api.getLod2DistInMeters());
-		this.magoPolicy.setLod3DistInMeters(api.getLod3DistInMeters());
+		var distAux;
+		distAux = api.getLod0DistInMeters();
+		if(distAux !== null && distAux !==undefined)
+			this.magoPolicy.setLod0DistInMeters(distAux);
+		
+		distAux = api.getLod1DistInMeters();
+		if(distAux !== null && distAux !==undefined)
+		this.magoPolicy.setLod1DistInMeters(distAux);
+	
+		distAux = api.getLod2DistInMeters();
+		if(distAux !== null && distAux !==undefined)
+		this.magoPolicy.setLod2DistInMeters(distAux);
+	
+		distAux = api.getLod3DistInMeters();
+		if(distAux !== null && distAux !==undefined)
+		this.magoPolicy.setLod3DistInMeters(distAux);
 	}
 	else if (apiName === "changeLighting")
 	{

@@ -426,7 +426,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 	}
 	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '1' )
 	{
-		if(neoReference.texture === undefined)
+		if(neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
 			// provisionally use materialId as textureId.
 			var textureId = neoReference.materialId;
