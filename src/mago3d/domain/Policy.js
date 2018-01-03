@@ -53,9 +53,9 @@ var Policy = function()
 	this.colorChangedObjectId;
 	
 	// LOD1
-	this.lod0DistInMeters = 2;
-	this.lod1DistInMeters = 5;
-	this.lod2DistInMeters = 40;
+	this.lod0DistInMeters = 4;
+	this.lod1DistInMeters = 8;
+	this.lod2DistInMeters = 50;
 	this.lod3DistInMeters = 200;
 	this.lod4DistInMeters = 1000;
 	this.lod5DistInMeters = 50000;
