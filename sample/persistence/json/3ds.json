@@ -20,7 +20,7 @@
 			"height": 31,
 			"latitude": 37.58198979353269,
 			"longitude": 126.60820956457543,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -56,7 +56,7 @@
 			"height": 26,
 			"latitude": 37.582419509248105,
 			"longitude": 126.60666274596315,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -164,7 +164,7 @@
 			"height": 33,
 			"latitude": 37.583925148368756,
 			"longitude": 126.61055308104375,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -218,7 +218,7 @@
 			"height": 28,
 			"latitude": 37.58276566574734,
 			"longitude": 126.60673026943972,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -254,7 +254,7 @@
 			"height": 32,
 			"latitude": 37.58201438816841,
 			"longitude": 126.60673623135487,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -272,7 +272,7 @@
 			"height": 32,
 			"latitude": 37.58289603056518,
 			"longitude": 126.60725378640926,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
