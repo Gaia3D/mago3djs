@@ -906,13 +906,13 @@
 		}
 	}
 	
-	var isInsertIssue = true;
+	var isInsertIssue = { "enable" : true }
 	$("#issueSaveButton").click(function() {
 		if (check() == false) {
 			return false;
 		}
-		if(isInsertIssue) {
-			isInsertIssue = false;
+		if(isInsertIssue["enable"]) {
+			isInsertIssue["enable"] = false;
 			var info = $("#issue").serialize();		
 			$.ajax({
 				url: "/issue/ajax-insert-issue.do",
@@ -930,20 +930,20 @@
 						alert(JS_MESSAGE[msg.result]);
 					}
 					
-					isInsertIssue = true;
+					isInsertIssue["enable"] = true;
 					ajaxIssueList();
 				},
 				error:function(request,status,error){
 			        alert(JS_MESSAGE["ajax.error.message"]);
 					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-			        isInsertIssue = true;
+			        isInsertIssue["enable"] = true;
 				}
 			});
 			
 			// issue 등록 버튼, css, 상태를 변경
 			$("#insertIssueEnableButton").removeClass("on");
 			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
-			insertIssueEnable = false;
+			insertIssueEnable["enable"] = false;
 			
 			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
@@ -1086,7 +1086,7 @@
 	
 	// 검색 메뉴 시작
 	// Data 검색
-	var searchDataFlag = true;
+	var searchDataFlag = { "enable" : true }
 	$("#searchData").click(function() {
 		if ($.trim($("#search_value").val()) === ""){
 			alert("검색어를 입력해 주세요.");
@@ -1094,8 +1094,8 @@
 			return false;
 		}
 		
-		if(searchDataFlag) {
-			searchDataFlag = false;
+		if(searchDataFlag["enable"]) {
+			searchDataFlag["enable"] = false;
 			var info = $("#searchForm").serialize();		
 			
 			var searchType = $("#search_word").val();
@@ -1135,7 +1135,7 @@
 			
 			$("#searchList").empty();
 			$("#searchList").html(content);
-			searchDataFlag = true;
+			searchDataFlag["enable"] = true;
 		} else {
 			alert(JS_MESSAGE["button.dobule.click"]);
 			return;
