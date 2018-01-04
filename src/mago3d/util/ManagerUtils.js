@@ -490,6 +490,13 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
 		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
 		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
+		
+		// test.***
+		//var yRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, yRotatedTMatrix);
+		//var yxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(yRotatedTMatrix, yxRotatedTMatrix);
+		//var yxzRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(yxRotatedTMatrix, yxzRotatedTMatrix);
+		//resultGeoLocationData.tMatrix = yxzRotatedTMatrix;
+		// end test.---
 
 		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;

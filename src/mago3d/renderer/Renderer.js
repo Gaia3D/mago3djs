@@ -233,18 +233,7 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		if (neoBuilding.lodMeshesArray === undefined)
 		{ continue; }
 		
-		if (neoBuilding.currentLod === 3)
-		{
-			skinLego = neoBuilding.lodMeshesArray[0];
-		}
-		else if (neoBuilding.currentLod === 4)
-		{
-			skinLego = neoBuilding.lodMeshesArray[1];
-		}
-		else if (neoBuilding.currentLod === 5)
-		{
-			skinLego = neoBuilding.lodMeshesArray[2];
-		}
+		skinLego = neoBuilding.getCurrentSkin();
 		
 		if (skinLego === undefined)
 		{ continue; }
