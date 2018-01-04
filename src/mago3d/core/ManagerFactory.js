@@ -172,7 +172,15 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		manager.createDefaultShaders(gl);// A1-Use this.***
 
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
-		manager.getObjectIndexFile();
+		//manager.getObjectIndexFile(); // old.***
+		//viewer.scene.magoManager.getObjectIndexFile();
+		if (projectIdArray !== null && projectIdArray.length > 0) 
+		{
+			for (var i=0; i<projectIdArray.length; i++) 
+			{
+				manager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
+			}
+		}
 	}
 
 	// cesium을 구현체로서 이용
@@ -198,7 +206,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			for (var i=0; i<projectIdArray.length; i++) 
 			{
-				viewer.scene.magoManager.getObjectIndexFileTEST(projectIdArray[i], projectDataFolderArray[i]);
+				viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
 			}
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);

@@ -998,6 +998,9 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
+			//if(neoBuilding.buildingId === "historypark_del")
+			//var hola = 0;
+		
 			if (neoBuilding.metaData === undefined) 
 			{
 				neoBuilding.metaData = new MetaData();

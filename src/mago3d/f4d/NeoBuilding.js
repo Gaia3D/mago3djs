@@ -377,6 +377,53 @@ NeoBuilding.prototype.getHeaderVersion = function()
  * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
+NeoBuilding.prototype.getCurrentSkin = function() 
+{
+	var skinLego;
+	if (this.currentLod === 3)
+	{
+		skinLego = this.lodMeshesArray[0];
+		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			skinLego = this.lodMeshesArray[1];
+			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			{
+				skinLego = this.lodMeshesArray[2];
+			}
+		}
+	}
+	else if (this.currentLod === 4)
+	{
+		skinLego = this.lodMeshesArray[1];
+		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			skinLego = this.lodMeshesArray[2];
+			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			{
+				skinLego = this.lodMeshesArray[0];
+			}
+		}
+	}
+	else if (this.currentLod === 5)
+	{
+		skinLego = this.lodMeshesArray[2];
+		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			skinLego = this.lodMeshesArray[1];
+			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			{
+				skinLego = this.lodMeshesArray[0];
+			}
+		}
+	}
+	
+	return skinLego;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param neoReference 변수
+ */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
 	var texture = undefined;

@@ -38,7 +38,7 @@
 			"height": 32,
 			"latitude": 37.583754532032326,
 			"longitude": 126.60931061270068,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -92,7 +92,7 @@
 			"height": 32,
 			"latitude": 37.58264782899985,
 			"longitude": 126.6093510039972,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -110,7 +110,7 @@
 			"height": 30,
 			"latitude": 37.5829305308201,
 			"longitude": 126.60932432621343,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -128,7 +128,7 @@
 			"height": 32,
 			"latitude": 37.5832891672532,
 			"longitude": 126.60702611657658,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -146,7 +146,7 @@
 			"height": 40,
 			"latitude": 37.58362692191355,
 			"longitude": 126.60845939021223,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -182,7 +182,7 @@
 			"height": 29,
 			"latitude": 37.58328870711409,
 			"longitude": 126.60625627706231,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -200,7 +200,7 @@
 			"height": 37,
 			"latitude": 37.58264274155634,
 			"longitude": 126.60831759533984,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -236,7 +236,7 @@
 			"height": 31,
 			"latitude": 37.58218502123928,
 			"longitude": 126.60727280962003,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -290,7 +290,7 @@
 			"height": 24,
 			"latitude": 37.584301221570534,
 			"longitude": 126.60780730555985,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -308,7 +308,7 @@
 			"height": 40,
 			"latitude": 37.584256200219306,
 			"longitude": 126.6084269712107,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -326,7 +326,7 @@
 			"height": 32,
 			"latitude": 37.58443455135179,
 			"longitude": 126.61061030373783,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -344,7 +344,7 @@
 			"height": 40,
 			"latitude": 37.582015824374196,
 			"longitude": 126.6092289903043,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -362,7 +362,7 @@
 			"height": 50,
 			"latitude": 37.58061786826666,
 			"longitude": 126.61092625615778,
-			"pitch": 0.0,
+			"pitch": 90.0,
 			"roll": 0.0
 		},
 		{
@@ -380,7 +380,7 @@
 			"height": 70,
 			"latitude": 37.5804305308201,
 			"longitude": 126.60832432621343,
-			"pitch": 0.0,
+			"pitch": 90.0,
 			"roll": 0.0
 		}
 	],

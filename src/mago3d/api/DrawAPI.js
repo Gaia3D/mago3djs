@@ -9,7 +9,7 @@ var DrawAPI = {};
 
 DrawAPI.drawAppendData = function(api, magoManager) 
 {
-	magoManager.getObjectIndexFileTEST(api.getProjectId(), api.getProjectDataFolder());
+	magoManager.getObjectIndexFile(api.getProjectId(), api.getProjectDataFolder());
 };
 
 DrawAPI.drawInsertIssueImage = function(api, magoManager) 

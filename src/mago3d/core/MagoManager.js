@@ -1316,73 +1316,6 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 {
 	// Prepare lod3, lod4 and lod5 meshes.***
 	// check "this.visibleObjControlerNodes.currentVisibles3".***
-	/*
-	if (this.fileRequestControler.isFullPlus(extraCount))	{ return; }
-		
-		lowestOctree = globalVisibleObjControlerOctrees.currentVisibles2[i];
-		
-		if (lowestOctree.octree_number_name === undefined)
-		{ continue; }
-		
-		if (lowestOctree.lego === undefined) 
-		{
-			lowestOctree.lego = new Lego();
-			lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
-		}
-
-		if (lowestOctree.lego === undefined && lowestOctree.lego.dataArrayBuffer === undefined) 
-		{ continue; }
-	
-		neoBuilding = lowestOctree.neoBuildingOwner;
-		if (neoBuilding === undefined)
-		{ continue; }
-	
-		projectFolderName = neoBuilding.projectFolderName;
-		buildingFolderName = neoBuilding.buildingFileName;
-
-		// && lowestOctree.neoRefsList_Array.length === 0)
-		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY && !this.isCameraMoving) 
-		{
-			// must load the legoStructure of the lowestOctree.***
-			if (!this.fileRequestControler.isFullPlus(extraCount))
-			{
-				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-				var bricks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Bricks";
-				var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-				this.readerWriter.getOctreeLegoArraybuffer(filePathInServer, lowestOctree, this);
-			}
-			continue;
-		}
-
-		// finally check if there are legoSimpleBuildingTexture.***
-		if (lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
-		{
-			var headerVersion = neoBuilding.getHeaderVersion();
-			if (headerVersion[0] === "v")
-			{
-				// this is the old version.***
-				if (neoBuilding.simpleBuilding3x3Texture === undefined)
-				{
-					neoBuilding.simpleBuilding3x3Texture = new Texture();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
-					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
-				}
-				//if(
-			}
-			else 
-			{
-				// this is the new version.***
-				if (neoBuilding.simpleBuilding3x3Texture === undefined)
-				{
-					neoBuilding.simpleBuilding3x3Texture = new Texture();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/mosaicTextureLod2.png";
-					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
-				}
-			}
-		}
-		*/
 	var lowLodMesh;
 	var lod;
 	var node;
@@ -1419,32 +1352,42 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		//neoBuilding.distToCam = neoBuilding.octree.getMinDistToCamera(cameraPosition);
 		var textureFileName;
 		var lodString;
+		var lodIdx;
 		
 		if (neoBuilding.distToCam < this.magoPolicy.getLod3DistInMeters())
 		{
 			textureFileName = "mosaicTextureLod3.png";
 			lodString = "lod3";
+			lodIdx = 0;
+			neoBuilding.currentLod = 3;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod4DistInMeters())
 		{
 			textureFileName = "mosaicTextureLod4.png";
 			lodString = "lod4";
+			lodIdx = 1;
+			neoBuilding.currentLod = 4;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod5DistInMeters())
 		{
 			textureFileName = "mosaicTextureLod5.png";
 			lodString = "lod5";
+			lodIdx = 2;
+			neoBuilding.currentLod = 5;
 		}
 		else { continue; }
+		
+		if(neoBuilding.buildingId === "historypark_del")
+			var hola = 0;
 
-		neoBuilding.currentLod = 3;
-		lowLodMesh = neoBuilding.lodMeshesArray[0];
+		
+		lowLodMesh = neoBuilding.lodMeshesArray[lodIdx];
 		if (lowLodMesh === undefined)
 		{
 			lowLodMesh = new Lego();
 			lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
 			lowLodMesh.textureName = textureFileName;
-			neoBuilding.lodMeshesArray.push(lowLodMesh);
+			neoBuilding.lodMeshesArray[lodIdx] = lowLodMesh;
 		}
 		
 		if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
@@ -2578,7 +2521,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			
 			// 1rst, check if there are octrees very close.
 			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				this.myCameraSCX.position, distLod0, distLod1, distLod2);
+				this.myCameraSCX.position, distLod0, distLod1, distLod2*100);
 		}
 
 		if (!find) 
@@ -3133,8 +3076,15 @@ MagoManager.prototype.manageQueue = function()
 			
 			if (neoBuilding === undefined || neoBuilding.lodMeshesArray === undefined)
 			{ continue; }
+		
+		    // check the current lod of the building.***
+			var currentBuildingLod = neoBuilding.currentLod;
+			var lodIdx = currentBuildingLod - 3;
 			
-			skinLego = neoBuilding.lodMeshesArray[0];
+			if(lodIdx < 0)
+				continue;
+			
+			skinLego = neoBuilding.lodMeshesArray[lodIdx];
 			if (skinLego === undefined)
 			{ continue; }
 			
@@ -3163,8 +3113,15 @@ MagoManager.prototype.manageQueue = function()
 			
 				if (neoBuilding === undefined)
 				{ continue; }
+			
+				// check the current lod of the building.***
+				var currentBuildingLod = neoBuilding.currentLod;
+				var lodIdx = currentBuildingLod - 3;
 				
-				skinLego = neoBuilding.lodMeshesArray[0];
+				if(lodIdx < 0)
+					continue;
+				
+				skinLego = neoBuilding.lodMeshesArray[lodIdx];
 				if (skinLego === undefined)
 				{ continue; }
 				if (this.parseQueue.skinLegosToParseMap.delete(skinLego))
@@ -4174,6 +4131,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	{
 		node = nodesArray[b];
 		neoBuilding = node.data.neoBuilding;
+
 		gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
 		var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
@@ -4182,6 +4140,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 
 		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
+		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 	}
 	
@@ -6176,7 +6135,7 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue); // original.***
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
-	if (geoLocDatamanager == undefined)
+	if (geoLocDatamanager === undefined)
 	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var latitude = geoLocationData.geographicCoord.latitude;
@@ -6195,7 +6154,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 {
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = this.getNodeGeoLocDataManager(node);
-	if (geoLocDatamanager == undefined)
+	if (geoLocDatamanager === undefined)
 	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var dataKey = node.data.nodeId;
@@ -6296,7 +6255,7 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.getObjectIndexFileTEST = function(projectId, projectDataFolder) 
+MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
 {
 	if (this.configInformation === undefined)
 	{
@@ -6313,7 +6272,7 @@ MagoManager.prototype.getObjectIndexFileTEST = function(projectId, projectDataFo
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.getObjectIndexFile = function() 
+MagoManager.prototype.getObjectIndexFile_xxxx = function() 
 {
 	if (this.configInformation === undefined)
 	{
@@ -6615,6 +6574,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	{
 		buildingSeed = buildingSeedList.buildingSeedArray[i];
 		buildingId = buildingSeed.buildingId;
+		
 		buildingSeedMap.set(buildingId, buildingSeed);
 	}
 	var projectFolderName = realTimeLocBlocksList.data_key;
@@ -6879,7 +6839,7 @@ MagoManager.prototype.callAPI = function(api)
 		if (!this.hierarchyManager.existProject(projectId))
 		{
 			var projectDataFolder = api.getProjectDataFolder();
-			this.getObjectIndexFileTEST(projectId, projectDataFolder);
+			this.getObjectIndexFile(projectId, projectDataFolder);
 		}
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
@@ -6890,7 +6850,7 @@ MagoManager.prototype.callAPI = function(api)
 		if (!this.hierarchyManager.existProject(projectId))
 		{
 			var projectDataFolder = api.getProjectDataFolder();
-			this.getObjectIndexFileTEST(projectId, projectDataFolder);
+			this.getObjectIndexFile(projectId, projectDataFolder);
 		}
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
