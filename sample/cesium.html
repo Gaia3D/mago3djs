@@ -16,18 +16,19 @@
 </head>
 
 <body>
-<input type="hidden" id="now_latitude" name="now_latitude" value="" />
-<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
 
 <ul class="nav">
 	<li id="homeMenu" class="home">
-		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;"/>
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
 	</li>
-	<li id="myIssueMenu" class="issue" data-tooltip-text="전체 Issue 리스트 중에서 최신 Issue 10개를 시간 순으로 정렬하여 보여 줍니다.">Issue<span id="issueListCount">10</span></li>
-	<li id="searchMenu" class="search" data-tooltip-text="Issue, Object, 공간 정보 등을 활용한 검색 기능을 제공 합니다.">검색</li>
-	<li id="apiMenu" class="api" data-tooltip-text="mago3D 여러 기능을 Control 할 수 있는 다양한 API들을 제공 합니다.">API</li>	
-	<li id="insertIssueMenu" class="regist" data-tooltip-text="Object에 대한 Issue 등록 기능을 제공 합니다.">등록</li>
-	<li id="configMenu" class="config" data-tooltip-text="Rendering 관련 각종 설정이 가능 합니다.">설정</li>	
+	<li id="myIssueMenu" class="issue" data-tooltip-text="Shows the latest 10 issues sorted chronologically from the entire Issue List.">Issue
+		<br/><span id="issueListCount">4</span></li>
+	<li id="searchMenu" class="search" data-tooltip-text="searching such as issue, object, and spatial information.">Search</li>
+	<li id="apiMenu" class="api" data-tooltip-text="APIs to control various functions of mago3D.">API</li>	
+	<li id="insertIssueMenu" class="regist" data-tooltip-text="Issue registration for Object.">Regist</li>
+	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
 </ul>
 
 <div id="menuContent" class="navContents">
@@ -56,60 +57,64 @@
 	
 	<ul id="myIssueMenuContent" class="issueList">
 		<li style="margin-bottom: 8px; font-size: 1em; font-weight: normal; color: #2955a6;">
-			최신 Issue 10개 표시
+			Show up to 10 latest issues.
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="gotoIssue('3ds.json', '133', 'ISSUE_TYPE_MODIFY', '126.60660443089857', '37.582788710510506', '30.075205419163662', '2')">바로가기</button>
+			<button type="button" title="Shortcuts" 
+				onclick="gotoIssue('3ds.json', '133', 'ISSUE_TYPE_MODIFY', '126.60660443089857', '37.582788710510506', '30.075205419163662', '2')">Shortcuts</button>
 			<div class="info">
 				<p class="title">
-					<span>3DS 통합 가시화</span>
+					<span>3DS Project</span>
 					aaaaaaa
 				</p>
 				<ul class="tag">
-					<li><span class="i3"></span>수정</li>
-					<li><span class="t4"></span>낮음</li>
+					<li><span class="i3"></span>Modify</li>
+					<li><span class="t4"></span>Low</li>
 					<li class="date">2017-08-25 15:02:44</li>
 				</ul>
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2')">바로가기</button>
+			<button type="button" title="Shortcuts" 
+				onclick="gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2')">Shortcuts</button>
 			<div class="info">
 				<p class="title">
-					<span>3DS 통합 가시화</span>
+					<span>3DS Project</span>
 					test
 				</p>
 				<ul class="tag">
-					<li><span class="i1"></span>버그</li>
-					<li><span class="t1"></span>매우중요</li>
+					<li><span class="i1"></span>Bugger</li>
+					<li><span class="t1"></span>Very Important</li>
 					<li class="date">2017-08-25 14:27:42</li>
 				</ul>
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="gotoIssue('ifc_mep.json', '128', 'ISSUE_TYPE_BUGGER', '126.60860404195267', '37.58308164273416', '39.60458358315561', '2')">바로가기</button>
+			<button type="button" title="Shortcuts" 
+				onclick="gotoIssue('ifc_mep.json', '128', 'ISSUE_TYPE_BUGGER', '126.60860404195267', '37.58308164273416', '39.60458358315561', '2')">Shortcuts</button>
 			<div class="info">
 				<p class="title">
 					<span>IFC(MEP)</span>
 					test8
 				</p>
 				<ul class="tag">
-					<li><span class="i1"></span>버그</li>
-					<li><span class="t4"></span>낮음</li>
+					<li><span class="i1"></span>Bugger</li>
+					<li><span class="t4"></span>Low</li>
 					<li class="date">2017-08-21 14:49:50</li>
 				</ul>
 			</div>
 		</li>
 		<li>
-			<button type="button" title="바로가기" onclick="gotoIssue('sea_port.json', '127', 'ISSUE_TYPE_ETC', '126.60828025652438', '37.58302423952313', '39.61857390681989', '2')">바로가기</button>
+			<button type="button" title="Shortcuts" 
+				onclick="gotoIssue('sea_port.json', '127', 'ISSUE_TYPE_ETC', '126.60828025652438', '37.58302423952313', '39.61857390681989', '2')">Shortcuts</button>
 			<div class="info">
 				<p class="title">
 					<span>Sea Port</span>
 					test7
 				</p>
 				<ul class="tag">
-					<li><span class="i4"></span>기타</li>
-					<li><span class="t3"></span>보통</li>
+					<li><span class="i4"></span>Etc</li>
+					<li><span class="t3"></span>General</li>
 					<li class="date">2017-08-21 14:43:54</li>
 				</ul>
 			</div>
@@ -120,11 +125,11 @@
 	<div id="searchMenuContent" class="searchWrap">
 		<table>
 			<tr style="height: 35px;">
-				<td style="width: 80px;"><label for="project_id">프로젝트</label></td>
+				<td style="width: 80px;"><label for="project_id">Project</label></td>
 				<td><select id="project_id" name="project_id" class="select">
-						<option value=""> 전체 </option>
-						<option value="1">3DS 통합 가시화</option>
-						<option value="2">Collada 통합 가시화</option>
+						<option value=""> ALL </option>
+						<option value="1">3DS Project</option>
+						<option value="2">Collada Project</option>
 						<option value="3">IFC</option>
 						<option value="4">IFC(MEP)</option>
 						<option value="5">Sea Port</option>
@@ -132,50 +137,50 @@
 				</td>
 			</tr>
 			<tr style="height: 35px;">
-				<td><label for="search_word">분류</label></td>
+				<td><label for="search_word">Category</label></td>
 				<td>
 					<select id="search_word" name="search_word" class="select">
-						<option value="data_name">Data 명</option>
-						<option value="title">Issue 명</option>
+						<option value="data_name">Data Name</option>
+						<option value="title">Issue Name</option>
 					</select>
 					<select id="search_option" name="search_option" class="select">
-						<option value="1">포함</option>
-						<option value="0">일치</option>
+						<option value="1">Included</option>
+						<option value="0">Matches</option>
 					</select>
 				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-				<label for="search_value">검색어</label></td>
+				<label for="search_value">Search Word</label></td>
 				<td><input type="text" id="search_value" name="search_value" size="31" /></td>
 			</tr>
 			<tr style="height: 35px;">
-				<td><label for="start_date">날짜</label></td>
+				<td><label for="start_date">Date</label></td>
 				<td><input type="text" class="s date" id="start_date" name="start_date" size="12" />
 				<span class="delimeter tilde">~</span>
 				<input type="text" class="s date" id="end_date" name="end_date" size="12" /></td>
 			</tr>
 			<tr style="height: 30px;">
-				<td><label for="order_word">표시순서</label></td>
+				<td><label for="order_word">View Order</label></td>
 				<td><select id="order_word" name="order_word" class="select">
-					<option value=""> 기본 </option>
-			       	<option value="register_date"> 등록일 </option>
+					<option value=""> Basic </option>
+			       	<option value="register_date"> Date </option>
 				</select>
 				<select id="order_value" name="order_value" class="select">
-					<option value=""> 기본 </option>
-				   	<option value="ASC"> 오름차순 </option>
-					<option value="DESC"> 내림차순 </option>
+					<option value=""> Basic </option>
+				   	<option value="ASC"> ASC </option>
+					<option value="DESC"> DESC </option>
 				</select>
 				<select id="list_counter" name="list_counter" class="select">
-					<option value="5"> 5 개씩 </option>
-				 	<option value="10"> 10 개씩 </option>
-					<option value="50"> 50 개씩 </option>
+					<option value="5"> listing 5 </option>
+				 	<option value="10"> listing 10 </option>
+					<option value="50"> listing 50 </option>
 				</select>
 				</td>
 			</tr>
 		</table>
 		<div class="btns">
-			<button type="button" id="searchData" class="full">검색</button>
+			<button type="button" id="searchData" class="full">Search</button>
 		</div>
 		<ul id="searchList" class="searchList"></ul>
 	</div>
@@ -183,52 +188,52 @@
 	
 	<div id="apiMenuContent" class="apiWrap">
 		<div>
-			<h3>로컬(Browser) 검색</h3>
+			<h3>Local(Browser) Search</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="localSearchProjectId">프로젝트 </label>
+					<label for="localSearchProjectId">Project </label>
 					<select id="localSearchProjectId" name="localSearchProjectId" class="select">
-						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
-						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="collada.json">Collada Project</option>
 						<option value="ifc_japan.json">IFC(japan)</option>
 					</select>
 				</li>
 				<li>
 					<label for="localSearchDataKey">Data Key</label>
-					<input type="text" id="localSearchDataKey" name="localSearchDataKey" size="23" />
-					<button type="button" id="localSearch" class="btn">검색</button> 
+					<input type="text" id="localSearchDataKey" name="localSearchDataKey" size="22" />
+					<button type="button" id="localSearch" class="btn">Search</button> 
 				</li>
 			</ul>
 		</div>
 		<div>
-			<h3>속성 가시화</h3>
+			<h3>Property Rendering</h3>
 			<ul class="apiLoca">
 				<li>
 					<input type="radio" id="showPropertyRendering" name="propertyRendering" value="true" />
-					<label for="showLabel"> 표시 </label>
+					<label for="showLabel"> Show </label>
 					<input type="radio" id="hidePropertyRendering" name="propertyRendering" value="false" />
-					<label for="hideLabel"> 비표시 </label>
+					<label for="hideLabel"> Hide </label>
 				</li>
 				<li>
-					<label for="propertyRenderingProjectId">프로젝트 </label>
+					<label for="propertyRenderingProjectId">Project </label>
 					<select id="propertyRenderingProjectId" name="propertyRenderingProjectId" class="select">
-						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
-						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="collada.json">Collada Project</option>
 						<option value="ifc_japan.json">IFC(japan)</option>
 					</select>
 				</li>
 				<li>
-					<label for="propertyRenderingWord">속성</label>
-					<input type="text" id="propertyRenderingWord" name="propertyRenderingWord" size="23" placeholder="isMain=true" />
-					<button type="button" id="changePropertyRendering" class="btn">변경</button> 
+					<label for="propertyRenderingWord">Property</label>
+					<input type="text" id="propertyRenderingWord" name="propertyRenderingWord" size="22" placeholder="isMain=true" />
+					<button type="button" id="changePropertyRendering" class="btn">Change</button> 
 				</li>
 			</ul>
 		</div>
@@ -236,14 +241,14 @@
 			<h3>색깔 변경</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="colorProjectId">프로젝트 </label>
+					<label for="colorProjectId">Project </label>
 					<select id="colorProjectId" name="colorProjectId" class="select">
-						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
-						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="collada.json">Collada Project</option>
 						<option value="ifc_japan.json">IFC(japan)</option>
 					</select>
 				</li>
@@ -253,24 +258,24 @@
 				</li>
 				<li>
 					<label for="colorObjectIds">Object Id</label>
-					<input type="text" id="colorObjectIds" name="colorObjectIds" placeholder="   , 구분" size="30" />
+					<input type="text" id="colorObjectIds" name="colorObjectIds" placeholder=" , Delimiter" size="30" />
 				</li>
 				<li>
-					<label for="colorProperty">속성</label>
+					<label for="colorProperty">Property</label>
 					<input type="text" id="colorProperty" name="colorProperty" size="30" placeholder="isMain=true" />
 				</li>
 				<li>
-					<label for="updateColor">색깔</label>
+					<label for="updateColor">Color</label>
 					<select id="updateColor" name="updateColor" class="select">
-						<option value="255,0,0"> 빨강 </option>
-						<option value="255,255,0"> 노랑 </option>
-						<option value="0,255,0"> 녹색 </option>
-						<option value="0,0,255"> 파랑 </option>
-						<option value="255,0,255"> 분홍 </option>
+						<option value="255,0,0"> Red </option>
+						<option value="255,255,0"> Yellow </option>
+						<option value="0,255,0"> Green </option>
+						<option value="0,0,255"> Blue </option>
+						<option value="255,0,255"> Pink </option>
 						<option value="0,0,0"> 검정 </option>
 					</select>
-					<button type="button" id="changeColor" class="btn">변경</button> 
-					<button type="button" id="deleteAllChangeColor" class="btn">전체 삭제</button>
+					<button type="button" id="changeColor" class="btn">Change</button> 
+					<button type="button" id="deleteAllChangeColor" class="btn">All Delte</button>
 				</li>
 			</ul>
 		</div>
@@ -278,14 +283,14 @@
 			<h3>Location and Rotation</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="moveProjectId">프로젝트 </label>
+					<label for="moveProjectId">Project </label>
 					<select id="moveProjectId" name="moveProjectId" class="select">
-						<option value="3ds.json">3DS 통합 가시화</option>
+						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
-						<option value="collada.json">Collada 통합 가시화</option>
+						<option value="collada.json">Collada Project</option>
 						<option value="ifc_japan.json">IFC(japan)</option>
 					</select>
 				</li>
@@ -294,15 +299,15 @@
 					<input type="text" id="moveDataKey" name="moveDataKey" size="25" />
 				</li>
 				<li>
-					<label for="moveLatitude">위도 </label>
+					<label for="moveLatitude">Latitude </label>
 					<input type="text" id="moveLatitude" name="moveLatitude" size="25"/>
 				</li>
 				<li>
-					<label for="moveLongitude">경도 </label>
+					<label for="moveLongitude">Longitude </label>
 					<input type="text" id="moveLongitude" name="moveLongitude" size="25"/>
 				</li>
 				<li>
-					<label for="moveHeight">높이 </label>
+					<label for="moveHeight">Altitude </label>
 					<input type="text" id="moveHeight" name="moveHeight" size="25" />
 				</li>
 				<li>
@@ -321,25 +326,25 @@
 			</ul>
 		</div>
 		<div>
-			<h3>현재 위치 근처 Issue List(100개)</h3>
+			<h3>Issue Lists(100) near current location</h3>
 			<input type="radio" id="showNearGeoIssueList" name="nearGeoIssueList" value="true" onclick="changeNearGeoIssueList(true);" />
-			<label for="showNearGeoIssueList"> 표시 </label>
+			<label for="showNearGeoIssueList"> Show </label>
 			<input type="radio" id="hideNearGeoIssueList" name="nearGeoIssueList" value="false" onclick="changeNearGeoIssueList(false);"/>
-			<label for="hideNearGeoIssueList"> 비표시 </label>
+			<label for="hideNearGeoIssueList"> Hide </label>
 		</div>
 		<div>
-			<h3>클릭 지점의 위치 정보</h3>
+			<h3>About the location of the click point</h3>
 			<ul class="apiLoca">
 				<li>
-					<label for="positionLatitude"> 위도 </label>
+					<label for="positionLatitude"> Latitude </label>
 					<input type="text" id="positionLatitude" name="positionLatitude" size="25" />
 				</li>
 				<li>
-					<label for="positionLongitude"> 경도 </label>
+					<label for="positionLongitude"> Longitude </label>
 					<input type="text" id="positionLongitude" name="positionLongitude" size="25" />
 				</li>
 				<li>
-					<label for="positionAltitude"> 높이 </label>
+					<label for="positionAltitude"> Altitude </label>
 					<input type="text" id="positionAltitude" name="positionAltitude" size="25" />
 				</li>
 			</ul>
@@ -351,16 +356,18 @@
 		<table>
 			<tr style="height: 35px;">
 				<td style="width: 100px;" nowrap="nowrap">
-					<label for="project_id">프로젝트</label>
+					<label for="project_id">Project</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
 					<select id="project_id" name="project_id" class="select">
-						<option value="1">3DS 통합 가시화</option>
-						<option value="2">Collada 통합 가시화</option>
-						<option value="3">IFC</option>
-						<option value="4">IFC(MEP)</option>
-						<option value="5">Sea Port</option>
+						<option value="3ds.json">3DS Project</option>
+						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada Project</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
 					</select>
 				</td>
 			</tr>
@@ -371,24 +378,24 @@
 				</td>
 				<td>
 					<select id="issue_type" name="issue_type" class="select">
-						<option value="ISSUE_TYPE_BUGGER">버그</option>
-						<option value="ISSUE_TYPE_IMPROVE">개선</option>
-						<option value="ISSUE_TYPE_MODIFY">수정</option>
-						<option value="ISSUE_TYPE_ETC">기타</option>
+						<option value="ISSUE_TYPE_BUGGER">Bugger</option>
+						<option value="ISSUE_TYPE_IMPROVE">Improve</option>
+						<option value="ISSUE_TYPE_MODIFY">Modify</option>
+						<option value="ISSUE_TYPE_ETC">Etc</option>
 					</select>
 				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-					Issue 위치
+					Issue Location
 				</td>
 				<td>
-					<button type="button" id="insertIssueEnableButton" class="btn">클릭 후 객체를 선택해 주세요.</button> 
+					<button type="button" id="insertIssueEnableButton" class="btn">Please select object after click.</button> 
 				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-					<label for="data_key">데이터명</label>
+					<label for="data_key">Data Name</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
@@ -399,7 +406,7 @@
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-					<label for="latitude">위도</label>
+					<label for="latitude">Latitude</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
@@ -409,7 +416,7 @@
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-					<label for="longitude">경도</label>
+					<label for="longitude">Longitude</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
@@ -418,7 +425,7 @@
 				</td>
 			</tr>
 			<tr style="height: 60px;">
-				<td><label for="title">제목</label>
+				<td><label for="title">Title</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
@@ -432,39 +439,39 @@
 				</td>
 				<td>
 					<select id="priority" name="priority" class="select">
-						<option value="ISSUE_PRIORITY_LEVEL1">매우중요</option>
-						<option value="ISSUE_PRIORITY_LEVEL2">중요</option>
-						<option value="ISSUE_PRIORITY_LEVEL3">보통</option>
-						<option value="ISSUE_PRIORITY_LEVEL4">낮음</option>
+						<option value="ISSUE_PRIORITY_LEVEL1">Very Important</option>
+						<option value="ISSUE_PRIORITY_LEVEL2">Important</option>
+						<option value="ISSUE_PRIORITY_LEVEL3">General</option>
+						<option value="ISSUE_PRIORITY_LEVEL4">Low</option>
 					</select>
 				</td>
 			</tr>
 			<tr style="height: 35px;">
-				<td><label for="due_day">마감일</label></td>
+				<td><label for="due_day">Due Date</label></td>
 				<td><input id="due_date" name="due_date" type="hidden" value=""/>
 					<input type="text" id="due_day" name="due_day" class="date" size="10" maxlength="10" />
-					일&nbsp;&nbsp;
+					D&nbsp;&nbsp;
 					<input type="text" id="due_hour" name="due_hour" placeholder=" 00" size="2" maxlength="2" /> :
 					<input type="text" id="due_minute" name="due_minute" placeholder=" 00" size="2" maxlength="2" />
-					분
+					M
 				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td><label for="assignee">Assignee</label></td>
-				<td><input id="assignee" name="assignee" class="m" placeholder=" 대리자" type="text" value="" size="24"/>
-					<button type="button" class="btn" onclick="alert('준비중입니다.');">선택</button> 
+				<td><input id="assignee" name="assignee" class="m" placeholder=" assignee" type="text" value="" size="23"/>
+					<button type="button" class="btn" onclick="alert('Comming Soon...');">Select</button> 
 				</td>
 			</tr>
 			
 			<tr style="height: 35px;">
 				<td><label for="reporter">reporter</label></td>
-				<td><input id="reporter" name="reporter" class="m" placeholder=" 보고 해야 하는 사람" type="text" value="" size="24"/>
-					<button type="button" class="btn" onclick="alert('준비중입니다.');">선택</button> 
+				<td><input id="reporter" name="reporter" class="m" placeholder=" Reporter" type="text" value="" size="23"/>
+					<button type="button" class="btn" onclick="alert('Comming Soon...');">Select</button> 
 				</td>
 			</tr>
 			
 			<tr>
-				<td><label for="contents">내용</label>
+				<td><label for="contents">Contents</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td><textarea id="contents" name="contents" rows="5" cols="32">
@@ -474,7 +481,7 @@
 		</table>
 		
 		<div class="btns">
-			<button type="button" id="issueSaveButton" class="full">저장</button>
+			<button type="button" id="issueSaveButton" class="full">Save</button>
 		</div>
 	</div>
 	</form>
@@ -483,23 +490,23 @@
 		<div>
 			<h3>Label</h3>
 			<input type="radio" id="showLabel" name="labelInfo" value="true" onclick="changeLabel(true);" />
-			<label for="showLabel"> 표시 </label>
+			<label for="showLabel"> Show </label>
 			<input type="radio" id="hideLabel" name="labelInfo" value="false" onclick="changeLabel(false);"/>
-			<label for="hideLabel"> 비표시 </label>
+			<label for="hideLabel"> Hide </label>
 		</div>
 		<div>
-			<h3>Object 정보</h3>
+			<h3>Object Information</h3>
 			<input type="radio" id="showObjectInfo" name="objectInfo" value="true" onclick="changeObjectInfoViewMode(true);" />
-			<label for="showObjectInfo"> 표시 </label>
+			<label for="showObjectInfo"> Show </label>
 			<input type="radio" id="hideObjectInfo" name="objectInfo" value="false" onclick="changeObjectInfoViewMode(false);"/>
-			<label for="hideObjectInfo"> 비표시 </label>
+			<label for="hideObjectInfo"> Hide </label>
 		</div>
 		<div>
 			<h3>Bounding Box</h3>
 			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
-			<label for="showBoundingBox"> 표시 </label>
+			<label for="showBoundingBox"> Show </label>
 			<input type="radio" id="hideBoundingBox" name="boundingBox" value="false" onclick="changeBoundingBox(false);"/>
-			<label for="hideBoundingBox"> 비표시 </label>
+			<label for="hideBoundingBox"> Hide </label>
 		</div>
 		<div>
 			<h3>Selecting And Moving</h3>
@@ -510,96 +517,74 @@
 			<input type="radio" id="objectMove" name="objectMoveMode" value="1" onclick="changeObjectMove('1');"/>
 			<label for="objectMove"> Object </label>
 			
-			<button type="button" id="saveObjectMoveButton" class="btn">저장</button>
-			<button type="button" id="deleteAllObjectMoveButton" class="btn">전체 삭제</button>
+			<button type="button" id="saveObjectMoveButton" class="btn">Save</button>
+			<button type="button" id="deleteAllObjectMoveButton" class="btn">All Delete</button>
 		</div>
 		<div>
 			<h3>Object Occlusion Culling</h3>
 			<div style="height: 30px;">
-				<div style="display: inline-block; width: 70px;">사용유무</div>
+				<div style="display: inline-block; width: 70px;">Select</div>
 				<input type="radio" id="useOcclusionCulling" name="occlusionCulling" value="true" />
-				<label for="useOccusionCulling"> 사용 </label>
+				<label for="useOccusionCulling"> Use </label>
 				<input type="radio" id="unusedOcclusionCulling" name="occlusionCulling" value="false" />
-				<label for="unusedOcclusionCulling"> 미사용 </label>
+				<label for="unusedOcclusionCulling"> Unused </label>
 			</div>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">Data Key</div>
-				<input type="text" id="occlusion_culling_data_key" name="occlusion_culling_data_key" size="25" />
-				<button type="button" id="changeOcclusionCullingButton" class="btn">변경</button>
+				<input type="text" id="occlusion_culling_data_key" name="occlusion_culling_data_key" size="22" />
+				<button type="button" id="changeOcclusionCullingButton" class="btn">Change</button>
 			</div>
 		</div>
 		<div>
 			<h3>LOD</h3>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">LOD0</div>
-				<input type="text" id="geo_lod0" name="geo_lod0" value="22" size="15" />&nbsp;M
+				<input type="text" id="geo_lod0" name="geo_lod0" value="15" size="15" />&nbsp;M
 			</div>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">LOD1</div>
-				<input type="text" id="geo_lod1" name="geo_lod1" value="70" size="15" />&nbsp;M
+				<input type="text" id="geo_lod1" name="geo_lod1" value="60" size="15" />&nbsp;M
 			</div>
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">LOD2</div>
-				<input type="text" id="geo_lod2" name="geo_lod2" value="22360" size="15" />&nbsp;M&nbsp;&nbsp;
-				<button type="button" id="changeLodButton" class="btn">변경</button>
+				<input type="text" id="geo_lod2" name="geo_lod2" value="90" size="15" />&nbsp;M
+			</div>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD3</div>
+				<input type="text" id="geo_lod3" name="geo_lod3" value="200" size="15" />&nbsp;M
+			</div>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD4</div>
+				<input type="text" id="geo_lod4" name="geo_lod4" value="1000" size="15" />&nbsp;M
+			</div>
+			<div style="height: 30px;">
+				<div style="display: inline-block; width: 70px;">LOD5</div>
+				<input type="text" id="geo_lod5" name="geo_lod5" value="50000" size="15" />&nbsp;M&nbsp;&nbsp;
+				<button type="button" id="changeLodButton" class="btn">Change</button>
 			</div>
 		</div>
 		<div>
 			<h3>Lighting</h3>
 			<div style="height: 30px;">AmbientReflectionCoeficient</div>
-			<div id="ambient_reflection_coef" style="display: inline-block; width: 245px;">
+			<div id="ambient_reflection_coef" style="display: inline-block; width: 225px;">
 				<div id="geo_ambient_reflection_coef_view" class="ui-slider-handle"></div>
 				<input type="hidden" id="geo_ambient_reflection_coef" name="geo_ambient_reflection_coef" value="0.5" />
 			</div>
 			<div style="height: 30px;">DiffuseReflectionCoeficient</div>
-			<div id="diffuse_reflection_coef" style="display: inline-block; width: 245px;">
+			<div id="diffuse_reflection_coef" style="display: inline-block; width: 225px;">
 				<div id="geo_diffuse_reflection_coef_view" class="ui-slider-handle"></div>
 				<input type="hidden" id="geo_diffuse_reflection_coef" name="geo_diffuse_reflection_coef" value="1" />
 			</div>
 			<div style="height: 30px;">SpecularReflectionCoeficient</div>
 			<div>
-				<div id="specular_reflection_coef" style="display: inline-block; width: 245px;">
+				<div id="specular_reflection_coef" style="display: inline-block; width: 225px;">
 					<div id="geo_specular_reflection_coef_view" class="ui-slider-handle"></div>
 					<input type="hidden" id="geo_specular_reflection_coef" name="geo_specular_reflection_coef" value="1" />
 				</div>
 				<div style="float: right;">
-					<button type="button" id="changeLightingButton" class="btn">변경</button>
+					<button type="button" id="changeLightingButton" class="btn">Change</button>
 				</div>
 			</div>
-			<!-- <div style="height: 30px;">
-				<label for="geo_ambient_color">AmbientColor</label>
-				<input type="text" id="geo_ambient_color" name="geo_ambient_color" class="m" size="15"
-					data-palette='[	"#c00000","#ff0000","#ffc000","#ffff00","#92d050",
-									"#00b050","#00b0f0","#0070c0","#002060","#7030a0",
-									"#f2f2f2","#d8d8d8","#bfbfbf","#a5a5a5","#7f7f7f",
-									"#7f7f7f","#595959","#3f3f3f","#262626","#0c0c0c",
-									"#ddd9c3","#c4bd97","#938953","#494429","#1d1b10",
-									"#c6d9f0","#8db3e2","#548dd4","#17365d","#0f243e",
-									"#dbe5f1","#b8cce4","#95b3d7","#366092","#244061",
-									"#f2dcdb","#e5b9b7","#d99694","#953734","#632423",
-									"#ebf1dd","#d7e3bc","#c3d69b","#76923c","#4f6128",
-									"#e5e0ec","#ccc1d9","#b2a2c7","#5f497a","#3f3151",
-									"#dbeef3","#b7dde8","#92cddc","#31859b","#205867",
-									"#fdeada","#fbd5b5","#fac08f","#e36c09","#974806" ]' />
-			</div>
-			<div style="height: 30px;">
-				<label for="geo_specular_color">SpecularColor</label>
-				<input type="text" id="geo_specular_color" name="geo_specular_color" class="m" size="15"
-					data-palette='[ "#c00000","#ff0000","#ffc000","#ffff00","#92d050",
-									"#00b050","#00b0f0","#0070c0","#002060","#7030a0",
-									"#f2f2f2","#d8d8d8","#bfbfbf","#a5a5a5","#7f7f7f",
-									"#7f7f7f","#595959","#3f3f3f","#262626","#0c0c0c",
-									"#ddd9c3","#c4bd97","#938953","#494429","#1d1b10",
-									"#c6d9f0","#8db3e2","#548dd4","#17365d","#0f243e",
-									"#dbe5f1","#b8cce4","#95b3d7","#366092","#244061",
-									"#f2dcdb","#e5b9b7","#d99694","#953734","#632423",
-									"#ebf1dd","#d7e3bc","#c3d69b","#76923c","#4f6128",
-									"#e5e0ec","#ccc1d9","#b2a2c7","#5f497a","#3f3151",
-									"#dbeef3","#b7dde8","#92cddc","#31859b","#205867",
-									"#fdeada","#fbd5b5","#fac08f","#e36c09","#974806" ]' />
-				&nbsp;
-			</div> -->
-			
 			<div style="text-align: center">
 			</div>
 		</div>
@@ -607,26 +592,26 @@
 		<div>
 			<h3><label for="geo_ssao_radius">SSAO Radius</label></h3>
 			<input type="text" id="geo_ssao_radius" name="geo_ssao_radius" />
-			<button type="button" id="changeSsaoRadiusButton" class="btn">변경</button>
+			<button type="button" id="changeSsaoRadiusButton" class="btn">Change</button>
 		</div>
 		
 		<div>
 			<h3>View Mode</h3>
 			<input type="radio" id="mode3PV" name="viewMode" value ="false" onclick="changeViewMode(false);"/>
-			<label for="mode3PV"> 3인칭 모드 </label>
+			<label for="mode3PV"> Third Person Mode </label>
 			<input type="radio" id="mode1PV" name="viewMode" value ="true" onclick="changeViewMode(true);"/>
-			<label for="mode1PV"> 1인칭 모드 </label>
+			<label for="mode1PV"> First Person Mode </label>
 		</div>
 	</div>
 </div>
 
 <ul class="shortcut">
-	<li onclick="gotoProject('3ds.json', '126.60856869381428', '37.58199267183209', '550', '3')">3DS 통합 가시화</li>
+	<li onclick="gotoProject('3ds.json', '126.60856869381428', '37.58199267183209', '550', '3')">3DS Project</li>
 	<li onclick="gotoProject('ifc_cultural_assets.json', '126.97772995695296', '37.57981', '80', '3')">IFC(Cultural Assets)</li>
 	<li onclick="gotoProject('ifc.json', '-58.784', '-62.2232', '220', '5')">IFC</li>
 	<li onclick="gotoProject('ifc_mep.json', '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
 	<li onclick="gotoProject('sea_port.json', '126.598426', '37.440778', '630', '3')">Sea Port</li>
-	<li onclick="gotoProject('collada.json', '126.799403', '37.568150', '370', '3')">Collada 통합 가시화</li>
+	<li onclick="gotoProject('collada.json', '126.799403', '37.568150', '370', '3')">Collada Project</li>
 	<li onclick="gotoProject('ifc_japan.json', '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
 </ul>
 
@@ -635,6 +620,7 @@
 <canvas id="objectLabel"></canvas>
 
 <script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="/src/mago3d/message/Message.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/AuxiliarSegment.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/BoundingBox.js"></script>
@@ -687,6 +673,7 @@
 <script type="text/javascript" src="/src/mago3d/api/ColorAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/api/DrawAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/api/LocationAndRotationAPI.js"></script>
+<script type="text/javascript" src="/src/mago3d/api/LodAPI.js"></script>
 <script type="text/javascript" src="/src/mago3d/domain/Policy.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/Accessor.js"></script>
 <script type="text/javascript" src="/src/mago3d/f4d/BlockModels.js"></script>
@@ -734,7 +721,7 @@
 <script>
 	var agent = navigator.userAgent.toLowerCase();
 	if(agent.indexOf('chrome') < 0) { 
-		alert("이 데모 페이지는 대용량 웹 데이터 처리를 위해 Chrome 브라우저에 최적화 되어 있습니다. \n원활한 서비스 이용을 위해 Chrome 브라우저를 이용  하시기 바랍니다.");
+		alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
 	}
 
 	var managerFactory = null;
@@ -750,7 +737,7 @@
 
 	var imagePath = "/images/ko";
 	var dataInformationUrl = "/sample/persistence/json/";
-	magoStart(null, "magoContainer", null, null);
+	magoStart(null, "magoContainer", imagePath);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
 	
@@ -811,7 +798,7 @@
 					url: dataInformationUrl + projectId,
 					type: "GET",
 					dataType: "json",
-					success: function(serverData){
+					success: function(serverData) {
 						//console.log("index = " + index + ", data = " + serverData);
 						projectDataArray[index] = serverData;
 						projectDataFolderArray[index] = serverData.data_key;
@@ -839,11 +826,11 @@
 				url: dataInformationUrl + projectId,
 				type: "GET",
 				dataType: "json",
-				success: function(serverData){
+				success: function(serverData) {
 					gotoProjectAPI(managerFactory, projectId, serverData, serverData.data_key, longitude, latitude, height, duration);		
 				},
-				error:function(request,status,error){
-			        console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				error : function(request, status, error) {
+					console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 				}
 			});
 		} else {
@@ -861,11 +848,11 @@
 				url: dataInformationUrl + projectId,
 				type: "GET",
 				dataType: "json",
-				success: function(serverData){
+				success: function(serverData) {
 					gotoIssueAPI(managerFactory, projectId, serverData, serverData.data_key, issueId, issueType, longitude, latitude, height, duration);		
 				},
-				error:function(request,status,error){
-			        console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				error : function(request, status, error) {
+					console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 				}
 			});
 		} else {
@@ -880,11 +867,11 @@
 	$("#insertIssueEnableButton").click(function() {
 		if(insertIssueEnable) {
 			$("#insertIssueEnableButton").removeClass("on");
-			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
+			$("#insertIssueEnableButton").text("Please select object after clicking.");
 			insertIssueEnable = false;
 		} else {
 			$("#insertIssueEnableButton").addClass("on");
-			$("#insertIssueEnableButton").text("Issue 등록 활성화 상태");
+			$("#insertIssueEnableButton").text("Status of issue registration activation");
 			insertIssueEnable = true;
 		}
 		changeInsertIssueModeAPI(managerFactory, insertIssueEnable);
@@ -931,16 +918,16 @@
 					isInsertIssue["enable"] = true;
 					ajaxIssueList();
 				},
-				error:function(request,status,error){
+				error : function(request, status, error) {
 			        alert(JS_MESSAGE["ajax.error.message"]);
-					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			        console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 			        isInsertIssue["enable"] = true;
 				}
 			});
 			
 			// issue 등록 버튼, css, 상태를 변경
 			$("#insertIssueEnableButton").removeClass("on");
-			$("#insertIssueEnableButton").text("클릭 후 객체를 선택해 주세요.");
+			$("#insertIssueEnableButton").text("Please select object after clicking.");
 			insertIssueEnable["enable"] = false;
 			
 			changeInsertIssueStateAPI(managerFactory, 0);
@@ -950,17 +937,17 @@
 		}
 	});
 	function check() {
-		if ($("#data_key").val() == "") {
+		if ($("#data_key").val() === "") {
 			alert(JS_MESSAGE["issue.datakey.empty"]);
 			$("#data_key").focus();
 			return false;
 		}
-		if ($("#title").val() == "") {
+		if ($("#title").val() === "") {
 			alert(JS_MESSAGE["issue.title.empty"]);
 			$("#title").focus();
 			return false;
 		}
-		if ($("#contents").val() == "") {
+		if ($("#contents").val() === "") {
 			alert(JS_MESSAGE["issue.contents.empty"]);
 			$("#contents").focus();
 			return false;
@@ -982,12 +969,12 @@
 					var issueListCount = 0;
 					content = content 
 						+	"<li style=\"margin-bottom: 8px; font-size: 1em; font-weight: normal; color: #2955a6;\">"
-						+ 		"최신 Issue 10개 표시"
+						+ 		"Show up to 10 latest issues"
 						+	"</li>";
 					if(issueList == null || issueList.length == 0) {
 						content = content	
 							+ 	"<li style=\"text-align: center; padding-top:20px; height: 50px;\">"
-							+	"	Issue가 존재하지 않습니다."
+							+	"	The issue does not exist."
 							+	"</li>";
 					} else {
 						issueListCount = issueList.length;
@@ -995,9 +982,9 @@
 							var issue = issueList[i];
 							content = content 
 								+ 	"<li>"
-								+ 	"	<button type=\"button\" title=\"바로가기\""
+								+ 	"	<button type=\"button\" title=\"Shortcuts\""
 								+			"onclick=\"flyTo('" + issue.issue_id + "', '" + issue.issue_type + "', '" 
-								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">바로가기</button>"
+								+ 				issue.longitude + "', '" + issue.latitude + "', '" + issue.height + "', '2')\">Shortcuts</button>"
 								+ 	"	<div class=\"info\">"
 								+ 	"		<p class=\"title\">"
 								+ 	"			<span>" + issue.project_name + "</span>"
@@ -1020,9 +1007,8 @@
 					alert(JS_MESSAGE[msg.result]);
 				}
 			},
-			error:function(request,status,error){
-		        //alert(JS_MESSAGE["ajax.error.message"]);
-				console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			error : function(request, status, error) {
+				console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 			}
 		});
 	}
@@ -1086,8 +1072,8 @@
 	// Data 검색
 	var searchDataFlag = { "enable" : true }
 	$("#searchData").click(function() {
-		if ($.trim($("#search_value").val()) === ""){
-			alert("검색어를 입력해 주세요.");
+		if ($.trim($("#search_value").val()) === "") {
+			alert("Please enter a search word.");
 			$("#search_value").focus();
 			return false;
 		}
@@ -1101,10 +1087,10 @@
 			if(searchType === "data_name") {
 				content = content 
 				+ 	"<li>"
-				+ 	"	<button type=\"button\" title=\"바로가기\" onclick=\"localSearch('3ds.json', 'kangbukSport_del');\">바로가기</button>"
+				+ 	"	<button type=\"button\" title=\"Shortcuts\" onclick=\"gotoData('3ds.json', 'kangbukSport_del');\">Shortcuts</button>"
 				+ 	"	<div class=\"info\">"		
 				+ 	"		<p class=\"title\">"			
-				+ 	"			<span>3DS 통합 가시화</span>kangbukSport_del"
+				+ 	"			<span>3DS Project</span>kangbukSport_del"
 				+ 	"		</p>"
 				+ 	"		<ul class=\"tag\">"
 				+ 	"			<li><span class=\"t3\"></span>37.58198979</li>"
@@ -1116,15 +1102,15 @@
 			} else {
 				content = content 
 				+ 	"<li>"
-				+ 	"	<button type=\"button\" title=\"바로가기\"" 
-				+ 	"	onclick=\"gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2');\">바로가기</button>"
+				+ 	"	<button type=\"button\" title=\"Shortcuts\"" 
+				+ 	"	onclick=\"gotoIssue('3ds.json', '129', 'ISSUE_TYPE_BUGGER', '126.60779951279575,', '37.582800047391295,', '38.95831222452215', '2');\">Shortcuts</button>"
 				+ 	"	<div class=\"info\">"
 				+ 	"		<p class=\"title\">"
-				+ 	"			<span>3DS 통합 가시화</span>test"
+				+ 	"			<span>3DS Project</span>test"
 				+ 	"		</p>"
 				+ 	"		<ul class=\"tag\">"
-				+ 	"			<li><span class=\"i1\"></span>버그</li>"
-				+ 	"			<li><span class=\"t1\"></span>매우중요</li>"
+				+ 	"			<li><span class=\"i1\"></span>Bugger</li>"
+				+ 	"			<li><span class=\"t1\"></span>Very Important</li>"
 				+ 	"			<li class=\"date\">2017-08-25 14:27:42</li>"
 				+ 	"		</ul>"
 				+ 	"	</div>"
@@ -1140,18 +1126,19 @@
 		}
 	});
 	
+	// 데이터 위치로 이동
+	function gotoData(projectId, dataKey) {
+		searchDataAPI(managerFactory, projectId, dataKey);
+	}
+	
 	$("#localSearch").click(function() {
-		if ($.trim($("#localSearchDataKey").val()) === ""){
-			alert("Data Key를 입력해 주세요.");
+		if ($.trim($("#localSearchDataKey").val()) === "") {
+			alert("Please enter data key.");
 			$("#localSearchDataKey").focus();
 			return false;
 		}
 		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
 	});
-	
-	function localSearch(projectId, dataKey) {
-		searchDataAPI(managerFactory, $("#localSearchProjectId").val(), $("#localSearchDataKey").val());
-	}
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
@@ -1195,11 +1182,11 @@
 	$("#changePropertyRendering").click(function(e) {
 		var isShow = $(':radio[name="propertyRendering"]:checked').val();
 		if(isShow === undefined){
-			alert("표시/비표시 를 선택하여 주십시오..");
+			alert("Select Show / Hide.");
 			return false;
 		}
-		if ($.trim($("#propertyRenderingWord").val()) === ""){
-			alert("속성값을 입력해 주세요.");
+		if ($.trim($("#propertyRenderingWord").val()) === "") {
+			alert("Please enter property.");
 			$("#propertyRenderingWord").focus();
 			return false;
 		}
@@ -1208,20 +1195,20 @@
 	
 	// 색변경
 	$("#changeColor").click(function(e) {
-		if ($.trim($("#colorDataKey").val()) === ""){
-			alert("Data Key를 입력해 주세요.");
+		if ($.trim($("#colorDataKey").val()) === "") {
+			alert("Please enter Data Key.");
 			$("#colorDataKey").focus();
 			return false;
 		}
 		
 		var objectIds = null;
 		var colorObjectIds = $("#colorObjectIds").val();
-		if(colorObjectIds !== null && colorObjectIds !=="") objectIds = colorObjectIds.split(",");
+		if(colorObjectIds !== null && colorObjectIds !== "") objectIds = colorObjectIds.split(",");
 		changeColorAPI(managerFactory, $("#colorProjectId").val(), $("#colorDataKey").val(), objectIds, $("#colorProperty").val(), $("#updateColor").val());
 	});
 	// 색깔 변경 이력 삭제
 	$("#deleteAllChangeColor").click(function () {
-		if(confirm("삭제 하시겠습니까?")) {
+		if(confirm("Are you sure you want to delete?")) {
 			deleteAllChangeColorAPI(managerFactory);
 		}
 	});
@@ -1234,38 +1221,38 @@
 										$("#moveHeight").val(), $("#moveHeading").val(), $("#movePitch").val(), $("#moveRoll").val());
 	});
 	function changeLocationAndRotationCheck() {
-		if ($.trim($("#moveDataKey").val()) === ""){
-			alert("Data Key를 입력해 주세요.");
+		if ($.trim($("#moveDataKey").val()) === "") {
+			alert("Please enter data key.");
 			$("#moveDataKey").focus();
 			return false;
 		}
-		if ($.trim($("#moveLatitude").val()) === ""){
-			alert("위도를 입력해 주세요.");
+		if ($.trim($("#moveLatitude").val()) === "") {
+			alert("Please enter latitude.");
 			$("#moveLatitude").focus();
 			return false;
 		}
-		if ($.trim($("#moveLongitude").val()) === ""){
-			alert("경도를 입력해 주세요.");
+		if ($.trim($("#moveLongitude").val()) === "") {
+			alert("Please enter longitude.");
 			$("#moveLongitude").focus();
 			return false;
 		}
-		if ($.trim($("#moveHeight").val()) === ""){
-			alert("높이를 입력해 주세요.");
+		if ($.trim($("#moveHeight").val()) === "") {
+			alert("Please enter altitude.");
 			$("#moveHeight").focus();
 			return false;
 		}
-		if ($.trim($("#moveHeading").val()) === ""){
-			alert("heading을 입력해 주세요.");
+		if ($.trim($("#moveHeading").val()) === "") {
+			alert("Please enter heading.");
 			$("#moveHeading").focus();
 			return false;
 		}
-		if ($.trim($("#movePitch").val()) === ""){
-			alert("pitch를 입력해 주세요.");
+		if ($.trim($("#movePitch").val()) === "") {
+			alert("Please enter pitch.");
 			$("#movePitch").focus();
 			return false;
 		}
-		if ($.trim($("#moveRoll").val()) === ""){
-			alert("roll를 입력해 주세요.");
+		if ($.trim($("#moveRoll").val()) === "") {
+			alert("Please enter roll.");
 			$("#moveRoll").focus();
 			return false;
 		}
@@ -1298,9 +1285,8 @@
 						alert(JS_MESSAGE[msg.result]);
 					}
 				},
-				error:function(request,status,error){
-			        //alert(JS_MESSAGE["ajax.error.message"]);
-					console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+				error : function(request, status, error) {
+					console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 				}
 			});
 		}
@@ -1330,10 +1316,11 @@
 	}
 	// 마우스 클릭 객체 이동 모드 변경 저장
 	$("#saveObjectMoveButton").click(function () {
-		alert("준비중 입니다.");
+		alert("Comming soon");
+		return;
 		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
 		if(objectMoveMode === "2") {
-			alert("None 모드일 경우 저장할 수 없습니다.");
+			alert("Can not be saved in None mode.");
 			return;
 		}
 		saveObjectMoveAPI(managerFactory, objectMoveMode);
@@ -1341,7 +1328,7 @@
 	// 마우스 클릭 객체 이동 모드 변경 삭제
 	$("#deleteAllObjectMoveButton").click(function () {
 		var objectMoveMode = $(':radio[name="objectMoveMode"]:checked').val();
-		if(confirm("삭제 하시겠습니까?")) {
+		if(confirm("Are you sure you want to delete?")) {
 			deleteAllObjectMoveAPI(managerFactory, objectMoveMode);
 		}
 	});
@@ -1358,15 +1345,15 @@
 	function initJqueryCalendar() {
 		$( ".date" ).datepicker({ 
 			dateFormat : "yymmdd",
-			dayNames : [ "일", "월", "화", "수", "목", "금", "토" ],
-			dayNamesShort : [ "일", "월", "화", "수", "목", "금", "토" ],
-			dayNamesMin : [ "일", "월", "화", "수", "목", "금", "토" ],
-			monthNames : [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-			monthNamesShort : [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+			dayNames : [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ],
+			dayNamesShort : [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ],
+			dayNamesMin : [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" ],
+			monthNames : [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+			monthNamesShort : [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
 			prevText : "",
 			nextText : "",
 			showMonthAfterYear : true,
-			yearSuffix : "년"
+			yearSuffix : ""
 		});
 	}
 	
@@ -1432,7 +1419,7 @@
 	
 	// LOD 설정
 	$("#changeLodButton").click(function() {
-		changeLodAPI(managerFactory, $("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), null);
+		changeLodAPI(managerFactory, $("#geo_lod0").val(), $("#geo_lod1").val(), $("#geo_lod2").val(), $("#geo_lod3").val(), $("#geo_lod4").val(), $("#geo_lod5").val());
 	});
 	// Lighting 설정
 	$("#changeLightingButton").click(function() {
@@ -1463,14 +1450,12 @@
 		var dataCount = 0;
 		$("input[name='" + checkboxName + "']:checked").each(function(index) {
 			var dataName = $(this).val();
-			if (!isDataExistAPI(CODE.PROJECT_ID_PREFIX + dataName))
-			{
+			if (!isDataExistAPI(CODE.PROJECT_ID_PREFIX + dataName)) {
 				$.ajax({
 					url      : dataInformationUrl + dataName,
 					type     : "GET",
 					dataType : "json",
-					success  : function(serverData)
-					{
+					success  : function(serverData) {
 						projectIdArray[index] = dataName;
 						projectDataArray[index] = serverData;
 						projectDataFolderArray[index] = serverData.data_key;
@@ -1480,10 +1465,8 @@
 						}
 						dataCount++;
 					},
-					error: function(request, status, error)
-					{
-						//alert(JS_MESSAGE["ajax.error.message"]);
-						console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+					error: function(request, status, error) {
+						console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 					}
 				});
 			} else {
@@ -1552,7 +1535,7 @@
 	function showApiResult(apiName, result) {
 		if(apiName === "searchData") {
 			if(result === "-1") {
-				alert(" 아직 로딩하지 않은 정보 입니다. 로딩 후 검색해 주십시오. ");
+				alert(" Information that has not yet been loaded. Please search after loading. ");
 			}
 		}
 	}
