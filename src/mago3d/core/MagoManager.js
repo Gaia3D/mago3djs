@@ -4048,10 +4048,12 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				if (this.colorSC === undefined)
 				{ this.colorSC = new Color(); }
 				this.colorSC.setRGB(0.8, 1.0, 1.0);
-				this.renderBoundingBoxesNodes(gl, selectedNodesArray, this.colorSC);
+				this.renderBoundingBoxesNodes(gl, selectedNodesArray, this.colorSC); // old.
 				
 				// new. Render the silhouette by lod3 or lod4 or lod5 mesh***
 				//this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader);
+				// 1rst, render mask.***
+				
 			}
 			
 			// 3) now render bboxes.*******************************************************************************************************************
