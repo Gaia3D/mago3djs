@@ -275,8 +275,10 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
  * @param {string} lod1DistInMeters
  * @param {string} lod2DistInMeters
  * @param {string} lod3DistInMeters
+ * @param {string} lod4DistInMeters
+ * @param {string} lod5DistInMeters
  */
-function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters)
+function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters, lod4DistInMeters, lod5DistInMeters)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -285,6 +287,8 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
 	api.setLod1DistInMeters(lod1DistInMeters);
 	api.setLod2DistInMeters(lod2DistInMeters);
 	api.setLod3DistInMeters(lod3DistInMeters);
+	api.setLod4DistInMeters(lod4DistInMeters);
+	api.setLod5DistInMeters(lod5DistInMeters);
 	managerFactoryInstance.callAPI(api);
 }
 

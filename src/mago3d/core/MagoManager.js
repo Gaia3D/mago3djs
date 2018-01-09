@@ -6794,22 +6794,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLod")
 	{
-		var distAux;
-		distAux = api.getLod0DistInMeters();
-		if(distAux !== null && distAux !==undefined)
-			this.magoPolicy.setLod0DistInMeters(distAux);
-		
-		distAux = api.getLod1DistInMeters();
-		if(distAux !== null && distAux !==undefined)
-		this.magoPolicy.setLod1DistInMeters(distAux);
-	
-		distAux = api.getLod2DistInMeters();
-		if(distAux !== null && distAux !==undefined)
-		this.magoPolicy.setLod2DistInMeters(distAux);
-	
-		distAux = api.getLod3DistInMeters();
-		if(distAux !== null && distAux !==undefined)
-		this.magoPolicy.setLod3DistInMeters(distAux);
+		LodAPI.changeLod(api, this);
 	}
 	else if (apiName === "changeLighting")
 	{

@@ -84,6 +84,8 @@ function API(apiName)
 	this.lod1DistInMeters = null;
 	this.lod2DistInMeters = null;
 	this.lod3DistInMeters = null;
+	this.lod4DistInMeters = null;
+	this.lod5DistInMeters = null;
 	
 	// Lighting
 	this.ambientReflectionCoef = null;
@@ -381,6 +383,22 @@ API.prototype.getLod3DistInMeters = function()
 API.prototype.setLod3DistInMeters = function(lod3DistInMeters) 
 {
 	this.lod3DistInMeters = lod3DistInMeters;
+};
+API.prototype.getLod4DistInMeters = function() 
+{
+	return this.lod4DistInMeters;
+};
+API.prototype.setLod4DistInMeters = function(lod4DistInMeters) 
+{
+	this.lod4DistInMeters = lod4DistInMeters;
+};
+API.prototype.getLod5DistInMeters = function() 
+{
+	return this.lod5DistInMeters;
+};
+API.prototype.setLod5DistInMeters = function(lod5DistInMeters) 
+{
+	this.lod5DistInMeters = lod5DistInMeters;
 };
 
 API.prototype.getAmbientReflectionCoef = function() 
