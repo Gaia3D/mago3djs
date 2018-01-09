@@ -13,32 +13,14 @@
 			"children": [],
 			"data_group_id": 10,
 			"data_group_name": "COLLADA",
-			"data_id": 1067,
-			"data_key": "CU Macky",
-			"data_name": "CU Macky",
-			"heading": 219,
-			"height": 50,
-			"latitude": 37.569019,
-			"longitude": 126.798852,
-			"pitch": 0,
-			"roll": 0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "COLLADA"
-			},
-			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_id": 1066,
 			"data_key": "Lara_Croft",
 			"data_name": "Lara_Croft",
 			"heading": 219,
-			"height": 47,
+			"height": 55,
 			"latitude": 37.566519,
 			"longitude": 126.798852,
-			"pitch": -90,
+			"pitch": 0,
 			"roll": 0
 		},
 		{
@@ -56,7 +38,7 @@
 			"height": 50,
 			"latitude": 37.567519,
 			"longitude": 126.799852,
-			"pitch": -90,
+			"pitch": 0,
 			"roll": 0
 		},
 		{
@@ -92,7 +74,7 @@
 			"height": 48,
 			"latitude": 37.567519,
 			"longitude": 126.796852,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
@@ -110,7 +92,7 @@
 			"height": 51,
 			"latitude": 37.568219,
 			"longitude": 126.798052,
-			"pitch": -96,
+			"pitch": 0,
 			"roll": 0
 		},
 		{
@@ -143,10 +125,10 @@
 			"data_key": "buggy",
 			"data_name": "buggy",
 			"heading": 219,
-			"height": 60,
+			"height": 90,
 			"latitude": 37.567219,
 			"longitude": 126.799052,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		}
 	],

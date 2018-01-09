@@ -1116,6 +1116,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 		var neoBuilding;
 		var node;
+		var octree;
 		// lod 0 & lod 1.
 		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
 		this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
@@ -1183,8 +1184,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			// inverse "for" because delete 1rst farest.***
 			node = this.visibleObjControlerNodes.currentVisibles3[i];
 			neoBuilding = node.data.neoBuilding;
-			if(neoBuilding && neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
-					var hola = 0;
 				
 			if (!this.processQueue.nodesToDeleteLessThanLod3Map.has(node))
 			{
@@ -1735,6 +1734,55 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 					this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader);
 				}
 			}
+		}
+		
+		// now, lod3, lod4 & lod5.***
+		var nodesLODXCount = visibleObjControlerNodes.currentVisibles3.length;
+		for (var i=0; i<nodesLODXCount; i++)
+		{
+			node = visibleObjControlerNodes.currentVisibles3[i];
+			neoBuilding = node.data.neoBuilding;
+			var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
+			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+			gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+			var currentLod = neoBuilding.currentLod;
+			
+			/*
+			currentVisibleOctreesControler = neoBuilding.currentVisibleOctreesControler;
+			if (currentVisibleOctreesControler)
+			{
+
+				// LOD2.***
+				gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
+				currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
+				for (var j=0; j<currentVisibleLowestOctCount; j++)
+				{
+					lowestOctree = currentVisibleOctreesControler.currentVisibles2[j];
+
+					if (lowestOctree.lego === undefined) 
+					{ continue; }
+
+					if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY) 
+					{ continue; }
+
+					if (lowestOctree.lego.fileLoadState === 2) 
+					{ continue; }
+
+					this.colorAux = this.selectionColor.getAvailableColor(this.colorAux);
+					idxKey = this.selectionColor.decodeColor3(this.colorAux.r, this.colorAux.g, this.colorAux.b);
+					this.selectionCandidates.setCandidates(idxKey, undefined, lowestOctree, neoBuilding, node);
+				
+					gl.uniform1i(currentShader.hasTexture_loc, false); //.***
+					gl.uniform4fv(currentShader.color4Aux_loc, [this.colorAux.r/255.0, this.colorAux.g/255.0, this.colorAux.b/255.0, 1.0]);
+
+					gl.uniform1i(currentShader.hasAditionalMov_loc, false);
+					gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+
+					this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader);
+				}
+			}
+			*/
 		}
 
 		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
@@ -2479,7 +2527,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
 	{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController(); }	
 
-	if (lod === 0 || lod === 1 || lod === 2)
+	//if (lod === 0 || lod === 1 || lod === 2)
 	{
 		var distLod0 = this.magoPolicy.getLod0DistInMeters();
 		var distLod1 = this.magoPolicy.getLod1DistInMeters();
@@ -2527,7 +2575,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		if (!find) 
 		{
 			// if the building is far to camera, then delete it.
-			if (neoBuilding.distToCam > 10)
+			if (neoBuilding.distToCam > 150)
 			{ this.processQueue.putNodeToDelete(node, 0); }
 			return false;
 		}
@@ -2536,12 +2584,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 			this.processQueue.eraseNodeToDelete(node);
 		}
 	}
-	else
-	{
-		// never enter here...
-		neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-		neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(neoBuilding.currentVisibleOctreesControler.currentVisibles2); // old.
-	}
+	//else
+	//{
+	//	// never enter here...
+	//	neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
+	//	neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(neoBuilding.currentVisibleOctreesControler.currentVisibles2); // old.
+	//}
 	
 	// LOD0 & LOD1
 	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
@@ -2600,6 +2648,30 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		}
 	}
 	currentVisibleOctrees.length = 0;
+	
+	// check if all lod2-octrees is ready to render. 
+	// If lod2-octrees is no ready to render, then render lod3.***
+	var allLod2OctreesIsReady = true;
+	var octree;
+	var visibleOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
+	if(visibleOctreesCount > 6)
+		visibleOctreesCount = 6;
+	for(var j=0; j<visibleOctreesCount; j++)
+	{
+		octree = neoBuilding.currentVisibleOctreesControler.currentVisibles2[j];
+		if(octree.lego === undefined || octree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			allLod2OctreesIsReady = false;
+			break;
+		}
+	}
+	
+	if(!allLod2OctreesIsReady)
+	{
+		// must render lod3.***
+		this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+	}
+				
 	return true;
 };
 
@@ -3970,13 +4042,16 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 					}
 				}
 				
-				// render bbox for neoBuildingSelected.
+				// render bbox for neoBuildingSelected. // old.***
 				var selectedNodesArray = [];
 				selectedNodesArray.push(this.nodeSelected);
 				if (this.colorSC === undefined)
 				{ this.colorSC = new Color(); }
 				this.colorSC.setRGB(0.8, 1.0, 1.0);
 				this.renderBoundingBoxesNodes(gl, selectedNodesArray, this.colorSC);
+				
+				// new. Render the silhouette by lod3 or lod4 or lod5 mesh***
+				//this.renderer.renderLodBuildingColorSelection(gl, lowestOctree.lego, this, currentShader);
 			}
 			
 			// 3) now render bboxes.*******************************************************************************************************************
