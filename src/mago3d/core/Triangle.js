@@ -88,6 +88,18 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2)
 /**
  * 어떤 일을 하고 있습니까?
  */
+Triangle.prototype.invertSense = function() 
+{
+	var vertexAux = this.vertex1;
+	this.vertex1 = this.vertex2;
+	this.vertex2 = vertexAux;
+	
+	this.calculatePlaneNormal();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Triangle.prototype.calculatePlaneNormal = function() 
 {
 	if (this.normal === undefined)

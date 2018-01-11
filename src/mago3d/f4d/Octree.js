@@ -99,8 +99,8 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 	}
 	
 	this.legoDataArrayBuffer = undefined;
-	if(this.centerPos)
-		this.centerPos.deleteObjects();
+	if (this.centerPos)
+	{ this.centerPos.deleteObjects(); }
 	this.centerPos = undefined;
 	this.half_dx = undefined; // half width.***
 	this.half_dy = undefined; // half length.***

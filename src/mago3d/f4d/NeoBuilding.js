@@ -383,10 +383,10 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	if (this.currentLod === 3)
 	{
 		skinLego = this.lodMeshesArray[0];
-		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesArray[1];
-			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
 				skinLego = this.lodMeshesArray[2];
 			}
@@ -395,10 +395,10 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	else if (this.currentLod === 4)
 	{
 		skinLego = this.lodMeshesArray[1];
-		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesArray[2];
-			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
 				skinLego = this.lodMeshesArray[0];
 			}
@@ -407,10 +407,10 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	else if (this.currentLod === 5)
 	{
 		skinLego = this.lodMeshesArray[2];
-		if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesArray[1];
-			if(skinLego && skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
 				skinLego = this.lodMeshesArray[0];
 			}
@@ -473,14 +473,14 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 	}
 	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '1' )
 	{
-		if(neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
+		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
 			// provisionally use materialId as textureId.
 			var textureId = neoReference.materialId;
 			texture = this.texturesLoaded[textureId];
 			neoReference.texture = texture;
 			
-			if(texture.texId === undefined && texture.textureImageFileName !== "")
+			if (texture.texId === undefined && texture.textureImageFileName !== "")
 			{
 				if (magoManager.backGround_fileReadings_count > 10) 
 				{ return undefined; }

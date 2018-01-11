@@ -22,6 +22,15 @@ TriPolyhedron.prototype.newTriSurface = function()
 	return triSurface;
 };
 
+TriPolyhedron.prototype.invertTrianglesSenses = function() 
+{
+	var triSurfacesCount = this.triSurfacesArray.length;
+	for(var i=0; i<triSurfacesCount; i++)
+	{
+		this.triSurfacesArray[i].invertTrianglesSenses();
+	}
+};
+
 TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey) 
 {
 	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
@@ -92,20 +101,20 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			// colors.***
 			if (vertex0.color4 === undefined) 
 			{
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
 
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
 
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
-				colorsArray.push(255);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
+				colorsArray.push(200);
 			}
 			else 
 			{
@@ -145,8 +154,6 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 		resultVBOVertexIdxCacheKey.colVboDataArray[i] = colorsArray[i];
 	}
 
-	//resultVBOVertexIdxCacheKey.norVboDataArray = Int8Array.from(normalsArray);
-	//resultVBOVertexIdxCacheKey.colVboDataArray = Uint8Array.from(colorsArray);
 	positionArray = undefined;
 	normalsArray = undefined;
 	colorsArray = undefined;

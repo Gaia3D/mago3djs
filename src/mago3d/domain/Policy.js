@@ -54,18 +54,18 @@ var Policy = function()
 	
 	// LOD1
 	this.lod0DistInMeters = 15;
-	this.lod1DistInMeters = 60;
+	this.lod1DistInMeters = 50;
 	this.lod2DistInMeters = 90;
 	this.lod3DistInMeters = 200;
 	this.lod4DistInMeters = 1000;
 	this.lod5DistInMeters = 50000;
 	
 	// Lighting
-	this.ambientReflectionCoef = 0.2;
-	this.diffuseReflectionCoef = 1.0;
-	this.specularReflectionCoef = 0.7;
+	this.ambientReflectionCoef = 0.5; // 0.2.
+	this.diffuseReflectionCoef = 0.8; // 1.0
+	this.specularReflectionCoef = 0.6; // 0.7
 	this.ambientColor = null;
-	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
+	this.specularColor = new Float32Array([0.6, 0.6, 0.6]);
 	
 	this.ssaoRadius = 0.15;
 };
