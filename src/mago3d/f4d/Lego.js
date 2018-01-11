@@ -37,6 +37,21 @@ Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 /**
  * F4D Lego 자료를 읽는다
  * 
+ */
+Lego.prototype.isReadyToRender = function()
+{
+	if(this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		return false;
+	
+	if(this.texture === undefined || this.texture.texId === undefined)
+		return false;
+	
+	return true;
+};
+
+/**
+ * F4D Lego 자료를 읽는다
+ * 
  * @param {any} gl 
  * @param {any} readWriter 
  * @param {any} dataArraybuffer 

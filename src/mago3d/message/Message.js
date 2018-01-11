@@ -1,12 +1,12 @@
 var JS_MESSAGE = new Object();
 
-JS_MESSAGE["create"] = "Created.";
-JS_MESSAGE["insert"] = "Registered.";
-JS_MESSAGE["update"] = "Modified.";
-JS_MESSAGE["delete"] = "Deleted.";
-JS_MESSAGE["success"] = "Success!";
-JS_MESSAGE["apply"] = "Applied.";
-JS_MESSAGE["upload"] = "Uploading is in progress.";
+JS_MESSAGE.create = "Created.";
+JS_MESSAGE.insert = "Registered.";
+JS_MESSAGE.update = "Modified.";
+JS_MESSAGE.delete = "Deleted.";
+JS_MESSAGE.success = "Success!";
+JS_MESSAGE.apply = "Applied.";
+JS_MESSAGE.upload = "Uploading is in progress.";
 JS_MESSAGE["delete.confirm"] = "Are you sure?";
 JS_MESSAGE["check.value.required"] = "No items selected.";
 
@@ -19,7 +19,7 @@ JS_MESSAGE["usersession.grant.invalid"] = "The permissions are invalid.";
 
 // 데이터
 JS_MESSAGE["data.key.empty"] = "Please enter Key.";
-JS_MESSAGE["data.key.duplication_value.check"] = "Please check the duplicate key."
+JS_MESSAGE["data.key.duplication_value.check"] = "Please check the duplicate key.";
 JS_MESSAGE["data.key.duplication_value.already"] = "Key in use, please choose another key.";
 JS_MESSAGE["data.project.id.empty"] = "Please select a project.";
 JS_MESSAGE["data.latitude.empty"] = "Please enter latitude.";

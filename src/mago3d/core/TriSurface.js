@@ -20,3 +20,12 @@ TriSurface.prototype.newTriangle = function()
 	this.trianglesArray.push(triangle);
 	return triangle;
 };
+
+TriSurface.prototype.invertTrianglesSenses = function() 
+{
+	var trianglesCount = this.trianglesArray.length;
+	for(var i=0; i<trianglesCount; i++)
+	{
+		this.trianglesArray[i].invertSense();
+	}
+};

@@ -180,7 +180,8 @@ var PostFxShader = function(gl)
 	this.program;
 	this.shader_vertex;
 	this.shader_fragment;
-
+	
+	/*
 	// attributes.***
 	this.position3_loc;
 	this.color3_loc;
@@ -226,6 +227,7 @@ var PostFxShader = function(gl)
 	this.useRefTransfMatrix_loc;
 	this.useTexture_loc;
 	this.invertNormals_loc;
+	*/
 };
 
 /**
@@ -305,6 +307,10 @@ var PostFxShadersManager = function()
 	this.gl;
 	this.pFx_shaders_array = []; // old.***
 	this.shadersCache = {};
+	
+	// preCreated shaders.***
+	this.modelRefShader;
+	this.modelRefSilhouetteShader;
 };
 
 /**
@@ -354,7 +360,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl)
 
 	// Now, create shaders for modelReference geometries.****
 	this.createRenderDepthShaderModelRef(gl); // 3.***
-	this.createSsaoShaderModelRef(gl); // 4.***
+	this.modelRefShader = this.createSsaoShaderModelRef(gl); // 4.***
 	//this.createBlurShader_ModelRef(gl); // 5.***
 
 	this.createColorSelectionShaderModelRef(gl);// 5.***
@@ -370,7 +376,23 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl)
 	this.createSsaoShaderBox(gl); // 12.***
 
 	this.createPngImageShader(gl); // 13.***
-	this.createSilhouetteShaderModelRef(gl); // 14.***
+	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+PostFxShadersManager.prototype.getModelRefShader = function() 
+{
+	return this.modelRefShader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+PostFxShadersManager.prototype.getModelRefSilhouetteShader = function() 
+{
+	return this.modelRefSilhouetteShader;
 };
 
 /**
@@ -508,7 +530,7 @@ PostFxShadersManager.prototype.createRenderDepthShader = function(gl)
 PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) 
 {
 	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
+	this.pFx_shaders_array.push(undefined); // old.***
 
 	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
 	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
@@ -577,7 +599,8 @@ PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl)
 	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
 	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
 	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
-
+	
+	return shader;
 };
 
 /**
@@ -755,6 +778,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl)
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
 	// ssao uniforms.**********************************************************************
+	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 
@@ -769,6 +793,7 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl)
 
 	//shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
+	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
 
 	// uniform samplers.***
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
@@ -780,6 +805,10 @@ PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl)
 	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
 	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
 	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius"); 
+	
+	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
+	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
+	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
 };
 
 /**
@@ -1149,7 +1178,7 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 {
 	// 14.***
 	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
+	this.pFx_shaders_array.push(undefined);
 
 	var ssao_vs_source = ShaderSource.SilhouetteVS;
 	var ssao_fs_source = ShaderSource.SilhouetteFS;
@@ -1183,6 +1212,8 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 	shader.screenSize_loc = gl.getUniformLocation(shader.program, "screenSize");
 	shader.ProjectionMatrix_loc = gl.getUniformLocation(shader.program, "ProjectionMatrix");
 	shader.ModelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewMatrixRelToEye");
+	
+	return shader;
 };
 
 
