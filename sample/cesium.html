@@ -928,7 +928,7 @@
 			// issue 등록 버튼, css, 상태를 변경
 			$("#insertIssueEnableButton").removeClass("on");
 			$("#insertIssueEnableButton").text("Please select object after clicking.");
-			insertIssueEnable["enable"] = false;
+			insertIssueEnable = false;
 			
 			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
@@ -963,7 +963,7 @@
 			data: info,
 			dataType: "json",
 			success: function(msg){
-				if(msg.result == "success") {
+				if(msg.result === "success") {
 					var issueList = msg.issueList;
 					var content = "";
 					var issueListCount = 0;
@@ -1273,7 +1273,7 @@
 				data: info,
 				dataType: "json",
 				success: function(msg){
-					if(msg.result == "success") {
+					if(msg.result === "success") {
 						var issueList = msg.issueList;
 						if(issueList != null && issueList.length > 0) {
 							for(i=0; i<issueList.length; i++ ) {
@@ -1404,17 +1404,6 @@
 				$("#geo_specular_reflection_coef" ).val(ui.value);
 			}
 		});
-		
-		/* $('[name="geo_ambient_color"]').paletteColorPicker({
-			clear_btn: 'last',
-			//position: 'downside',
-			close_all_but_this: true // Default is false
-		});
-		$('[name="geo_specular_color"]').paletteColorPicker({
-			clear_btn: 'last',
-			//position: 'downside',
-			close_all_but_this: true // Default is false
-		}); */
 	}
 	
 	// LOD 설정
