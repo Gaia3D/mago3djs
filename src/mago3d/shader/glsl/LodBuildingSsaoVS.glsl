@@ -24,6 +24,7 @@ varying vec2 vTexCoord;
 varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
 varying vec4 vcolor4;
+varying vec3 vertexPos;
 
 void main()
 {	
@@ -33,7 +34,8 @@ void main()
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
-   
+	
+	vertexPos = vec3(modelViewMatrixRelToEye * pos4);
     vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);
     vLightWeighting = vec3(1.0, 1.0, 1.0);
     uAmbientColor = vec3(0.8, 0.8, 0.8);

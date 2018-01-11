@@ -1053,8 +1053,8 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 						texture.textureTypeName = textureTypeName;
 						texture.textureImageFileName = textureImageFileName;
 						
-						if(neoBuilding.texturesLoaded === undefined)
-							neoBuilding.texturesLoaded = [];
+						if (neoBuilding.texturesLoaded === undefined)
+						{ neoBuilding.texturesLoaded = []; }
 						
 						neoBuilding.texturesLoaded.push(texture);
 					}

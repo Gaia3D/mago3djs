@@ -210,7 +210,8 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(e
 				//}
 				isExterior = false;
 			}
-			else{
+			else 
+			{
 				isExterior = true;
 			}
 		}
@@ -490,8 +491,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 			
-			if(neoRef.objectId === "20046")
-					var hola = 0;
+			if (neoRef.objectId === "20046")
+			{ var hola = 0; }
 			
 			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
@@ -654,7 +655,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			neoRef.materialId = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			if (neoRef.materialId === -1)
 			{ neoRef.hasTexture = false; }
-			else { 
+			else 
+			{ 
 				neoRef.hasTexture = true; 
 			}
 

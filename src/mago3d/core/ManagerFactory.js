@@ -319,7 +319,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var DEFALUT_IMAGE = "ESRI World Imagery";
 		var DEFALUT_TERRAIN = "STK World Terrain meshes";
 		// WGS84 Ellipsoide
-		if(MagoConfig.getPolicy().geo_init_default_terrain !== null && MagoConfig.getPolicy().geo_init_default_terrain !== "") {
+		if (MagoConfig.getPolicy().geo_init_default_terrain !== null && MagoConfig.getPolicy().geo_init_default_terrain !== "") 
+		{
 			DEFALUT_TERRAIN = MagoConfig.getPolicy().geo_init_default_terrain;
 		}
 		
@@ -400,7 +401,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
 		//viewer.camera.frustum.near = 0.1;
-		if(MagoConfig.getPolicy().geo_init_default_fov > 0) {
+		if (MagoConfig.getPolicy().geo_init_default_fov > 0) 
+		{
 			viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE * MagoConfig.getPolicy().geo_init_default_fov;
 		}
 
