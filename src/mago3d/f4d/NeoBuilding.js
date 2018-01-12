@@ -84,6 +84,7 @@ NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId)
  */
 NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx) 
 {
+	// function called by "NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned".***
 	if (this.motherNeoReferencesArray === undefined)
 	{ this.motherNeoReferencesArray = []; }
 
@@ -129,7 +130,10 @@ NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManag
 {
 	// 1rst, clear this.motherNeoReferencesMap.
 	if (this.motherNeoReferencesMap)
-	{ this.motherNeoReferencesMap.clear(); }
+	{ 
+		this.motherNeoReferencesMap.clear(); 
+		this.motherNeoReferencesMap = undefined;
+	}
 	
 	var blocksCount = this.motherBlocksArray.length;
 	for (var i=0; i<blocksCount; i++)
@@ -379,8 +383,8 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.getCurrentSkin = function() 
 {
-	if(this.lodMeshesArray === undefined)
-		return undefined;
+	if (this.lodMeshesArray === undefined)
+	{ return undefined; }
 	
 	var skinLego;
 	if (this.currentLod === 3)

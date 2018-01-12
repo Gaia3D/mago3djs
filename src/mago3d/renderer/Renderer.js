@@ -267,6 +267,9 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		if (neoBuilding === undefined)
 		{ continue; }
 	
+		if (neoBuilding.buildingId ==="BAR POOL ROOM")
+		{ var hola = 0; }
+	
 		if (neoBuilding.lodMeshesArray === undefined)
 		{ continue; }
 		

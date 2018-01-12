@@ -86,13 +86,13 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_key": "BAR_POOL_ROOM",
-			"data_name": "BAR_POOL_ROOM",
+			"data_key": "BAR POOL ROOM",
+			"data_name": "BAR POOL ROOM",
 			"heading": 219,
-			"height": 32,
+			"height": 42,
 			"latitude": 37.567219,
 			"longitude": 126.798052,
-			"pitch": 0,
+			"pitch": 90,
 			"roll": 0
 		},
 		{
