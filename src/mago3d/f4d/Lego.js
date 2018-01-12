@@ -40,11 +40,11 @@ Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
  */
 Lego.prototype.isReadyToRender = function()
 {
-	if(this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-		return false;
+	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+	{ return false; }
 	
-	if(this.texture === undefined || this.texture.texId === undefined)
-		return false;
+	if (this.texture === undefined || this.texture.texId === undefined)
+	{ return false; }
 	
 	return true;
 };

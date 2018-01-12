@@ -526,8 +526,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			if (!vboViCacheKey.isReadyFaces(gl, magoManager.vboMemoryManager))
 			{ succesfullyGpuDataBinded = false; }
 		}
-		
-		
 
 		// Pendent to load the block's lego.***
 	}
