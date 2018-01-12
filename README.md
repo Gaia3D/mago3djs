@@ -84,9 +84,6 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
     "children" : [
     ],
     //위치 정보 영역
-    "data_group_id" : 0,
-    "data_group_name" : "데이터 그룹명",
-    "data_id" : 0,
     "data_key" : "프로젝트명",
     "data_name" : "프로젝트명"
 }</code></pre>
@@ -103,9 +100,6 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
      },
      "children" : [
      ],
-     "data_group_id" : 0,
-     "data_group_name" : "데이터 그룹명",
-     "data_id" : 0,
      "data_key" : "고유 식별자",
      "data_name" : "데이터 이름",
      "latitude" : 위도 입력,
@@ -231,9 +225,6 @@ Add two configuration files. (data.json, policy.json)
     "children" : [
     ],
     //Location information area
-    "data_group_id" : 0,
-    "data_group_name" : "Data group name",
-    "data_id" : 0,
     "data_key" : "Project name",
     "data_name" : "Project name"
 }</code></pre>
@@ -250,9 +241,6 @@ Add two configuration files. (data.json, policy.json)
      },
      "children" : [
      ],
-     "data_group_id" : 0,
-     "data_group_name" : "Data group name",
-     "data_id" : 0,
      "data_key" : "Unique identifier",
      "data_name" : "Data name",
      "latitude" : Enter latitude,
@@ -379,9 +367,6 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
     "children" : [
     ],
     //位置情報領域
-    "data_group_id" : 0,
-    "data_group_name" : "データグループ名",
-    "data_id" : 0,
     "data_key" : "プロジェクト名",
     "data_name" : "プロジェクト名"
 }</code></pre>
@@ -398,9 +383,6 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
      },
      "children" : [
      ],
-     "data_group_id" : 0,
-     "data_group_name" : "データグループ名",
-     "data_id" : 0,
      "data_key" : "一意の識別子",
      "data_name" : "データ名",
      "latitude" : 緯度の入力,

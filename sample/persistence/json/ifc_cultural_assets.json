@@ -11,9 +11,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "IFC",
-			"data_id": 999,
 			"data_key": "ByeolMaJeolDoSa",
 			"data_name": "병마 절도사",
 			"heading": 0,
@@ -24,9 +21,9 @@
 			"roll": 0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "ifc_cultural_assets",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  	
 	"data_key": "ifc_cultural_assets",
 	"data_name": "ifc_cultural_assets"
 }

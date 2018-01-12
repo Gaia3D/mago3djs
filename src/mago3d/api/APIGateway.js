@@ -2,13 +2,13 @@
 'use strict';
 
 /**
- * 화면단 UI와 연동 되는 API. APIGateWay 혹은 API 클래스로 클래스명 수정 예정
+ * An API that interacts with the on-screen UI. Class name to be modified by APIGateWay or API class
  * @class MagoFacade
  */
 /**
  * mago3d 활성화/비활성화
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = 활성화, false = 비활성화
+ * @param {boolean} isShow true = show, false = hide
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
@@ -20,9 +20,9 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 };
 
 /**
- * Label 표시/비표시
+ * Label show/hide
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = 표시, false = 비표시
+ * @param {boolean} isShow true = show, false = hide
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
@@ -34,9 +34,9 @@ function changeLabelAPI(managerFactoryInstance, isShow)
 }
 
 /**
- * boundingBox 표시/비표시
+ * boundingBox show/hide
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = 활성화, false = 비활성화
+ * @param {boolean} isShow true = show, false = hide
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
