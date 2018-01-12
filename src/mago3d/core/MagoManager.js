@@ -6543,12 +6543,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				node.data.buildingSeed = buildingSeed;
 				resultPhysicalNodesArray.push(node);
 			}
-			else 
-			{
-				var hola = 0;
-			}
-			
-			node.data.isMain = attributes.isMain; // delete this.***
 		}
 
 		if (longitude && latitude)
@@ -6691,7 +6685,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 		for (var j=0; j<nodesCount; j++)
 		{
 			node = nodesArray[j];
-			if (node.data.isMain)
+			if (node.data.attributes && node.data.attributes.isMain)
 			{
 				buildingSeed = node.data.buildingSeed;
 				if (buildingSeed)
