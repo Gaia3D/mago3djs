@@ -61,8 +61,8 @@ var Policy = function()
 	this.lod5DistInMeters = 50000;
 	
 	// Lighting
-	this.ambientReflectionCoef = 0.5; // 0.2.
-	this.diffuseReflectionCoef = 0.8; // 1.0
+	this.ambientReflectionCoef = 0.45; // 0.2.
+	this.diffuseReflectionCoef = 0.75; // 1.0
 	this.specularReflectionCoef = 0.6; // 0.7
 	this.ambientColor = null;
 	this.specularColor = new Float32Array([0.6, 0.6, 0.6]);

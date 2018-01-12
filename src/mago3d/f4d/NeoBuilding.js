@@ -379,6 +379,9 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.getCurrentSkin = function() 
 {
+	if(this.lodMeshesArray === undefined)
+		return undefined;
+	
 	var skinLego;
 	if (this.currentLod === 3)
 	{

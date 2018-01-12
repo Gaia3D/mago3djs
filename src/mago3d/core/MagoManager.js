@@ -1111,7 +1111,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 				
 			}
 			
-			if(this.isFirstFrustum())
+			if (this.isFirstFrustum())
 			{
 				gl.clearStencil(0); // provisionally here.***
 				gl.clear(gl.STENCIL_BUFFER_BIT);
@@ -1763,8 +1763,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			
 			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
 			var skinLod = neoBuilding.getCurrentSkin();
-			if(skinLod === undefined)
-				continue;
+			if (skinLod === undefined)
+			{ continue; }
 		
 			if (skinLod.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
 			{ continue; }
@@ -4072,7 +4072,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				var maxSizeToRender = 0.0;
 				var refMatrixIdxKey = 0;
 				var skinLego = neoBuilding.getCurrentSkin();
-				if(skinLego !== undefined)
+				if (skinLego !== undefined)
 				{
 					// do as the "getSelectedObjectPicking".**********************************************************
 					currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
@@ -6548,7 +6548,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				var hola = 0;
 			}
 			
-			node.data.isMain = attributes.isMain;
+			node.data.isMain = attributes.isMain; // delete this.***
 		}
 
 		if (longitude && latitude)

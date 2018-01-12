@@ -24,7 +24,7 @@ TriSurface.prototype.newTriangle = function()
 TriSurface.prototype.invertTrianglesSenses = function() 
 {
 	var trianglesCount = this.trianglesArray.length;
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		this.trianglesArray[i].invertSense();
 	}
