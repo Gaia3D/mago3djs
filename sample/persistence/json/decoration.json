@@ -12,9 +12,6 @@
 			 },
 			 "children" : [
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_2DOCK",
 			 "data_name" : "decoration_2DOCK",
 			 "heading" : 181.5,
@@ -32,9 +29,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_Drill_Ship_7000m_center",
 			 "data_name" : "decoration_Drill_Ship_7000m_center",
 			 "heading" : 7.5,
@@ -52,9 +46,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_Goliath",
 			 "data_name" : "decoration_Goliath",
 			 "heading" : 0.0,
@@ -72,9 +63,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_LLC_30TON_NO23_DOWN",
 			 "data_name" : "decoration_LLC_30TON_NO23_DOWN",
 			 "heading" : 94.5,
@@ -92,9 +80,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_LLC_30TON_NO21_UP",
 			 "data_name" : "decoration_LLC_30TON_NO21_UP",
 			 "heading" : 94.5,
@@ -112,9 +97,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_PipeFactory",
 			 "data_name" : "decoration_PipeFactory",
 			 "heading" : 1.0,
@@ -132,9 +114,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_supportOffice",
 			 "data_name" : "decoration_supportOffice",
 			 "heading" : 4.5,
@@ -152,9 +131,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_TTC_20Ton_No48_UP",
 			 "data_name" : "decoration_TTC_20Ton_No48_UP",
 			 "heading" : 97.5,
@@ -172,9 +148,6 @@
 			 "children" : [
 			 
 			 ],
-			 "data_group_id" : 0,
-			 "data_group_name" : "temporary",
-			 "data_id" : 0,
 			 "data_key" : "decoration_WeldingMachine_Blue",
 			 "data_name" : "decoration_WeldingMachine_Blue",
 			 "heading" : 0.0,
@@ -185,9 +158,9 @@
 			   "roll" : 0.0
 		}
 	],
-	"data_group_id" : 0,
-	 "data_group_name" : "temporary",
-	 "data_id" : 0,
-	 "data_key" : "decoration",
-	 "data_name" : "decoration"
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  	
+	"data_key" : "decoration",
+	"data_name" : "decoration"
 }

@@ -11,9 +11,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1066,
 			"data_key": "Lara_Croft",
 			"data_name": "Lara_Croft",
 			"heading": 219,
@@ -29,9 +26,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1069,
 			"data_key": "ED-209",
 			"data_name": "ED-209",
 			"heading": 42,
@@ -47,9 +41,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1062,
 			"data_key": "2_cylinder_engine",
 			"data_name": "2_cylinder_engine",
 			"heading": 228,
@@ -65,9 +56,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1065,
 			"data_key": "Vulture2",
 			"data_name": "Vulture2",
 			"heading": 219,
@@ -83,9 +71,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1068,
 			"data_key": "Grendizer",
 			"data_name": "Grendizer",
 			"heading": 48,
@@ -101,9 +86,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1064,
 			"data_key": "BAR_POOL_ROOM",
 			"data_name": "BAR_POOL_ROOM",
 			"heading": 219,
@@ -119,9 +101,6 @@
 				"nodeType": "COLLADA"
 			},
 			"children": [],
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
-			"data_id": 1063,
 			"data_key": "buggy",
 			"data_name": "buggy",
 			"heading": 219,
@@ -132,9 +111,9 @@
 			"roll": 0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "collada",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  	
 	"data_key": "collada",
 	"data_name": "collada"
 }
