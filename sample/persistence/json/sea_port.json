@@ -11,9 +11,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1080,
 			"data_key": "Sea_Port",
 			"data_name": "Sea_Port",
 			"heading": 90.0,
@@ -24,9 +21,9 @@
 			"roll": 0.0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "sea_port",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
 	"data_key": "sea_port",
 	"data_name": "sea_port"
 }

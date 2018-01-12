@@ -11,9 +11,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "PCv2_RVT2018",
 			"data_name": "橋(はし)",
 			"heading": -20,
@@ -29,9 +26,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "B2_1SPN_2018",
 			"data_name": "ビル",
 			"heading": 75,
@@ -47,9 +41,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "TunelSection_2018",
 			"data_name": "トンネル",
 			"heading": -18,
@@ -65,9 +56,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "Tekla Training Modell",
 			"data_name": "ビルディング",
 			"heading": 70,
@@ -78,9 +66,9 @@
 			"roll": 0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "ifc_japan",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
 	"data_key": "ifc_japan",
 	"data_name": "ifc_japan"
 }
