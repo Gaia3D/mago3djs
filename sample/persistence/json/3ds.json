@@ -14,6 +14,24 @@
 			"data_group_id": 3,
 			"data_group_name": "3DS",
 			"data_id": 1043,
+			"data_key": "hexa",
+			"data_name": "hexa",
+			"heading": 0,
+			"height": 80,
+			"latitude": 37.58198979353269,
+			"longitude": 126.60820956457543,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_group_id": 3,
+			"data_group_name": "3DS",
+			"data_id": 1043,
 			"data_key": "kangbukSport_del",
 			"data_name": "강북스포츠센터",
 			"heading": 1080,

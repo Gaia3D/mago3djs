@@ -25,7 +25,7 @@ TriPolyhedron.prototype.newTriSurface = function()
 TriPolyhedron.prototype.invertTrianglesSenses = function() 
 {
 	var triSurfacesCount = this.triSurfacesArray.length;
-	for(var i=0; i<triSurfacesCount; i++)
+	for (var i=0; i<triSurfacesCount; i++)
 	{
 		this.triSurfacesArray[i].invertTrianglesSenses();
 	}

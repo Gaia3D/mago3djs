@@ -63,8 +63,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
-		if(neoBuilding.buildingId === "PCv2_RVT2018")
-			var hola = 0;
+		if (neoBuilding.buildingId === "PCv2_RVT2018")
+		{ var hola = 0; }
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
@@ -80,8 +80,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		}
 		else if (ssao_idx === 1)
 		{
-			if(neoBuilding.buildingId === "PCv2_RVT2018")
-			var hola = 0;
+			if (neoBuilding.buildingId === "PCv2_RVT2018")
+			{ var hola = 0; }
 		
 			if (neoBuilding.texturesLoaded && neoBuilding.texturesLoaded.length>0)
 			{
@@ -89,7 +89,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 			}
 			else { renderTexture = false; }
 			
-			if(magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 			{
 				// active stencil buffer to draw silhouette.***
 				this.enableStencilBuffer(gl);
@@ -111,7 +111,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		}
 		
 		// LOD1.***
-		minSize = 0.8;
+		minSize = 0.45;
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles1.length;
 		for (var j=0; j<lowestOctreesCount; j++) 
 		{
@@ -125,7 +125,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		
 		if (ssao_idx === 1)
 		{
-			if(magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 			{
 				// deactive stencil buffer to draw silhouette.***
 				this.disableStencilBuffer(gl);
@@ -166,7 +166,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		if (lowestOctreesCount === 0)
 		{ continue; }
 		
-		if(ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
 			this.enableStencilBuffer(gl);
@@ -235,7 +235,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 			this.renderLodBuilding(gl, lowestOctree.lego, magoManager, standardShader, ssao_idx, renderTexture);
 		}
 		
-		if(ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
 			this.disableStencilBuffer(gl);
@@ -275,7 +275,7 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		if (skinLego === undefined)
 		{ continue; }
 	
-		if(ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
 			this.enableStencilBuffer(gl);
@@ -330,7 +330,7 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		this.renderLodBuilding(gl, skinLego, magoManager, standardShader, ssao_idx, renderTexture);
 		skinLego = undefined;
 		
-		if(ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
+		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
 			this.disableStencilBuffer(gl);
