@@ -53,8 +53,8 @@
 		vec3 rotatedNormal = currentTMat * normal;
 		vLightWeighting = vec3(1.0, 1.0, 1.0);
 		uAmbientColor = vec3(0.8);
-		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);
-		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);
+		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;
 		vTexCoord = texCoord;
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
