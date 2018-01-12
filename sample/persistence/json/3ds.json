@@ -384,9 +384,9 @@
 			"roll": 0.0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "3ds",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
 	"data_key": "3ds",
 	"data_name": "3ds"
 }
