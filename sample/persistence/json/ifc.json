@@ -11,9 +11,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1059,
 			"data_key": "KICT_main",
 			"data_name": "KICT_main",
 			"heading": 9,
@@ -29,9 +26,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_100",
 			"data_name": "KSJ_100",
 			"heading": 0,
@@ -47,9 +41,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_110",
 			"data_name": "KSJ_110",
 			"heading": 0,
@@ -65,9 +56,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_120",
 			"data_name": "KSJ_120",
 			"heading": 0,
@@ -83,9 +71,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_130,140-PowerStation",
 			"data_name": "KSJ_130,140-PowerStation",
 			"heading": 0,
@@ -101,9 +86,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_141",
 			"data_name": "KSJ_141",
 			"heading": 0,
@@ -119,9 +101,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_142",
 			"data_name": "KSJ_142",
 			"heading": 0,
@@ -137,9 +116,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_150",
 			"data_name": "KSJ_150",
 			"heading": 0,
@@ -155,9 +131,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_160",
 			"data_name": "KSJ_160",
 			"heading": 0,
@@ -173,9 +146,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_180",
 			"data_name": "KSJ_180",
 			"heading": 0,
@@ -191,9 +161,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_190",
 			"data_name": "KSJ_190",
 			"heading": 0,
@@ -209,9 +176,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_220",
 			"data_name": "KSJ_220",
 			"heading": 0,
@@ -227,9 +191,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_230",
 			"data_name": "KSJ_230",
 			"heading": 0,
@@ -245,9 +206,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_240",
 			"data_name": "KSJ_240",
 			"heading": 0,
@@ -263,9 +221,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_250",
 			"data_name": "KSJ_250",
 			"heading": 0,
@@ -281,9 +236,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_260",
 			"data_name": "KSJ_260",
 			"heading": 0,
@@ -299,9 +251,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_270",
 			"data_name": "KSJ_270",
 			"heading": 0,
@@ -317,9 +266,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_271",
 			"data_name": "KSJ_271",
 			"heading": 0,
@@ -335,9 +281,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_280",
 			"data_name": "KSJ_280",
 			"heading": 0,
@@ -353,9 +296,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_290",
 			"data_name": "KSJ_290",
 			"heading": 0,
@@ -371,9 +311,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_300",
 			"data_name": "KSJ_300",
 			"heading": 0,
@@ -389,9 +326,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_310",
 			"data_name": "KSJ_310",
 			"heading": 0,
@@ -407,9 +341,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_320",
 			"data_name": "KSJ_320",
 			"heading": 0,
@@ -425,9 +356,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_330",
 			"data_name": "KSJ_330",
 			"heading": 0,
@@ -443,9 +371,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_340",
 			"data_name": "KSJ_340",
 			"heading": 0,
@@ -461,9 +386,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_360",
 			"data_name": "KSJ_360",
 			"heading": 0,
@@ -479,9 +401,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_370",
 			"data_name": "KSJ_370",
 			"heading": 0,
@@ -497,9 +416,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_380",
 			"data_name": "KSJ_380",
 			"heading": 0,
@@ -515,9 +431,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_381",
 			"data_name": "KSJ_381",
 			"heading": 0,
@@ -533,9 +446,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_390",
 			"data_name": "KSJ_390",
 			"heading": 0,
@@ -551,9 +461,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_400",
 			"data_name": "KSJ_400",
 			"heading": 0,
@@ -569,9 +476,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_410",
 			"data_name": "KSJ_410",
 			"heading": 0,
@@ -587,9 +491,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_420",
 			"data_name": "KSJ_420",
 			"heading": 0,
@@ -605,9 +506,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_430",
 			"data_name": "KSJ_430",
 			"heading": 0,
@@ -623,9 +521,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_500",
 			"data_name": "KSJ_500",
 			"heading": 0,
@@ -641,9 +536,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_510",
 			"data_name": "KSJ_510",
 			"heading": 0,
@@ -659,9 +551,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_520",
 			"data_name": "KSJ_520",
 			"heading": 0,
@@ -677,9 +566,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_900",
 			"data_name": "KSJ_900",
 			"heading": 0,
@@ -695,9 +581,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_910",
 			"data_name": "KSJ_910",
 			"heading": 0,
@@ -713,9 +596,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_920",
 			"data_name": "KSJ_920",
 			"heading": 0,
@@ -731,9 +611,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_980",
 			"data_name": "KSJ_980",
 			"heading": 0,
@@ -749,9 +626,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_group_id": 9,
-			"data_group_name": "IFC",
-			"data_id": 1000,
 			"data_key": "KSJ_990",
 			"data_name": "KSJ_990",
 			"heading": 0,
@@ -762,9 +636,9 @@
 			"roll": 0
 		}
 	],
-	"data_group_id": 0,
-	"data_group_name": "ifc",
-	"data_id": 0,
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
 	"data_key": "ifc",
 	"data_name": "ifc"
 }

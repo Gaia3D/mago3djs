@@ -11,9 +11,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1043,
 			"data_key": "kangbukSport_del",
 			"data_name": "강북스포츠센터",
 			"heading": 1080,
@@ -29,9 +26,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1052,
 			"data_key": "gwangjin_Youth_Center_del",
 			"data_name": "광진청소년수련관",
 			"heading": 630,
@@ -47,9 +41,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1045,
 			"data_key": "Gangseo_cultural_del",
 			"data_name": "강서문화원",
 			"heading": 990,
@@ -65,9 +56,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1040,
 			"data_key": "gangnam_del",
 			"data_name": "강남구민회관",
 			"heading": 990,
@@ -83,9 +71,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1051,
 			"data_key": "gwangjin_library_del",
 			"data_name": "광진정보도서관",
 			"heading": 630,
@@ -101,9 +86,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1058,
 			"data_key": "historypark_del",
 			"data_name": "동대문운동장기념관",
 			"heading": 699,
@@ -119,9 +101,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1055,
 			"data_key": "DC_library_del",
 			"data_name": "대방어린이도서관",
 			"heading": 540,
@@ -137,9 +116,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1049,
 			"data_key": "Gwanakgu_del",
 			"data_name": "관악구의회",
 			"heading": 990,
@@ -155,9 +131,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1042,
 			"data_key": "KANGBUK_del",
 			"data_name": "강북문화예술회관",
 			"heading": 1563,
@@ -173,9 +146,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1047,
 			"data_key": "GyeomjaeJeongSeon_del",
 			"data_name": "겸재정선기념관",
 			"heading": 540,
@@ -191,9 +161,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1050,
 			"data_key": "Gwangjin_center_del",
 			"data_name": "광진문화예술회관",
 			"heading": 360,
@@ -209,9 +176,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1044,
 			"data_key": "Gangsu_office_del",
 			"data_name": "강서구청",
 			"heading": 1170,
@@ -227,9 +191,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1057,
 			"data_key": "Dongdaemoongu_center_del",
 			"data_name": "동대문구민체육센터",
 			"heading": 810,
@@ -245,9 +206,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1046,
 			"data_key": "gangil_del",
 			"data_name": "강일동 주민센터",
 			"heading": 1080,
@@ -263,9 +221,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1041,
 			"data_key": "gangbuk_cultur_del",
 			"data_name": "강북문화정보센터",
 			"heading": 990,
@@ -281,9 +236,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1054,
 			"data_key": "gookjoo_library_del",
 			"data_name": "동작상도국주도서관",
 			"heading": 450,
@@ -299,9 +251,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1053,
 			"data_key": "Guro_Art_Valley_del",
 			"data_name": "구로아트밸리(예술극장)",
 			"heading": 540,
@@ -317,9 +266,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1056,
 			"data_key": "dogok_library_del",
 			"data_name": "도곡정보문화도서관",
 			"heading": 840,
@@ -335,9 +281,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 3,
-			"data_group_name": "3DS",
-			"data_id": 1048,
 			"data_key": "gomdalrae_del",
 			"data_name": "금달래 문화복지센터",
 			"heading": 540,
@@ -353,9 +296,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "Factory Kitbash",
 			"data_name": "Factory Kitbash",
 			"heading": 90.0,
@@ -371,9 +311,6 @@
 				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_group_id": 77,
-			"data_group_name": "3DS",
-			"data_id": 999,
 			"data_key": "Factory 03",
 			"data_name": "Factory 03",
 			"heading": 90.0,

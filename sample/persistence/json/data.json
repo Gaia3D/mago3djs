@@ -2,9 +2,6 @@
 	"alldata": {
 		"kangbukSport_del": {
 			"list_counter": 10,
-			"data_id": 1043,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "kangbukSport_del",
 			"data_name": "강북스포츠센터",
 			"latitude": "37.58198979353269",
@@ -19,9 +16,6 @@
 		},
 		"gwangjin_Youth_Center_del": {
 			"list_counter": 10,
-			"data_id": 1052,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gwangjin_Youth",
 			"data_name": "광진청소년수련관",
 			"latitude": "37.583754532032326",
@@ -36,9 +30,6 @@
 		},
 		"Gangseo_cultural_del": {
 			"list_counter": 10,
-			"data_id": 1045,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Gangseo_cultural",
 			"data_name": "강서문화원",
 			"latitude": "37.582419509248105",
@@ -53,9 +44,6 @@
 		},
 		"CU Macky": {
 			"list_counter": 10,
-			"data_id": 1067,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "CU Macky",
 			"data_name": "CU Macky",
 			"latitude": "37.569019",
@@ -70,9 +58,6 @@
 		},
 		"gangnam_del": {
 			"list_counter": 10,
-			"data_id": 1040,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gangnam_del",
 			"data_name": "강남구민회관",
 			"latitude": "37.58395319107423",
@@ -87,9 +72,6 @@
 		},
 		"gwangjin_library_del": {
 			"list_counter": 10,
-			"data_id": 1051,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gwangjin_library",
 			"data_name": "광진정보도서관",
 			"latitude": "37.58264782899985",
@@ -104,9 +86,6 @@
 		},
 		"historypark_del": {
 			"list_counter": 10,
-			"data_id": 1058,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "historypark_del",
 			"data_name": "동대문운동장기념관",
 			"latitude": "37.5829305308201",
@@ -121,9 +100,6 @@
 		},
 		"Lara_Croft": {
 			"list_counter": 10,
-			"data_id": 1066,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "Lara_Croft",
 			"data_name": "Lara_Croft",
 			"latitude": "37.566519",
@@ -138,9 +114,6 @@
 		},
 		"DC_library_del": {
 			"list_counter": 10,
-			"data_id": 1055,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "DC_library",
 			"data_name": "대방어린이도서관",
 			"latitude": "37.5832891672532",
@@ -155,9 +128,6 @@
 		},
 		"ED-209": {
 			"list_counter": 10,
-			"data_id": 1069,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "ED-209",
 			"data_name": "ED-209",
 			"latitude": "37.567519",
@@ -172,9 +142,6 @@
 		},
 		"Gwanakgu_del": {
 			"list_counter": 10,
-			"data_id": 1049,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Gwanakgu_del",
 			"data_name": "관악구의회",
 			"latitude": "37.58362692191355",
@@ -189,9 +156,6 @@
 		},
 		"KANGBUK_del": {
 			"list_counter": 10,
-			"data_id": 1042,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "KANGBUK_del",
 			"data_name": "강북문화예술회관",
 			"latitude": "37.583925148368756",
@@ -206,9 +170,6 @@
 		},
 		"Sample_MEP": {
 			"list_counter": 10,
-			"data_id": 1060,
-			"data_group_id": 9,
-			"data_group_name": "IFC",
 			"data_key": "Sample_MEP",
 			"data_name": "Sample_MEP",
 			"latitude": "37.663059",
@@ -223,9 +184,6 @@
 		},
 		"GyeomjaeJeongSeon_del": {
 			"list_counter": 10,
-			"data_id": 1047,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "GyeomjaeJeongSeon_del",
 			"data_name": "겸재정선기념관",
 			"latitude": "37.58328870711409",
@@ -240,9 +198,6 @@
 		},
 		"Gwangjin_center_del": {
 			"list_counter": 10,
-			"data_id": 1050,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Gwangjin_center",
 			"data_name": "광진문화예술회관",
 			"latitude": "37.58264274155634",
@@ -257,9 +212,6 @@
 		},
 		"Gangsu_office_del": {
 			"list_counter": 10,
-			"data_id": 1044,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Gangsu_office",
 			"data_name": "강서구청",
 			"latitude": "37.58276566574734",
@@ -274,9 +226,6 @@
 		},
 		"Dongdaemoongu_center_del": {
 			"list_counter": 10,
-			"data_id": 1057,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Dongdaemoongu_center",
 			"data_name": "동대문구민체육센터",
 			"latitude": "37.58218502123928",
@@ -291,9 +240,6 @@
 		},
 		"KICT_main": {
 			"list_counter": 10,
-			"data_id": 1059,
-			"data_group_id": 9,
-			"data_group_name": "IFC",
 			"data_key": "KICT_main",
 			"data_name": "KICT_main",
 			"latitude": "37.524059",
@@ -308,9 +254,6 @@
 		},
 		"2_cylinder_engine": {
 			"list_counter": 10,
-			"data_id": 1062,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "2_cylinder_engine",
 			"data_name": "2_cylinder_engine",
 			"latitude": "37.569519",
@@ -325,9 +268,6 @@
 		},
 		"gangil_del": {
 			"list_counter": 10,
-			"data_id": 1046,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gangil_del",
 			"data_name": "강일동 주민센터",
 			"latitude": "37.58201438816841",
@@ -342,9 +282,6 @@
 		},
 		"gangbuk_cultur_del": {
 			"list_counter": 10,
-			"data_id": 1041,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gangbuk_cultur",
 			"data_name": "강북문화정보센터",
 			"latitude": "37.58289603056518",
@@ -359,9 +296,6 @@
 		},
 		"gookjoo_library_del": {
 			"list_counter": 10,
-			"data_id": 1054,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gookjoo_library",
 			"data_name": "동작상도국주도서관",
 			"latitude": "37.584301221570534",
@@ -376,9 +310,6 @@
 		},
 		"Guro_Art_Valley_del": {
 			"list_counter": 10,
-			"data_id": 1053,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Guro_Art",
 			"data_name": "구로아트밸리(예술극장)",
 			"latitude": "37.584256200219306",
@@ -393,9 +324,6 @@
 		},
 		"Vulture2": {
 			"list_counter": 10,
-			"data_id": 1065,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "Vulture2",
 			"data_name": "Vulture2",
 			"latitude": "37.567519",
@@ -410,9 +338,6 @@
 		},
 		"Grendizer": {
 			"list_counter": 10,
-			"data_id": 1068,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "Grendizer",
 			"data_name": "Grendizer",
 			"latitude": "37.568219",
@@ -427,9 +352,6 @@
 		},
 		"dogok_library_del": {
 			"list_counter": 10,
-			"data_id": 1056,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "dogok_library",
 			"data_name": "도곡정보문화도서관",
 			"latitude": "37.58443455135179",
@@ -444,9 +366,6 @@
 		},
 		"BAR_POOL_ROOM": {
 			"list_counter": 10,
-			"data_id": 1064,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "BAR_POOL_ROOM",
 			"data_name": "BAR_POOL_ROOM",
 			"latitude": "37.567219",
@@ -461,9 +380,6 @@
 		},
 		"gomdalrae_del": {
 			"list_counter": 10,
-			"data_id": 1048,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "gomdalrae_del",
 			"data_name": "금달래 문화복지센터",
 			"latitude": "37.582015824374196",
@@ -478,9 +394,6 @@
 		},
 		"buggy": {
 			"list_counter": 10,
-			"data_id": 1063,
-			"data_group_id": 10,
-			"data_group_name": "COLLADA",
 			"data_key": "buggy",
 			"data_name": "buggy",
 			"latitude": "37.567219",
@@ -495,9 +408,6 @@
 		},
 	    "KSJ_100": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_100",
 	      "data_name": "KSJ_100",
 	      "latitude": "-62.2233",
@@ -512,9 +422,6 @@
 	    },
 	    "KSJ_110": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_110",
 	      "data_name": "KSJ_110",
 	      "latitude": "-62.22312549680816",
@@ -529,9 +436,6 @@
 	    },
 	    "KSJ_120": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_120",
 	      "data_name": "KSJ_120",
 	      "latitude": "-62.2231083234491",
@@ -546,9 +450,6 @@
 	    },
 	    "KSJ_130,140-PowerStation": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_130,140-PowerStation",
 	      "data_name": "KSJ_130,140-PowerStation",
 	      "latitude": "-62.22325843117872",
@@ -563,9 +464,6 @@
 	    },
 	    "KSJ_141": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_141",
 	      "data_name": "KSJ_141",
 	      "latitude": "-62.22342152128351",
@@ -580,9 +478,6 @@
 	    },
 	    "KSJ_142": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_142",
 	      "data_name": "KSJ_142",
 	      "latitude": "-62.22337601693507",
@@ -597,9 +492,6 @@
 	    },
 	    "KSJ_150": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_150",
 	      "data_name": "KSJ_150",
 	      "latitude": "-62.223528959379685",
@@ -614,9 +506,6 @@
 	    },
 	    "KSJ_160": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_160",
 	      "data_name": "KSJ_160",
 	      "latitude": "-62.223557821476795",
@@ -631,9 +520,6 @@
 	    },
 	    "KSJ_180": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_180",
 	      "data_name": "KSJ_180",
 	      "latitude": "-62.222626959185",
@@ -648,9 +534,6 @@
 	    },
 	    "KSJ_190": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_190",
 	      "data_name": "KSJ_190",
 	      "latitude": "-62.22334989944395",
@@ -665,9 +548,6 @@
 	    },
 	    "KSJ_220": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_220",
 	      "data_name": "KSJ_220",
 	      "latitude": "-62.223730030134",
@@ -682,9 +562,6 @@
 	    },
 	    "KSJ_230": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_230",
 	      "data_name": "KSJ_230",
 	      "latitude": "-62.223723990628464",
@@ -699,9 +576,6 @@
 	    },
 	    "KSJ_240": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_240",
 	      "data_name": "KSJ_240",
 	      "latitude": "-62.223744427102595",
@@ -716,9 +590,6 @@
 	    },
 	    "KSJ_250": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_250",
 	      "data_name": "KSJ_250",
 	      "latitude": "-62.22377230035535",
@@ -733,9 +604,6 @@
 	    },
 	    "KSJ_260": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_260",
 	      "data_name": "KSJ_260",
 	      "latitude": "-62.2245293784798",
@@ -750,9 +618,6 @@
 	    },
 	    "KSJ_270": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_270",
 	      "data_name": "KSJ_270",
 	      "latitude": "-62.22457018146242",
@@ -767,9 +632,6 @@
 	    },
 	    "KSJ_271": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_271",
 	      "data_name": "KSJ_271",
 	      "latitude": "-62.224822276390036",
@@ -784,9 +646,6 @@
 	    },
 	    "KSJ_280": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_280",
 	      "data_name": "KSJ_280",
 	      "latitude": "-62.22497577312869",
@@ -801,9 +660,6 @@
 	    },
 	    "KSJ_290": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_290",
 	      "data_name": "KSJ_290",
 	      "latitude": "-62.22483303415602",
@@ -818,9 +674,6 @@
 	    },
 	    "KSJ_300": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_300",
 	      "data_name": "KSJ_300",
 	      "latitude": "-62.223341227289254",
@@ -835,9 +688,6 @@
 	    },
 	    "KSJ_310": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_310",
 	      "data_name": "KSJ_310",
 	      "latitude": "-62.22335482041323",
@@ -852,9 +702,6 @@
 	    },
 	    "KSJ_320": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_320",
 	      "data_name": "KSJ_320",
 	      "latitude": "-62.223414038802574",
@@ -869,9 +716,6 @@
 	    },
 	    "KSJ_330": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_330",
 	      "data_name": "KSJ_330",
 	      "latitude": "-62.22389552293767",
@@ -886,9 +730,6 @@
 	    },
 	    "KSJ_340": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_340",
 	      "data_name": "KSJ_340",
 	      "latitude": "-62.22438440353841",
@@ -903,9 +744,6 @@
 	    },
 	    "KSJ_360": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_360",
 	      "data_name": "KSJ_360",
 	      "latitude": "-62.223668032518866",
@@ -920,9 +758,6 @@
 	    },
 	    "KSJ_370": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_370",
 	      "data_name": "KSJ_370",
 	      "latitude": "-62.22347680577461",
@@ -937,9 +772,6 @@
 	    },
 	    "KSJ_380": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_380",
 	      "data_name": "KSJ_380",
 	      "latitude": "-62.22333407880447",
@@ -954,9 +786,6 @@
 	    },
 	    "KSJ_381": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_381",
 	      "data_name": "KSJ_381",
 	      "latitude": "-62.223400151976655",
@@ -971,9 +800,6 @@
 	    },
 	    "KSJ_390": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_390",
 	      "data_name": "KSJ_390",
 	      "latitude": "-62.22325265008233",
@@ -988,9 +814,6 @@
 	    },
 	    "KSJ_400": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_400",
 	      "data_name": "KSJ_400",
 	      "latitude": "-62.22293469870538",
@@ -1005,9 +828,6 @@
 	    },
 	    "KSJ_410": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_410",
 	      "data_name": "KSJ_410",
 	      "latitude": "-62.22296826652779",
@@ -1022,9 +842,6 @@
 	    },
 	    "KSJ_420": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_420",
 	      "data_name": "KSJ_420",
 	      "latitude": "-62.22294660583377",
@@ -1039,9 +856,6 @@
 	    },
 	    "KSJ_430": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_430",
 	      "data_name": "KSJ_430",
 	      "latitude": "-62.22303658140419",
@@ -1056,9 +870,6 @@
 	    },
 	    "KSJ_500": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_500",
 	      "data_name": "KSJ_500",
 	      "latitude": "-62.22118823601661",
@@ -1073,9 +884,6 @@
 	    },
 	    "KSJ_510": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_510",
 	      "data_name": "KSJ_510",
 	      "latitude": "-62.2209066387983",
@@ -1090,9 +898,6 @@
 	    },
 	    "KSJ_520": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_520",
 	      "data_name": "KSJ_520",
 	      "latitude": "-62.220849122393616",
@@ -1107,9 +912,6 @@
 	    },
 	    "KSJ_900": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_900",
 	      "data_name": "KSJ_900",
 	      "latitude": "-62.22307422309151",
@@ -1124,9 +926,6 @@
 	    },
 	    "KSJ_910": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_910",
 	      "data_name": "KSJ_910",
 	      "latitude": "-62.22345688386159",
@@ -1141,9 +940,6 @@
 	    },
 	    "KSJ_920": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_920",
 	      "data_name": "KSJ_920",
 	      "latitude": "-62.22353091202436",
@@ -1158,9 +954,6 @@
 	    },
 	    "KSJ_980": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_980",
 	      "data_name": "KSJ_980",
 	      "latitude": "-62.223797023246625",
@@ -1175,9 +968,6 @@
 	    },
 	    "KSJ_990": {
 	      "list_counter": 10,
-	      "data_id": 1000,
-	      "data_group_id": 9,
-	      "data_group_name": "IFC",
 	      "data_key": "KSJ_990",
 	      "data_name": "KSJ_990",
 	      "latitude": "-62.22368949449477",
@@ -1192,9 +982,6 @@
 	    },
 	    "Sea_Port": {
 			"list_counter": 10,
-			"data_id": 1080,
-			"data_group_id": 3,
-			"data_group_name": "3DS",
 			"data_key": "Sea_Port",
 			"data_name": "Sea_Port",
 			"latitude": "37.438778",
@@ -1209,9 +996,6 @@
 		},
 		"Factory Kitbash": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "Factory Kitbash",
 			"data_name": "Factory Kitbash",
 			"latitude": "37.5804305308201",
@@ -1226,9 +1010,6 @@
 		},
 		"Factory 03": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "Factory 03",
 			"data_name": "Factory 03",
 			"latitude": "37.5804305308201",
@@ -1243,9 +1024,6 @@
 		},
 		"PCv2_RVT2018": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "PCv2_RVT2018",
 			"data_name": "橋(はし)",
 			"latitude": "35.6629",
@@ -1260,9 +1038,6 @@
 		},
 		"B2_1SPN_2018": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "B2_1SPN_2018",
 			"data_name": "ビル",
 			"latitude": "35.6620",
@@ -1277,9 +1052,6 @@
 		},
 		"TunelSection_2018": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "TunelSection_2018",
 			"data_name": "トンネル",
 			"latitude": "35.6623",
@@ -1294,9 +1066,6 @@
 		},
 		"Tekla Training Modell": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "Tekla Training Modell",
 			"data_name": "ビルディング",
 			"latitude": "35.6618",
@@ -1311,9 +1080,6 @@
 		},
 		"ByeolMaJeolDoSa": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "IFC",
 			"data_key": "ByeolMaJeolDoSa",
 			"data_name": "병마절도사",
 			"latitude": "37.579813075158986",
@@ -1328,9 +1094,6 @@
 		},
 		"AC11-Institute-Var-2-IFC": {
 			"list_counter": 10,
-			"data_id": 999,
-			"data_group_id": 77,
-			"data_group_name": "3DS",
 			"data_key": "AC11-Institute-Var-2-IFC",
 			"data_name": "AC11-Institute-Var-2-IFC",
 			"latitude": "37.583",
