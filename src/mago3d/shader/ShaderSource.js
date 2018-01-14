@@ -689,6 +689,8 @@ void main()\n\
         offset.xy /= offset.w;\n\
         offset.xy = offset.xy * 0.5 + 0.5;        \n\
         float sampleDepth = -sample.z/far;\n\
+		if(sampleDepth > 0.49)\n\
+			continue;\n\
         float depthBufferValue = getDepth(offset.xy);				              \n\
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
@@ -883,6 +885,8 @@ void main()\n\
         offset.xy /= offset.w;\n\
         offset.xy = offset.xy * 0.5 + 0.5;        \n\
         float sampleDepth = -sample.z/far;\n\
+		if(sampleDepth > 0.49)\n\
+			continue;\n\
         float depthBufferValue = getDepth(offset.xy);				              \n\
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
