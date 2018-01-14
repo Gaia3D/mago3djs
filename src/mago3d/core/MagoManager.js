@@ -1282,8 +1282,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	var renderTexture = false;
 	this.depthFboNeo.bind(); 
 	gl.clearColor(1, 1, 1, 1);
-	if (this.isFirstFrustum())
-	{ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); }
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	this.depthFboNeo.unbind();
