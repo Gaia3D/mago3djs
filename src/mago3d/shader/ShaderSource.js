@@ -689,6 +689,8 @@ void main()\n\
         offset.xy /= offset.w;\n\
         offset.xy = offset.xy * 0.5 + 0.5;        \n\
         float sampleDepth = -sample.z/far;\n\
+		if(sampleDepth > 0.49)\n\
+			continue;\n\
         float depthBufferValue = getDepth(offset.xy);				              \n\
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
@@ -785,7 +787,7 @@ void main()\n\
     vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
     vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
     uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-    vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
+    vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
     vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
     vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
     float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
@@ -883,6 +885,8 @@ void main()\n\
         offset.xy /= offset.w;\n\
         offset.xy = offset.xy * 0.5 + 0.5;        \n\
         float sampleDepth = -sample.z/far;\n\
+		if(sampleDepth > 0.49)\n\
+			continue;\n\
         float depthBufferValue = getDepth(offset.xy);				              \n\
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
@@ -992,8 +996,8 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
 		uAmbientColor = vec3(0.8);\n\
-		vec3 uLightingDirection = vec3(0.7, 0.7, 0.7);\n\
-		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
 		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
