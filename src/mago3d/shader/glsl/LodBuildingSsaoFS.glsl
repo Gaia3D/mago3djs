@@ -75,6 +75,8 @@ void main()
         offset.xy /= offset.w;
         offset.xy = offset.xy * 0.5 + 0.5;        
         float sampleDepth = -sample.z/far;
+		if(sampleDepth > 0.49)
+			continue;
         float depthBufferValue = getDepth(offset.xy);				              
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)
