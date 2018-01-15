@@ -1510,10 +1510,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	// 1rst, collect rootNodes.
 	var rootNodesMap = new Map();
-	var nodesCount = visibleObjControlerNodes.currentVisibles2.length;
+	var currentVisiblesArray = visibleObjControlerNodes.currentVisibles2.concat(visibleObjControlerNodes.currentVisibles3);
+	var nodesCount = currentVisiblesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
-		node = visibleObjControlerNodes.currentVisibles2[i];
+		node = currentVisiblesArray[i];
 		nodeRoot = node.getRoot();
 		rootNodesMap.set(nodeRoot, nodeRoot);
 	}
@@ -5705,12 +5706,28 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					
 					// test.
 					//***********************************************************************************************************
-					var rootNode = node.getRoot();
-					if (rootNode)
+					if (node.data.attributes.centerOfBBoxAsOrigen !== undefined)
 					{
-						// now, calculate the root center of bbox.
-						this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
-						ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+						if (node.data.attributes.centerOfBBoxAsOrigen === true)
+						{
+							var rootNode = node.getRoot();
+							if (rootNode)
+							{
+								// now, calculate the root center of bbox.
+								this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
+								ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+							}
+						}
+					}
+					else 
+					{
+						var rootNode = node.getRoot();
+						if (rootNode)
+						{
+							// now, calculate the root center of bbox.
+							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
+							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+						}
 					}
 					//------------------------------------------------------------------------------------------------------------
 					continue;
