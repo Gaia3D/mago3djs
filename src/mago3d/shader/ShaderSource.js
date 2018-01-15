@@ -702,7 +702,7 @@ void main()\n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
                                 \n\
-    vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
+    vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
     vec3 L = normalize(lightPos - vertexPos);\n\
     float lambertian = max(dot(normal2, L), 0.0);\n\
     float specular = 0.0;\n\
@@ -897,7 +897,7 @@ void main()\n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
 \n\
-    vec3 lightPos = vec3(0.0, 0.0, 20.0);\n\
+    vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
     vec3 L = normalize(lightPos - vertexPos);\n\
     float lambertian = max(dot(normal2, L), 0.0);\n\
     float specular = 0.0;\n\
