@@ -53,6 +53,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 	gl.enable(gl.CULL_FACE);
 	gl.frontFace(gl.CCW);
 	
+	var flipYTexCoord = false;
+	
 	// do render.
 	var nodesCount = visibleNodesArray.length;
 	for (var i=0; i<nodesCount; i++)
@@ -68,6 +70,15 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
+	
+		if(node.data.attributes.flipYTexCoords !== undefined)
+		{
+			flipYTexCoord = node.data.attributes.flipYTexCoords;
+		}
+		else{
+			flipYTexCoord = false;
+		}
+		gl.uniform1i(standardShader.textureFlipYAxis_loc, flipYTexCoord);
 		
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
