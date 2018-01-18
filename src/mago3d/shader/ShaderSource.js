@@ -695,7 +695,7 @@ void main()\n\
         float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
         if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
         {\n\
-            occlusion +=  1.0;\n\
+            occlusion +=  0.6;\n\
         }\n\
         \n\
     }   \n\
@@ -705,7 +705,7 @@ void main()\n\
     vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
     vec3 L = normalize(lightPos - vertexPos);\n\
     float lambertian = max(dot(normal2, L), 0.0);\n\
-    float specular = 0.0;\n\
+    float specular = 0.2;\n\
     if(lambertian > 0.0)\n\
     {\n\
         vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
@@ -718,7 +718,7 @@ void main()\n\
 	\n\
 	if(lambertian < 0.5)\n\
     {\n\
-		lambertian = 0.5;\n\
+		//lambertian = 0.5;\n\
 	}\n\
 \n\
     vec4 textureColor;\n\
