@@ -1,0 +1,52 @@
+{
+	"attributes" : {
+		"isPhysical" : false,
+		"nodeType" : "root",
+		"projectType" : "workshop"
+	},
+	"children" : [
+		{
+			"attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			},
+			"children" : [
+			],
+			"data_group_id" : 0,
+			"data_group_name" : "temporary",
+			"data_id" : 0,
+			"data_key" : "hakdongPark_s",
+			"data_name" : "학생 1조 실습 홍덕 건물",
+			"latitude": 37.5835,
+			"longitude": 126.6075,
+			"height": 40,
+			"heading" : 0,
+			"pitch" : 0.0,
+			"roll" : 0.0
+		},
+		{
+			"attributes" : {
+				"isPhysical" : true,
+				"nodeType" : "decoration"
+			},
+			"children" : [
+			],
+			"data_group_id" : 0,
+			"data_group_name" : "temporary",
+			"data_id" : 0,
+			"data_key" : "musicHall",
+			"data_name" : "학생 2조 실습 음악홀",
+			"latitude": 37.583754532032326,
+			"longitude": 126.60931061270068,
+			"height": 30,
+			"heading" : 0.0,
+			"pitch" : 0.0,
+			"roll" : 0.0
+		}
+	],
+	"data_group_id" : 0,
+	"data_group_name" : "workshop",
+	"data_id" : 0,
+	"data_key" : "workshop",
+	"data_name" : "workshop"
+}

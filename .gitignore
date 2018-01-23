@@ -1,5 +1,8 @@
-/build/
+.settings/
 /node_modules/
 package-lock.json
+/data/
+build/
+data
 /.settings/
 .project

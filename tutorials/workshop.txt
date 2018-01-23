@@ -1,0 +1,3 @@
+F4DConverter.exe -inputFolder d:\demo_data -outputFolder c:\data\workshop -log d:\demo_data\logTest.txt -indexing y
+
+mklink /d "C:\mago3djs\data" "C:\data"

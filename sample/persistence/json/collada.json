@@ -1,0 +1,119 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "collada"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "Lara_Croft",
+			"data_name": "Lara_Croft",
+			"heading": 219,
+			"height": 55,
+			"latitude": 37.566519,
+			"longitude": 126.798852,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "ED-209",
+			"data_name": "ED-209",
+			"heading": 42,
+			"height": 50,
+			"latitude": 37.567519,
+			"longitude": 126.799852,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "2_cylinder_engine",
+			"data_name": "2_cylinder_engine",
+			"heading": 228,
+			"height": 48,
+			"latitude": 37.568219,
+			"longitude": 126.798952,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "Vulture2",
+			"data_name": "Vulture2",
+			"heading": 219,
+			"height": 48,
+			"latitude": 37.567519,
+			"longitude": 126.796852,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "Grendizer",
+			"data_name": "Grendizer",
+			"heading": 48,
+			"height": 51,
+			"latitude": 37.568219,
+			"longitude": 126.798052,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "BAR POOL ROOM",
+			"data_name": "BAR POOL ROOM",
+			"heading": 219,
+			"height": 42,
+			"latitude": 37.567219,
+			"longitude": 126.798052,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "buggy",
+			"data_name": "buggy",
+			"heading": 219,
+			"height": 90,
+			"latitude": 37.567219,
+			"longitude": 126.799052,
+			"pitch": 90,
+			"roll": 0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  	
+	"data_key": "collada",
+	"data_name": "collada"
+}

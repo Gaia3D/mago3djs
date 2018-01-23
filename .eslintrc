@@ -1,0 +1,69 @@
+{
+  "env": {
+    "browser": true,
+    "node" : true,
+    "jasmine": true,
+    "mocha": true,
+    "amd": true
+  },
+  "globals": {},
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script"
+  },
+  "rules": {
+    "brace-style": [2, "allman", { "allowSingleLine": true }],  // 괄호 스타일
+    "comma-style": [2, "last"], // 콤마 스타일
+    "block-spacing": 2, // 단일 블럭 구문의 안쪽에 일관된 공백
+    "comma-spacing": [2, { "before": false, "after": true }], // 콤마 앞뒤에 일관된 공백
+    "func-call-spacing": [2, "never"],  // 함수 식별자와 호출 사이의 일관된 공백
+    "indent": [2, "tab"], // 일관된 들여쓰기
+    "key-spacing": [2, {
+      "align": {
+        "beforeColon": true,
+        "afterColon": true,
+        "on": "colon"
+      }
+    }], // 객체 리터럴 속성에서 키와 값 사이의 일관된 공백
+    "keyword-spacing": [2, { "before": true, "after": true }],  // 키워드 전후에 일관된 공백
+    "new-parens": 2,  // 인수없는 생성자 호출할 때 괄호 필요함
+    "no-bitwise": 0,  // 비트 연산자를 허용하지 않음
+    "camelcase": 0, // 변수 이름을 작성할 때 카멜표기법을 따름
+    "curly": [2, "all"],  // 모든 제어문에 대해 일괄된 중괄호 규칙을 따름
+    "eqeqeq": 2,  // 타입에 안전한 항등 연산자 사용(===, !==)
+    "guard-for-in": 2,  // 안전한 for in 반복문 사용을 위해 필터링된 결과를 사용(hasOwnProperty)
+    "no-extend-native": 2,  // 네이티브 객체의 확장 금지(Object.prototype)
+    "wrap-iife": [2, "inside"], // 즉시 호출된 함수식(IIFE)을 생성하는 괄호를 요구함
+    "no-use-before-define": 2,  // 선언 전에 식별자 사용 금지
+    "new-cap": [2, { "newIsCap": true, "capIsNew": false }], // 생성자 이름은 대문자로 시작
+    "no-caller": 2, // arguments.caller, arguments.callee 사용 금지
+    "no-empty": 2,  // 빈 블럭 구문을 허용하지 않음
+    "no-irregular-whitespace": 2, // 유효하지 않거나 불규칙한 공백을 허용하지 않음
+    "no-new": 2,  // new 생성자 단독 사용 금지(생성된 객체를 저장하는 변수를 선언해야 함)
+    "no-plusplus": 0, // 단항 연산자(+++, --) 사용을 허용하지 않음
+    "quotes": 0,  // 인용부호(", ', `)의 일관된 사용을 강제
+    "no-undef": 0,  // 선언되지 않은 변수 허용하지 않음
+    "no-unused-vars": 1,  // 사용되지 않는 변수 허용하지 않음
+    "strict": 2,  // 엄격모드 사용
+    "semi": 2,  // 세미콜론 요구
+    "no-cond-assign": 2,  // 조건문에서 할당 연산자를 허용하지 않음
+    "no-debugger": 0, // debugger문 사용을 허용하지 않음
+    "no-eq-null": 2,  // 형식 검사 연산자 없이 null 비교를 허용하지 않음
+    "no-eval": 2, // eval() 함수 사용을 허용하지 않음
+    "no-unused-expressions": 0, // 사용되지 않는 표현식의 사용을 허용하지 않음
+    "block-scoped-var": 0,  // 선언된 블럭문 안에서만 사용되는 변수로 다룸
+    "no-iterator": 2, // 반복자(__iterator__) 사용 금지
+    "linebreak-style": [2, "unix"], // 일관성있는 줄바꿈 스타일 적용
+    "no-loop-func": 0,  // 반복문에서 함수 작성 금지
+    "no-multi-str": 0,  // 여러 줄의 문자열 금지
+    "require-yield": 0, // yield 가 없는 생성자 함수를 허용하지 않음
+    "valid-typeof": 2,  // 유효한 문자열에 대해 typeof 표현식을 비교함
+    "no-proto": 2,  // __proto__  사용을 금지(deprecated as of ECMAScript 3.1)
+    "no-script-url": 2, // javascript:URL 사용 금지
+    "no-shadow": 2, // 외부에서 선언된 쉐도잉 변수를 내부 변수로 선언하는 것을 허용하지 않음
+    "dot-notation": 2,  // 속성 접근 할 때 . 기호 사용(O : foo.bar , X : foo["bar"])
+    "no-new-func": 0, // 함수 생성자를 허용하지 않음(new Function)
+    "no-new-wrappers": 0, // primitive wrapper(String, Number, Boolean)의 인스턴스를 허용하지 않음
+    "no-invalid-this": 2  // 클래스 또는 클래스같은 객체의 외부에서 this 키워드를 허용하지 않음
+  }
+}

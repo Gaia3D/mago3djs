@@ -1,0 +1,329 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "3ds"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "kangbukSport_del",
+			"data_name": "강북스포츠센터",
+			"heading": 360,
+			"height": 31,
+			"latitude": 37.58198979353269,
+			"longitude": 126.60820956457543,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gwangjin_Youth_Center_del",
+			"data_name": "광진청소년수련관",
+			"heading": 630,
+			"height": 32,
+			"latitude": 37.583754532032326,
+			"longitude": 126.60931061270068,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Gangseo_cultural_del",
+			"data_name": "강서문화원",
+			"heading": 990,
+			"height": 26,
+			"latitude": 37.582419509248105,
+			"longitude": 126.60666274596315,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gangnam_del",
+			"data_name": "강남구민회관",
+			"heading": 990,
+			"height": 44,
+			"latitude": 37.58395319107423,
+			"longitude": 126.60724995998346,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gwangjin_library_del",
+			"data_name": "광진정보도서관",
+			"heading": 630,
+			"height": 32,
+			"latitude": 37.58264782899985,
+			"longitude": 126.6093510039972,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "historypark_del",
+			"data_name": "동대문운동장기념관",
+			"heading": 699,
+			"height": 30,
+			"latitude": 37.5829305308201,
+			"longitude": 126.60932432621343,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "DC_library_del",
+			"data_name": "대방어린이도서관",
+			"heading": 540,
+			"height": 32,
+			"latitude": 37.5832891672532,
+			"longitude": 126.60702611657658,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Gwanakgu_del",
+			"data_name": "관악구의회",
+			"heading": 990,
+			"height": 40,
+			"latitude": 37.58362692191355,
+			"longitude": 126.60845939021223,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "KANGBUK_del",
+			"data_name": "강북문화예술회관",
+			"heading": 123,
+			"height": 33,
+			"latitude": 37.583925148368756,
+			"longitude": 126.61055308104375,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "GyeomjaeJeongSeon_del",
+			"data_name": "겸재정선기념관",
+			"heading": 540,
+			"height": 29,
+			"latitude": 37.58328870711409,
+			"longitude": 126.60625627706231,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Gwangjin_center_del",
+			"data_name": "광진문화예술회관",
+			"heading": 360,
+			"height": 37,
+			"latitude": 37.58264274155634,
+			"longitude": 126.60831759533984,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Gangsu_office_del",
+			"data_name": "강서구청",
+			"heading": 90,
+			"height": 28,
+			"latitude": 37.58276566574734,
+			"longitude": 126.60673026943972,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Dongdaemoongu_center_del",
+			"data_name": "동대문구민체육센터",
+			"heading": 810,
+			"height": 31,
+			"latitude": 37.58218502123928,
+			"longitude": 126.60727280962003,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gangil_del",
+			"data_name": "강일동 주민센터",
+			"heading": 360,
+			"height": 32,
+			"latitude": 37.58201438816841,
+			"longitude": 126.60673623135487,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gangbuk_cultur_del",
+			"data_name": "강북문화정보센터",
+			"heading": 990,
+			"height": 32,
+			"latitude": 37.58289603056518,
+			"longitude": 126.60725378640926,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gookjoo_library_del",
+			"data_name": "동작상도국주도서관",
+			"heading": 450,
+			"height": 24,
+			"latitude": 37.584301221570534,
+			"longitude": 126.60780730555985,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Guro_Art_Valley_del",
+			"data_name": "구로아트밸리(예술극장)",
+			"heading": 540,
+			"height": 40,
+			"latitude": 37.584256200219306,
+			"longitude": 126.6084269712107,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "dogok_library_del",
+			"data_name": "도곡정보문화도서관",
+			"heading": 840,
+			"height": 32,
+			"latitude": 37.58443455135179,
+			"longitude": 126.61061030373783,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "gomdalrae_del",
+			"data_name": "금달래 문화복지센터",
+			"heading": 540,
+			"height": 40,
+			"latitude": 37.582015824374196,
+			"longitude": 126.6092289903043,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Factory Kitbash",
+			"data_name": "Factory Kitbash",
+			"heading": 90.0,
+			"height": 50,
+			"latitude": 37.58061786826666,
+			"longitude": 126.61092625615778,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Factory 03",
+			"data_name": "Factory 03",
+			"heading": 90.0,
+			"height": 70,
+			"latitude": 37.5804305308201,
+			"longitude": 126.60832432621343,
+			"pitch": 90.0,
+			"roll": 0.0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "3ds",
+	"data_name": "3ds"
+}

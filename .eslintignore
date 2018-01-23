@@ -1,0 +1,2 @@
+# /node_modules/* and /bower_components/* ignored by default
+/src/mago3d/extern/*
