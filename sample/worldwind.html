@@ -909,19 +909,19 @@
 				dataType: "json",
 				success: function(msg){
 					if(msg.result == "success") {
-						alert(JS_MESSAGE["insert"]);
+						alert("Registered.");
 						// pin image를 그림
 						drawInsertIssueImageAPI(managerFactory, 1, msg.issue.issue_id, msg.issue.issue_type, 
 								$("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
 					} else {
-						alert(JS_MESSAGE[msg.result]);
+						alert("failed.");
 					}
 					
 					isInsertIssue["enable"] = true;
 					ajaxIssueList();
 				},
 				error : function(request, status, error) {
-			        alert(JS_MESSAGE["ajax.error.message"]);
+			        alert("Please use it after a while. \n If the same phenomenon repeats for a long time, please contact the administrator.");
 			        console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 			        isInsertIssue["enable"] = true;
 				}
@@ -934,23 +934,23 @@
 			
 			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
-			alert(JS_MESSAGE["button.dobule.click"]);
+			alert("In progress.");
 			return;
 		}
 	});
 	function check() {
 		if ($("#data_key").val() === "") {
-			alert(JS_MESSAGE["issue.datakey.empty"]);
+			alert("Please enter the Data Key.");
 			$("#data_key").focus();
 			return false;
 		}
 		if ($("#title").val() === "") {
-			alert(JS_MESSAGE["issue.title.empty"]);
+			alert("Please enter a title.");
 			$("#title").focus();
 			return false;
 		}
 		if ($("#contents").val() === "") {
-			alert(JS_MESSAGE["issue.contents.empty"]);
+			alert("Please enter your content.");
 			$("#contents").focus();
 			return false;
 		}
@@ -1006,7 +1006,7 @@
 					$("#myIssueMenuContent").empty();
 					$("#myIssueMenuContent").html(content);
 				} else {
-					alert(JS_MESSAGE[msg.result]);
+					alert("failed.");
 				}
 			},
 			error : function(request, status, error) {
@@ -1123,7 +1123,7 @@
 			$("#searchList").html(content);
 			searchDataFlag["enable"] = true;
 		} else {
-			alert(JS_MESSAGE["button.dobule.click"]);
+			alert("In progress.");
 			return;
 		}
 	});
@@ -1284,7 +1284,7 @@
 							}
 						}
 					} else {
-						alert(JS_MESSAGE[msg.result]);
+						alert("failed.");
 					}
 				},
 				error : function(request, status, error) {
