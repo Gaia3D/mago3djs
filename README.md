@@ -66,7 +66,9 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
   - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
   <code>C:\git\repository\mago3djs</code>
-  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
+  (삭제의 경우 rmdir data)
+  </code></pre>
 
 ### 6. 설정 파일 수정
 두 가지의 설정파일을 수정한다. (data.json, policy.json)
@@ -207,7 +209,8 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - Create Symbolic Link to use transformed F4D files as web service in mago3D JS project
   - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project
   <code>C:\mago3djs</code>
-  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
+  (delete is rmdir data)</code></pre>
 
 ### 6. Edit Configuration File
 Add two configuration files. (data.json, policy.json)
@@ -349,7 +352,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - 変換完了F4Dファイルをmago3D JSプロジェクトでは、Webサービスとして利用できるようにSymbolic Linkを作成
   - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動
   <code>C:\mago3djs</code>
-  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
+  (削除の場合 rmdir data)</code></pre>
 
 ### 6. 設定ファイルを変更する
 二種類の設定ファイルを追加します。 (data.json, policy.json)
