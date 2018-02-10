@@ -5698,7 +5698,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					heading = neoBuilding.metaData.heading;
 					pitch = neoBuilding.metaData.pitch;
 					roll = neoBuilding.metaData.roll;
-					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude+10, heading, pitch, roll, geoLoc, this);
+					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					
 					if (neoBuilding.buildingId === "ctships")
@@ -6753,7 +6753,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
-	var smartTilesCount = this.smartTileManager.tilesArray.length; // "smartTilesCount" = 2.
+	var smartTilesCount = this.smartTileManager.tilesArray.length; // In this point, "smartTilesCount" = 2 always.
 	for (var a=0; a<smartTilesCount; a++)
 	{
 		var smartTile = this.smartTileManager.tilesArray[a];
