@@ -236,10 +236,10 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				}
 				else 
 				{
-					continue;
-					//gl.uniform1i(standardShader.hasTexture_loc, false);
-					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-					//renderTexture = false;
+					//continue;
+					gl.uniform1i(standardShader.hasTexture_loc, false);
+					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					renderTexture = false;
 				}
 			}
 
@@ -279,6 +279,9 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		{ continue; }
 	
 		if (neoBuilding.buildingId ==="BAR POOL ROOM")
+		{ var hola = 0; }
+	
+		if (neoBuilding.buildingId ==="k11_0163")
 		{ var hola = 0; }
 	
 		if (neoBuilding.lodMeshesArray === undefined)
@@ -1052,7 +1055,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
-		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
+		if (!renderTexture && !vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
 		{ return; }
 		
 		// 4) Texcoord.*********************************************

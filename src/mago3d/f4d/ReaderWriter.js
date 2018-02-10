@@ -989,6 +989,40 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
  */
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
 {
+function Utf8ArrayToStr(array) {
+    var out, i, len, c;
+    var char2, char3;
+
+    out = "";
+    len = array.length;
+    i = 0;
+    while(i < len) {
+    c = array[i++];
+    switch(c >> 4)
+    { 
+      case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+        // 0xxxxxxx
+        out += String.fromCharCode(c);
+        break;
+      case 12: case 13:
+        // 110x xxxx   10xx xxxx
+        char2 = array[i++];
+        out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+        break;
+      case 14:
+        // 1110 xxxx  10xx xxxx  10xx xxxx
+        char2 = array[i++];
+        char3 = array[i++];
+        out += String.fromCharCode(((c & 0x0F) << 12) |
+                       ((char2 & 0x3F) << 6) |
+                       ((char3 & 0x3F) << 0));
+        break;
+    }
+    }
+
+    return out;
+};
+
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
@@ -1040,12 +1074,14 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 					{
 						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
 					}
+					
+					if (i === 165)
+						var hola = 0;
 
 					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					for (var j=0; j<texture_fileName_Legth; j++) 
-					{
-						textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
-					}
+					var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
+					var decoder = new TextDecoder('utf-8');
+					textureImageFileName = decoder.decode(charArray);
 					
 					if (texture_fileName_Legth > 0)
 					{
@@ -1058,6 +1094,62 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 						
 						neoBuilding.texturesLoaded.push(texture);
 					}
+				}
+				
+				// read geometry type data.***
+				var lod;
+				var geometryLodsCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				if(geometryLodsCount !== undefined)
+				{
+					if(neoBuilding.availableLodMeshesArray === undefined)
+						neoBuilding.availableLodMeshesArray = [];
+					
+					neoBuilding.availableLodMeshesArray.length = 0;
+					
+					for(var i =0; i<geometryLodsCount; i++)
+					{
+						lod = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						neoBuilding.availableLodMeshesArray.push(lod);
+					}
+					
+					var textureLodsCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+					if(textureLodsCount === undefined)
+						var hola = 0;
+					
+					if(neoBuilding.availableLodTexturesArray === undefined)
+						neoBuilding.availableLodTexturesArray = [];
+					
+					neoBuilding.availableLodTexturesArray.length = 0;
+					
+					for(var i =0; i<textureLodsCount; i++)
+					{
+						lod = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						neoBuilding.availableLodTexturesArray.push(lod);
+					}
+				}
+				else{
+					// is the old version, so make the available arrays.***
+					if(neoBuilding.availableLodMeshesArray === undefined)
+						neoBuilding.availableLodMeshesArray = [];
+					
+					neoBuilding.availableLodMeshesArray.length = 0;
+					
+					neoBuilding.availableLodMeshesArray.push(0);
+					neoBuilding.availableLodMeshesArray.push(2);
+					neoBuilding.availableLodMeshesArray.push(3);
+					neoBuilding.availableLodMeshesArray.push(4);
+					neoBuilding.availableLodMeshesArray.push(5);
+					
+					if(neoBuilding.availableLodTexturesArray === undefined)
+						neoBuilding.availableLodTexturesArray = [];
+					
+					neoBuilding.availableLodTexturesArray.length = 0;
+					
+					neoBuilding.availableLodTexturesArray.push(2);
+					neoBuilding.availableLodTexturesArray.push(3);
+					neoBuilding.availableLodTexturesArray.push(4);
+					neoBuilding.availableLodTexturesArray.push(5);
+					neoBuilding.availableLodTexturesArray.push(6);
 				}
 			}
 
