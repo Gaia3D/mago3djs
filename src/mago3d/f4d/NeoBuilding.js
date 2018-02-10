@@ -47,6 +47,8 @@ var NeoBuilding = function()
 	
 	// In version 001, there are 5 lods.***
 	// actually oldMeshes are lego object.***
+	this.availableLodMeshesArray;
+	this.availableLodTexturesArray;
 	this.lodMeshesArray; // here stores lod3mesh, lod4mesh and lod5mesh.***
 	
 	// Render settings.***************************************************

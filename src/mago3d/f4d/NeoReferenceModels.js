@@ -1040,10 +1040,16 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<texture_fileName_Legth; j++) 
-				{
-					textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-				}
+				
+				// utf8.***
+				var charArray = new Uint8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ texture_fileName_Legth)); bytes_readed += texture_fileName_Legth;
+				var decoder = new TextDecoder('utf-8');
+				textureImageFileName = decoder.decode(charArray);
+					
+				//for (var j=0; j<texture_fileName_Legth; j++) 
+				//{
+				//	textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
+				//}
 				
 				if (texture_fileName_Legth > 0)
 				{
