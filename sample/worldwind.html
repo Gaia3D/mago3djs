@@ -311,16 +311,17 @@
 				</li>
 				<li>
 					<label for="moveHeading">HEADING </label>
-					<input type="text" id="moveHeading" name="moveHeading" size="25" />
+					<input type="text" id="moveHeading" name="moveHeading" size="15" />
 				</li>
 				<li>
 					<label for="movePitch">PITCH </label>
-					<input type="text" id="movePitch" name="movePitch" size="25" />
+					<input type="text" id="movePitch" name="movePitch" size="15" />
 				</li>
 				<li>
 					<label for="moveRoll">ROLL </label>
-					<input type="text" id="moveRoll" name="moveRoll" size="18" />
-					<button type="button" id="changeLocationAndRotation" class="btn">Change</button> 
+					<input type="text" id="moveRoll" name="moveRoll" size="15" />
+					<button type="button" id="changeLocationAndRotation" class="btn">Change</button>
+					<button type="button" id="saveLocationAndRotation" class="btn">Save</button>
 				</li>
 			</ul>
 		</div>
@@ -511,7 +512,7 @@
 			<h3>Selecting And Moving</h3>
 			<input type="radio" id="objectNoneMove" name="objectMoveMode" value="2" onclick="changeObjectMove('2');"/>
 			<label for="objectNoneMove"> None </label>
-			<input type="radio" id="mouseAllMove" name="objectMoveMode" value="0" onclick="changeObjectMove('0');"/>
+			<input type="radio" id="objectAllMove" name="objectMoveMode" value="0" onclick="changeObjectMove('0');"/>
 			<label for="objectAllMove"> ALL </label>
 			<input type="radio" id="objectMove" name="objectMoveMode" value="1" onclick="changeObjectMove('1');"/>
 			<label for="objectMove"> Object </label>
@@ -524,7 +525,7 @@
 			<div style="height: 30px;">
 				<div style="display: inline-block; width: 70px;">Select</div>
 				<input type="radio" id="useOcclusionCulling" name="occlusionCulling" value="true" />
-				<label for="useOccusionCulling"> Use </label>
+				<label for="useOcclusionCulling"> Use </label>
 				<input type="radio" id="unusedOcclusionCulling" name="occlusionCulling" value="false" />
 				<label for="unusedOcclusionCulling"> Unused </label>
 			</div>
@@ -605,13 +606,13 @@
 </div>
 
 <ul class="shortcut">
-	<li onclick="gotoProject('3ds.json', '126.60856869381428', '37.58199267183209', '550', '3')">3DS Project</li>
+	<li onclick="gotoProject('3ds.json', '126.60856869381428', '37.58210', '550', '3')">3DS Project</li>
 	<li onclick="gotoProject('ifc_cultural_assets.json', '126.97772995695296', '37.57981', '80', '3')">IFC(Cultural Assets)</li>
-	<li onclick="gotoProject('ifc.json', '-58.784', '-62.2232', '220', '5')">IFC</li>
-	<li onclick="gotoProject('ifc_mep.json', '126.738134', '37.663559', '150', '3')">IFC(MEP)</li>
+	<li onclick="gotoProject('ifc.json', '-58.787', '-62.2237', '270', '5')">IFC</li>
+	<li onclick="gotoProject('ifc_mep.json', '126.738234', '37.6636', '150', '3')">IFC(MEP)</li>
 	<li onclick="gotoProject('sea_port.json', '126.598426', '37.440778', '630', '3')">Sea Port</li>
-	<li onclick="gotoProject('collada.json', '126.799403', '37.568150', '370', '3')">Collada Project</li>
-	<li onclick="gotoProject('ifc_japan.json', '139.6845', '35.6624', '270', '3')">IFC(Japan)</li>
+	<li onclick="gotoProject('collada.json', '126.7987', '37.567450', '370', '3')">Collada Project</li>
+	<li onclick="gotoProject('ifc_japan.json', '139.6842', '35.6624', '320', '3')">IFC(Japan)</li>
 </ul>
 
 <div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
@@ -909,19 +910,19 @@
 				dataType: "json",
 				success: function(msg){
 					if(msg.result == "success") {
-						alert(JS_MESSAGE["insert"]);
+						alert("Registered.");
 						// pin image를 그림
 						drawInsertIssueImageAPI(managerFactory, 1, msg.issue.issue_id, msg.issue.issue_type, 
 								$("#data_key").val(), $("#latitude").val(), $("#longitude").val(), $("#height").val());
 					} else {
-						alert(JS_MESSAGE[msg.result]);
+						alert("failed.");
 					}
 					
 					isInsertIssue["enable"] = true;
 					ajaxIssueList();
 				},
 				error : function(request, status, error) {
-			        alert(JS_MESSAGE["ajax.error.message"]);
+			        alert("Please use it after a while. \n If the same phenomenon repeats for a long time, please contact the administrator.");
 			        console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
 			        isInsertIssue["enable"] = true;
 				}
@@ -934,23 +935,23 @@
 			
 			changeInsertIssueStateAPI(managerFactory, 0);
 		} else {
-			alert(JS_MESSAGE["button.dobule.click"]);
+			alert("In progress.");
 			return;
 		}
 	});
 	function check() {
 		if ($("#data_key").val() === "") {
-			alert(JS_MESSAGE["issue.datakey.empty"]);
+			alert("Please enter the Data Key.");
 			$("#data_key").focus();
 			return false;
 		}
 		if ($("#title").val() === "") {
-			alert(JS_MESSAGE["issue.title.empty"]);
+			alert("Please enter a title.");
 			$("#title").focus();
 			return false;
 		}
 		if ($("#contents").val() === "") {
-			alert(JS_MESSAGE["issue.contents.empty"]);
+			alert("Please enter your content.");
 			$("#contents").focus();
 			return false;
 		}
@@ -1006,7 +1007,7 @@
 					$("#myIssueMenuContent").empty();
 					$("#myIssueMenuContent").html(content);
 				} else {
-					alert(JS_MESSAGE[msg.result]);
+					alert("failed.");
 				}
 			},
 			error : function(request, status, error) {
@@ -1123,7 +1124,7 @@
 			$("#searchList").html(content);
 			searchDataFlag["enable"] = true;
 		} else {
-			alert(JS_MESSAGE["button.dobule.click"]);
+			alert("In progress.");
 			return;
 		}
 	});
@@ -1260,7 +1261,13 @@
 		}
 		return true;
 	}
-	
+
+    // 변환행렬 저장
+    $("#saveLocationAndRotation").click(function() {
+		alert("This service is available only in Enterprise Version.");
+		return;
+    });
+
 	// 인접 지역 이슈 표시
 	function changeNearGeoIssueList(isShow) {
 		$("input:radio[name='nearGeoIssueList']:radio[value='" + isShow + "']").prop("checked", true);
@@ -1284,7 +1291,7 @@
 							}
 						}
 					} else {
-						alert(JS_MESSAGE[msg.result]);
+						alert("failed.");
 					}
 				},
 				error : function(request, status, error) {
@@ -1427,101 +1434,7 @@
 		$("#positionLongitude").val(position.lon);
 		$("#positionAltitude").val(position.alt);
 	}
-	
-	// 모든 데이터 비표시
-	function clearAllData() {
-		clearAllDataAPI(managerFactory);
-	}
-	
-	function drawCheckedData(checkboxName) {
-		var checkCount = $("input[name='" + checkboxName + "']:checked").length;
-		var projectIdArray = new Array(checkCount);
-		var projectDataArray = new Array(checkCount);
-		var projectDataFolderArray = new Array(checkCount);
-		var dataCount = 0;
-		$("input[name='" + checkboxName + "']:checked").each(function(index) {
-			var dataName = $(this).val();
-			if (!isDataExistAPI(CODE.PROJECT_ID_PREFIX + dataName)) {
-				$.ajax({
-					url      : dataInformationUrl + dataName,
-					type     : "GET",
-					dataType : "json",
-					success  : function(serverData) {
-						projectIdArray[index] = dataName;
-						projectDataArray[index] = serverData;
-						projectDataFolderArray[index] = serverData.data_key;
-											
-						if(checkCount === (dataCount + 1)) {
-							drawAppendDataAPI(managerFactory, projectIdArray, projectDataArray, projectDataFolderArray);
-						}
-						dataCount++;
-					},
-					error: function(request, status, error) {
-						console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
-					}
-				});
-			} else {
-				// TODO 이 부분은 조금 수정을 해야 할지도 모르겠다. 데이터는 cache로 있지만 아직 새로 로딩을 해야 하는 경우 배열로 이름을 넘겨줘야 하지 않나?
-				console.log("########## data Exist. name = " + dataName);
-				dataCount++;
-			}
-		});
-	}
-	
-	// fullship
-	$("#2119_fullship").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	
-	// deploy
-	$("#2119_deploy").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	
-	// decoration
-	$("#decoration").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	
-	// 2119_sampleBlocks
-	$("#2119_sampleBlocks").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_PEConstructed
-	$("#2119_PEConstructed").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_fullShipUnderConstruction1
-	$("#2119_fullShipUnderConstruction1").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_PERemained1
-	$("#2119_PERemained1").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_fullShipUnderConstruction2
-	$("#2119_fullShipUnderConstruction2").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_PERemained2
-	$("#2119_PERemained2").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	// 2119_fullShipCompleted
-	$("#2119_fullShipCompleted").click(function() {
-		clearAllDataAPI(managerFactory);
-		drawCheckedData("createStepsShip");
-	});
-	
+
 	// general callback alert function
 	function showApiResult(apiName, result) {
 		if(apiName === "searchData") {

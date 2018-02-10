@@ -4,3 +4,5 @@
 build/
 data
 .project
+.idea/
+mago3djs.iml
