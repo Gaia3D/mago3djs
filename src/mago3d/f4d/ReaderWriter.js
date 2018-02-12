@@ -1041,6 +1041,9 @@ function Utf8ArrayToStr(array) {
 			}
 			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
 
+			if(neoBuilding.buildingId === "k11_0163")
+				var hola = 0;
+			
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 

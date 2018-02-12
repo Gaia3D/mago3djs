@@ -236,6 +236,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				}
 				else 
 				{
+					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1.texId);
 					//continue;
 					gl.uniform1i(standardShader.hasTexture_loc, false);
 					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
