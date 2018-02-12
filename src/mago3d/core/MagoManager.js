@@ -2512,6 +2512,10 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, scene, node, visibleObjControlerOctrees, lod) 
 {
 	var neoBuilding = node.data.neoBuilding;
+	
+	// chaek if the neoBuilding has availableLod_0.***
+	
+	
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
@@ -5569,9 +5573,14 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	var neoBuilding;
 	var nodeBbox;
 	var buildingSeed;
+	var startIndex = 0;
+	
+	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
+	if(lowestTile.nodesArray)
+		startIndex = lowestTile.nodesArray.length;
 	
 	var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
-	for (var j=0; j<nodeSeedsCount; j++)
+	for (var j=startIndex; j<nodeSeedsCount; j++)
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		neoBuilding = new NeoBuilding();
@@ -5674,6 +5683,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
+				
+				if (neoBuilding.buildingId === "Gaikan")
+					{ var hola = 0; }
 
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
@@ -5800,6 +5812,12 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				{
 					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
 				}
+			}
+			
+			if(lowestTile.nodesArray.length !== lowestTile.nodeSeedsArray.length)
+			{
+				// create the buildings by buildingSeeds.
+				this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
 			}
 		}
 		else
