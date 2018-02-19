@@ -65,9 +65,6 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
-		if (neoBuilding.buildingId === "PCv2_RVT2018")
-		{ var hola = 0; }
-		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 	
@@ -91,9 +88,6 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		}
 		else if (ssao_idx === 1)
 		{
-			if (neoBuilding.buildingId === "PCv2_RVT2018")
-			{ var hola = 0; }
-		
 			if (neoBuilding.texturesLoaded && neoBuilding.texturesLoaded.length>0)
 			{
 				renderTexture = true;
@@ -236,11 +230,11 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				}
 				else 
 				{
-					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1.texId);
-					//continue;
-					gl.uniform1i(standardShader.hasTexture_loc, false);
-					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-					renderTexture = false;
+					//gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1.texId);
+					continue;
+					//gl.uniform1i(standardShader.hasTexture_loc, false);
+					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					//renderTexture = false;
 				}
 			}
 
@@ -277,15 +271,6 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		if (neoBuilding === undefined)
-		{ continue; }
-	
-		if (neoBuilding.buildingId ==="BAR POOL ROOM")
-		{ var hola = 0; }
-	
-		if (neoBuilding.buildingId ==="k11_0163")
-		{ var hola = 0; }
-	
-		if (neoBuilding.lodMeshesArray === undefined)
 		{ continue; }
 		
 		skinLego = neoBuilding.getCurrentSkin();
@@ -339,9 +324,16 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 			}
 			else 
 			{
-				gl.uniform1i(standardShader.hasTexture_loc, false);
-				gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-				renderTexture = false;
+				if(magoManager.textureAux_1x1 !== undefined)
+				{
+					gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+					//gl.activeTexture(gl.TEXTURE2); 
+					gl.uniform1i(standardShader.hasTexture_loc, true);
+					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+					//gl.uniform1i(standardShader.hasTexture_loc, false);
+					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					//renderTexture = false;
+				}
 			}
 		}
 

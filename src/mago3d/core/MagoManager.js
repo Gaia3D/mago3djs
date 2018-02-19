@@ -1353,8 +1353,11 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 			continue;
 		}
 		
-		if (neoBuilding.lodMeshesArray === undefined)
-		{ neoBuilding.lodMeshesArray = []; }
+		//if (neoBuilding.lodMeshesArray === undefined)
+		//{ neoBuilding.lodMeshesArray = []; } // old.***
+	
+		if (neoBuilding.lodMeshesMap === undefined)
+		{ neoBuilding.lodMeshesMap = new Map(); } 
 		
 		projectFolderName = neoBuilding.projectFolderName;
 		buildingFolderName = neoBuilding.buildingFileName;
@@ -1364,42 +1367,42 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		//neoBuilding.distToCam = neoBuilding.octree.getMinDistToCamera(cameraPosition);
 		var textureFileName;
 		var lodString;
-		var lodIdx;
+		var lodIdx; // old.***
 		
 		if (neoBuilding.distToCam < this.magoPolicy.getLod3DistInMeters())
 		{
-			textureFileName = "mosaicTextureLod3.png";
-			lodString = "lod3";
 			lodIdx = 0;
 			neoBuilding.currentLod = 3;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod4DistInMeters())
 		{
-			textureFileName = "mosaicTextureLod4.png";
-			lodString = "lod4";
 			lodIdx = 1;
 			neoBuilding.currentLod = 4;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod5DistInMeters())
 		{
-			textureFileName = "mosaicTextureLod5.png";
-			lodString = "lod5";
 			lodIdx = 2;
 			neoBuilding.currentLod = 5;
 		}
 		else { continue; }
 		
-		if (neoBuilding.buildingId === "historypark_del")
-		{ var hola = 0; }
-
+		// must check if the desirable lodMesh is available.***
+		var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
+		if(lodBuildingData === undefined)
+			continue;
 		
-		lowLodMesh = neoBuilding.lodMeshesArray[lodIdx];
+		textureFileName = lodBuildingData.textureFileName;
+		lodString = lodBuildingData.geometryFileName;
+		
+		//lowLodMesh = neoBuilding.lodMeshesArray[lodIdx]; // old.***
+		lowLodMesh = neoBuilding.lodMeshesMap.get(lodString);
 		if (lowLodMesh === undefined)
 		{
 			lowLodMesh = new Lego();
 			lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
 			lowLodMesh.textureName = textureFileName;
-			neoBuilding.lodMeshesArray[lodIdx] = lowLodMesh;
+			//neoBuilding.lodMeshesArray[lodIdx] = lowLodMesh;// old.***
+			neoBuilding.lodMeshesMap.set(lodString, lowLodMesh);
 		}
 		
 		if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
@@ -1424,7 +1427,6 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, this);
 			}
 		}
-
 	}
 	
 };
@@ -3149,7 +3151,7 @@ MagoManager.prototype.manageQueue = function()
 			node = this.visibleObjControlerNodes.currentVisibles3[i];
 			neoBuilding = node.data.neoBuilding;
 			
-			if (neoBuilding === undefined || neoBuilding.lodMeshesArray === undefined)
+			if (neoBuilding === undefined || neoBuilding.lodMeshesMap === undefined)
 			{ continue; }
 		
 		    // check the current lod of the building.***
@@ -3157,9 +3159,17 @@ MagoManager.prototype.manageQueue = function()
 			var lodIdx = currentBuildingLod - 3;
 			
 			if (lodIdx < 0)
-			{ continue; }
+			{ continue; }// old.***
+		
+			var lodString;
+			if(currentBuildingLod === 3)
+				lodString = "lod3";
+			else if(currentBuildingLod === 4)
+				lodString = "lod4";
+			else if(currentBuildingLod === 5)
+				lodString = "lod5";
 			
-			skinLego = neoBuilding.lodMeshesArray[lodIdx];
+			skinLego = neoBuilding.lodMeshesMap.get(lodString);
 			if (skinLego === undefined)
 			{ continue; }
 			
