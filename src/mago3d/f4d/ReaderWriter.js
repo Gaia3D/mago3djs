@@ -1101,58 +1101,90 @@ function Utf8ArrayToStr(array) {
 				
 				// read geometry type data.***
 				var lod;
-				var geometryLodsCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-				if(geometryLodsCount !== undefined)
+				var nameLength;
+				var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				if(lodBuildingDatasCount !== undefined)
 				{
-					if(neoBuilding.availableLodMeshesArray === undefined)
-						neoBuilding.availableLodMeshesArray = [];
+					if(neoBuilding.lodBuildingDatasArray === undefined)
+						neoBuilding.lodBuildingDatasArray = [];
 					
-					neoBuilding.availableLodMeshesArray.length = 0;
+					neoBuilding.lodBuildingDatasArray.length = 0;
 					
-					for(var i =0; i<geometryLodsCount; i++)
+					for(var i =0; i<lodBuildingDatasCount; i++)
 					{
-						lod = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-						neoBuilding.availableLodMeshesArray.push(lod);
+						var lodBuildingData = new LodBuildingData();
+						lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						
+						if(!lodBuildingData.isModelRef)
+						{
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.geometryFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+							
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.textureFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+						}
+						neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
 					}
-					
-					var textureLodsCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-					if(textureLodsCount === undefined)
-						var hola = 0;
-					
-					if(neoBuilding.availableLodTexturesArray === undefined)
-						neoBuilding.availableLodTexturesArray = [];
-					
-					neoBuilding.availableLodTexturesArray.length = 0;
-					
-					for(var i =0; i<textureLodsCount; i++)
-					{
-						lod = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-						neoBuilding.availableLodTexturesArray.push(lod);
-					}
+
 				}
 				else{
 					// is the old version, so make the available arrays.***
-					if(neoBuilding.availableLodMeshesArray === undefined)
-						neoBuilding.availableLodMeshesArray = [];
+					if(neoBuilding.lodBuildingDatasArray === undefined)
+						neoBuilding.lodBuildingDatasArray = [];
 					
-					neoBuilding.availableLodMeshesArray.length = 0;
+					neoBuilding.lodBuildingDatasArray.length = 0;
+
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 0;
+					lodBuildingData.isModelRef = true;
+					lodBuildingData.geometryFileName = undefined;
+					lodBuildingData.textureFileName = undefined;
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
 					
-					neoBuilding.availableLodMeshesArray.push(0);
-					neoBuilding.availableLodMeshesArray.push(2);
-					neoBuilding.availableLodMeshesArray.push(3);
-					neoBuilding.availableLodMeshesArray.push(4);
-					neoBuilding.availableLodMeshesArray.push(5);
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 1;
+					lodBuildingData.isModelRef = true;
+					lodBuildingData.geometryFileName = undefined;
+					lodBuildingData.textureFileName = undefined;
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
 					
-					if(neoBuilding.availableLodTexturesArray === undefined)
-						neoBuilding.availableLodTexturesArray = [];
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 2;
+					lodBuildingData.isModelRef = true;
+					lodBuildingData.geometryFileName = undefined;
+					lodBuildingData.textureFileName = undefined;
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
 					
-					neoBuilding.availableLodTexturesArray.length = 0;
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 3;
+					lodBuildingData.isModelRef = false;
+					lodBuildingData.geometryFileName = "lod3";
+					lodBuildingData.textureFileName = "mosaicTextureLod3.png";
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
 					
-					neoBuilding.availableLodTexturesArray.push(2);
-					neoBuilding.availableLodTexturesArray.push(3);
-					neoBuilding.availableLodTexturesArray.push(4);
-					neoBuilding.availableLodTexturesArray.push(5);
-					neoBuilding.availableLodTexturesArray.push(6);
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 4;
+					lodBuildingData.isModelRef = false;
+					lodBuildingData.geometryFileName = "lod4";
+					lodBuildingData.textureFileName = "mosaicTextureLod4.png";
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
+					
+					var lodBuildingData = new LodBuildingData();
+					lodBuildingData.lod = 5;
+					lodBuildingData.isModelRef = false;
+					lodBuildingData.geometryFileName = "lod5";
+					lodBuildingData.textureFileName = "mosaicTextureLod5.png";
+					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
+					
 				}
 			}
 
