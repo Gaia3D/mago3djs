@@ -341,22 +341,6 @@
 				"flipYTexCoords": true
 			},
 			"children": [],
-			"data_key": "k11_0163",
-			"data_name": "k11_0163",
-			"heading": 0,
-			"height": 55,
-			"latitude": 37.5808,
-			"longitude": 126.614,
-			"pitch": 0,
-			"roll": 0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
-			},
-			"children": [],
 			"data_key": "SEOULSTATION_del",
 			"data_name": "SEOULSTATION_del",
 			"heading": -40,
