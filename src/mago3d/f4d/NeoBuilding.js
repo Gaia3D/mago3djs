@@ -427,7 +427,7 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	if (this.currentLod === 3)
 	{
 		skinLego = this.lodMeshesMap.get("lod3");
-		/*
+		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesMap.get("lod4");
@@ -436,12 +436,12 @@ NeoBuilding.prototype.getCurrentSkin = function()
 				skinLego = this.lodMeshesMap.get("lod5");
 			}
 		}
-		*/
+		
 	}
 	else if (this.currentLod === 4)
 	{
 		skinLego = this.lodMeshesMap.get("lod4");
-		/*
+		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesMap.get("lod5");
@@ -450,12 +450,12 @@ NeoBuilding.prototype.getCurrentSkin = function()
 				skinLego = this.lodMeshesMap.get("lod3");
 			}
 		}
-		*/
+		
 	}
 	else if (this.currentLod === 5)
 	{
 		skinLego = this.lodMeshesMap.get("lod5");
-		/*
+		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesMap.get("lod4");
@@ -464,7 +464,7 @@ NeoBuilding.prototype.getCurrentSkin = function()
 				skinLego = this.lodMeshesMap.get("lod3");
 			}
 		}
-		*/
+		
 	}
 	/*
 	if (this.currentLod === 3)
