@@ -15,7 +15,7 @@ var HierarchyManager = function()
 
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
-	this.projectsMap = new Map();
+	this.projectsMap = {};
 };
 
 /**
@@ -25,12 +25,11 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
-	for (var value of this.projectsMap.values()) 
-	{
-		value.clear();
-	}
-	
-	this.projectsMap.clear();
+	//for (var value of this.projectsMap.values()) 
+	//{
+	//	value.clear();
+	//}
+	this.projectsMap = {};
 	
 	var nodesCount = this.nodesArray.length;
 	for (var i=0; i<nodesCount; i++)
@@ -58,8 +57,10 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
 	
 	var resultNode;
 	
-	for (var value of nodesMap.values()) 
+	//for (var value of nodesMap.values()) 
+	for(var key in nodesMap)
 	{
+		var value = nodesMap[key];
 		if (value.data[dataName] === dataNameValue)
 		{
 			resultNode = value;
@@ -102,7 +103,7 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
  */
 HierarchyManager.prototype.existProject = function(projectId) 
 {
-	return this.projectsMap.has(projectId);
+	return this.projectsMap.hasOwnProperty(projectId);
 };
 
 /**
@@ -113,11 +114,11 @@ HierarchyManager.prototype.existProject = function(projectId)
 HierarchyManager.prototype.getNodesMap = function(projectId) 
 {
 	// 1rst, check if exist.
-	var nodesMap = this.projectsMap.get(projectId);
+	var nodesMap = this.projectsMap[projectId];
 	if (nodesMap === undefined)
 	{
-		nodesMap = new Map();
-		this.projectsMap.set(projectId, nodesMap);
+		nodesMap = {};
+		this.projectsMap[projectId] = nodesMap;
 	}
 	return nodesMap;
 };
@@ -135,7 +136,7 @@ HierarchyManager.prototype.newNode = function(id, projectId)
 	var node = new Node();
 	node.data = {"nodeId": id};
 	this.nodesArray.push(node);
-	nodesMap.set(id, node);
+	nodesMap[id] = node;
 	return node;
 };
 

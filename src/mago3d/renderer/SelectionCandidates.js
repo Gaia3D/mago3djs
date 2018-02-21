@@ -13,10 +13,10 @@ var SelectionCandidates = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.referencesMap = new Map();
-	this.octreesMap = new Map();
-	this.buildingsMap = new Map();
-	this.nodesMap = new Map();
+	this.referencesMap = {};
+	this.octreesMap = {};
+	this.buildingsMap = {};
+	this.nodesMap = {};
 	
 	this.currentReferenceSelected;
 	this.currentOctreeSelected;
@@ -34,22 +34,22 @@ SelectionCandidates.prototype.setCandidates = function(idxKey, reference, octree
 {
 	if (reference)
 	{
-		this.referencesMap.set(idxKey, reference);
+		this.referencesMap[idxKey] = reference;
 	}
 	
 	if (octree)
 	{
-		this.octreesMap.set(idxKey, octree);
+		this.octreesMap[idxKey] = octree;
 	}
 	
 	if (building)
 	{
-		this.buildingsMap.set(idxKey, building);
+		this.buildingsMap[idxKey] = building;
 	}
 	
 	if (node)
 	{
-		this.nodesMap.set(idxKey, node);
+		this.nodesMap[idxKey] = node;
 	}
 };
 
@@ -61,10 +61,10 @@ SelectionCandidates.prototype.setCandidates = function(idxKey, reference, octree
  */
 SelectionCandidates.prototype.clearCandidates = function()
 {
-	this.referencesMap.clear();
-	this.octreesMap.clear();
-	this.buildingsMap.clear();
-	this.nodesMap.clear();
+	this.referencesMap = {};
+	this.octreesMap = {};
+	this.buildingsMap = {};
+	this.nodesMap = {};
 };
 
 /**
@@ -75,10 +75,10 @@ SelectionCandidates.prototype.clearCandidates = function()
  */
 SelectionCandidates.prototype.selectObjects = function(idxKey)
 {
-	this.currentReferenceSelected = this.referencesMap.get(idxKey);
-	this.currentOctreeSelected = this.octreesMap.get(idxKey);
-	this.currentBuildingSelected = this.buildingsMap.get(idxKey);
-	this.currentNodeSelected = this.nodesMap.get(idxKey);
+	this.currentReferenceSelected = this.referencesMap[idxKey];
+	this.currentOctreeSelected = this.octreesMap[idxKey];
+	this.currentBuildingSelected = this.buildingsMap[idxKey];
+	this.currentNodeSelected = this.nodesMap[idxKey];
 };
 
 /**

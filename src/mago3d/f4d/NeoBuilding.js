@@ -76,7 +76,7 @@ NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId)
 	if (this.motherNeoReferencesMap === undefined)
 	{ return undefined; }
 
-	var refObject = this.motherNeoReferencesMap.get(objectId);
+	var refObject = this.motherNeoReferencesMap[objectId];
 	return refObject;
 };
 
@@ -94,15 +94,15 @@ NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx)
 	
 	// Additionally, make a objects map.
 	if (this.motherNeoReferencesMap === undefined)
-	{ this.motherNeoReferencesMap = new Map(); }
+	{ this.motherNeoReferencesMap = {}; }
 	
-	var objectsArray = this.motherNeoReferencesMap.get(refObject.objectId);
+	var objectsArray = this.motherNeoReferencesMap[refObject.objectId];
 	if (objectsArray === undefined)
 	{ objectsArray = []; }
 	
 	objectsArray.push(refObject);
 	
-	this.motherNeoReferencesMap.set(refObject.objectId, objectsArray);
+	this.motherNeoReferencesMap[refObject.objectId] = objectsArray;
 };
 
 /**
@@ -133,7 +133,7 @@ NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManag
 	// 1rst, clear this.motherNeoReferencesMap.
 	if (this.motherNeoReferencesMap)
 	{ 
-		this.motherNeoReferencesMap.clear(); 
+		this.motherNeoReferencesMap = {}; 
 		this.motherNeoReferencesMap = undefined;
 	}
 	
@@ -388,6 +388,10 @@ NeoBuilding.prototype.getLodBuildingData = function(lod)
 {
 	var resultLodBuildingData = undefined;
 	var find = false;
+	
+	if(this.lodBuildingDatasArray === undefined)
+		return;
+	
 	var lodBuildingDatasCount = this.lodBuildingDatasArray.length;
 	var i = 0;
 	while(!find && i<lodBuildingDatasCount)
@@ -426,42 +430,42 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	var skinLego;
 	if (this.currentLod === 3)
 	{
-		skinLego = this.lodMeshesMap.get("lod3");
+		skinLego = this.lodMeshesMap["lod3"];
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap.get("lod4");
+			skinLego = this.lodMeshesMap["lod4"];
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap.get("lod5");
+				skinLego = this.lodMeshesMap["lod5"];
 			}
 		}
 		
 	}
 	else if (this.currentLod === 4)
 	{
-		skinLego = this.lodMeshesMap.get("lod4");
+		skinLego = this.lodMeshesMap["lod4"];
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap.get("lod5");
+			skinLego = this.lodMeshesMap["lod5"];
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap.get("lod3");
+				skinLego = this.lodMeshesMap["lod3"];
 			}
 		}
 		
 	}
 	else if (this.currentLod === 5)
 	{
-		skinLego = this.lodMeshesMap.get("lod5");
+		skinLego = this.lodMeshesMap["lod5"];
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap.get("lod4");
+			skinLego = this.lodMeshesMap["lod4"];
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap.get("lod3");
+				skinLego = this.lodMeshesMap["lod3"];
 			}
 		}
 		

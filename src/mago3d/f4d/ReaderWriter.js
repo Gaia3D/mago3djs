@@ -953,7 +953,9 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
 				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
 				neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-
+			
+			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
+			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 			neoBuilding.octree.makeTree(3);
 			neoBuilding.octree.setSizesSubBoxes();
 
@@ -1040,12 +1042,11 @@ function Utf8ArrayToStr(array) {
 				neoBuilding.metaData = new MetaData();
 			}
 			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
-
-			if(neoBuilding.buildingId === "k11_0163")
-				var hola = 0;
 			
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
+			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
+			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 
 			// now, parse octreeAsimetric.***
 			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
