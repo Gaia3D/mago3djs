@@ -62,7 +62,7 @@ var VBOKeysNation = function(bufferSizes, minSize)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// buffer sizes are in bytes.
-	this.vboKeysStoreMap = new Map();
+	this.vboKeysStoreMap = {};
 	this.bufferSizes = bufferSizes;
 	this.minSize = minSize;
 	this.maxSize = bufferSizes[bufferSizes.length-1];
@@ -73,7 +73,7 @@ var VBOKeysNation = function(bufferSizes, minSize)
 	for (var i=0; i<sizesCount; i++)
 	{
 		vboKeysStore = new VBOKeysStore(bufferSizes[i]);
-		this.vboKeysStoreMap.set(bufferSizes[i], vboKeysStore);
+		this.vboKeysStoreMap[bufferSizes[i]] = vboKeysStore;
 
 		if (bufferSizes[i] > this.maxSize) { this.maxSize = bufferSizes[i]; }
 	}
@@ -86,7 +86,7 @@ var VBOKeysNation = function(bufferSizes, minSize)
 VBOKeysNation.prototype.getClassifiedBufferKey = function(gl, bufferSize, keyWorld, onlyReuse) 
 {
 	// 1rst find the vboKeyStore for this bufferSize.
-	var vboKeyStore = this.vboKeysStoreMap.get(bufferSize);
+	var vboKeyStore = this.vboKeysStoreMap[bufferSize];
 	
 	if (vboKeyStore)
 	{
@@ -102,7 +102,7 @@ VBOKeysNation.prototype.getClassifiedBufferKey = function(gl, bufferSize, keyWor
 VBOKeysNation.prototype.storeClassifiedBufferKey = function(bufferKey, bufferSize) 
 {
 	// 1rst find the vboKeyStore for this bufferSize.
-	var vboKeyStore = this.vboKeysStoreMap.get(bufferSize);
+	var vboKeyStore = this.vboKeysStoreMap[bufferSize];
 	if (vboKeyStore)
 	{
 		vboKeyStore.storeBufferKey(bufferKey);

@@ -453,7 +453,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
 }
 
 /**
- * 환경 설정 data map에 key 값의 존재 유무를 판별
+ * 환경 설정 data Object에 key 값의 존재 유무를 판별
  * @param {string} key 검색 키
  * @param 
  */

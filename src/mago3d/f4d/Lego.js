@@ -19,6 +19,7 @@ var Lego = function()
 	this.selColor4;
 	this.texture;
 	this.textureName;
+	this.legoKey;
 };
 
 /**
