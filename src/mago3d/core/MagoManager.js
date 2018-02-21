@@ -4151,6 +4151,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 					gl.uniform2fv(currentShader.screenSize_loc, [this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight]);
 					gl.uniformMatrix4fv(currentShader.ProjectionMatrix_loc, false, this.sceneState.projectionMatrix._floatArrays);
 					
+					gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+					
 					gl.enable(gl.STENCIL_TEST);
 					gl.disable(gl.POLYGON_OFFSET_FILL);
 					gl.disable(gl.CULL_FACE);
