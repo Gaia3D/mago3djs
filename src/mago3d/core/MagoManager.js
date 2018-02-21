@@ -5734,7 +5734,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					
 				neoBuilding = node.data.neoBuilding;
 				
-				if (neoBuilding.buildingId === "Gaikan")
+				if (neoBuilding.buildingId === "Tile_173078_LD_010_017_L22")
 					{ var hola = 0; }
 
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
@@ -5920,6 +5920,10 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	
 	var nodeRoot = node.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	
+	if(geoLocDataManager === undefined)
+	{ return; }
+
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 
@@ -6619,6 +6623,9 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
 		
+		if (buildingId === "Tile_173078_LD_010_017_L22")
+		{ var hola = 0; }
+		
 		if (attributes.isPhysical)
 		{
 			// find the buildingSeed.
@@ -6812,6 +6819,9 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	{
 		buildingSeed = buildingSeedList.buildingSeedArray[i];
 		buildingId = buildingSeed.buildingId;
+		
+		if(buildingId === "Tile_173078_LD_010_017_L22")
+			var hola = 0;
 		
 		buildingSeedMap[buildingId] = buildingSeed;
 	}
