@@ -124,8 +124,8 @@
 	<div id="searchMenuContent" class="searchWrap">
 		<table>
 			<tr style="height: 35px;">
-				<td style="width: 80px;"><label for="project_id">Project</label></td>
-				<td><select id="project_id" name="project_id" class="select">
+				<td style="width: 80px;"><label for="search_project_id">Project</label></td>
+				<td><select id="search_project_id" name="search_project_id" class="select">
 						<option value=""> ALL </option>
 						<option value="1">3DS Project</option>
 						<option value="2">Collada Project</option>
@@ -150,13 +150,13 @@
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-				<label for="search_value">Search Word</label></td>
+				<label for="search_value">SearchWord</label></td>
 				<td><input type="text" id="search_value" name="search_value" size="31" /></td>
 			</tr>
 			<tr style="height: 35px;">
 				<td><label for="start_date">Date</label></td>
 				<td><input type="text" class="s date" id="start_date" name="start_date" size="12" />
-				<span class="delimeter tilde">~</span>
+				<span class="delimiter tilde">~</span>
 				<input type="text" class="s date" id="end_date" name="end_date" size="12" /></td>
 			</tr>
 			<tr style="height: 30px;">
@@ -728,15 +728,8 @@
 	}
 
 	var managerFactory = null;
-	var menuMap = new Map();
-	menuMap.set("homeMenu", false);
-	menuMap.set("myIssueMenu", false);
-	menuMap.set("searchMenu", false);
-	menuMap.set("apiMenu", false);
-	menuMap.set("insertIssueMenu", false);
-	menuMap.set("configMenu", false);
+	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, configMenu : false };
 	var insertIssueEnable = false;
-	var FPVModeFlag = false;
 
 	var imagePath = "/images/ko";
 	var dataInformationUrl = "/sample/persistence/json/";
@@ -1036,10 +1029,11 @@
 		menuSlideControl("configMenu");
 	});
 	function menuSlideControl(menuName) {
-		var compareMenuState = menuMap.get(menuName);
-		for(var [key, value] of menuMap) {
-			// state 값 변경하고, css 변경
+		var compareMenuState = menuObject[menuName];
+		for(var key in menuObject) {
+		    // state 값 변경하고, css 변경
 			if(key === menuName) {
+			    var value = menuObject[key];
 				if(value) {
 					$("#" + menuName).removeClass("on");
 					$("#menuContent").hide();
@@ -1049,7 +1043,7 @@
 					$("#menuContent").show();
 					$("#" + menuName + "Content").show();
 				}
-				menuMap.set(menuName, !compareMenuState);
+				menuObject[menuName] = !compareMenuState;
 			} else {
 				$("#" + key).removeClass("on");
 				$("#" + key + "Content").hide();
@@ -1059,12 +1053,13 @@
 	
 	// menu content close 버튼
 	$("#menuContentClose").click(function() {
-		for(var [key, value] of menuMap) {
+        for(var key in menuObject) {
+            var value = menuObject[key];
 			if(value) {
 				$("#menuContent").hide();
 				$("#" + key + "Content").hide();
 				$("#" + key).removeClass("on");
-				menuMap.set(key, !value);
+				menuObject[key] = !value;
 			}
 		}
 		// 이슈 등록 비활성화 상태
@@ -1287,7 +1282,7 @@
 						if(issueList != null && issueList.length > 0) {
 							for(i=0; i<issueList.length; i++ ) {
 								var issue = issueList[i];
-								drawInsertIssueImageAPI(managerFactory, 0, issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
+								drawInsertIssueImageAPI(managerFactory, "0", issue.issue_id, issue.issue_type, issue.data_key, issue.latitude, issue.longitude, issue.height);
 							}
 						}
 					} else {

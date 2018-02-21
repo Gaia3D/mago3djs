@@ -339,7 +339,10 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 		if (existLego)
 		{
 			if (block.lego === undefined)
-			{ block.lego = new Lego(); }
+			{ 
+				// TODO : this is no used. delete this.***
+				block.lego = new Lego(); 
+			}
 			
 			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
 		}

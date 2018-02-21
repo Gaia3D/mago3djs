@@ -190,10 +190,8 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 			{
 				lowestOctree.lego = new Lego();
 				lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
+				lowestOctree.lego.legoKey = lowestOctree.octreeKey + "_lego";
 			}
-
-			if (lowestOctree.lego === undefined && lowestOctree.lego.dataArrayBuffer === undefined) 
-			{ continue; }
 
 			if (neoBuilding === undefined)
 			{ continue; }
