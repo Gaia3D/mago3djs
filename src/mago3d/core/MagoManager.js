@@ -1530,11 +1530,14 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		rootNodesMap[key] = nodeRoot;
 	}
 	
-	var rootNodesArray = Object.values(rootNodesMap);
-	var nodesCount = rootNodesArray.length;
-	for (var i=0; i<nodesCount; i++)
+	//var rootNodesArray = Object.values(rootNodesMap);
+	//var rootNodesKeysArray = Object.keys(rootNodesMap);
+	//var nodesCount = rootNodesKeysArray.length;
+	//for (var i=0; i<nodesCount; i++)
+	for(var key in rootNodesMap)
 	{
-		nodeRoot = rootNodesArray[i];
+		//nodeRoot = rootNodesArray[i];
+		nodeRoot = rootNodesMap[key];
 		geoLocDataManager = nodeRoot.data.geoLocDataManager;
 		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 		//neoBuilding = node.data.neoBuilding;
@@ -2721,11 +2724,13 @@ MagoManager.prototype.manageQueue = function()
 	//}
 	
 	///var nodesToDeleteArray = Array.from(this.processQueue.nodesToDeleteMap.keys());
-	var nodesToDeleteArray = Object.values(this.processQueue.nodesToDeleteMap);
+	//var nodesToDeleteArray = Object.values(this.processQueue.nodesToDeleteMap);
 
-	for (var i=0; i<maxDeleteNodesCount; i++)
+	//for (var i=0; i<maxDeleteNodesCount; i++)
+	for(var key in this.processQueue.nodesToDeleteMap)
 	{
-		node = nodesToDeleteArray[i];
+		//node = nodesToDeleteArray[i];
+		node = this.processQueue.nodesToDeleteMap[key];
 		
 		if (node == undefined)
 		{ continue; }
@@ -2738,17 +2743,19 @@ MagoManager.prototype.manageQueue = function()
 	
 		this.deleteNeoBuilding(gl, neoBuilding);
 	}
-	nodesToDeleteArray = [];
-	nodesToDeleteArray = undefined;
+	//nodesToDeleteArray = [];
+	//nodesToDeleteArray = undefined;
 	
 	// now delete modelReferences of lod2Octrees.
 	var modelRefsDeletedCount = 0;
-	var nodesToDeletesCount = Object.keys(this.processQueue.nodesToDeleteModelReferencesMap).length;
-	var nodesToDeleteModelReferencesArray = Object.values(this.processQueue.nodesToDeleteModelReferencesMap);
+	//var nodesToDeletesCount = Object.keys(this.processQueue.nodesToDeleteModelReferencesMap).length;
+	//var nodesToDeleteModelReferencesArray = Object.values(this.processQueue.nodesToDeleteModelReferencesMap);
 
-	for (var i=0; i<nodesToDeletesCount; i++)
+	//for (var i=0; i<nodesToDeletesCount; i++)
+	for(var key in this.processQueue.nodesToDeleteModelReferencesMap)
 	{
-		node = nodesToDeleteModelReferencesArray[i];
+		//node = nodesToDeleteModelReferencesArray[i];
+		node = this.processQueue.nodesToDeleteModelReferencesMap[key];
 		
 		if (node.data === undefined)
 		{ continue; }
