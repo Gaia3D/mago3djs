@@ -65,7 +65,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 <br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\프로젝트명 -log C:\demo_data/logTest.txt -indexing y</code></pre>
 - 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
   - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
-  <code>C:\git\repository\mago3djs</code>
+  <code>C:\git\repository\mago3djs</code><br>
   <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
   (삭제의 경우 rmdir data)
   </code></pre>
@@ -73,7 +73,8 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 ### 6. 설정 파일 수정
 두 가지의 설정파일을 수정한다. (data.json, policy.json)
 #### data.json
-- 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children 그외 위치 정보를 저장하는 영역
+- 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children, 그외 위치 정보를 저장하는 영역
+- attributes 영역의 isPhysical 속성은 데이터 표시 여부를 체크하는 필수 속성
 - json의 root 노드의 data_key는 data 폴더 아래 프로젝트명과 일치
 <pre><code>{
     //attributes영역
@@ -97,8 +98,8 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -144,9 +145,11 @@ http:localhost/sample/worldwind.html</code></pre>
 
 
 <br><br>
+-----
+<br><br>
 
 
-[한국어](#korean)
+###### Using Google Translator
 # <a name="english"></a>mago3DJS
 Open source JavaScript library for 3D multi-block visualization
 
@@ -207,8 +210,8 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - Run
 <br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\projectname -log C:\demo_data/logTest.txt -indexing y</code></pre>
 - Create Symbolic Link to use transformed F4D files as web service in mago3D JS project
-  - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project
-  <code>C:\mago3djs</code>
+  - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project<br>
+  <code>C:\mago3djs</code><br>
   <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
   (delete is rmdir data)</code></pre>
 
@@ -216,6 +219,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 Add two configuration files. (data.json, policy.json)
 #### data.json
 - It is divided into three major areas. Attributes to store attribute values, children to store child node information, other area to store location information
+- The isPhysical attribute of the - attributes field is a mandatory attribute
 - The data_key of the root node of json matches the project name under the data folder
 <pre><code>{
     //attributes area
@@ -239,8 +243,8 @@ Add two configuration files. (data.json, policy.json)
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -283,11 +287,13 @@ http:localhost/sample/worldwind.html</code></pre>
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
-<br><br>
-[english](#english) <br>
 
-<a name="japan"></a>
-準備中です。
+<br><br>
+-----
+<br><br>
+
+
+###### Googleの翻訳を使用して
 # mago3DJS
 3次元マルチブロック可視化のためのオープンソースのJavaScriptライブラリ
 
@@ -350,15 +356,16 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - 次を実行し
 <br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\プロジェクト名 -log C:\demo_data/logTest.txt -indexing y</code></pre>
 - 変換完了F4Dファイルをmago3D JSプロジェクトでは、Webサービスとして利用できるようにSymbolic Linkを作成
-  - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動
-  <code>C:\mago3djs</code>
+  - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動<br>
+  <code>C:\mago3djs</code><br>
   <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" 
   (削除の場合 rmdir data)</code></pre>
 
 ### 6. 設定ファイルを変更する
 二種類の設定ファイルを追加します。 (data.json, policy.json)
 #### data.json
-- 大きく3つのエリアに分けられる。属性値を格納するattributes、子ノードの情報を格納するchildrenその他の位置情報を格納する領域
+- 大きく3つのエリアに分けられる。属性値を格納するattributes、子ノードの情報を格納するchildren、その他の位置情報を格納する領域
+- attributes領域のisPhysicalプロパティは、データを表示するかどうかをチェックする必須属性
 - jsonのrootノードのdata_keyはdataフォルダの下のプロジェクト名と一致
 <pre><code>{
     //attributes領域
@@ -382,8 +389,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -425,3 +432,5 @@ http:localhost/sample/worldwind.html</code></pre>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+<br><br>
