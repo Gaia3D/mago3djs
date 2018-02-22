@@ -1067,13 +1067,13 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
-		var cabreadoTex = new Texture();
+		cabreadoTex = new Texture();
 		filePath_inServer = this.magoPolicy.imagePath + "/etc.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
-		var cabreadoTex = new Texture();
+		cabreadoTex = new Texture();
 		filePath_inServer = this.magoPolicy.imagePath + "/new.png";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
@@ -3186,13 +3186,16 @@ MagoManager.prototype.manageQueue = function()
 			if (lodIdx < 0)
 			{ continue; }// old.***
 		
-			var lodString;
+			var lodString = undefined;
 			if(currentBuildingLod === 3)
 				lodString = "lod3";
 			else if(currentBuildingLod === 4)
 				lodString = "lod4";
 			else if(currentBuildingLod === 5)
 				lodString = "lod5";
+
+			if(lodString === undefined)
+			{ continue; }
 			
 			///skinLego = neoBuilding.lodMeshesMap.get(lodString);
 			skinLego = neoBuilding.lodMeshesMap[lodString];
