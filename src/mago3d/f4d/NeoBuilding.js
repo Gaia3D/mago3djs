@@ -198,20 +198,16 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 	this.texturesLoaded = undefined;
 	
 	// delete lod3, lod4, lod5.***
-	if (this.lodMeshesArray)
+	if(this.lodMeshesMap !== undefined)
 	{
-		var lodMeshesCount = this.lodMeshesArray.length;
-		for (var i=0; i<lodMeshesCount; i++)
+		for(var key in this.lodMeshesMap)
 		{
-			if (this.lodMeshesArray[i])
-			{
-				this.lodMeshesArray[i].deleteObjects(gl, vboMemoryManager);
-				this.lodMeshesArray[i] = undefined;
-			}
+			var legoSkin = this.lodMeshesMap[key];
+			legoSkin.deleteObjects(gl, vboMemoryManager)
+			legoSkin = undefined;
 		}
-		this.lodMeshesArray.length = 0;
+		this.lodMeshesMap = undefined;
 	}
-	this.lodMeshesArray = undefined;
 };
 
 /**
