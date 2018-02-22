@@ -2780,13 +2780,12 @@ MagoManager.prototype.manageQueue = function()
 	}
 	
 	// now, delete lod0, lod1, lod2.***
-	/*
 	var deletedCount = 0;
-	var nodesToDeleteLod2Lod4Lod5Array = Array.from(this.processQueue.nodesToDeleteLessThanLod3Map.keys());
-	var nodesCount = nodesToDeleteLod2Lod4Lod5Array.length;
-	for (var i=0; i<nodesCount; i++)
+	/*
+	for(var key in this.processQueue.nodesToDeleteLessThanLod3Map)
 	{
-		node = nodesToDeleteLod2Lod4Lod5Array[i];
+		node = this.processQueue.nodesToDeleteLessThanLod3Map[key];
+		//node = nodesToDeleteLod2Lod4Lod5Array[i];
 		if (node.data === undefined)
 		{ continue; }
 	

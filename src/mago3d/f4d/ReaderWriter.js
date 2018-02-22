@@ -312,44 +312,6 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
- * @param fileName 변수
- * @param blocksList 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) 
-{
-//	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else { blocksList.fileLoadState = status; }
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
  * @param fileName 파일명
  * @param magoManager 변수
  */
