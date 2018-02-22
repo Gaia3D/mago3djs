@@ -46,7 +46,6 @@ var NeoBuilding = function()
 	this.simpleBuilding3x3Texture; // old version.***
 	
 	// In version 001, there are 6 lods.***
-	//this.lodMeshesArray; // here stores lod3mesh, lod4mesh and lod5mesh, but must change by "lodMeshesMap".***
 	this.lodMeshesMap;
 	this.lodBuildingDatasArray;
 	
