@@ -6554,56 +6554,20 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var pitch = undefined;
 	var roll = undefined;
 	
-	if (jasonObject.attributes !== undefined)
+	if (jasonObject !== undefined)
 	{
 		attributes = jasonObject.attributes;
-	}
-	if (jasonObject.children !== undefined)
-	{
 		children = jasonObject.children;
-	}
-	if (jasonObject.data_group_id !== undefined)
-	{
 		data_group_id = jasonObject.data_group_id;
-	}
-	if (jasonObject.data_group_name !== undefined)
-	{
 		data_group_name = jasonObject.data_group_name;
-	}
-	if (jasonObject.data_id !== undefined)
-	{
 		data_id = jasonObject.data_id;
-	}
-	if (jasonObject.data_key !== undefined)
-	{
 		data_key = jasonObject.data_key;
-	}
-	if (jasonObject.data_name !== undefined)
-	{
 		data_name = jasonObject.data_name;
-	}
-	if (jasonObject.heading !== undefined)
-	{
 		heading = jasonObject.heading;
-	}
-	if (jasonObject.height !== undefined)
-	{
 		height = jasonObject.height;
-	}
-	if (jasonObject.latitude !== undefined)
-	{
 		latitude = jasonObject.latitude;
-	}
-	if (jasonObject.longitude !== undefined)
-	{
 		longitude = jasonObject.longitude;
-	}
-	if (jasonObject.pitch !== undefined)
-	{
 		pitch = jasonObject.pitch;
-	}
-	if (jasonObject.roll !== undefined)
-	{
 		roll = jasonObject.roll;
 	}
 	
