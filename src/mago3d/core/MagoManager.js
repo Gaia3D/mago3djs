@@ -2795,9 +2795,6 @@ MagoManager.prototype.manageQueue = function()
 			neoBuilding = node.data.neoBuilding;
 			if (neoBuilding === undefined)
 			{ continue; }
-		
-			if(neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
-				var hola = 0;
 			
 			if (neoBuilding.octree !== undefined)
 			{ 
@@ -2867,11 +2864,11 @@ MagoManager.prototype.manageQueue = function()
 			else 
 			{
 				// test else.
-				if (lowestOctree.neoReferencesMotherAndIndices)
-				{
-					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-					{ var hola = 0; }
-				}
+				//if (lowestOctree.neoReferencesMotherAndIndices)
+				//{
+					//if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+					//{ var hola = 0; }
+				//}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -2945,11 +2942,11 @@ MagoManager.prototype.manageQueue = function()
 			else 
 			{
 				// test else.
-				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
-				{
-					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-					{ var hola = 0; }
-				}
+				//if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				//{
+				//	if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				//	{ var hola = 0; }
+				//}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -3049,11 +3046,11 @@ MagoManager.prototype.manageQueue = function()
 			else 
 			{
 				// test else.
-				if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
-				{
-					if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-					{ var hola = 0; }
-				}
+				//if (lowestOctree.neoReferencesMotherAndIndices && lowestOctree.neoReferencesMotherAndIndices.blocksList)
+				//{
+				//	if (lowestOctree.neoReferencesMotherAndIndices.blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				//	{ var hola = 0; }
+				//}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -5457,8 +5454,8 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	this.visibleObjControlerNodes.currentVisibles2.length = 0;
 	this.visibleObjControlerNodes.currentVisibles3.length = 0;
 	
-	if (this.fullyIntersectedLowestTilesArray.length > 0)
-	{ var hola= 0 ; }
+	//if (this.fullyIntersectedLowestTilesArray.length > 0)
+	//{ var hola= 0 ; }
 	var bDoFrustumCullingToBuildings = false;
 	this.tilesFrustumCullingFinished(this.fullyIntersectedLowestTilesArray, cameraPosition, frustumVolume, bDoFrustumCullingToBuildings);
 	bDoFrustumCullingToBuildings = true;
@@ -5536,7 +5533,6 @@ MagoManager.prototype.testAproxDist3D = function()
 	var ratio = aproxDistCalculationTimeAmount/distCalculationTimeAmount *100;
 	var error = (aproxDist - realDist)/realDist * 100;
 	
-	var hola = 0;
 };
 
 /**
@@ -5671,8 +5667,8 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 		neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
 		neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 		neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-		if (node.data.projectFolderName === undefined)
-		{ var hola = 0; }
+		//if (node.data.projectFolderName === undefined)
+		//{ var hola = 0; }
 		neoBuilding.projectFolderName = node.data.projectFolderName;
 	}
 };
@@ -5693,6 +5689,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var lod1_minDist = 1;
 	var lod2_minDist = this.magoPolicy.getLod2DistInMeters();
 	var lod5_minDist = this.magoPolicy.getLod5DistInMeters();
+	var lod3_minDist;
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
@@ -5735,10 +5732,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
-				
-				if (neoBuilding.buildingId === "Tile_173078_LD_010_017_L22")
-					{ var hola = 0; }
-
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
 					if (neoBuilding.metaData.geographicCoord === undefined)
@@ -6786,9 +6779,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 		buildingSeed = buildingSeedList.buildingSeedArray[i];
 		buildingId = buildingSeed.buildingId;
 		
-		if(buildingId === "Tile_173078_LD_010_017_L22")
-			var hola = 0;
-		
 		buildingSeedMap[buildingId] = buildingSeed;
 	}
 	var projectFolderName = realTimeLocBlocksList.data_key;
@@ -7017,8 +7007,7 @@ MagoManager.prototype.callAPI = function(api)
 		this.propertyFilterSC.projectId = projectId;
 		this.propertyFilterSC.propertyKey = propertyKey;
 		this.propertyFilterSC.propertyValue = propertyValue;
-			
-		var hola = 0;
+
 	}	
 	else if (apiName === "drawAppendData")
 	{
