@@ -284,13 +284,15 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
-	{
+	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
 			blocksList.dataArraybuffer = arrayBuffer;
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
+			
+			
 			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
 		}
 		else 
@@ -953,39 +955,41 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
  */
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
 {
-function Utf8ArrayToStr(array) {
-    var out, i, len, c;
-    var char2, char3;
+	function Utf8ArrayToStr(array) 
+	{
+		var out, i, len, c;
+		var char2, char3;
 
-    out = "";
-    len = array.length;
-    i = 0;
-    while(i < len) {
-    c = array[i++];
-    switch(c >> 4)
-    { 
-      case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-        // 0xxxxxxx
-        out += String.fromCharCode(c);
-        break;
-      case 12: case 13:
-        // 110x xxxx   10xx xxxx
-        char2 = array[i++];
-        out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
-        break;
-      case 14:
-        // 1110 xxxx  10xx xxxx  10xx xxxx
-        char2 = array[i++];
-        char3 = array[i++];
-        out += String.fromCharCode(((c & 0x0F) << 12) |
+		out = "";
+		len = array.length;
+		i = 0;
+		while (i < len) 
+		{
+			c = array[i++];
+			switch (c >> 4)
+			{ 
+			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+				// 0xxxxxxx
+				out += String.fromCharCode(c);
+				break;
+			case 12: case 13:
+				// 110x xxxx   10xx xxxx
+				char2 = array[i++];
+				out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+				break;
+			case 14:
+				// 1110 xxxx  10xx xxxx  10xx xxxx
+				char2 = array[i++];
+				char3 = array[i++];
+				out += String.fromCharCode(((c & 0x0F) << 12) |
                        ((char2 & 0x3F) << 6) |
                        ((char3 & 0x3F) << 0));
-        break;
-    }
-    }
+				break;
+			}
+		}
 
-    return out;
-};
+		return out;
+	};
 
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
@@ -1004,9 +1008,6 @@ function Utf8ArrayToStr(array) {
 				neoBuilding.metaData = new MetaData();
 			}
 			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
-			
-			if(neoBuilding.buildingId === "Tile_173078_LD_010_017_L22")
-				var hola = 0;
 			
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
@@ -1066,20 +1067,28 @@ function Utf8ArrayToStr(array) {
 				var lod;
 				var nameLength;
 				var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-				if(lodBuildingDatasCount !== undefined)
+				if (lodBuildingDatasCount !== undefined)
 				{
-					if(neoBuilding.lodBuildingDatasArray === undefined)
-						neoBuilding.lodBuildingDatasArray = [];
+					neoBuilding.lodBuildingDatasMap = {};
 					
-					neoBuilding.lodBuildingDatasArray.length = 0;
-					
-					for(var i =0; i<lodBuildingDatasCount; i++)
+					for (var i =0; i<lodBuildingDatasCount; i++)
 					{
 						var lodBuildingData = new LodBuildingData();
 						lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 						lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 						
-						if(!lodBuildingData.isModelRef)
+						if (lodBuildingData.lod === 2)
+						{
+							// read the lod2_textureFileName.***
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.textureFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+						}
+						
+						if (!lodBuildingData.isModelRef)
 						{
 							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 							lodBuildingData.geometryFileName = "";
@@ -1095,59 +1104,9 @@ function Utf8ArrayToStr(array) {
 								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
 							}
 						}
-						neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
+						neoBuilding.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
 					}
 
-				}
-				else{
-					// is the old version, so make the available arrays.***
-					if(neoBuilding.lodBuildingDatasArray === undefined)
-						neoBuilding.lodBuildingDatasArray = [];
-					
-					neoBuilding.lodBuildingDatasArray.length = 0;
-
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 0;
-					lodBuildingData.isModelRef = true;
-					lodBuildingData.geometryFileName = undefined;
-					lodBuildingData.textureFileName = undefined;
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 1;
-					lodBuildingData.isModelRef = true;
-					lodBuildingData.geometryFileName = undefined;
-					lodBuildingData.textureFileName = undefined;
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 2;
-					lodBuildingData.isModelRef = true;
-					lodBuildingData.geometryFileName = undefined;
-					lodBuildingData.textureFileName = undefined;
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 3;
-					lodBuildingData.isModelRef = false;
-					lodBuildingData.geometryFileName = "lod3";
-					lodBuildingData.textureFileName = "mosaicTextureLod3.png";
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 4;
-					lodBuildingData.isModelRef = false;
-					lodBuildingData.geometryFileName = "lod4";
-					lodBuildingData.textureFileName = "mosaicTextureLod4.png";
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
-					var lodBuildingData = new LodBuildingData();
-					lodBuildingData.lod = 5;
-					lodBuildingData.isModelRef = false;
-					lodBuildingData.geometryFileName = "lod5";
-					lodBuildingData.textureFileName = "mosaicTextureLod5.png";
-					neoBuilding.lodBuildingDatasArray.push(lodBuildingData);
-					
 				}
 			}
 

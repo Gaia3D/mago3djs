@@ -574,6 +574,22 @@
 			"longitude": 126.60832432621343,
 			"pitch": 90.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "GasanDigital_del",
+			"data_name": "GasanDigital_del",
+			"heading": 0.0,
+			"height": 55,
+			"latitude": 37.579,
+			"longitude": 126.611,
+			"pitch": 0.0,
+			"roll": 0.0
 		}
 	],
 	"parent": 0,

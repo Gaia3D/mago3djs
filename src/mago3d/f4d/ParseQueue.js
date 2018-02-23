@@ -50,11 +50,11 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 			else 
 			{
 				// test else.
-				if (lowestOctree.neoReferencesMotherAndIndices)
-				{
-					if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-					{ var hola = 0; }
-				}
+				//if (lowestOctree.neoReferencesMotherAndIndices)
+				//{
+				//	if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				//	{ var hola = 0; }
+				//}
 			}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -66,7 +66,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 			//var octreesArray = Array.from(this.octreesLod0ReferencesToParseMap.keys());
 			//var octreesArray = Object.keys(this.octreesLod0ReferencesToParseMap);
 			///for (var i=0; i<octreesArray.length; i++)
-			for(var key in this.octreesLod0ReferencesToParseMap)
+			for (var key in this.octreesLod0ReferencesToParseMap)
 			{
 				lowestOctree = this.octreesLod0ReferencesToParseMap[key];
 				delete this.octreesLod0ReferencesToParseMap[key];
@@ -87,7 +87,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 ParseQueue.prototype.parseOctreesLod0References = function(gl, lowestOctree, magoManager)
 {
 	var parsed = false;
-	if(this.octreesLod0ReferencesToParseMap.hasOwnProperty(lowestOctree.octreeKey))
+	if (this.octreesLod0ReferencesToParseMap.hasOwnProperty(lowestOctree.octreeKey))
 	{
 		delete this.octreesLod0ReferencesToParseMap[lowestOctree.octreeKey];
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined)

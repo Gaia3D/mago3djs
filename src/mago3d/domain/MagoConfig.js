@@ -18,7 +18,7 @@ MagoConfig.getData = function(key)
 
 MagoConfig.isDataExist = function(key) 
 {
-	return this.dataObject.hasOwnProperty(key)
+	return this.dataObject.hasOwnProperty(key);
 };
 
 MagoConfig.deleteData = function(key) 

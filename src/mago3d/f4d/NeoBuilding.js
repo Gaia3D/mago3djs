@@ -47,12 +47,25 @@ var NeoBuilding = function()
 	
 	// In version 001, there are 6 lods.***
 	this.lodMeshesMap;
-	this.lodBuildingDatasArray;
-	
+	this.lodBuildingDatasMap;
 	
 	// Render settings.***************************************************
 	// provisionally put this here.
 	this.applyOcclusionCulling;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {boolean} applyOcclusionCulling
+ */
+NeoBuilding.prototype.getImageFileNameForLOD = function(lod) 
+{
+	var lodBuildingData = this.getLodBuildingData(lod);
+	
+	if (lodBuildingData === undefined)
+	{ return undefined; }
+	
+	return lodBuildingData.textureFileName;
 };
 
 /**
@@ -197,12 +210,12 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 	this.texturesLoaded = undefined;
 	
 	// delete lod3, lod4, lod5.***
-	if(this.lodMeshesMap !== undefined)
+	if (this.lodMeshesMap !== undefined)
 	{
-		for(var key in this.lodMeshesMap)
+		for (var key in this.lodMeshesMap)
 		{
 			var legoSkin = this.lodMeshesMap[key];
-			legoSkin.deleteObjects(gl, vboMemoryManager)
+			legoSkin.deleteObjects(gl, vboMemoryManager);
 			legoSkin = undefined;
 		}
 		this.lodMeshesMap = undefined;
@@ -381,24 +394,10 @@ NeoBuilding.prototype.getHeaderVersion = function()
  */
 NeoBuilding.prototype.getLodBuildingData = function(lod) 
 {
-	var resultLodBuildingData = undefined;
-	var find = false;
+	if (this.lodBuildingDatasMap === undefined)
+	{ return undefined; }
 	
-	if(this.lodBuildingDatasArray === undefined)
-		return;
-	
-	var lodBuildingDatasCount = this.lodBuildingDatasArray.length;
-	var i = 0;
-	while(!find && i<lodBuildingDatasCount)
-	{
-		if(this.lodBuildingDatasArray[i].lod === lod)
-		{
-			find = true;
-			resultLodBuildingData = this.lodBuildingDatasArray[i];
-		}
-		i++;
-	}
-	return resultLodBuildingData;
+	return this.lodBuildingDatasMap[lod];
 };
 
 /**
@@ -425,42 +424,42 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	var skinLego;
 	if (this.currentLod === 3)
 	{
-		skinLego = this.lodMeshesMap["lod3"];
+		skinLego = this.lodMeshesMap.lod3;
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap["lod4"];
+			skinLego = this.lodMeshesMap.lod4;
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap["lod5"];
+				skinLego = this.lodMeshesMap.lod5;
 			}
 		}
 		
 	}
 	else if (this.currentLod === 4)
 	{
-		skinLego = this.lodMeshesMap["lod4"];
+		skinLego = this.lodMeshesMap.lod4;
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap["lod5"];
+			skinLego = this.lodMeshesMap.lod5;
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap["lod3"];
+				skinLego = this.lodMeshesMap.lod3;
 			}
 		}
 		
 	}
 	else if (this.currentLod === 5)
 	{
-		skinLego = this.lodMeshesMap["lod5"];
+		skinLego = this.lodMeshesMap.lod5;
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
-			skinLego = this.lodMeshesMap["lod4"];
+			skinLego = this.lodMeshesMap.lod4;
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
-				skinLego = this.lodMeshesMap["lod3"];
+				skinLego = this.lodMeshesMap.lod3;
 			}
 		}
 		

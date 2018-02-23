@@ -68,11 +68,12 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 	
-		if(node.data.attributes.flipYTexCoords !== undefined)
+		if (node.data.attributes.flipYTexCoords !== undefined)
 		{
 			flipYTexCoord = node.data.attributes.flipYTexCoords;
 		}
-		else{
+		else 
+		{
 			flipYTexCoord = false;
 		}
 		gl.uniform1i(standardShader.textureFlipYAxis_loc, flipYTexCoord);
@@ -322,7 +323,7 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 			}
 			else 
 			{
-				if(magoManager.textureAux_1x1 !== undefined)
+				if (magoManager.textureAux_1x1 !== undefined)
 				{
 					gl.enableVertexAttribArray(standardShader.texCoord2_loc);
 					//gl.activeTexture(gl.TEXTURE2); 
@@ -559,6 +560,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		
 		cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 		// Must applicate the transformMatrix of the reference object.***
+		
+		// test.***
+		//if(neoBuilding.buildingId === "testID")
+		//neoReference.refMatrixType = 0;
+	
 		gl.uniform1i(standardShader.refMatrixType_loc, neoReference.refMatrixType);
 		if (refMatrixIdxKey === undefined || refMatrixIdxKey === -1)
 		{ // never enter here...

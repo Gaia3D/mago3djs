@@ -1197,11 +1197,11 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			// inverse "for" because delete 1rst farest.***
 			node = this.visibleObjControlerNodes.currentVisibles3[i];
 			neoBuilding = node.data.neoBuilding;
-			if(neoBuilding === undefined)
-				continue;
+			if (neoBuilding === undefined)
+			{ continue; }
 			
 			var key = neoBuilding.buildingId;
-			if(!this.processQueue.nodesToDeleteLessThanLod3Map.hasOwnProperty(key))
+			if (!this.processQueue.nodesToDeleteLessThanLod3Map.hasOwnProperty(key))
 			{
 				this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
 				nodesPutted++;
@@ -1391,8 +1391,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		
 		// must check if the desirable lodMesh is available.***
 		var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
-		if(lodBuildingData === undefined)
-			continue;
+		if (lodBuildingData === undefined)
+		{ continue; }
 		
 		textureFileName = lodBuildingData.textureFileName;
 		lodString = lodBuildingData.geometryFileName;
@@ -1522,8 +1522,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	{
 		node = currentVisiblesArray[i];
 		nodeRoot = node.getRoot();
-		if(node.data === undefined || node.data.neoBuilding === undefined)
-			continue;
+		if (node.data === undefined || node.data.neoBuilding === undefined)
+		{ continue; }
 		
 		var key = node.data.neoBuilding.buildingId;
 		///rootNodesMap.set(nodeRoot, nodeRoot);
@@ -1534,7 +1534,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	//var rootNodesKeysArray = Object.keys(rootNodesMap);
 	//var nodesCount = rootNodesKeysArray.length;
 	//for (var i=0; i<nodesCount; i++)
-	for(var key in rootNodesMap)
+	for (var key in rootNodesMap)
 	{
 		//nodeRoot = rootNodesArray[i];
 		nodeRoot = rootNodesMap[key];
@@ -2727,7 +2727,7 @@ MagoManager.prototype.manageQueue = function()
 	//var nodesToDeleteArray = Object.values(this.processQueue.nodesToDeleteMap);
 
 	//for (var i=0; i<maxDeleteNodesCount; i++)
-	for(var key in this.processQueue.nodesToDeleteMap)
+	for (var key in this.processQueue.nodesToDeleteMap)
 	{
 		//node = nodesToDeleteArray[i];
 		node = this.processQueue.nodesToDeleteMap[key];
@@ -2752,7 +2752,7 @@ MagoManager.prototype.manageQueue = function()
 	//var nodesToDeleteModelReferencesArray = Object.values(this.processQueue.nodesToDeleteModelReferencesMap);
 
 	//for (var i=0; i<nodesToDeletesCount; i++)
-	for(var key in this.processQueue.nodesToDeleteModelReferencesMap)
+	for (var key in this.processQueue.nodesToDeleteModelReferencesMap)
 	{
 		//node = nodesToDeleteModelReferencesArray[i];
 		node = this.processQueue.nodesToDeleteModelReferencesMap[key];
@@ -2865,8 +2865,8 @@ MagoManager.prototype.manageQueue = function()
 				// test else.
 				//if (lowestOctree.neoReferencesMotherAndIndices)
 				//{
-					//if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-					//{ var hola = 0; }
+				//if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				//{ var hola = 0; }
 				//}
 			}
 			if (octreesParsedCount > maxParsesCount)
@@ -2877,7 +2877,7 @@ MagoManager.prototype.manageQueue = function()
 		{
 			///var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
 			///for (var i=0; i<octreesArray.length; i++)
-			for(var key in this.parseQueue.octreesLod0ReferencesToParseMap)
+			for (var key in this.parseQueue.octreesLod0ReferencesToParseMap)
 			{
 				var lowestOctree = this.parseQueue.octreesLod0ReferencesToParseMap[key];
 				//lowestOctree = octreesArray[i];
@@ -2955,7 +2955,7 @@ MagoManager.prototype.manageQueue = function()
 		{
 			//var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
 			//for (var i=0; i<octreesArray.length; i++)
-			for(var key in this.parseQueue.octreesLod0ModelsToParseMap)
+			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
 				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
 				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
@@ -3059,7 +3059,7 @@ MagoManager.prototype.manageQueue = function()
 		{
 			//var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
 			//for (var i=0; i<octreesArray.length; i++)
-			for(var key in this.parseQueue.octreesLod0ModelsToParseMap)
+			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
 				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
 				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
@@ -3133,7 +3133,7 @@ MagoManager.prototype.manageQueue = function()
 		{
 			//var octreesArray = Array.from(this.parseQueue.octreesLod2LegosToParseMap.keys());
 			//for (var i=0; i<octreesArray.length; i++)
-			for(var key in this.parseQueue.octreesLod2LegosToParseMap)
+			for (var key in this.parseQueue.octreesLod2LegosToParseMap)
 			{
 				var lowestOctree = this.parseQueue.octreesLod2LegosToParseMap[key];
 				if (this.parseQueue.octreesLod2LegosToParseMap.hasOwnProperty(key))
@@ -3186,14 +3186,14 @@ MagoManager.prototype.manageQueue = function()
 			{ continue; }// old.***
 		
 			var lodString = undefined;
-			if(currentBuildingLod === 3)
-				lodString = "lod3";
-			else if(currentBuildingLod === 4)
-				lodString = "lod4";
-			else if(currentBuildingLod === 5)
-				lodString = "lod5";
+			if (currentBuildingLod === 3)
+			{ lodString = "lod3"; }
+			else if (currentBuildingLod === 4)
+			{ lodString = "lod4"; }
+			else if (currentBuildingLod === 5)
+			{ lodString = "lod5"; }
 
-			if(lodString === undefined)
+			if (lodString === undefined)
 			{ continue; }
 			
 			///skinLego = neoBuilding.lodMeshesMap.get(lodString);
@@ -3217,7 +3217,7 @@ MagoManager.prototype.manageQueue = function()
 		{
 			//var nodessArray = Array.from(this.parseQueue.skinLegosToParseMap.keys());
 			//for (var i=0; i<nodessArray.length; i++)
-			for(var key in this.parseQueue.skinLegosToParseMap)
+			for (var key in this.parseQueue.skinLegosToParseMap)
 			{
 				var node = this.parseQueue.skinLegosToParseMap[key];
 				
@@ -3287,9 +3287,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, scene
 	// now, prepare the ocree normally.
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
-		//if(i > 1)
-		//	break;
-		
 		lowestOctree = currentVisibleOctrees[i];
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		
@@ -3430,7 +3427,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
 					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 				}
-				//if(
 			}
 			else 
 			{
@@ -3438,8 +3434,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, s
 				if (neoBuilding.simpleBuilding3x3Texture === undefined)
 				{
 					neoBuilding.simpleBuilding3x3Texture = new Texture();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/mosaicTextureLod2.png";
+					var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
+					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
 					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
 				}
 			}
@@ -3494,7 +3490,7 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 		{
 			neoBuilding = node.data.neoBuilding;
 			///for (var changeHistory of moveHistoryMap.values()) 
-			for(var key in moveHistoryMap)
+			for (var key in moveHistoryMap)
 			{
 				var changeHistory = moveHistoryMap[key];
 				objectIndexOrder = changeHistory.getObjectIndexOrder();
@@ -3612,7 +3608,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		{
 			neoBuilding = node.data.neoBuilding;
 			//for (var changeHistory of colorChangedHistoryMap.values()) 
-			for(var key in colorChangedHistoryMap)
+			for (var key in colorChangedHistoryMap)
 			{
 				var changeHistory = colorChangedHistoryMap[key];
 				if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
@@ -3675,19 +3671,22 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 	var allColorHistoryMap = MagoConfig.getAllColorHistory();
 	if (allColorHistoryMap)
 	{
-		for(var key in allColorHistoryMap) {
+		for (var key in allColorHistoryMap) 
+		{
 			var colorChangedHistoryMap = allColorHistoryMap[key];
-		//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
-		//{
-			// now check nodes that is no physical.
-			for(var key2 in colorChangedHistoryMap) {
-				var changeHistoryMap = colorChangedHistoryMap[key2];
-			//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+			//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
 			//{
-				for(var key3 in changeHistoryMap) {
-					var changeHistory = changeHistoryMap[key3];
-				//for (var changeHistory of changeHistoryMap.values()) 
+			// now check nodes that is no physical.
+			for (var key2 in colorChangedHistoryMap) 
+			{
+				var changeHistoryMap = colorChangedHistoryMap[key2];
+				//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
 				//{
+				for (var key3 in changeHistoryMap) 
+				{
+					var changeHistory = changeHistoryMap[key3];
+					//for (var changeHistory of changeHistoryMap.values()) 
+					//{
 					var projectId = changeHistory.projectId;
 					var nodesMap = this.hierarchyManager.getNodesMap(projectId);
 					var aNode = nodesMap[changeHistory.dataKey];
@@ -5626,8 +5625,8 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	var startIndex = 0;
 	
 	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
-	if(lowestTile.nodesArray)
-		startIndex = lowestTile.nodesArray.length;
+	if (lowestTile.nodesArray)
+	{ startIndex = lowestTile.nodesArray.length; }
 	
 	var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
 	for (var j=startIndex; j<nodeSeedsCount; j++)
@@ -5802,22 +5801,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					lod2_minDist = 316000;
 					lod3_minDist = lod2_minDist*10;
 				}
-				
-				if (neoBuilding.buildingId === "2119_C92GC_C930C_o")
-				{ var hola = 0; }
-				if (neoBuilding.buildingId === "Goliath")
-				{ var hola = 0; }
 			
-				if (neoBuilding.buildingId == "2119_E43GC_E43PP_A410P")
-				{ var hola = 0; }
-			
-				// test.***
-				//if(neoBuilding.octree)
-				//{
-				//	var cameraPosition = this.sceneState.camera.position;
-				//	distToCamera = neoBuilding.octree.getMinDistToCamera(cameraPosition);
-				//}
-				//else{
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
@@ -5861,7 +5845,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				}
 			}
 			
-			if(lowestTile.nodesArray.length !== lowestTile.nodeSeedsArray.length)
+			if (lowestTile.nodesArray.length !== lowestTile.nodeSeedsArray.length)
 			{
 				// create the buildings by buildingSeeds.
 				this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
@@ -5918,7 +5902,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	var nodeRoot = node.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	
-	if(geoLocDataManager === undefined)
+	if (geoLocDataManager === undefined)
 	{ return; }
 
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
@@ -6583,9 +6567,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.projectId = projectId;
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
-		
-		if (buildingId === "Tile_173078_LD_010_017_L22")
-		{ var hola = 0; }
 		
 		if (attributes.isPhysical)
 		{

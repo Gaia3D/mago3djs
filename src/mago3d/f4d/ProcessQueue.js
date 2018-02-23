@@ -24,8 +24,8 @@ ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
 	if (aValue === undefined)
 	{ aValue = 0; }
 
-	if(node.data === undefined || node.data.neoBuilding === undefined)
-		return;
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
 	this.nodesToDeleteLessThanLod3Map[key] = node;
@@ -36,11 +36,12 @@ ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
 ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
 {
 	// this erases the node from the "nodesToDeleteLessThanLod3Map".
-	if(node.data === undefined || node.data.neoBuilding === undefined)
-		return;
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
-	if(this.nodesToDeleteLessThanLod3Map.hasOwnProperty(key)) {
+	if (this.nodesToDeleteLessThanLod3Map.hasOwnProperty(key)) 
+	{
 		delete this.nodesToDeleteLessThanLod3Map[key];
 		return true;
 	}
@@ -55,8 +56,8 @@ ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 	if (aValue === undefined)
 	{ aValue = 0; }
 
-	if(node.data === undefined || node.data.neoBuilding === undefined)
-		return;
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
 	this.nodesToDeleteModelReferencesMap[key] = node;
@@ -66,11 +67,12 @@ ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 ProcessQueue.prototype.eraseNodeToDeleteModelReferences = function(node)
 {
 	// this erases the node from the "nodesToDeleteModelReferencesMap".
-	if(node.data === undefined || node.data.neoBuilding === undefined)
-		return;
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
-	if(this.nodesToDeleteModelReferencesMap.hasOwnProperty(key)) {
+	if (this.nodesToDeleteModelReferencesMap.hasOwnProperty(key)) 
+	{
 		delete this.nodesToDeleteModelReferencesMap[key];
 		return true;
 	}
@@ -85,8 +87,8 @@ ProcessQueue.prototype.putNodeToDelete = function(node, aValue)
 	if (aValue === undefined)
 	{ aValue = 0; }
 
-	if(node.data === undefined || node.data.neoBuilding === undefined)
-		return;
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
 	this.nodesToDeleteMap[key] = node;
@@ -113,7 +115,8 @@ ProcessQueue.prototype.eraseNodeToDelete = function(node)
 {
 	// this erases the node from the "nodesToDeleteMap".
 	var key = node.data.neoBuilding.buildingId;
-	if(this.nodesToDeleteMap.hasOwnProperty(key)) {
+	if (this.nodesToDeleteMap.hasOwnProperty(key)) 
+	{
 		delete this.nodesToDeleteMap[key];
 		return true;
 	}

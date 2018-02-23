@@ -491,9 +491,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 			
-			if (neoRef.objectId === "20046")
-			{ var hola = 0; }
-			
 			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
 			// 2) Block's Idx.***
