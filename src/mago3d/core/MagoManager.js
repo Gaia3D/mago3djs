@@ -7071,7 +7071,7 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	var posX = this.sceneState.drawingBufferWidth * 0.5;
 	var posY = this.sceneState.drawingBufferHeight * 0.5;
 	
-	var objects = this.getSelectedObjects(gl, posX, posY, this.visibleObjControlerBuildings, this.arrayAuxSC);
+	var objects = this.getSelectedObjects(gl, posX, posY, this.visibleObjControlerNodes, this.arrayAuxSC);
 	if (objects === undefined)	{ return; }
 
 	var current_building = this.buildingSelected;
