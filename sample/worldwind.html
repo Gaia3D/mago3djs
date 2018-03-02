@@ -7,11 +7,19 @@
 	<link rel="stylesheet" href="/sample/homepage-demo.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
-<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
+	<link rel="stylesheet" href="/thirdparty/treegrid/jquery.treegrid.css" />
+	<link rel="stylesheet" href="/thirdparty/jqplot/jquery.jqplot.min.css" />
+	<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
 <!-- 	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script> -->
+	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.js"></script>
+	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.bootstrap3.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/jquery.jqplot.min.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.pieRenderer.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.barRenderer.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.categoryAxisRenderer.js"></script>
 </head>
 
 <body>
@@ -27,6 +35,10 @@
 	<li id="searchMenu" class="search" data-tooltip-text="searching such as issue, object, and spatial information.">Search</li>
 	<li id="apiMenu" class="api" data-tooltip-text="APIs to control various functions of mago3D.">API</li>	
 	<li id="insertIssueMenu" class="regist" data-tooltip-text="Issue registration for Object.">Regist</li>
+	<li id="treeMenu" class="tree" data-tooltip-text="Display data hierarchy and Attributes by project.">Tree</li>
+	<li id="chartMenu" class="chart" data-tooltip-text="Display statistical data by project.">Chart</li>
+	<li id="logMenu" class="log" data-tooltip-text="Displays the data change log.">Log</li>
+	<li id="attributeMenu" class="attribute" data-tooltip-text="Supports data attribute retrieval.">Attribute</li>
 	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
 </ul>
 
@@ -193,7 +205,7 @@
 					<label for="localSearchProjectId">Project </label>
 					<select id="localSearchProjectId" name="localSearchProjectId" class="select">
 						<option value="3ds.json">3DS Project</option>
-						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
@@ -362,7 +374,7 @@
 				<td>
 					<select id="project_id" name="project_id" class="select">
 						<option value="3ds.json">3DS Project</option>
-						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
@@ -485,7 +497,185 @@
 		</div>
 	</div>
 	</form>
-	
+
+	<div id="treeMenuContent" class="treeWrap">
+		<div>
+			<h3>Data Tree</h3>
+			<ul>
+				<li>
+					<label for="treeProjectId">Project </label>
+					<select id="treeProjectId" name="treeProjectId" onchange="initDataTree();" class="select">
+						<option value="3ds.json">3DS Project</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada Project</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
+				</li>
+			</ul>
+		</div>
+		<div style="margin-top: 20px; margin-left: 10px;">
+			<table id="dataTree" class="table dataTree table-bordered table-striped table-condensed" style="padding-bottom: 20px;" width="310px;">
+			</table>
+		</div>
+	</div>
+
+	<div id="chartMenuContent" class="chartWrap">
+		<div>
+			<h3>Number of data by project</h3>
+		</div>
+		<div id="projectChart" style="width: 340px; height: 340px; font-size: 18px;"></div>
+		<div style="margin-top: 30px;">
+			<h3>Full data status</h3>
+		</div>
+		<div id="dataStatusChart" style="width: 340px; height: 340px; font-size: 18px;"></div>
+	</div>
+
+	<div id="logMenuContent" class="logWrap">
+		<div>
+			<h3>Log of data change request</h3>
+		</div>
+		<table class="list-table scope-col" style="width: 100%; margin-top: 10px;">
+			<col class="col-number" />
+			<col class="col-name" />
+			<col class="col-name" />
+			<col class="col-toggle" />
+			<col class="col-date" />
+			<tr>
+				<th rowspan="2" scope="col" class="col-number">No</th>
+				<th scope="col" class="col-name">Name</th>
+				<th scope="col" class="col-name">Data Name</th>
+			</tr>
+			<tr>
+				<th scope="col" class="col-toggle">Status</th>
+				<th scope="col" class="col-date">Date</th>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">9</td>
+				<td>gt1000</td>
+				<td><a href="#" onclick="dataChangeLog('mapoartcenter_del'); return false;">mapoartcenter_del</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td>Waiting</td>
+				<td>2018-03-02</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">8</td>
+				<td>Admin</td>
+				<td><a href="#" onclick="dataChangeLog('fm_dyna_0001'); return false;">fm_dyna_0001</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td>Waiting</td>
+				<td>2018-02-27</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">7</td>
+				<td>Kimkiyoung</td>
+				<td><a href="#" onclick="dataChangeLog('KSJ_180'); return false;">KSJ_180</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:red"><b>Reject</b></td>
+				<td>2018-02-27</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">6</td>
+				<td>Parkjinwoo</td>
+				<td><a href="#" onclick="dataChangeLog('KSJ_330'); return false;">KSJ_330</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:blue"><b>Complete</b></td>
+				<td>2018-02-24</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">5</td>
+				<td>홍길동</td>
+				<td><a href="#" onclick="dataChangeLog('Lara_Croft'); return false;">Lara_Croft</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:blue"><b>Complete</b></td>
+				<td>2018-02-10</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">4</td>
+				<td>Admin</td>
+				<td><a href="#" onclick="dataChangeLog('Grendizer'); return false;">Grendizer</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:blue"><b>Complete</b></td>
+				<td>2018-02-01</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">3</td>
+				<td>Admin</td>
+				<td><a href="#" onclick="dataChangeLog('SEOULHISTORICA_del'); return false;">SEOULHISTORICA_del</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:blue"><b>Complete</b></td>
+				<td>2018-01-14</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">2</td>
+				<td>Test</td>
+				<td><a href="#" onclick="dataChangeLog('Factory Kitbash'); return false;">Factory Kitbash</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:red"><b>Reject</b></td>
+				<td>2018-01-11</td>
+			</tr>
+			<tr style="height: 30px;">
+				<td rowspan="2">1</td>
+				<td>gt1000</td>
+				<td><a href="#" onclick="dataChangeLog('SD_COUNCIL_del'); return false;">SD_COUNCIL_del</a></td>
+			</tr>
+			<tr style="height: 30px;">
+				<td style="color:blue"><b>Complete</b></td>
+				<td>2018-01-08</td>
+			</tr>
+		</table>
+	</div>
+
+	<form id="attributeForm" action="#" method="post" onsubmit="return false;">
+	<div id="attributeMenuContent" class="attributeWrap">
+		<div>
+			<h3>Object Attribute Search</h3>
+		</div>
+		<div>It is under development.</div>
+		<table style="margin-top: 30px;">
+			<tr style="height: 35px;">
+				<td style="width: 80px;"><label for="project_id">Project</label></td>
+				<td><select id="project_id" name="project_id" class="select">
+					<option value=""> ALL </option>
+					<option value="1">3DS Project</option>
+					<option value="2">Collada Project</option>
+					<option value="3">IFC</option>
+					<option value="4">IFC(MEP)</option>
+					<option value="5">Sea Port</option>
+				</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="search_word">Category</label></td>
+				<td>
+					<select id="search_word" name="search_word" class="select">
+						<option value="data_name">Data Name</option>
+						<option value="data_key">Data Key</option>
+					</select>
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td>
+					<label for="search_value">SearchWord</label></td>
+				<td><input type="text" id="search_value" name="search_value" size="31" /></td>
+			</tr>
+		</table>
+		<div class="btns">
+			<button type="button" id="searchData" class="full">Search</button>
+		</div>
+	</div>
+	</form>
+
 	<div id="configMenuContent" class="configWrap">
 		<div>
 			<h3>Label</h3>
@@ -622,6 +812,133 @@
 	<canvas id="objectLabel"></canvas>
 </div>
 
+<div class="dataAttributeDialog" title="Data Detail Info">
+    <div><b>Geo Spatial Info</b></div>
+    <table class="list-table scope-col" style="width: 100%;">
+        <col class="col-label" />
+        <col class="col-data" />
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left; width: 30%">Data Key</th>
+            <td id="detailDataKey" class="col-data" style="width: 70%;"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Data Name</th>
+            <td id="detailDataName" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Latitude</th>
+            <td id="detailLatitude" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
+            <td id="detailLongitude" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Height</th>
+            <td id="detailHeight" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Heading</th>
+            <td id="detailHeading" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
+            <td id="detailPitch" class="col-data"></td>
+        </tr>
+        <tr>
+            <th class="col-label" scope="row" style="text-align: left">Roll</th>
+            <td id="detailRoll" class="col-data"></td>
+        </tr>
+    </table>
+    <div style="margin-top: 10px;"><b>Data Attribute</b>(It is stored in json format in PostgreSQL.)</div>
+    <div style="border: 1px solid #d9d9d9;">
+        <div style="padding: 5px;">
+            {
+            "properties" : {
+            "Author(s)" : {
+            "value" : "Gaia3D"
+            },
+            "Country" : {
+            "value" : "Korea"
+            },
+            "Title" : {
+            "value" : "F4D Data Attribute Example"
+            }
+            }
+            }
+        </div>
+    </div>
+    <div style="margin-top: 10px;"><b>Object Attribute</b></div>
+    <div style="border: 1px solid #d9d9d9;">
+        <div style="padding: 5px;">
+            There is a maximum of 1 million objects per IFC data. <br/>
+            For lists, the number is too large to provide search functionality.
+        </div>
+    </div>
+</div>
+
+<div class="dataInfoChangeDialog" title="Data Info Change Log">
+    <div><b>Before</b></div>
+    <table class="list-table scope-col" style="width: 100%;">
+        <col class="col-label" />
+        <col class="col-data" />
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left; width: 35%;">Latitude</th>
+            <td id="BeforeLatitude" class="col-data">36.543</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
+            <td id="BeforeLongitude" class="col-data">127.28487</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Height</th>
+            <td id="BeforeHeight" class="col-data">100</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Heading</th>
+            <td id="BeforeHeading" class="col-data">55</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
+            <td id="BeforePitch" class="col-data">0</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Roll</th>
+            <td id="BeforeRoll" class="col-data">0</td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 30px;"><b>After</b></div>
+    <table class="list-table scope-col" style="width: 100%;">
+        <col class="col-label" />
+        <col class="col-data" />
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left; width: 35%;">Latitude</th>
+            <td id="AfterLatitude" class="col-data">36.554</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
+            <td id="AfterLongitude" class="col-data">126.732</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Height</th>
+            <td id="AfterHeight" class="col-data">70</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Heading</th>
+            <td id="AfterHeading" class="col-data">90</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
+            <td id="AfterPitch" class="col-data">10</td>
+        </tr>
+        <tr style="height: 30px;">
+            <th class="col-label" scope="row" style="text-align: left">Roll</th>
+            <td id="AfterRoll" class="col-data">10</td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
 <script type="text/javascript" src="/src/mago3d/message/Message.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
@@ -727,8 +1044,8 @@
 		alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
 	}
 
-	var managerFactory = null;
-	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, configMenu : false };
+   	var managerFactory = null;
+	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, logMenu : false, attributeMenu : false, configMenu : false };
 	var insertIssueEnable = false;
 
 	var imagePath = "/images/ko";
@@ -736,7 +1053,7 @@
 	magoStart(null, "magoContainer", imagePath);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
-	
+
 	function startMogoUI() {
 		intervalCount++;
 		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
@@ -761,8 +1078,8 @@
 		}
 		console.log("--------- intervalCount = " + intervalCount);
 	}
-	
-	// mago3d 시작, 정책 데이터 파일을 로딩
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
 			url: dataInformationUrl + "policy-worldwind.json",
@@ -1025,6 +1342,20 @@
 	$("#insertIssueMenu").click(function() {
 		menuSlideControl("insertIssueMenu");
 	});
+    $("#treeMenu").click(function() {
+        menuSlideControl("treeMenu");
+        initDataTree();
+    });
+    $("#chartMenu").click(function() {
+        menuSlideControl("chartMenu");
+        initDataChart();
+    });
+    $("#logMenu").click(function() {
+        menuSlideControl("logMenu");
+    });
+    $("#attributeMenu").click(function() {
+        menuSlideControl("attributeMenu");
+    });
 	$("#configMenu").click(function() {
 		menuSlideControl("configMenu");
 	});
@@ -1296,7 +1627,227 @@
 		}
 		changeNearGeoIssueListViewModeAPI(managerFactory, isShow);
 	}
-	
+
+	// project 별 data tree 표시
+    // var dataTreeSetting = {
+	// 	data: {
+	// 		key: {
+	// 			name: ["data_key"],
+	// 			title: "data_name"
+     //        }
+     //    },
+	// };
+
+	function initDataTree() {
+        var projectId = $("#treeProjectId").val();
+		//if(projectId === undefined) projectId = "3ds.json";
+        var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+        if (projectData === null || projectData === undefined) {
+            $.ajax({
+                url: dataInformationUrl + projectId,
+                type: "GET",
+                dataType: "json",
+                success: function(serverData) {
+                    drawDataTree(projectId, serverData);
+                },
+                error : function(request, status, error) {
+                    console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
+                }
+            });
+        } else {
+            drawDataTree(projectId, projectData);
+        }
+	}
+
+	function drawDataTree(projectId, projectData) {
+	    var content = 	"";
+	    var dataId = 1;
+	    content 	= 	content
+					+ 	"<tr class=\"treegrid-" + dataId + "\" style=\"height: 25px; background-color: #F79F81\">"
+					+ 		"<td style=\"padding-left: 10px\" nowrap=\"nowrap\"></td>"
+					+		"<td colspan=\"3\"> <b>" + projectData.data_name + "</b></td>"
+					+	"</tr>";
+	    var childrenCount = projectData.children.length;
+	    if(childrenCount > 0) {
+            var childrenContent = getChildrenContent(projectId, dataId, projectData.children);
+            content = content + childrenContent;
+        }
+
+        $("#dataTree").html("");
+		$("#dataTree").append(content);
+        $('.dataTree').treegrid({
+            expanderExpandedClass: 'glyphicon glyphicon-minus',
+            expanderCollapsedClass: 'glyphicon glyphicon-plus'
+        });
+	}
+
+	function getChildrenContent(projectId, dataId, children) {
+        var content = 	"";
+       	var count = children.length;
+       	var parentClass = " treegrid-parent-" + dataId;
+       	var evenColor = "background-color: #ccc";
+       	var oddColor = "background-color: #eee";
+       	for(var i=0; i<count; i++) {
+			dataId++;
+			var bgcolor = (dataId % 2 == 0) ? evenColor : oddColor;
+			var myClass = "treegrid-" + dataId;
+	        var dataInfo = children[i];
+			content 	= 	content
+                + 	"<tr class=\"" + myClass + parentClass + "\" style=\"height: 25px;" + bgcolor + "\">"
+                + 		"<td style=\"padding-left: 2px\" nowrap=\"nowrap\"></td>"
+                +		"<td title=\"" + dataInfo.data_key + "\"> " + dataInfo.data_name + "</td>"
+                +		"<td style=\"padding-left: 5px\"><button type=\"button\" title=\"Shortcuts\" class=\"dataShortcut\" onclick=\"gotoData('" + projectId + "', '" + dataInfo.data_key + "');\">Shortcuts</button></td>"
+                +		"<td style=\"padding-left: 5px; padding-right: 5px;\"><a href=\"#\" onclick=\"viewDataAttribute('" + dataInfo.data_key + "'); return false; \">Details</a></td>"
+                +	"</tr>";
+            var childrenCount = dataInfo.children.length;
+            if(childrenCount > 0) {
+                var childrenContent = getChildrenContent(projectId, dataId, dataInfo.children);
+                content = content + childrenContent;
+            }
+		}
+		return content;
+	}
+
+    var dataAttributeDialog = $( ".dataAttributeDialog" ).dialog({
+        autoOpen: false,
+        width: 400,
+        height: 550,
+		modal: true,
+        resizable: false
+    });
+
+    // data key 를 이용하여 dataInfo 정보를 취득
+    function viewDataAttribute(dataKey) {
+        getDataInfoByDataKeyAPI(managerFactory, $("#treeProjectId").val(), dataKey);
+    }
+
+    // data info daialog callback
+    function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+        dataAttributeDialog.dialog( "open" );
+        $("#detailDataKey").html(dataKey);
+        $("#detailDataName").html(dataName);
+        $("#detailLatitude").html(latitude);
+        $("#detailLongitude").html(longitude);
+        $("#detailHeight").html(height);
+        $("#detailHeading").html(heading);
+        $("#detailPitch").html(pitch);
+        $("#detailRoll").html(roll);
+	}
+
+	// chart 표시
+	function initDataChart() {
+        projectChart();
+        dataStatusChart();
+	}
+
+	// project 별 chart
+	function projectChart() {
+        $("#projectChart").html("");
+        var data = [["3DS", 37],["IFC(Cultural Assets)", 1],["IFC", 42],["IFC(MEP)", 1],["Sea Port", 7],["Collada", 7],["IFC(Japan)", 5]];
+        var plot = $.jqplot("projectChart", [data], {
+            //title : "project 별 chart",
+            seriesColors: [ "#a67ee9", "#FE642E", "#01DF01", "#2E9AFE", "#F781F3", "#F6D8CE", "#99a0ac" ],
+            grid: {
+                drawBorder: false,
+                drawGridlines: false,
+                background: "#ffffff",
+                shadow:false
+            },
+            gridPadding: {top:0, bottom:115, left:0, right:20},
+            seriesDefaults:{
+                renderer:$.jqplot.PieRenderer,
+                trendline : { show : false},
+                rendererOptions: {
+                    padding:8,
+                    showDataLabels: true,
+                    dataLabels: "value",
+                    //dataLabelFormatString: "%.1f%"
+                },
+            },
+            legend: {
+                show: true,
+                fontSize: "10pt",
+                placement : "outside",
+                rendererOptions: {
+                    numberRows: 3,
+                    numberCols: 3
+                },
+                location: "s",
+                border: "none",
+                marginLeft: "10px"
+            }
+        });
+	}
+
+	function dataStatusChart() {
+        $("#dataStatusChart").html("");
+        var otpValues = [ 85, 10, 5];
+        var ticks = ["Complete", "Developing", "Temp"];
+        var yMax = 100;
+
+        var plot = $.jqplot("dataStatusChart", [otpValues], {
+            //title : "data 상태별 차트",
+            height: 205,
+            animate: !$.jqplot.use_excanvas,
+            seriesColors: [ "#ffa076"],
+            grid: {
+                background: "#fff",
+                //background: "#14BA6C"
+                gridLineWidth: 0.7,
+                //borderColor: 'transparent',
+                shadow: false,
+                borderWidth:0.1
+                //shadowColor: 'transparent'
+            },
+            gridPadding:{
+                left:35,
+                right:1,
+                to:40,
+                bottom:27
+            },
+            seriesDefaults:{
+                shadow:false,
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true },
+                rendererOptions: {
+                    barWidth: 40
+                }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks,
+                    tickOptions:{
+                        formatString: "%'d",
+                        fontSize: "10pt"
+                    }
+                },
+                yaxis: {
+                    numberTicks : 6,
+                    min : 0,
+                    max : yMax,
+                    tickOptions:{
+                        formatString: "%'d",
+                        fontSize: "10pt"
+                    }
+                }
+            },
+            highlighter: { show: false }
+        });
+	}
+
+	// data info change request log
+    var dataInfoChangeDialog = $( ".dataInfoChangeDialog" ).dialog({
+        autoOpen: false,
+        width: 400,
+        height: 550,
+        modal: true,
+        resizable: false
+    });
+	function dataChangeLog(dataInfoLogId) {
+        dataInfoChangeDialog.dialog({title: dataInfoLogId + " Change Request Log"}).dialog( "open" );
+	}
+
 	// 설정 메뉴 시작
 	// Label 표시
 	function changeLabel(isShow) {
@@ -1432,7 +1983,7 @@
 
 	// general callback alert function
 	function showApiResult(apiName, result) {
-		if(apiName === "searchData") {
+		if(apiName === "getDataInfoByDataKey" || apiName === "searchData" ) {
 			if(result === "-1") {
 				alert(" Information that has not yet been loaded. Please search after loading. ");
 			}
