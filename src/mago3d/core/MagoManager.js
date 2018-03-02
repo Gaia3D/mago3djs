@@ -7015,7 +7015,29 @@ MagoManager.prototype.callAPI = function(api)
 	}
     else if (apiName === "getDataInfoByDataKey")
     {
-        //
+        var dataKey = api.getDataKey();
+		/*
+		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
+				dataKey,
+				dataName,
+				geoLocationData.geographicCoord.latitude,
+				geoLocationData.geographicCoord.longitude,
+				geoLocationData.geographicCoord.altitude,
+				geoLocationData.heading,
+				geoLocationData.pitch,
+				geoLocationData.roll);
+				*/
+				
+		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
+				"hola",
+				"hola",
+				3,
+				4,
+				4,
+				5,
+				6,
+				7);
+		
 		var i=0;
     }
 	else if (apiName === "gotoProject")
