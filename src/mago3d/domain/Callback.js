@@ -23,9 +23,26 @@ function apiResultCallback(functionName, apiName, result)
  * @param roll
  * @param
  */
-function selectedObjectCallback(functionName, data_key, objectId, latitude, longitude, elevation, heading, pitch, roll) 
+function selectedObjectCallback(functionName, dataKey, objectId, latitude, longitude, elevation, heading, pitch, roll)
 {
-	window[functionName](data_key, objectId, latitude, longitude, elevation, heading, pitch, roll);
+	window[functionName](dataKey, objectId, latitude, longitude, elevation, heading, pitch, roll);
+}
+
+/**
+ * Data Key 를 이용하여 Geo Spatial Info를 획득하여 화면에 표시
+ * @param data_key
+ * @param dataName
+ * @param latitude
+ * @param longitude
+ * @param elevation
+ * @param heading
+ * @param pitch
+ * @param roll
+ * @param
+ */
+function dataInfoCallback(functionName, dataKey, dataName, latitude, longitude, elevation, heading, pitch, roll)
+{
+    window[functionName](dataKey, dataName, latitude, longitude, elevation, heading, pitch, roll);
 }
 
 /**
@@ -37,9 +54,9 @@ function selectedObjectCallback(functionName, data_key, objectId, latitude, long
  * @param longitude
  * @param elevation
  */
-function insertIssueCallback(functionName, data_key, objectId, latitude, longitude, elevation) 
+function insertIssueCallback(functionName, dataKey, objectId, latitude, longitude, elevation)
 {
-	window[functionName](data_key, objectId, latitude, longitude, elevation);
+	window[functionName](dataKey, objectId, latitude, longitude, elevation);
 }
 
 /**

@@ -7013,6 +7013,11 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.deleteAll();
 	}
+    else if (apiName === "getDataInfoByDataKey")
+    {
+        //
+		var i=0;
+    }
 	else if (apiName === "gotoProject")
 	{
 		var projectId = api.getProjectId();

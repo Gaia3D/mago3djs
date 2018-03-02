@@ -1,0 +1,37 @@
+.treegrid-indent {width:16px; height: 16px; display: inline-block; position: relative;}
+
+.treegrid-expander {width:16px; height: 16px; display: inline-block; position: relative; cursor: pointer;}
+
+.treegrid-expander-expanded{background-image: url(./collapse.png); }
+.treegrid-expander-collapsed{background-image: url(./expand.png);}
+
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.glyphicon-plus:before {
+    content: "\25b6";
+//    background-color: #70B585;
+//    font-size: 10px;
+}
+
+.glyphicon-minus:before {
+    content: "\25bc";
+//    background-color: #70B585;
+//    font-size: 10px;
+}
+
+:after, :before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}

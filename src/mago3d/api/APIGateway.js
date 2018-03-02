@@ -474,6 +474,21 @@ function getDataAPI(key)
 }
 
 /**
+ * Data Key 를 이용하여 Geo Spatial Info를 취득
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {String} dataKey Data 고유키
+ * @param
+ */
+function getDataInfoByDataKeyAPI(managerFactoryInstance, dataKey)
+{
+    if (managerFactoryInstance === null) { return; }
+
+    var api = new API("getDataInfoByDataKey");
+    api.setDataKey(dataKey);
+    managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 데이터를 Rendering
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Object[]} projectIdArray 프로젝트 이름들

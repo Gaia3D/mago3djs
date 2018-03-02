@@ -8,11 +8,17 @@
 	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
-<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
+	<link rel="stylesheet" href="/thirdparty/treegrid/jquery.treegrid.css" />
+
+	<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
+
 <!-- 	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script> -->
+
+	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.js"></script>
+	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.bootstrap3.js"></script>
 </head>
 
 <body>
@@ -28,6 +34,8 @@
 	<li id="searchMenu" class="search" data-tooltip-text="searching such as issue, object, and spatial information.">Search</li>
 	<li id="apiMenu" class="api" data-tooltip-text="APIs to control various functions of mago3D.">API</li>	
 	<li id="insertIssueMenu" class="regist" data-tooltip-text="Issue registration for Object.">Regist</li>
+	<li id="treeMenu" class="tree" data-tooltip-text="Display data hierarchy and Attributes by project.">Tree</li>
+	<li id="chartMenu" class="chart" data-tooltip-text="Display statistical data by project.">Chart</li>
 	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
 </ul>
 
@@ -194,7 +202,7 @@
 					<label for="localSearchProjectId">Project </label>
 					<select id="localSearchProjectId" name="localSearchProjectId" class="select">
 						<option value="3ds.json">3DS Project</option>
-						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
@@ -363,7 +371,7 @@
 				<td>
 					<select id="project_id" name="project_id" class="select">
 						<option value="3ds.json">3DS Project</option>
-						<option value="ifc_cultural_asserts.json">IFC(Cultural Assets)</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
 						<option value="ifc_mep.json">IFC(MEP)</option>
 						<option value="sea_port.json">Sea Port</option>
@@ -486,7 +494,35 @@
 		</div>
 	</div>
 	</form>
-	
+
+	<div id="treeMenuContent" class="treeWrap">
+		<div>
+			<h3>Data Tree</h3>
+			<ul>
+				<li>
+					<label for="treeProjectId">Project </label>
+					<select id="treeProjectId" name="treeProjectId" onchange="initDataTree();" class="select">
+						<option value="3ds.json">3DS Project</option>
+						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
+						<option value="ifc.json">IFC</option>
+						<option value="ifc_mep.json">IFC(MEP)</option>
+						<option value="sea_port.json">Sea Port</option>
+						<option value="collada.json">Collada Project</option>
+						<option value="ifc_japan.json">IFC(japan)</option>
+					</select>
+				</li>
+			</ul>
+		</div>
+		<div style="margin-top: 20px; margin-left: 10px;">
+			<table id="dataTree" class="table dataTree table-bordered table-striped table-condensed" style="padding-bottom: 20px;" width="310px;">
+			</table>
+		</div>
+	</div>
+
+	<div id="chartMenuContent" class="chartWrap">
+		<div>chart</div>
+	</div>
+
 	<div id="configMenuContent" class="configWrap">
 		<div>
 			<h3>Label</h3>
@@ -620,6 +656,71 @@
 </div>
 <canvas id="objectLabel"></canvas>
 
+<div class="dataAttributeDialog" title="Data Detail Info">
+	<div><b>Geo Spatial Info</b></div>
+	<table class="list-table scope-col" style="width: 100%;">
+		<col class="col-label" />
+		<col class="col-data" />
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left; width: 30%">Data Key</th>
+			<td id="detailDataKey" class="col-data" style="width: 70%;"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Data Name</th>
+			<td id="detailDataName" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Latitude</th>
+			<td id="detailLatitude" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Longitude</th>
+			<td id="detailLongitude" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Height</th>
+			<td id="detailHeight" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Heading</th>
+			<td id="detailHeading" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Pitch</th>
+			<td id="detailPitch" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Roll</th>
+			<td id="detailRoll" class="col-data"></td>
+		</tr>
+	</table>
+	<div style="margin-top: 10px;"><b>Data Attribute</b>(It is stored in json format in PostgreSQL.)</div>
+	<div style="border: 1px solid #d9d9d9;">
+		<div style="padding: 5px;">
+		{
+			"properties" : {
+				"Author(s)" : {
+					"value" : "Gaia3D"
+				},
+				"Country" : {
+					"value" : "Korea"
+				},
+				"Title" : {
+					"value" : "F4D Data Attribute Example"
+				}
+			}
+		}
+		</div>
+	</div>
+	<div style="margin-top: 10px;"><b>Object Attribute</b></div>
+	<div style="border: 1px solid #d9d9d9;">
+		<div style="padding: 5px;">
+			There is a maximum of 1 million objects per IFC data. <br/>
+			For lists, the number is too large to provide search functionality.
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="/src/mago3d/message/Message.js"></script>
 <script type="text/javascript" src="/src/mago3d/core/Atmosphere.js"></script>
@@ -725,8 +826,8 @@
 		alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
 	}
 
-	var managerFactory = null;
-	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, configMenu : false };
+   	var managerFactory = null;
+	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, configMenu : false };
 	var insertIssueEnable = false;
 
 	var imagePath = "/images/ko";
@@ -734,7 +835,7 @@
 	magoStart(null, "magoContainer", imagePath);
 	var intervalCount = 0;
 	var timerId = setInterval("startMogoUI()", 1000);
-	
+
 	function startMogoUI() {
 		intervalCount++;
 		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
@@ -759,8 +860,8 @@
 		}
 		console.log("--------- intervalCount = " + intervalCount);
 	}
-	
-	// mago3d 시작, 정책 데이터 파일을 로딩
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
 			url: dataInformationUrl + "policy-cesium.json",
@@ -1023,6 +1124,13 @@
 	$("#insertIssueMenu").click(function() {
 		menuSlideControl("insertIssueMenu");
 	});
+    $("#treeMenu").click(function() {
+        menuSlideControl("treeMenu");
+        initDataTree();
+    });
+    $("#chartMenu").click(function() {
+        menuSlideControl("chartMenu");
+    });
 	$("#configMenu").click(function() {
 		menuSlideControl("configMenu");
 	});
@@ -1293,6 +1401,111 @@
 			});
 		}
 		changeNearGeoIssueListViewModeAPI(managerFactory, isShow);
+	}
+
+	// project 별 data tree 표시
+    // var dataTreeSetting = {
+	// 	data: {
+	// 		key: {
+	// 			name: ["data_key"],
+	// 			title: "data_name"
+     //        }
+     //    },
+	// };
+
+	function initDataTree() {
+        var projectId = $("#treeProjectId").val();
+		//if(projectId === undefined) projectId = "3ds.json";
+        var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+        if (projectData === null || projectData === undefined) {
+            $.ajax({
+                url: dataInformationUrl + projectId,
+                type: "GET",
+                dataType: "json",
+                success: function(serverData) {
+                    drawDataTree(projectId, serverData);
+                },
+                error : function(request, status, error) {
+                    console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
+                }
+            });
+        } else {
+            drawDataTree(projectId, projectData);
+        }
+	}
+
+	function drawDataTree(projectId, projectData) {
+	    var content = 	"";
+	    var dataId = 1;
+	    content 	= 	content
+					+ 	"<tr class=\"treegrid-" + dataId + "\" style=\"height: 25px; background-color: #F79F81\">"
+					+ 		"<td style=\"padding-left: 10px\" nowrap=\"nowrap\"></td>"
+					+		"<td colspan=\"3\"> <b>" + projectData.data_name + "</b></td>"
+					+	"</tr>";
+	    var childrenCount = projectData.children.length;
+	    if(childrenCount > 0) {
+            var childrenContent = getChildrenContent(projectId, dataId, projectData.children);
+            content = content + childrenContent;
+        }
+
+        $("#dataTree").html("");
+		$("#dataTree").append(content);
+        $('.dataTree').treegrid({
+            expanderExpandedClass: 'glyphicon glyphicon-minus',
+            expanderCollapsedClass: 'glyphicon glyphicon-plus'
+        });
+	}
+
+	function getChildrenContent(projectId, dataId, children) {
+        var content = 	"";
+       	var count = children.length;
+       	var parentClass = " treegrid-parent-" + dataId;
+       	var evenColor = "background-color: #ccc";
+       	var oddColor = "background-color: #eee";
+       	for(var i=0; i<count; i++) {
+			dataId++;
+			var bgcolor = (dataId % 2 == 0) ? evenColor : oddColor;
+			var myClass = "treegrid-" + dataId;
+	        var dataInfo = children[i];
+			content 	= 	content
+                + 	"<tr class=\"" + myClass + parentClass + "\" style=\"height: 25px;" + bgcolor + "\">"
+                + 		"<td style=\"padding-left: 2px\" nowrap=\"nowrap\"></td>"
+                +		"<td> " + dataInfo.data_name + "</td>"
+                +		"<td style=\"padding-left: 5px\"><button type=\"button\" title=\"Shortcuts\" class=\"dataShortcut\" onclick=\"gotoData('" + projectId + "', '" + dataInfo.data_key + "');\">Shortcuts</button></td>"
+                +		"<td style=\"padding-left: 5px; padding-right: 5px;\"><a href=\"#\" onclick=\"viewDataAttribute('" + dataInfo.data_key + "'); return false; \">Details</a></td>"
+                +	"</tr>";
+            var childrenCount = dataInfo.children.length;
+            if(childrenCount > 0) {
+                var childrenContent = getChildrenContent(projectId, dataId, dataInfo.children);
+                content = content + childrenContent;
+            }
+		}
+		return content;
+	}
+
+    var dataAttributeDialog = $( ".dataAttributeDialog" ).dialog({
+        autoOpen: false,
+        width: 400,
+        height: 550,
+		modal: true,
+        resizable: false
+    });
+
+    // data key 를 이용하여 dataInfo 정보를 취득
+    function viewDataAttribute(dataKey) {
+        getDataInfoByDataKeyAPI(managerFactory, dataKey);
+    }
+
+    function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+        dataAttributeDialog.dialog( "open" );
+        $("#detailDataKey").html(dataKey);
+        $("#detailDataName").html(dataName);
+        $("#detailLatitude").html(latitude);
+        $("#detailLongitude").html(longitude);
+        $("#detailHeight").html(height);
+        $("#detailHeading").html(heading);
+        $("#detailPitch").html(pitch);
+        $("#detailRoll").html(roll);
 	}
 	
 	// 설정 메뉴 시작
