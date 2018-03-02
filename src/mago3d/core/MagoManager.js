@@ -7019,6 +7019,10 @@ MagoManager.prototype.callAPI = function(api)
         var dataKey = api.getDataKey();
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		
+		if(node === undefined)
+			return;
+		
 		var dataName = node.data["data_name"];
 		var geoLocDataManager = node.data["geoLocDataManager"];
 		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
@@ -7038,8 +7042,6 @@ MagoManager.prototype.callAPI = function(api)
 				heading,
 				pitch,
 				roll);
-		
-		var i=0;
     }
 	else if (apiName === "gotoProject")
 	{
