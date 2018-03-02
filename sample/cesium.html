@@ -1470,7 +1470,7 @@
 			content 	= 	content
                 + 	"<tr class=\"" + myClass + parentClass + "\" style=\"height: 25px;" + bgcolor + "\">"
                 + 		"<td style=\"padding-left: 2px\" nowrap=\"nowrap\"></td>"
-                +		"<td> " + dataInfo.data_name + "</td>"
+                +		"<td title=\"" + dataInfo.data_key + "\"> " + dataInfo.data_name + "</td>"
                 +		"<td style=\"padding-left: 5px\"><button type=\"button\" title=\"Shortcuts\" class=\"dataShortcut\" onclick=\"gotoData('" + projectId + "', '" + dataInfo.data_key + "');\">Shortcuts</button></td>"
                 +		"<td style=\"padding-left: 5px; padding-right: 5px;\"><a href=\"#\" onclick=\"viewDataAttribute('" + dataInfo.data_key + "'); return false; \">Details</a></td>"
                 +	"</tr>";
