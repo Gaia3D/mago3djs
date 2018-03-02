@@ -590,6 +590,54 @@
 			"longitude": 126.611,
 			"pitch": 0.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "SD_COUNCIL_del",
+			"data_name": "SD_COUNCIL_del",
+			"heading": 0.0,
+			"height": 46,
+			"latitude": 37.57957919894378,
+			"longitude": 126.61169762954184,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Seongdong_del",
+			"data_name": "Seongdong_del",
+			"heading": 0.0,
+			"height": 65,
+			"latitude": 37.579202597716254,
+			"longitude": 126.61425359401416,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Seongbuk_del",
+			"data_name": "Seongbuk_del",
+			"heading": 0.0,
+			"height": 42,
+			"latitude": 37.57977495576556,
+			"longitude": 126.61285261452178,
+			"pitch": 90.0,
+			"roll": 0.0
 		}
 	],
 	"parent": 0,
