@@ -1493,7 +1493,7 @@
 
     // data key 를 이용하여 dataInfo 정보를 취득
     function viewDataAttribute(dataKey) {
-        getDataInfoByDataKeyAPI(managerFactory, dataKey);
+        getDataInfoByDataKeyAPI(managerFactory, $("#treeProjectId").val(), dataKey);
     }
 
     function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
