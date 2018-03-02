@@ -82,6 +82,9 @@ nav li.issue > span * {
 .nav li.chart {
 	background-position: 0 -50px;
 }
+.nav li.history {
+	background-position: 0 -50px;
+}
 .nav li.config {
 	background-position: 0 -50px;
 }
@@ -243,6 +246,9 @@ button.btn.on {
 	display:none;
 }
 .chartWrap {
+	display:none;
+}
+.historyWrap {
 	display:none;
 }
 .configWrap {
@@ -514,12 +520,34 @@ button.btn.on {
 }
 .chartWrap > div {
 	padding-bottom: 7px;
-	border-bottom: 1px dotted #888;
+	//border-bottom: 1px dotted #888;
 }
 .chartWrap > div:last-child {
 	border-bottom: none;
 }
 .chartWrap div label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+/* history */
+.navContents div.historyWrap {
+	margin: 10px 15px 0px 80px;
+}
+.navContents div.historyWrap > div h3 {
+	margin-bottom: 8px;
+	font-size: 1em;
+	font-weight: normal;
+	color: #2955a6;
+}
+.historyWrap > div {
+	padding-bottom: 7px;
+	border-bottom: 1px dotted #888;
+}
+.historyWrap > div:last-child {
+	border-bottom: none;
+}
+.historyWrap div label {
 	display: inline-block;
 	margin-right: 10px;
 }

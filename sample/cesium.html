@@ -9,16 +9,18 @@
 	<link rel="stylesheet" href="/thirdparty/jquery-ui/jquery-ui.css" />
 	<link rel="stylesheet" href="/thirdparty/jquery-toast/jquery.toast.css" />
 	<link rel="stylesheet" href="/thirdparty/treegrid/jquery.treegrid.css" />
-
+	<link rel="stylesheet" href="/thirdparty/jqplot/jquery.jqplot.min.css" />
 	<!-- 	<link rel="stylesheet" href="/thirdparty/color-picker/palette-color-picker.css" /> -->
 	<script type="text/javascript" src="/thirdparty/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="/thirdparty/jquery-toast/jquery.toast.js"></script>
-
 <!-- 	<script type="text/javascript" src="/thirdparty/color-picker/palette-color-picker.js"></script> -->
-
 	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.js"></script>
 	<script type="text/javascript" src="/thirdparty/treegrid/jquery.treegrid.bootstrap3.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/jquery.jqplot.min.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.pieRenderer.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.barRenderer.js"></script>
+	<script type="text/javascript" src="/thirdparty/jqplot/plugins/jqplot.categoryAxisRenderer.js"></script>
 </head>
 
 <body>
@@ -36,6 +38,7 @@
 	<li id="insertIssueMenu" class="regist" data-tooltip-text="Issue registration for Object.">Regist</li>
 	<li id="treeMenu" class="tree" data-tooltip-text="Display data hierarchy and Attributes by project.">Tree</li>
 	<li id="chartMenu" class="chart" data-tooltip-text="Display statistical data by project.">Chart</li>
+	<li id="historyMenu" class="history" data-tooltip-text="Displays the data change history.">History</li>
 	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
 </ul>
 
@@ -520,7 +523,18 @@
 	</div>
 
 	<div id="chartMenuContent" class="chartWrap">
-		<div>chart</div>
+		<div>
+			<h3>Number of data by project</h3>
+		</div>
+		<div id="projectChart" style="width: 340px; height: 340px; font-size: 18px;"></div>
+		<div style="margin-top: 30px;">
+			<h3>Full data status</h3>
+		</div>
+		<div id="dataStatusChart" style="width: 340px; height: 340px; font-size: 18px;"></div>
+	</div>
+
+	<div id="historyMenuContent" class="historyWrap">
+		<div>history</div>
 	</div>
 
 	<div id="configMenuContent" class="configWrap">
@@ -827,7 +841,7 @@
 	}
 
    	var managerFactory = null;
-	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, configMenu : false };
+	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, historyMenu : false, configMenu : false };
 	var insertIssueEnable = false;
 
 	var imagePath = "/images/ko";
@@ -1130,6 +1144,10 @@
     });
     $("#chartMenu").click(function() {
         menuSlideControl("chartMenu");
+        initDataChart();
+    });
+    $("#historyMenu").click(function() {
+        menuSlideControl("historyMenu");
     });
 	$("#configMenu").click(function() {
 		menuSlideControl("configMenu");
@@ -1496,6 +1514,7 @@
         getDataInfoByDataKeyAPI(managerFactory, $("#treeProjectId").val(), dataKey);
     }
 
+    // data info daialog callback
     function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
         dataAttributeDialog.dialog( "open" );
         $("#detailDataKey").html(dataKey);
@@ -1506,6 +1525,108 @@
         $("#detailHeading").html(heading);
         $("#detailPitch").html(pitch);
         $("#detailRoll").html(roll);
+	}
+
+	// chart 표시
+	function initDataChart() {
+        projectChart();
+        dataStatusChart();
+	}
+
+	// project 별 chart
+	function projectChart() {
+        $("#projectChart").html("");
+        var data = [["3DS", 37],["IFC(Cultural Assets)", 1],["IFC", 42],["IFC(MEP)", 1],["Sea Port", 7],["Collada", 7],["IFC(Japan)", 5]];
+        var plot = $.jqplot("projectChart", [data], {
+            //title : "project 별 chart",
+            //seriesColors: [ "#99a0ac", "#a67ee9" ],
+            grid: {
+                drawBorder: false,
+                drawGridlines: false,
+                background: "#ffffff",
+                shadow:false
+            },
+            gridPadding: {top:0, bottom:115, left:0, right:20},
+            seriesDefaults:{
+                renderer:$.jqplot.PieRenderer,
+                trendline : { show : false},
+                rendererOptions: {
+                    padding:8,
+                    showDataLabels: true,
+                    dataLabels: "value",
+                    //dataLabelFormatString: "%.1f%"
+                },
+            },
+            legend: {
+                show: true,
+                fontSize: "10pt",
+                placement : "outside",
+                rendererOptions: {
+                    numberRows: 3,
+                    numberCols: 3
+                },
+                location: "s",
+                border: "none",
+                marginLeft: "10px"
+            }
+        });
+	}
+
+	function dataStatusChart() {
+        $("#dataStatusChart").html("");
+        var otpValues = [ 85, 10, 5];
+        var ticks = ["Complete", "Developing", "Temp"];
+        var yMax = 100;
+
+        var plot = $.jqplot("dataStatusChart", [otpValues], {
+            //title : "data 상태별 차트",
+            height: 205,
+            animate: !$.jqplot.use_excanvas,
+            seriesColors: [ "#ffa076"],
+            grid: {
+                background: "#fff",
+                //background: "#14BA6C"
+                gridLineWidth: 0.7,
+                //borderColor: 'transparent',
+                shadow: false,
+                borderWidth:0.1
+                //shadowColor: 'transparent'
+            },
+            gridPadding:{
+                left:35,
+                right:1,
+                to:40,
+                bottom:27
+            },
+            seriesDefaults:{
+                shadow:false,
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true },
+                rendererOptions: {
+                    barWidth: 40
+                }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks,
+                    tickOptions:{
+                        formatString: "%'d",
+                        fontSize: "10pt"
+                    }
+                },
+                yaxis: {
+                    numberTicks : 6,
+                    min : 0,
+                    max : yMax,
+                    tickOptions:{
+                        formatString: "%'d",
+                        fontSize: "10pt"
+                    }
+                }
+            },
+            highlighter: { show: false }
+        });
 	}
 	
 	// 설정 메뉴 시작
@@ -1643,7 +1764,7 @@
 
 	// general callback alert function
 	function showApiResult(apiName, result) {
-		if(apiName === "searchData") {
+		if(apiName === "getDataInfoByDataKey" || apiName === "searchData" ) {
 			if(result === "-1") {
 				alert(" Information that has not yet been loaded. Please search after loading. ");
 			}
