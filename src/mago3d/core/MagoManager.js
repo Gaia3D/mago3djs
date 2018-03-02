@@ -7015,28 +7015,29 @@ MagoManager.prototype.callAPI = function(api)
 	}
     else if (apiName === "getDataInfoByDataKey")
     {
+		var projectId = api.getProjectId(); // for example : 3ds, collada, ifc, etc.***
         var dataKey = api.getDataKey();
-		/*
+		
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		var dataName = node.data["data_name"];
+		var geoLocDataManager = node.data["geoLocDataManager"];
+		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
+		var latitude = geoLocdata.geographicCoord.latitude;
+		var longitude = geoLocdata.geographicCoord.longitude;
+		var altitude = geoLocdata.geographicCoord.altitude;
+		var heading = geoLocdata.heading;
+		var pitch = geoLocdata.pitch;
+		var roll = geoLocdata.roll;
+		
 		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
 				dataKey,
 				dataName,
-				geoLocationData.geographicCoord.latitude,
-				geoLocationData.geographicCoord.longitude,
-				geoLocationData.geographicCoord.altitude,
-				geoLocationData.heading,
-				geoLocationData.pitch,
-				geoLocationData.roll);
-				*/
-				
-		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
-				"hola",
-				"hola",
-				3,
-				4,
-				4,
-				5,
-				6,
-				7);
+				latitude,
+				longitude,
+				altitude,
+				heading,
+				pitch,
+				roll);
 		
 		var i=0;
     }
