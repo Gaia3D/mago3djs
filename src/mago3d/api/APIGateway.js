@@ -484,7 +484,7 @@ function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
 {
     if (managerFactoryInstance === null) { return; }
 
-    var api = new API("searchData");
+    var api = new API("getDataInfoByDataKey");
     api.setProjectId(projectId);
     api.setDataKey(dataKey);
     managerFactoryInstance.callAPI(api);
