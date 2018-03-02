@@ -1389,6 +1389,9 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		}
 		else { continue; }
 		
+		if (neoBuilding.buildingId === "2119_P11VC_F41GC_W530P_o")
+		{ var hola = 0; }
+		
 		// must check if the desirable lodMesh is available.***
 		var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
 		if (lodBuildingData === undefined)
@@ -1407,6 +1410,12 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 			lowLodMesh.legoKey = neoBuilding.buildingId + "_" + lodString;
 			//neoBuilding.lodMeshesArray[lodIdx] = lowLodMesh;// old.***
 			neoBuilding.lodMeshesMap[lodString] = lowLodMesh;
+		}
+		
+		if (lowLodMesh.fileLoadState === -1)
+		{
+			// if a lodObject has "fileLoadState" = -1 means that there are no file in server.***
+			continue;
 		}
 		
 		if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
@@ -7007,11 +7016,19 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "gotoProject")
 	{
 		var projectId = api.getProjectId();
-		if (!this.hierarchyManager.existProject(projectId))
+		//if (!this.hierarchyManager.existProject(projectId))
+		//{
+		//	var projectDataFolder = api.getProjectDataFolder();
+		//	this.getObjectIndexFile(projectId, projectDataFolder);
+		//}
+		
+		var nodeMap = this.hierarchyManager.getNodesMap(projectId);
+		if (Object.keys(nodeMap).length == 0)
 		{
 			var projectDataFolder = api.getProjectDataFolder();
 			this.getObjectIndexFile(projectId, projectDataFolder);
 		}
+		
 		
 		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
 	}

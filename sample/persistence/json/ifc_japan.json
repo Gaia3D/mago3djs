@@ -120,6 +120,63 @@
 			"longitude": 139.6858,
 			"pitch": 90,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 77,
+			"data_group_name": "3DS",
+			"data_id": 999,
+			"data_key": "KSJ_100_objectRemoved",
+			"data_name": "KSJ_100_objectRemoved",
+			"heading": 0,
+			"height": 95,
+			"latitude": 35.6618,
+			"longitude": 139.6862,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 77,
+			"data_group_name": "3DS",
+			"data_id": 999,
+			"data_key": "KSJ_100_subset",
+			"data_name": "KSJ_100_subset",
+			"heading": 0,
+			"height": 95,
+			"latitude": 35.6618,
+			"longitude": 139.6864,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 77,
+			"data_group_name": "3DS",
+			"data_id": 999,
+			"data_key": "Tile_173078_LD_010_017_L22",
+			"data_name": "Tile_173078_LD_010_017_L22",
+			"heading": 0,
+			"height": 120,
+			"latitude": 35.6618,
+			"longitude": 139.687,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,

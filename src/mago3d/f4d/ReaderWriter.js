@@ -430,7 +430,8 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { legoMesh.fileLoadState = 500; }
-		else { legoMesh.fileLoadState = status; }
+		//else { legoMesh.fileLoadState = status; }
+		else { legoMesh.fileLoadState = -1; }
 	}).always(function() 
 	{
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
