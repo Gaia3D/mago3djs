@@ -7021,7 +7021,10 @@ MagoManager.prototype.callAPI = function(api)
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		
 		if(node === undefined)
+		{
+			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
+		}
 		
 		var dataName = node.data["data_name"];
 		var geoLocDataManager = node.data["geoLocDataManager"];
