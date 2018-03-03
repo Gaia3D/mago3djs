@@ -878,65 +878,46 @@
 </div>
 
 <div class="dataInfoChangeDialog" title="Data Info Change Log">
-    <div><b>Before</b></div>
-    <table class="list-table scope-col" style="width: 100%;">
-        <col class="col-label" />
-        <col class="col-data" />
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left; width: 35%;">Latitude</th>
-            <td id="BeforeLatitude" class="col-data">36.543</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
-            <td id="BeforeLongitude" class="col-data">127.28487</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Height</th>
-            <td id="BeforeHeight" class="col-data">100</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Heading</th>
-            <td id="BeforeHeading" class="col-data">55</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
-            <td id="BeforePitch" class="col-data">0</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Roll</th>
-            <td id="BeforeRoll" class="col-data">0</td>
-        </tr>
-    </table>
-
-    <div style="margin-top: 30px;"><b>After</b></div>
-    <table class="list-table scope-col" style="width: 100%;">
-        <col class="col-label" />
-        <col class="col-data" />
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left; width: 35%;">Latitude</th>
-            <td id="AfterLatitude" class="col-data">36.554</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
-            <td id="AfterLongitude" class="col-data">126.732</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Height</th>
-            <td id="AfterHeight" class="col-data">70</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Heading</th>
-            <td id="AfterHeading" class="col-data">90</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
-            <td id="AfterPitch" class="col-data">10</td>
-        </tr>
-        <tr style="height: 30px;">
-            <th class="col-label" scope="row" style="text-align: left">Roll</th>
-            <td id="AfterRoll" class="col-data">10</td>
-        </tr>
-    </table>
+	<table class="list-table scope-col" style="width: 100%;">
+		<col class="col-label" />
+		<col class="col-data" />
+		<col class="col-data" />
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="width: 30%; text-align: center">Name</th>
+			<th class="col-label" scope="row" style="width: 35%; text-align: center">Before</th>
+			<th class="col-label" scope="row" style="width: 35%; text-align: center">After</th>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left;">Latitude</th>
+			<td id="BeforeLatitude" class="col-data">36.1234</td>
+			<td id="AfterLatitude" class="col-data" style="color: red">36.1277</td>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left">Longitude</th>
+			<td id="BeforeLongitude" class="col-data">127.28487</td>
+			<td id="AfterLongitude" class="col-data" style="color: red">127.28387</td>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left">Height</th>
+			<td id="BeforeHeight" class="col-data">100</td>
+			<td id="AfterHeight" class="col-data">100</td>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left">Heading</th>
+			<td id="BeforeHeading" class="col-data">55</td>
+			<td id="AfterHeading" class="col-data">55</td>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left">Pitch</th>
+			<td id="BeforePitch" class="col-data">0</td>
+			<td id="AfterPitch" class="col-data" style="color: red">3</td>
+		</tr>
+		<tr style="height: 30px;">
+			<th class="col-label" scope="row" style="text-align: left">Roll</th>
+			<td id="BeforeRoll" class="col-data">0</td>
+			<td id="AfterRoll" class="col-data">0</td>
+		</tr>
+	</table>
 </div>
 
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
@@ -1840,7 +1821,7 @@
     var dataInfoChangeDialog = $( ".dataInfoChangeDialog" ).dialog({
         autoOpen: false,
         width: 400,
-        height: 550,
+        height: 300,
         modal: true,
         resizable: false
     });
