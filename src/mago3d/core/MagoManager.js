@@ -6868,10 +6868,103 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
+		// delete "aditionalMove" of the objects.***
+		var moveHistoryMap = MagoConfig.getAllMovingHistory(); // get colorHistoryMap.***
+		if(moveHistoryMap === undefined)
+		{
+			MagoConfig.clearMovingHistory();
+			return;
+		}
+		
+		for (var key_projectId in moveHistoryMap)
+		{
+			var projectId = key_projectId;
+			var buildingsMap = moveHistoryMap[projectId];
+			if(buildingsMap === undefined)
+				continue;
+			
+			for (var key_dataKey in buildingsMap)
+			{
+				var dataKey = key_dataKey;
+				var dataValue = buildingsMap[key_dataKey];
+				
+				if(dataValue === undefined)
+					continue;
+				
+				for(var objectIdx in dataValue)
+				{
+					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+					if(node === undefined || node.data === undefined)
+						continue;
+					
+					var neoBuilding = node.data["neoBuilding"];
+					if(neoBuilding === undefined)
+						continue;
+					
+					var refObject = neoBuilding.getReferenceObject(objectIdx);
+					if(refObject)
+					{
+						refObject.moveVector = undefined;
+						refObject.moveVectorRelToBuilding = undefined;
+					}
+				}
+			}
+		}
+		
 		MagoConfig.clearMovingHistory();
 	}
 	else if (apiName === "deleteAllChangeColor") 
 	{
+		// 1rst, must delete the aditionalColors of objects.***
+		var colorHistoryMap = MagoConfig.getAllColorHistory(); // get colorHistoryMap.***
+		
+		if(colorHistoryMap === undefined)
+		{
+			MagoConfig.clearColorHistory();
+			return;
+		}
+		
+		for (var key_projectId in colorHistoryMap)
+		{
+			var projectId = key_projectId;
+			var buildingsMap = colorHistoryMap[projectId];
+			if(buildingsMap === undefined)
+				continue;
+			
+			for (var key_dataKey in buildingsMap)
+			{
+				var dataKey = key_dataKey;
+				var dataValue = buildingsMap[key_dataKey];
+				if(dataValue === undefined)
+					continue;
+				
+				for(var objectId in dataValue)
+				{
+					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+					if(node === undefined || node.data === undefined)
+						continue;
+					
+					var neoBuilding = node.data["neoBuilding"];
+					if(neoBuilding === undefined)
+						continue;
+					
+					var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+					if(refObjectArray === undefined)
+						continue;
+					
+					var refObjectsCount = refObjectArray.length;
+					for(var i=0; i<refObjectsCount; i++)
+					{
+						var refObject = refObjectArray[i];
+						if(refObject)
+						{
+							refObject.aditionalColor = undefined;
+						}
+					}
+				}
+			}
+		}
+		
 		MagoConfig.clearColorHistory();
 	}
 	else if (apiName === "changeInsertIssueMode") 
@@ -7013,21 +7106,21 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		this.deleteAll();
 	}
-    else if (apiName === "getDataInfoByDataKey")
-    {
+	else if (apiName === "getDataInfoByDataKey")
+	{
 		var projectId = api.getProjectId(); // for example : 3ds, collada, ifc, etc.***
-        var dataKey = api.getDataKey();
+		var dataKey = api.getDataKey();
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		
-		if(node === undefined)
+		if (node === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
 		}
 		
-		var dataName = node.data["data_name"];
-		var geoLocDataManager = node.data["geoLocDataManager"];
+		var dataName = node.data.data_name;
+		var geoLocDataManager = node.data.geoLocDataManager;
 		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
 		var latitude = geoLocdata.geographicCoord.latitude;
 		var longitude = geoLocdata.geographicCoord.longitude;
@@ -7037,15 +7130,15 @@ MagoManager.prototype.callAPI = function(api)
 		var roll = geoLocdata.roll;
 		
 		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
-				dataKey,
-				dataName,
-				latitude,
-				longitude,
-				altitude,
-				heading,
-				pitch,
-				roll);
-    }
+			dataKey,
+			dataName,
+			latitude,
+			longitude,
+			altitude,
+			heading,
+			pitch,
+			roll);
+	}
 	else if (apiName === "gotoProject")
 	{
 		var projectId = api.getProjectId();
