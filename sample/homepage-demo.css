@@ -606,8 +606,9 @@ button.btn.on {
 .shortcut {
 	position: absolute;
 	left: 50%;
+	transform: translate(-50%);
+	display: table;
 	margin: 0 auto;
-	margin-left: -320px;
 	border-radius: 0 0 10px 10px;
 	background-color: tomato;
 	z-index: 90;

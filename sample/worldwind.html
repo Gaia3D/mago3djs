@@ -286,7 +286,7 @@
 						<option value="0,0,0"> Black </option>
 					</select>
 					<button type="button" id="changeColor" class="btn">Change</button> 
-					<button type="button" id="deleteAllChangeColor" class="btn">All Delte</button>
+					<button type="button" id="deleteAllChangeColor" class="btn">All Delete</button>
 				</li>
 			</ul>
 		</div>
@@ -517,7 +517,7 @@
 			</ul>
 		</div>
 		<div style="margin-top: 20px; margin-left: 10px;">
-			<table id="dataTree" class="table dataTree table-bordered table-striped table-condensed" style="padding-bottom: 20px;" width="310px;">
+			<table id="dataTree" class="table dataTree table-bordered table-striped table-condensed" style="padding-bottom: 20px; width:310px;">
 			</table>
 		</div>
 	</div>
@@ -1608,16 +1608,6 @@
 		}
 		changeNearGeoIssueListViewModeAPI(managerFactory, isShow);
 	}
-
-	// project 별 data tree 표시
-    // var dataTreeSetting = {
-	// 	data: {
-	// 		key: {
-	// 			name: ["data_key"],
-	// 			title: "data_name"
-     //        }
-     //    },
-	// };
 
 	function initDataTree() {
         var projectId = $("#treeProjectId").val();
