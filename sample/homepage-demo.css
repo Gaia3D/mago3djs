@@ -82,7 +82,10 @@ nav li.issue > span * {
 .nav li.chart {
 	background-position: 0 -50px;
 }
-.nav li.history {
+.nav li.log {
+	background-position: 0 -50px;
+}
+.nav li.attribute {
 	background-position: 0 -50px;
 }
 .nav li.config {
@@ -248,7 +251,10 @@ button.btn.on {
 .chartWrap {
 	display:none;
 }
-.historyWrap {
+.logWrap {
+	display:none;
+}
+.attributeWrap {
 	display:none;
 }
 .configWrap {
@@ -530,24 +536,46 @@ button.btn.on {
 	margin-right: 10px;
 }
 
-/* history */
-.navContents div.historyWrap {
+/* log */
+.navContents div.logWrap {
 	margin: 10px 15px 0px 80px;
 }
-.navContents div.historyWrap > div h3 {
+.navContents div.logWrap > div h3 {
 	margin-bottom: 8px;
 	font-size: 1em;
 	font-weight: normal;
 	color: #2955a6;
 }
-.historyWrap > div {
+.logWrap > div {
 	padding-bottom: 7px;
 	border-bottom: 1px dotted #888;
 }
-.historyWrap > div:last-child {
+.logWrap > div:last-child {
 	border-bottom: none;
 }
-.historyWrap div label {
+.logWrap div label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+/* attribute */
+.navContents div.attributeWrap {
+	margin: 10px 15px 0px 80px;
+}
+.navContents div.attributeWrap > div h3 {
+	margin-bottom: 8px;
+	font-size: 1em;
+	font-weight: normal;
+	color: #2955a6;
+}
+.attributeWrap > div {
+	padding-bottom: 7px;
+	border-bottom: 1px dotted #888;
+}
+.attributeWrap > div:last-child {
+	border-bottom: none;
+}
+.attributeWrap div label {
 	display: inline-block;
 	margin-right: 10px;
 }

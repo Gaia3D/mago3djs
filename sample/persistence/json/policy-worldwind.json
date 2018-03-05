@@ -23,6 +23,7 @@
 	"geo_view_library": "worldwind",
 	"geo_data_path": "/data",
 	"geo_data_default_projects": [
+		"3ds.json"
 	],
 	"geo_cull_face_enable": "false",
 	"geo_time_line_enable": "false",
@@ -62,6 +63,7 @@
 	"geo_server_add_parameters_format": "image/png",
 	"geo_callback_enable": "true",
 	"geo_callback_apiresult": "showApiResult",
+	"geo_callback_dataInfo": "showDataInfo",
 	"geo_callback_selectedobject": "showSelectedObject",
 	"geo_callback_insertissue": "showInsertIssueLayer",
 	"geo_callback_clickposition": "showClickPosition",
