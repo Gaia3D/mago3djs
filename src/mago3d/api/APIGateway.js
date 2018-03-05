@@ -482,12 +482,12 @@ function getDataAPI(key)
  */
 function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
 {
-    if (managerFactoryInstance === null) { return; }
+	if (managerFactoryInstance === null) { return; }
 
-    var api = new API("getDataInfoByDataKey");
-    api.setProjectId(projectId);
-    api.setDataKey(dataKey);
-    managerFactoryInstance.callAPI(api);
+	var api = new API("getDataInfoByDataKey");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
 }
 
 /**

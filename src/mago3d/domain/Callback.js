@@ -42,7 +42,7 @@ function selectedObjectCallback(functionName, dataKey, objectId, latitude, longi
  */
 function dataInfoCallback(functionName, dataKey, dataName, latitude, longitude, elevation, heading, pitch, roll)
 {
-    window[functionName](dataKey, dataName, latitude, longitude, elevation, heading, pitch, roll);
+	window[functionName](dataKey, dataName, latitude, longitude, elevation, heading, pitch, roll);
 }
 
 /**
