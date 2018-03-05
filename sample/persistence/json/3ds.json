@@ -585,7 +585,7 @@
 			"data_key": "GasanDigital_del",
 			"data_name": "GasanDigital_del",
 			"heading": 0.0,
-			"height": 55,
+			"height": 50,
 			"latitude": 37.579,
 			"longitude": 126.611,
 			"pitch": 0.0,
@@ -636,6 +636,54 @@
 			"height": 42,
 			"latitude": 37.57977495576556,
 			"longitude": 126.61285261452178,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "SeongBuck_del",
+			"data_name": "SeongBuck_del",
+			"heading": 0.0,
+			"height": 62,
+			"latitude": 37.57927674395256,
+			"longitude": 126.60927587033039,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Main_del",
+			"data_name": "Main_del",
+			"heading": 0.0,
+			"height": 42,
+			"latitude": 37.57946142139059,
+			"longitude": 126.61274203614141,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Sinnae_del",
+			"data_name": "Sinnae_del",
+			"heading": 0.0,
+			"height": 62,
+			"latitude": 37.5794168324911,
+			"longitude": 126.6106198514921,
 			"pitch": 90.0,
 			"roll": 0.0
 		}
