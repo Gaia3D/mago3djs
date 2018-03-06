@@ -686,6 +686,22 @@
 			"longitude": 126.6106198514921,
 			"pitch": 90.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Yongsan_del",
+			"data_name": "Yongsan_del",
+			"heading": 180.0,
+			"height": 62,
+			"latitude": 37.57853273021515,
+			"longitude": 126.60872933314623,
+			"pitch": 90.0,
+			"roll": 0.0
 		}
 	],
 	"parent": 0,
