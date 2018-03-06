@@ -6870,7 +6870,7 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		// delete "aditionalMove" of the objects.***
 		var moveHistoryMap = MagoConfig.getAllMovingHistory(); // get colorHistoryMap.***
-		if(moveHistoryMap === undefined)
+		if (moveHistoryMap === undefined)
 		{
 			MagoConfig.clearMovingHistory();
 			return;
@@ -6880,29 +6880,29 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			var projectId = key_projectId;
 			var buildingsMap = moveHistoryMap[projectId];
-			if(buildingsMap === undefined)
-				continue;
+			if (buildingsMap === undefined)
+			{ continue; }
 			
 			for (var key_dataKey in buildingsMap)
 			{
 				var dataKey = key_dataKey;
 				var dataValue = buildingsMap[key_dataKey];
 				
-				if(dataValue === undefined)
-					continue;
+				if (dataValue === undefined)
+				{ continue; }
 				
-				for(var objectIdx in dataValue)
+				for (var objectIdx in dataValue)
 				{
 					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if(node === undefined || node.data === undefined)
-						continue;
+					if (node === undefined || node.data === undefined)
+					{ continue; }
 					
-					var neoBuilding = node.data["neoBuilding"];
-					if(neoBuilding === undefined)
-						continue;
+					var neoBuilding = node.data.neoBuilding;
+					if (neoBuilding === undefined)
+					{ continue; }
 					
 					var refObject = neoBuilding.getReferenceObject(objectIdx);
-					if(refObject)
+					if (refObject)
 					{
 						refObject.moveVector = undefined;
 						refObject.moveVectorRelToBuilding = undefined;
@@ -6918,7 +6918,7 @@ MagoManager.prototype.callAPI = function(api)
 		// 1rst, must delete the aditionalColors of objects.***
 		var colorHistoryMap = MagoConfig.getAllColorHistory(); // get colorHistoryMap.***
 		
-		if(colorHistoryMap === undefined)
+		if (colorHistoryMap === undefined)
 		{
 			MagoConfig.clearColorHistory();
 			return;
@@ -6928,35 +6928,35 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			var projectId = key_projectId;
 			var buildingsMap = colorHistoryMap[projectId];
-			if(buildingsMap === undefined)
-				continue;
+			if (buildingsMap === undefined)
+			{ continue; }
 			
 			for (var key_dataKey in buildingsMap)
 			{
 				var dataKey = key_dataKey;
 				var dataValue = buildingsMap[key_dataKey];
-				if(dataValue === undefined)
-					continue;
+				if (dataValue === undefined)
+				{ continue; }
 				
-				for(var objectId in dataValue)
+				for (var objectId in dataValue)
 				{
 					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if(node === undefined || node.data === undefined)
-						continue;
+					if (node === undefined || node.data === undefined)
+					{ continue; }
 					
-					var neoBuilding = node.data["neoBuilding"];
-					if(neoBuilding === undefined)
-						continue;
+					var neoBuilding = node.data.neoBuilding;
+					if (neoBuilding === undefined)
+					{ continue; }
 					
 					var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if(refObjectArray === undefined)
-						continue;
+					if (refObjectArray === undefined)
+					{ continue; }
 					
 					var refObjectsCount = refObjectArray.length;
-					for(var i=0; i<refObjectsCount; i++)
+					for (var i=0; i<refObjectsCount; i++)
 					{
 						var refObject = refObjectArray[i];
-						if(refObject)
+						if (refObject)
 						{
 							refObject.aditionalColor = undefined;
 						}
@@ -7121,7 +7121,21 @@ MagoManager.prototype.callAPI = function(api)
 		
 		var dataName = node.data.data_name;
 		var geoLocDataManager = node.data.geoLocDataManager;
+		
+		if(dataName === undefined || geoLocDataManager === undefined)
+		{
+			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			return;
+		}
+		
 		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
+		
+		if(geoLocdata === undefined || geoLocdata.geographicCoord === undefined)
+		{
+			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			return;
+		}
+		
 		var latitude = geoLocdata.geographicCoord.latitude;
 		var longitude = geoLocdata.geographicCoord.longitude;
 		var altitude = geoLocdata.geographicCoord.altitude;
