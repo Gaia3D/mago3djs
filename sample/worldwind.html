@@ -516,7 +516,7 @@
 				</li>
 			</ul>
 		</div>
-		<div style="margin-top: 20px; margin-left: 10px;">
+		<div style="margin-top: 20px; margin-left: 10px; margin-bottom: 20px;">
 			<table id="dataTree" class="table dataTree table-bordered table-striped table-condensed" style="padding-bottom: 20px; width:310px;">
 			</table>
 		</div>
@@ -1632,15 +1632,15 @@
 
 	function drawDataTree(projectId, projectData) {
 	    var content = 	"";
-	    var dataId = 1;
+	    var dataCssId = 1;
 	    content 	= 	content
-					+ 	"<tr class=\"treegrid-" + dataId + "\" style=\"height: 25px; background-color: #F79F81\">"
+					+ 	"<tr class=\"treegrid-" + dataCssId + "\" style=\"height: 25px; background-color: #F79F81\">"
 					+ 		"<td style=\"padding-left: 10px\" nowrap=\"nowrap\"></td>"
 					+		"<td colspan=\"3\"> <b>" + projectData.data_name + "</b></td>"
 					+	"</tr>";
 	    var childrenCount = projectData.children.length;
 	    if(childrenCount > 0) {
-            var childrenContent = getChildrenContent(projectId, dataId, projectData.children);
+            var childrenContent = getChildrenContent(projectId, dataCssId, projectData.children);
             content = content + childrenContent;
         }
 
@@ -1652,16 +1652,16 @@
         });
 	}
 
-	function getChildrenContent(projectId, dataId, children) {
+	function getChildrenContent(projectId, dataCssId, children) {
         var content = 	"";
        	var count = children.length;
-       	var parentClass = " treegrid-parent-" + dataId;
+       	var parentClass = " treegrid-parent-" + dataCssId;
        	var evenColor = "background-color: #ccc";
        	var oddColor = "background-color: #eee";
        	for(var i=0; i<count; i++) {
-			dataId++;
-			var bgcolor = (dataId % 2 == 0) ? evenColor : oddColor;
-			var myClass = "treegrid-" + dataId;
+            dataCssId++;
+			var bgcolor = (dataCssId % 2 == 0) ? evenColor : oddColor;
+			var myClass = "treegrid-" + dataCssId;
 	        var dataInfo = children[i];
 			content 	= 	content
                 + 	"<tr class=\"" + myClass + parentClass + "\" style=\"height: 25px;" + bgcolor + "\">"
@@ -1672,7 +1672,7 @@
                 +	"</tr>";
             var childrenCount = dataInfo.children.length;
             if(childrenCount > 0) {
-                var childrenContent = getChildrenContent(projectId, dataId, dataInfo.children);
+                var childrenContent = getChildrenContent(projectId, dataCssId, dataInfo.children);
                 content = content + childrenContent;
             }
 		}
