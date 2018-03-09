@@ -7122,7 +7122,7 @@ MagoManager.prototype.callAPI = function(api)
 		var dataName = node.data.data_name;
 		var geoLocDataManager = node.data.geoLocDataManager;
 		
-		if(dataName === undefined || geoLocDataManager === undefined)
+		if (dataName === undefined || geoLocDataManager === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
@@ -7130,7 +7130,7 @@ MagoManager.prototype.callAPI = function(api)
 		
 		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
 		
-		if(geoLocdata === undefined || geoLocdata.geographicCoord === undefined)
+		if (geoLocdata === undefined || geoLocdata.geographicCoord === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
