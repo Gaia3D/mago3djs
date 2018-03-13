@@ -2336,6 +2336,33 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				}
 				this.mustCheckIfDragging = false;
 			}
+
+			// Display geoLocationData while moving building.***
+			var nodeOwner = this.buildingSelected.nodeOwner;
+			if(nodeOwner === undefined)
+				return;
+
+			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
+			if(geoLocDataManager === undefined)
+				return;
+
+			var geoLocation = geoLocDataManager.getGeoLocationData(0);
+			if(geoLocation === undefined)
+				return;
+
+			var geographicCoords = geoLocation.geographicCoord;
+			if(geographicCoords === undefined)
+				return;
+
+			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
+                				nodeOwner.data.nodeId,
+								null,
+								geographicCoords.latitude,
+								geographicCoords.longitude,
+								geographicCoords.altitude,
+								geoLocation.heading,
+								geoLocation.pitch,
+								geoLocation.roll);
 		}
 		else 
 		{

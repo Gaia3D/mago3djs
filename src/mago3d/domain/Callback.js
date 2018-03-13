@@ -29,6 +29,23 @@ function selectedObjectCallback(functionName, dataKey, objectId, latitude, longi
 }
 
 /**
+ * 이동한 data 정보를 화면에 표시
+ * @param data_key
+ * @param objectId
+ * @param latitude
+ * @param longitude
+ * @param elevation
+ * @param heading
+ * @param pitch
+ * @param roll
+ * @param
+ */
+function movedDataCallback(functionName, dataKey, objectId, latitude, longitude, elevation, heading, pitch, roll)
+{
+	window[functionName](dataKey, objectId, latitude, longitude, elevation, heading, pitch, roll);
+}
+
+/**
  * Data Key 를 이용하여 Geo Spatial Info를 획득하여 화면에 표시
  * @param data_key
  * @param dataName
