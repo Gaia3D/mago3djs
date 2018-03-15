@@ -1,0 +1,158 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "collada"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1067,
+			"data_key": "CU Macky",
+			"data_name": "CU Macky",
+			"heading": 219,
+			"height": 50,
+			"latitude": 37.569019,
+			"longitude": 126.798852,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1066,
+			"data_key": "Lara_Croft",
+			"data_name": "Lara_Croft",
+			"heading": 219,
+			"height": 47,
+			"latitude": 37.566519,
+			"longitude": 126.798852,
+			"pitch": -90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1069,
+			"data_key": "ED-209",
+			"data_name": "ED-209",
+			"heading": 42,
+			"height": 50,
+			"latitude": 37.567519,
+			"longitude": 126.799852,
+			"pitch": -90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1062,
+			"data_key": "2_cylinder_engine",
+			"data_name": "2_cylinder_engine",
+			"heading": 228,
+			"height": 48,
+			"latitude": 37.569519,
+			"longitude": 126.799852,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1065,
+			"data_key": "Vulture2",
+			"data_name": "Vulture2",
+			"heading": 219,
+			"height": 48,
+			"latitude": 37.567519,
+			"longitude": 126.796852,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1068,
+			"data_key": "Grendizer",
+			"data_name": "Grendizer",
+			"heading": 48,
+			"height": 51,
+			"latitude": 37.568219,
+			"longitude": 126.798052,
+			"pitch": -96,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1064,
+			"data_key": "BAR_POOL_ROOM",
+			"data_name": "BAR_POOL_ROOM",
+			"heading": 219,
+			"height": 32,
+			"latitude": 37.567219,
+			"longitude": 126.798052,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_group_id": 10,
+			"data_group_name": "COLLADA",
+			"data_id": 1063,
+			"data_key": "buggy",
+			"data_name": "buggy",
+			"heading": 219,
+			"height": 60,
+			"latitude": 37.567219,
+			"longitude": 126.799052,
+			"pitch": 0,
+			"roll": 0
+		}
+	],
+	"data_group_id": 0,
+	"data_group_name": "collada",
+	"data_id": 0,
+	"data_key": "collada",
+	"data_name": "collada"
+}

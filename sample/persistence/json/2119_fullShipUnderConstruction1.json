@@ -1,0 +1,141 @@
+{
+   "attributes" : {
+      "isPhysical" : false,
+      "nodeType" : "root",
+      "projectType" : "ship"
+   },
+   "children" : [
+      {
+         "attributes" : {
+            "isPhysical" : false,
+            "nodeType" : "PE"
+         },
+         "children" : [
+            {
+               "attributes" : {
+                  "isMain" : true,
+                  "isPhysical" : true,
+                  "nodeType" : "block"
+               },
+               "children" : [
+                  {
+                     "attributes" : {
+                        "isMain" : false,
+                        "isPhysical" : true,
+                        "nodeType" : "block"
+                     },
+                     "children" : [],
+                     "data_group_id" : 0,
+                     "data_group_name" : "temporary",
+                     "data_id" : 0,
+                     "data_key" : "2119_B11GS_H120S_o",
+                     "data_name" : "2119_B11GS_H120S_o"
+                  }
+               ],
+               "data_group_id" : 0,
+               "data_group_name" : "temporary",
+               "data_id" : 0,
+               "data_key" : "2119_B11GS_H120S",
+               "data_name" : "2119_B11GS_H120S"
+            },
+            {
+               "attributes" : {
+                  "isMain" : true,
+                  "isPhysical" : true,
+                  "nodeType" : "block"
+               },
+               "children" : [
+                  {
+                     "attributes" : {
+                        "isMain" : false,
+                        "isPhysical" : true,
+                        "nodeType" : "block"
+                     },
+                     "children" : [],
+                     "data_group_id" : 0,
+                     "data_group_name" : "temporary",
+                     "data_id" : 0,
+                     "data_key" : "2119_B11GS_H110S_o",
+                     "data_name" : "2119_B11GS_H110S_o"
+                  }
+               ],
+               "data_group_id" : 0,
+               "data_group_name" : "temporary",
+               "data_id" : 0,
+               "data_key" : "2119_B11GS_H110S",
+               "data_name" : "2119_B11GS_H110S"
+            },
+            {
+               "attributes" : {
+                  "isMain" : true,
+                  "isPhysical" : true,
+                  "nodeType" : "block"
+               },
+               "children" : [
+                  {
+                     "attributes" : {
+                        "isMain" : false,
+                        "isPhysical" : true,
+                        "nodeType" : "block"
+                     },
+                     "children" : [],
+                     "data_group_id" : 0,
+                     "data_group_name" : "temporary",
+                     "data_id" : 0,
+                     "data_key" : "2119_B11GS_B110S_o",
+                     "data_name" : "2119_B11GS_B110S_o"
+                  }
+               ],
+               "data_group_id" : 0,
+               "data_group_name" : "temporary",
+               "data_id" : 0,
+               "data_key" : "2119_B11GS_B110S",
+               "data_name" : "2119_B11GS_B110S"
+            },
+            {
+               "attributes" : {
+                  "isMain" : true,
+                  "isPhysical" : true,
+                  "nodeType" : "block"
+               },
+               "children" : [
+                  {
+                     "attributes" : {
+                        "isMain" : false,
+                        "isPhysical" : true,
+                        "nodeType" : "block"
+                     },
+                     "children" : [],
+                     "data_group_id" : 0,
+                     "data_group_name" : "temporary",
+                     "data_id" : 0,
+                     "data_key" : "2119_B11GS_B120S_o",
+                     "data_name" : "2119_B11GS_B120S_o"
+                  }
+               ],
+               "data_group_id" : 0,
+               "data_group_name" : "temporary",
+               "data_id" : 0,
+               "data_key" : "2119_B11GS_B120S",
+               "data_name" : "2119_B11GS_B120S"
+            }
+         ],
+         "data_group_id" : 0,
+         "data_group_name" : "temporary",
+         "data_id" : 0,
+         "data_key" : "2119_B11GS",
+         "data_name" : "2119_B11GS"
+      }
+   ],
+   "data_group_id" : 0,
+   "data_group_name" : "temporary",
+   "data_id" : 0,
+   "data_key" : "2119",
+   "data_name" : "2119",
+   "heading" : 0.0,
+   "height" : 5.0,
+   "latitude" : 34.90242825811708,
+   "longitude" : 128.5889949521996,
+   "pitch" : 0.0,
+   "roll" : 0.0
+}

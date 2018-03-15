@@ -1,4 +1,5 @@
 /**
+ * https://github.com/AnalyticalGraphicsInc/cesium/blob/master/server.js
  * Copy of Cesium
  */
 
