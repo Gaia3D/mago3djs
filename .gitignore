@@ -1,0 +1,8 @@
+.settings/
+/node_modules/
+/data/
+build/
+data
+.project
+.idea/
+mago3djs.iml
