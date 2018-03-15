@@ -702,6 +702,86 @@
 			"longitude": 126.60872933314623,
 			"pitch": 90.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "imun_del",
+			"data_name": "imun_del",
+			"heading": 180.0,
+			"height": 42,
+			"latitude": 37.57853724588487,
+			"longitude": 126.61293775000532,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Leejina_del",
+			"data_name": "Leejina_del",
+			"heading": 270.0,
+			"height": 42,
+			"latitude": 37.57858017066692,
+			"longitude": 126.613454257586,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "junggok_del",
+			"data_name": "junggok_del",
+			"heading": 0.0,
+			"height": 42,
+			"latitude": 37.5785134644084,
+			"longitude": 126.61382863033367,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "GARAK_del",
+			"data_name": "GARAK_del",
+			"heading": 0.0,
+			"height": 45,
+			"latitude": 37.57772632410791,
+			"longitude": 126.61596315544706,
+			"pitch": 90.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Jungnanggu-public-library_del",
+			"data_name": "Jungnanggu-public-library_del",
+			"heading": 0.0,
+			"height": 45,
+			"latitude": 37.581335572353154,
+			"longitude": 126.615338146804,
+			"pitch": 90.0,
+			"roll": 0.0
 		}
 	],
 	"parent": 0,
