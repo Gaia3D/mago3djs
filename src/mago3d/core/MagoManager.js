@@ -2336,7 +2336,6 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				}
 				this.mustCheckIfDragging = false;
 			}
-
 			// Display geoLocationData while moving building.***
 			var nodeOwner = this.buildingSelected.nodeOwner;
 			if(nodeOwner === undefined)
