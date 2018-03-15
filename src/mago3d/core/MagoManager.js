@@ -1389,9 +1389,6 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		}
 		else { continue; }
 		
-		if (neoBuilding.buildingId === "2119_P11VC_F41GC_W530P_o")
-		{ var hola = 0; }
-		
 		// must check if the desirable lodMesh is available.***
 		var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
 		if (lodBuildingData === undefined)
@@ -2352,7 +2349,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			var geographicCoords = geoLocation.geographicCoord;
 			if(geographicCoords === undefined)
 				return;
-
+			
 			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
                 				nodeOwner.data.nodeId,
 								null,
@@ -2362,6 +2359,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 								geoLocation.heading,
 								geoLocation.pitch,
 								geoLocation.roll);
+								
 		}
 		else 
 		{
@@ -6746,6 +6744,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 	for (var i=0; i<rootNodesCount; i++)
 	{
 		nodeRoot = rootNodesArray[i];
+		
 		nodesArray.length = 0; // init.***
 		nodeRoot.extractNodesByDataName(nodesArray, "buildingSeed");
 		// now, take nodes that is "isMain" = true.

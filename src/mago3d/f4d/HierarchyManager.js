@@ -104,11 +104,11 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = this.nodesArray[i];
+		
 		if (node.parent === undefined)
 		{
 			resultRootNodesArray.push(node);
 		}
-		i++;
 	}
 	
 	return resultRootNodesArray;
