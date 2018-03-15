@@ -2336,6 +2336,8 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				}
 				this.mustCheckIfDragging = false;
 			}
+			
+			//alert("hola");
 		}
 		else 
 		{
