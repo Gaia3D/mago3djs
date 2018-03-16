@@ -3526,6 +3526,7 @@ MagoManager.prototype.renderLowestOctreeAsimetricVersion = function(gl, cameraPo
 				
 				// 1) LOD0 & LOD1.*********************************************************************************************************************
 				var refTMatrixIdxKey = 0;
+				var refTMatrixIdxKey = 0;
 				var minSize = 0.0;
 				var renderTexture;
 				if (this.isLastFrustum)
@@ -5199,6 +5200,12 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
+				
+				if(nodeRoot.data.nodeId === "2119_E43GC")
+				{
+					var hola = 0;
+				}
+				
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
@@ -5224,6 +5231,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 			
 					geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+					/*
+					// old. error.***
 					longitude = neoBuilding.metaData.geographicCoord.longitude;
 					latitude = neoBuilding.metaData.geographicCoord.latitude;
 					altitude = neoBuilding.metaData.geographicCoord.altitude;
@@ -5232,14 +5241,22 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					roll = neoBuilding.metaData.roll;
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+					*/
+					longitude = nodeRoot.data.geographicCoord.longitude;
+					latitude = nodeRoot.data.geographicCoord.latitude;
+					altitude = nodeRoot.data.geographicCoord.altitude;
+					heading = nodeRoot.data.rotationsDegree.z;
+					pitch = nodeRoot.data.rotationsDegree.x;
+					roll = nodeRoot.data.rotationsDegree.y;
+					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
+					this.pointSC = nodeRoot.data.bbox.getCenterPoint(this.pointSC);
 					
 					// test.
 					//***********************************************************************************************************
-					var rootNode = node.getRoot();
-					if (rootNode)
+					if (nodeRoot)
 					{
 						// now, calculate the root center of bbox.
-						this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
+						this.pointSC = nodeRoot.data.bbox.getCenterPoint(this.pointSC);
 						ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 					}
 					//------------------------------------------------------------------------------------------------------------
