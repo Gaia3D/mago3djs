@@ -782,6 +782,22 @@
 			"longitude": 126.615338146804,
 			"pitch": 90.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "gangnamgu_office_del",
+			"data_name": "gangnamgu_office_del",
+			"heading": 0.0,
+			"height": 45,
+			"latitude": 37.581335572353154,
+			"longitude": 126.615338146804,
+			"pitch": 90.0,
+			"roll": 0.0
 		}
 	],
 	"parent": 0,
