@@ -792,10 +792,10 @@
 			"children": [],
 			"data_key": "gangnamgu_office_del",
 			"data_name": "gangnamgu_office_del",
-			"heading": 0.0,
-			"height": 45,
-			"latitude": 37.581335572353154,
-			"longitude": 126.615338146804,
+			"heading": -90.0,
+			"height": 53,
+			"latitude": 37.57768464085319,
+			"longitude": 126.6111422764297,
 			"pitch": 90.0,
 			"roll": 0.0
 		}
