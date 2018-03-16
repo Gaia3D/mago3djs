@@ -125,10 +125,25 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
 		bytesReaded += buildingNameLength;
 
+		//console.log(buildingName);
+		/*////////////////////////////////////////////////////////////////////////////////////////////
+		// 최성인 수정
+		if(buildingName === "F4D_2220_E11VC_E12GC_E120C_o") {
+			console.log("SIChoi Debugging : ");
+			console.log(buildingName);
+			console.log("");
+		}
+		////////////////////////////////////////////////////////////////////////////////////////////*/
+
 		// now the geographic coords, but this is provisional coords.
-		longitude = new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8))[0]; bytesReaded += 8;
-		latitude = new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8))[0]; bytesReaded += 8;
-		altitude = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
+		var size = arrayBuffer.slice(bytesReaded, bytesReaded+8);
+		longitude = new Float64Array(size)[0]; bytesReaded += 8;
+
+		size = arrayBuffer.slice(bytesReaded, bytesReaded+8);
+		latitude = new Float64Array(size)[0]; bytesReaded += 8;
+		
+		size = arrayBuffer.slice(bytesReaded, bytesReaded+4);
+		altitude = new Float32Array(size)[0]; bytesReaded += 4;
 
 		buildingSeed.bBox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
 		buildingSeed.bBox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
