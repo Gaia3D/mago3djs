@@ -6415,10 +6415,102 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "deleteAllObjectMove") 
 	{
+		var moveHistoryMap = MagoConfig.getAllMovingHistory(); // get colorHistoryMap.***
+		if (moveHistoryMap === undefined)
+		{
+			MagoConfig.clearMovingHistory();
+			return;
+		}
+		
+		for (var key_projectId of moveHistoryMap.keys())
+		{
+			var projectId = key_projectId;
+			var buildingsMap = moveHistoryMap.get(projectId);
+			if (buildingsMap === undefined)
+			{ continue; }
+			
+			for (var key_dataKey of buildingsMap.keys())
+			{
+				var dataKey = key_dataKey;
+				var dataValue = buildingsMap.get(key_dataKey);
+				
+				if (dataValue === undefined)
+				{ continue; }
+				
+				for (var objectIdx of dataValue.keys())
+				{
+					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+					if (node === undefined || node.data === undefined)
+					{ continue; }
+					
+					var neoBuilding = node.data.neoBuilding;
+					if (neoBuilding === undefined)
+					{ continue; }
+					
+					var refObject = neoBuilding.getReferenceObject(objectIdx);
+					if (refObject)
+					{
+						refObject.moveVector = undefined;
+						refObject.moveVectorRelToBuilding = undefined;
+					}
+				}
+			}
+		}
+		
 		MagoConfig.clearMovingHistory();
 	}
 	else if (apiName === "deleteAllChangeColor") 
 	{
+		// 1rst, must delete the aditionalColors of objects.***
+		var colorHistoryMap = MagoConfig.getAllColorHistory(); // get colorHistoryMap.***
+		
+		if (colorHistoryMap === undefined)
+		{
+			MagoConfig.clearColorHistory();
+			return;
+		}
+		
+		for (var key_projectId of colorHistoryMap.keys())
+		{
+			var projectId = key_projectId;
+			var buildingsMap = colorHistoryMap.get(projectId);
+			if (buildingsMap === undefined)
+			{ continue; }
+			
+			for (var key_dataKey of buildingsMap.keys())
+			{
+				var dataKey = key_dataKey;
+				var dataValue = buildingsMap.get(key_dataKey);
+				if (dataValue === undefined)
+				{ continue; }
+				
+				for (var objectId of dataValue.keys())
+				{
+					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+					if (node === undefined || node.data === undefined)
+					{ continue; }
+					
+					var neoBuilding = node.data.neoBuilding;
+					if (neoBuilding === undefined)
+					{ continue; }
+					
+					var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+					if (refObjectArray === undefined)
+					{ continue; }
+					
+					var refObjectsCount = refObjectArray.length;
+					for (var i=0; i<refObjectsCount; i++)
+					{
+						var refObject = refObjectArray[i];
+						if (refObject)
+						{
+							refObject.aditionalColor = undefined;
+						}
+					}
+				}
+			}
+		}
+		
 		MagoConfig.clearColorHistory();
 	}
 	else if (apiName === "changeInsertIssueMode") 
