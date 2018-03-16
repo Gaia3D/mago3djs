@@ -5233,9 +5233,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					
-					if (neoBuilding.buildingId === "ctships")
-					{ ; }
-					
 					// test.
 					//***********************************************************************************************************
 					var rootNode = node.getRoot();
@@ -5251,19 +5248,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				}
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
-				
-				if (neoBuilding.buildingId === "ctships")
-				{
-					lod0_minDist = 32;
-					lod1_minDist = 1;
-					lod2_minDist = 316000;
-					lod3_minDist = lod2_minDist*10;
-				}
-				
-				if (neoBuilding.buildingId === "2119_C92GC_C930C_o")
-				{ var hola = 0; }
-				if (neoBuilding.buildingId === "Goliath")
-				{ var hola = 0; }
 				
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
@@ -5299,11 +5283,29 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				}
 				else if (distToCamera < lod2_minDist) 
 				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+					if(node.data.attributes)
+					{
+						if(node.data.attributes.isPhysical && node.data.attributes.isPhysical === true)
+						{
+							if(node.data.attributes.isMain && node.data.attributes.isMain === true)
+							{
+								this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+							}
+						}
+					}
 				}
 				else if (distToCamera < lod3_minDist) 
 				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					if(node.data.attributes)
+					{
+						if(node.data.attributes.isPhysical && node.data.attributes.isPhysical === true)
+						{
+							if(node.data.attributes.isMain && node.data.attributes.isMain === true)
+							{
+								this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -5311,52 +5313,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 		{
 			// create the buildings by buildingSeeds.
 			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
-			/*
-			var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
-			
-			for (var j=0; j<nodeSeedsCount; j++)
-			{
-				var node = lowestTile.nodeSeedsArray[j];
-				neoBuilding = new NeoBuilding();
-				node.data.neoBuilding = neoBuilding;
-				nodeBbox = new BoundingBox();
-				node.data.bbox = nodeBbox;
-				buildingSeed = node.data.buildingSeed;
-			
-				if (lowestTile.nodesArray === undefined)
-				{ lowestTile.nodesArray = []; }
-				
-				lowestTile.nodesArray.push(node);
-				
-				if (neoBuilding.metaData === undefined) 
-				{ neoBuilding.metaData = new MetaData(); }
-
-				if (neoBuilding.metaData.geographicCoord === undefined)
-				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-				if (neoBuilding.metaData.bbox === undefined) 
-				{ neoBuilding.metaData.bbox = new BoundingBox(); }
-
-				// create a building and set the location.***
-				neoBuilding.name = buildingSeed.name;
-				neoBuilding.buildingId = buildingSeed.buildingId;
-			
-				neoBuilding.buildingType = "basicBuilding";
-				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
-				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
-				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
-				if (neoBuilding.bbox === undefined)
-				{ neoBuilding.bbox = new BoundingBox(); }
-				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-				if (node.data.projectFolderName === undefined)
-				{ var hola = 0; }
-				neoBuilding.projectFolderName = node.data.projectFolderName;
-			}
-			*/
 		}
 	}
 };
