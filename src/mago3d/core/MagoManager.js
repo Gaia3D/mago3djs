@@ -1372,19 +1372,34 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		var lodString;
 		var lodIdx; // old.***
 		
-		if (neoBuilding.distToCam < this.magoPolicy.getLod3DistInMeters())
+		if (neoBuilding.distToCam < this.magoPolicy.getLod0DistInMeters())
 		{
 			lodIdx = 0;
+			neoBuilding.currentLod = 0;
+		}
+		else if (neoBuilding.distToCam < this.magoPolicy.getLod1DistInMeters())
+		{
+			lodIdx = 1;
+			neoBuilding.currentLod = 1;
+		}
+		else if (neoBuilding.distToCam < this.magoPolicy.getLod2DistInMeters())
+		{
+			lodIdx = 2;
+			neoBuilding.currentLod = 2;
+		}
+		else if (neoBuilding.distToCam < this.magoPolicy.getLod3DistInMeters())
+		{
+			lodIdx = 3;
 			neoBuilding.currentLod = 3;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod4DistInMeters())
 		{
-			lodIdx = 1;
+			lodIdx = 4;
 			neoBuilding.currentLod = 4;
 		}
 		else if (neoBuilding.distToCam < this.magoPolicy.getLod5DistInMeters())
 		{
-			lodIdx = 2;
+			lodIdx = 5;
 			neoBuilding.currentLod = 5;
 		}
 		else { continue; }
@@ -1393,6 +1408,9 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
 		if (lodBuildingData === undefined)
 		{ continue; }
+	
+		if(lodBuildingData.isModelRef)
+			continue;
 		
 		textureFileName = lodBuildingData.textureFileName;
 		lodString = lodBuildingData.geometryFileName;
@@ -3213,13 +3231,19 @@ MagoManager.prototype.manageQueue = function()
 		
 		    // check the current lod of the building.***
 			var currentBuildingLod = neoBuilding.currentLod;
-			var lodIdx = currentBuildingLod - 3;
+			var lodIdx = currentBuildingLod;
 			
 			if (lodIdx < 0)
 			{ continue; }// old.***
 		
 			var lodString = undefined;
-			if (currentBuildingLod === 3)
+			if (currentBuildingLod === 0)
+			{ lodString = "lod0"; }
+			else if (currentBuildingLod === 1)
+			{ lodString = "lod1"; }
+			else if (currentBuildingLod === 2)
+			{ lodString = "lod2"; }
+			else if (currentBuildingLod === 3)
 			{ lodString = "lod3"; }
 			else if (currentBuildingLod === 4)
 			{ lodString = "lod4"; }
@@ -5738,6 +5762,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var geoLoc;
 	var geoLocDataManager;
 	var realBuildingPos;
+	var metaData;
 	var longitude, latitude, altitude, heading, pitch, roll;
 
 	for (var i=0; i<tilesCount; i++)
@@ -5772,6 +5797,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 					
 				neoBuilding = node.data.neoBuilding;
+				metaData = neoBuilding.metaData;
 				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 				{ 
 					if (neoBuilding.metaData.geographicCoord === undefined)
@@ -5803,8 +5829,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						var hola = 0; 
 					}
 					
-					// test.
-					//***********************************************************************************************************
 					if (node.data.attributes.centerOfBBoxAsOrigen !== undefined)
 					{
 						if (node.data.attributes.centerOfBBoxAsOrigen === true)
@@ -5818,19 +5842,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 							}
 						}
 					}
-					else 
-					{
-						/*
-						var rootNode = node.getRoot();
-						if (rootNode)
-						{
-							// now, calculate the root center of bbox.
-							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
-							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-						}
-						*/
-					}
-					//------------------------------------------------------------------------------------------------------------
+
 					continue;
 					
 				}
@@ -5864,15 +5876,28 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				//-------------------------------------------------------------------------------------------
 				if (distToCamera < lod0_minDist) 
 				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
+					// check if the lod0, lod1, lod2 are modelReference type.***
+					var lodBuildingData = neoBuilding.getLodBuildingData(0);
+					if(lodBuildingData && lodBuildingData.isModelRef)
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
+					else
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
 				}
 				else if (distToCamera < lod1_minDist) 
 				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+					var lodBuildingData = neoBuilding.getLodBuildingData(1);
+					if(lodBuildingData && lodBuildingData.isModelRef)
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+					else
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
 				}
 				else if (distToCamera < lod2_minDist) 
 				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+					var lodBuildingData = neoBuilding.getLodBuildingData(2);
+					if(lodBuildingData && lodBuildingData.isModelRef)
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+					else
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
 				}
 				else if (distToCamera < lod5_minDist) 
 				{
