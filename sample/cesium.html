@@ -1170,7 +1170,7 @@
 	});
 	
 	// issue input layer call back function
-	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
+	function showInsertIssueLayer(project_id, data_key, object_key, latitude, longitude, height) {
 		if(insertIssueEnable) {
 			$("#data_key").val(data_key);
 			$("#object_key").val(object_key);
@@ -1450,7 +1450,7 @@
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
 			$("#moveDataKey").val(dataKey);
@@ -1691,7 +1691,7 @@
     }
 
     // data info daialog callback
-    function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+    function showDataInfo(project_id, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
         dataAttributeDialog.dialog( "open" );
         $("#detailDataKey").html(dataKey);
         $("#detailDataName").html(dataName);
@@ -1965,7 +1965,7 @@
 		$("#now_longitude").val(longitude);
 	}
 
-    function showMovedData(dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+    function showMovedData(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		$("#moveDataKey").val(dataKey);
         $("#moveLatitude").val(latitude);
         $("#moveLongitude").val(longitude);
