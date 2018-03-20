@@ -803,6 +803,7 @@
 	<li onclick="gotoProject('sea_port.json', '126.598426', '37.440778', '630', '3')">Sea Port</li>
 	<li onclick="gotoProject('collada.json', '126.7987', '37.567450', '370', '3')">Collada Project</li>
 	<li onclick="gotoProject('ifc_japan.json', '139.6842', '35.6624', '320', '3')">IFC(Japan)</li>
+	<li onclick="gotoProject('sejong.json', '127.26557490316421', '36.5010938719156', '320', '3')">Sejong City</li>
 </ul>
 
 <div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
@@ -1172,7 +1173,7 @@
 	});
 	
 	// issue input layer call back function
-	function showInsertIssueLayer(data_key, object_key, latitude, longitude, height) {
+	function showInsertIssueLayer(project_id, data_key, object_key, latitude, longitude, height) {
 		if(insertIssueEnable) {
 			$("#data_key").val(data_key);
 			$("#object_key").val(object_key);
@@ -1452,7 +1453,7 @@
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
 			$("#moveDataKey").val(dataKey);
@@ -1693,7 +1694,7 @@
     }
 
     // data info daialog callback
-    function showDataInfo(dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+    function showDataInfo(project_id, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
         dataAttributeDialog.dialog( "open" );
         $("#detailDataKey").html(dataKey);
         $("#detailDataName").html(dataName);
@@ -1966,6 +1967,16 @@
 		$("#now_latitude").val(latitude);
 		$("#now_longitude").val(longitude);
 	}
+
+    function showMovedData(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+		$("#moveDataKey").val(dataKey);
+        $("#moveLatitude").val(latitude);
+        $("#moveLongitude").val(longitude);
+        $("#moveHeight").val(height);
+        $("#moveHeading").val(heading);
+        $("#movePitch").val(pitch);
+        $("#moveRoll").val(roll);
+    }
 </script>
 </body>
 </html>
