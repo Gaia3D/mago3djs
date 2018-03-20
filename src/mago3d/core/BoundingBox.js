@@ -97,7 +97,7 @@ BoundingBox.prototype.expand = function(distance)
  */
 BoundingBox.prototype.addPoint = function(point) 
 {
-	if (point !== undefined)	{ return; }
+	if (point === undefined)	{ return; }
 
 	if (point.x < this.minX) { this.minX = point.x; }
 	else if (point.x > this.maxX) { this.maxX = point.x; }
@@ -116,7 +116,7 @@ BoundingBox.prototype.addPoint = function(point)
  */
 BoundingBox.prototype.addBox = function(box) 
 {
-	if (box !== undefined)	{ return; }
+	if (box === undefined)	{ return; }
 
 	if (box.minX < this.minX) { this.minX = box.minX; }
 	if (box.maxX > this.maxX) { this.maxX = box.maxX; }
