@@ -45,8 +45,8 @@
 			"data_name": "강서문화원",
 			"heading": 990,
 			"height": 36,
-			"latitude": 37.582419509248105,
-			"longitude": 126.60666274596315,
+			"latitude": 37.58271766227185,
+			"longitude": 126.60652316950765,
 			"pitch": 90,
 			"roll": 0
 		},
@@ -465,8 +465,8 @@
 			"data_name": "강일동 주민센터",
 			"heading": 360,
 			"height": 42,
-			"latitude": 37.58201438816841,
-			"longitude": 126.60673623135487,
+			"latitude": 37.58210254926388,
+			"longitude": 126.60686085387776,
 			"pitch": 90,
 			"roll": 0
 		},
@@ -480,8 +480,8 @@
 			"data_name": "강북문화정보센터",
 			"heading": 990,
 			"height": 42,
-			"latitude": 37.58289603056518,
-			"longitude": 126.60725378640926,
+			"latitude": 37.58313394394016,
+			"longitude": 126.6071814586386,
 			"pitch": 90,
 			"roll": 0
 		},
@@ -810,22 +810,6 @@
 			"data_name": "gangdongguoffice_del_1222_02",
 			"heading": -540.0,
 			"height": 46,
-			"latitude": 37.57744105735498,
-			"longitude": 126.60857442352082,
-			"pitch": 90.0,
-			"roll": 0.0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "7M6_31",
-			"data_name": "7M6_31",
-			"heading": 0.0,
-			"height": 66,
 			"latitude": 37.57744105735498,
 			"longitude": 126.60857442352082,
 			"pitch": 90.0,

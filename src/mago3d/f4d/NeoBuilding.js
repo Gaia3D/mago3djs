@@ -422,7 +422,73 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	{ return undefined; }
 	
 	var skinLego;
-	if (this.currentLod === 3)
+	if (this.currentLod === 0)
+	{
+		skinLego = this.lodMeshesMap.lod0;
+		
+		if (skinLego === undefined || !skinLego.isReadyToRender())
+		{
+			skinLego = this.lodMeshesMap.lod1;
+			if (skinLego === undefined || !skinLego.isReadyToRender())
+			{
+				skinLego = this.lodMeshesMap.lod2;
+				if (skinLego === undefined || !skinLego.isReadyToRender())
+				{
+					skinLego = this.lodMeshesMap.lod3;
+					if (skinLego === undefined || !skinLego.isReadyToRender())
+					{
+						skinLego = this.lodMeshesMap.lod4;
+						if (skinLego === undefined || !skinLego.isReadyToRender())
+						{
+							skinLego = this.lodMeshesMap.lod5;
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 1)
+	{
+		skinLego = this.lodMeshesMap.lod1;
+		
+		if (skinLego === undefined || !skinLego.isReadyToRender())
+		{
+			skinLego = this.lodMeshesMap.lod2;
+			if (skinLego === undefined || !skinLego.isReadyToRender())
+			{
+				skinLego = this.lodMeshesMap.lod3;
+				if (skinLego === undefined || !skinLego.isReadyToRender())
+				{
+					skinLego = this.lodMeshesMap.lod4;
+					if (skinLego === undefined || !skinLego.isReadyToRender())
+					{
+						skinLego = this.lodMeshesMap.lod5;
+					}
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 2)
+	{
+		skinLego = this.lodMeshesMap.lod2;
+		
+		if (skinLego === undefined || !skinLego.isReadyToRender())
+		{
+			skinLego = this.lodMeshesMap.lod3;
+			if (skinLego === undefined || !skinLego.isReadyToRender())
+			{
+				skinLego = this.lodMeshesMap.lod4;
+				if (skinLego === undefined || !skinLego.isReadyToRender())
+				{
+					skinLego = this.lodMeshesMap.lod5;
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 3)
 	{
 		skinLego = this.lodMeshesMap.lod3;
 		
