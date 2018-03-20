@@ -1397,7 +1397,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		textureFileName = lodBuildingData.textureFileName;
 		lodString = lodBuildingData.geometryFileName;
 		
-		///lowLodMesh = neoBuilding.lodMeshesMap.get(lodString);
+		///lowLodMesh = neoBuilding.lodMeshesMap.get(lodString); // code if "lodMeshesMap" is a map.***
 		lowLodMesh = neoBuilding.lodMeshesMap[lodString];
 		if (lowLodMesh === undefined)
 		{
@@ -1405,7 +1405,6 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 			lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
 			lowLodMesh.textureName = textureFileName;
 			lowLodMesh.legoKey = neoBuilding.buildingId + "_" + lodString;
-			//neoBuilding.lodMeshesArray[lodIdx] = lowLodMesh;// old.***
 			neoBuilding.lodMeshesMap[lodString] = lowLodMesh;
 		}
 		
@@ -2351,6 +2350,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				return;
 			
 			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
+								nodeOwner.data.projectId,
                 				nodeOwner.data.nodeId,
 								null,
 								geographicCoords.latitude,
@@ -5759,6 +5759,12 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
+				
+				if (node.data.nodeId === "7M6_31")
+					{ 
+						var hola = 0; 
+					}
+					
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
@@ -5792,8 +5798,10 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					
-					if (neoBuilding.buildingId === "ctships")
-					{ ; }
+					if (neoBuilding.buildingId === "7M6_31")
+					{ 
+						var hola = 0; 
+					}
 					
 					// test.
 					//***********************************************************************************************************
@@ -5812,6 +5820,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 					else 
 					{
+						/*
 						var rootNode = node.getRoot();
 						if (rootNode)
 						{
@@ -5819,6 +5828,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 							this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
 							ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 						}
+						*/
 					}
 					//------------------------------------------------------------------------------------------------------------
 					continue;
@@ -5826,14 +5836,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				}
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
-				
-				if (neoBuilding.buildingId === "ctships")
-				{
-					lod0_minDist = 32;
-					lod1_minDist = 1;
-					lod2_minDist = 316000;
-					lod3_minDist = lod2_minDist*10;
-				}
 			
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
@@ -6420,6 +6422,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 	{ return; }
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var dataKey = node.data.nodeId;
+	var projectId = node.data.projectId;
 
 	if (MagoConfig.getPolicy().geo_callback_enable === "true") 
 	{
@@ -6431,6 +6434,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 		if (this.magoPolicy.getObjectInfoViewEnable()) 
 		{
 			selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
+				projectId,
 				dataKey,
 				objectId,
 				geoLocationData.geographicCoord.latitude,
@@ -6447,6 +6451,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 			if (this.objMarkerSC === undefined) { return; }
 			
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
+				projectId,
 				dataKey,
 				objectId,
 				geoLocationData.geographicCoord.latitude,
@@ -6600,6 +6605,9 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.projectId = projectId;
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
+		
+		if(node.data.nodeId === "7M6_31")
+			var hola = 0;
 		
 		if (attributes.isPhysical)
 		{
@@ -7161,6 +7169,7 @@ MagoManager.prototype.callAPI = function(api)
 			return;
 		}
 		
+		var projectId = node.data.projectId;
 		var latitude = geoLocdata.geographicCoord.latitude;
 		var longitude = geoLocdata.geographicCoord.longitude;
 		var altitude = geoLocdata.geographicCoord.altitude;
@@ -7169,6 +7178,7 @@ MagoManager.prototype.callAPI = function(api)
 		var roll = geoLocdata.roll;
 		
 		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
+			projectId,
 			dataKey,
 			dataName,
 			latitude,
