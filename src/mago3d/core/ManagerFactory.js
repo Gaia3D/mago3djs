@@ -642,6 +642,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var currentHeading = geoLocationData.heading || 0;
 		var currentPitch = geoLocationData.pitch || 0;
 		var currentRoll = geoLocationData.roll || 0;
+		
+		var increDist = 0.2;
+		var currentAlt = geoLocationData.geographicCoord.altitude || 0;
 
 		// For Heading
 		if (event.keyCode === 'Q'.charCodeAt(0))
@@ -672,8 +675,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			currentRoll -= increDeg;
 		}
+		
+		// For Altitude
+		if (event.keyCode === 'Z'.charCodeAt(0))
+		{
+			currentAlt += increDist;
+		}
+		else if (event.keyCode === 'X'.charCodeAt(0))
+		{
+			currentAlt -= increDist;
+		}
 
-		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
+		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.latitude, geoLocationData.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
 
 	}, false);
 	
