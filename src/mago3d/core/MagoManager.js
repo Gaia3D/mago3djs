@@ -1001,14 +1001,12 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var camera = this.scene.frameState.camera;
-
-		this.sceneState.camera.frustum.far[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far; 
-		this.sceneState.camera.frustum.near[0] = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
-		var currentFrustumFar = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].far;
-		var currentFrustumNear = this.scene._frustumCommandsList[this.numFrustums-this.currentFrustumIdx-1].near;
 		
-		//currentFrustumFar = 50000;
-		//currentFrustumNear = 0.1;
+		var frustumIdx = this.numFrustums-this.currentFrustumIdx-1;
+		this.sceneState.camera.frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
+		this.sceneState.camera.frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
+		var currentFrustumFar = this.scene._frustumCommandsList[frustumIdx].far;
+		var currentFrustumNear = this.scene._frustumCommandsList[frustumIdx].near;
 
 		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
 		resultCamera.direction.set(camera.direction.x, camera.direction.y, camera.direction.z);
@@ -1189,7 +1187,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			this.processQueue.putNodeToDeleteModelReferences(node, 0);
 		}
 		
-		// in this point, put nodes to delete lod lower than lod3 (delete lod0, lod1, lod2).***
+		// in this point, put nodes to delete lod LOWER THAN lod3 (delete lod0, lod1, lod2).***
 		nodesCount = this.visibleObjControlerNodes.currentVisibles3.length;
 		var nodesPutted = 0;
 		for (var i=nodesCount-1; i>=0; i--) 
@@ -1208,8 +1206,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			}
 			if (nodesPutted > 10)
 			{ break; }
-			//if(this.processQueue.nodesToDeleteLessThanLod3Map.length > 10)
-			//{ break; }
 		}
 		
 		// lod3, lod4, lod5.***
@@ -5784,11 +5780,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
-				
-				if (node.data.nodeId === "7M6_31")
-					{ 
-						var hola = 0; 
-					}
 					
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -5824,11 +5815,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 					
-					if (neoBuilding.buildingId === "7M6_31")
-					{ 
-						var hola = 0; 
-					}
-					
 					if (node.data.attributes.centerOfBBoxAsOrigen !== undefined)
 					{
 						if (node.data.attributes.centerOfBBoxAsOrigen === true)
@@ -5844,7 +5830,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 
 					continue;
-					
 				}
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
@@ -5859,8 +5844,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
 				//}
 				neoBuilding.distToCam = distToCamera;
-			
-				if (distToCamera > this.magoPolicy.getFrustumFarDistance())
+				
+				var frustumFar = this.magoPolicy.getFrustumFarDistance();
+				if (distToCamera > frustumFar*10)
 				{ continue; }
 				
 				// If necessary do frustum culling.*************************************************************************
