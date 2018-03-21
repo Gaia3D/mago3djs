@@ -368,11 +368,11 @@
 		<table>
 			<tr style="height: 35px;">
 				<td style="width: 100px;" nowrap="nowrap">
-					<label for="project_id">Project</label>
+					<label for="issueProjectId">Project</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
-					<select id="project_id" name="project_id" class="select">
+					<select id="issueProjectId" name="issueProjectId" class="select">
 						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
@@ -1193,10 +1193,11 @@
 	});
 	
 	// issue input layer call back function
-	function showInsertIssueLayer(project_id, data_key, object_key, latitude, longitude, height) {
+	function showInsertIssueLayer(projectId, dataKey, objectKey, latitude, longitude, height) {
 		if(insertIssueEnable) {
-			$("#data_key").val(data_key);
-			$("#object_key").val(object_key);
+		    $("#issueProjectId").val(projectId);
+			$("#data_key").val(dataKey);
+			$("#object_key").val(objectKey);
 			$("#latitude").val(latitude);
 			$("#longitude").val(longitude);
 			$("#height").val(height);
@@ -1474,9 +1475,10 @@
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(projectId, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
+		    $("#moveProjectId").val(projectId);
 			$("#moveDataKey").val(dataKey);
 			$("#moveLatitude").val(latitude);
 			$("#moveLongitude").val(longitude);
@@ -1714,7 +1716,7 @@
     }
 
     // data info daialog callback
-    function showDataInfo(project_id, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+    function showDataInfo(projectId, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
         dataAttributeDialog.dialog( "open" );
         $("#detailDataKey").html(dataKey);
         $("#detailDataName").html(dataName);
@@ -2058,7 +2060,7 @@
 		$("#now_longitude").val(longitude);
 	}
 
-    function showMovedData(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+    function showMovedData(projectId, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		$("#moveDataKey").val(dataKey);
         $("#moveLatitude").val(latitude);
         $("#moveLongitude").val(longitude);
