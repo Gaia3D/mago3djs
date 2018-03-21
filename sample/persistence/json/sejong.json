@@ -270,7 +270,7 @@
             "data_name": "7M6_31",
             "latitude": 36.491745688986406,
             "longitude": 127.25686166536181,
-            "height": 80.82102298736572,
+            "height": 63.82102298736572,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -18908,12 +18908,11 @@
 		{
 			"attributes": {
 				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"nodeType": "3DS"
 			},
 			"children": [],
-			"data_key": "GyeomjaeJeongSeon_del",
-			"data_name": "겸재정선기념관",
+			"data_key": "gomdalrae_del",
+			"data_name": "gomdalrae_del",
 			"heading": 0,
 			"height": 55,
 			"latitude": 36.50045822040739,
