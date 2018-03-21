@@ -368,11 +368,11 @@
 		<table>
 			<tr style="height: 35px;">
 				<td style="width: 100px;" nowrap="nowrap">
-					<label for="project_id">Project</label>
+					<label for="issueProjectId">Project</label>
 					<span class="icon-glyph glyph-emark-dot color-warning"></span>
 				</td>
 				<td>
-					<select id="project_id" name="project_id" class="select">
+					<select id="issueProjectId" name="issueProjectId" class="select">
 						<option value="3ds.json">3DS Project</option>
 						<option value="ifc_cultural_assets.json">IFC(Cultural Assets)</option>
 						<option value="ifc.json">IFC</option>
@@ -641,11 +641,10 @@
 		<div>
 			<h3>Object Attribute Search</h3>
 		</div>
-		<div>It is under development.</div>
 		<table style="margin-top: 30px;">
 			<tr style="height: 35px;">
-				<td style="width: 80px;"><label for="project_id">Project</label></td>
-				<td><select id="project_id" name="project_id" class="select">
+				<td style="width: 80px;"><label for="objectAttributeProjectId">Project</label></td>
+				<td><select id="objectAttributeProjectId" name="objectAttributeProjectId" class="select">
 					<option value=""> ALL </option>
 					<option value="1">3DS Project</option>
 					<option value="2">Collada Project</option>
@@ -656,23 +655,32 @@
 				</td>
 			</tr>
 			<tr style="height: 35px;">
-				<td><label for="search_word">Category</label></td>
+				<td><label for="objectAttributeDataKey">Data Key</label></td>
 				<td>
-					<select id="search_word" name="search_word" class="select">
-						<option value="data_name">Data Name</option>
-						<option value="data_key">Data Key</option>
-					</select>
+					<input type="text" id="objectAttributeDataKey" name="objectAttributeDataKey" size="22" />
+				</td>
+			</tr>
+			<tr style="height: 35px;">
+				<td><label for="objectAttributeObjectId">Object Id</label></td>
+				<td>
+					<input type="text" id="objectAttributeObjectId" name="objectAttributeObjectId" size="22" />
 				</td>
 			</tr>
 			<tr style="height: 35px;">
 				<td>
-					<label for="search_value">SearchWord</label></td>
-				<td><input type="text" id="search_value" name="search_value" size="31" /></td>
+					<label for="objectAttributeSearchValue">SearchWord</label></td>
+				<td><input type="text" id="objectAttributeSearchValue" name="objectAttributeSearchValue" size="31" /></td>
 			</tr>
 		</table>
 		<div class="btns">
-			<button type="button" id="searchData" class="full">Search</button>
+			<button type="button" id="objectAttributeSearch" class="full">Search</button>
 		</div>
+		<table id="objectAttributeSearchList" class="" style="width: 100%;">
+			<col style="width: 30%;" />
+			<col style="width: 40%;" />
+			<col style="width: 30%;" />
+			<tbody></tbody>
+		</table>
 	</div>
 	</form>
 
@@ -814,68 +822,70 @@
 </div>
 
 <div class="dataAttributeDialog" title="Data Detail Info">
-    <div><b>Geo Spatial Info</b></div>
-    <table class="list-table scope-col" style="width: 100%;">
-        <col class="col-label" />
-        <col class="col-data" />
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left; width: 30%">Data Key</th>
-            <td id="detailDataKey" class="col-data" style="width: 70%;"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Data Name</th>
-            <td id="detailDataName" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Latitude</th>
-            <td id="detailLatitude" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Longitude</th>
-            <td id="detailLongitude" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Height</th>
-            <td id="detailHeight" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Heading</th>
-            <td id="detailHeading" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Pitch</th>
-            <td id="detailPitch" class="col-data"></td>
-        </tr>
-        <tr>
-            <th class="col-label" scope="row" style="text-align: left">Roll</th>
-            <td id="detailRoll" class="col-data"></td>
-        </tr>
-    </table>
-    <div style="margin-top: 10px;"><b>Data Attribute</b>(It is stored in json format in PostgreSQL.)</div>
-    <div style="border: 1px solid #d9d9d9;">
-        <div style="padding: 5px;">
-            {
-            "properties" : {
-            "Author(s)" : {
-            "value" : "Gaia3D"
-            },
-            "Country" : {
-            "value" : "Korea"
-            },
-            "Title" : {
-            "value" : "F4D Data Attribute Example"
-            }
-            }
-            }
-        </div>
-    </div>
-    <div style="margin-top: 10px;"><b>Object Attribute</b></div>
-    <div style="border: 1px solid #d9d9d9;">
-        <div style="padding: 5px;">
-            There is a maximum of 1 million objects per IFC data. <br/>
-            For lists, the number is too large to provide search functionality.
-        </div>
-    </div>
+	<div><b>Geo Spatial Info</b></div>
+	<table class="list-table scope-col" style="width: 100%;">
+		<col class="col-label" />
+		<col class="col-data" />
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left; width: 30%">Data Key</th>
+			<td id="detailDataKey" class="col-data" style="width: 70%;"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Data Name</th>
+			<td id="detailDataName" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Latitude</th>
+			<td id="detailLatitude" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Longitude</th>
+			<td id="detailLongitude" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Height</th>
+			<td id="detailHeight" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Heading</th>
+			<td id="detailHeading" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Pitch</th>
+			<td id="detailPitch" class="col-data"></td>
+		</tr>
+		<tr>
+			<th class="col-label" scope="row" style="text-align: left">Roll</th>
+			<td id="detailRoll" class="col-data"></td>
+		</tr>
+	</table>
+	<div style="margin-top: 10px;"><b>Data Attribute</b>(It is stored in json format in PostgreSQL.)</div>
+	<div style="border: 1px solid #d9d9d9;">
+		<div style="padding: 5px;">
+			<code>
+			{
+				"properties" : {
+					"Author(s)" : {
+						"value" : "Gaia3D"
+					},
+					"Country" : {
+						"value" : "Korea"
+					},
+					"Title" : {
+						"value" : "F4D Data Attribute Example"
+					}
+				}
+			}
+			</code>
+		</div>
+	</div>
+	<div style="margin-top: 10px;"><b>Object Attribute</b></div>
+	<div style="border: 1px solid #d9d9d9;">
+		<div style="padding: 5px;">
+			There is a maximum of 1 million objects per IFC data. <br/>
+			For lists, the number is too large to provide search functionality.
+		</div>
+	</div>
 </div>
 
 <div class="dataInfoChangeDialog" title="Data Info Change Log">
@@ -919,6 +929,16 @@
 			<td id="AfterRoll" class="col-data">0</td>
 		</tr>
 	</table>
+</div>
+
+<div class="dataObjectAttributeDialog" title="Data Object Detail Info">
+	<div style="margin-top: 10px;"><b>It is stored in json format in PostgreSQL.</b></div>
+	<div style="border: 1px solid #d9d9d9;">
+			<pre>
+				<code id="dataObjectAttributeContent">
+				</code>
+			</pre>
+	</div>
 </div>
 
 <script type="text/javascript" src="/src/engine/webworldwind/worldwind.js"></script>
@@ -1173,10 +1193,11 @@
 	});
 	
 	// issue input layer call back function
-	function showInsertIssueLayer(project_id, data_key, object_key, latitude, longitude, height) {
+	function showInsertIssueLayer(projectId, dataKey, objectKey, latitude, longitude, height) {
 		if(insertIssueEnable) {
-			$("#data_key").val(data_key);
-			$("#object_key").val(object_key);
+		    $("#issueProjectId").val(projectId);
+			$("#data_key").val(dataKey);
+			$("#object_key").val(objectKey);
 			$("#latitude").val(latitude);
 			$("#longitude").val(longitude);
 			$("#height").val(height);
@@ -1186,13 +1207,13 @@
 		}
 	}
 	
-	var isInsertIssue = { "enable" : true }
+	var isInsertIssue = true;
 	$("#issueSaveButton").click(function() {
 		if (check() == false) {
 			return false;
 		}
-		if(isInsertIssue["enable"]) {
-			isInsertIssue["enable"] = false;
+		if(isInsertIssue) {
+			isInsertIssue = false;
 			var info = $("#issue").serialize();		
 			$.ajax({
 				url: "/issue/ajax-insert-issue.do",
@@ -1210,13 +1231,13 @@
 						alert("failed.");
 					}
 					
-					isInsertIssue["enable"] = true;
+					isInsertIssue = true;
 					ajaxIssueList();
 				},
 				error : function(request, status, error) {
 			        alert("Please use it after a while. \n If the same phenomenon repeats for a long time, please contact the administrator.");
 			        console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
-			        isInsertIssue["enable"] = true;
+			        isInsertIssue = true;
 				}
 			});
 			
@@ -1231,6 +1252,7 @@
 			return;
 		}
 	});
+
 	function check() {
 		if ($("#data_key").val() === "") {
 			alert("Please enter the Data Key.");
@@ -1381,7 +1403,7 @@
 	
 	// 검색 메뉴 시작
 	// Data 검색
-	var searchDataFlag = { "enable" : true }
+	var searchDataFlag = true;
 	$("#searchData").click(function() {
 		if ($.trim($("#search_value").val()) === "") {
 			alert("Please enter a search word.");
@@ -1389,8 +1411,8 @@
 			return false;
 		}
 		
-		if(searchDataFlag["enable"]) {
-			searchDataFlag["enable"] = false;
+		if(searchDataFlag) {
+			searchDataFlag = false;
 			var info = $("#searchForm").serialize();		
 			
 			var searchType = $("#search_word").val();
@@ -1430,7 +1452,7 @@
 			
 			$("#searchList").empty();
 			$("#searchList").html(content);
-			searchDataFlag["enable"] = true;
+			searchDataFlag = true;
 		} else {
 			alert("In progress.");
 			return;
@@ -1453,9 +1475,10 @@
 	
 	// API 메뉴시작
 	// object 정보 표시 call back function
-	function showSelectedObject(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+	function showSelectedObject(projectId, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		var objectInfoViewFlag = $(':radio[name="objectInfo"]:checked').val();
 		if(objectInfoViewFlag) {
+		    $("#moveProjectId").val(projectId);
 			$("#moveDataKey").val(dataKey);
 			$("#moveLatitude").val(latitude);
 			$("#moveLongitude").val(longitude);
@@ -1612,8 +1635,7 @@
 
 	function initDataTree() {
         var projectId = $("#treeProjectId").val();
-		//if(projectId === undefined) projectId = "3ds.json";
-        var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
         if (projectData === null || projectData === undefined) {
             $.ajax({
                 url: dataInformationUrl + projectId,
@@ -1683,7 +1705,7 @@
     var dataAttributeDialog = $( ".dataAttributeDialog" ).dialog({
         autoOpen: false,
         width: 400,
-        height: 550,
+        height: 590,
 		modal: true,
         resizable: false
     });
@@ -1694,7 +1716,7 @@
     }
 
     // data info daialog callback
-    function showDataInfo(project_id, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
+    function showDataInfo(projectId, dataKey, dataName, latitude, longitude, height, heading, pitch, roll) {
         dataAttributeDialog.dialog( "open" );
         $("#detailDataKey").html(dataKey);
         $("#detailDataName").html(dataName);
@@ -1819,6 +1841,76 @@
 	function dataChangeLog(dataInfoLogId) {
         dataInfoChangeDialog.dialog({title: dataInfoLogId + " Change Request Log"}).dialog( "open" );
 	}
+
+    // Data Object Attribute 검색
+	var objectAttributeSearchFlag = true;
+    $("#objectAttributeSearch").click(function() {
+        if ($.trim($("#objectAttributeDataKey").val()) === "") {
+            alert("Please enter a Data Key.");
+            $("#objectAttributeDataKey").focus();
+            return false;
+        }
+        if ($.trim($("#objectAttributeObjectId").val()) === "") {
+            alert("Please enter a Object Id.");
+            $("#objectAttributeObjectId").focus();
+            return false;
+        }
+
+        if(objectAttributeSearchFlag) {
+            objectAttributeSearchFlag = false;
+            var info = $("#attributeForm").serialize();
+
+            var content = "";
+            content 	=  content
+                + 	"<tr style=\"height: 30px; background-color: #eee\">"
+                + 		"<td style=\"padding-left: 2px;\" nowrap=\"nowrap\">Data Key</td>"
+                +		"<td>Object Id</td>"
+                +		"<td style=\"padding-left: 5px; padding-right: 5px; \">Attribute</td>"
+                +	"</tr>"
+                + 	"<tr style=\"height: 30px; background-color: #ccc\">"
+                + 		"<td style=\"padding-left: 2px\" nowrap=\"nowrap\">" + $("#objectAttributeDataKey").val() + "</td>"
+                +		"<td>" + $("#objectAttributeObjectId").val() + "</td>"
+                +		"<td style=\"padding-left: 5px; padding-right: 5px;\"><a href=\"#\" onclick=\"viewDataObjectAttribute('" + $("#objectAttributeDataKey").val() + "', '" + $("#objectAttributeObjectId").val() + "'); return false; \">Details</a></td>"
+                +	"</tr>"
+				+ 	"<tr style=\"height: 30px; background-color: #eee\">"
+				+ 		"<td style=\"padding-left: 2px\" nowrap=\"nowrap\">" + $("#objectAttributeDataKey").val() + "</td>"
+				+		"<td>" + $("#objectAttributeObjectId").val() + "</td>"
+				+		"<td style=\"padding-left: 5px; padding-right: 5px;\"><a href=\"#\" onclick=\"viewDataObjectAttribute('" + $("#objectAttributeDataKey").val() + "', '" + $("#objectAttributeObjectId").val() + "'); return false; \">Details</a></td>"
+				+	"</tr>";
+
+            $("#objectAttributeSearchList > tbody:last").html("");
+            $("#objectAttributeSearchList > tbody:last").append(content);
+            objectAttributeSearchFlag = true;
+        } else {
+            alert("In progress.");
+            return;
+        }
+    });
+
+    var dataObjectAttributeDialog = $( ".dataObjectAttributeDialog" ).dialog({
+        autoOpen: false,
+        width: 600,
+        height: 550,
+        modal: true,
+        resizable: false
+    });
+
+    // data key 를 이용하여 dataInfo 정보를 취득
+	function viewDataObjectAttribute(dataKey, objectId) {
+        dataObjectAttributeDialog.dialog( "open" );
+        $.ajax({
+            url: dataInformationUrl + "object_attributes.json",
+            type: "GET",
+            dataType: "json",
+            success: function(attributeData) {
+                var jsonAttribute = JSON.stringify(attributeData, null, 2);
+                $("#dataObjectAttributeContent").append(jsonAttribute);
+            },
+            error: function(e) {
+                alert(e.responseText);
+            }
+        });
+    }
 
 	// 설정 메뉴 시작
 	// Label 표시
@@ -1968,7 +2060,7 @@
 		$("#now_longitude").val(longitude);
 	}
 
-    function showMovedData(project_id, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
+    function showMovedData(projectId, dataKey, objectId, latitude, longitude, height, heading, pitch, roll) {
 		$("#moveDataKey").val(dataKey);
         $("#moveLatitude").val(latitude);
         $("#moveLongitude").val(longitude);
