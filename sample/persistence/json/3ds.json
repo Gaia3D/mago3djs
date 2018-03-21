@@ -398,7 +398,8 @@
 		{
 			"attributes": {
 				"isPhysical": true,
-				"nodeType": "3DS"
+				"nodeType": "3DS",
+				"flipYTexCoords": true
 			},
 			"children": [],
 			"data_key": "GyeomjaeJeongSeon_del",
@@ -428,7 +429,8 @@
 		{
 			"attributes": {
 				"isPhysical": true,
-				"nodeType": "3DS"
+				"nodeType": "3DS",
+				"flipYTexCoords": true
 			},
 			"children": [],
 			"data_key": "Gangsu_office_del",
@@ -458,7 +460,8 @@
 		{
 			"attributes": {
 				"isPhysical": true,
-				"nodeType": "3DS"
+				"nodeType": "3DS",
+				"flipYTexCoords": true
 			},
 			"children": [],
 			"data_key": "gangil_del",

@@ -422,6 +422,13 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	{ return undefined; }
 	
 	var skinLego;
+	//var currLodString = this.getCurrentLodString();
+	//skinLego = this.lodMeshesMap[currLodString];
+	//if(skinLego)
+		//var hola = 0;
+	
+	//return skinLego;
+	
 	if (this.currentLod === 0)
 	{
 		skinLego = this.lodMeshesMap.lod0;
