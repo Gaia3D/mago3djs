@@ -4020,7 +4020,7 @@
             "data_name": "7U6_1718",
             "latitude": 36.49946159304063,
             "longitude": 127.26603408296825,
-            "height": 68.34178352355957,
+            "height": 61.94178352355948,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -4035,7 +4035,7 @@
             "data_name": "7U6_1719",
             "latitude": 36.49959677828882,
             "longitude": 127.26558633221077,
-            "height": 68.72932243347168,
+            "height": 56.72932243347151,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -4635,7 +4635,7 @@
             "data_name": "7U6_1761",
             "latitude": 36.50363648356642,
             "longitude": 127.26666142097093,
-            "height": 69.92705345153809,
+            "height": 63.92705345153809,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -5610,7 +5610,7 @@
             "data_name": "7U6_1828",
             "latitude": 36.50007502427786,
             "longitude": 127.26428648233839,
-            "height": 63.067626953125,
+            "height": 61.86762695312498,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -6315,7 +6315,7 @@
             "data_name": "7U6_1919",
             "latitude": 36.50557644673059,
             "longitude": 127.25966442191621,
-            "height": 68.43134498596191,
+            "height": 63.43134498596191,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -6345,7 +6345,7 @@
             "data_name": "7U6_1921",
             "latitude": 36.50563270496023,
             "longitude": 127.26001701649551,
-            "height": 68.68532943725586,
+            "height": 63.68532943725586,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8805,7 +8805,7 @@
             "data_name": "7U6_2086",
             "latitude": 36.50089109357031,
             "longitude": 127.2660780399161,
-            "height": 67.97282028198242,
+            "height": 58.97282028198242,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8820,7 +8820,7 @@
             "data_name": "7U6_2087",
             "latitude": 36.50088611309779,
             "longitude": 127.2661014803362,
-            "height": 68.02530288696289,
+            "height": 59.02530288696289,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8835,7 +8835,7 @@
             "data_name": "7U6_2088",
             "latitude": 36.50090855777971,
             "longitude": 127.2661392286116,
-            "height": 68.52338218688965,
+            "height": 60.52338218688965,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8850,7 +8850,7 @@
             "data_name": "7U6_2089",
             "latitude": 36.50096139441772,
             "longitude": 127.26618684762057,
-            "height": 68.98391723632812,
+            "height": 60.98391723632812,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8910,7 +8910,7 @@
             "data_name": "7U6_2093",
             "latitude": 36.50043353641505,
             "longitude": 127.2673106435533,
-            "height": 68.90704536437988,
+            "height": 62.90704536437988,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8925,7 +8925,7 @@
             "data_name": "7U6_2094",
             "latitude": 36.50021322858177,
             "longitude": 127.26753835473447,
-            "height": 68.97098922729492,
+            "height": 64.97098922729492,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8955,7 +8955,7 @@
             "data_name": "7U6_2096",
             "latitude": 36.5048597615053,
             "longitude": 127.26623786631697,
-            "height": 70.4992446899414,
+            "height": 63.4992446899414,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -8985,7 +8985,7 @@
             "data_name": "7U6_2098",
             "latitude": 36.50449108423755,
             "longitude": 127.26619657614877,
-            "height": 69.91161918640137,
+            "height": 63.91161918640137,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -9000,7 +9000,7 @@
             "data_name": "7U6_2099",
             "latitude": 36.504493407049104,
             "longitude": 127.26641756537902,
-            "height": 71.11015129089355,
+            "height": 63.11015129089355,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -9015,7 +9015,7 @@
             "data_name": "7U6_2100",
             "latitude": 36.50440508837262,
             "longitude": 127.26655871155187,
-            "height": 70.78530311584473,
+            "height": 57.78530311584473,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14205,7 +14205,7 @@
             "data_name": "7U6_2543",
             "latitude": 36.5004928541327,
             "longitude": 127.26552782782876,
-            "height": 67.75874710083008,
+            "height": 53.75874710083008,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14235,7 +14235,7 @@
             "data_name": "7U6_2545",
             "latitude": 36.499538661728465,
             "longitude": 127.26639117288022,
-            "height": 68.60476112365723,
+            "height": 65.80476112365719,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14250,7 +14250,7 @@
             "data_name": "7U6_2546",
             "latitude": 36.49950826667747,
             "longitude": 127.26644574373609,
-            "height": 68.55513191223145,
+            "height": 66.75513191223142,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14265,7 +14265,7 @@
             "data_name": "7U6_2547",
             "latitude": 36.49948578099882,
             "longitude": 127.26642639530144,
-            "height": 68.24976539611816,
+            "height": 66.64976539611814,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14280,7 +14280,7 @@
             "data_name": "7U6_2548",
             "latitude": 36.499618552213356,
             "longitude": 127.26624093755188,
-            "height": 67.63072395324707,
+            "height": 63.63072395324707,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14295,7 +14295,7 @@
             "data_name": "7U6_2549",
             "latitude": 36.49964750721862,
             "longitude": 127.26620066258484,
-            "height": 68.55404472351074,
+            "height": 63.55404472351074,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14310,7 +14310,7 @@
             "data_name": "7U6_2550",
             "latitude": 36.50011055093731,
             "longitude": 127.26540853873783,
-            "height": 67.52477645874023,
+            "height": 47.52477645874023,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14340,7 +14340,7 @@
             "data_name": "7U6_2552",
             "latitude": 36.49858248498755,
             "longitude": 127.26568140425967,
-            "height": 68.25934028625488,
+            "height": 62.2593402862548,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -14355,7 +14355,7 @@
             "data_name": "7U6_2553",
             "latitude": 36.49989760329661,
             "longitude": 127.26581033341327,
-            "height": 67.63640975952148,
+            "height": 37.63640975952148,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -17145,7 +17145,7 @@
             "data_name": "7U6_3997",
             "latitude": 36.499192811051834,
             "longitude": 127.26621637189233,
-            "height": 69.24239349365234,
+            "height": 65.24239349365229,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -17205,7 +17205,7 @@
             "data_name": "7U6_4001",
             "latitude": 36.49951198493178,
             "longitude": 127.26471211502692,
-            "height": 68.21859741210938,
+            "height": 58.41859741210936,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -17220,7 +17220,7 @@
             "data_name": "7U6_4002",
             "latitude": 36.499334620800326,
             "longitude": 127.26500633694778,
-            "height": 68.18768882751465,
+            "height": 57.38768882751461,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -17370,7 +17370,7 @@
             "data_name": "7U6_4026",
             "latitude": 36.499251665888025,
             "longitude": 127.26463492840081,
-            "height": 67.76928520202637,
+            "height": 59.56928520202625,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -17865,7 +17865,7 @@
             "data_name": "7U6_4162",
             "latitude": 36.49891151761463,
             "longitude": 127.26493504780218,
-            "height": 68.31147956848145,
+            "height": 60.11147956848133,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -18330,7 +18330,7 @@
             "data_name": "7U6_4324",
             "latitude": 36.498527556705845,
             "longitude": 127.26492789741641,
-            "height": 79.83271980285645,
+            "height": 75.83271980285639,
             "heading": 0,
             "pitch": 90,
             "roll": 0
@@ -18891,20 +18891,20 @@
             "roll": 0
         },
 		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS"
-			},
-			"children": [],
-			"data_key": "mapoartcenter_del",
-			"data_name": "mapoartcenter_del",
-			"heading": 17,
-			"height": 70,
-			"latitude": 36.501010495867774,
-			"longitude": 127.26554472389078,
-			"pitch": 90,
-			"roll": 0
-		},
+            "attributes": {
+                "isPhysical": true,
+                "nodeType": "3DS"
+            },
+            "children": [],
+            "data_key": "mapoartcenter_del",
+            "data_name": "mapoartcenter_del",
+            "heading": -34,
+            "height": 67,
+            "latitude": 36.499673416760245,
+            "longitude": 127.26596419302122,
+            "pitch": 90,
+            "roll": 0
+        },
 		{
 			"attributes": {
 				"isPhysical": true,
@@ -18913,10 +18913,10 @@
 			"children": [],
 			"data_key": "gomdalrae_del",
 			"data_name": "gomdalrae_del",
-			"heading": 0,
-			"height": 55,
-			"latitude": 36.50045822040739,
-			"longitude": 127.26571288023318,
+			"heading": -114,
+			"height": 66,
+			"latitude": 36.50062694716797,
+			"longitude": 127.26817560145369,
 			"pitch": 90,
 			"roll": 0
 		}
