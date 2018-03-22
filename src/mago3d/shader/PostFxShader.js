@@ -311,6 +311,7 @@ var PostFxShadersManager = function()
 	// preCreated shaders.***
 	this.modelRefShader;
 	this.modelRefSilhouetteShader;
+	this.lodBuildingShader;
 };
 
 /**
@@ -367,7 +368,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl)
 	this.createSimpleDepthShaderModelRef(gl);// 6.***
 
 	this.createRenderDepthShaderLODBuilding(gl);// 7.***
-	this.createSsaoShaderLODBuilding(gl);// 8.***
+	this.lodBuildingShader = this.createSsaoShaderLODBuilding(gl);// 8.***
 
 	this.createRenderDepthShaderLego(gl);// 9.***
 	this.createSsaoShaderLego(gl);// 10.***

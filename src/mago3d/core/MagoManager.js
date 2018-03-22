@@ -1305,7 +1305,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(); TEST
+	this.renderMagoGeometries(); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1455,7 +1455,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 };
 
 /**
- * Draw building names on scene.
+ * Mago geometries generation test.***
  */
 MagoManager.prototype.renderMagoGeometries = function() 
 {
@@ -1463,7 +1463,8 @@ MagoManager.prototype.renderMagoGeometries = function()
 	if (this.parametricMeshTest == undefined)
 	{
 		this.parametricMeshTest = new ParametricMesh();
-		
+
+		/*
 		// make a extrude object.***
 		// create a profile.
 		var profile = new Profile();
@@ -1493,6 +1494,7 @@ MagoManager.prototype.renderMagoGeometries = function()
 		
 		// now extrude or revolve.***
 		this.parametricMeshTest.extrude(profile, extrusionVector, extrusionDist);
+		*/
 	}
 };
 
@@ -4343,6 +4345,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	var node;
 	var currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
 	var shaderProgram = currentShader.program;
+	gl.enable(gl.BLEND);
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -4368,11 +4371,11 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	gl.uniform1i(currentShader.bUse1Color_loc, true);
 	if (color)
 	{
-		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
+		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 0.3]); //.***
 	}
 	else 
 	{
-		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 1.0]); //.***
+		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 0.3]); //.***
 	}
 
 	gl.uniform1i(currentShader.depthTex_loc, 0);
@@ -4425,6 +4428,8 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	gl.disable(gl.BLEND);
 };
 
 /**
@@ -5726,6 +5731,53 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 		neoBuilding.projectFolderName = node.data.projectFolderName;
 	}
 };
+
+/**
+ * dataKey 이용해서 data 검색
+ * @param dataKey
+ */
+MagoManager.prototype.calculate_geoLocDataOfNode = function(node) 
+{
+	var nodeRoot = node.getRoot();
+	
+	if (nodeRoot.data.geoLocDataManager === undefined)
+	{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
+	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		
+	if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
+	{ 
+		geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+		var buildingSeed = node.data.buildingSeed;
+		
+		var longitude = buildingSeed.geographicCoord.longitude;
+		var latitude = buildingSeed.geographicCoord.latitude;
+		var altitude = buildingSeed.geographicCoord.altitude;
+		var heading = buildingSeed.rotationsDegree.z;
+		var pitch = buildingSeed.rotationsDegree.x;
+		var roll = buildingSeed.rotationsDegree.y;
+
+		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
+		this.pointSC = buildingSeed.bBox.getCenterPoint(this.pointSC);
+		
+		if (node.data.attributes.centerOfBBoxAsOrigen !== undefined)
+		{
+			if (node.data.attributes.centerOfBBoxAsOrigen === true)
+			{
+				var rootNode = node.getRoot();
+				if (rootNode)
+				{
+					// now, calculate the root center of bbox.
+					this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
+					ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+				}
+			}
+		}
+	}
+	
+	return geoLoc;
+};
+
 /**
  * dataKey 이용해서 data 검색
  * @param dataKey
@@ -5758,7 +5810,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 	var geoLoc;
 	var geoLocDataManager;
 	var realBuildingPos;
-	var metaData;
 	var longitude, latitude, altitude, heading, pitch, roll;
 
 	for (var i=0; i<tilesCount; i++)
@@ -5783,57 +5834,14 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
-				{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
-				geoLocDataManager = nodeRoot.data.geoLocDataManager;
-				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-					
-				neoBuilding = node.data.neoBuilding;
-				metaData = neoBuilding.metaData;
-				if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
-				{ 
-					if (neoBuilding.metaData.geographicCoord === undefined)
-					{
-						neoBuilding.metaData.geographicCoord = new GeographicCoord();
-			
-						var buildingSeed = lowestTile.getBuildingSeedById(undefined, neoBuilding.buildingId) ;
-						if (buildingSeed)
-						{
-							neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-							neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-							neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-							neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-						}
-					}
-			
-					geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
-					longitude = neoBuilding.metaData.geographicCoord.longitude;
-					latitude = neoBuilding.metaData.geographicCoord.latitude;
-					altitude = neoBuilding.metaData.geographicCoord.altitude;
-					heading = neoBuilding.metaData.heading;
-					pitch = neoBuilding.metaData.pitch;
-					roll = neoBuilding.metaData.roll;
-					ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
-					this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
-					
-					if (node.data.attributes.centerOfBBoxAsOrigen !== undefined)
-					{
-						if (node.data.attributes.centerOfBBoxAsOrigen === true)
-						{
-							var rootNode = node.getRoot();
-							if (rootNode)
-							{
-								// now, calculate the root center of bbox.
-								this.pointSC = rootNode.data.bbox.getCenterPoint(this.pointSC);
-								ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-							}
-						}
-					}
-
+				{
+					geoLoc = this.calculate_geoLocDataOfNode(node);
 					continue;
 				}
+				geoLocDataManager = nodeRoot.data.geoLocDataManager;
 				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
-			
+				neoBuilding = node.data.neoBuilding;
 				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
@@ -5842,7 +5850,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
 					
 				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
-				//}
 				neoBuilding.distToCam = distToCamera;
 				
 				var frustumFar = this.magoPolicy.getFrustumFarDistance();
@@ -5947,11 +5954,26 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	
 	var nodeRoot = node.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
-	
+	var geoLoc;
 	if (geoLocDataManager === undefined)
-	{ return; }
+	{ 
+		nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); 
+		geoLocDataManager = nodeRoot.data.geoLocDataManager;
+		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+			
+		if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
+		{ 
+			geoLoc = this.calculate_geoLocDataOfNode(node);
+		}
+		
+		if(geoLoc === undefined)
+		{
+			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			return; 
+		}
+	}
 
-	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 
 	if (realBuildingPos === undefined)
