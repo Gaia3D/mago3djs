@@ -686,7 +686,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			currentAlt -= increDist;
 		}
 
-		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.latitude, geoLocationData.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
+		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
 
 	}, false);
 	

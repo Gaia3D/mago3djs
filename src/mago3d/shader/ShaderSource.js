@@ -200,7 +200,7 @@ void main()\n\
     textureColor = vcolor4;\n\
 \n\
     gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
-    gl_FragColor.a = 1.0;   \n\
+    gl_FragColor.a = textureColor.w;   \n\
 }\n\
 ";
 ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
