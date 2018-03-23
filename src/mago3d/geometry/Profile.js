@@ -12,18 +12,18 @@ var Profile = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.outer; // one vertexList. no.
-	this.inners; // vertexLists array. no.
+	this.outer; // one Ring. 
+	this.inners; // Rings array. 
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.getOuter = function() 
+Profile.prototype.newOuterRing = function() 
 {
 	if (this.outer === undefined)
-	{ this.outer = new VertexList(); }
+	{ this.outer = new Ring(); }
 	
 	return this.outer;
 };
@@ -32,15 +32,15 @@ Profile.prototype.getOuter = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.newInner = function() 
+Profile.prototype.newInnerRing = function() 
 {
 	if (this.inners === undefined)
 	{ this.inners = []; }
 	
-	var innerVertexList = new VertexList();
-	this.inners.push(innerVertexList);
+	var innerRing = new Ring();
+	this.inners.push(innerRing);
 	
-	return innerVertexList;
+	return innerRing;
 };
 
 /**
@@ -98,33 +98,6 @@ Profile.prototype.copyFrom = function(profileRef)
 	}
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.getSurfaceOuterConvex = function(resultSurface) 
-{
-	// this function return a face made by convex outer.
-	if (this.outer === undefined)
-	{ return; }
-	
-	var vertex;
-	var outerVertexCount = this.outer.getVertexCount();
-	for (var i=0; i<outerVertexCount; i++)
-	{
-		vertex = this.outer.getVertex(i);
-		
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.getSurface = function(resultSurface) 
-{
-	
-};
 
 
 

@@ -1463,7 +1463,33 @@ MagoManager.prototype.renderMagoGeometries = function()
 	if (this.parametricMeshTest == undefined)
 	{
 		this.parametricMeshTest = new ParametricMesh();
-
+		
+		this.profileAux = new Profile();
+		
+		var ringAux = this.profileAux.newOuterRing();
+		
+		// test draw a "U" form polyLine.***
+		var polyLineAux = ringAux.newElement("POLYLINE");
+		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint3d(7.0, 0.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(7.0, 8.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(5.0, 8.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(5.0, 2.0, 0.0); // 4
+		point3d = polyLineAux.newPoint3d(2.0, 2.0, 0.0); // 5
+		point3d = polyLineAux.newPoint3d(2.0, 8.0, 0.0); // 6
+		point3d = polyLineAux.newPoint3d(0.0, 8.0, 0.0); // 7
+		
+		var arcAux = ringAux.newElement("ARC");
+		arcAux.setCenterPosition(0, 0, 0);
+		arcAux.setRadius(1);
+		arcAux.setStartAngleDegree(90.0);
+		arcAux.setSweepAngleDegree(-45.0);
+		var pointsArray;
+		pointsArray = arcAux.getPoints(pointsArray, 36);
+		
+		
+		var hola = 0;
+		
 		/*
 		// make a extrude object.***
 		// create a profile.
@@ -5738,6 +5764,7 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
  */
 MagoManager.prototype.calculate_geoLocDataOfNode = function(node) 
 {
+	// this function creates the geoLocationData of "node" using the data inside of "buildingSeed".***
 	var nodeRoot = node.getRoot();
 	
 	if (nodeRoot.data.geoLocDataManager === undefined)
@@ -5853,7 +5880,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				neoBuilding.distToCam = distToCamera;
 				
 				var frustumFar = this.magoPolicy.getFrustumFarDistance();
-				if (distToCamera > frustumFar*10)
+				if (distToCamera > frustumFar)
 				{ continue; }
 				
 				// If necessary do frustum culling.*************************************************************************
@@ -5867,34 +5894,58 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 					}
 				}
 				//-------------------------------------------------------------------------------------------
-				if (distToCamera < lod0_minDist) 
+				
+				// provisionally fork versions.***
+				var version = neoBuilding.getHeaderVersion();
+				if(version[0] === 'v')
 				{
-					// check if the lod0, lod1, lod2 are modelReference type.***
-					var lodBuildingData = neoBuilding.getLodBuildingData(0);
-					if(lodBuildingData && lodBuildingData.isModelRef)
+					if (distToCamera < lod0_minDist) 
+					{
 						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
-					else
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
-				}
-				else if (distToCamera < lod1_minDist) 
-				{
-					var lodBuildingData = neoBuilding.getLodBuildingData(1);
-					if(lodBuildingData && lodBuildingData.isModelRef)
+					}
+					else if (distToCamera < lod1_minDist) 
+					{
 						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
-					else
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
-				}
-				else if (distToCamera < lod2_minDist) 
-				{
-					var lodBuildingData = neoBuilding.getLodBuildingData(2);
-					if(lodBuildingData && lodBuildingData.isModelRef)
+					}
+					else if (distToCamera < lod2_minDist) 
+					{
 						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
-					else
-						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					}
+					else if (distToCamera < lod5_minDist) 
+					{
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+					}
 				}
-				else if (distToCamera < lod5_minDist) 
-				{
-					this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+				else{
+					if (distToCamera < lod0_minDist) 
+					{
+						// check if the lod0, lod1, lod2 are modelReference type.***
+						var lodBuildingData = neoBuilding.getLodBuildingData(0);
+						if(lodBuildingData && lodBuildingData.isModelRef)
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
+						else
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					}
+					else if (distToCamera < lod1_minDist) 
+					{
+						var lodBuildingData = neoBuilding.getLodBuildingData(1);
+						if(lodBuildingData && lodBuildingData.isModelRef)
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+						else
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					}
+					else if (distToCamera < lod2_minDist) 
+					{
+						var lodBuildingData = neoBuilding.getLodBuildingData(2);
+						if(lodBuildingData && lodBuildingData.isModelRef)
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+						else
+							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					}
+					else if (distToCamera < lod5_minDist) 
+					{
+						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+					}
 				}
 			}
 			
@@ -5957,29 +6008,20 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	var geoLoc;
 	if (geoLocDataManager === undefined)
 	{ 
-		nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); 
-		geoLocDataManager = nodeRoot.data.geoLocDataManager;
-		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-			
-		if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
-		{ 
-			geoLoc = this.calculate_geoLocDataOfNode(node);
-		}
-		
+		geoLoc = this.calculate_geoLocDataOfNode(node);
 		if(geoLoc === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return; 
 		}
 	}
-
+	geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	//this.radiusAprox_aux = (nodeRoot.data.bbox.maxX - nodeRoot.data.bbox.minX) * 1.2/2.0;
 	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
 	if (this.boundingSphere_Aux === undefined)
@@ -5990,7 +6032,6 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
-		//var viewer = this.scene.viewer;
 		var seconds = 3;
 		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
 	}

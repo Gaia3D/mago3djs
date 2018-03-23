@@ -4,16 +4,29 @@
  * 3차원 정보
  * @class Point3D
  */
-var Point3D = function() 
+var Point3D = function(x, y, z) 
 {
 	if (!(this instanceof Point3D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.x = 0.0;
-	this.y = 0.0;
-	this.z = 0.0;
+	if(x !== undefined)
+		this.x = x;
+	else
+		this.x = 0.0;
+	
+	if(y !== undefined)
+		this.y = y;
+	else
+		this.y = 0.0;
+	
+	if(z !== undefined)
+		this.z = z;
+	else
+		this.z = 0.0;
+	
+	this.pointType; // 1 = important point.***
 };
 
 /**
