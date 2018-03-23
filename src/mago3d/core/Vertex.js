@@ -8,18 +8,19 @@
  * 어떤 일을 하고 있습니까?
  * @class Vertex
  */
-var Vertex = function() 
+var Vertex = function(posX, posY, posZ) 
 {
 	if (!(this instanceof Vertex)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.point3d = new Point3D();
+	this.point3d = new Point3D(posX, posY, posZ);
 	this.normal; // class: Point3D.
 	this.texCoord; // class: Point2D.
 	this.color4; // class: Color.
 	this.outHalfEdgesArray; // Array [class: HalfEdge]. 
+	this.vertexType; // 1 = important vertex.***
 };
 
 /**
