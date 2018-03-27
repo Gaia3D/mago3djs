@@ -20,8 +20,8 @@ var PolyLine = function()
  */
 PolyLine.prototype.newPoint3d = function(x, y, z)
 {
-	if(this.point3dArray === undefined)
-		this.point3dArray = [];
+	if (this.point3dArray === undefined)
+	{ this.point3dArray = []; }
 	
 	var point3d = new Point3D(x, y, z);
 	this.point3dArray.push(point3d);
@@ -35,7 +35,7 @@ PolyLine.prototype.newPoint3d = function(x, y, z)
 PolyLine.prototype.deleteObjects = function()
 {
 	var pointsCount = this.point3dArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		this.point3dArray[i].deleteObjects();
 		this.point3dArray[i] = undefined;
@@ -49,13 +49,13 @@ PolyLine.prototype.deleteObjects = function()
  */
 PolyLine.prototype.getPoints = function(resultPointsArray)
 {
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
 	var point;
 	
 	var pointsCount = this.point3dArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point = new Point3D();
 		point.copyFrom(this.point3dArray[i]); 

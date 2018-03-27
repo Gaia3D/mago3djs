@@ -90,7 +90,7 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
 	
-	if (this.version[0] == '0')
+	if (this.version[0] === '0')
 	{ var hola = 0; }
 
 	// 3) Global unique ID.*********************

@@ -61,11 +61,14 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
 	//for (var value of nodesMap.values()) 
 	for (var key in nodesMap)
 	{
-		var value = nodesMap[key];
-		if (value.data[dataName] === dataNameValue)
+		if (Object.prototype.hasOwnProperty.call(nodesMap, key))
 		{
-			resultNode = value;
-			break;
+			var value = nodesMap[key];
+			if (value.data[dataName] === dataNameValue)
+			{
+				resultNode = value;
+				break;
+			}
 		}
 	}
 	

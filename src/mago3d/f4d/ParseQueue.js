@@ -68,13 +68,16 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 			///for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.octreesLod0ReferencesToParseMap)
 			{
-				lowestOctree = this.octreesLod0ReferencesToParseMap[key];
-				delete this.octreesLod0ReferencesToParseMap[key];
-				this.parseOctreesLod0References(gl, lowestOctree, magoManager);
-
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+				if (Object.prototype.hasOwnProperty.call(foo, key))
+				{
+					lowestOctree = this.octreesLod0ReferencesToParseMap[key];
+					delete this.octreesLod0ReferencesToParseMap[key];
+					this.parseOctreesLod0References(gl, lowestOctree, magoManager);
+	
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
 	}
@@ -110,7 +113,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, lowestOctree, mag
 		if (rootNode === undefined)
 		{ return false; }
 		
-		if (rootNode.data == undefined)
+		if (rootNode.data === undefined)
 		{ return false; }
 		
 		var geoLocDataManager = rootNode.data.geoLocDataManager;

@@ -1405,8 +1405,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		if (lodBuildingData === undefined)
 		{ continue; }
 	
-		if(lodBuildingData.isModelRef)
-			continue;
+		if (lodBuildingData.isModelRef)
+		{ continue; }
 		
 		textureFileName = lodBuildingData.textureFileName;
 		lodString = lodBuildingData.geometryFileName;
@@ -1460,7 +1460,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function() 
 {
 	// 1rst, make the test object if no exist.***
-	if (this.parametricMeshTest == undefined)
+	if (this.parametricMeshTest === undefined)
 	{
 		this.parametricMeshTest = new ParametricMesh();
 		
@@ -1583,21 +1583,24 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	//for (var i=0; i<nodesCount; i++)
 	for (var key in rootNodesMap)
 	{
-		//nodeRoot = rootNodesArray[i];
-		nodeRoot = rootNodesMap[key];
-		geoLocDataManager = nodeRoot.data.geoLocDataManager;
-		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		//neoBuilding = node.data.neoBuilding;
-		worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
-		
-		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		if (Object.prototype.hasOwnProperty.call(rootNodesMap, key))
 		{
-			ctx.font = "13px Arial";
-			//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-			//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-			ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
-			ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			//nodeRoot = rootNodesArray[i];
+			nodeRoot = rootNodesMap[key];
+			geoLocDataManager = nodeRoot.data.geoLocDataManager;
+			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+			//neoBuilding = node.data.neoBuilding;
+			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
+			screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+			
+			if (screenCoord.x >= 0 && screenCoord.y >= 0)
+			{
+				ctx.font = "13px Arial";
+				//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+				//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+				ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+				ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			}
 		}
 	}
 	
@@ -2376,31 +2379,31 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			}
 			// Display geoLocationData while moving building.***
 			var nodeOwner = this.buildingSelected.nodeOwner;
-			if(nodeOwner === undefined)
-				return;
+			if (nodeOwner === undefined)
+			{ return; }
 
 			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
-			if(geoLocDataManager === undefined)
-				return;
+			if (geoLocDataManager === undefined)
+			{ return; }
 
 			var geoLocation = geoLocDataManager.getGeoLocationData(0);
-			if(geoLocation === undefined)
-				return;
+			if (geoLocation === undefined)
+			{ return; }
 
 			var geographicCoords = geoLocation.geographicCoord;
-			if(geographicCoords === undefined)
-				return;
+			if (geographicCoords === undefined)
+			{ return; }
 			
 			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
-								nodeOwner.data.projectId,
+				nodeOwner.data.projectId,
                 				nodeOwner.data.nodeId,
-								null,
-								geographicCoords.latitude,
-								geographicCoords.longitude,
-								geographicCoords.altitude,
-								geoLocation.heading,
-								geoLocation.pitch,
-								geoLocation.roll);
+				null,
+				geographicCoords.latitude,
+				geographicCoords.longitude,
+				geographicCoords.altitude,
+				geoLocation.heading,
+				geoLocation.pitch,
+				geoLocation.roll);
 								
 		}
 		else 
@@ -2804,19 +2807,22 @@ MagoManager.prototype.manageQueue = function()
 	//for (var i=0; i<maxDeleteNodesCount; i++)
 	for (var key in this.processQueue.nodesToDeleteMap)
 	{
-		//node = nodesToDeleteArray[i];
-		node = this.processQueue.nodesToDeleteMap[key];
-		
-		if (node == undefined)
-		{ continue; }
+		if (Object.prototype.hasOwnProperty.call(this.processQueue.nodesToDeleteMap, key))
+		{
+			//node = nodesToDeleteArray[i];
+			node = this.processQueue.nodesToDeleteMap[key];
+			
+			if (node === undefined)
+			{ continue; }
 
-		neoBuilding = node.data.neoBuilding;
-		this.processQueue.eraseNodeToDelete(node);
+			neoBuilding = node.data.neoBuilding;
+			this.processQueue.eraseNodeToDelete(node);
+			
+			if (neoBuilding === undefined)
+			{ continue; }
 		
-		if (neoBuilding == undefined)
-		{ continue; }
-	
-		this.deleteNeoBuilding(gl, neoBuilding);
+			this.deleteNeoBuilding(gl, neoBuilding);
+		}
 	}
 	//nodesToDeleteArray = [];
 	//nodesToDeleteArray = undefined;
@@ -2829,29 +2835,32 @@ MagoManager.prototype.manageQueue = function()
 	//for (var i=0; i<nodesToDeletesCount; i++)
 	for (var key in this.processQueue.nodesToDeleteModelReferencesMap)
 	{
-		//node = nodesToDeleteModelReferencesArray[i];
-		node = this.processQueue.nodesToDeleteModelReferencesMap[key];
+		if (Object.prototype.hasOwnProperty.call(this.processQueue.nodesToDeleteModelReferencesMap, key))
+		{
+			//node = nodesToDeleteModelReferencesArray[i];
+			node = this.processQueue.nodesToDeleteModelReferencesMap[key];
+			
+			if (node.data === undefined)
+			{ continue; }
 		
-		if (node.data === undefined)
-		{ continue; }
-	
-		neoBuilding = node.data.neoBuilding;
-		this.processQueue.eraseNodeToDeleteModelReferences(neoBuilding);
-		if (neoBuilding === undefined)
-		{ continue; }
+			neoBuilding = node.data.neoBuilding;
+			this.processQueue.eraseNodeToDeleteModelReferences(neoBuilding);
+			if (neoBuilding === undefined)
+			{ continue; }
 
-		if (neoBuilding.octree)
-		{
-			neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			if (neoBuilding.octree)
+			{
+				neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			}
+			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+			{
+				modelRefsDeletedCount ++;
+			}
+			neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			
+			if (modelRefsDeletedCount > 10)
+			{ break; }
 		}
-		if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
-		{
-			modelRefsDeletedCount ++;
-		}
-		neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
-		
-		if (modelRefsDeletedCount > 10)
-		{ break; }
 	}
 	
 	// now, delete lod0, lod1, lod2.***
@@ -2954,12 +2963,15 @@ MagoManager.prototype.manageQueue = function()
 			///for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ReferencesToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ReferencesToParseMap[key];
-				//lowestOctree = octreesArray[i];
-				this.parseQueue.parseOctreesLod0References(gl, lowestOctree, this);
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ReferencesToParseMap, key))
+				{
+					var lowestOctree = this.parseQueue.octreesLod0ReferencesToParseMap[key];
+					//lowestOctree = octreesArray[i];
+					this.parseQueue.parseOctreesLod0References(gl, lowestOctree, this);
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }
+				}
 			}
 		}
 		
@@ -3032,38 +3044,41 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
-				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
-				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-				{ continue; }
-				
-				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList === undefined)
-				{ continue; }
-				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
-				
-				neoBuilding = lowestOctree.neoBuildingOwner;
-				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] === "v")
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ModelsToParseMap, key))
 				{
-					// parse the beta version.
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				else 
-				{
-					// parse versioned.
-					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				blocksList.dataArraybuffer = undefined;
+					var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
+					delete this.parseQueue.octreesLod0ModelsToParseMap[key];
+					if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+					{ continue; }
+					
+					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+					if (blocksList === undefined)
+					{ continue; }
+					
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
 				
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+					
+					neoBuilding = lowestOctree.neoBuildingOwner;
+					headerVersion = neoBuilding.getHeaderVersion();
+					if (headerVersion[0] === "v")
+					{
+						// parse the beta version.
+						blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					else 
+					{
+						// parse versioned.
+						blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					blocksList.dataArraybuffer = undefined;
+					
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
 		
@@ -3136,38 +3151,41 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
-				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
-				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-				{ continue; }
-				
-				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList === undefined)
-				{ continue; }
-				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
-				
-				neoBuilding = lowestOctree.neoBuildingOwner;
-				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] === "v")
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ModelsToParseMap, key))
 				{
-					// parse the beta version.
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				else 
-				{
-					// parse versioned.
-					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				blocksList.dataArraybuffer = undefined;
+					var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
+					delete this.parseQueue.octreesLod0ModelsToParseMap[key];
+					if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+					{ continue; }
+					
+					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+					if (blocksList === undefined)
+					{ continue; }
+					
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
 				
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+					
+					neoBuilding = lowestOctree.neoBuildingOwner;
+					headerVersion = neoBuilding.getHeaderVersion();
+					if (headerVersion[0] === "v")
+					{
+						// parse the beta version.
+						blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					else 
+					{
+						// parse versioned.
+						blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					blocksList.dataArraybuffer = undefined;
+					
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
 		
@@ -3210,21 +3228,24 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod2LegosToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod2LegosToParseMap[key];
-				if (this.parseQueue.octreesLod2LegosToParseMap.hasOwnProperty(key))
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod2LegosToParseMap, key))
 				{
-					delete this.parseQueue.octreesLod2LegosToParseMap[key];
-					//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
-					if (lowestOctree.lego === undefined)
-					{ continue; }
-					
-					lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
-					lowestOctree.lego.dataArrayBuffer = undefined;
-					
-					octreesParsedCount++;
+					var lowestOctree = this.parseQueue.octreesLod2LegosToParseMap[key];
+					if (this.parseQueue.octreesLod2LegosToParseMap.hasOwnProperty(key))
+					{
+						delete this.parseQueue.octreesLod2LegosToParseMap[key];
+						//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+						if (lowestOctree.lego === undefined)
+						{ continue; }
+						
+						lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+						lowestOctree.lego.dataArrayBuffer = undefined;
+						
+						octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
 			}
 		}
 		
@@ -3300,38 +3321,40 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<nodessArray.length; i++)
 			for (var key in this.parseQueue.skinLegosToParseMap)
 			{
-				var node = this.parseQueue.skinLegosToParseMap[key];
-				
-				if (node.data === undefined)
-				{ continue; }
-				
-				neoBuilding = node.data.neoBuilding;
-			
-				if (neoBuilding === undefined)
-				{ continue; }
-			
-				// check the current lod of the building.***
-				var currentBuildingLod = neoBuilding.currentLod;
-				var lodIdx = currentBuildingLod - 3;
-				
-				if (lodIdx < 0)
-				{ continue; }
-				
-				skinLego = neoBuilding.lodMeshesArray[lodIdx];
-				if (skinLego === undefined)
-				{ continue; }
-				if (this.parseQueue.skinLegosToParseMap.hasOwnProperty(skinLego.legoKey))
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.skinLegosToParseMap, key)) 
 				{
-					delete this.parseQueue.skinLegosToParseMap[skinLego.legoKey];
-					skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, this);
-					skinLego.dataArrayBuffer = undefined;
+					var node = this.parseQueue.skinLegosToParseMap[key];
+				
+					if (node.data === undefined)
+					{ continue; }
 					
-					octreesParsedCount++;
+					neoBuilding = node.data.neoBuilding;
+				
+					if (neoBuilding === undefined)
+					{ continue; }
+				
+					// check the current lod of the building.***
+					var currentBuildingLod = neoBuilding.currentLod;
+					var lodIdx = currentBuildingLod - 3;
+					
+					if (lodIdx < 0)
+					{ continue; }
+					
+					skinLego = neoBuilding.lodMeshesArray[lodIdx];
+					if (skinLego === undefined)
+					{ continue; }
+					if (this.parseQueue.skinLegosToParseMap.hasOwnProperty(skinLego.legoKey))
+					{
+						delete this.parseQueue.skinLegosToParseMap[skinLego.legoKey];
+						skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, this);
+						skinLego.dataArrayBuffer = undefined;
+						
+						octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
 			}
-			
 		}
 	}
 };
@@ -3573,29 +3596,32 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 			///for (var changeHistory of moveHistoryMap.values()) 
 			for (var key in moveHistoryMap)
 			{
-				var changeHistory = moveHistoryMap[key];
-				objectIndexOrder = changeHistory.getObjectIndexOrder();
-				refObject = neoBuilding.getReferenceObject(objectIndexOrder);
-				if (refObject === undefined)
-				{ continue; }
-				
-				if (refObject.moveVector === undefined)
-				{ refObject.moveVector = new Point3D(); }
-				
-				if (refObject.moveVectorRelToBuilding === undefined)
-				{ refObject.moveVectorRelToBuilding = new Point3D(); }
-				
-				moveVector = changeHistory.getReferenceObjectAditionalMovement();
-				moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
-				refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
-				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
-				
-				// now check if the building was rotated.
-				// if was rotated then recalculate the move vector.
-				refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
-				
-				// if was no rotated, then set the moveVector of the changeHistory.
-				//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+				if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key)) 
+				{
+					var changeHistory = moveHistoryMap[key];
+					objectIndexOrder = changeHistory.getObjectIndexOrder();
+					refObject = neoBuilding.getReferenceObject(objectIndexOrder);
+					if (refObject === undefined)
+					{ continue; }
+					
+					if (refObject.moveVector === undefined)
+					{ refObject.moveVector = new Point3D(); }
+					
+					if (refObject.moveVectorRelToBuilding === undefined)
+					{ refObject.moveVectorRelToBuilding = new Point3D(); }
+					
+					moveVector = changeHistory.getReferenceObjectAditionalMovement();
+					moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
+					refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+					refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+					
+					// now check if the building was rotated.
+					// if was rotated then recalculate the move vector.
+					refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
+					
+					// if was no rotated, then set the moveVector of the changeHistory.
+					//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);	
+				}
 			}
 		}
 	}
@@ -3691,59 +3717,62 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 			//for (var changeHistory of colorChangedHistoryMap.values()) 
 			for (var key in colorChangedHistoryMap)
 			{
-				var changeHistory = colorChangedHistoryMap[key];
-				if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
+				if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
 				{
-					if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+					var changeHistory = colorChangedHistoryMap[key];
+					if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
 					{
-						// change color for all node.
-						neoBuilding.isColorChanged = true;
-						if (neoBuilding.aditionalColor === undefined)
-						{ neoBuilding.aditionalColor = new Color(); }
-						
-						neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-					}
-					else 
-					{
-						// there are properties.
-						var nodesArray = [];
-						node.extractNodes(nodesArray);
-						var nodesCount = nodesArray.length;
-						var aNode;
-						for (var i=0; i<nodesCount; i++)
+						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 						{
-							aNode = nodesArray[i];
-							var propertyKey = changeHistory.propertyKey;
-							var propertyValue = changeHistory.propertyValue;
-							// 1rst, check if this has the same "key" and same "value".
-							if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+							// change color for all node.
+							neoBuilding.isColorChanged = true;
+							if (neoBuilding.aditionalColor === undefined)
+							{ neoBuilding.aditionalColor = new Color(); }
+							
+							neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+						}
+						else 
+						{
+							// there are properties.
+							var nodesArray = [];
+							node.extractNodes(nodesArray);
+							var nodesCount = nodesArray.length;
+							var aNode;
+							for (var i=0; i<nodesCount; i++)
 							{
-								neoBuilding.isColorChanged = true;
-								if (neoBuilding.aditionalColor === undefined)
-								{ neoBuilding.aditionalColor = new Color(); }
-								
-								neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+								aNode = nodesArray[i];
+								var propertyKey = changeHistory.propertyKey;
+								var propertyValue = changeHistory.propertyValue;
+								// 1rst, check if this has the same "key" and same "value".
+								if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+								{
+									neoBuilding.isColorChanged = true;
+									if (neoBuilding.aditionalColor === undefined)
+									{ neoBuilding.aditionalColor = new Color(); }
+									
+									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+								}
 							}
 						}
 					}
-				}
-				else 
-				{
-					// change color for an object.
-					var objectId = changeHistory.objectId;
-					var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if (objectsArray)
+					else 
 					{
-						var objectsCount = objectsArray.length;
-						for (var j=0; j<objectsCount; j++)
+						// change color for an object.
+						var objectId = changeHistory.objectId;
+						var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+						if (objectsArray)
 						{
-							var object = objectsArray[j];
-							if (object.aditionalColor === undefined)
-							{ object.aditionalColor = new Color(); }
-							
-							object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							var objectsCount = objectsArray.length;
+							for (var j=0; j<objectsCount; j++)
+							{
+								var object = objectsArray[j];
+								if (object.aditionalColor === undefined)
+								{ object.aditionalColor = new Color(); }
+								
+								object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							}
 						}
-					}
+					}	
 				}
 			}
 		}
@@ -3754,79 +3783,86 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 	{
 		for (var key in allColorHistoryMap) 
 		{
-			var colorChangedHistoryMap = allColorHistoryMap[key];
-			//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
-			//{
-			// now check nodes that is no physical.
-			for (var key2 in colorChangedHistoryMap) 
+			if (Object.prototype.hasOwnProperty.call(allColorHistoryMap, key))
 			{
-				var changeHistoryMap = colorChangedHistoryMap[key2];
-				//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+				var colorChangedHistoryMap = allColorHistoryMap[key];
+				//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
 				//{
-				for (var key3 in changeHistoryMap) 
+				// now check nodes that is no physical.
+				for (var key2 in colorChangedHistoryMap) 
 				{
-					var changeHistory = changeHistoryMap[key3];
-					//for (var changeHistory of changeHistoryMap.values()) 
-					//{
-					var projectId = changeHistory.projectId;
-					var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-					var aNode = nodesMap[changeHistory.dataKey];
-					if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
+					if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key2))
 					{
-						// must check if there are filters.
-						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+						var changeHistoryMap = colorChangedHistoryMap[key2];
+						//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+						//{
+						for (var key3 in changeHistoryMap) 
 						{
-							// this is a no physical node, so must check children.
-							var nodesArray = [];
-							aNode.extractNodes(nodesArray);
-							var nodesCount = nodesArray.length;
-							for (var i=0; i<nodesCount; i++)
+							if (Object.prototype.hasOwnProperty.call(changeHistoryMap, key3))
 							{
-								var aNode2 = nodesArray[i];
-								neoBuilding = aNode2.data.neoBuilding;
-								if (neoBuilding)
+								var changeHistory = changeHistoryMap[key3];
+								//for (var changeHistory of changeHistoryMap.values()) 
+								//{
+								var projectId = changeHistory.projectId;
+								var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+								var aNode = nodesMap[changeHistory.dataKey];
+								if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
 								{
-									neoBuilding.isColorChanged = true;
-									if (neoBuilding.aditionalColor === undefined)
-									{ neoBuilding.aditionalColor = new Color(); }
-									
-									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-								}
-							}
-						}
-						else 
-						{
-							
-							var propertyKey = changeHistory.propertyKey;
-							var propertyValue = changeHistory.propertyValue;
-								
-							// this is a no physical node, so must check children.
-							var nodesArray = [];
-							aNode.extractNodes(nodesArray);
-							var nodesCount = nodesArray.length;
-							for (var i=0; i<nodesCount; i++)
-							{
-								var aNode2 = nodesArray[i];
-								neoBuilding = aNode2.data.neoBuilding;
-								if (neoBuilding)
-								{
-									if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+									// must check if there are filters.
+									if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 									{
-										neoBuilding.isColorChanged = true;
-										if (neoBuilding.aditionalColor === undefined)
-										{ neoBuilding.aditionalColor = new Color(); }
-										
-										neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+										// this is a no physical node, so must check children.
+										var nodesArray = [];
+										aNode.extractNodes(nodesArray);
+										var nodesCount = nodesArray.length;
+										for (var i=0; i<nodesCount; i++)
+										{
+											var aNode2 = nodesArray[i];
+											neoBuilding = aNode2.data.neoBuilding;
+											if (neoBuilding)
+											{
+												neoBuilding.isColorChanged = true;
+												if (neoBuilding.aditionalColor === undefined)
+												{ neoBuilding.aditionalColor = new Color(); }
+												
+												neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+											}
+										}
 									}
-								}
+									else 
+									{
+										var propertyKey = changeHistory.propertyKey;
+										var propertyValue = changeHistory.propertyValue;
+											
+										// this is a no physical node, so must check children.
+										var nodesArray = [];
+										aNode.extractNodes(nodesArray);
+										var nodesCount = nodesArray.length;
+										for (var i=0; i<nodesCount; i++)
+										{
+											var aNode2 = nodesArray[i];
+											neoBuilding = aNode2.data.neoBuilding;
+											if (neoBuilding)
+											{
+												if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+												{
+													neoBuilding.isColorChanged = true;
+													if (neoBuilding.aditionalColor === undefined)
+													{ neoBuilding.aditionalColor = new Color(); }
+													
+													neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+												}
+											}
+										}
+									}
+								}	
 							}
-						}
+						}	
 					}
-				}
+				}	
 			}
 		}
 	}
-	
 };
 
 /**
@@ -5897,7 +5933,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
-				if(version[0] === 'v')
+				if (version[0] === 'v')
 				{
 					if (distToCamera < lod0_minDist) 
 					{
@@ -5916,31 +5952,32 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
 					}
 				}
-				else{
+				else 
+				{
 					if (distToCamera < lod0_minDist) 
 					{
 						// check if the lod0, lod1, lod2 are modelReference type.***
 						var lodBuildingData = neoBuilding.getLodBuildingData(0);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod1_minDist) 
 					{
 						var lodBuildingData = neoBuilding.getLodBuildingData(1);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod2_minDist) 
 					{
 						var lodBuildingData = neoBuilding.getLodBuildingData(2);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod5_minDist) 
 					{
@@ -6009,7 +6046,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (geoLocDataManager === undefined)
 	{ 
 		geoLoc = this.calculate_geoLocDataOfNode(node);
-		if(geoLoc === undefined)
+		if (geoLoc === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return; 
@@ -6680,8 +6717,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
 		
-		if(node.data.nodeId === "7M6_31")
-			var hola = 0;
+		if (node.data.nodeId === "7M6_31")
+		{ var hola = 0; }
 		
 		if (attributes.isPhysical)
 		{
@@ -6985,36 +7022,45 @@ MagoManager.prototype.callAPI = function(api)
 		
 		for (var key_projectId in moveHistoryMap)
 		{
-			var projectId = key_projectId;
-			var buildingsMap = moveHistoryMap[projectId];
-			if (buildingsMap === undefined)
-			{ continue; }
-			
-			for (var key_dataKey in buildingsMap)
+			if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key_projectId))
 			{
-				var dataKey = key_dataKey;
-				var dataValue = buildingsMap[key_dataKey];
-				
-				if (dataValue === undefined)
+				var projectId = key_projectId;
+				var buildingsMap = moveHistoryMap[projectId];
+				if (buildingsMap === undefined)
 				{ continue; }
 				
-				for (var objectIdx in dataValue)
+				for (var key_dataKey in buildingsMap)
 				{
-					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if (node === undefined || node.data === undefined)
-					{ continue; }
-					
-					var neoBuilding = node.data.neoBuilding;
-					if (neoBuilding === undefined)
-					{ continue; }
-					
-					var refObject = neoBuilding.getReferenceObject(objectIdx);
-					if (refObject)
+					if (Object.prototype.hasOwnProperty.call(buildingsMap, key_dataKey))
 					{
-						refObject.moveVector = undefined;
-						refObject.moveVectorRelToBuilding = undefined;
+						var dataKey = key_dataKey;
+						var dataValue = buildingsMap[key_dataKey];
+						
+						if (dataValue === undefined)
+						{ continue; }
+						
+						for (var objectIdx in dataValue)
+						{
+							if (Object.prototype.hasOwnProperty.call(dataValue, objectIdx))
+							{
+								var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+								if (node === undefined || node.data === undefined)
+								{ continue; }
+								
+								var neoBuilding = node.data.neoBuilding;
+								if (neoBuilding === undefined)
+								{ continue; }
+								
+								var refObject = neoBuilding.getReferenceObject(objectIdx);
+								if (refObject)
+								{
+									refObject.moveVector = undefined;
+									refObject.moveVectorRelToBuilding = undefined;
+								}	
+							}
+						}	
 					}
-				}
+				}	
 			}
 		}
 		
@@ -7033,42 +7079,51 @@ MagoManager.prototype.callAPI = function(api)
 		
 		for (var key_projectId in colorHistoryMap)
 		{
-			var projectId = key_projectId;
-			var buildingsMap = colorHistoryMap[projectId];
-			if (buildingsMap === undefined)
-			{ continue; }
-			
-			for (var key_dataKey in buildingsMap)
+			if (Object.prototype.hasOwnProperty.call(colorHistoryMap, key_projectId))
 			{
-				var dataKey = key_dataKey;
-				var dataValue = buildingsMap[key_dataKey];
-				if (dataValue === undefined)
+				var projectId = key_projectId;
+				var buildingsMap = colorHistoryMap[projectId];
+				if (buildingsMap === undefined)
 				{ continue; }
 				
-				for (var objectId in dataValue)
+				for (var key_dataKey in buildingsMap)
 				{
-					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if (node === undefined || node.data === undefined)
-					{ continue; }
-					
-					var neoBuilding = node.data.neoBuilding;
-					if (neoBuilding === undefined)
-					{ continue; }
-					
-					var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if (refObjectArray === undefined)
-					{ continue; }
-					
-					var refObjectsCount = refObjectArray.length;
-					for (var i=0; i<refObjectsCount; i++)
+					if (Object.prototype.hasOwnProperty.call(buildingsMap, key_dataKey))
 					{
-						var refObject = refObjectArray[i];
-						if (refObject)
+						var dataKey = key_dataKey;
+						var dataValue = buildingsMap[key_dataKey];
+						if (dataValue === undefined)
+						{ continue; }
+						
+						for (var objectId in dataValue)
 						{
-							refObject.aditionalColor = undefined;
-						}
+							if (Object.prototype.hasOwnProperty.call(dataValue, objectId))
+							{
+								var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+								if (node === undefined || node.data === undefined)
+								{ continue; }
+								
+								var neoBuilding = node.data.neoBuilding;
+								if (neoBuilding === undefined)
+								{ continue; }
+								
+								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+								if (refObjectArray === undefined)
+								{ continue; }
+								
+								var refObjectsCount = refObjectArray.length;
+								for (var i=0; i<refObjectsCount; i++)
+								{
+									var refObject = refObjectArray[i];
+									if (refObject)
+									{
+										refObject.aditionalColor = undefined;
+									}
+								}	
+							}
+						}	
 					}
-				}
+				}	
 			}
 		}
 		
@@ -7272,7 +7327,7 @@ MagoManager.prototype.callAPI = function(api)
 		//}
 		
 		var nodeMap = this.hierarchyManager.getNodesMap(projectId);
-		if (Object.keys(nodeMap).length == 0)
+		if (Object.keys(nodeMap).length === 0)
 		{
 			var projectDataFolder = api.getProjectDataFolder();
 			this.getObjectIndexFile(projectId, projectDataFolder);

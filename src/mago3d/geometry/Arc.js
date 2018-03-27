@@ -39,8 +39,8 @@ Arc.prototype.deleteObjects = function()
  */
 Arc.prototype.setCenterPosition = function(cx, cy, cz)
 {
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point3D();
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point3D(); }
 	
 	this.centerPoint.set(cx, cy, cz);
 };
@@ -78,13 +78,13 @@ Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
  */
 Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
-	if(pointsCountFor360Deg === undefined)
-		this.numPointsFor360Deg = 36;
+	if (pointsCountFor360Deg === undefined)
+	{ this.numPointsFor360Deg = 36; }
 	else
-		this.numPointsFor360Deg = pointsCountFor360Deg;
+	{ this.numPointsFor360Deg = pointsCountFor360Deg; }
 	
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
 	var increAngRad = 2.0 * Math.PI / this.numPointsFor360Deg;
 	var cx = this.centerPoint.x;
@@ -96,9 +96,9 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	var sweepAngRad = Math.PI/180.0 * this.sweepAngleDeg;
 	var point;
 	
-	if(sweepAngRad >=0)
+	if (sweepAngRad >=0)
 	{
-		for(var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
+		for (var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
@@ -106,8 +106,9 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 			resultPointsArray.push(point);
 		}
 	}
-	else{
-		for(var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
+	else 
+	{
+		for (var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
@@ -118,7 +119,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	
 	// once finished, mark the 1rst point and the last point as"important point".***
 	var pointsCount = resultPointsArray.length;
-	if(pointsCount > 0)
+	if (pointsCount > 0)
 	{
 		resultPointsArray[0].pointType = 1;
 		resultPointsArray[pointsCount-1].pointType = 1;
