@@ -53,14 +53,40 @@ PolyLine.prototype.getPoints = function(resultPointsArray)
 		resultPointsArray = [];
 	
 	var point;
-	
+	var resultExistentPointsCount = resultPointsArray.length;
 	var pointsCount = this.point3dArray.length;
 	for(var i=0; i<pointsCount; i++)
 	{
-		point = new Point3D();
-		point.copyFrom(this.point3dArray[i]); 
-		point.pointType = 1; // mark as "important point".***
-		resultPointsArray.push(point);
+		if(i===0)
+		{
+			if(resultExistentPointsCount > 0)
+			{
+				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
+				var point0 = this.point3dArray[i];
+				if(!lastExistentPoint.isCoincidentToPoint(point0, errorDist))
+				{
+					point = new Point3D();
+					point.copyFrom(this.point3dArray[i]); 
+					point.pointType = 1; // mark as "important point".***
+					resultPointsArray.push(point);
+				}
+			}
+			else
+			{
+				point = new Point3D();
+				point.copyFrom(this.point3dArray[i]); 
+				point.pointType = 1; // mark as "important point".***
+				resultPointsArray.push(point);
+			}
+		}
+		else
+		{
+			point = new Point3D();
+			point.copyFrom(this.point3dArray[i]); 
+			point.pointType = 1; // mark as "important point".***
+			resultPointsArray.push(point);
+		}
 	}
 	
 	return resultPointsArray;

@@ -20,49 +20,22 @@ var Triangle= function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Triangle.prototype.destroy = function() 
-{
-	// delete this.*************
-	if (this.vertex0)
-	{
-		this.vertex0.deleteObjects();
-		this.vertex0 = undefined;
-	}
-	if (this.vertex1)
-	{
-		this.vertex1.deleteObjects();
-		this.vertex1 = undefined;
-	}
-	if (this.vertex2)
-	{
-		this.vertex2.deleteObjects();
-		this.vertex2 = undefined;
-	}
-	if (this.normal)
-	{
-		this.normal.deleteObjects();
-		this.normal = undefined;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
 Triangle.prototype.deleteObjects = function() 
 {
+	// the triangle no delete vertices.***
 	if (this.vertex0)
 	{
-		this.vertex0.deleteObjects();
+		//this.vertex0.deleteObjects();
 		this.vertex0 = undefined;
 	}
 	if (this.vertex1)
 	{
-		this.vertex1.deleteObjects();
+		//this.vertex1.deleteObjects();
 		this.vertex1 = undefined;
 	}
 	if (this.vertex2)
 	{
-		this.vertex2.deleteObjects();
+		//this.vertex2.deleteObjects();
 		this.vertex2 = undefined;
 	}
 	if (this.normal)

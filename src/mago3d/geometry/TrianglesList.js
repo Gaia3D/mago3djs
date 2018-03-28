@@ -28,3 +28,22 @@ TrianglesList.prototype.newTriangle = function()
 	this.trianglesArray.push(triangle);
 	return triangle;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
+TrianglesList.prototype.deleteObjects = function() 
+{
+	if (this.trianglesArray === undefined)
+		return;
+	
+	var trianglesCount = this.trianglesArray.length;
+	for(var i=0; i<trianglesCount; i++)
+	{
+		this.trianglesArray[i].deleteObjects();
+		this.trianglesArray[i] = undefined;
+	}
+	this.trianglesArray = undefined;
+};

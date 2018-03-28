@@ -12,6 +12,7 @@ var Ring = function()
 	}
 
 	this.elemsArray;
+	this.polygon;
 };
 
 /**
@@ -42,6 +43,56 @@ Ring.prototype.newElement = function(elementTypeString)
 };
 
 /**
+ * returns the points array of the ring.
+ * @class Ring
+ */
+Ring.prototype.makePolygon = function()
+{
+	this.polygon = this.getPolygon(this.polygon);
+};
+
+/**
+ * returns the points array of the ring.
+ * @class Ring
+ */
+Ring.prototype.getPolygon = function(resultPolygon)
+{
+	if(resultPolygon === undefined)
+		resultPolygon = new Polygon();
+	
+	// reset polygon.***
+	resultPolygon.deleteObjects();
+	resultPolygon.verticesArray = this.getVertices(resultPolygon.verticesArray);
+	return resultPolygon;
+};
+
+/**
+ * returns the vertices array of the ring.
+ * @class Ring
+ */
+Ring.prototype.getVertices = function(resultVerticesArray)
+{
+	if(resultVerticesArray === undefined)
+		resultVerticesArray = [];
+	
+	var pointsArray;
+	pointsArray = this.getPoints(pointsArray);
+	
+	var point;
+	var vertex;
+	var pointsCount = pointsArray.length;
+	for(var i=0; i<pointsCount; i++)
+	{
+		point = pointsArray[i];
+		vertex = new Vertex(point);
+		resultVerticesArray.push(vertex);
+	}
+	
+	return resultVerticesArray;
+}
+
+/**
+ * returns the points array of the ring.
  * @class Ring
  */
 Ring.prototype.getPoints = function(resultPointsArray)
@@ -58,6 +109,22 @@ Ring.prototype.getPoints = function(resultPointsArray)
 	{
 		elem = this.elemsArray[i];
 		elem.getPoints(resultPointsArray);
+	}
+	
+	// finally check if the 1rst point and the last point are coincidents.***
+	var totalPointsCount = resultPointsArray.length;
+	if(totalPointsCount > 1)
+	{
+		var errorDist = 0.0001;
+		var firstPoint = resultPointsArray[0];
+		var lastPoint = resultPointsArray[totalPointsCount-1];
+		if(firstPoint.isCoincidentToPoint(lastPoint, errorDist))
+		{
+			// delete the last point.***
+			lastPoint = resultPointsArray.pop();
+			lastPoint.deleteObjects();
+			lastPoint = undefined;
+		}
 	}
 	
 	return resultPointsArray;

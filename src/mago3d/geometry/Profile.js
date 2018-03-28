@@ -12,8 +12,8 @@ var Profile = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.outer; // one Ring. 
-	this.inners; // Rings array. 
+	this.outerRing; // one Ring. 
+	this.innerRingsArray; // Rings array. 
 };
 
 /**
@@ -22,10 +22,10 @@ var Profile = function()
  */
 Profile.prototype.newOuterRing = function() 
 {
-	if (this.outer === undefined)
-	{ this.outer = new Ring(); }
+	if (this.outerRing === undefined)
+	{ this.outerRing = new Ring(); }
 	
-	return this.outer;
+	return this.outerRing;
 };
 
 /**
@@ -34,11 +34,11 @@ Profile.prototype.newOuterRing = function()
  */
 Profile.prototype.newInnerRing = function() 
 {
-	if (this.inners === undefined)
-	{ this.inners = []; }
+	if (this.innerRingsArray === undefined)
+	{ this.innerRingsArray = []; }
 	
 	var innerRing = new Ring();
-	this.inners.push(innerRing);
+	this.innerRingsArray.push(innerRing);
 	
 	return innerRing;
 };
@@ -49,21 +49,21 @@ Profile.prototype.newInnerRing = function()
  */
 Profile.prototype.deleteObjects = function() 
 {
-	if (this.outer)
+	if (this.outerRing)
 	{
-		this.outer.deleteObjects();
-		this.outer = undefined;
+		this.outerRing.deleteObjects();
+		this.outerRing = undefined;
 	}
 
-	if (this.inners)
+	if (this.innerRingsArray)
 	{
-		var innersCount = this.inners.length;
+		var innersCount = this.innerRingsArray.length;
 		for (var i=0; i<innersCount; i++)
 		{
-			this.inners[i].deleteObjects();
-			this.inners[i] = undefined;
+			this.innerRingsArray[i].deleteObjects();
+			this.innerRingsArray[i] = undefined;
 		}
-		this.inners = undefined;
+		this.innerRingsArray = undefined;
 	}
 };
 
@@ -71,32 +71,34 @@ Profile.prototype.deleteObjects = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.copyFrom = function(profileRef) 
+Profile.prototype.tessellate = function(resultTrianglesIndices) 
 {
-	// outer vertex list.
-	if (profileRef.outer)
-	{
-		if (this.outer === undefined)
-		{ this.outer = new VertexList(); }
-		
-		this.outer.copyFrom(profileRef.outer);
-	}
+	if(resultTrianglesIndices === undefined)
+		resultTrianglesIndices = [];
 	
-	// inner vertex lists.
-	if (profileRef.inners && profileRef.inners.length > 0)
-	{
-		if (this.inners === undefined)
-		{ this.inners = []; }
-		
-		var innersCount = profileRef.inners.length;
-		var myInner;
-		for (var i=0; i<innersCount; i++)
-		{
-			myInner = this.newInner();
-			myInner.copyFrom(profileRef.inners[i]);
-		}
-	}
+	var innerRingsCount;
+	if(this.innerRingsArray === undefined)
+		innerRingsCount = 0;
+	else
+		innerRingsCount = this.innerRingsArray.length;
+	
+	// test.***
+	// provisionally tessellate the outerRing.***
+	
+	
+	return resultTrianglesIndices;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
+Profile.prototype.getVBO = function(resultVBOCacheKeys) 
+{
+	
+};
+
+
 
 
 

@@ -11,21 +11,6 @@
 				"nodeType": "IFC"
 			},
 			"children": [],
-			"data_key": "KICT_main",
-			"data_name": "KICT_main",
-			"heading": 9,
-			"height": 60,
-			"latitude": 37.524059,
-			"longitude": 126.923279,
-			"pitch": 0,
-			"roll": 0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "IFC"
-			},
-			"children": [],
 			"data_key": "KSJ_100",
 			"data_name": "KSJ_100",
 			"heading": 0,
