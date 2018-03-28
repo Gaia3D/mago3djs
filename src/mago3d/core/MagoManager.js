@@ -1460,68 +1460,174 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function() 
 {
 	// 1rst, make the test object if no exist.***
-	if (this.parametricMeshTest === undefined)
+	if(this.nativeProjectsArray === undefined)
 	{
-		this.parametricMeshTest = new ParametricMesh();
+		this.nativeProjectsArray = [];
+		var natProject = new MagoNativeProject();
+		this.nativeProjectsArray.push(natProject);
 		
-		this.profileAux = new Profile();
+		this.parametricMeshTest = natProject.newParametricMesh();
 		
-		var ringAux = this.profileAux.newOuterRing();
+		this.parametricMeshTest.profile = new Profile();
 		
-		// test draw a "U" form polyLine.***
-		var polyLineAux = ringAux.newElement("POLYLINE");
+		var profileAux = this.parametricMeshTest.profile;
+		
+		var outerRing = profileAux.newOuterRing();
+		
+		/*
+		// test draw a "L" form polyLine.***
+		var polyLineAux = outerRing.newElement("POLYLINE");
 		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
-		point3d = polyLineAux.newPoint3d(7.0, 0.0, 0.0); // 1
-		point3d = polyLineAux.newPoint3d(7.0, 8.0, 0.0); // 2
-		point3d = polyLineAux.newPoint3d(5.0, 8.0, 0.0); // 3
-		point3d = polyLineAux.newPoint3d(5.0, 2.0, 0.0); // 4
-		point3d = polyLineAux.newPoint3d(2.0, 2.0, 0.0); // 5
-		point3d = polyLineAux.newPoint3d(2.0, 8.0, 0.0); // 6
-		point3d = polyLineAux.newPoint3d(0.0, 8.0, 0.0); // 7
+		point3d = polyLineAux.newPoint3d(3.0, 0.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(2.0, 1.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(1.0, 1.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(1.0, 2.0, 0.0); // 4
+		point3d = polyLineAux.newPoint3d(0.0, 2.0, 0.0); // 5
+		*/
 		
-		var arcAux = ringAux.newElement("ARC");
-		arcAux.setCenterPosition(0, 0, 0);
-		arcAux.setRadius(1);
-		arcAux.setStartAngleDegree(90.0);
-		arcAux.setSweepAngleDegree(-45.0);
-		var pointsArray;
-		pointsArray = arcAux.getPoints(pointsArray, 36);
+		/*
+		// test draw a "L" form polyLine.***
+		var polyLineAux = outerRing.newElement("POLYLINE");
+		var point3d = polyLineAux.newPoint3d(-0.5, 0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint3d(-0.5, 3.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(-1.0, -2.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(0.0, -6.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(1.0, -2.0, 0.0); // 4
+		point3d = polyLineAux.newPoint3d(0.5, 3.0, 0.0); // 5
+		point3d = polyLineAux.newPoint3d(0.5, 0.0, 0.0); // 6
 		
+		var arc = outerRing.newElement("ARC");
+		arc.setCenterPosition(0, 0, 0);
+		arc.setRadius(0.5);
+		arc.setStartAngleDegree(0.0);
+		arc.setSweepAngleDegree(-180.0);
+		arc.pointsCountFor360Deg = 720;
+		*/
+		
+		// create a convex polygon to test.***
+		var polyLineAux = outerRing.newElement("POLYLINE");
+		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint3d(3.0, 0.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(4.0, 2.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(1.0, 4.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(-1.0, 2.0, 0.0); // 4
+		
+		outerRing.makePolygon();
+		outerRing.polygon.tessellate();
 		
 		var hola = 0;
 		
-		/*
-		// make a extrude object.***
-		// create a profile.
-		var profile = new Profile();
-		var extrusionVector = new Point3D();
-		extrusionVector.set(0.0, 0.0, 1.0);
-		var extrusionDist = 10.0;
-		
-		// make a concave profile ( a "L" shape).***
-		var outer = profile.getOuter();
-		var vertex = outer.newVertex();
-		vertex.setPosition(1.0, 0.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(1.0, 3.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(3.0, 3.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(3.0, 5.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(0.0, 5.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(0.0, 0.0, 0.0);
-		
-		// now extrude or revolve.***
-		this.parametricMeshTest.extrude(profile, extrusionVector, extrusionDist);
-		*/
+		// Now, provisionally make a geoLocationData for the nativeProject.*************************************
+		if(natProject.geoLocDataManager === undefined)
+		{
+			natProject.geoLocDataManager = new GeoLocationDataManager();
+			var geoLoc = natProject.geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+			
+			var longitude = 126.61120237344926;
+			var latitude = 37.577213509597016;
+			var altitude = 50;
+			var heading = 0.0;
+			var pitch = 0.0;
+			var roll = 0.0;
+
+			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
+		}
 	}
+	//---------------------------------------------------------------------------------------------------------------
+	
+	// provisionally render all native projects.***
+	var gl = this.sceneState.gl;
+	var color;
+	var node;
+	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // triPolyhedron ssao.***
+	var shaderProgram = currentShader.program;
+	gl.enable(gl.BLEND);
+	gl.useProgram(shaderProgram);
+	gl.enableVertexAttribArray(currentShader.position3_loc);
+	gl.enableVertexAttribArray(currentShader.normal3_loc);
+	gl.disableVertexAttribArray(currentShader.color4_loc);
+
+	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+
+	gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
+	gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
+
+	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
+	//-----------------------------------------------------------------------------------------------------------
+
+	gl.uniform1i(currentShader.hasAditionalMov_loc, true);
+	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	gl.uniform1i(currentShader.bScale_loc, true);
+
+	gl.uniform1i(currentShader.bUse1Color_loc, true);
+	if (color)
+	{
+		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 0.3]); //.***
+	}
+	else 
+	{
+		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 0.3]); //.***
+	}
+
+	gl.uniform1i(currentShader.depthTex_loc, 0);
+	gl.uniform1i(currentShader.noiseTex_loc, 1);
+	gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+	gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
+	gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
+	gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
+	gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
+
+
+	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
+	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+
+	var neoBuilding;
+	var geoLocDataManager;
+	var ssao_idx = 1;
+	var buildingGeoLocation;
+	var nativeProjectsCount = this.nativeProjectsArray.length;
+	for(var i=0; i<nativeProjectsCount; i++)
+	{
+		natProject = this.nativeProjectsArray[i];
+		geoLocDataManager = natProject.geoLocDataManager;
+		
+		gl.uniform3fv(currentShader.scale_loc, [1,1,1]); //.***
+		buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+		
+		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+		//this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
+		
+	}
+	
+	if (currentShader)
+	{
+		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
+		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
+		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+	}
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.activeTexture(gl.TEXTURE2); 
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	gl.disable(gl.BLEND);
+
 };
 
 /**
@@ -4405,7 +4511,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color) 
 {
 	var node;
-	var currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
+	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // box ssao.***
 	var shaderProgram = currentShader.program;
 	gl.enable(gl.BLEND);
 	gl.useProgram(shaderProgram);
@@ -6716,9 +6822,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.projectId = projectId;
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
-		
-		if (node.data.nodeId === "7M6_31")
-		{ var hola = 0; }
 		
 		if (attributes.isPhysical)
 		{

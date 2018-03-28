@@ -374,7 +374,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl)
 	this.createSsaoShaderLego(gl);// 10.***
 
 	this.createDepthShaderBox(gl); // 11.***
-	this.createSsaoShaderBox(gl); // 12.***
+	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.***
 
 	this.createPngImageShader(gl); // 13.***
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.***
@@ -394,6 +394,14 @@ PostFxShadersManager.prototype.getModelRefShader = function()
 PostFxShadersManager.prototype.getModelRefSilhouetteShader = function() 
 {
 	return this.modelRefSilhouetteShader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+PostFxShadersManager.prototype.getTriPolyhedronShader = function() 
+{
+	return this.triPolyhedronShader;
 };
 
 /**
@@ -1127,6 +1135,8 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
 	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
 	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
+	
+	return shader;
 };
 
 // PNG images shader.**************************************************************************************************

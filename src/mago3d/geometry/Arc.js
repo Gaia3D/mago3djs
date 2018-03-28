@@ -78,13 +78,17 @@ Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
  */
 Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
-	if (pointsCountFor360Deg === undefined)
-	{ this.numPointsFor360Deg = 36; }
-	else
-	{ this.numPointsFor360Deg = pointsCountFor360Deg; }
+	if(pointsCountFor360Deg)
+		this.numPointsFor360Deg = pointsCountFor360Deg
+
+	if(this.numPointsFor360Deg === undefined)
+		this.numPointsFor360Deg = 36;
+
+	if(resultPointsArray === undefined)
+		resultPointsArray = [];
+
 	
-	if (resultPointsArray === undefined)
-	{ resultPointsArray = []; }
+	var pointsArray = [];
 	
 	var increAngRad = 2.0 * Math.PI / this.numPointsFor360Deg;
 	var cx = this.centerPoint.x;
@@ -103,7 +107,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
 			point = new Point3D(x, y, z);
-			resultPointsArray.push(point);
+			pointsArray.push(point);
 		}
 	}
 	else 
@@ -113,16 +117,44 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
 			point = new Point3D(x, y, z);
-			resultPointsArray.push(point);
+			pointsArray.push(point);
 		}
 	}
 	
 	// once finished, mark the 1rst point and the last point as"important point".***
-	var pointsCount = resultPointsArray.length;
-	if (pointsCount > 0)
+	var pointsCount = pointsArray.length;
+	if(pointsCount > 0)
 	{
-		resultPointsArray[0].pointType = 1;
-		resultPointsArray[pointsCount-1].pointType = 1;
+		pointsArray[0].pointType = 1;
+		pointsArray[pointsCount-1].pointType = 1;
+	}
+	
+	// now merge points into "resultPointsArray".***
+	var errorDist = 0.0001; // 0.1mm.***
+	var resultExistentPointsCount = resultPointsArray.length;
+	for(var i=0; i<pointsCount; i++)
+	{
+		if(i===0)
+		{
+			if(resultExistentPointsCount > 0)
+			{
+				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
+				point = pointsArray[i];
+				if(!lastExistentPoint.isCoincidentToPoint(point, errorDist))
+				{
+					resultPointsArray.push(point);
+				}
+			}
+			else
+			{
+				resultPointsArray.push(pointsArray[i]);
+			}
+		}
+		else
+		{
+			resultPointsArray.push(pointsArray[i]);
+		}
 	}
 	
 	return resultPointsArray;

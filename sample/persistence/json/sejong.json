@@ -18919,6 +18919,38 @@
 			"longitude": 127.26817560145369,
 			"pitch": 90,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Sadang_del",
+			"data_name": "Sadang_del",
+			"heading": 0,
+			"height": 45,
+			"latitude": 36.50062694716797,
+			"longitude": 127.26817560145369,
+			"pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Sangdo3dong_del",
+			"data_name": "Sangdo3dong_del",
+			"heading": 0,
+			"height": 45,
+			"latitude": 36.50062694716797,
+			"longitude": 127.26817560145369,
+			"pitch": 90,
+			"roll": 0
 		}
     ],
     "parent": 0,

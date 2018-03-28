@@ -1134,9 +1134,9 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, shader, ssao_idx)
+Renderer.prototype.renderTriPolyhedron = function(gl, triPolyhedron, magoManager, shader, ssao_idx)
 {
-	if (lodBuilding.vbo_vicks_container.vboCacheKeysArray.length === 0) 
+	if (triPolyhedron.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
 		return;
 	}
@@ -1148,7 +1148,7 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 	if (ssao_idx === 0) // depth.***
 	{
 		// 1) Position.*********************************************
-		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		var vbo_vicky = triPolyhedron.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
 		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
@@ -1164,7 +1164,7 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 	}
 	else if (ssao_idx === 1) // ssao.***
 	{
-		var vbo_vicky = lodBuilding.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		var vbo_vicky = triPolyhedron.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
 		var vertices_count = vbo_vicky.vertexCount;
 
 		if (vertices_count === 0) 
@@ -1175,10 +1175,10 @@ Renderer.prototype.renderTriPolyhedron = function(gl, lodBuilding, magoManager, 
 		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
 		{ return; }
 
-		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
+		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
 		{ return; }
 		
-		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
+		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
 		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
