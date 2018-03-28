@@ -11,20 +11,20 @@ var Point3D = function(x, y, z)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	if(x !== undefined)
-		this.x = x;
+	if (x !== undefined)
+	{ this.x = x; }
 	else
-		this.x = 0.0;
+	{ this.x = 0.0; }
 	
-	if(y !== undefined)
-		this.y = y;
+	if (y !== undefined)
+	{ this.y = y; }
 	else
-		this.y = 0.0;
+	{ this.y = 0.0; }
 	
-	if(z !== undefined)
-		this.z = z;
+	if (z !== undefined)
+	{ this.z = z; }
 	else
-		this.z = 0.0;
+	{ this.z = 0.0; }
 	
 	this.pointType; // 1 = important point.***
 };

@@ -22,18 +22,18 @@ Ring.prototype.newElement = function(elementTypeString)
 {
 	var elem;
 	
-	if(elementTypeString === "POLYLINE")
+	if (elementTypeString === "POLYLINE")
 	{
-		if(this.elemsArray === undefined)
-			this.elemsArray = [];
+		if (this.elemsArray === undefined)
+		{ this.elemsArray = []; }
 		
 		elem = new PolyLine();
 		this.elemsArray.push(elem);
 	}
-	else if(elementTypeString === "ARC")
+	else if (elementTypeString === "ARC")
 	{
-		if(this.elemsArray === undefined)
-			this.elemsArray = [];
+		if (this.elemsArray === undefined)
+		{ this.elemsArray = []; }
 		
 		elem = new Arc();
 		this.elemsArray.push(elem);
@@ -97,15 +97,15 @@ Ring.prototype.getVertices = function(resultVerticesArray)
  */
 Ring.prototype.getPoints = function(resultPointsArray)
 {
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
-	if(this.elemsArray === undefined)
-		return resultPointsArray;
+	if (this.elemsArray === undefined)
+	{ return resultPointsArray; }
 	
 	var elem;
 	var elemsCount = this.elemsArray.length;
-	for(var i=0; i<elemsCount; i++)
+	for (var i=0; i<elemsCount; i++)
 	{
 		elem = this.elemsArray[i];
 		elem.getPoints(resultPointsArray);

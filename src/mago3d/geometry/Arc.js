@@ -39,8 +39,8 @@ Arc.prototype.deleteObjects = function()
  */
 Arc.prototype.setCenterPosition = function(cx, cy, cz)
 {
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point3D();
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point3D(); }
 	
 	this.centerPoint.set(cx, cy, cz);
 };
@@ -86,6 +86,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 
 	if(resultPointsArray === undefined)
 		resultPointsArray = [];
+
 	
 	var pointsArray = [];
 	
@@ -99,9 +100,9 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	var sweepAngRad = Math.PI/180.0 * this.sweepAngleDeg;
 	var point;
 	
-	if(sweepAngRad >=0)
+	if (sweepAngRad >=0)
 	{
-		for(var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
+		for (var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
@@ -109,8 +110,9 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 			pointsArray.push(point);
 		}
 	}
-	else{
-		for(var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
+	else 
+	{
+		for (var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
