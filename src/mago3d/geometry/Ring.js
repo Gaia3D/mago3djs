@@ -12,7 +12,7 @@ var Ring = function()
 	}
 
 	this.elemsArray;
-	this.polygon;
+	this.polygon; // auxiliar.***
 };
 
 /**
@@ -60,36 +60,14 @@ Ring.prototype.getPolygon = function(resultPolygon)
 	if(resultPolygon === undefined)
 		resultPolygon = new Polygon();
 	
+	if(resultPolygon.point2dList === undefined)
+		resultPolygon.point2dList = new Point2DList();
+	
 	// reset polygon.***
-	resultPolygon.deleteObjects();
-	resultPolygon.verticesArray = this.getVertices(resultPolygon.verticesArray);
+	resultPolygon.point2dList.deleteObjects();
+	resultPolygon.point2dList.pointsArray = this.getPoints(resultPolygon.point2dList.pointsArray);
 	return resultPolygon;
 };
-
-/**
- * returns the vertices array of the ring.
- * @class Ring
- */
-Ring.prototype.getVertices = function(resultVerticesArray)
-{
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
-	
-	var pointsArray;
-	pointsArray = this.getPoints(pointsArray);
-	
-	var point;
-	var vertex;
-	var pointsCount = pointsArray.length;
-	for(var i=0; i<pointsCount; i++)
-	{
-		point = pointsArray[i];
-		vertex = new Vertex(point);
-		resultVerticesArray.push(vertex);
-	}
-	
-	return resultVerticesArray;
-}
 
 /**
  * returns the points array of the ring.

@@ -62,6 +62,9 @@ Line.prototype.isCoincidentPoint = function(point, error)
 	if(projectedPoint === undefined)
 		return false;
 	
+	if(error === undefined)
+		error = 10E-8;
+	
 	var squaredDist = projectedPoint.squareDistToPoint(point);
 	
 	if(squaredDist < error*error)

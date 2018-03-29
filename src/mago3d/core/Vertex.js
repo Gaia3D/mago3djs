@@ -138,6 +138,20 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param r 변수
+ * @param g 변수
+ * @param b 변수
+ * @param alpha 변수
+ */
+Vertex.prototype.setNormal = function(nx, ny, nz) 
+{
+	if (this.normal === undefined) { this.normal = new Point3D(); }
+	
+	this.normal.set(nx, ny, nz);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param dirX 변수
  * @param dirY 변수
  * @param dirZ 변수
@@ -147,3 +161,50 @@ Vertex.prototype.translate = function(dirX, dirY, dirZ, distance)
 {
 	this.point3d.add(dirX * distance, dirY * distance, dirZ * distance);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

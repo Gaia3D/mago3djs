@@ -15,6 +15,7 @@ var MagoNativeProject = function()
 	// This is a "ParametricMeshes" composition.***
 	this.meshesArray;
 	this.geoLocDataManager;
+	this.vboKeysContainer; // class: VBOVertexIdxCacheKeysContainer
 };
 
 MagoNativeProject.prototype.newParametricMesh = function()
@@ -45,3 +46,67 @@ MagoNativeProject.prototype.deleteObjects = function()
 	
 	this.geoLocDataManager = undefined;
 };
+
+MagoNativeProject.prototype.getMeshesCount = function()
+{
+	if(this.meshesArray === undefined)
+		return 0;
+	
+	return this.meshesArray.length;
+};
+
+MagoNativeProject.prototype.getMesh = function(idx)
+{
+	if(this.meshesArray === undefined)
+		return undefined;
+	
+	return this.meshesArray[idx];
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

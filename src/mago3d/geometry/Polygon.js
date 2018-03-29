@@ -11,118 +11,37 @@ var Polygon = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.verticesArray;
-	this.normal;
+	this.point2dList;
+	this.normal; // polygon sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
 };
 
 Polygon.prototype.deleteObjects = function()
 {
-	if(this.verticesArray !== undefined)
+	if(this.point2dList !== undefined)
 	{
-		var verticesCount = this.verticesArray.length;
-		for(var i=0; i<verticesCount; i++)
-		{
-			this.verticesArray[i].deleteObjects();
-			this.verticesArray[i] = undefined;
-		}
-		this.verticesArray = undefined;
+		this.point2dList.deleteObjects();
+		this.point2dList = undefined;
 	}
 	
-	if(this.normal !== undefined)
-	{
-		this.normal.deleteObjects();
-		this.normal = undefined;
-	}
-};
-
-Polygon.prototype.getPrevIdx = function(idx)
-{
-	var verticesCount = this.verticesArray.length;
-	var prevIdx;
-	
-	if(idx === 0)
-		prevIdx = verticesCount - 1;
-	else
-		prevIdx = idx - 1;
-
-	return prevIdx;
-};
-
-Polygon.prototype.getNextIdx = function(idx)
-{
-	var verticesCount = this.verticesArray.length;
-	var nextIdx;
-	
-	if(idx === verticesCount - 1)
-		nextIdx = 0;
-	else
-		nextIdx = idx + 1;
-
-	return nextIdx;
-};
-
-Polygon.prototype.getIdxOfVertex = function(vertex)
-{
-	var verticesCount = this.verticesArray.length;
-	var i=0;
-	var idx = -1;
-	var found = false;
-	while(!found && i<verticesCount)
-	{
-		if(this.verticesArray[i] === vertex)
-		{
-			found = true;
-			idx = i;
-		}
-		i++;
-	}
-	
-	return idx;
-};
-
-Polygon.prototype.getVtxSegment = function(idx, resultVtxSegment)
-{
-	var currVertex = this.verticesArray[idx];
-	var nextIdx = this.getNextIdx(idx);
-	var nextVertex = this.verticesArray[nextIdx];
-	
-	if(resultVtxSegment === undefined)
-		resultVtxSegment = new VtxSegment(currVertex, nextVertex);
-	else{
-		resultVtxSegment.setVertices(currVertex, nextVertex);
-	}
-
-	return resultVtxSegment;
+	this.normal = undefined;
 };
 
 Polygon.prototype.getEdgeDirection = function(idx)
 {
 	// the direction is unitary vector.***
-	var vtxSegment = this.getVtxSegment(idx);
-	var direction = vtxSegment.getDirection(direction);
+	var segment = this.point2dList.getSegment(idx);
+	var direction = segment.getDirection(direction);
 	return direction;
 };
 
 Polygon.prototype.getEdgeVector = function(idx)
 {
-	var vtxSegment = this.getVtxSegment(idx);
-	var vector = vtxSegment.getVector(vector);
+	var segment = this.point2dList.getSegment(idx);
+	var vector = segment.getVector(vector);
 	return vector;
 };
 
-Polygon.prototype.getCrossProductOnVertex = function(currIdx)
-{
-	var crossProd; // Point3D.
-	var prevIdx = this.getPrevIdx(currIdx);
-	var startVec = this.getEdgeDirection(prevIdx); // Point3D.
-	var endVec = this.getEdgeDirection(currIdx); // Point3D.
-	
-	crossProd = startVec.crossProduct(endVec, crossProd); // Point3D.
-	
-	return crossProd; // Point3D.
-};
-
-Polygon.prototype.calculateNormal = function(resultConcaveVertexIdxArray)
+Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
 	// this is a false 2d polygon.***
 	
@@ -131,23 +50,21 @@ Polygon.prototype.calculateNormal = function(resultConcaveVertexIdxArray)
 	// A & B are vectors.
 	// A*B is scalarProduct.
 	// A*B = |A|*|B|*cos(alfa)
-	var vertex;
+	var point;
 	var crossProd;
-	if(this.normal === undefined)
-		this.normal = new Point3D();
 	
-	if(resultConcaveVertexIdxArray === undefined)
-		resultConcaveVertexIdxArray = [];
+	if(resultConcavePointsIdxArray === undefined)
+		resultConcavePointsIdxArray = [];
 	
 	//var candidate_1 = {}; // normal candidate 1.***
 	//var candidate_2 = {}; // normal candidate 2.***
 	
-	this.normal.set(0.0, 0.0, 0.0);
-	var verticesCount = this.verticesArray.length;
-	for(var i=0; i<verticesCount; i++)
+	this.normal = 0; // unknown sense.***
+	var pointsCount = this.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
 	{
-		vertex = this.verticesArray[i];
-		var prevIdx = this.getPrevIdx(i);
+		point = this.point2dList.getPoint(i);
+		var prevIdx = this.point2dList.getPrevIdx(i);
 		
 		// get unitari directions of the vertex.***
 		var startVec = this.getEdgeDirection(prevIdx); // Point3D.
@@ -157,22 +74,25 @@ Polygon.prototype.calculateNormal = function(resultConcaveVertexIdxArray)
 		var crossProd = startVec.crossProduct(endVec, crossProd); // Point3D.
 		var scalarProd = startVec.scalarProduct(endVec);
 		
-		if(crossProd.z < 0.0) // provisionally.***
+		if(crossProd < 0.0) 
 		{
-			resultConcaveVertexIdxArray.push(i);
+			resultConcavePointsIdxArray.push(i);
 		}
 		// calcule by cos.***
 		// cosAlfa = scalarProd / (strModul * endModul); (but strVecModul = 1 & endVecModul = 1), so:
 		var cosAlfa = scalarProd;
 		var alfa = Math.acos(cosAlfa);
 		//var angDeg = alfa * 180.0/Math.PI;
-		
-		crossProd.scale(alfa);
-		this.normal.addPoint(crossProd);
+
+		this.normal += (crossProd * alfa);
 	}
 	
-	this.normal.unitary();
-	return resultConcaveVertexIdxArray;
+	if(this.normal > 0 )
+		this.normal = 1;
+	else
+		this.normal = -1;
+	
+	return resultConcavePointsIdxArray;
 };
 
 Polygon.prototype.tessellate = function(resultConvexPolygons)
@@ -183,32 +103,50 @@ Polygon.prototype.tessellate = function(resultConvexPolygons)
 	
 	// now, for any concave vertex, find the closest vertex to split the polygon.***
 	var find = false;
-	var vertexBIdx;
+	var idx_B;
 	var i=0;
+	
 	while(!find && i<concaveVerticesCount)
 	{
 		var idx = concaveVerticesIndices[i];
-		var vertex = this.verticesArray[idx];
-		var resultSortedVerticesIdxArray = [];
+		var point = this.point2dList.getPoint(idx);
+		var resultSortedPointsIdxArray = [];
 		
-		// get vertices indices sorted by distance to "vertex".***
-		this.getVerticesIdxSortedByDistToVertex(vertex, this.verticesArray, resultSortedVerticesIdxArray);
+		// get vertices indices sorted by distance to "point".***
+		this.getVerticesIdxSortedByDistToVertex(point, this.point2dList.pointsArray, resultSortedPointsIdxArray);
 		
 		var finished = false;
-		var sortedVerticesCount = resultSortedVerticesIdxArray.length;
+		var sortedVerticesCount = resultSortedPointsIdxArray.length;
 		var j=0;
 		while(!finished && j<sortedVerticesCount)
 		{
-			vertexBIdx = resultSortedVerticesIdxArray[j];
+			idx_B = resultSortedPointsIdxArray[j];
 			
 			// skip adjacent vertices.***
-			if(this.getPrevIdx(idx) === vertexBIdx || this.getNextIdx(idx) === vertexBIdx)
+			if(this.point2dList.getPrevIdx(idx) === idx_B || this.point2dList.getNextIdx(idx) === idx_B)
 			{
 				j++;
 				continue;
 			}
 			
-			var resultSplittedPolygons = this.splitPolygon(idx, vertexBIdx);
+			// check if is splittable by idx-idx_B.***
+			var segment = new Segment2D(this.point2dList.getPoint(idx), this.point2dList.getPoint(idx_B));
+			
+			
+			var resultSplittedPolygons = this.splitPolygon(idx, idx_B);
+			
+			if(resultSplittedPolygons.length < 2)
+				continue;
+			
+			// now, compare splittedPolygon's normals with myNormal.***
+			var polygon_A = resultSplittedPolygons[0];
+			var polygon_B = resultSplittedPolygons[1];
+			var concaveVtx_A = polygon_A.calculateNormal();
+			var concaveVtx_B = polygon_B.calculateNormal();
+			
+			var normal_A = polygon_A.normal;
+			var normal_B = polygon_A.normal;
+			
 			
 			j++;
 		}
@@ -230,34 +168,88 @@ Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArra
 		resultSplittedPolygonsArray = [];
 	
 	// polygon A. idx1 -> idx2.***
+	var polygon_A = new Polygon();
+	polygon_A.point2dList = new Point2DList();
+	polygon_A.point2dList.pointsArray = [];
 	
+	// 1rst, put vertex1 & vertex2 in to the polygon_A.***
+	polygon_A.point2dList.pointsArray.push(this.point2dList.getPoint(idx1));
+	polygon_A.point2dList.pointsArray.push(this.point2dList.getPoint(idx2));
 	
+	var finished = false;
+	var currIdx = idx2;
+	var startIdx = idx1;
+	var i=0;
+	var totalPointsCount = this.point2dList.getPointsCount();
+	while(!finished && i<totalPointsCount)
+	{
+		var nextIdx = this.point2dList.getNextIdx(currIdx);
+		if(nextIdx === startIdx)
+		{
+			finished = true;
+		}
+		else{
+			polygon_A.point2dList.pointsArray.push(this.point2dList.getPoint(nextIdx));
+			currIdx = nextIdx;
+		}
+		i++;
+	}
 	
+	resultSplittedPolygonsArray.push(polygon_A);
+	
+	// polygon B. idx2 -> idx1.***
+	var polygon_B = new Polygon();
+	polygon_B.point2dList = new Point2DList();
+	polygon_B.point2dList.pointsArray = [];
+	
+	// 1rst, put vertex2 & vertex1 in to the polygon_B.***
+	polygon_B.point2dList.pointsArray.push(this.point2dList.getPoint(idx2));
+	polygon_B.point2dList.pointsArray.push(this.point2dList.getPoint(idx1));
+	
+	finished = false;
+	currIdx = idx1;
+	startIdx = idx2;
+	i=0;
+	while(!finished && i<totalPointsCount)
+	{
+		var nextIdx = this.point2dList.getNextIdx(currIdx);
+		if(nextIdx === startIdx)
+		{
+			finished = true;
+		}
+		else{
+			polygon_B.point2dList.pointsArray.push(this.point2dList.getPoint(nextIdx));
+			currIdx = nextIdx;
+		}
+		i++;
+	}
+	
+	resultSplittedPolygonsArray.push(polygon_B);
 	return resultSplittedPolygonsArray;
 };
 
-Polygon.prototype.getVerticesIdxSortedByDistToVertex = function(theVertex, verticesArray, resultSortedVerticesIdxArray)
+Polygon.prototype.getVerticesIdxSortedByDistToVertex = function(thePoint, pointsArray, resultSortedPointsIdxArray)
 {
 	// Static function.***
 	// Sorting minDist to maxDist.***
-	if(resultSortedVerticesIdxArray === undefined)
-		resultSortedVerticesIdxArray = [];
+	if(resultSortedPointsIdxArray === undefined)
+		resultSortedPointsIdxArray = [];
 	
 	var objectAux;
 	var objectsAuxArray = [];
-	var vertex;
+	var point;
 	var squaredDist;
 	var startIdx, endIdx, insertIdx;
-	var verticesCount = verticesArray.length;
-	for(var i=0; i<verticesCount; i++)
+	var pointsCount = pointsArray.length;
+	for(var i=0; i<pointsCount; i++)
 	{
-		vertex = verticesArray[i];
-		if(vertex === theVertex)
+		point = pointsArray[i];
+		if(point === thePoint)
 			continue;
 		
-		squaredDist = theVertex.point3d.squareDistToPoint(vertex.point3d);
+		squaredDist = thePoint.squareDistToPoint(point);
 		objectAux = {};
-		objectAux.vertexIdx = i;
+		objectAux.pointIdx = i;
 		objectAux.squaredDist = squaredDist;
 		startIdx = 0;
 		endIdx = objectsAuxArray.length - 1;
@@ -266,14 +258,14 @@ Polygon.prototype.getVerticesIdxSortedByDistToVertex = function(theVertex, verti
 		objectsAuxArray.splice(insertIdx, 0, objectAux);
 	}
 	
-	resultSortedVerticesIdxArray.length = 0;
+	resultSortedPointsIdxArray.length = 0;
 	var objectsCount = objectsAuxArray.length;
 	for(var i=0; i<objectsCount; i++)
 	{
-		resultSortedVerticesIdxArray.push(objectsAuxArray[i].vertexIdx);
+		resultSortedPointsIdxArray.push(objectsAuxArray[i].pointIdx);
 	}
 	
-	return resultSortedVerticesIdxArray;
+	return resultSortedPointsIdxArray;
 };
 
 /**
@@ -341,9 +333,68 @@ Polygon.prototype.isPolygonSplittableByVtxSegment = function(vertexSegment)
 	
 };
 
-Polygon.prototype.getTriangles = function(resultTriangles)
+Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesList)
 {
+	// in this case, consider the polygon is convex.***
+	if(resultTrianglesList === undefined)
+		resultTrianglesList = new TrianglesList();
+
+	var pointsCount = this.point2dList.getPointsCount();
+	if(pointsCount <3)
+		return resultTrianglesList;
 	
+	var triangle;
+	for(var i=1; i<pointsCount-1; i++)
+	{
+		triangle = resultTrianglesList.newTriangle();
+		triangle.vtxIdx0 = 0;
+		triangle.vtxIdx1 = i;
+		triangle.vtxIdx2 = i+1;
+	}
+	
+	return resultTrianglesList;
+};
+
+Polygon.prototype.getVbo = function(resultVbo)
+{
+	// return positions, normals and indices.***
+	if(resultVbo === undefined)
+		resultVbo = new VBOVertexIdxCacheKey();
+	
+	// 1rst, obtain pos, nor.***
+	var posArray = [];
+	var norArray = [];
+	var point;
+	var normal;
+	if(this.normal > 0)
+		normal = 1;
+	else
+		normal = -1;
+		
+	var pointsCount = this.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		point = this.point2dList.getPoint(i);
+		
+		posArray.push(point.x);
+		posArray.push(point.y);
+		posArray.push(0.0);
+		
+		norArray.push(0);
+		norArray.push(0);
+		norArray.push(normal*255);
+	}
+	
+	resultVbo.posVboDataArray = Float32Array.from(posArray);
+	resultVbo.norVboDataArray = Int8Array.from(norArray);
+	
+	// now calculate triangles indices.***
+	var trianglesList = new TrianglesList();
+	trianglesList = this.getTrianglesConvexPolygon(trianglesList);
+	
+	trianglesList.getFaceDataArray(resultVbo);
+
+	return resultVbo;
 };
 
 

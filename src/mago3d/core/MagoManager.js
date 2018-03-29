@@ -1466,24 +1466,23 @@ MagoManager.prototype.renderMagoGeometries = function()
 		var natProject = new MagoNativeProject();
 		this.nativeProjectsArray.push(natProject);
 		
-		this.parametricMeshTest = natProject.newParametricMesh();
+		var mesh = natProject.newParametricMesh();
 		
-		this.parametricMeshTest.profile = new Profile();
-		
-		var profileAux = this.parametricMeshTest.profile;
+		mesh.profile = new Profile(); // provisional.***
+		var profileAux = mesh.profile; // provisional.***
 		
 		var outerRing = profileAux.newOuterRing();
 		
-		/*
+		
 		// test draw a "L" form polyLine.***
 		var polyLineAux = outerRing.newElement("POLYLINE");
-		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
-		point3d = polyLineAux.newPoint3d(3.0, 0.0, 0.0); // 1
-		point3d = polyLineAux.newPoint3d(2.0, 1.0, 0.0); // 2
-		point3d = polyLineAux.newPoint3d(1.0, 1.0, 0.0); // 3
-		point3d = polyLineAux.newPoint3d(1.0, 2.0, 0.0); // 4
-		point3d = polyLineAux.newPoint3d(0.0, 2.0, 0.0); // 5
-		*/
+		var point3d = polyLineAux.newPoint2d(0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint2d(3.0, 0.0); // 1
+		point3d = polyLineAux.newPoint2d(2.0, 1.0); // 2
+		point3d = polyLineAux.newPoint2d(1.0, 1.0); // 3
+		point3d = polyLineAux.newPoint2d(1.0, 2.0); // 4
+		point3d = polyLineAux.newPoint2d(0.0, 2.0); // 5
+		
 		
 		/*
 		// test draw a "L" form polyLine.***
@@ -1495,25 +1494,34 @@ MagoManager.prototype.renderMagoGeometries = function()
 		point3d = polyLineAux.newPoint3d(1.0, -2.0, 0.0); // 4
 		point3d = polyLineAux.newPoint3d(0.5, 3.0, 0.0); // 5
 		point3d = polyLineAux.newPoint3d(0.5, 0.0, 0.0); // 6
-		
-		var arc = outerRing.newElement("ARC");
-		arc.setCenterPosition(0, 0, 0);
-		arc.setRadius(0.5);
-		arc.setStartAngleDegree(0.0);
-		arc.setSweepAngleDegree(-180.0);
-		arc.pointsCountFor360Deg = 720;
 		*/
 		
 		// create a convex polygon to test.***
+		/*
 		var polyLineAux = outerRing.newElement("POLYLINE");
 		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
 		point3d = polyLineAux.newPoint3d(3.0, 0.0, 0.0); // 1
 		point3d = polyLineAux.newPoint3d(4.0, 2.0, 0.0); // 2
 		point3d = polyLineAux.newPoint3d(1.0, 4.0, 0.0); // 3
 		point3d = polyLineAux.newPoint3d(-1.0, 2.0, 0.0); // 4
+		*/
+		
+		/*
+		var arc = outerRing.newElement("ARC");
+		arc.setCenterPosition(0, 0, 0);
+		arc.setRadius(10);
+		arc.setStartAngleDegree(0.0);
+		arc.setSweepAngleDegree(360.0);
+		arc.numPointsFor360Deg = 36;
+		*/
 		
 		outerRing.makePolygon();
 		outerRing.polygon.tessellate();
+		
+		if(mesh.vboKeyContainer === undefined)
+			mesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
+		var vboKeys = mesh.vboKeyContainer.newVBOVertexIdxCacheKey();
+		outerRing.polygon.getVbo(vboKeys);
 		
 		var hola = 0;
 		
@@ -1532,6 +1540,8 @@ MagoManager.prototype.renderMagoGeometries = function()
 
 			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 		}
+		
+		var hola = 0;
 	}
 	//---------------------------------------------------------------------------------------------------------------
 	
@@ -1542,6 +1552,7 @@ MagoManager.prototype.renderMagoGeometries = function()
 	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // triPolyhedron ssao.***
 	var shaderProgram = currentShader.program;
 	gl.enable(gl.BLEND);
+	gl.frontFace(gl.CCW);
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1567,11 +1578,11 @@ MagoManager.prototype.renderMagoGeometries = function()
 	gl.uniform1i(currentShader.bUse1Color_loc, true);
 	if (color)
 	{
-		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 0.3]); //.***
+		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
 	}
 	else 
 	{
-		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, 0.3]); //.***
+		gl.uniform4fv(currentShader.oneColor4_loc, [0.7, 0.4, 0.95, 1.0]); //.***
 	}
 
 	gl.uniform1i(currentShader.depthTex_loc, 0);
@@ -1591,6 +1602,7 @@ MagoManager.prototype.renderMagoGeometries = function()
 	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 
 	var neoBuilding;
+	var natProject, mesh;
 	var geoLocDataManager;
 	var ssao_idx = 1;
 	var buildingGeoLocation;
@@ -1607,8 +1619,15 @@ MagoManager.prototype.renderMagoGeometries = function()
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-		//this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 		
+		var meshesCount = natProject.getMeshesCount();
+		for(var j=0; j<meshesCount; j++)
+		{
+			mesh = natProject.getMesh(j);
+			
+			this.renderer.renderObject(gl, mesh, this, currentShader, ssao_idx);
+			var hola = 0;
+		}
 	}
 	
 	if (currentShader)
@@ -4514,6 +4533,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // box ssao.***
 	var shaderProgram = currentShader.program;
 	gl.enable(gl.BLEND);
+	gl.frontFace(gl.CCW);
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -4579,7 +4599,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-		this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
+		this.renderer.renderObject(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 	}
 	
 	if (currentShader)
@@ -4871,544 +4891,6 @@ MagoManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(sc
 	var modelViewProjectionRelToEye = new Cesium.Matrix4();
 	Cesium.Matrix4.multiply(scene.context._us._projection, modelViewRelToEye, modelViewProjectionRelToEye);
 	Cesium.Matrix4.toArray(modelViewProjectionRelToEye, this.modelViewProjRelToEye_matrix);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param scene 변수
- * @param isLastFrustum 변수
- */
-MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene, isLastFrustum) 
-{
-	if (!isLastFrustum) { return; }
-	if (this.isCameraInsideNeoBuilding) { return; }
-
-	var gl = scene.context._gl;
-	var cameraPosition = scene.context._us._cameraPosition;
-	var cullingVolume = scene._frameState.cullingVolume;
-	//	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
-
-	gl.disable(gl.CULL_FACE);
-
-	// Check if camera was moved considerably for update the renderables objects.***
-	if (this.detailed_building) 
-	{
-		this.squareDistUmbral = 4.5*4.5;
-	}
-	else 
-	{
-		this.squareDistUmbral = 50*50;
-	}
-	this.isCameraMoved(cameraPosition, this.squareDistUmbral);
-
-	if (this.depthFbo === undefined) { this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); }
-	if (this.ssaoFbo === undefined) { this.ssaoFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); } // no used.***
-
-	// Another check for depthBuffer.***
-	if (this.depthFbo.width !== scene.drawingBufferWidth || this.depthFbo.height !== scene.drawingBufferHeight) 
-	{
-		this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	}
-
-	//if(cameraMoved && !this.isCameraMoving)
-	if (!this.isCameraMoving) 
-	{
-		this.currentVisibleBuildings_array.length = 0; // Init.***
-		this.currentVisibleBuildings_LOD0_array.length = 0; // Init.***
-		this.detailed_building;
-
-		//this.doFrustumCulling(cullingVolume, this.currentVisibleBuildings_array, cameraPosition); // delete this.***
-		this.doFrustumCullingTerranTileServiceFormat(gl, cullingVolume, this.currentVisibleBuildings_array, cameraPosition);
-	}
-
-	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
-	this.reCalculateModelViewProjectionRelToEyeMatrix(scene);
-
-	//Cesium.Matrix4.toArray(_modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.***
-	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix);
-	//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
-
-	// Calculate encodedCamPosMC high and low values.********************************************************
-	this.calculateEncodedCameraPositionMCHighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
-
-	// *************************************************************************************************************************************************
-	// Now, render the detailed building if exist.******************************************************************************************************
-	// This is OLD.************************************
-	var currentShader;
-	if (this.detailed_building && isLastFrustum) 
-	{
-		currentShader = this.shadersManager.getMagoShader(0);
-		//this.render_DetailedBuilding(gl, cameraPosition, _modelViewProjectionRelativeToEye, scene, currentShader);
-	}
-	// End render the detailed building if exist.---------------------------------------------------------------------------------------------------------------
-	// ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	// Save the cesium framebuffer.***
-	//	var cesium_frameBuffer = scene._context._currentFramebuffer._framebuffer;
-	//var cesium_frameBuffer = scene._context._currentFramebuffer;
-
-	// Now, render the simple visible buildings.***************************************************************************
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-
-	var shaderProgram;
-
-	// Calculate the normal_matrix.***
-	//https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Lighting_in_Webgl
-	// this code must be executed if the camera was moved.***
-	this.isCameraMoved(cameraPosition, 10);
-	//if(cameraLittleMoved)
-	//	{
-	var mvMat = scene._context._us._modelView; // original.***
-	//var mvMat = scene._context._us._modelViewRelativeToEye;
-	//mvMat[12] = 0.0;
-	//mvMat[13] = 0.0;
-	//mvMat[14] = 0.0;
-	var mvMat_inv = new Cesium.Matrix4();
-	mvMat_inv = Cesium.Matrix4.inverseTransformation(mvMat, mvMat_inv);
-	//var normalMat = new Cesium.Matrix4();
-	this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
-	//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
-	this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
-	//	}
-
-	Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array);
-	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array);
-	//gl.uniformMatrix3fv(currentShader._NormalMatrix, false, this.normalMat3_array);
-
-	if (this.isCameraMoving) 
-	{
-		this.dateSC = new Date();
-		this.currentTimeSC;
-		this.startTimeSC = this.dateSC.getTime();
-	}
-
-	this.currentVisibleBuildingsPost_array.length = 0;
-
-	var filePath_scratch = "";
-	var camera = scene._camera;
-	var frustum = camera.frustum;
-	//	var current_frustum_near = scene._context._us._currentFrustum.x;
-	var current_frustum_far = scene._context._us._currentFrustum.y;
-	current_frustum_far = 5000.0;
-
-	// Depth render.********************************************************
-	// Depth render.********************************************************
-	// Depth render.********************************************************
-	this.depthFbo.bind(); // DEPTH START.**************************************************************************************************************************************************
-	gl.clearColor(0, 0, 0, 1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.viewport(0, 0, this.depthFbo.width, this.depthFbo.height);
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[0];
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-	//gl.enableVertexAttribArray(currentShader.texCoord2_loc); // no use texcoords.***
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-
-	gl.uniform1f(currentShader.near_loc, frustum._near);
-	//gl.uniform1f(currentShader.far_loc, frustum._far);	// Original (bad)..***
-	gl.uniform1f(currentShader.far_loc, current_frustum_far); // test (best)..***
-
-	gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-
-	//gl.uniform1i(currentShader.useRefTransfMatrix_loc, false, false);
-
-	// LOD0 BUILDINGS.***************************************************************************************************************
-
-	// Now, render LOD0 texture buildings.***
-	var LOD0_projectsCount = this.currentVisibleBuildings_LOD0_array.length;
-	for (var i=0; i<LOD0_projectsCount; i++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_LOD0_array[i];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-			else if (!BR_Project._f4d_lod0Image_readed && BR_Project._f4d_nailImage_readed_finished && BR_Project._f4d_lod0Image_exists) 
-			{
-				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
-				{
-					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
-
-					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
-					this.backGround_fileReadings_count ++;
-
-				}
-				//continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1) 
-		{
-			//renderSimpleBuildingV1PostFxShader
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-			/*
-			if(BR_Project._f4d_lod0Image_exists)
-			{
-				if(BR_Project._f4d_lod0Image_readed_finished)
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 0 = lod0.***
-
-				else if(BR_Project._f4d_nailImage_readed_finished)
-				{
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-				}
-			}
-			else if(BR_Project._f4d_nailImage_readed_finished)
-			{
-				this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-			}
-			*/
-		}
-	}
-
-	var projects_count = this.currentVisibleBuildings_array.length;
-	for (var p_counter = 0; p_counter<projects_count; p_counter++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_array[p_counter];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished) 
-		{
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-		}
-	}
-	//gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	gl.disableVertexAttribArray(currentShader.normal3_loc);
-	this.depthFbo.unbind(); // DEPTH END.*****************************************************************************************************************************************************************
-
-	// Now, ssao.************************************************************
-	scene._context._currentFramebuffer._bind();
-
-	if (this.depthFbo.width !== scene.drawingBufferWidth || this.depthFbo.height !== scene.drawingBufferHeight) 
-	{
-		this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	}
-
-	//this.ssaoFbo.bind();// SSAO START.********************************************************************************************************************************************************************
-	gl.clearColor(0, 0, 0, 1);
-	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
-
-	if (this.noiseTexture === undefined) { this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[1];
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
-
-	gl.uniform1f(currentShader.near_loc, frustum._near);
-	//gl.uniform1f(currentShader.far_loc, frustum._far); // Original.***
-	gl.uniform1f(currentShader.far_loc, current_frustum_far); // test.***
-
-	gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-
-	gl.uniform1i(currentShader.depthTex_loc, 0);
-	gl.uniform1i(currentShader.noiseTex_loc, 1);
-	gl.uniform1i(currentShader.diffuseTex_loc, 2);
-	gl.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-	gl.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);
-	gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
-	gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
-	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFbo.width/this.noiseTexture.width, this.depthFbo.height/this.noiseTexture.height]);
-	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.depthFbo.colorBuffer);  // original.***
-	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-
-	// LOD0 BUILDINGS.***************************************************************************************************************
-	// Now, render LOD0 texture buildings.***
-	var LOD0_projectsCount = this.currentVisibleBuildings_LOD0_array.length;
-	for (var i=0; i<LOD0_projectsCount; i++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_LOD0_array[i];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-			else if (!BR_Project._f4d_lod0Image_readed && BR_Project._f4d_nailImage_readed_finished && BR_Project._f4d_lod0Image_exists) 
-			{
-				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
-				{
-					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
-
-					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
-					this.backGround_fileReadings_count ++;
-				}
-				//continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1) 
-		{
-			//renderSimpleBuildingV1PostFxShader
-			if (BR_Project._f4d_lod0Image_exists) 
-			{
-				if (BR_Project._f4d_lod0Image_readed_finished) { this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 0, currentShader); } // 0 = lod0.***
-				else if (BR_Project._f4d_nailImage_readed_finished) 
-				{
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-				}
-			}
-			else if (BR_Project._f4d_nailImage_readed_finished) 
-			{
-				this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-			}
-		}
-	}
-
-	var projects_count = this.currentVisibleBuildings_array.length;
-	for (var p_counter = 0; p_counter<projects_count; p_counter++) 
-	{
-		/*
-		if(!isLastFrustum && this.isCameraMoving && timeControlCounter === 0)
-		{
-			date = new Date();
-			currentTime = date.getTime();
-			secondsUsed = currentTime - startTime;
-			if(secondsUsed > 20) // miliseconds.***
-			{
-				gl.disableVertexAttribArray(shader._texcoord);
-				gl.disableVertexAttribArray(shader._position);
-				return;
-			}
-		}
-		*/
-
-		var BR_Project = this.currentVisibleBuildings_array[p_counter];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished) 
-		{
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-		}
-		/*
-		if(this.isCameraMoving)
-		{
-			this.dateSC = new Date();
-			this.currentTimeSC = this.dateSC.getTime();
-			if(this.currentTimeSC-this.startTimeSC > this.maxMilisecondsForRender)
-			{
-				gl.disableVertexAttribArray(shader._texcoord);
-				gl.disableVertexAttribArray(shader._position);
-				return;
-			}
-		}
-		*/
-	}
-
-	gl.activeTexture(gl.TEXTURE0);
-	//this.ssaoFbo.unbind();
-
-	gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	gl.disableVertexAttribArray(currentShader.normal3_loc);
-	//this.ssaoFbo.unbind();// SSAO END.********************************************************************************************************************************************************************
-
-	// Now, blur.************************************************************
-	/*
-	scene._context._currentFramebuffer._bind();
-
-	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix);
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[2]; // blur.***
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-
-	gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	//gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	this.modelView_matrix[12] = 0.0;
-	this.modelView_matrix[13] = 0.0;
-	this.modelView_matrix[14] = 0.0;
-
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-
-	gl.uniform1i(currentShader.colorTex_loc, 0);
-	gl.uniform2fv(currentShader.texelSize_loc, [1/this.ssaoFbo.width, 1/this.ssaoFbo.height]);
-	gl.activeTexture(gl.TEXTURE0);
-	//gl.bindTexture(gl.TEXTURE_2D, this.ssaoFbo.colorBuffer); // original.***
-	gl.bindTexture(gl.TEXTURE_2D, scene._context._currentFramebuffer.colorBuffer);
-	//scene._context._currentFramebuffer._bind();
-	this.ssaoFSQuad.draw(currentShader, gl);
-	gl.activeTexture(gl.TEXTURE0);
-
-	gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	//gl.disableVertexAttribArray(currentShader.normal3_loc);
-	*/
-	// END BLUR.**************************************************************************************************************************************************************************************************************
-
-	gl.viewport(0, 0, scene._canvas.width, scene._canvas.height);
-
-	scene._context._currentFramebuffer._bind();
-	//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, cesium_frameBuffer);
-	// Render the lasts simpleBuildings.***
-
-	var last_simpBuilds_count = this.currentVisibleBuildingsPost_array.length;
-
-	for (var i=0; i<last_simpBuilds_count; i++) 
-	{
-		this.renderer.render_F4D_simpleBuilding(	gl, this.currentVisibleBuildingsPost_array[i], this.modelViewProjRelToEye_matrix,
-			this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this.shadersManager);
-	}
-
-	//gl.useProgram(null);
-	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
 /**

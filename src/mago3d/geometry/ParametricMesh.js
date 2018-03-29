@@ -16,7 +16,7 @@ var ParametricMesh = function()
 	this.profilesList; // class: ProfilesList
 	this.trianglesMatrix;
 	this.profile;
-	//VBOVertexIdxCacheKey
+	this.vboKeyContainer;//VBOVertexIdxCacheKey
 	this.bbox;
 };
 
@@ -41,6 +41,11 @@ ParametricMesh.prototype.deleteObjects = function()
 	this.profile = undefined;
 };
 
+ParametricMesh.prototype.getVboKeysContainer = function()
+{
+	return this.vboKeyContainer;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -53,3 +58,38 @@ ParametricMesh.prototype.extrude = function(profile, extrusionVector, extrusionD
 	
 	
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
