@@ -379,3 +379,28 @@ Point3D.prototype.scale = function(scaleFactor)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

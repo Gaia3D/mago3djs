@@ -14,6 +14,9 @@ var Triangle= function()
 	this.vertex0;
 	this.vertex1;
 	this.vertex2;
+	this.vtxIdx0;
+	this.vtxIdx1;
+	this.vtxIdx2;
 	this.normal; // plainNormal.
 };
 
@@ -43,6 +46,10 @@ Triangle.prototype.deleteObjects = function()
 		this.normal.deleteObjects();
 		this.normal = undefined;
 	}
+	
+	this.vtxIdx0 = undefined;
+	this.vtxIdx1 = undefined;
+	this.vtxIdx2 = undefined;
 };
 
 /**
