@@ -12,6 +12,7 @@ var Ring = function()
 	}
 
 	this.elemsArray;
+	this.polygon; // auxiliar.***
 };
 
 /**
@@ -21,18 +22,18 @@ Ring.prototype.newElement = function(elementTypeString)
 {
 	var elem;
 	
-	if(elementTypeString === "POLYLINE")
+	if (elementTypeString === "POLYLINE")
 	{
-		if(this.elemsArray === undefined)
-			this.elemsArray = [];
+		if (this.elemsArray === undefined)
+		{ this.elemsArray = []; }
 		
 		elem = new PolyLine();
 		this.elemsArray.push(elem);
 	}
-	else if(elementTypeString === "ARC")
+	else if (elementTypeString === "ARC")
 	{
-		if(this.elemsArray === undefined)
-			this.elemsArray = [];
+		if (this.elemsArray === undefined)
+		{ this.elemsArray = []; }
 		
 		elem = new Arc();
 		this.elemsArray.push(elem);
@@ -42,22 +43,66 @@ Ring.prototype.newElement = function(elementTypeString)
 };
 
 /**
+ * returns the points array of the ring.
+ * @class Ring
+ */
+Ring.prototype.makePolygon = function()
+{
+	this.polygon = this.getPolygon(this.polygon);
+};
+
+/**
+ * returns the points array of the ring.
+ * @class Ring
+ */
+Ring.prototype.getPolygon = function(resultPolygon)
+{
+	if(resultPolygon === undefined)
+		resultPolygon = new Polygon();
+	
+	if(resultPolygon.point2dList === undefined)
+		resultPolygon.point2dList = new Point2DList();
+	
+	// reset polygon.***
+	resultPolygon.point2dList.deleteObjects();
+	resultPolygon.point2dList.pointsArray = this.getPoints(resultPolygon.point2dList.pointsArray);
+	return resultPolygon;
+};
+
+/**
+ * returns the points array of the ring.
  * @class Ring
  */
 Ring.prototype.getPoints = function(resultPointsArray)
 {
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
-	if(this.elemsArray === undefined)
-		return resultPointsArray;
+	if (this.elemsArray === undefined)
+	{ return resultPointsArray; }
 	
 	var elem;
 	var elemsCount = this.elemsArray.length;
-	for(var i=0; i<elemsCount; i++)
+	for (var i=0; i<elemsCount; i++)
 	{
 		elem = this.elemsArray[i];
 		elem.getPoints(resultPointsArray);
+	}
+	
+	// finally check if the 1rst point and the last point are coincidents.***
+	var totalPointsCount = resultPointsArray.length;
+	if(totalPointsCount > 1)
+	{
+		var errorDist = 0.0001;
+		var firstPoint = resultPointsArray[0];
+		var lastPoint = resultPointsArray[totalPointsCount-1];
+		if(firstPoint.isCoincidentToPoint(lastPoint, errorDist))
+		{
+			// delete the last point.***
+			lastPoint = resultPointsArray.pop();
+			lastPoint.deleteObjects();
+			lastPoint = undefined;
+		}
 	}
 	
 	return resultPointsArray;

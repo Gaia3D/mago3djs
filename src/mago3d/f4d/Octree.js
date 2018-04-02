@@ -1058,6 +1058,10 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 	// 1rst, check the range.
 	
 	var range = endIdx - startIdx;
+	
+	if(range <= 0)
+		return 0;
+	
 	if (range < 6)
 	{
 		// in this case do a lineal search.

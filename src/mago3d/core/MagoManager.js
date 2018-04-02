@@ -1405,8 +1405,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		if (lodBuildingData === undefined)
 		{ continue; }
 	
-		if(lodBuildingData.isModelRef)
-			continue;
+		if (lodBuildingData.isModelRef)
+		{ continue; }
 		
 		textureFileName = lodBuildingData.textureFileName;
 		lodString = lodBuildingData.geometryFileName;
@@ -1460,68 +1460,193 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function() 
 {
 	// 1rst, make the test object if no exist.***
-	if (this.parametricMeshTest == undefined)
+	if(this.nativeProjectsArray === undefined)
 	{
-		this.parametricMeshTest = new ParametricMesh();
+		this.nativeProjectsArray = [];
+		var natProject = new MagoNativeProject();
+		this.nativeProjectsArray.push(natProject);
 		
-		this.profileAux = new Profile();
+		var mesh = natProject.newParametricMesh();
 		
-		var ringAux = this.profileAux.newOuterRing();
+		mesh.profile = new Profile(); // provisional.***
+		var profileAux = mesh.profile; // provisional.***
 		
-		// test draw a "U" form polyLine.***
-		var polyLineAux = ringAux.newElement("POLYLINE");
+		var outerRing = profileAux.newOuterRing();
+		
+		
+		// test draw a "L" form polyLine.***
+		var polyLineAux = outerRing.newElement("POLYLINE");
+		var point3d = polyLineAux.newPoint2d(0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint2d(3.0, 0.0); // 1
+		point3d = polyLineAux.newPoint2d(2.0, 1.0); // 2
+		point3d = polyLineAux.newPoint2d(1.0, 1.0); // 3
+		point3d = polyLineAux.newPoint2d(1.0, 2.0); // 4
+		point3d = polyLineAux.newPoint2d(0.0, 2.0); // 5
+		
+		
+		/*
+		// test draw a "L" form polyLine.***
+		var polyLineAux = outerRing.newElement("POLYLINE");
+		var point3d = polyLineAux.newPoint3d(-0.5, 0.0, 0.0); // 0
+		point3d = polyLineAux.newPoint3d(-0.5, 3.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(-1.0, -2.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(0.0, -6.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(1.0, -2.0, 0.0); // 4
+		point3d = polyLineAux.newPoint3d(0.5, 3.0, 0.0); // 5
+		point3d = polyLineAux.newPoint3d(0.5, 0.0, 0.0); // 6
+		*/
+		
+		// create a convex polygon to test.***
+		/*
+		var polyLineAux = outerRing.newElement("POLYLINE");
 		var point3d = polyLineAux.newPoint3d(0.0, 0.0, 0.0); // 0
-		point3d = polyLineAux.newPoint3d(7.0, 0.0, 0.0); // 1
-		point3d = polyLineAux.newPoint3d(7.0, 8.0, 0.0); // 2
-		point3d = polyLineAux.newPoint3d(5.0, 8.0, 0.0); // 3
-		point3d = polyLineAux.newPoint3d(5.0, 2.0, 0.0); // 4
-		point3d = polyLineAux.newPoint3d(2.0, 2.0, 0.0); // 5
-		point3d = polyLineAux.newPoint3d(2.0, 8.0, 0.0); // 6
-		point3d = polyLineAux.newPoint3d(0.0, 8.0, 0.0); // 7
+		point3d = polyLineAux.newPoint3d(3.0, 0.0, 0.0); // 1
+		point3d = polyLineAux.newPoint3d(4.0, 2.0, 0.0); // 2
+		point3d = polyLineAux.newPoint3d(1.0, 4.0, 0.0); // 3
+		point3d = polyLineAux.newPoint3d(-1.0, 2.0, 0.0); // 4
+		*/
 		
-		var arcAux = ringAux.newElement("ARC");
-		arcAux.setCenterPosition(0, 0, 0);
-		arcAux.setRadius(1);
-		arcAux.setStartAngleDegree(90.0);
-		arcAux.setSweepAngleDegree(-45.0);
-		var pointsArray;
-		pointsArray = arcAux.getPoints(pointsArray, 36);
+		/*
+		var arc = outerRing.newElement("ARC");
+		arc.setCenterPosition(0, 0, 0);
+		arc.setRadius(10);
+		arc.setStartAngleDegree(0.0);
+		arc.setSweepAngleDegree(360.0);
+		arc.numPointsFor360Deg = 36;
+		*/
 		
+		outerRing.makePolygon();
+		outerRing.polygon.tessellate();
+		
+		if(mesh.vboKeyContainer === undefined)
+			mesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
+		var vboKeys = mesh.vboKeyContainer.newVBOVertexIdxCacheKey();
+		outerRing.polygon.getVbo(vboKeys);
 		
 		var hola = 0;
 		
-		/*
-		// make a extrude object.***
-		// create a profile.
-		var profile = new Profile();
-		var extrusionVector = new Point3D();
-		extrusionVector.set(0.0, 0.0, 1.0);
-		var extrusionDist = 10.0;
+		// Now, provisionally make a geoLocationData for the nativeProject.*************************************
+		if(natProject.geoLocDataManager === undefined)
+		{
+			natProject.geoLocDataManager = new GeoLocationDataManager();
+			var geoLoc = natProject.geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+			
+			var longitude = 126.61120237344926;
+			var latitude = 37.577213509597016;
+			var altitude = 50;
+			var heading = 0.0;
+			var pitch = 0.0;
+			var roll = 0.0;
+
+			ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
+		}
 		
-		// make a concave profile ( a "L" shape).***
-		var outer = profile.getOuter();
-		var vertex = outer.newVertex();
-		vertex.setPosition(1.0, 0.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(1.0, 3.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(3.0, 3.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(3.0, 5.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(0.0, 5.0, 0.0);
-		
-		vertex = outer.newVertex();
-		vertex.setPosition(0.0, 0.0, 0.0);
-		
-		// now extrude or revolve.***
-		this.parametricMeshTest.extrude(profile, extrusionVector, extrusionDist);
-		*/
+		var hola = 0;
 	}
+	//---------------------------------------------------------------------------------------------------------------
+	
+	// provisionally render all native projects.***
+	var gl = this.sceneState.gl;
+	var color;
+	var node;
+	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // triPolyhedron ssao.***
+	var shaderProgram = currentShader.program;
+	gl.enable(gl.BLEND);
+	gl.frontFace(gl.CCW);
+	gl.useProgram(shaderProgram);
+	gl.enableVertexAttribArray(currentShader.position3_loc);
+	gl.enableVertexAttribArray(currentShader.normal3_loc);
+	gl.disableVertexAttribArray(currentShader.color4_loc);
+
+	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
+	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
+	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
+	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+
+	gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
+	gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
+
+	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
+	//-----------------------------------------------------------------------------------------------------------
+
+	gl.uniform1i(currentShader.hasAditionalMov_loc, true);
+	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	gl.uniform1i(currentShader.bScale_loc, true);
+
+	gl.uniform1i(currentShader.bUse1Color_loc, true);
+	if (color)
+	{
+		gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
+	}
+	else 
+	{
+		gl.uniform4fv(currentShader.oneColor4_loc, [0.7, 0.4, 0.95, 1.0]); //.***
+	}
+
+	gl.uniform1i(currentShader.depthTex_loc, 0);
+	gl.uniform1i(currentShader.noiseTex_loc, 1);
+	gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+	gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
+	gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
+	gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
+	gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
+
+
+	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
+	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+
+	var neoBuilding;
+	var natProject, mesh;
+	var geoLocDataManager;
+	var ssao_idx = 1;
+	var buildingGeoLocation;
+	var nativeProjectsCount = this.nativeProjectsArray.length;
+	for(var i=0; i<nativeProjectsCount; i++)
+	{
+		natProject = this.nativeProjectsArray[i];
+		geoLocDataManager = natProject.geoLocDataManager;
+		
+		gl.uniform3fv(currentShader.scale_loc, [1,1,1]); //.***
+		buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+		
+		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+		
+		var meshesCount = natProject.getMeshesCount();
+		for(var j=0; j<meshesCount; j++)
+		{
+			mesh = natProject.getMesh(j);
+			
+			this.renderer.renderObject(gl, mesh, this, currentShader, ssao_idx);
+			var hola = 0;
+		}
+	}
+	
+	if (currentShader)
+	{
+		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
+		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
+		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+	}
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.activeTexture(gl.TEXTURE2); 
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	gl.disable(gl.BLEND);
+
 };
 
 /**
@@ -1583,21 +1708,24 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	//for (var i=0; i<nodesCount; i++)
 	for (var key in rootNodesMap)
 	{
-		//nodeRoot = rootNodesArray[i];
-		nodeRoot = rootNodesMap[key];
-		geoLocDataManager = nodeRoot.data.geoLocDataManager;
-		geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		//neoBuilding = node.data.neoBuilding;
-		worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
-		
-		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		if (Object.prototype.hasOwnProperty.call(rootNodesMap, key))
 		{
-			ctx.font = "13px Arial";
-			//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-			//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-			ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
-			ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			//nodeRoot = rootNodesArray[i];
+			nodeRoot = rootNodesMap[key];
+			geoLocDataManager = nodeRoot.data.geoLocDataManager;
+			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+			//neoBuilding = node.data.neoBuilding;
+			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
+			screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+			
+			if (screenCoord.x >= 0 && screenCoord.y >= 0)
+			{
+				ctx.font = "13px Arial";
+				//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+				//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+				ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+				ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			}
 		}
 	}
 	
@@ -2376,31 +2504,31 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			}
 			// Display geoLocationData while moving building.***
 			var nodeOwner = this.buildingSelected.nodeOwner;
-			if(nodeOwner === undefined)
-				return;
+			if (nodeOwner === undefined)
+			{ return; }
 
 			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
-			if(geoLocDataManager === undefined)
-				return;
+			if (geoLocDataManager === undefined)
+			{ return; }
 
 			var geoLocation = geoLocDataManager.getGeoLocationData(0);
-			if(geoLocation === undefined)
-				return;
+			if (geoLocation === undefined)
+			{ return; }
 
 			var geographicCoords = geoLocation.geographicCoord;
-			if(geographicCoords === undefined)
-				return;
+			if (geographicCoords === undefined)
+			{ return; }
 			
 			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
-								nodeOwner.data.projectId,
+				nodeOwner.data.projectId,
                 				nodeOwner.data.nodeId,
-								null,
-								geographicCoords.latitude,
-								geographicCoords.longitude,
-								geographicCoords.altitude,
-								geoLocation.heading,
-								geoLocation.pitch,
-								geoLocation.roll);
+				null,
+				geographicCoords.latitude,
+				geographicCoords.longitude,
+				geographicCoords.altitude,
+				geoLocation.heading,
+				geoLocation.pitch,
+				geoLocation.roll);
 								
 		}
 		else 
@@ -2804,19 +2932,22 @@ MagoManager.prototype.manageQueue = function()
 	//for (var i=0; i<maxDeleteNodesCount; i++)
 	for (var key in this.processQueue.nodesToDeleteMap)
 	{
-		//node = nodesToDeleteArray[i];
-		node = this.processQueue.nodesToDeleteMap[key];
-		
-		if (node == undefined)
-		{ continue; }
+		if (Object.prototype.hasOwnProperty.call(this.processQueue.nodesToDeleteMap, key))
+		{
+			//node = nodesToDeleteArray[i];
+			node = this.processQueue.nodesToDeleteMap[key];
+			
+			if (node === undefined)
+			{ continue; }
 
-		neoBuilding = node.data.neoBuilding;
-		this.processQueue.eraseNodeToDelete(node);
+			neoBuilding = node.data.neoBuilding;
+			this.processQueue.eraseNodeToDelete(node);
+			
+			if (neoBuilding === undefined)
+			{ continue; }
 		
-		if (neoBuilding == undefined)
-		{ continue; }
-	
-		this.deleteNeoBuilding(gl, neoBuilding);
+			this.deleteNeoBuilding(gl, neoBuilding);
+		}
 	}
 	//nodesToDeleteArray = [];
 	//nodesToDeleteArray = undefined;
@@ -2829,29 +2960,32 @@ MagoManager.prototype.manageQueue = function()
 	//for (var i=0; i<nodesToDeletesCount; i++)
 	for (var key in this.processQueue.nodesToDeleteModelReferencesMap)
 	{
-		//node = nodesToDeleteModelReferencesArray[i];
-		node = this.processQueue.nodesToDeleteModelReferencesMap[key];
+		if (Object.prototype.hasOwnProperty.call(this.processQueue.nodesToDeleteModelReferencesMap, key))
+		{
+			//node = nodesToDeleteModelReferencesArray[i];
+			node = this.processQueue.nodesToDeleteModelReferencesMap[key];
+			
+			if (node.data === undefined)
+			{ continue; }
 		
-		if (node.data === undefined)
-		{ continue; }
-	
-		neoBuilding = node.data.neoBuilding;
-		this.processQueue.eraseNodeToDeleteModelReferences(neoBuilding);
-		if (neoBuilding === undefined)
-		{ continue; }
+			neoBuilding = node.data.neoBuilding;
+			this.processQueue.eraseNodeToDeleteModelReferences(neoBuilding);
+			if (neoBuilding === undefined)
+			{ continue; }
 
-		if (neoBuilding.octree)
-		{
-			neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			if (neoBuilding.octree)
+			{
+				neoBuilding.octree.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			}
+			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+			{
+				modelRefsDeletedCount ++;
+			}
+			neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
+			
+			if (modelRefsDeletedCount > 10)
+			{ break; }
 		}
-		if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
-		{
-			modelRefsDeletedCount ++;
-		}
-		neoBuilding.deleteObjectsModelReferences(gl, this.vboMemoryManager);
-		
-		if (modelRefsDeletedCount > 10)
-		{ break; }
 	}
 	
 	// now, delete lod0, lod1, lod2.***
@@ -2954,12 +3088,15 @@ MagoManager.prototype.manageQueue = function()
 			///for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ReferencesToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ReferencesToParseMap[key];
-				//lowestOctree = octreesArray[i];
-				this.parseQueue.parseOctreesLod0References(gl, lowestOctree, this);
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ReferencesToParseMap, key))
+				{
+					var lowestOctree = this.parseQueue.octreesLod0ReferencesToParseMap[key];
+					//lowestOctree = octreesArray[i];
+					this.parseQueue.parseOctreesLod0References(gl, lowestOctree, this);
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }
+				}
 			}
 		}
 		
@@ -3032,38 +3169,41 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
-				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
-				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-				{ continue; }
-				
-				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList === undefined)
-				{ continue; }
-				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
-				
-				neoBuilding = lowestOctree.neoBuildingOwner;
-				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] === "v")
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ModelsToParseMap, key))
 				{
-					// parse the beta version.
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				else 
-				{
-					// parse versioned.
-					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				blocksList.dataArraybuffer = undefined;
+					var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
+					delete this.parseQueue.octreesLod0ModelsToParseMap[key];
+					if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+					{ continue; }
+					
+					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+					if (blocksList === undefined)
+					{ continue; }
+					
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
 				
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+					
+					neoBuilding = lowestOctree.neoBuildingOwner;
+					headerVersion = neoBuilding.getHeaderVersion();
+					if (headerVersion[0] === "v")
+					{
+						// parse the beta version.
+						blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					else 
+					{
+						// parse versioned.
+						blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					blocksList.dataArraybuffer = undefined;
+					
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
 		
@@ -3136,38 +3276,41 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
-				delete this.parseQueue.octreesLod0ModelsToParseMap[key];
-				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-				{ continue; }
-				
-				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList === undefined)
-				{ continue; }
-				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
-				
-				neoBuilding = lowestOctree.neoBuildingOwner;
-				headerVersion = neoBuilding.getHeaderVersion();
-				if (headerVersion[0] === "v")
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ModelsToParseMap, key))
 				{
-					// parse the beta version.
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				else 
-				{
-					// parse versioned.
-					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
-				}
-				blocksList.dataArraybuffer = undefined;
+					var lowestOctree = this.parseQueue.octreesLod0ModelsToParseMap[key];
+					delete this.parseQueue.octreesLod0ModelsToParseMap[key];
+					if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+					{ continue; }
+					
+					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+					if (blocksList === undefined)
+					{ continue; }
+					
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
 				
-				octreesParsedCount++;
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+					
+					neoBuilding = lowestOctree.neoBuildingOwner;
+					headerVersion = neoBuilding.getHeaderVersion();
+					if (headerVersion[0] === "v")
+					{
+						// parse the beta version.
+						blocksList.parseBlocksList(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					else 
+					{
+						// parse versioned.
+						blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, this.readerWriter, neoBuilding.motherBlocksArray, this);
+					}
+					blocksList.dataArraybuffer = undefined;
+					
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
 		
@@ -3210,21 +3353,24 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod2LegosToParseMap)
 			{
-				var lowestOctree = this.parseQueue.octreesLod2LegosToParseMap[key];
-				if (this.parseQueue.octreesLod2LegosToParseMap.hasOwnProperty(key))
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod2LegosToParseMap, key))
 				{
-					delete this.parseQueue.octreesLod2LegosToParseMap[key];
-					//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
-					if (lowestOctree.lego === undefined)
-					{ continue; }
-					
-					lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
-					lowestOctree.lego.dataArrayBuffer = undefined;
-					
-					octreesParsedCount++;
+					var lowestOctree = this.parseQueue.octreesLod2LegosToParseMap[key];
+					if (this.parseQueue.octreesLod2LegosToParseMap.hasOwnProperty(key))
+					{
+						delete this.parseQueue.octreesLod2LegosToParseMap[key];
+						//this.parseQueue.eraseOctreeLod2LegosToParse(lowestOctree);
+						if (lowestOctree.lego === undefined)
+						{ continue; }
+						
+						lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, this);
+						lowestOctree.lego.dataArrayBuffer = undefined;
+						
+						octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
 			}
 		}
 		
@@ -3300,38 +3446,40 @@ MagoManager.prototype.manageQueue = function()
 			//for (var i=0; i<nodessArray.length; i++)
 			for (var key in this.parseQueue.skinLegosToParseMap)
 			{
-				var node = this.parseQueue.skinLegosToParseMap[key];
-				
-				if (node.data === undefined)
-				{ continue; }
-				
-				neoBuilding = node.data.neoBuilding;
-			
-				if (neoBuilding === undefined)
-				{ continue; }
-			
-				// check the current lod of the building.***
-				var currentBuildingLod = neoBuilding.currentLod;
-				var lodIdx = currentBuildingLod - 3;
-				
-				if (lodIdx < 0)
-				{ continue; }
-				
-				skinLego = neoBuilding.lodMeshesArray[lodIdx];
-				if (skinLego === undefined)
-				{ continue; }
-				if (this.parseQueue.skinLegosToParseMap.hasOwnProperty(skinLego.legoKey))
+				if (Object.prototype.hasOwnProperty.call(this.parseQueue.skinLegosToParseMap, key)) 
 				{
-					delete this.parseQueue.skinLegosToParseMap[skinLego.legoKey];
-					skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, this);
-					skinLego.dataArrayBuffer = undefined;
+					var node = this.parseQueue.skinLegosToParseMap[key];
+				
+					if (node.data === undefined)
+					{ continue; }
 					
-					octreesParsedCount++;
+					neoBuilding = node.data.neoBuilding;
+				
+					if (neoBuilding === undefined)
+					{ continue; }
+				
+					// check the current lod of the building.***
+					var currentBuildingLod = neoBuilding.currentLod;
+					var lodIdx = currentBuildingLod - 3;
+					
+					if (lodIdx < 0)
+					{ continue; }
+					
+					skinLego = neoBuilding.lodMeshesArray[lodIdx];
+					if (skinLego === undefined)
+					{ continue; }
+					if (this.parseQueue.skinLegosToParseMap.hasOwnProperty(skinLego.legoKey))
+					{
+						delete this.parseQueue.skinLegosToParseMap[skinLego.legoKey];
+						skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, this);
+						skinLego.dataArrayBuffer = undefined;
+						
+						octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }
 			}
-			
 		}
 	}
 };
@@ -3573,29 +3721,32 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 			///for (var changeHistory of moveHistoryMap.values()) 
 			for (var key in moveHistoryMap)
 			{
-				var changeHistory = moveHistoryMap[key];
-				objectIndexOrder = changeHistory.getObjectIndexOrder();
-				refObject = neoBuilding.getReferenceObject(objectIndexOrder);
-				if (refObject === undefined)
-				{ continue; }
-				
-				if (refObject.moveVector === undefined)
-				{ refObject.moveVector = new Point3D(); }
-				
-				if (refObject.moveVectorRelToBuilding === undefined)
-				{ refObject.moveVectorRelToBuilding = new Point3D(); }
-				
-				moveVector = changeHistory.getReferenceObjectAditionalMovement();
-				moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
-				refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
-				refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
-				
-				// now check if the building was rotated.
-				// if was rotated then recalculate the move vector.
-				refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
-				
-				// if was no rotated, then set the moveVector of the changeHistory.
-				//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+				if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key)) 
+				{
+					var changeHistory = moveHistoryMap[key];
+					objectIndexOrder = changeHistory.getObjectIndexOrder();
+					refObject = neoBuilding.getReferenceObject(objectIndexOrder);
+					if (refObject === undefined)
+					{ continue; }
+					
+					if (refObject.moveVector === undefined)
+					{ refObject.moveVector = new Point3D(); }
+					
+					if (refObject.moveVectorRelToBuilding === undefined)
+					{ refObject.moveVectorRelToBuilding = new Point3D(); }
+					
+					moveVector = changeHistory.getReferenceObjectAditionalMovement();
+					moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
+					refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+					refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+					
+					// now check if the building was rotated.
+					// if was rotated then recalculate the move vector.
+					refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
+					
+					// if was no rotated, then set the moveVector of the changeHistory.
+					//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);	
+				}
 			}
 		}
 	}
@@ -3691,59 +3842,62 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 			//for (var changeHistory of colorChangedHistoryMap.values()) 
 			for (var key in colorChangedHistoryMap)
 			{
-				var changeHistory = colorChangedHistoryMap[key];
-				if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
+				if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
 				{
-					if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+					var changeHistory = colorChangedHistoryMap[key];
+					if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
 					{
-						// change color for all node.
-						neoBuilding.isColorChanged = true;
-						if (neoBuilding.aditionalColor === undefined)
-						{ neoBuilding.aditionalColor = new Color(); }
-						
-						neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-					}
-					else 
-					{
-						// there are properties.
-						var nodesArray = [];
-						node.extractNodes(nodesArray);
-						var nodesCount = nodesArray.length;
-						var aNode;
-						for (var i=0; i<nodesCount; i++)
+						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 						{
-							aNode = nodesArray[i];
-							var propertyKey = changeHistory.propertyKey;
-							var propertyValue = changeHistory.propertyValue;
-							// 1rst, check if this has the same "key" and same "value".
-							if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+							// change color for all node.
+							neoBuilding.isColorChanged = true;
+							if (neoBuilding.aditionalColor === undefined)
+							{ neoBuilding.aditionalColor = new Color(); }
+							
+							neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+						}
+						else 
+						{
+							// there are properties.
+							var nodesArray = [];
+							node.extractNodes(nodesArray);
+							var nodesCount = nodesArray.length;
+							var aNode;
+							for (var i=0; i<nodesCount; i++)
 							{
-								neoBuilding.isColorChanged = true;
-								if (neoBuilding.aditionalColor === undefined)
-								{ neoBuilding.aditionalColor = new Color(); }
-								
-								neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+								aNode = nodesArray[i];
+								var propertyKey = changeHistory.propertyKey;
+								var propertyValue = changeHistory.propertyValue;
+								// 1rst, check if this has the same "key" and same "value".
+								if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+								{
+									neoBuilding.isColorChanged = true;
+									if (neoBuilding.aditionalColor === undefined)
+									{ neoBuilding.aditionalColor = new Color(); }
+									
+									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+								}
 							}
 						}
 					}
-				}
-				else 
-				{
-					// change color for an object.
-					var objectId = changeHistory.objectId;
-					var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if (objectsArray)
+					else 
 					{
-						var objectsCount = objectsArray.length;
-						for (var j=0; j<objectsCount; j++)
+						// change color for an object.
+						var objectId = changeHistory.objectId;
+						var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+						if (objectsArray)
 						{
-							var object = objectsArray[j];
-							if (object.aditionalColor === undefined)
-							{ object.aditionalColor = new Color(); }
-							
-							object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							var objectsCount = objectsArray.length;
+							for (var j=0; j<objectsCount; j++)
+							{
+								var object = objectsArray[j];
+								if (object.aditionalColor === undefined)
+								{ object.aditionalColor = new Color(); }
+								
+								object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							}
 						}
-					}
+					}	
 				}
 			}
 		}
@@ -3754,79 +3908,86 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 	{
 		for (var key in allColorHistoryMap) 
 		{
-			var colorChangedHistoryMap = allColorHistoryMap[key];
-			//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
-			//{
-			// now check nodes that is no physical.
-			for (var key2 in colorChangedHistoryMap) 
+			if (Object.prototype.hasOwnProperty.call(allColorHistoryMap, key))
 			{
-				var changeHistoryMap = colorChangedHistoryMap[key2];
-				//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+				var colorChangedHistoryMap = allColorHistoryMap[key];
+				//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
 				//{
-				for (var key3 in changeHistoryMap) 
+				// now check nodes that is no physical.
+				for (var key2 in colorChangedHistoryMap) 
 				{
-					var changeHistory = changeHistoryMap[key3];
-					//for (var changeHistory of changeHistoryMap.values()) 
-					//{
-					var projectId = changeHistory.projectId;
-					var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-					var aNode = nodesMap[changeHistory.dataKey];
-					if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
+					if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key2))
 					{
-						// must check if there are filters.
-						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+						var changeHistoryMap = colorChangedHistoryMap[key2];
+						//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+						//{
+						for (var key3 in changeHistoryMap) 
 						{
-							// this is a no physical node, so must check children.
-							var nodesArray = [];
-							aNode.extractNodes(nodesArray);
-							var nodesCount = nodesArray.length;
-							for (var i=0; i<nodesCount; i++)
+							if (Object.prototype.hasOwnProperty.call(changeHistoryMap, key3))
 							{
-								var aNode2 = nodesArray[i];
-								neoBuilding = aNode2.data.neoBuilding;
-								if (neoBuilding)
+								var changeHistory = changeHistoryMap[key3];
+								//for (var changeHistory of changeHistoryMap.values()) 
+								//{
+								var projectId = changeHistory.projectId;
+								var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+								var aNode = nodesMap[changeHistory.dataKey];
+								if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
 								{
-									neoBuilding.isColorChanged = true;
-									if (neoBuilding.aditionalColor === undefined)
-									{ neoBuilding.aditionalColor = new Color(); }
-									
-									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-								}
-							}
-						}
-						else 
-						{
-							
-							var propertyKey = changeHistory.propertyKey;
-							var propertyValue = changeHistory.propertyValue;
-								
-							// this is a no physical node, so must check children.
-							var nodesArray = [];
-							aNode.extractNodes(nodesArray);
-							var nodesCount = nodesArray.length;
-							for (var i=0; i<nodesCount; i++)
-							{
-								var aNode2 = nodesArray[i];
-								neoBuilding = aNode2.data.neoBuilding;
-								if (neoBuilding)
-								{
-									if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+									// must check if there are filters.
+									if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 									{
-										neoBuilding.isColorChanged = true;
-										if (neoBuilding.aditionalColor === undefined)
-										{ neoBuilding.aditionalColor = new Color(); }
-										
-										neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+										// this is a no physical node, so must check children.
+										var nodesArray = [];
+										aNode.extractNodes(nodesArray);
+										var nodesCount = nodesArray.length;
+										for (var i=0; i<nodesCount; i++)
+										{
+											var aNode2 = nodesArray[i];
+											neoBuilding = aNode2.data.neoBuilding;
+											if (neoBuilding)
+											{
+												neoBuilding.isColorChanged = true;
+												if (neoBuilding.aditionalColor === undefined)
+												{ neoBuilding.aditionalColor = new Color(); }
+												
+												neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+											}
+										}
 									}
-								}
+									else 
+									{
+										var propertyKey = changeHistory.propertyKey;
+										var propertyValue = changeHistory.propertyValue;
+											
+										// this is a no physical node, so must check children.
+										var nodesArray = [];
+										aNode.extractNodes(nodesArray);
+										var nodesCount = nodesArray.length;
+										for (var i=0; i<nodesCount; i++)
+										{
+											var aNode2 = nodesArray[i];
+											neoBuilding = aNode2.data.neoBuilding;
+											if (neoBuilding)
+											{
+												if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+												{
+													neoBuilding.isColorChanged = true;
+													if (neoBuilding.aditionalColor === undefined)
+													{ neoBuilding.aditionalColor = new Color(); }
+													
+													neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+												}
+											}
+										}
+									}
+								}	
 							}
-						}
+						}	
 					}
-				}
+				}	
 			}
 		}
 	}
-	
 };
 
 /**
@@ -4369,9 +4530,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color) 
 {
 	var node;
-	var currentShader = this.postFxShadersManager.pFx_shaders_array[12]; // box ssao.***
+	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // box ssao.***
 	var shaderProgram = currentShader.program;
 	gl.enable(gl.BLEND);
+	gl.frontFace(gl.CCW);
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -4437,7 +4599,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color)
 		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-		this.renderer.renderTriPolyhedron(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
+		this.renderer.renderObject(gl, this.unitaryBoxSC, this, currentShader, ssao_idx);
 	}
 	
 	if (currentShader)
@@ -4729,544 +4891,6 @@ MagoManager.prototype.reCalculateModelViewProjectionRelToEyeMatrix = function(sc
 	var modelViewProjectionRelToEye = new Cesium.Matrix4();
 	Cesium.Matrix4.multiply(scene.context._us._projection, modelViewRelToEye, modelViewProjectionRelToEye);
 	Cesium.Matrix4.toArray(modelViewProjectionRelToEye, this.modelViewProjRelToEye_matrix);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param scene 변수
- * @param isLastFrustum 변수
- */
-MagoManager.prototype.renderTerranTileServiceFormatPostFxShader = function(scene, isLastFrustum) 
-{
-	if (!isLastFrustum) { return; }
-	if (this.isCameraInsideNeoBuilding) { return; }
-
-	var gl = scene.context._gl;
-	var cameraPosition = scene.context._us._cameraPosition;
-	var cullingVolume = scene._frameState.cullingVolume;
-	//	var modelViewProjectionRelativeToEye = scene.context._us._modelViewProjectionRelativeToEye;
-
-	gl.disable(gl.CULL_FACE);
-
-	// Check if camera was moved considerably for update the renderables objects.***
-	if (this.detailed_building) 
-	{
-		this.squareDistUmbral = 4.5*4.5;
-	}
-	else 
-	{
-		this.squareDistUmbral = 50*50;
-	}
-	this.isCameraMoved(cameraPosition, this.squareDistUmbral);
-
-	if (this.depthFbo === undefined) { this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); }
-	if (this.ssaoFbo === undefined) { this.ssaoFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight); } // no used.***
-
-	// Another check for depthBuffer.***
-	if (this.depthFbo.width !== scene.drawingBufferWidth || this.depthFbo.height !== scene.drawingBufferHeight) 
-	{
-		this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	}
-
-	//if(cameraMoved && !this.isCameraMoving)
-	if (!this.isCameraMoving) 
-	{
-		this.currentVisibleBuildings_array.length = 0; // Init.***
-		this.currentVisibleBuildings_LOD0_array.length = 0; // Init.***
-		this.detailed_building;
-
-		//this.doFrustumCulling(cullingVolume, this.currentVisibleBuildings_array, cameraPosition); // delete this.***
-		this.doFrustumCullingTerranTileServiceFormat(gl, cullingVolume, this.currentVisibleBuildings_array, cameraPosition);
-	}
-
-	// Calculate "modelViewProjectionRelativeToEye".*********************************************************
-	this.reCalculateModelViewProjectionRelToEyeMatrix(scene);
-
-	//Cesium.Matrix4.toArray(_modelViewProjectionRelativeToEye, this.modelViewProjRelToEye_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._modelViewRelativeToEye, this.modelViewRelToEye_matrix); // Original.***
-	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix);
-	//End Calculate "modelViewProjectionRelativeToEye".------------------------------------------------------
-
-	// Calculate encodedCamPosMC high and low values.********************************************************
-	this.calculateEncodedCameraPositionMCHighLow(this.encodedCamPosMC_High, this.encodedCamPosMC_Low, cameraPosition);
-
-	// *************************************************************************************************************************************************
-	// Now, render the detailed building if exist.******************************************************************************************************
-	// This is OLD.************************************
-	var currentShader;
-	if (this.detailed_building && isLastFrustum) 
-	{
-		currentShader = this.shadersManager.getMagoShader(0);
-		//this.render_DetailedBuilding(gl, cameraPosition, _modelViewProjectionRelativeToEye, scene, currentShader);
-	}
-	// End render the detailed building if exist.---------------------------------------------------------------------------------------------------------------
-	// ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	// Save the cesium framebuffer.***
-	//	var cesium_frameBuffer = scene._context._currentFramebuffer._framebuffer;
-	//var cesium_frameBuffer = scene._context._currentFramebuffer;
-
-	// Now, render the simple visible buildings.***************************************************************************
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-
-	var shaderProgram;
-
-	// Calculate the normal_matrix.***
-	//https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Lighting_in_Webgl
-	// this code must be executed if the camera was moved.***
-	this.isCameraMoved(cameraPosition, 10);
-	//if(cameraLittleMoved)
-	//	{
-	var mvMat = scene._context._us._modelView; // original.***
-	//var mvMat = scene._context._us._modelViewRelativeToEye;
-	//mvMat[12] = 0.0;
-	//mvMat[13] = 0.0;
-	//mvMat[14] = 0.0;
-	var mvMat_inv = new Cesium.Matrix4();
-	mvMat_inv = Cesium.Matrix4.inverseTransformation(mvMat, mvMat_inv);
-	//var normalMat = new Cesium.Matrix4();
-	this.normalMat4 = Cesium.Matrix4.transpose(mvMat_inv, this.normalMat4);// Original.***
-	//this.normalMat4 = Cesium.Matrix4.clone(mvMat_inv, this.normalMat4);
-	this.normalMat3 = Cesium.Matrix4.getRotation(this.normalMat4, this.normalMat3);
-	//	}
-
-	Cesium.Matrix3.toArray(this.normalMat3, this.normalMat3_array);
-	Cesium.Matrix4.toArray(this.normalMat4, this.normalMat4_array);
-	//gl.uniformMatrix3fv(currentShader._NormalMatrix, false, this.normalMat3_array);
-
-	if (this.isCameraMoving) 
-	{
-		this.dateSC = new Date();
-		this.currentTimeSC;
-		this.startTimeSC = this.dateSC.getTime();
-	}
-
-	this.currentVisibleBuildingsPost_array.length = 0;
-
-	var filePath_scratch = "";
-	var camera = scene._camera;
-	var frustum = camera.frustum;
-	//	var current_frustum_near = scene._context._us._currentFrustum.x;
-	var current_frustum_far = scene._context._us._currentFrustum.y;
-	current_frustum_far = 5000.0;
-
-	// Depth render.********************************************************
-	// Depth render.********************************************************
-	// Depth render.********************************************************
-	this.depthFbo.bind(); // DEPTH START.**************************************************************************************************************************************************
-	gl.clearColor(0, 0, 0, 1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.viewport(0, 0, this.depthFbo.width, this.depthFbo.height);
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[0];
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-	//gl.enableVertexAttribArray(currentShader.texCoord2_loc); // no use texcoords.***
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.modelViewRelToEye_matrix); // original.***
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-
-	gl.uniform1f(currentShader.near_loc, frustum._near);
-	//gl.uniform1f(currentShader.far_loc, frustum._far);	// Original (bad)..***
-	gl.uniform1f(currentShader.far_loc, current_frustum_far); // test (best)..***
-
-	gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-
-	//gl.uniform1i(currentShader.useRefTransfMatrix_loc, false, false);
-
-	// LOD0 BUILDINGS.***************************************************************************************************************
-
-	// Now, render LOD0 texture buildings.***
-	var LOD0_projectsCount = this.currentVisibleBuildings_LOD0_array.length;
-	for (var i=0; i<LOD0_projectsCount; i++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_LOD0_array[i];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-			else if (!BR_Project._f4d_lod0Image_readed && BR_Project._f4d_nailImage_readed_finished && BR_Project._f4d_lod0Image_exists) 
-			{
-				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
-				{
-					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
-
-					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
-					this.backGround_fileReadings_count ++;
-
-				}
-				//continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1) 
-		{
-			//renderSimpleBuildingV1PostFxShader
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-			/*
-			if(BR_Project._f4d_lod0Image_exists)
-			{
-				if(BR_Project._f4d_lod0Image_readed_finished)
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 0 = lod0.***
-
-				else if(BR_Project._f4d_nailImage_readed_finished)
-				{
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-				}
-			}
-			else if(BR_Project._f4d_nailImage_readed_finished)
-			{
-				this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-			}
-			*/
-		}
-	}
-
-	var projects_count = this.currentVisibleBuildings_array.length;
-	for (var p_counter = 0; p_counter<projects_count; p_counter++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_array[p_counter];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished) 
-		{
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, -1, currentShader); // 3 = lod3.***
-		}
-	}
-	//gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	gl.disableVertexAttribArray(currentShader.normal3_loc);
-	this.depthFbo.unbind(); // DEPTH END.*****************************************************************************************************************************************************************
-
-	// Now, ssao.************************************************************
-	scene._context._currentFramebuffer._bind();
-
-	if (this.depthFbo.width !== scene.drawingBufferWidth || this.depthFbo.height !== scene.drawingBufferHeight) 
-	{
-		this.depthFbo = new FBO(gl, scene.drawingBufferWidth, scene.drawingBufferHeight);
-	}
-
-	//this.ssaoFbo.bind();// SSAO START.********************************************************************************************************************************************************************
-	gl.clearColor(0, 0, 0, 1);
-	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.viewport(0, 0, scene.drawingBufferWidth, scene.drawingBufferHeight);
-
-	if (this.noiseTexture === undefined) { this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[1];
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.modelViewProjRelToEye_matrix);
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.encodedCamPosMC_High);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.encodedCamPosMC_Low);
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix); // original.***
-
-	gl.uniform1f(currentShader.near_loc, frustum._near);
-	//gl.uniform1f(currentShader.far_loc, frustum._far); // Original.***
-	gl.uniform1f(currentShader.far_loc, current_frustum_far); // test.***
-
-	gl.uniformMatrix3fv(currentShader.normalMatrix3_loc, false, this.normalMat3_array);
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.normalMat4_array);
-
-	gl.uniform1i(currentShader.depthTex_loc, 0);
-	gl.uniform1i(currentShader.noiseTex_loc, 1);
-	gl.uniform1i(currentShader.diffuseTex_loc, 2);
-	gl.uniform1f(currentShader.fov_loc, frustum._fovy);	// "frustum._fov" is in radians.***
-	gl.uniform1f(currentShader.aspectRatio_loc, frustum._aspectRatio);
-	gl.uniform1f(currentShader.screenWidth_loc, scene.drawingBufferWidth);	//scene._canvas.width, scene._canvas.height
-	gl.uniform1f(currentShader.screenHeight_loc, scene.drawingBufferHeight);
-	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFbo.width/this.noiseTexture.width, this.depthFbo.height/this.noiseTexture.height]);
-	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.depthFbo.colorBuffer);  // original.***
-	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-
-	// LOD0 BUILDINGS.***************************************************************************************************************
-	// Now, render LOD0 texture buildings.***
-	var LOD0_projectsCount = this.currentVisibleBuildings_LOD0_array.length;
-	for (var i=0; i<LOD0_projectsCount; i++) 
-	{
-		var BR_Project = this.currentVisibleBuildings_LOD0_array[i];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-			else if (!BR_Project._f4d_lod0Image_readed && BR_Project._f4d_nailImage_readed_finished && BR_Project._f4d_lod0Image_exists) 
-			{
-				if (!this.isCameraMoving && this.backGround_fileReadings_count < 1) 
-				{
-					//filePath_scratch = this.readerWriter.getCurrentDataPath() +"/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-					filePath_scratch = this.readerWriter.getCurrentDataPath() + Constant.RESULT_XDO2F4D + BR_Project._header._global_unique_id + ".jpg";
-
-					this.readerWriter.readNailImage(gl, filePath_scratch, BR_Project, this.readerWriter, this, 0);
-					this.backGround_fileReadings_count ++;
-				}
-				//continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1) 
-		{
-			//renderSimpleBuildingV1PostFxShader
-			if (BR_Project._f4d_lod0Image_exists) 
-			{
-				if (BR_Project._f4d_lod0Image_readed_finished) { this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 0, currentShader); } // 0 = lod0.***
-				else if (BR_Project._f4d_nailImage_readed_finished) 
-				{
-					this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-				}
-			}
-			else if (BR_Project._f4d_nailImage_readed_finished) 
-			{
-				this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-			}
-		}
-	}
-
-	var projects_count = this.currentVisibleBuildings_array.length;
-	for (var p_counter = 0; p_counter<projects_count; p_counter++) 
-	{
-		/*
-		if(!isLastFrustum && this.isCameraMoving && timeControlCounter === 0)
-		{
-			date = new Date();
-			currentTime = date.getTime();
-			secondsUsed = currentTime - startTime;
-			if(secondsUsed > 20) // miliseconds.***
-			{
-				gl.disableVertexAttribArray(shader._texcoord);
-				gl.disableVertexAttribArray(shader._position);
-				return;
-			}
-		}
-		*/
-
-		var BR_Project = this.currentVisibleBuildings_array[p_counter];
-
-		//if(!this.isCameraMoving)
-		//		{
-		// Check if this building has readed 1- Header, 2- SimpBuilding, 3- NailImage.******************************
-		if (BR_Project._header._f4d_version === 2) 
-		{
-			//if(!BR_Project._f4d_nailImage_readed && BR_Project._f4d_simpleBuilding_readed_finished)
-			var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-			if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0]._verticesArray_cacheKey === null) 
-			{
-				this.createFirstTimeVBOCacheKeys(gl, BR_Project);
-				continue;
-			}
-			else if (!BR_Project._f4d_nailImage_readed) 
-			{
-				if (this.backGround_imageReadings_count < 100) 
-				{
-					this.backGround_imageReadings_count++;
-					BR_Project._f4d_nailImage_readed = true;
-
-					var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-					this.readerWriter.readNailImageOfArrayBuffer(gl, simpBuildingV1.textureArrayBuffer, BR_Project, this.readerWriter, this, 3);
-				}
-				continue;
-			}
-		}
-		else 
-		{
-			this.currentVisibleBuildingsPost_array.push(BR_Project);
-		}
-
-		//		}
-
-		//if(BR_Project._simpleBuilding_v1 && BR_Project._f4d_simpleBuilding_readed_finished)// Original.***
-		// Test
-		if (BR_Project._simpleBuilding_v1 && BR_Project._f4d_nailImage_readed_finished) 
-		{
-			this.renderer.renderSimpleBuildingV1PostFxShader(gl, BR_Project, this, 3, currentShader); // 3 = lod3.***
-		}
-		/*
-		if(this.isCameraMoving)
-		{
-			this.dateSC = new Date();
-			this.currentTimeSC = this.dateSC.getTime();
-			if(this.currentTimeSC-this.startTimeSC > this.maxMilisecondsForRender)
-			{
-				gl.disableVertexAttribArray(shader._texcoord);
-				gl.disableVertexAttribArray(shader._position);
-				return;
-			}
-		}
-		*/
-	}
-
-	gl.activeTexture(gl.TEXTURE0);
-	//this.ssaoFbo.unbind();
-
-	gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	gl.disableVertexAttribArray(currentShader.normal3_loc);
-	//this.ssaoFbo.unbind();// SSAO END.********************************************************************************************************************************************************************
-
-	// Now, blur.************************************************************
-	/*
-	scene._context._currentFramebuffer._bind();
-
-	Cesium.Matrix4.toArray(scene._context._us._modelView, this.modelView_matrix);
-	Cesium.Matrix4.toArray(scene._context._us._projection, this.projection_matrix);
-
-	currentShader = this.postFxShadersManager.pFx_shaders_array[2]; // blur.***
-
-	shaderProgram = currentShader.program;
-	gl.useProgram(shaderProgram);
-
-	gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	//gl.enableVertexAttribArray(currentShader.normal3_loc);
-
-	this.modelView_matrix[12] = 0.0;
-	this.modelView_matrix[13] = 0.0;
-	this.modelView_matrix[14] = 0.0;
-
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.projection_matrix);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.modelView_matrix);
-
-	gl.uniform1i(currentShader.colorTex_loc, 0);
-	gl.uniform2fv(currentShader.texelSize_loc, [1/this.ssaoFbo.width, 1/this.ssaoFbo.height]);
-	gl.activeTexture(gl.TEXTURE0);
-	//gl.bindTexture(gl.TEXTURE_2D, this.ssaoFbo.colorBuffer); // original.***
-	gl.bindTexture(gl.TEXTURE_2D, scene._context._currentFramebuffer.colorBuffer);
-	//scene._context._currentFramebuffer._bind();
-	this.ssaoFSQuad.draw(currentShader, gl);
-	gl.activeTexture(gl.TEXTURE0);
-
-	gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-	gl.disableVertexAttribArray(currentShader.position3_loc);
-	//gl.disableVertexAttribArray(currentShader.normal3_loc);
-	*/
-	// END BLUR.**************************************************************************************************************************************************************************************************************
-
-	gl.viewport(0, 0, scene._canvas.width, scene._canvas.height);
-
-	scene._context._currentFramebuffer._bind();
-	//this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, cesium_frameBuffer);
-	// Render the lasts simpleBuildings.***
-
-	var last_simpBuilds_count = this.currentVisibleBuildingsPost_array.length;
-
-	for (var i=0; i<last_simpBuilds_count; i++) 
-	{
-		this.renderer.render_F4D_simpleBuilding(	gl, this.currentVisibleBuildingsPost_array[i], this.modelViewProjRelToEye_matrix,
-			this.encodedCamPosMC_High, this.encodedCamPosMC_Low, this.shadersManager);
-	}
-
-	//gl.useProgram(null);
-	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
 /**
@@ -5897,7 +5521,7 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
-				if(version[0] === 'v')
+				if (version[0] === 'v')
 				{
 					if (distToCamera < lod0_minDist) 
 					{
@@ -5916,31 +5540,32 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 						this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
 					}
 				}
-				else{
+				else 
+				{
 					if (distToCamera < lod0_minDist) 
 					{
 						// check if the lod0, lod1, lod2 are modelReference type.***
 						var lodBuildingData = neoBuilding.getLodBuildingData(0);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles0, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod1_minDist) 
 					{
 						var lodBuildingData = neoBuilding.getLodBuildingData(1);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles1, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod2_minDist) 
 					{
 						var lodBuildingData = neoBuilding.getLodBuildingData(2);
-						if(lodBuildingData && lodBuildingData.isModelRef)
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node);
+						if (lodBuildingData && lodBuildingData.isModelRef)
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles2, node); }
 						else
-							this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node);
+						{ this.putNodeToArraySortedByDist(this.visibleObjControlerNodes.currentVisibles3, node); }
 					}
 					else if (distToCamera < lod5_minDist) 
 					{
@@ -6009,7 +5634,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (geoLocDataManager === undefined)
 	{ 
 		geoLoc = this.calculate_geoLocDataOfNode(node);
-		if(geoLoc === undefined)
+		if (geoLoc === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return; 
@@ -6680,9 +6305,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
 		
-		if(node.data.nodeId === "7M6_31")
-			var hola = 0;
-		
 		if (attributes.isPhysical)
 		{
 			// find the buildingSeed.
@@ -6985,36 +6607,45 @@ MagoManager.prototype.callAPI = function(api)
 		
 		for (var key_projectId in moveHistoryMap)
 		{
-			var projectId = key_projectId;
-			var buildingsMap = moveHistoryMap[projectId];
-			if (buildingsMap === undefined)
-			{ continue; }
-			
-			for (var key_dataKey in buildingsMap)
+			if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key_projectId))
 			{
-				var dataKey = key_dataKey;
-				var dataValue = buildingsMap[key_dataKey];
-				
-				if (dataValue === undefined)
+				var projectId = key_projectId;
+				var buildingsMap = moveHistoryMap[projectId];
+				if (buildingsMap === undefined)
 				{ continue; }
 				
-				for (var objectIdx in dataValue)
+				for (var key_dataKey in buildingsMap)
 				{
-					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if (node === undefined || node.data === undefined)
-					{ continue; }
-					
-					var neoBuilding = node.data.neoBuilding;
-					if (neoBuilding === undefined)
-					{ continue; }
-					
-					var refObject = neoBuilding.getReferenceObject(objectIdx);
-					if (refObject)
+					if (Object.prototype.hasOwnProperty.call(buildingsMap, key_dataKey))
 					{
-						refObject.moveVector = undefined;
-						refObject.moveVectorRelToBuilding = undefined;
+						var dataKey = key_dataKey;
+						var dataValue = buildingsMap[key_dataKey];
+						
+						if (dataValue === undefined)
+						{ continue; }
+						
+						for (var objectIdx in dataValue)
+						{
+							if (Object.prototype.hasOwnProperty.call(dataValue, objectIdx))
+							{
+								var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+								if (node === undefined || node.data === undefined)
+								{ continue; }
+								
+								var neoBuilding = node.data.neoBuilding;
+								if (neoBuilding === undefined)
+								{ continue; }
+								
+								var refObject = neoBuilding.getReferenceObject(objectIdx);
+								if (refObject)
+								{
+									refObject.moveVector = undefined;
+									refObject.moveVectorRelToBuilding = undefined;
+								}	
+							}
+						}	
 					}
-				}
+				}	
 			}
 		}
 		
@@ -7033,42 +6664,51 @@ MagoManager.prototype.callAPI = function(api)
 		
 		for (var key_projectId in colorHistoryMap)
 		{
-			var projectId = key_projectId;
-			var buildingsMap = colorHistoryMap[projectId];
-			if (buildingsMap === undefined)
-			{ continue; }
-			
-			for (var key_dataKey in buildingsMap)
+			if (Object.prototype.hasOwnProperty.call(colorHistoryMap, key_projectId))
 			{
-				var dataKey = key_dataKey;
-				var dataValue = buildingsMap[key_dataKey];
-				if (dataValue === undefined)
+				var projectId = key_projectId;
+				var buildingsMap = colorHistoryMap[projectId];
+				if (buildingsMap === undefined)
 				{ continue; }
 				
-				for (var objectId in dataValue)
+				for (var key_dataKey in buildingsMap)
 				{
-					var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-					if (node === undefined || node.data === undefined)
-					{ continue; }
-					
-					var neoBuilding = node.data.neoBuilding;
-					if (neoBuilding === undefined)
-					{ continue; }
-					
-					var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-					if (refObjectArray === undefined)
-					{ continue; }
-					
-					var refObjectsCount = refObjectArray.length;
-					for (var i=0; i<refObjectsCount; i++)
+					if (Object.prototype.hasOwnProperty.call(buildingsMap, key_dataKey))
 					{
-						var refObject = refObjectArray[i];
-						if (refObject)
+						var dataKey = key_dataKey;
+						var dataValue = buildingsMap[key_dataKey];
+						if (dataValue === undefined)
+						{ continue; }
+						
+						for (var objectId in dataValue)
 						{
-							refObject.aditionalColor = undefined;
-						}
+							if (Object.prototype.hasOwnProperty.call(dataValue, objectId))
+							{
+								var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+								if (node === undefined || node.data === undefined)
+								{ continue; }
+								
+								var neoBuilding = node.data.neoBuilding;
+								if (neoBuilding === undefined)
+								{ continue; }
+								
+								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+								if (refObjectArray === undefined)
+								{ continue; }
+								
+								var refObjectsCount = refObjectArray.length;
+								for (var i=0; i<refObjectsCount; i++)
+								{
+									var refObject = refObjectArray[i];
+									if (refObject)
+									{
+										refObject.aditionalColor = undefined;
+									}
+								}	
+							}
+						}	
 					}
-				}
+				}	
 			}
 		}
 		
@@ -7272,7 +6912,7 @@ MagoManager.prototype.callAPI = function(api)
 		//}
 		
 		var nodeMap = this.hierarchyManager.getNodesMap(projectId);
-		if (Object.keys(nodeMap).length == 0)
+		if (Object.keys(nodeMap).length === 0)
 		{
 			var projectDataFolder = api.getProjectDataFolder();
 			this.getObjectIndexFile(projectId, projectDataFolder);

@@ -37,12 +37,12 @@ Arc.prototype.deleteObjects = function()
  * Set the center position of arc.
  * @class Arc
  */
-Arc.prototype.setCenterPosition = function(cx, cy, cz)
+Arc.prototype.setCenterPosition = function(cx, cy)
 {
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point3D();
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point2D(); }
 	
-	this.centerPoint.set(cx, cy, cz);
+	this.centerPoint.set(cx, cy);
 };
 
 /**
@@ -78,50 +78,81 @@ Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
  */
 Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
-	if(pointsCountFor360Deg === undefined)
+	if(pointsCountFor360Deg)
+		this.numPointsFor360Deg = pointsCountFor360Deg
+
+	if(this.numPointsFor360Deg === undefined)
 		this.numPointsFor360Deg = 36;
-	else
-		this.numPointsFor360Deg = pointsCountFor360Deg;
-	
+
 	if(resultPointsArray === undefined)
 		resultPointsArray = [];
+
+	
+	var pointsArray = [];
 	
 	var increAngRad = 2.0 * Math.PI / this.numPointsFor360Deg;
 	var cx = this.centerPoint.x;
 	var cy = this.centerPoint.y;
-	var cz = this.centerPoint.z;
 	var x, y;
-	var z = 0;
 	var startAngRad = Math.PI/180.0 * this.startAngleDeg;
 	var sweepAngRad = Math.PI/180.0 * this.sweepAngleDeg;
 	var point;
 	
-	if(sweepAngRad >=0)
+	if (sweepAngRad >=0)
 	{
-		for(var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
+		for (var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
-			point = new Point3D(x, y, z);
-			resultPointsArray.push(point);
+			point = new Point2D(x, y);
+			pointsArray.push(point);
 		}
 	}
-	else{
-		for(var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
+	else 
+	{
+		for (var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
 		{
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
-			point = new Point3D(x, y, z);
-			resultPointsArray.push(point);
+			point = new Point2D(x, y);
+			pointsArray.push(point);
 		}
 	}
 	
 	// once finished, mark the 1rst point and the last point as"important point".***
-	var pointsCount = resultPointsArray.length;
+	var pointsCount = pointsArray.length;
 	if(pointsCount > 0)
 	{
-		resultPointsArray[0].pointType = 1;
-		resultPointsArray[pointsCount-1].pointType = 1;
+		pointsArray[0].pointType = 1;
+		pointsArray[pointsCount-1].pointType = 1;
+	}
+	
+	// now merge points into "resultPointsArray".***
+	var errorDist = 0.0001; // 0.1mm.***
+	var resultExistentPointsCount = resultPointsArray.length;
+	for(var i=0; i<pointsCount; i++)
+	{
+		if(i===0)
+		{
+			if(resultExistentPointsCount > 0)
+			{
+				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
+				point = pointsArray[i];
+				if(!lastExistentPoint.isCoincidentToPoint(point, errorDist))
+				{
+					resultPointsArray.push(point);
+				}
+			}
+			else
+			{
+				resultPointsArray.push(pointsArray[i]);
+			}
+		}
+		else
+		{
+			resultPointsArray.push(pointsArray[i]);
+		}
 	}
 	
 	return resultPointsArray;

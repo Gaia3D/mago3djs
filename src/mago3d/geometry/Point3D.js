@@ -11,20 +11,20 @@ var Point3D = function(x, y, z)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	if(x !== undefined)
-		this.x = x;
+	if (x !== undefined)
+	{ this.x = x; }
 	else
-		this.x = 0.0;
+	{ this.x = 0.0; }
 	
-	if(y !== undefined)
-		this.y = y;
+	if (y !== undefined)
+	{ this.y = y; }
 	else
-		this.y = 0.0;
+	{ this.y = 0.0; }
 	
-	if(z !== undefined)
-		this.z = z;
+	if (z !== undefined)
+	{ this.z = z; }
 	else
-		this.z = 0.0;
+	{ this.z = 0.0; }
 	
 	this.pointType; // 1 = important point.***
 };
@@ -99,6 +99,62 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
 };
 
 /**
+ * nomal 계산
+ * @param point 변수
+ * @param resultPoint 변수
+ * @returns resultPoint
+ */
+Point3D.prototype.scalarProduct = function(point) 
+{
+	var scalarProd = this.x*point.x + this.y*point.y + this.z*point.z;
+	return scalarProd;
+};
+
+/**
+ * nomal 계산
+ * @param point 변수
+ * @param resultPoint 변수
+ * @returns resultPoint
+ */
+Point3D.prototype.angleRadToVector = function(vector) 
+{
+	if(vector === undefined)
+		return undefined;
+	
+	//******************************************************
+	//var scalarProd = this.scalarProd(vector);
+	//var myModul = this.modul();
+	//var vecModul = vector.modul();
+	
+	// calcule by cos.***
+	//var cosAlfa = scalarProd / (myModul * vecModul); 
+	//var angRad = Math.acos(cosAlfa);
+	//var angDeg = alfa * 180.0/Math.PI;
+	//------------------------------------------------------
+	
+	return Math.acos(this.scalarProd(vector) / (this.modul() * vector.modul()));
+};
+
+/**
+ * nomal 계산
+ * @param point 변수
+ * @param resultPoint 변수
+ * @returns resultPoint
+ */
+Point3D.prototype.angleDegToVector = function(vector) 
+{
+	if(vector === undefined)
+		return undefined;
+	
+	var angRad = this.angleRadToVector(vector);
+	
+	if(angRad === undefined)
+		return undefined;
+		
+	return angRad * 180.0/Math.PI;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  * @param px 변수
  * @returns dx*dx + dy*dy + dz*dz
@@ -110,6 +166,25 @@ Point3D.prototype.squareDistToPoint = function(point)
 	var dz = this.z - point.z;
 
 	return dx*dx + dy*dy + dz*dz;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
+Point3D.prototype.isCoincidentToPoint = function(point, errorDist) 
+{
+	var squareDist = this.distToPoint(point);
+	var coincident = false;
+	if(squareDist < errorDist*errorDist)
+	{
+		coincident = true;
+	}
+
+	return coincident;
 };
 
 /**
@@ -235,6 +310,27 @@ Point3D.prototype.aproxDistTo = function(pointB, sqrtTable)
  * @param y 변수
  * @param z 변수
  */
+Point3D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
+{
+	// this returns a vector that points to "targetPoint" from "this".***
+	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.***
+	if(targetPoint === undefined)
+		return undefined;
+	
+	if(resultVector === undefined)
+		resultVector = new Point3D();
+	
+	resultVector.set(targetPoint.x - this.x, targetPoint.y - this.y, targetPoint.z - this.z);
+	
+	return resultVector;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
 Point3D.prototype.set = function(x, y, z) 
 {
 	this.x = x; this.y = y; this.z = z;
@@ -250,3 +346,61 @@ Point3D.prototype.add = function(x, y, z)
 {
 	this.x += x; this.y += y; this.z += z;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Point3D.prototype.addPoint = function(point) 
+{
+	this.x += point.x; this.y += point.y; this.z += point.z;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Point3D.prototype.scale = function(scaleFactor) 
+{
+	this.x *= scaleFactor; this.y *= scaleFactor; this.z *= scaleFactor;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

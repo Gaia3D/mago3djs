@@ -414,7 +414,8 @@
 		{
 			"attributes": {
 				"isPhysical": true,
-				"nodeType": "3DS"
+				"nodeType": "3DS",
+				"flipYTexCoords": true
 			},
 			"children": [],
 			"data_key": "Gwangjin_center_del",

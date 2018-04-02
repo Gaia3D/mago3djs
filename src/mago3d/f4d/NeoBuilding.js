@@ -214,9 +214,12 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
 	{
 		for (var key in this.lodMeshesMap)
 		{
-			var legoSkin = this.lodMeshesMap[key];
-			legoSkin.deleteObjects(gl, vboMemoryManager);
-			legoSkin = undefined;
+			if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, key))
+			{
+				var legoSkin = this.lodMeshesMap[key];
+				legoSkin.deleteObjects(gl, vboMemoryManager);
+				legoSkin = undefined;
+			}
 		}
 		this.lodMeshesMap = undefined;
 	}
@@ -425,7 +428,7 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	//var currLodString = this.getCurrentLodString();
 	//skinLego = this.lodMeshesMap[currLodString];
 	//if(skinLego)
-		//var hola = 0;
+	//var hola = 0;
 	
 	//return skinLego;
 	
