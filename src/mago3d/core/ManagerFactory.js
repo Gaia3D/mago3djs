@@ -697,37 +697,36 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			magoManager.callAPI(api);
 		},
-		// flyTo
-		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 
-		{
-			if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
-			{
-				viewer.camera.flyTo({
-					destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
-						parseFloat(latitude),
-						parseFloat(height) + 10),
-					duration: parseInt(duration)
-				});
-			}
-			else 
-			{
-				wwd.goToAnimator.travelTime = duration * 1000;
-				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
-			}
-			// pin을 그림
-			if (issueId !== null && issueType !== undefined) 
-			{
-				var api = new API("drawInsertIssueImage");
-				api.setDrawType(0);
-				api.setIssueId(issueId);
-				api.setIssueType(issueType);
-				api.setDataKey(null);
-				api.setLatitude(latitude);
-				api.setLongitude(longitude);
-				api.setElevation(height);
-				magoManager.callAPI(api);
-			}
-		},
+		// flyTo: function(issueId, issueType, longitude, latitude, height, duration)
+		// {
+		// 	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		// 	{
+		// 		viewer.camera.flyTo({
+		// 			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+		// 				parseFloat(latitude),
+		// 				parseFloat(height) + 10),
+		// 			duration: parseInt(duration)
+		// 		});
+		// 	}
+		// 	else
+		// 	{
+		// 		wwd.goToAnimator.travelTime = duration * 1000;
+		// 		wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
+		// 	}
+		// 	// pin을 그림
+		// 	if (issueId !== null && issueType !== undefined)
+		// 	{
+		// 		var api = new API("drawInsertIssueImage");
+		// 		api.setDrawType(0);
+		// 		api.setIssueId(issueId);
+		// 		api.setIssueType(issueType);
+		// 		api.setDataKey(null);
+		// 		api.setLatitude(latitude);
+		// 		api.setLongitude(longitude);
+		// 		api.setElevation(height);
+		// 		magoManager.callAPI(api);
+		// 	}
+		// },
 		// magoManager 상태
 		getMagoManagerState: function() 
 		{
