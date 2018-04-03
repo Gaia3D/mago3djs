@@ -1308,7 +1308,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(); //TEST
+	this.renderMagoGeometries(); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1483,7 +1483,7 @@ MagoManager.prototype.renderMagoGeometries = function()
 		//profileAux.TEST__setFigureConcave_duckMouth();
 		//profileAux.TEST__setFigureConcave_almostHole();
 		//profileAux.TEST__setFigureConcave_almostHole_2();
-		//profileAux.TEST__setFigureHole_1();
+		profileAux.TEST__setFigureHole_1();
 		
 		if(mesh.vboKeyContainer === undefined)
 			mesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();

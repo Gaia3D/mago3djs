@@ -272,6 +272,20 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		}
 	}
 	
+	// Last check: finally, in case of sweepAngle = 360 degrees, or is closed pointsArray, then pop the last insertedPoint.***
+	resultExistentPointsCount = resultPointsArray.length;
+	if(resultExistentPointsCount > 0)
+	{
+		// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+		var lastPoint = resultPointsArray[resultExistentPointsCount-1];
+		var firstPoint = resultPointsArray[0];
+		if(lastPoint.isCoincidentToPoint(firstPoint, errorDist))
+		{
+			resultPointsArray.pop();
+			lastPoint.deleteObjects();
+		}
+	}
+	
 	return resultPointsArray;
 };
 

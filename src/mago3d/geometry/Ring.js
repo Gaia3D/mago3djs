@@ -44,30 +44,22 @@ Ring.prototype.newElement = function(elementTypeString)
 {
 	var elem;
 	
-	if (elementTypeString === "POLYLINE")
-	{
-		if (this.elemsArray === undefined)
-		{ this.elemsArray = []; }
-		
-		elem = new PolyLine();
-		this.elemsArray.push(elem);
-	}
-	else if (elementTypeString === "ARC")
-	{
-		if (this.elemsArray === undefined)
-		{ this.elemsArray = []; }
-		
+	if (elementTypeString === "ARC")
 		elem = new Arc();
-		this.elemsArray.push(elem);
-	}
+	else if (elementTypeString === "CIRCLE")
+		elem = new Circle();
+	else if (elementTypeString === "POLYLINE")
+		elem = new PolyLine();
 	else if (elementTypeString === "RECTANGLE")
-	{
-		if (this.elemsArray === undefined)
-		{ this.elemsArray = []; }
-		
 		elem = new Rectangle();
-		this.elemsArray.push(elem);
-	}
+	
+	if(elem === undefined)
+		return undefined;
+	
+	if (this.elemsArray === undefined)
+	{ this.elemsArray = []; }
+
+	this.elemsArray.push(elem);
 	
 	return elem;
 };
