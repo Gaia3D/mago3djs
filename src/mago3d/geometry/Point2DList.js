@@ -249,7 +249,7 @@ Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obj
 	
 	var range = endIdx - startIdx;
 	
-	if(range <= 0)
+	if(objectsArray.length === 0)
 		return 0;
 	
 	if (range < 6)

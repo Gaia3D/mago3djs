@@ -68,29 +68,6 @@ Profile.prototype.deleteObjects = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.tessellate = function(resultTrianglesIndices) 
-{
-	if(this.outerRing === undefined)
-		return undefined;
-	
-	if(resultTrianglesIndices === undefined)
-		resultTrianglesIndices = [];
-	
-	innerRingsCount = this.innerRingsList.getRingsCount();
-	
-	if(innerRingsCount > 0)
-	{
-		
-	}
-	
-	
-	return resultTrianglesIndices;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
 
 Profile.prototype.hasHoles = function() 
 {
@@ -124,6 +101,16 @@ Profile.prototype.getVBO = function(resultVBOCacheKeys)
 		// 1rst, check normals congruences.***
 		this.checkNormals();
 		var resultConvexPolygons = this.tessellate(resultConvexPolygons);
+		
+		if(resultConvexPolygons.length > 0)
+		{
+			var polygon = resultConvexPolygons[0];
+			
+			polygon.convexPolygonsArray = [];
+			var concavePointsIndices = polygon.calculateNormal(concavePointsIndices);
+			polygon.convexPolygonsArray = polygon.tessellate(concavePointsIndices, polygon.convexPolygonsArray);
+			polygon.getVbo(resultVBOCacheKeys);
+		}
 		var hola = 0;
 	}
 };
@@ -154,7 +141,13 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 		
 		currIdx = outerPolygon.point2dList.getNextIdx(currIdx);
 		if(currIdx === outerPointIdx)
+		{
 			finished = true;
+			
+			// must add the firstPoint point.***
+			outerPoint = outerPolygon.point2dList.getPoint(currIdx);
+			newPoint = resultPolygon.point2dList.newPoint(outerPoint.x, outerPoint.y);
+		}
 		
 		i++;
 	}
@@ -164,16 +157,21 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 	finished = false;
 	i=0;
 	newPoint;
-	innerPoint;
+	var innerPoint;
 	currIdx = innerPointIdx;
 	while(!finished && i<innerPointsCount)
 	{
 		innerPoint = innerPolygon.point2dList.getPoint(currIdx);
-		newPoint = resultPolygon.point2dList.newPoint(outerPoint.x, outerPoint.y);
+		newPoint = resultPolygon.point2dList.newPoint(innerPoint.x, innerPoint.y);
 		
 		currIdx = innerPolygon.point2dList.getNextIdx(currIdx);
 		if(currIdx === innerPointIdx)
+		{
 			finished = true;
+			// must add the firstPoint point.***
+			innerPoint = innerPolygon.point2dList.getPoint(currIdx);
+			newPoint = resultPolygon.point2dList.newPoint(innerPoint.x, innerPoint.y);
+		}
 		
 		i++;
 	}
@@ -306,40 +304,11 @@ Profile.prototype.tessellate = function(resultConvexPolygons)
 			holePolygon = hole.polygon;
 			innerPointIdx = objectAux.pointIdx;
 			holePolygon.calculateNormal();
-			holeNormal = holePolygon.normal;
+			//holeNormal = holePolygon.normal;
 			
-			// compare outerNormal with hole normal.***
-			
-			
-			this.eliminateHolePolygon(outerPolygon, holePolygon, innerPointIdx, resultPolygon);
-			
-			// now find 
-			/*
-			// create a segment( mostLeftDownPoint, innerPoint ) and check if intersects another holes or the outerPolygon.***
-			if(splitSegment === undefined)
-				splitSegment = new Segment2D();
-			
-			splitSegment.setPoints(mostLeftDownPoint, innerPoint);
-			
-			// 1) check if splitSegment intersects the outerPolygon.***
-			if(outerPolygon.intersectionWithSegment(splitSegment))
-			{
-				continue;
-			}
-			
-			// 2) check if splitSegment intersects any holePolygon.***
-			if(this.innerRingsList.intersectionWithSegment(splitSegment))
-			{
-				continue;
-			}
-			
-			// 3) now split the outerPolygon-hole and recalculate the normal.***
-			this.eliminateHolePolygon(outerPolygon, holePolygon, splitSegment, resultPolygon);
-			*/
+			resultPolygon = this.eliminateHolePolygon(outerPolygon, holePolygon, innerPointIdx, resultPolygon);
+			resultConvexPolygons.push(resultPolygon);
 		}
-	}
-	else{
-		
 	}
 	
 	return resultConvexPolygons;
@@ -362,11 +331,17 @@ Profile.prototype.TEST__setFigureHole_1 = function()
 	rect = outerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(0, 0);
 	rect.setDimensions(10, 6);
-	
+	/*
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(1, 0);
 	rect.setDimensions(5, 3);
+	*/
+	
+	var innerRing = this.newInnerRing();
+	rect = innerRing.newElement("CIRCLE");
+	rect.setCenterPosition(1, 0);
+	rect.setRadius(2.2);
 	
 };
 
