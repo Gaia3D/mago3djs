@@ -113,11 +113,6 @@ VtxSegment.prototype.intersectionWithPoint = function(point, error)
 	
 };
 
-VtxSegment.prototype.intersectionWithVtxSegment = function(vtxSeg, error)
-{
-	
-};
-
 
 
 

@@ -17,6 +17,11 @@ var Arc = function()
 	this.startAngleDeg;
 	this.sweepAngleDeg;
 	this.numPointsFor360Deg; // interpolation param.***
+	
+	// Alternative vars.***
+	this.startPoint; // if no exist radius, then startPoint define the radius.***
+	this.endPoint;
+	this.sweepSense; // 1=CCW, -1=CW.***
 };
 
 /**
@@ -25,12 +30,24 @@ var Arc = function()
  */
 Arc.prototype.deleteObjects = function()
 {
-	this.centerPoint.deleteObjects(); // Point3D.***
+	if(this.centerPoint !== undefined)
+		this.centerPoint.deleteObjects(); // Point3D.***
 	this.centerPoint = undefined;
 	this.radius = undefined;
 	this.startAngleDeg = undefined;
 	this.sweepAngleDeg = undefined;
 	this.numPointsFor360Deg = undefined;
+	
+	if(this.startPoint !== undefined)
+		this.startPoint.deleteObjects(); 
+	
+	this.startPoint = undefined;
+	
+	if(this.endPoint !== undefined)
+		this.endPoint.deleteObjects(); 
+	
+	this.endPoint = undefined;
+	this.sweepSense = undefined; // 1=CCW, -1=CW.***
 };
 
 /**
@@ -64,6 +81,41 @@ Arc.prototype.setStartAngleDegree = function(startAngleDegree)
 };
 
 /**
+ * Set the start angle of the arc.
+ * @class Arc
+ */
+Arc.prototype.setStartPoint = function(x, y)
+{
+	// If no exist startAngle, then use this to calculate startAngle.***
+	if (this.startPoint === undefined)
+	{ this.startPoint = new Point2D(); }
+	
+	this.startPoint.set(x, y);
+};
+
+/**
+ * Set the start angle of the arc.
+ * @class Arc
+ */
+Arc.prototype.setEndPoint = function(x, y)
+{
+	// If no exist sweepAngle, then use this to calculate sweepAngle.***
+	if (this.endPoint === undefined)
+	{ this.endPoint = new Point2D(); }
+	
+	this.endPoint.set(x, y);
+};
+
+/**
+ * Set the start angle of the arc.
+ * @class Arc
+ */
+Arc.prototype.setSense = function(sense)
+{
+	this.sweepSense = sense; // 1=CCW, -1=CW.***
+};
+
+/**
  * Set the sweep angle of the arc.
  * @class Arc
  */
@@ -78,15 +130,80 @@ Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
  */
 Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
+	if(this.centerPoint === undefined)
+		return resultPointsArray;
+	
 	if(pointsCountFor360Deg)
 		this.numPointsFor360Deg = pointsCountFor360Deg
 
 	if(this.numPointsFor360Deg === undefined)
 		this.numPointsFor360Deg = 36;
 
+	// Check if exist strAng.*********************************************************************************
+	var strVector, endVector;
+	var strVectorModul;
+	if(this.startAngleDeg === undefined)
+	{
+		if(this.startPoint === undefined)
+			return resultPointsArray;
+		
+		strVector = new Point2D();
+		strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
+		strVectorModul = strVector.modul();
+		
+		var angRad = Math.acos(x/strVectorModul);
+		if(this.startPoint.y < 0)
+		{
+			angRad *= -1;
+		}
+		
+		this.startAngleDeg = angRad * 180.0/Math.PI;
+	}
+	
+	// Check if exist radius.*********************************************************************************
+	if(this.radius === undefined)
+	{
+		// calculate by startPoint.***
+		if(this.startPoint === undefined)
+			return resultPointsArray;
+		
+		if(strVectorModul === undefined)
+		{
+			if(strVector === undefined)
+			{
+				strVector = new Point2D();
+				strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
+			}
+			strVectorModul = strVector.modul();
+		}
+		
+		this.radius = strVectorModul;
+	}
+	
+	// check if exist sweepAng.*********************************************************************************
+	if(this.sweepAngleDeg === undefined)
+	{
+		if(this.endPoint === undefined || this.sweepSense === undefined)
+			return resultPointsArray;
+		
+		endVector = new Point2D();
+		endVector.set(this.endPoint.x - this.centerPoint.x, this.endPoint.y - this.endPoint.y);
+		var endVectorModul = endPoint.modul();
+		
+		var angRad = Math.acos(x/strVectorModul);
+		if(this.endPoint.y < 0)
+		{
+			angRad *= -1;
+		}
+		
+		this.sweepAngleDeg = angRad * 180.0/Math.PI;
+		
+		if(this.sweepSense < 0)
+			this.sweepAngleDeg = 360 - this.sweepAngleDeg;
+	}
+	
 	if(resultPointsArray === undefined)
 		resultPointsArray = [];
-
 	
 	var pointsArray = [];
 	

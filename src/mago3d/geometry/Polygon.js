@@ -13,6 +13,8 @@ var Polygon = function()
 
 	this.point2dList;
 	this.normal; // polygon sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
+	this.convexPolygonsArray; // tessellation result.***
+	this.bRect; // boundary rectangle.***
 };
 
 Polygon.prototype.deleteObjects = function()
@@ -24,6 +26,15 @@ Polygon.prototype.deleteObjects = function()
 	}
 	
 	this.normal = undefined;
+};
+
+Polygon.prototype.getBoundingRectangle = function(resultBRect)
+{
+	if(this.point2dList === undefined)
+		return resultBRect;
+	
+	resultBRect = this.point2dList.getBoundingRectangle(resultBRect);
+	return resultBRect;
 };
 
 Polygon.prototype.getEdgeDirection = function(idx)
@@ -41,10 +52,14 @@ Polygon.prototype.getEdgeVector = function(idx)
 	return vector;
 };
 
+Polygon.prototype.reverseSense = function()
+{
+	if(this.point2dList !== undefined)
+		this.point2dList.reverse();
+};
+
 Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
-	// this is a false 2d polygon.***
-	
 	// must check if the verticesCount is 3. Then is a convex polygon.***
 	
 	// A & B are vectors.
@@ -76,14 +91,16 @@ Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 		
 		if(crossProd < 0.0) 
 		{
+			crossProd = -1;
 			resultConcavePointsIdxArray.push(i);
+		}
+		else if(crossProd > 0.0) {
+			crossProd = 1;
 		}
 		// calcule by cos.***
 		// cosAlfa = scalarProd / (strModul * endModul); (but strVecModul = 1 & endVecModul = 1), so:
 		var cosAlfa = scalarProd;
 		var alfa = Math.acos(cosAlfa);
-		//var angDeg = alfa * 180.0/Math.PI;
-
 		this.normal += (crossProd * alfa);
 	}
 	
@@ -95,11 +112,16 @@ Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 	return resultConcavePointsIdxArray;
 };
 
-Polygon.prototype.tessellate = function(resultConvexPolygons)
+
+Polygon.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
 {
-	// 1rst, must find concave vertices.***
-	var concaveVerticesIndices = this.calculateNormal();
 	var concaveVerticesCount = concaveVerticesIndices.length;
+	
+	if(concaveVerticesCount === 0)
+	{
+		convexPolygonsArray.push(this);
+		return convexPolygonsArray;
+	}
 	
 	// now, for any concave vertex, find the closest vertex to split the polygon.***
 	var find = false;
@@ -113,12 +135,11 @@ Polygon.prototype.tessellate = function(resultConvexPolygons)
 		var resultSortedPointsIdxArray = [];
 		
 		// get vertices indices sorted by distance to "point".***
-		this.getVerticesIdxSortedByDistToVertex(point, this.point2dList.pointsArray, resultSortedPointsIdxArray);
+		this.getPointsIdxSortedByDistToPoint(point, resultSortedPointsIdxArray);
 		
-		var finished = false;
 		var sortedVerticesCount = resultSortedPointsIdxArray.length;
 		var j=0;
-		while(!finished && j<sortedVerticesCount)
+		while(!find && j<sortedVerticesCount)
 		{
 			idx_B = resultSortedPointsIdxArray[j];
 			
@@ -131,35 +152,98 @@ Polygon.prototype.tessellate = function(resultConvexPolygons)
 			
 			// check if is splittable by idx-idx_B.***
 			var segment = new Segment2D(this.point2dList.getPoint(idx), this.point2dList.getPoint(idx_B));
-			
+			if(this.intersectionWithSegment(segment))
+			{
+				j++;
+				continue;
+			}
 			
 			var resultSplittedPolygons = this.splitPolygon(idx, idx_B);
 			
 			if(resultSplittedPolygons.length < 2)
+			{
+				j++;
 				continue;
+			}
 			
 			// now, compare splittedPolygon's normals with myNormal.***
 			var polygon_A = resultSplittedPolygons[0];
 			var polygon_B = resultSplittedPolygons[1];
-			var concaveVtx_A = polygon_A.calculateNormal();
-			var concaveVtx_B = polygon_B.calculateNormal();
+			var concavePoints_A = polygon_A.calculateNormal();
+			var concavePoints_B = polygon_B.calculateNormal();
 			
 			var normal_A = polygon_A.normal;
-			var normal_B = polygon_A.normal;
-			
+			var normal_B = polygon_B.normal;
+			if(normal_A === this.normal && normal_B === this.normal)
+			{
+				find = true;
+				// polygon_A.***
+				if(concavePoints_A.length > 0)
+				{
+					convexPolygonsArray = polygon_A.tessellate(concavePoints_A, convexPolygonsArray);
+				}
+				else{
+					if(convexPolygonsArray === undefined)
+						convexPolygonsArray = [];
+					
+					convexPolygonsArray.push(polygon_A);
+				}
+				
+				// polygon_B.***
+				if(concavePoints_B.length > 0)
+				{
+					convexPolygonsArray = polygon_B.tessellate(concavePoints_B, convexPolygonsArray);
+				}
+				else{
+					if(convexPolygonsArray === undefined)
+						convexPolygonsArray = [];
+					
+					convexPolygonsArray.push(polygon_B);
+				}
+			}
 			
 			j++;
 		}
 		i++;
 	}
+	
+	return convexPolygonsArray;
 };
 
-Polygon.prototype.intersectionWithVtxSegment = function(vtxSeg)
+Polygon.prototype.intersectionWithSegment = function(segment)
 {
-	// "vtxSeg" cut a polygons edge.***
-	// "vtxSeg" coincident with a polygons vertex.***
-	// 1rst check if the vtxSeg is coincident with any polygons vertex.***
+	// "segment" cut a polygons edge.***
+	// "segment" coincident with a polygons vertex.***
+	if(this.bRect !== undefined)
+	{
+		// if exist boundary rectangle, check bRect intersection.***
+		var segmentsBRect = segment.getBoundaryRectangle(segmentsBRect);
+		if(!this.bRect.intersectsWithRectangle(segmentsBRect))
+			return false;
+	}
 	
+	// 1rst check if the segment is coincident with any polygons vertex.***
+	var mySegment;
+	var intersectionType;
+	var error = 10E-8;
+	var pointsCount = this.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		mySegment = this.point2dList.getSegment(i, mySegment);
+		
+		// if segment shares points, then must not cross.***
+		if(segment.sharesPointsWithSegment(mySegment))
+		{
+			continue;
+		}
+		
+		if(segment.intersectionWithSegment(mySegment, error))
+		{
+			return true;
+		}
+	}
+	
+	return false;
 };
 
 Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArray)
@@ -228,104 +312,16 @@ Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArra
 	return resultSplittedPolygonsArray;
 };
 
-Polygon.prototype.getVerticesIdxSortedByDistToVertex = function(thePoint, pointsArray, resultSortedPointsIdxArray)
+Polygon.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
 {
 	// Static function.***
 	// Sorting minDist to maxDist.***
 	if(resultSortedPointsIdxArray === undefined)
 		resultSortedPointsIdxArray = [];
 	
-	var objectAux;
-	var objectsAuxArray = [];
-	var point;
-	var squaredDist;
-	var startIdx, endIdx, insertIdx;
-	var pointsCount = pointsArray.length;
-	for(var i=0; i<pointsCount; i++)
-	{
-		point = pointsArray[i];
-		if(point === thePoint)
-			continue;
-		
-		squaredDist = thePoint.squareDistToPoint(point);
-		objectAux = {};
-		objectAux.pointIdx = i;
-		objectAux.squaredDist = squaredDist;
-		startIdx = 0;
-		endIdx = objectsAuxArray.length - 1;
-		
-		insertIdx = this.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
-		objectsAuxArray.splice(insertIdx, 0, objectAux);
-	}
-	
-	resultSortedPointsIdxArray.length = 0;
-	var objectsCount = objectsAuxArray.length;
-	for(var i=0; i<objectsCount; i++)
-	{
-		resultSortedPointsIdxArray.push(objectsAuxArray[i].pointIdx);
-	}
+	resultSortedPointsIdxArray = this.point2dList.getPointsIdxSortedByDistToPoint(thePoint, resultSortedPointsIdxArray);
 	
 	return resultSortedPointsIdxArray;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns result_idx
- */
-Polygon.prototype.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
-{
-	// this do a dicotomic search of idx in a ordered table.
-	// 1rst, check the range.
-	
-	var range = endIdx - startIdx;
-	
-	if(range <= 0)
-		return 0;
-	
-	if (range < 6)
-	{
-		// in this case do a lineal search.
-		var finished = false;
-		var i = startIdx;
-		var idx;
-		//var objectsCount = objectsArray.length;
-		while (!finished && i<=endIdx)
-		{
-			if (object.squaredDist < objectsArray[i].squaredDist)
-			{
-				idx = i;
-				finished = true;
-			}
-			i++;
-		}
-		
-		if (finished)
-		{
-			return idx;
-		}
-		else 
-		{
-			return endIdx+1;
-		}
-	}
-	else 
-	{
-		// in this case do the dicotomic search.
-		var middleIdx = startIdx + Math.floor(range/2);
-		var newStartIdx;
-		var newEndIdx;
-		if (objectsArray[middleIdx].squaredDist > object.squaredDist)
-		{
-			newStartIdx = startIdx;
-			newEndIdx = middleIdx;
-		}
-		else 
-		{
-			newStartIdx = middleIdx;
-			newEndIdx = endIdx;
-		}
-		return this.getIndexToInsertBySquaredDist(objectsArray, object, newStartIdx, newEndIdx);
-	}
 };
 
 Polygon.prototype.isPolygonSplittableByVtxSegment = function(vertexSegment)
@@ -347,9 +343,14 @@ Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesList)
 	for(var i=1; i<pointsCount-1; i++)
 	{
 		triangle = resultTrianglesList.newTriangle();
-		triangle.vtxIdx0 = 0;
-		triangle.vtxIdx1 = i;
-		triangle.vtxIdx2 = i+1;
+		
+		var point0idx = this.point2dList.getPoint(0).idxInList;
+		var point1idx = this.point2dList.getPoint(i).idxInList;
+		var point2idx = this.point2dList.getPoint(i+1).idxInList;
+		
+		triangle.vtxIdx0 = point0idx;
+		triangle.vtxIdx1 = point1idx;
+		triangle.vtxIdx2 = point2idx;
 	}
 	
 	return resultTrianglesList;
@@ -389,9 +390,15 @@ Polygon.prototype.getVbo = function(resultVbo)
 	resultVbo.norVboDataArray = Int8Array.from(norArray);
 	
 	// now calculate triangles indices.***
-	var trianglesList = new TrianglesList();
-	trianglesList = this.getTrianglesConvexPolygon(trianglesList);
+	this.point2dList.setIdxInList(); // use this function instead a map.***
 	
+	var trianglesList = new TrianglesList();
+	var convexPolygonsCount = this.convexPolygonsArray.length;
+	for(var i=0; i<convexPolygonsCount; i++)
+	{
+		var convexPolygon = this.convexPolygonsArray[i];
+		trianglesList = convexPolygon.getTrianglesConvexPolygon(trianglesList);
+	}
 	trianglesList.getFaceDataArray(resultVbo);
 
 	return resultVbo;

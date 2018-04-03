@@ -18,6 +18,28 @@ var Ring = function()
 /**
  * @class Ring
  */
+Ring.prototype.deleteObjects = function()
+{
+	if(this.elemsArray !== undefined)
+	{
+		var elemsCount = this.elemsArray.length;
+		for(var i=0; i<elemsCount; i++)
+		{
+			this.elemsArray[i].deleteObjects();
+			this.elemsArray[i] = undefined;
+		}
+		this.elemsArray = undefined;
+	}
+	
+	if(this.polygon !== undefined)
+		this.polygon.deleteObjects();
+	
+	this.polygon = undefined;
+};
+
+/**
+ * @class Ring
+ */
 Ring.prototype.newElement = function(elementTypeString)
 {
 	var elem;
@@ -38,6 +60,14 @@ Ring.prototype.newElement = function(elementTypeString)
 		elem = new Arc();
 		this.elemsArray.push(elem);
 	}
+	else if (elementTypeString === "RECTANGLE")
+	{
+		if (this.elemsArray === undefined)
+		{ this.elemsArray = []; }
+		
+		elem = new Rectangle();
+		this.elemsArray.push(elem);
+	}
 	
 	return elem;
 };
@@ -49,6 +79,7 @@ Ring.prototype.newElement = function(elementTypeString)
 Ring.prototype.makePolygon = function()
 {
 	this.polygon = this.getPolygon(this.polygon);
+	return this.polygon;
 };
 
 /**
@@ -93,7 +124,7 @@ Ring.prototype.getPoints = function(resultPointsArray)
 	var totalPointsCount = resultPointsArray.length;
 	if(totalPointsCount > 1)
 	{
-		var errorDist = 0.0001;
+		var errorDist = 10E-8;
 		var firstPoint = resultPointsArray[0];
 		var lastPoint = resultPointsArray[totalPointsCount-1];
 		if(firstPoint.isCoincidentToPoint(lastPoint, errorDist))
