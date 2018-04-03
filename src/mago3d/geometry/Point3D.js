@@ -123,16 +123,19 @@ Point3D.prototype.angleRadToVector = function(vector)
 	
 	//******************************************************
 	//var scalarProd = this.scalarProd(vector);
-	//var myModul = this.modul();
-	//var vecModul = vector.modul();
+	var myModul = this.modul();
+	var vecModul = vector.modul();
 	
 	// calcule by cos.***
 	//var cosAlfa = scalarProd / (myModul * vecModul); 
 	//var angRad = Math.acos(cosAlfa);
 	//var angDeg = alfa * 180.0/Math.PI;
 	//------------------------------------------------------
+	var error = 10E-10;
+	if(myModul < error || vecModul < error)
+		return undefined;
 	
-	return Math.acos(this.scalarProd(vector) / (this.modul() * vector.modul()));
+	return Math.acos(this.scalarProd(vector) / (myModul * vecModul));
 };
 
 /**

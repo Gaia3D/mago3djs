@@ -1132,7 +1132,7 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx)
+Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx, bRenderLines)
 {
 	var vbo_vicks_container = renderable.getVboKeysContainer();
 	
@@ -1161,15 +1161,17 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	if (ssao_idx === 1) // ssao.***
 	{
 		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-		{ return; }
+		{ 
+			return;
+		}
 		
 		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
 		{ 
-			gl.disableVertexAttribArray(shader.normal3_loc);
+			gl.disableVertexAttribArray(shader.color4_loc);
 		}
 		else{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+			gl.vertexAttribPointer(shader.color4_loc, 4, gl.BYTE, true, 0, 0);
 		}
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
@@ -1181,17 +1183,44 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		
 	}
 	
-	if(vbo_vicky.indicesCount > 0)
+	if(bRenderLines === undefined || bRenderLines === false)
 	{
-		if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
-		{ return; }
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
-		gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		if(vbo_vicky.indicesCount > 0)
+		{
+			if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
+			{ return; }
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+			gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		}
+		else{
+			gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+			//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+		}
 	}
 	else{
-		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+		gl.drawArrays(gl.LINES, 0, vertices_count);
 	}
-	
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

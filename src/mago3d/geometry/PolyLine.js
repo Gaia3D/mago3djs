@@ -53,6 +53,7 @@ PolyLine.prototype.getPoints = function(resultPointsArray)
 	{ resultPointsArray = []; }
 	
 	var point;
+	var errorDist = 10E-8;
 	var resultExistentPointsCount = resultPointsArray.length;
 	var pointsCount = this.point2dArray.length;
 	for (var i=0; i<pointsCount; i++)

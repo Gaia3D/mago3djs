@@ -162,6 +162,53 @@ Point2D.prototype.scalarProduct = function(point)
 	return scalarProd;
 };
 
+/**
+ * nomal 계산
+ * @param vector 변수
+ */
+Point2D.prototype.angleRadToVector = function(vector) 
+{
+	if(vector === undefined)
+		return undefined;
+	
+	//******************************************************
+	//var scalarProd = this.scalarProduct(vector);
+	var myModul = this.getModul();
+	var vecModul = vector.getModul();
+	
+	// calcule by cos.***
+	//var cosAlfa = scalarProd / (myModul * vecModul); 
+	//var angRad = Math.acos(cosAlfa);
+	//var angDeg = alfa * 180.0/Math.PI;
+	//------------------------------------------------------
+	var error = 10E-10;
+	if(myModul < error || vecModul < error)
+		return undefined;
+	
+	return Math.acos(this.scalarProduct(vector) / (myModul * vecModul));
+};
+
+/**
+ * nomal 계산
+ * @param point 변수
+ * @param resultPoint 변수
+ * @returns resultPoint
+ */
+Point2D.prototype.angleDegToVector = function(vector) 
+{
+	if(vector === undefined)
+		return undefined;
+	
+	var angRad = this.angleRadToVector(vector);
+	
+	if(angRad === undefined)
+		return undefined;
+		
+	return angRad * 180.0/Math.PI;
+};
+
+
+
 
 
 
