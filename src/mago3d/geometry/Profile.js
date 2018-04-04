@@ -215,7 +215,10 @@ Profile.prototype.eliminateHolePolygon = function(outerPolygon, innerPolygon, in
 		i++;
 	}
 	
-	return resultPolygon;
+	if(!finished)
+		return false;
+	
+	return true;
 };
 
 /**
@@ -276,8 +279,17 @@ Profile.prototype.tessellate = function(resultConvexPolygons)
 		// 1rst, calculate the most left-down innerRing.***
 		var innersBRect = this.innerRingsList.getBoundingRectangle(innersBRect);
 		var innersBRectLeftDownPoint = new Point2D(innersBRect.minX, innersBRect.minY);
+		
+		// make a innerRingsArray copy.***
+		var innerRingsArray = [];
+		var innerRingsCount = this.innerRingsList.getRingsCount();
+		for(var i=0; i<innerRingsCount; i++)
+		{
+			innerRingsArray.push(this.innerRingsList.getRing(i));
+		}
+		
 		var objectsArray = [];
-		objectsArray = this.innerRingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, objectsArray);
+		objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
 		
 		// now, for each hole, calculate the nearest point to outerRing.***
 		var hole;
@@ -286,13 +298,16 @@ Profile.prototype.tessellate = function(resultConvexPolygons)
 		var innerPointIdx;
 		var holeNormal;
 		var splitSegment;
-		var resultPolygon;
 		
 		// prepare outerRing.***
 		var outerRing = this.outerRing;
 		if(outerRing.polygon === undefined)
 			outerRing.makePolygon();
 		var outerPolygon = outerRing.polygon;
+		
+		var resultPolygon = new Polygon();
+		//resultPolygon = outerPolygon.getCopy(resultPolygon);
+
 		var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
 		
 		// now, for each innerRing, try to merge to outerRing by splitSegment.***
@@ -306,9 +321,12 @@ Profile.prototype.tessellate = function(resultConvexPolygons)
 			holePolygon.calculateNormal();
 			//holeNormal = holePolygon.normal;
 			
-			resultPolygon = this.eliminateHolePolygon(outerPolygon, holePolygon, innerPointIdx, resultPolygon);
-			resultConvexPolygons.push(resultPolygon);
+			if(this.eliminateHolePolygon(outerPolygon, holePolygon, innerPointIdx, resultPolygon))
+			{
+				
+			}
 		}
+		resultConvexPolygons.push(resultPolygon);
 	}
 	
 	return resultConvexPolygons;
@@ -330,18 +348,17 @@ Profile.prototype.TEST__setFigureHole_1 = function()
 	
 	rect = outerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(0, 0);
-	rect.setDimensions(10, 6);
+	rect.setDimensions(20, 18);
 	/*
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
-	rect.setCenterPosition(1, 0);
+	rect.setCenterPosition(-5.5, 5.5);
 	rect.setDimensions(5, 3);
 	*/
-	
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("CIRCLE");
-	rect.setCenterPosition(1, 0);
-	rect.setRadius(2.2);
+	rect.setCenterPosition(0, 4);
+	rect.setRadius(2);
 	
 };
 
