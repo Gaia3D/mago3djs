@@ -121,6 +121,27 @@ Point2DList.prototype.setIdxInList = function()
 
 /**
  * nomal 계산
+ */
+Point2DList.prototype.getCopy = function(resultPoint2dList) 
+{
+	if(resultPoint2dList === undefined)
+		resultPoint2dList = new Point2DList();
+	else
+		resultPoint2dList.deleteObjects();
+	
+	var myPoint, copyPoint;
+	var pointsCount = this.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		myPoint = this.getPoint(i);
+		copyPoint = resultPoint2dList.newPoint(myPoint.x, myPoint.y);
+	}
+	
+	return resultPoint2dList;
+};
+
+/**
+ * nomal 계산
  * @param point 변수
  * @param resultPoint 변수
  * @returns resultPoint

@@ -128,7 +128,7 @@ RingsList.prototype.intersectionWithSegment = function(segment)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getSortedRingsByDistToPoint = function(point, resultSortedObjectsArray) 
+RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
 {
 	if(point === undefined)
 		return resultSortedObjectsArray;
@@ -143,10 +143,10 @@ RingsList.prototype.getSortedRingsByDistToPoint = function(point, resultSortedOb
 	var squaredDist;
 	var objectAux;
 	var startIdx, endIdx, insertIdx;
-	var ringsCount = this.getRingsCount();
+	var ringsCount = ringsArray.length;
 	for(var i=0; i<ringsCount; i++)
 	{
-		ring = this.getRing(i);
+		ring = ringsArray[i];
 		if(ring.polygon === undefined)
 			ring.makePolygon();
 		ringPointIdx = ring.polygon.point2dList.getNearestPointIdxToPoint(point);
@@ -160,7 +160,7 @@ RingsList.prototype.getSortedRingsByDistToPoint = function(point, resultSortedOb
 		startIdx = 0;
 		endIdx = objectsAuxArray.length - 1;
 		
-		insertIdx = this.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
+		insertIdx = RingsList.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
 		objectsAuxArray.splice(insertIdx, 0, objectAux);
 	}
 	
@@ -182,7 +182,7 @@ RingsList.prototype.getSortedRingsByDistToPoint = function(point, resultSortedOb
  * 어떤 일을 하고 있습니까?
  * @returns result_idx
  */
-RingsList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
+RingsList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.

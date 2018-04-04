@@ -375,9 +375,6 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 		node = nodeSeedsArray[i];
 		buildingSeed = node.data.buildingSeed;
 		
-		if(node.data.nodeId ==="Tile_173078_LD_010_017_L22")
-			var hola = 0;
-		
 		rootNode = node.getRoot();
 		
 		var longitude, latitude;

@@ -1308,7 +1308,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(); //TEST
+	//this.renderMagoGeometries(); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1489,7 +1489,7 @@ MagoManager.prototype.renderMagoGeometries = function()
 			mesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
 		var vboKeys = mesh.vboKeyContainer.newVBOVertexIdxCacheKey();
 		
-		//profileAux.getVBO(vboKeys);
+		profileAux.getVBO(vboKeys);
 
 		var hola = 0;
 		
@@ -5568,9 +5568,6 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
 				
-				if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
-					var hola = 0;
-
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{

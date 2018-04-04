@@ -58,6 +58,26 @@ Polygon.prototype.reverseSense = function()
 		this.point2dList.reverse();
 };
 
+Polygon.prototype.getCopy = function(resultCopyPolygon)
+{
+	if(this.point2dList === undefined)
+		return resultCopyPolygon;
+	
+	if(resultCopyPolygon === undefined)
+		resultCopyPolygon = new Polygon();
+	
+	// copy the point2dList and the normal.***
+	if(resultCopyPolygon.point2dList === undefined)
+		resultCopyPolygon.point2dList = new Point2DList();
+	
+	resultCopyPolygon.point2dList = this.point2dList.getCopy(resultCopyPolygon.point2dList);
+	
+	if(this.normal)
+		resultCopyPolygon.normal = this.normal;
+	
+	return resultCopyPolygon;
+};
+
 Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
 	// must check if the verticesCount is 3. Then is a convex polygon.***
