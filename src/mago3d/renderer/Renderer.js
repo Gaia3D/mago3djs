@@ -1198,7 +1198,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		}
 	}
 	else{
-		gl.drawArrays(gl.LINES, 0, vertices_count);
+		gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 	}
 };
 
