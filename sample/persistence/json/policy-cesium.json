@@ -21,7 +21,7 @@
   "password_create_char": "!@#",
   "password_exception_char": "\u003c\u003e\u0026\u0027\"",
   "geo_view_library": "cesium",
-  "geo_data_path": "/data",
+  "geo_data_path": "/f4d",
   "geo_data_default_projects": [
     "3ds.json"
   ],
