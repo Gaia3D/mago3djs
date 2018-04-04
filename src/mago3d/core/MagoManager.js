@@ -5462,7 +5462,7 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
  */
 MagoManager.prototype.calculate_geoLocDataOfNode = function(node) 
 {
-	// this function creates the geoLocationData of "node" using the data inside of "buildingSeed".***
+	// this function creates the geoLocationData of "node".***
 	var nodeRoot = node.getRoot();
 
 	if (nodeRoot.data.geoLocDataManager === undefined)
@@ -5473,44 +5473,40 @@ MagoManager.prototype.calculate_geoLocDataOfNode = function(node)
 	if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
 	{ 
 		geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+		var geographicCoord;
+		var rotationsDegree;
 		
-		var longitude = node.data.geographicCoord.longitude;
-		var latitude = node.data.geographicCoord.latitude;
-		var altitude = node.data.geographicCoord.altitude;
-		var heading = node.data.rotationsDegree.z;
-		var pitch = node.data.rotationsDegree.x;
-		var roll = node.data.rotationsDegree.y;
+		if(node.data.geographicCoord === undefined)
+		{
+			var buildingSeed = node.data.buildingSeed;
+			geographicCoord = buildingSeed.geographicCoord;
+			rotationsDegree = buildingSeed.rotationsDegree;
+		}
+		else{
+			geographicCoord = node.data.geographicCoord;
+			rotationsDegree = node.data.rotationsDegree;
+		}
+		
+		var longitude = geographicCoord.longitude;
+		var latitude = geographicCoord.latitude;
+		var altitude = geographicCoord.altitude;
+		var heading = rotationsDegree.z;
+		var pitch = rotationsDegree.x;
+		var roll = rotationsDegree.y;
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
 		this.pointSC = node.data.bbox.getCenterPoint(this.pointSC);
-		/*
-		var buildingSeed = node.data.buildingSeed;
-		var longitude = buildingSeed.geographicCoord.longitude;
-		var latitude = buildingSeed.geographicCoord.latitude;
-		var altitude = buildingSeed.geographicCoord.altitude;
-		var heading = buildingSeed.rotationsDegree.z;
-		var pitch = buildingSeed.rotationsDegree.x;
-		var roll = buildingSeed.rotationsDegree.y;
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
-		this.pointSC = buildingSeed.bBox.getCenterPoint(this.pointSC);
-		*/
-		if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
-				var hola = 0;
-		//"mapping_type": "BoundingBoxCenter",
+
+		// check if use "centerOfBoundingBoxAsOrigin".***
 		if(node.data.mapping_type !== undefined && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
-		//if (node.data.attributes.centerOfBBoxAsOrigen !== undefined) // old.***
 		{
-			//if (node.data.attributes.centerOfBBoxAsOrigen === true)
+			var rootNode = node.getRoot();
+			if (rootNode)
 			{
-				var rootNode = node.getRoot();
-				if (rootNode)
-				{
-					// now, calculate the root center of bbox.
-					var buildingSeed = node.data.buildingSeed;
-					var buildingSeedBBox = buildingSeed.bBox;
-					this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
-					//this.pointSC.scale(-1);
-					ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-				}
+				// now, calculate the root center of bbox.
+				var buildingSeed = node.data.buildingSeed;
+				var buildingSeedBBox = buildingSeed.bBox;
+				this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
+				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 			}
 		}
 	}
@@ -5571,13 +5567,13 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
+				
+				if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
+					var hola = 0;
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{
-					if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
-					var hola = 0;
-				
 					geoLoc = this.calculate_geoLocDataOfNode(node);
 					continue;
 				}
@@ -6399,6 +6395,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		node.data.data_name = data_name;
 		node.data.attributes = attributes;
 		node.data.mapping_type = mapping_type;
+		var tMatrix;
 		
 		if (attributes.isPhysical)
 		{
@@ -6424,6 +6421,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			{ node.data.rotationsDegree = new Point3D(); }
 			node.data.rotationsDegree.set(pitch, roll, heading);
 			
+			
 			if (buildingSeed !== undefined)
 			{
 				if (buildingSeed.geographicCoord === undefined)
@@ -6441,7 +6439,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			
 				// calculate the transformation matrix at (longitude, latitude, height).
 				var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
-				var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+				tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
 				
 				// now calculate the geographicCoord of the center of the bBox.
 				var bboxCenterPoint;
@@ -6453,8 +6451,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
 			}
 		}
-		if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
-				var hola = 0;
+
 		// now, calculate the bbox.***
 		node.data.bbox = new BoundingBox();
 		
@@ -6464,6 +6461,14 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		if(node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
 		{
 			node.data.bbox.translateToOrigin();
+		}
+		
+		// calculate the geographicCoordOfTheBBox.***
+		if(tMatrix !== undefined)
+		{
+			bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
+			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+			node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
 		}
 
 		bbox = node.data.bbox;
@@ -6482,12 +6487,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					node.addChildren(childNode);
 				}
 			}
-		}
-		else 
-		{
-		    // there are no children.
-			//if (node.data.buildingSeed)
-			//{ node.data.bbox.copyFrom(node.data.buildingSeed.bBox); }
 		}
 	}
 	return node;
