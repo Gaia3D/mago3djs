@@ -74,6 +74,25 @@ BoundingBox.prototype.copyFrom = function(bbox)
 /**
  * 영역박스 확대
  * 
+ */
+BoundingBox.prototype.translateToOrigin = function() 
+{
+	var semiXLength = this.getXLength() /2;
+	var semiYLength = this.getYLength() /2;
+	var semiZLength = this.getZLength() /2;
+	
+	this.minX = -semiXLength;
+	this.minY = -semiYLength;
+	this.minZ = -semiZLength;
+
+	this.maxX = semiXLength;
+	this.maxY = semiYLength;
+	this.maxZ = semiZLength;
+};
+
+/**
+ * 영역박스 확대
+ * 
  * @param {Number} distance
  */
 BoundingBox.prototype.expand = function(distance) 
