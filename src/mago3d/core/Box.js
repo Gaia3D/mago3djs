@@ -29,6 +29,17 @@ var Box = function()
  * @param yLength
  * @param zLength
  */
+Box.prototype.getVboKeysContainer = function()
+{
+	return this.vbo_vicks_container;
+};
+
+/**
+ * axis aligned bounding box
+ * @param xLength
+ * @param yLength
+ * @param zLength
+ */
 Box.prototype.makeAABB = function(xLength, yLength, zLength)
 {
 	// this makes a box centered on the center of the box.***

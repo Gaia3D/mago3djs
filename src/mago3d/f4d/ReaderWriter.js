@@ -284,13 +284,15 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
-	{
+	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
 			blocksList.dataArraybuffer = arrayBuffer;
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
+			
+			
 			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
 		}
 		else 
@@ -306,44 +308,6 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	{
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param blocksList 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getNeoBlocks = function(gl, fileName, blocksList, readerWriter, magoManager) 
-{
-//	magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount += 1;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			readerWriter.readNeoBlocks(gl, arrayBuffer, blocksList);
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else { blocksList.fileLoadState = status; }
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount < 0) magoManager.fileRequestControler.neoBuildingBlocksListsRequestedCount = 0;
 	});
 };
 
@@ -466,7 +430,8 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { legoMesh.fileLoadState = 500; }
-		else { legoMesh.fileLoadState = status; }
+		//else { legoMesh.fileLoadState = status; }
+		else { legoMesh.fileLoadState = -1; }
 	}).always(function() 
 	{
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -953,7 +918,9 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
 			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
 				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
 				neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-
+			
+			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
+			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 			neoBuilding.octree.makeTree(3);
 			neoBuilding.octree.setSizesSubBoxes();
 
@@ -989,6 +956,42 @@ ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, reader
  */
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
 {
+	function Utf8ArrayToStr(array) 
+	{
+		var out, i, len, c;
+		var char2, char3;
+
+		out = "";
+		len = array.length;
+		i = 0;
+		while (i < len) 
+		{
+			c = array[i++];
+			switch (c >> 4)
+			{ 
+			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+				// 0xxxxxxx
+				out += String.fromCharCode(c);
+				break;
+			case 12: case 13:
+				// 110x xxxx   10xx xxxx
+				char2 = array[i++];
+				out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+				break;
+			case 14:
+				// 1110 xxxx  10xx xxxx  10xx xxxx
+				char2 = array[i++];
+				char3 = array[i++];
+				out += String.fromCharCode(((c & 0x0F) << 12) |
+                       ((char2 & 0x3F) << 6) |
+                       ((char3 & 0x3F) << 0));
+				break;
+			}
+		}
+
+		return out;
+	};
+
 	//BR_Project._f4d_header_readed = true;
 	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
@@ -1006,9 +1009,11 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				neoBuilding.metaData = new MetaData();
 			}
 			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
-
+			
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
+			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
+			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 
 			// now, parse octreeAsimetric.***
 			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
@@ -1042,10 +1047,9 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 					}
 
 					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					for (var j=0; j<texture_fileName_Legth; j++) 
-					{
-						textureImageFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1;
-					}
+					var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
+					var decoder = new TextDecoder('utf-8');
+					textureImageFileName = decoder.decode(charArray);
 					
 					if (texture_fileName_Legth > 0)
 					{
@@ -1058,6 +1062,52 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 						
 						neoBuilding.texturesLoaded.push(texture);
 					}
+				}
+				
+				// read geometry type data.***
+				var lod;
+				var nameLength;
+				var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				if (lodBuildingDatasCount !== undefined)
+				{
+					neoBuilding.lodBuildingDatasMap = {};
+					
+					for (var i =0; i<lodBuildingDatasCount; i++)
+					{
+						var lodBuildingData = new LodBuildingData();
+						lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+						
+						if (lodBuildingData.lod === 2)
+						{
+							// read the lod2_textureFileName.***
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.textureFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+						}
+						
+						if (!lodBuildingData.isModelRef)
+						{
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.geometryFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+							
+							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+							lodBuildingData.textureFileName = "";
+							for (var j=0; j<nameLength; j++) 
+							{
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+							}
+						}
+						neoBuilding.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
+					}
+
 				}
 			}
 

@@ -1,8 +1,10 @@
 .settings/
 /node_modules/
-package-lock.json
 /data/
 build/
 data
-/.settings/
 .project
+.idea/
+mago3djs.iml
+sample/persistence/json/2119_deploy.json
+f4d

@@ -58,21 +58,24 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 
 ### 5. 데이터 변환
 - 변한된 데이터(outputFolder)를 저장할 디렉토리를 생성<br>
-<code>C:\data\프로젝트명 (root folder인 data 폴더 아래 프로젝트 별로 디렉토리를 생성)</code>
-- 변환할 데이터를 C:\demo_data(inputFolder)에 저장
+<code>C:\f4d\프로젝트명 (root folder인 f4d 폴더 아래 프로젝트 별로 디렉토리를 생성)</code>
+- 변환할 데이터를 C:\demo_f4d(inputFolder)에 저장
 - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행한 다음 F4D Converter가 설치된 디렉토리로 이동
 - 다음을 실행
-<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\프로젝트명 -log C:\demo_data/logTest.txt -indexing y</code></pre>
+<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\프로젝트명 -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
 - 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
   - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
-  <code>C:\git\repository\mago3djs</code>
-  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  <code>C:\git\repository\mago3djs</code><br>
+  <pre><code>C:\git\repository\mago3djs>mklink /d "C:\git\repository\mago3djs\f4d" "C:\f4d" 
+  (삭제의 경우 rmdir data)
+  </code></pre>
 
 ### 6. 설정 파일 수정
 두 가지의 설정파일을 수정한다. (data.json, policy.json)
 #### data.json
-- 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children 그외 위치 정보를 저장하는 영역
-- json의 root 노드의 data_key는 data 폴더 아래 프로젝트명과 일치
+- 크게 세가지 영역으로 나눠진다. 속성값을 저장하는 attributes, 자식 노드 정보를 저장하는 children, 그외 위치 정보를 저장하는 영역
+- attributes 영역의 isPhysical 속성은 데이터 표시 여부를 체크하는 필수 속성
+- json의 root 노드의 data_key는 f4d 폴더 아래 프로젝트명과 일치
 <pre><code>{
     //attributes영역
     "attributes" : {
@@ -87,7 +90,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
     "data_key" : "프로젝트명",
     "data_name" : "프로젝트명"
 }</code></pre>
-- <code>C:\data\프로젝트명</code> 에서 Rendering 할 디렉토리를 찾음
+- <code>C:\f4d\프로젝트명</code> 에서 Rendering 할 디렉토리를 찾음
 - 디렉토리명에서 F4D_이후의 글자가 고유 식별자
 - data.json 파일에서 children의 data_key 값을 고유 식별자로 수정
 - lattiude, longitude, height, heading, pitch, roll 값을 적당한 값으로 수정
@@ -95,8 +98,8 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -142,9 +145,11 @@ http:localhost/sample/worldwind.html</code></pre>
 
 
 <br><br>
+-----
+<br><br>
 
 
-[한국어](#korean)
+###### Using Google Translator
 # <a name="english"></a>mago3DJS
 Open source JavaScript library for 3D multi-block visualization
 
@@ -198,22 +203,24 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - Install Path: C:\F4DConverter\ 
 
 ### 5. Data Conversion
-- Create a directory to store the changed data(outputFolder) <br>
-<code>C:\data\projectname (Create a directory for each project under the data folder, the root folder)</code>
+- Create a directory to store the changed f4d(outputFolder) <br>
+<code>C:\f4d\projectname (Create a directory for each project under the data folder, the root folder)</code>
 - Save the data to be converted to C:\demo_data(inputFolder)
 - Run Command Line Prompt (cmd.exe) as an administrator and move to the directory where F4D Converter is installed
 - Run
-<br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\projectname -log C:\demo_data/logTest.txt -indexing y</code></pre>
+<br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\projectname -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
 - Create Symbolic Link to use transformed F4D files as web service in mago3D JS project
-  - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project
-  <code>C:\mago3djs</code>
-  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project<br>
+  <code>C:\mago3djs</code><br>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\f4d" "C:\f4d" 
+  (delete is rmdir data)</code></pre>
 
 ### 6. Edit Configuration File
 Add two configuration files. (data.json, policy.json)
 #### data.json
 - It is divided into three major areas. Attributes to store attribute values, children to store child node information, other area to store location information
-- The data_key of the root node of json matches the project name under the data folder
+- The isPhysical attribute of the - attributes field is a mandatory attribute
+- The data_key of the root node of json matches the project name under the f4d folder
 <pre><code>{
     //attributes area
     "attributes" : {
@@ -228,7 +235,7 @@ Add two configuration files. (data.json, policy.json)
     "data_key" : "Project name",
     "data_name" : "Project name"
 }</code></pre>
-- <code>C:\data\projectname</code>to find the directory to render
+- <code>C:\f4d\projectname</code>to find the directory to render
 - The characters after F4D_ in the directory name are unique identifiers
 - Modify the data_key value of children from the data.json file to a unique identifier
 - Modify latitude, longitude, height, heading, pitch, and roll values to appropriate values
@@ -236,8 +243,8 @@ Add two configuration files. (data.json, policy.json)
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -280,11 +287,13 @@ http:localhost/sample/worldwind.html</code></pre>
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
-<br><br>
-[english](#english) <br>
 
-<a name="japan"></a>
-準備中です。
+<br><br>
+-----
+<br><br>
+
+
+###### Googleの翻訳を使用して
 # mago3DJS
 3次元マルチブロック可視化のためのオープンソースのJavaScriptライブラリ
 
@@ -341,21 +350,23 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 
 ### 5. データ変換
 - 変わったデータ（outputFolder）を格納するディレクトリを作成し<br>
-<code>C:\data\プロジェクト名（root folderであるdataフォルダの下のプロジェクトごとにディレクトリを作成）</code>
-- 変換するデータをC:\demo_data(inputFolder)に保存
+<code>C:\f4d\プロジェクト名（root folderであるdataフォルダの下のプロジェクトごとにディレクトリを作成）</code>
+- 変換するデータをC:\demo_f4d(inputFolder)に保存
 - 管理者権限でCommand Line Prompt（cmd.exe）を実行し、F4D Converterがインストールされてディレクトリに移動
 - 次を実行し
-<br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_data -outputFolder C:\data\プロジェクト名 -log C:\demo_data/logTest.txt -indexing y</code></pre>
+<br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\プロジェクト名 -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
 - 変換完了F4Dファイルをmago3D JSプロジェクトでは、Webサービスとして利用できるようにSymbolic Linkを作成
-  - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動
-  <code>C:\mago3djs</code>
-  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\data" "C:\data" </code></pre>
+  - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動<br>
+  <code>C:\mago3djs</code><br>
+  <pre><code>C:\mago3djs>mklink /d "C:\git\repository\mago3djs\f4d" "C:\f4d" 
+  (削除の場合 rmdir data)</code></pre>
 
 ### 6. 設定ファイルを変更する
 二種類の設定ファイルを追加します。 (data.json, policy.json)
 #### data.json
-- 大きく3つのエリアに分けられる。属性値を格納するattributes、子ノードの情報を格納するchildrenその他の位置情報を格納する領域
-- jsonのrootノードのdata_keyはdataフォルダの下のプロジェクト名と一致
+- 大きく3つのエリアに分けられる。属性値を格納するattributes、子ノードの情報を格納するchildren、その他の位置情報を格納する領域
+- attributes領域のisPhysicalプロパティは、データを表示するかどうかをチェックする必須属性
+- jsonのrootノードのdata_keyはf4dフォルダの下のプロジェクト名と一致
 <pre><code>{
     //attributes領域
     "attributes" : {
@@ -370,7 +381,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
     "data_key" : "プロジェクト名",
     "data_name" : "プロジェクト名"
 }</code></pre>
-- <code>C:\data\プロジェクト名</code>でRenderingするディレクトリを捜す
+- <code>C:\f4d\プロジェクト名</code>でRenderingするディレクトリを捜す
 - ディレクトリ名でF4D_以降の文字が一意の識別子
 - data.jsonファイルからchildrenのdata_key値を一意の識別子として修正
 - latitude、longitude、height、heading、pitch、roll値を適切な値に変更
@@ -378,8 +389,8 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 "children" : [
    {
      "attributes" : {
-     "isPhysical" : true,
-     "nodeType" : "..."
+       "isPhysical" : true,
+       "nodeType" : "..."
      },
      "children" : [
      ],
@@ -421,3 +432,5 @@ http:localhost/sample/worldwind.html</code></pre>
 
 ## LICENSE ##
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+<br><br>

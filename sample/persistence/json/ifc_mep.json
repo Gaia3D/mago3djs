@@ -13,8 +13,9 @@
 			"children": [],
 			"data_key": "Sample_MEP",
 			"data_name": "Sample_MEP",
-			"heading": 63,
-			"height": 55,
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 63,
 			"latitude": 37.663459,
 			"longitude": 126.738134,
 			"pitch": 0,
@@ -25,5 +26,6 @@
 	"depth": 1,
 	"view_order": 2,  
 	"data_key": "ifc_mep",
-	"data_name": "ifc_mep"
+	"data_name": "ifc_mep",
+    "mapping_type": "origin"
 }

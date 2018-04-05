@@ -8,18 +8,26 @@
  * 어떤 일을 하고 있습니까?
  * @class Vertex
  */
-var Vertex = function() 
+var Vertex = function(position) 
 {
 	if (!(this instanceof Vertex)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.point3d = new Point3D();
+	this.point3d;
 	this.normal; // class: Point3D.
 	this.texCoord; // class: Point2D.
 	this.color4; // class: Color.
-	this.outHalfEdge; // class: HalfEdge.
+	this.outHalfEdgesArray; // Array [class: HalfEdge]. 
+	this.vertexType; // 1 = important vertex.***
+	
+	if(position)
+		this.point3d = position;
+	else
+	{
+		this.point3d = new Point3D();
+	}
 };
 
 /**
@@ -130,6 +138,20 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param r 변수
+ * @param g 변수
+ * @param b 변수
+ * @param alpha 변수
+ */
+Vertex.prototype.setNormal = function(nx, ny, nz) 
+{
+	if (this.normal === undefined) { this.normal = new Point3D(); }
+	
+	this.normal.set(nx, ny, nz);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param dirX 변수
  * @param dirY 변수
  * @param dirZ 변수
@@ -139,3 +161,50 @@ Vertex.prototype.translate = function(dirX, dirY, dirZ, distance)
 {
 	this.point3d.add(dirX * distance, dirY * distance, dirZ * distance);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

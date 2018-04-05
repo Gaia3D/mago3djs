@@ -74,6 +74,25 @@ BoundingBox.prototype.copyFrom = function(bbox)
 /**
  * 영역박스 확대
  * 
+ */
+BoundingBox.prototype.translateToOrigin = function() 
+{
+	var semiXLength = this.getXLength() /2;
+	var semiYLength = this.getYLength() /2;
+	var semiZLength = this.getZLength() /2;
+	
+	this.minX = -semiXLength;
+	this.minY = -semiYLength;
+	this.minZ = -semiZLength;
+
+	this.maxX = semiXLength;
+	this.maxY = semiYLength;
+	this.maxZ = semiZLength;
+};
+
+/**
+ * 영역박스 확대
+ * 
  * @param {Number} distance
  */
 BoundingBox.prototype.expand = function(distance) 
@@ -97,7 +116,7 @@ BoundingBox.prototype.expand = function(distance)
  */
 BoundingBox.prototype.addPoint = function(point) 
 {
-	if (point !== undefined)	{ return; }
+	if (point === undefined)	{ return; }
 
 	if (point.x < this.minX) { this.minX = point.x; }
 	else if (point.x > this.maxX) { this.maxX = point.x; }
@@ -116,7 +135,7 @@ BoundingBox.prototype.addPoint = function(point)
  */
 BoundingBox.prototype.addBox = function(box) 
 {
-	if (box !== undefined)	{ return; }
+	if (box === undefined)	{ return; }
 
 	if (box.minX < this.minX) { this.minX = box.minX; }
 	if (box.maxX > this.maxX) { this.maxX = box.maxX; }

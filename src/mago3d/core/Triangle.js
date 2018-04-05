@@ -14,35 +14,10 @@ var Triangle= function()
 	this.vertex0;
 	this.vertex1;
 	this.vertex2;
+	this.vtxIdx0;
+	this.vtxIdx1;
+	this.vtxIdx2;
 	this.normal; // plainNormal.
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Triangle.prototype.destroy = function() 
-{
-	// delete this.*************
-	if (this.vertex0)
-	{
-		this.vertex0.deleteObjects();
-		this.vertex0 = undefined;
-	}
-	if (this.vertex1)
-	{
-		this.vertex1.deleteObjects();
-		this.vertex1 = undefined;
-	}
-	if (this.vertex2)
-	{
-		this.vertex2.deleteObjects();
-		this.vertex2 = undefined;
-	}
-	if (this.normal)
-	{
-		this.normal.deleteObjects();
-		this.normal = undefined;
-	}
 };
 
 /**
@@ -50,19 +25,20 @@ Triangle.prototype.destroy = function()
  */
 Triangle.prototype.deleteObjects = function() 
 {
+	// the triangle no delete vertices.***
 	if (this.vertex0)
 	{
-		this.vertex0.deleteObjects();
+		//this.vertex0.deleteObjects();
 		this.vertex0 = undefined;
 	}
 	if (this.vertex1)
 	{
-		this.vertex1.deleteObjects();
+		//this.vertex1.deleteObjects();
 		this.vertex1 = undefined;
 	}
 	if (this.vertex2)
 	{
-		this.vertex2.deleteObjects();
+		//this.vertex2.deleteObjects();
 		this.vertex2 = undefined;
 	}
 	if (this.normal)
@@ -70,6 +46,10 @@ Triangle.prototype.deleteObjects = function()
 		this.normal.deleteObjects();
 		this.normal = undefined;
 	}
+	
+	this.vtxIdx0 = undefined;
+	this.vtxIdx1 = undefined;
+	this.vtxIdx2 = undefined;
 };
 
 /**

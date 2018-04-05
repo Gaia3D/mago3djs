@@ -15,7 +15,7 @@ var HierarchyManager = function()
 
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
-	this.projectsMap = new Map();
+	this.projectsMap = {};
 };
 
 /**
@@ -25,12 +25,11 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
-	for (var value of this.projectsMap.values()) 
-	{
-		value.clear();
-	}
-	
-	this.projectsMap.clear();
+	//for (var value of this.projectsMap.values()) 
+	//{
+	//	value.clear();
+	//}
+	this.projectsMap = {};
 	
 	var nodesCount = this.nodesArray.length;
 	for (var i=0; i<nodesCount; i++)
@@ -51,6 +50,7 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
  */
 HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
+	// note: here "dataName" refers "nodeId", or other datas that can be inside of"data".***
 	var nodesMap = this.getNodesMap(projectId);
 	
 	if (nodesMap === undefined)
@@ -58,14 +58,36 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
 	
 	var resultNode;
 	
-	for (var value of nodesMap.values()) 
+	//for (var value of nodesMap.values()) 
+	for (var key in nodesMap)
 	{
-		if (value.data[dataName] === dataNameValue)
+		if (Object.prototype.hasOwnProperty.call(nodesMap, key))
 		{
-			resultNode = value;
-			break;
+			var value = nodesMap[key];
+			if (value.data[dataName] === dataNameValue)
+			{
+				resultNode = value;
+				break;
+			}
 		}
 	}
+	
+	return resultNode;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class GeoLocationData
+ * @param geoLocData 변수
+ */
+HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey) 
+{
+	var nodesMap = this.getNodesMap(projectId);
+	
+	if (nodesMap === undefined)
+	{ return undefined; }
+	
+	var resultNode = nodesMap[dataKey];
 	
 	return resultNode;
 };
@@ -85,11 +107,11 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = this.nodesArray[i];
+		
 		if (node.parent === undefined)
 		{
 			resultRootNodesArray.push(node);
 		}
-		i++;
 	}
 	
 	return resultRootNodesArray;
@@ -102,7 +124,7 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
  */
 HierarchyManager.prototype.existProject = function(projectId) 
 {
-	return this.projectsMap.has(projectId);
+	return this.projectsMap.hasOwnProperty(projectId);
 };
 
 /**
@@ -113,11 +135,11 @@ HierarchyManager.prototype.existProject = function(projectId)
 HierarchyManager.prototype.getNodesMap = function(projectId) 
 {
 	// 1rst, check if exist.
-	var nodesMap = this.projectsMap.get(projectId);
+	var nodesMap = this.projectsMap[projectId];
 	if (nodesMap === undefined)
 	{
-		nodesMap = new Map();
-		this.projectsMap.set(projectId, nodesMap);
+		nodesMap = {};
+		this.projectsMap[projectId] = nodesMap;
 	}
 	return nodesMap;
 };
@@ -135,7 +157,7 @@ HierarchyManager.prototype.newNode = function(id, projectId)
 	var node = new Node();
 	node.data = {"nodeId": id};
 	this.nodesArray.push(node);
-	nodesMap.set(id, node);
+	nodesMap[id] = node;
 	return node;
 };
 

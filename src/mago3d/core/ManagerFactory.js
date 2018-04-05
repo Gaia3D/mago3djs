@@ -642,6 +642,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var currentHeading = geoLocationData.heading || 0;
 		var currentPitch = geoLocationData.pitch || 0;
 		var currentRoll = geoLocationData.roll || 0;
+		
+		var increDist = 0.2;
+		var currentAlt = geoLocationData.geographicCoord.altitude || 0;
 
 		// For Heading
 		if (event.keyCode === 'Q'.charCodeAt(0))
@@ -672,8 +675,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			currentRoll -= increDeg;
 		}
+		
+		// For Altitude
+		if (event.keyCode === 'Z'.charCodeAt(0))
+		{
+			currentAlt += increDist;
+		}
+		else if (event.keyCode === 'X'.charCodeAt(0))
+		{
+			currentAlt -= increDist;
+		}
 
-		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.latitude, geoLocationData.longitude, geoLocationData.elevation, currentHeading, currentPitch, currentRoll);
+		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
 
 	}, false);
 	
@@ -684,37 +697,36 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			magoManager.callAPI(api);
 		},
-		// flyTo
-		flyTo: function(issueId, issueType, longitude, latitude, height, duration) 
-		{
-			if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
-			{
-				viewer.camera.flyTo({
-					destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
-						parseFloat(latitude),
-						parseFloat(height) + 10),
-					duration: parseInt(duration)
-				});
-			}
-			else 
-			{
-				wwd.goToAnimator.travelTime = duration * 1000;
-				wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
-			}
-			// pin을 그림
-			if (issueId !== null && issueType !== undefined) 
-			{
-				var api = new API("drawInsertIssueImage");
-				api.setDrawType(0);
-				api.setIssueId(issueId);
-				api.setIssueType(issueType);
-				api.setDataKey(null);
-				api.setLatitude(latitude);
-				api.setLongitude(longitude);
-				api.setElevation(height);
-				magoManager.callAPI(api);
-			}
-		},
+		// flyTo: function(issueId, issueType, longitude, latitude, height, duration)
+		// {
+		// 	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		// 	{
+		// 		viewer.camera.flyTo({
+		// 			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+		// 				parseFloat(latitude),
+		// 				parseFloat(height) + 10),
+		// 			duration: parseInt(duration)
+		// 		});
+		// 	}
+		// 	else
+		// 	{
+		// 		wwd.goToAnimator.travelTime = duration * 1000;
+		// 		wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(height) + 50));
+		// 	}
+		// 	// pin을 그림
+		// 	if (issueId !== null && issueType !== undefined)
+		// 	{
+		// 		var api = new API("drawInsertIssueImage");
+		// 		api.setDrawType(0);
+		// 		api.setIssueId(issueId);
+		// 		api.setIssueType(issueType);
+		// 		api.setDataKey(null);
+		// 		api.setLatitude(latitude);
+		// 		api.setLongitude(longitude);
+		// 		api.setElevation(height);
+		// 		magoManager.callAPI(api);
+		// 	}
+		// },
 		// magoManager 상태
 		getMagoManagerState: function() 
 		{

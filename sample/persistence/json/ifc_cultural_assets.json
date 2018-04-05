@@ -13,8 +13,9 @@
 			"children": [],
 			"data_key": "ByeolMaJeolDoSa",
 			"data_name": "병마 절도사",
-			"heading": 0,
-			"height": 65,
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 70,
 			"latitude": 37.579813075158986,
 			"longitude": 126.97772995695296,
 			"pitch": 0,
@@ -25,5 +26,6 @@
 	"depth": 1,
 	"view_order": 2,  	
 	"data_key": "ifc_cultural_assets",
-	"data_name": "ifc_cultural_assets"
+	"data_name": "ifc_cultural_assets",
+    "mapping_type": "origin"
 }

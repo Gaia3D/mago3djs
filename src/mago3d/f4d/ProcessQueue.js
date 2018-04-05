@@ -13,9 +13,9 @@ var ProcessQueue = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.nodesToDeleteMap = new Map();
-	this.nodesToDeleteModelReferencesMap = new Map();
-	this.nodesToDeleteLessThanLod3Map = new Map();
+	this.nodesToDeleteMap = {};
+	this.nodesToDeleteModelReferencesMap = {};
+	this.nodesToDeleteLessThanLod3Map = {};
 };
 
 ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
@@ -23,14 +23,30 @@ ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
-	this.nodesToDeleteLessThanLod3Map.set(node, aValue);
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteLessThanLod3Map[key] = node;
+	
+	//this.nodesToDeleteLessThanLod3Map.set(node, aValue);
 };
 
 ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
 {
 	// this erases the node from the "nodesToDeleteLessThanLod3Map".
-	return this.nodesToDeleteLessThanLod3Map.delete(node);
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteLessThanLod3Map.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteLessThanLod3Map[key];
+		return true;
+	}
+	return false;
+	//return this.nodesToDeleteLessThanLod3Map.delete(node);
 };
 
 ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
@@ -39,14 +55,29 @@ ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
-	this.nodesToDeleteModelReferencesMap.set(node, aValue);
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteModelReferencesMap[key] = node;
+	//this.nodesToDeleteModelReferencesMap.set(node, aValue);
 };
 
 ProcessQueue.prototype.eraseNodeToDeleteModelReferences = function(node)
 {
 	// this erases the node from the "nodesToDeleteModelReferencesMap".
-	return this.nodesToDeleteModelReferencesMap.delete(node);
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteModelReferencesMap.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteModelReferencesMap[key];
+		return true;
+	}
+	return false;
+	//return this.nodesToDeleteModelReferencesMap.delete(node);
 };
 
 ProcessQueue.prototype.putNodeToDelete = function(node, aValue)
@@ -55,8 +86,12 @@ ProcessQueue.prototype.putNodeToDelete = function(node, aValue)
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
 	
-	this.nodesToDeleteMap.set(node, aValue);
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteMap[key] = node;
 };
 
 ProcessQueue.prototype.putNodesArrayToDelete = function(nodesToDeleteArray, aValue)
@@ -79,13 +114,19 @@ ProcessQueue.prototype.putNodesArrayToDelete = function(nodesToDeleteArray, aVal
 ProcessQueue.prototype.eraseNodeToDelete = function(node)
 {
 	// this erases the node from the "nodesToDeleteMap".
-	return this.nodesToDeleteMap.delete(node);
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteMap.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteMap[key];
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.clearAll = function()
 {
-	this.nodesToDeleteMap.clear();
-	this.nodesToDeleteModelReferencesMap.clear();
+	this.nodesToDeleteMap = {};
+	this.nodesToDeleteModelReferencesMap = {};
 };
 
 

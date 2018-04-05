@@ -453,7 +453,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
 }
 
 /**
- * 환경 설정 data map에 key 값의 존재 유무를 판별
+ * 환경 설정 data Object에 key 값의 존재 유무를 판별
  * @param {string} key 검색 키
  * @param 
  */
@@ -471,6 +471,23 @@ function isDataExistAPI(key)
 function getDataAPI(key) 
 {
 	return MagoConfig.getData(key);
+}
+
+/**
+ * Data Key 를 이용하여 Geo Spatial Info를 취득
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {String} projectId 고유키
+ * @param {String} dataKey Data 고유키
+ * @param
+ */
+function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
+{
+	if (managerFactoryInstance === null) { return; }
+
+	var api = new API("getDataInfoByDataKey");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
 }
 
 /**

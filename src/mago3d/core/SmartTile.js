@@ -317,6 +317,8 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		}
 		
 	}
+	//else
+	//	var hola = 0;
 };
 
 /**
@@ -366,14 +368,28 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 	// this function intersects the buildingSeeds with this tile.
 	// this function is used only one time when load a initial buildings distributions on the globe.
 	var buildingSeed;
-	var node;
+	var node, rootNode;
 	var buildingSeedsCount = nodeSeedsArray.length;
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
 		node = nodeSeedsArray[i];
 		buildingSeed = node.data.buildingSeed;
 		
-		if (this.intersectPoint(buildingSeed.geographicCoordOfBBox.longitude, buildingSeed.geographicCoordOfBBox.latitude))
+		rootNode = node.getRoot();
+		
+		var longitude, latitude;
+		if(rootNode.data.bbox.geographicCoord === undefined)
+		{
+			// in this case take the data from buildingSeed.***
+			longitude = buildingSeed.geographicCoordOfBBox.longitude;
+			latitude = buildingSeed.geographicCoordOfBBox.latitude;
+		}
+		else{
+			longitude = rootNode.data.bbox.geographicCoord.longitude;
+			latitude = rootNode.data.bbox.geographicCoord.latitude;
+		}
+		
+		if (this.intersectPoint(longitude, latitude))
 		{
 			nodeSeedsArray.splice(i, 1);
 			i--;

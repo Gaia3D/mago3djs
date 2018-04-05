@@ -13,3 +13,17 @@ var TrianglesMatrix= function()
 
 	this.trianglesListsArray;
 };
+
+TrianglesMatrix.prototype.deleteObjects = function()
+{
+	if(this.trianglesListsArray === undefined)
+		return;
+	
+	var trianglesListsCount = this.trianglesListsArray.length;
+	for(var i=0; i<trianglesListsCount; i++)
+	{
+		this.trianglesListsArray[i].deleteObjects();
+		this.trianglesListsArray[i] = undefined;
+	}
+	this.trianglesListsArray = undefined;
+}

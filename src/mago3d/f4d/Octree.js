@@ -22,6 +22,8 @@ var Octree = function(octreeOwner)
 	this.octree_owner;
 	this.octree_level = 0;
 	this.octree_number_name = 0;
+	this.neoBuildingOwnerId;
+	this.octreeKey;
 	this.distToCamera;
 	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
 	this.fileLoadState = CODE.fileLoadState.READY;
@@ -216,6 +218,8 @@ Octree.prototype.makeTree = function(treeDepth)
 		{
 			var subOctree = this.new_subOctree();
 			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
+			subOctree.neoBuildingOwnerId = this.neoBuildingOwnerId;
+			subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
 		}
 
 		this.setSizesSubBoxes();
@@ -1054,6 +1058,10 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 	// 1rst, check the range.
 	
 	var range = endIdx - startIdx;
+	
+	if(range <= 0)
+		return 0;
+	
 	if (range < 6)
 	{
 		// in this case do a lineal search.
@@ -1245,6 +1253,8 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	{
 		var subOctree = this.new_subOctree();
 		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
+		subOctree.neoBuildingOwnerId = this.neoBuildingOwnerId;
+		subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
 	}
 
 	// now, set size of subOctrees.***
