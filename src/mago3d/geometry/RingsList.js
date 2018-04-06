@@ -74,17 +74,17 @@ RingsList.prototype.getRing = function(idx)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getBoundingRectangle = function(resultBRect) 
+RingsList.getBoundingRectangle = function(ringsArray, resultBRect) 
 {
 	if (this.resultBRect === undefined)
 		resultBRect = new BoundingRectangle();
 	
 	var ring;
 	var currBRect;
-	var ringsCount = this.getRingsCount();
+	var ringsCount = ringsArray.length;
 	for(var i=0; i<ringsCount; i++)
 	{
-		ring = this.getRing(i);
+		ring = ringsArray[i];
 		if(ring.polygon === undefined)
 			ring.makePolygon();
 		
@@ -154,6 +154,7 @@ RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorted
 		squaredDist = ringPoint.squareDistToPoint(point);
 		objectAux = {};
 		objectAux.ring = ring;
+		objectAux.ringIdx = i;
 		objectAux.pointIdx = ringPointIdx;
 		objectAux.squaredDist = squaredDist;
 		
@@ -189,7 +190,7 @@ RingsList.getIndexToInsertBySquaredDist = function(objectsArray, object, startId
 	
 	var range = endIdx - startIdx;
 	
-	if(range <= 0)
+	if(objectsArray.length === 0)
 		return 0;
 	
 	if (range < 6)

@@ -100,11 +100,12 @@ Profile.prototype.getVBO = function(resultVBOCacheKeys)
 	else{
 		// 1rst, check normals congruences.***
 		this.checkNormals();
-		var resultConvexPolygons = this.tessellate(resultConvexPolygons);
+		var resultHolesEliminatedPolygons = this.tessellate(resultHolesEliminatedPolygons);
 		
-		if(resultConvexPolygons.length > 0)
+		if(resultHolesEliminatedPolygons.length > 0)
 		{
-			var polygon = resultConvexPolygons[0];
+			// there are only one polygon in "resultHolesEliminatedPolygons".***
+			var polygon = resultHolesEliminatedPolygons[0]; // there are only 1 polygon.***
 			
 			polygon.convexPolygonsArray = [];
 			var concavePointsIndices = polygon.calculateNormal(concavePointsIndices);
@@ -225,6 +226,89 @@ Profile.prototype.eliminateHolePolygon = function(outerPolygon, innerPolygon, in
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
+Profile.prototype.tessellate = function(resultHolesEliminatedPolygons) 
+{
+	if(this.outerRing === undefined)
+		return undefined;
+	
+	if(resultHolesEliminatedPolygons === undefined)
+		resultHolesEliminatedPolygons = [];
+	
+	if(this.hasHoles())
+	{
+		var hole;
+		var holeIdx;
+		var holePolygon;
+		var objectAux;
+		var innerPointIdx;
+		var innersBRect;
+		
+		// prepare outerRing if necessary.***
+		var outerRing = this.outerRing;
+		if(outerRing.polygon === undefined)
+			outerRing.makePolygon();
+		var outerPolygon = outerRing.polygon;
+		var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
+		
+		// make a innerRingsArray copy.***
+		var innerRingsArray = [];
+		var innerRingsCount = this.innerRingsList.getRingsCount();
+		for(var i=0; i<innerRingsCount; i++)
+		{
+			innerRingsArray.push(this.innerRingsList.getRing(i));
+		}
+		
+		var resultPolygon = new Polygon();
+		var resultPolygonAux = new Polygon();
+		resultPolygonAux = outerPolygon.getCopy(resultPolygonAux);
+		var innersBRectLeftDownPoint = new Point2D();
+		var objectsArray = [];
+		
+		// now, for each innerRing, try to merge to outerRing by splitSegment.***
+		var innerRingsCount = innerRingsArray.length;
+		var i=0;
+		var finished = false;
+		while(!finished && i<innerRingsCount)
+		{
+			// calculate the most left-down innerRing.***
+			innersBRect = RingsList.getBoundingRectangle(innerRingsArray, innersBRect);
+			innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
+			
+			objectsArray.length = 0; // init.***
+			objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
+		
+			objectAux = objectsArray[0];
+			hole = objectAux.ring;
+			holeIdx = objectAux.ringIdx;
+			holePolygon = hole.polygon;
+			innerPointIdx = objectAux.pointIdx;
+			holePolygon.calculateNormal();
+			
+			if(this.eliminateHolePolygon(resultPolygonAux, holePolygon, innerPointIdx, resultPolygon))
+			{
+				if(innerRingsArray.length == 1)
+				{
+					finished = true;
+					break;
+				}
+				// erase the hole from innerRingsArray.***
+				innerRingsArray.splice(holeIdx, 1);
+				resultPolygonAux.deleteObjects();
+				resultPolygonAux = resultPolygon;
+				resultPolygon = new Polygon();
+			}
+			i++;
+		}
+		resultHolesEliminatedPolygons.push(resultPolygon);
+	}
+	
+	return resultHolesEliminatedPolygons;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 Profile.prototype.checkNormals = function() 
 {
 	if(this.outerRing === undefined)
@@ -266,399 +350,240 @@ Profile.prototype.checkNormals = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.tessellate = function(resultConvexPolygons) 
+Profile.prototype.TEST__setFigureHole_2 = function() 
 {
-	if(this.outerRing === undefined)
-		return undefined;
-	
-	if(resultConvexPolygons === undefined)
-		resultConvexPolygons = [];
-	
-	if(this.hasHoles())
-	{
-		// 1rst, calculate the most left-down innerRing.***
-		var innersBRect = this.innerRingsList.getBoundingRectangle(innersBRect);
-		var innersBRectLeftDownPoint = new Point2D(innersBRect.minX, innersBRect.minY);
-		
-		// make a innerRingsArray copy.***
-		var innerRingsArray = [];
-		var innerRingsCount = this.innerRingsList.getRingsCount();
-		for(var i=0; i<innerRingsCount; i++)
-		{
-			innerRingsArray.push(this.innerRingsList.getRing(i));
-		}
-		
-		var objectsArray = [];
-		objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
-		
-		// now, for each hole, calculate the nearest point to outerRing.***
-		var hole;
-		var holePolygon;
-		var objectAux;
-		var innerPointIdx;
-		var holeNormal;
-		var splitSegment;
-		
-		// prepare outerRing.***
-		var outerRing = this.outerRing;
-		if(outerRing.polygon === undefined)
-			outerRing.makePolygon();
-		var outerPolygon = outerRing.polygon;
-		
-		var resultPolygon = new Polygon();
-		//resultPolygon = outerPolygon.getCopy(resultPolygon);
-
-		var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
-		
-		// now, for each innerRing, try to merge to outerRing by splitSegment.***
-		var innerRingsCount = objectsArray.length;
-		for(var i=0; i<innerRingsCount; i++)
-		{
-			objectAux = objectsArray[i];
-			hole = objectAux.ring;
-			holePolygon = hole.polygon;
-			innerPointIdx = objectAux.pointIdx;
-			holePolygon.calculateNormal();
-			//holeNormal = holePolygon.normal;
-			
-			if(this.eliminateHolePolygon(outerPolygon, holePolygon, innerPointIdx, resultPolygon))
-			{
-				
-			}
-		}
-		resultConvexPolygons.push(resultPolygon);
-	}
-	
-	return resultConvexPolygons;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureHole_1 = function() 
-{
-	// profile with holes.***
-	var outerRing = this.newOuterRing();
-	
+	// complicated polygon with multiple holes.***
 	var polyLine;
 	var arc;
-	var point3d;
+	var circle;
 	var rect;
+	var point3d;
+	var star;
 	
-	rect = outerRing.newElement("RECTANGLE");
-	rect.setCenterPosition(0, 0);
-	rect.setDimensions(20, 18);
-	/*
-	var innerRing = this.newInnerRing();
-	rect = innerRing.newElement("RECTANGLE");
-	rect.setCenterPosition(-5.5, 5.5);
-	rect.setDimensions(5, 3);
-	*/
-	var innerRing = this.newInnerRing();
-	rect = innerRing.newElement("CIRCLE");
-	rect.setCenterPosition(0, 4);
-	rect.setRadius(2);
-	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_almostHole_2 = function() 
-{
-	// profile without holes.***
+	// Outer ring.**************************************
 	var outerRing = this.newOuterRing();
 	
-	var polyLine;
-	var arc;
-	var point3d;
-	
 	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(3.0, 4.0); // 0
-	point3d = polyLine.newPoint2d(5.0, 6.0); // 1
-	point3d = polyLine.newPoint2d(0.0, 6.0); // 2
-	point3d = polyLine.newPoint2d(0.0, 0.0); // 3
-	point3d = polyLine.newPoint2d(9.0, 0.0); // 4
-	point3d = polyLine.newPoint2d(9.0, 6.0); // 5
-	point3d = polyLine.newPoint2d(5.0, 6.0); // 6
-	point3d = polyLine.newPoint2d(3.0, 4.0); // 7
-	point3d = polyLine.newPoint2d(4.0, 4.0); // 8
-	point3d = polyLine.newPoint2d(4.0, 3.0); // 9
-	point3d = polyLine.newPoint2d(3.0, 3.0); // 10
-	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_almostHole = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
-	
-	var polyLine;
-	var arc;
-	var point3d;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(0.0, 0.0); // 0
-	point3d = polyLine.newPoint2d(7.0, 0.0); // 1
-	point3d = polyLine.newPoint2d(7.0, 5.0); // 2
-	point3d = polyLine.newPoint2d(5.0, 4.0); // 3
-	point3d = polyLine.newPoint2d(5.0, 2.0); // 4
-	point3d = polyLine.newPoint2d(1.0, 2.0); // 5
-	point3d = polyLine.newPoint2d(1.0, 4.0); // 6
-	point3d = polyLine.newPoint2d(5.0, 4.0); // 7
-	point3d = polyLine.newPoint2d(7.0, 5.0); // 8
-	point3d = polyLine.newPoint2d(0.0, 5.0); // 9
-	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_duckMouth = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
-	
-	var polyLine;
-	var arc;
-	var point3d;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(3.0, 0.0); // 0
-	point3d = polyLine.newPoint2d(8.0, 0.0); // 1
-	point3d = polyLine.newPoint2d(8.0, 5.0); // 2
-	point3d = polyLine.newPoint2d(2.0, 5.0); // 3
-	point3d = polyLine.newPoint2d(0.0, 0.0); // 4
-	point3d = polyLine.newPoint2d(6.0, 4.0); // 5
-	point3d = polyLine.newPoint2d(6.0, 2.0); // 6
-	point3d = polyLine.newPoint2d(3.0, 2.0); // 7
-	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_spiral = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
-	
-	var polyLine;
-	var arc;
-	var point3d;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(0.0, -3.0); // 0
-	point3d = polyLine.newPoint2d(3.0, -2.0); // 1
-	point3d = polyLine.newPoint2d(5.0, -2.0); // 2
-	point3d = polyLine.newPoint2d(5.0, 3.0); // 3
-	point3d = polyLine.newPoint2d(-2.0, 4.0); // 4
+	point3d = polyLine.newPoint2d(-13, 3); // 0
+	point3d = polyLine.newPoint2d(-13, -11); // 1
 	
 	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(-3, 3);
-	arc.setRadius(Math.sqrt(2));
-	arc.setStartAngleDegree(45.0);
-	arc.setSweepAngleDegree(-180.0);
+	arc.setCenterPosition(-8, -11);
+	arc.setRadius(5);
+	arc.setStartAngleDegree(180.0);
+	arc.setSweepAngleDegree(90.0);
 	arc.numPointsFor360Deg = 24;
 	
 	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-4.0, 2.0); // 0
-	point3d = polyLine.newPoint2d(-4.0, -5.0); // 1
-	point3d = polyLine.newPoint2d(-5.0, -5.0); // 2
-	point3d = polyLine.newPoint2d(-5.0, -3.0); // 3
+	point3d = polyLine.newPoint2d(-8, -16); // 0
+	point3d = polyLine.newPoint2d(-5, -16); // 1
+	point3d = polyLine.newPoint2d(-3, -15); // 2
+	point3d = polyLine.newPoint2d(-3, -14); // 3
+	point3d = polyLine.newPoint2d(-5, -12); // 4
+	point3d = polyLine.newPoint2d(-3, -11); // 5
+	point3d = polyLine.newPoint2d(-2, -9); // 6
+	point3d = polyLine.newPoint2d(3, -9); // 7
 	
 	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(-6, -3);
-	arc.setRadius(1);
-	arc.setStartAngleDegree(0.0);
+	arc.setCenterPosition(9, -9);
+	arc.setRadius(6);
+	arc.setStartAngleDegree(180.0);
 	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
 	
 	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-7.0, -3.0); // 0
-	point3d = polyLine.newPoint2d(-7.0, -7.0); // 1
-	point3d = polyLine.newPoint2d(8.0, -5.0); // 2
-	point3d = polyLine.newPoint2d(8.0, 8.0); // 3
-	point3d = polyLine.newPoint2d(3.0, 8.0); // 4
+	point3d = polyLine.newPoint2d(15, -9); // 0
+	point3d = polyLine.newPoint2d(16, -9); // 1
+	point3d = polyLine.newPoint2d(16, 4); // 2
 	
 	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(0, 8);
+	arc.setCenterPosition(11, 4);
+	arc.setRadius(5);
+	arc.setStartAngleDegree(0.0);
+	arc.setSweepAngleDegree(90.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(11, 9); // 0
+	point3d = polyLine.newPoint2d(4, 9); // 1
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(4, 11);
+	arc.setRadius(2);
+	arc.setStartAngleDegree(-90.0);
+	arc.setSweepAngleDegree(-180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(4, 13); // 0
+	point3d = polyLine.newPoint2d(9, 13); // 1
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(9, 14.5);
+	arc.setRadius(1.5);
+	arc.setStartAngleDegree(-90.0);
+	arc.setSweepAngleDegree(180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(9, 16); // 0
+	point3d = polyLine.newPoint2d(2, 16); // 1
+	point3d = polyLine.newPoint2d(0, 14); // 2
+	point3d = polyLine.newPoint2d(-4, 16); // 3
+	point3d = polyLine.newPoint2d(-9, 16); // 4
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(-9, 14);
+	arc.setRadius(2);
+	arc.setStartAngleDegree(90.0);
+	arc.setSweepAngleDegree(180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(-9, 12); // 0
+	point3d = polyLine.newPoint2d(-6, 12); // 1
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(-6, 10.5);
+	arc.setRadius(1.5);
+	arc.setStartAngleDegree(90.0);
+	arc.setSweepAngleDegree(-180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(-6, 9); // 0
+	point3d = polyLine.newPoint2d(-7, 9); // 1
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(-7, 3);
+	arc.setRadius(6);
+	arc.setStartAngleDegree(90.0);
+	arc.setSweepAngleDegree(90.0);
+	arc.numPointsFor360Deg = 24;
+	
+	// Holes.**************************************************
+	// Hole 1.*************************************************
+	var innerRing = this.newInnerRing();
+	
+	polyLine = innerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(-9, 3); // 0
+	point3d = polyLine.newPoint2d(-10, -4); // 1
+	point3d = polyLine.newPoint2d(-10, -8); // 2
+	point3d = polyLine.newPoint2d(-8, -11); // 3
+	point3d = polyLine.newPoint2d(-3, -7); // 4
+	point3d = polyLine.newPoint2d(4, -7); // 5
+	
+	arc = innerRing.newElement("ARC");
+	arc.setCenterPosition(8, -7);
+	arc.setRadius(4);
+	arc.setStartAngleDegree(180.0);
+	arc.setSweepAngleDegree(180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	polyLine = innerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(12, -7); // 0
+	point3d = polyLine.newPoint2d(12, -4); // 1
+	point3d = polyLine.newPoint2d(8, -10); // 2
+	point3d = polyLine.newPoint2d(4, -5); // 3
+	point3d = polyLine.newPoint2d(-8, -5); // 4
+	point3d = polyLine.newPoint2d(-7, 4); // 5
+	point3d = polyLine.newPoint2d(9, 4); // 6
+	point3d = polyLine.newPoint2d(9, -5); // 7
+	point3d = polyLine.newPoint2d(14, 2); // 8
+	point3d = polyLine.newPoint2d(13, 2); // 9
+	point3d = polyLine.newPoint2d(11, 0); // 10
+	point3d = polyLine.newPoint2d(11, 7); // 11
+	point3d = polyLine.newPoint2d(13, 8); // 12
+	point3d = polyLine.newPoint2d(5, 8); // 13
+	point3d = polyLine.newPoint2d(9, 6); // 14
+	point3d = polyLine.newPoint2d(-6, 6); // 15
+	
+	arc = innerRing.newElement("ARC");
+	arc.setCenterPosition(-6, 3);
 	arc.setRadius(3);
-	arc.setStartAngleDegree(0.0);
-	arc.setSweepAngleDegree(180.0);
+	arc.setStartAngleDegree(90.0);
+	arc.setSweepAngleDegree(90.0);
 	arc.numPointsFor360Deg = 24;
 	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-3.0, 8.0); // 0
-	point3d = polyLine.newPoint2d(-9.0, 8.0); // 1
-	point3d = polyLine.newPoint2d(-9.0, 9.0); // 2
-	point3d = polyLine.newPoint2d(-5.0, 9.0); // 3
+	// Hole 2.*************************************************
+	innerRing = this.newInnerRing();
+	circle = innerRing.newElement("CIRCLE");
+	circle.setCenterPosition(-10, -13);
+	circle.setRadius(1);
 	
-	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(-5, 10);
-	arc.setRadius(1);
-	arc.setStartAngleDegree(-90);
-	arc.setSweepAngleDegree(180.0);
-	arc.numPointsFor360Deg = 24;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-5.0, 11.0); // 0
-	point3d = polyLine.newPoint2d(-10.0, 9.0); // 1
-	point3d = polyLine.newPoint2d(-10.0, -10.0); // 2
-	point3d = polyLine.newPoint2d(-3.0, -8.0); // 3
-	point3d = polyLine.newPoint2d(-8.0, -8.0); // 4
-	point3d = polyLine.newPoint2d(-8.0, -1.0); // 5
-	point3d = polyLine.newPoint2d(-5.0, -1.0); // 6
-	point3d = polyLine.newPoint2d(-6.0, 1.0); // 7
-	point3d = polyLine.newPoint2d(-6.0, 6.0); // 8
-	point3d = polyLine.newPoint2d(5.0, 6.0); // 9
-	point3d = polyLine.newPoint2d(7.0, -4.0); // 10
-	point3d = polyLine.newPoint2d(-2.0, -4.0); // 11
-	point3d = polyLine.newPoint2d(-2.0, -2.0); // 12
-	point3d = polyLine.newPoint2d(3.0, 1.0); // 13
-	point3d = polyLine.newPoint2d(3.0, -1.0); // 14
-	point3d = polyLine.newPoint2d(0.0, -1.0); // 15
-	
-};
+	// Hole 3.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(-6.5, -14);
+	star.setRadiusCount(5);
+	star.setInteriorRadius(0.6);
+	star.setExteriorRadius(2);
 
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_simpleArc = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
+	// Hole 4.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(-9, 14);
+	star.setRadiusCount(6);
+	star.setInteriorRadius(0.5);
+	star.setExteriorRadius(1.5);
 	
-	var polyLine;
-	var arc;
-	var point3d;
+	// Hole 5.*************************************************
+	innerRing = this.newInnerRing();
+	rect = innerRing.newElement("RECTANGLE");
+	rect.setCenterPosition(-4.5, 1.5);
+	rect.setDimensions(3, 3);
 	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-2.0, 0.0); // 0
-	point3d = polyLine.newPoint2d(-2.0, -3.0); // 1
-	point3d = polyLine.newPoint2d(0.0, -3.0); // 2
-	point3d = polyLine.newPoint2d(0.0, -1.0); // 3
-	point3d = polyLine.newPoint2d(1.0, -1.0); // 4
+	// Hole 6.*************************************************
+	innerRing = this.newInnerRing();
+	circle = innerRing.newElement("CIRCLE");
+	circle.setCenterPosition(-4.5, -2.5);
+	circle.setRadius(2);
 	
-	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(0, 0);
-	arc.setRadius(2);
-	arc.setStartAngleDegree(-45.0);
-	arc.setSweepAngleDegree(225.0);
-	arc.numPointsFor360Deg = 36;
+	// Hole 7.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(0, 0);
+	star.setRadiusCount(5);
+	star.setInteriorRadius(1);
+	star.setExteriorRadius(2.5);
 	
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_2 = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
+	// Hole 8.*************************************************
+	innerRing = this.newInnerRing();
+	circle = innerRing.newElement("CIRCLE");
+	circle.setCenterPosition(-6, 14);
+	circle.setRadius(1.5);
 	
-	var polyLine;
-	var arc;
-	var point3d;
+	// Hole 9.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(-1.5, 11);
+	star.setRadiusCount(12);
+	star.setInteriorRadius(0.6);
+	star.setExteriorRadius(2);
 	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(-5.0, 2.0); // 0
-	point3d = polyLine.newPoint2d(-5.0, -4.0); // 1
-	point3d = polyLine.newPoint2d(4.0, -4.0); // 2
-	point3d = polyLine.newPoint2d(4.0, 7.0); // 3
-	point3d = polyLine.newPoint2d(1.0, 8.0); // 4
-	point3d = polyLine.newPoint2d(-1.0, 6.0); // 5
-	point3d = polyLine.newPoint2d(1.0, 4.0); // 6
-	point3d = polyLine.newPoint2d(1.0, 6.0); // 7
-	point3d = polyLine.newPoint2d(3.0, 3.0); // 8
-	point3d = polyLine.newPoint2d(0.0, -3.0); // 9
-	point3d = polyLine.newPoint2d(-3.0, -3.0); // 10
-	point3d = polyLine.newPoint2d(-3.0, 1.0); // 11
-	point3d = polyLine.newPoint2d(-2.0, 1.0); // 12
+	// Hole 10.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(13.5, 5);
+	star.setRadiusCount(25);
+	star.setInteriorRadius(0.4);
+	star.setExteriorRadius(1.5);
 	
-	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(-3, 2);
-	arc.setRadius(2);
-	arc.setStartAngleDegree(-45.0);
-	arc.setSweepAngleDegree(225.0);
-	arc.numPointsFor360Deg = 77;
+	// Hole 11.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(9, -13);
+	star.setRadiusCount(10);
+	star.setInteriorRadius(0.4);
+	star.setExteriorRadius(1.5);
 	
-};
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_1 = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
-	
-	var polyLine;
-	var arc;
-	var point3d;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(9.0, 0.0); // 0
-	point3d = polyLine.newPoint2d(9.0, 3.0); // 1
-	point3d = polyLine.newPoint2d(8.0, 3.0); // 2
-	point3d = polyLine.newPoint2d(6.0, 1.0); // 3
-	point3d = polyLine.newPoint2d(6.0, 2.0); // 4
-	point3d = polyLine.newPoint2d(8.0, 4.0); // 5
-	point3d = polyLine.newPoint2d(8.0, 5.0); // 6
-	point3d = polyLine.newPoint2d(6.0, 5.0); // 7
-	
-	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(4, 5);
-	arc.setRadius(2);
-	arc.setStartAngleDegree(0.0);
-	arc.setSweepAngleDegree(-180.0);
-	arc.numPointsFor360Deg = 36;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(2.0, 5.0); // 0
-	point3d = polyLine.newPoint2d(0.0, 5.0); // 1
-	point3d = polyLine.newPoint2d(0.0, 0.0); // 2
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
- */
-Profile.prototype.TEST__setFigureConcave_TShirt = function() 
-{
-	// profile without holes.***
-	var outerRing = this.newOuterRing();
-	
-	var polyLine;
-	var arc;
-	var point3d;
-	
-	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(2.0, 3.0); // 0
-	point3d = polyLine.newPoint2d(0.0, 3.0); // 1
-	point3d = polyLine.newPoint2d(0.0, 0.0); // 2
-	point3d = polyLine.newPoint2d(8.0, 0.0); // 3
-	point3d = polyLine.newPoint2d(8.0, 3.0); // 4
-	point3d = polyLine.newPoint2d(6.0, 3.0); // 5
-	
-	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(4, 3);
-	arc.setRadius(2);
-	arc.setStartAngleDegree(0.0);
-	arc.setSweepAngleDegree(-180.0);
-	arc.numPointsFor360Deg = 36;
+	// Hole 12.*************************************************
+	innerRing = this.newInnerRing();
+	star = innerRing.newElement("STAR");
+	star.setCenterPosition(5.5, 1.5);
+	star.setRadiusCount(7);
+	star.setInteriorRadius(0.7);
+	star.setExteriorRadius(2);
 };
 
 

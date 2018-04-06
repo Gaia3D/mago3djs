@@ -54,6 +54,32 @@ VertexList.prototype.copyFrom = function(vertexList)
  * 어떤 일을 하고 있습니까?
  * @returns vertex
  */
+VertexList.prototype.copyFromPoint2DList = function(point2dList, z) 
+{
+	// first reset vertexArray.
+	this.deleteObjects();
+	this.vertexArray = [];
+	
+	var point2d;
+	var vertex;
+	if(z === undefined)
+		z = 0;
+
+	var pointsCount = point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		point2d = point2dList.getPoint(i);
+		vertex = this.newVertex();
+		vertex.point3d = new Point3D();
+		vertex.point3d.set(point2d.x, point2d.y, z);
+		vertex.vertexType = point2d.pointType;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertex
+ */
 VertexList.prototype.setNormal = function(nx, ny, nz) 
 {
 	var vertex;
@@ -162,11 +188,11 @@ VertexList.prototype.getVtxSegment = function(idx, resultVtxSegment)
  * @param dirZ 변수
  * @param distance 변수
  */
-VertexList.prototype.translateVertices = function(dirX, dirY, dirZ, distance) 
+VertexList.prototype.translateVertices = function(dx, dy, dz) 
 {
 	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
 	{
-		this.vertexArray[i].translate(dirX, dirY, dirZ, distance);
+		this.vertexArray[i].translate(dx, dy, dz);
 	}
 };
 
