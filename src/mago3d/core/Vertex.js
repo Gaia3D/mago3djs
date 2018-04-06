@@ -96,6 +96,8 @@ Vertex.prototype.copyFrom = function(vertex)
 		
 		this.color4.copyFrom(vertex.color4);
 	}
+	
+	this.vertexType = vertex.vertexType;
 };
 
 /**
@@ -157,9 +159,9 @@ Vertex.prototype.setNormal = function(nx, ny, nz)
  * @param dirZ 변수
  * @param distance 변수
  */
-Vertex.prototype.translate = function(dirX, dirY, dirZ, distance) 
+Vertex.prototype.translate = function(dx, dy, dz) 
 {
-	this.point3d.add(dirX * distance, dirY * distance, dirZ * distance);
+	this.point3d.add(dx, dy, dz);
 };
 
 

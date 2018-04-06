@@ -1308,7 +1308,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(); //TEST
+	this.renderMagoGeometries(); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1474,22 +1474,17 @@ MagoManager.prototype.renderMagoGeometries = function()
 		mesh.profile = new Profile(); // provisional.***
 		var profileAux = mesh.profile; // provisional.***
 		
-		
-		//profileAux.TEST__setFigureConcave_1();
-		//profileAux.TEST__setFigureConcave_2();
-		//profileAux.TEST__setFigureConcave_simpleArc();
-		//profileAux.TEST__setFigureConcave_TShirt();
-		//profileAux.TEST__setFigureConcave_spiral();
-		//profileAux.TEST__setFigureConcave_duckMouth();
-		//profileAux.TEST__setFigureConcave_almostHole();
-		//profileAux.TEST__setFigureConcave_almostHole_2();
-		profileAux.TEST__setFigureHole_1();
+		profileAux.TEST__setFigureHole_2();
 		
 		if(mesh.vboKeyContainer === undefined)
 			mesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
 		var vboKeys = mesh.vboKeyContainer.newVBOVertexIdxCacheKey();
 		
 		profileAux.getVBO(vboKeys);
+		
+		var extrusionVector, extrusionDist, extrudeSegmentsCount;
+		extrusionDist = 10.0;
+		mesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
 
 		var hola = 0;
 		
@@ -2699,8 +2694,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var neoBuilding = node.data.neoBuilding;
 	
 	// chaek if the neoBuilding has availableLod_0.***
-	
-	
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
 
 	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
@@ -2714,69 +2707,50 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (neoBuilding.currentVisibleOctreesControler === undefined)
 	{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController(); }	
 
-	//if (lod === 0 || lod === 1 || lod === 2)
+	var distLod0 = this.magoPolicy.getLod0DistInMeters();
+	var distLod1 = this.magoPolicy.getLod1DistInMeters();
+	var distLod2 = this.magoPolicy.getLod2DistInMeters();
+	var distLod3 = this.magoPolicy.getLod3DistInMeters();
+	var distLod4 = this.magoPolicy.getLod4DistInMeters();
+	var distLod5 = this.magoPolicy.getLod5DistInMeters();
+
+	var find = false;
+	
+	this.myCameraSCX = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
+	//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z); // old.***
+
+	neoBuilding.currentVisibleOctreesControler.clear();
+	
+	if (lod === 2)
 	{
-		var distLod0 = this.magoPolicy.getLod0DistInMeters();
-		var distLod1 = this.magoPolicy.getLod1DistInMeters();
-		var distLod2 = this.magoPolicy.getLod2DistInMeters();
-		var distLod3 = this.magoPolicy.getLod3DistInMeters();
-		var distLod4 = this.magoPolicy.getLod4DistInMeters();
-		var distLod5 = this.magoPolicy.getLod5DistInMeters();
-		
-		if (neoBuilding.buildingId === "Sea_Port" || neoBuilding.buildingId === "ctships")
-		{
-			if (distLod0 < 350)
-			{ distLod0 = 350; }
-			if (distLod1 < 550)
-			{ distLod1 = 550; }
-			if (distLod2 < 25000)
-			{ distLod2 = 25000; }
-		}
-
-		var find = false;
-		
-		this.myCameraSCX = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraSCX);
-		//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraSCX.position.x, this.myCameraSCX.position.y, this.myCameraSCX.position.z); // old.***
-
-		neoBuilding.currentVisibleOctreesControler.clear();
-		
-		if (lod === 2)
-		{
-			// in this case is not necessary calculate the frustum planes.
-			neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				this.myCameraSCX.position, distLod0, distLod1, distLod5);
-			find = true;
-		}
-		else 
-		{
-			// must calculate the frustum planes.
-			//var keepFar = this.myCameraSCX.frustum.far;
-			//this.myCameraSCX.frustum.far = distLod0;
-			this.myCameraSCX.calculateFrustumPlanes();
-			
-			// 1rst, check if there are octrees very close.
-			find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-				this.myCameraSCX.position, distLod0, distLod1, distLod2*100);
-		}
-
-		if (!find) 
-		{
-			// if the building is far to camera, then delete it.
-			if (neoBuilding.distToCam > 60)
-			{ this.processQueue.putNodeToDelete(node, 0); }
-			return false;
-		}
-		else 
-		{
-			this.processQueue.eraseNodeToDelete(node);
-		}
+		// in this case is not necessary calculate the frustum planes.
+		neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+			this.myCameraSCX.position, distLod0, distLod1, distLod5);
+		find = true;
 	}
-	//else
-	//{
-	//	// never enter here...
-	//	neoBuilding.currentVisibleOctreesControler.currentVisibles2.length = 0;
-	//	neoBuilding.octree.extractLowestOctreesIfHasTriPolyhedrons(neoBuilding.currentVisibleOctreesControler.currentVisibles2); // old.
-	//}
+	else 
+	{
+		// must calculate the frustum planes.
+		//var keepFar = this.myCameraSCX.frustum.far;
+		//this.myCameraSCX.frustum.far = distLod0;
+		this.myCameraSCX.calculateFrustumPlanes();
+		
+		// 1rst, check if there are octrees very close.
+		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	this.myCameraSCX.frustum, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
+			this.myCameraSCX.position, distLod0, distLod1, distLod2*100);
+	}
+
+	if (!find) 
+	{
+		// if the building is far to camera, then delete it.
+		if (neoBuilding.distToCam > 60)
+		{ this.processQueue.putNodeToDelete(node, 0); }
+		return false;
+	}
+	else 
+	{
+		this.processQueue.eraseNodeToDelete(node);
+	}
 	
 	// LOD0 & LOD1
 	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
@@ -2793,13 +2767,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	{
 		this.processQueue.eraseNodeToDeleteModelReferences(node);
 	}
-	
-	// test.*************************************************************************
-	//if(neoBuilding.currentVisibleOctreesControler.currentVisibles2.length === 0)
-	//{
-	//	this.processQueue.putNodeToDeleteLessThanLod3(node);
-	//}
-	// end test.---------------------------------------------------------------------
 	
 	var putLowestOctreeToLod2 = false;
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
@@ -6565,8 +6532,6 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			node = nodesArray[j];
 			var nodeBBox = node.data.bbox;
 			
-			if(node.data.nodeId === "Tile_173078_LD_010_017_L22")
-				var hola = 0;
 			if (nodeBBox)
 			{
 				if (node.data.attributes)

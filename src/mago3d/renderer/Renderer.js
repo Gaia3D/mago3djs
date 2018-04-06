@@ -1191,6 +1191,9 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			{ return; }
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
 			gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			
+			//gl.uniform4fv(shader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]); //.***
+			//gl.drawElements(gl.LINE_STRIP, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 		}
 		else{
 			gl.drawArrays(gl.TRIANGLES, 0, vertices_count);

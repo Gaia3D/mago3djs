@@ -13,7 +13,7 @@ var ParametricMesh = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.profilesList; // class: ProfilesList
+	this.vtxProfilesList; // class: VtxProfilesList.***
 	this.trianglesMatrix;
 	this.profile;
 	this.vboKeyContainer;//VBOVertexIdxCacheKey
@@ -25,11 +25,6 @@ var ParametricMesh = function()
  */
 ParametricMesh.prototype.deleteObjects = function() 
 {
-	if(this.profilesList)
-		this.profilesList.deleteObjects();
-	
-	this.profilesList = undefined;
-	
 	if(this.trianglesMatrix)
 		this.trianglesMatrix.deleteObjects();
 	
@@ -46,17 +41,41 @@ ParametricMesh.prototype.getVboKeysContainer = function()
 	return this.vboKeyContainer;
 };
 
+ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
+{
+	if(resultVBOCacheKeys === undefined)
+		resultVBOCacheKeys = new VBOVertexIdxCacheKey();
+	
+	
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
-ParametricMesh.prototype.extrude = function(profile, extrusionVector, extrusionDist, extrudeSegmentsCount) 
+ParametricMesh.prototype.extrude = function(profile, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {
+	if(profile === undefined || extrusionDist === undefined)
+		return undefined;
+	
+	if(this.vtxProfilesList === undefined)
+		this.vtxProfilesList = new VtxProfilesList();
+	
+	// make the base-vtxProfile.***
+	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile(profile);
+	
+	if(extrusionVector === undefined)
+		extrusionVector = new Point3D(0, 0, 1);
+	
+	// test with a 1 segment extrusion.***
+	var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+	nextVtxProfile.copyFrom(baseVtxProfile);
+	nextVtxProfile.translate(0, 0, extrusionDist);
+	
+	// now make the triangles.***
 	
 	
-	// now, make the bottomCap, topCap, and lateral triangles.
-	this.trianglesMatrix = new TrianglesMatrix();
-	
-	
+	var hola = 0;
 };
 
 

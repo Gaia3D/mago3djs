@@ -52,6 +52,8 @@ Ring.prototype.newElement = function(elementTypeString)
 		elem = new PolyLine();
 	else if (elementTypeString === "RECTANGLE")
 		elem = new Rectangle();
+	else if (elementTypeString === "STAR")
+		elem = new Star();
 	
 	if(elem === undefined)
 		return undefined;

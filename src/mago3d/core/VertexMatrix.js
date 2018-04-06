@@ -60,7 +60,24 @@ VertexMatrix.prototype.getVertexList = function(idx)
 	}
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param vertexMatrix 변수
+ */
+VertexMatrix.prototype.copyFrom = function(vertexMatrix) 
+{
+	if(vertexMatrix === undefined)
+		return;
+	
+	var vertexList, myVertexList;
+	var vertexListsCount = vertexMatrix.vertexListsArray.length;
+	for(var i=0; i<vertexListsCount; i++)
+	{
+		vertexList = vertexMatrix.getVertexList(i);
+		myVertexList = this.newVertexList();
+		myVertexList.copyFrom(vertexList);
+	}
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -222,11 +239,11 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray)
  * @param dirZ 변수
  * @param distance 변수
  */
-VertexMatrix.prototype.translateVertices = function(dirX, dirY, dirZ, distance) 
+VertexMatrix.prototype.translateVertices = function(dx, dy, dz) 
 {
 	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount; i++) 
 	{
-		this.vertexListsArray[i].translateVertices(dirX, dirY, dirZ, distance);
+		this.vertexListsArray[i].translateVertices(dx, dy, dz);
 	}
 };
 

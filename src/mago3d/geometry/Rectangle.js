@@ -47,15 +47,19 @@ Rectangle.prototype.getPoints = function(resultPointsArray)
 	
 	// starting in left-down corner, go in CCW.***
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y - halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y - halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y + halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y + halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	return resultPointsArray;
