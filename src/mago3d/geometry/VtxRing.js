@@ -33,6 +33,19 @@ VtxRing.prototype.getElementIndexRange = function(idx)
 	return this.elemsIndexRangesArray[idx];
 };
 
+VtxRing.prototype.getAllVertices = function(resultVerticesArray)
+{
+	if(this.vertexList === undefined || this.vertexList.vertexArray === undefined)
+		return resultVerticesArray;
+	
+	if(resultVerticesArray === undefined)
+		resultVerticesArray = [];
+	
+	resultVerticesArray.push.apply(resultVerticesArray, this.vertexList.vertexArray);
+	
+	return resultVerticesArray;
+};
+
 VtxRing.prototype.copyFrom = function(vtxRing)
 {
 	if(vtxRing.vertexList !== undefined)
@@ -67,6 +80,14 @@ VtxRing.prototype.translate = function(x, y, z)
 	}
 };
 
+VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
+{
+	if(this.vertexList !== undefined)
+	{
+		this.vertexList.transformPointsByMatrix4(tMat4);
+	}
+};
+
 VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 {
 	if(point2dList === undefined)
@@ -96,13 +117,20 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 		vertex = this.vertexList.getVertex(i);
 		vertexType = vertex.vertexType;
 		
+		//if(vertexType === undefined && i===0)
+		//{
+		//	var prevIdx = this.vertexList.getPrevIdx(i);
+		//	var prevVertex = this.vertexList.getVertex(prevIdx);
+		//	vertexType = prevVertex.vertexType;
+		//}
+		
 		if(vertexType && vertexType === 1)
 		{
 			if(idxRange !== undefined)
 			{
 				idxRange.endIdx = i;
 			}
-			if(i !== vertexCount-1)
+			if(i !== vertexCount)
 			{
 				idxRange = this.newElementIndexRange();
 				idxRange.strIdx = i;
@@ -111,7 +139,7 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 	}
 	
 	if(idxRange !== undefined)
-		idxRange.endIdx = vertexCount-1;
+		idxRange.endIdx = 0;
 };
 
 

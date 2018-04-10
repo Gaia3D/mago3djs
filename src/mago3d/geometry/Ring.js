@@ -91,6 +91,17 @@ Ring.prototype.getPolygon = function(resultPolygon)
 	// reset polygon.***
 	resultPolygon.point2dList.deleteObjects();
 	resultPolygon.point2dList.pointsArray = this.getPoints(resultPolygon.point2dList.pointsArray);
+	
+	// set idxData for all points.***
+	var point;
+	var pointsCount = resultPolygon.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		point = resultPolygon.point2dList.getPoint(i);
+		point.indexData = new IndexData();
+		point.indexData.owner = this;
+	}
+	
 	return resultPolygon;
 };
 
@@ -113,11 +124,15 @@ Ring.prototype.getPoints = function(resultPointsArray)
 		elem = this.elemsArray[i];
 		elem.getPoints(resultPointsArray);
 	}
-	
+
 	// finally check if the 1rst point and the last point are coincidents.***
 	var totalPointsCount = resultPointsArray.length;
+	
 	if(totalPointsCount > 1)
 	{
+		// mark the last as pointType = 1
+		resultPointsArray[totalPointsCount-1].pointType = 1;
+		
 		var errorDist = 10E-8;
 		var firstPoint = resultPointsArray[0];
 		var lastPoint = resultPointsArray[totalPointsCount-1];

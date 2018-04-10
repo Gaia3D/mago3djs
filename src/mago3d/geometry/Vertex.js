@@ -21,6 +21,7 @@ var Vertex = function(position)
 	this.color4; // class: Color.
 	this.outHalfEdgesArray; // Array [class: HalfEdge]. 
 	this.vertexType; // 1 = important vertex.***
+	this.idxInList;
 	
 	if(position)
 		this.point3d = position;
@@ -51,6 +52,28 @@ Vertex.prototype.deleteObjects = function()
 	this.normal = undefined;
 	this.texCoord = undefined;
 	this.color4 = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Vertex.prototype.getIdxInList = function() 
+{
+	return this.idxInList;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Vertex.prototype.setIdxInList = function(idx) 
+{
+	this.idxInList = idx;
 };
 
 /**

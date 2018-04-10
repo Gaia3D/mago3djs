@@ -12,7 +12,35 @@ var VtxProfile = function(x, y)
 
 	this.outerVtxRing;
 	this.innerVtxRingsList;
+};
+
+VtxProfile.prototype.getInnerVtxRingsCount = function()
+{
+	if(this.innerVtxRingsList === undefined || this.innerVtxRingsList.getRingsCount === 0)
+		return 0;
 	
+	return this.innerVtxRingsList.getVtxRingsCount();
+};
+
+VtxProfile.prototype.getInnerVtxRing = function(idx)
+{
+	if(this.innerVtxRingsList === undefined || this.innerVtxRingsList.getRingsCount === 0)
+		return undefined;
+	
+	return this.innerVtxRingsList.getVtxRing(idx);
+};
+
+VtxProfile.prototype.setVerticesIdxInList = function()
+{
+	if(this.outerVtxRing && this.outerVtxRing.vertexList)
+	{
+		this.outerVtxRing.vertexList.setIdxInList();
+	}
+	
+	if(this.innerVtxRingsList)
+	{
+		this.innerVtxRingsList.setVerticesIdxInList();
+	}
 };
 
 VtxProfile.prototype.copyFrom = function(vtxProfile)
@@ -41,6 +69,15 @@ VtxProfile.prototype.translate = function(dx, dy, dz)
 	
 	if(this.innerVtxRingsList !== undefined)
 		this.innerVtxRingsList.translate(dx, dy, dz);
+};
+
+VtxProfile.prototype.transformPointsByMatrix4 = function(tMat4)
+{
+	if(this.outerVtxRing !== undefined)
+		this.outerVtxRing.transformPointsByMatrix4(tMat4);
+	
+	if(this.innerVtxRingsList !== undefined)
+		this.innerVtxRingsList.transformPointsByMatrix4(tMat4);
 };
 
 VtxProfile.prototype.makeByProfile = function(profile)
@@ -89,6 +126,17 @@ VtxProfile.prototype.makeByProfile = function(profile)
 		innerVtxRing = this.innerVtxRingsList.newVtxRing();
 		innerVtxRing.makeByPoint2DList(point2dList, z);
 	}
+};
+
+VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
+{
+	if(this.outerVtxRing !== undefined)
+		this.outerVtxRing.getAllVertices(resultVerticesArray);
+	
+	if(this.innerVtxRingsList !== undefined)
+		this.innerVtxRingsList.getAllVertices(resultVerticesArray);
+	
+	return resultVerticesArray;
 };
 
 

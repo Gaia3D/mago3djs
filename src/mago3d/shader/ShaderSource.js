@@ -136,7 +136,7 @@ varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 \n\
 const int kernelSize = 16;  \n\
-const float radius = 0.5;      \n\
+const float radius = 0.15;      \n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\

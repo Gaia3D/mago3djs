@@ -1171,7 +1171,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		}
 		else{
 			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			gl.vertexAttribPointer(shader.color4_loc, 4, gl.BYTE, true, 0, 0);
+			gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
 		}
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);

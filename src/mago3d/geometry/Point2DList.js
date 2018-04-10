@@ -27,6 +27,17 @@ Point2DList.prototype.deleteObjects = function()
 	this.pointsArray = undefined;
 };
 
+Point2DList.prototype.addPoint = function(point2d)
+{
+	if(point2d === undefined)
+		return;
+	
+	if(this.pointsArray === undefined)
+		this.pointsArray = [];
+
+	this.pointsArray.push(point2d);
+};
+
 Point2DList.prototype.newPoint = function(x, y)
 {
 	if(this.pointsArray === undefined)

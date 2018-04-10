@@ -11,6 +11,7 @@ var RingsList = function()
 	}
 
 	this.ringsArray;
+	this.idxInList;
 };
 
 /**
@@ -62,6 +63,32 @@ RingsList.prototype.getRingsCount = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
+RingsList.prototype.getRingIdx = function(ring) 
+{
+	if (ring === undefined)
+		return undefined;
+
+	var ringIdx;
+	var ringsCount = this.getRingsCount();
+	var find = false;
+	var i=0; 
+	while(!find && i<ringsCount)
+	{
+		if(this.getRing(i) === ring)
+		{
+			find = true;
+			ringIdx = i;
+		}
+		i++;
+	}
+	
+	return ringIdx;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 RingsList.prototype.getRing = function(idx) 
 {
 	if (this.ringsArray === undefined)
@@ -97,6 +124,19 @@ RingsList.getBoundingRectangle = function(ringsArray, resultBRect)
 	}
 
 	return resultBRect;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
+RingsList.prototype.setIdxInList = function() 
+{
+	var ringsCount = this.ringsArray.length;
+	for (var i=0; i<ringsCount; i++)
+	{
+		this.ringsArray[i].idxInList = i;
+	}
 };
 
 /**
