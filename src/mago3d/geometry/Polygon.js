@@ -41,14 +41,14 @@ Polygon.prototype.getEdgeDirection = function(idx)
 {
 	// the direction is unitary vector.***
 	var segment = this.point2dList.getSegment(idx);
-	var direction = segment.getDirection(direction);
+	var direction = segment.getDirection(undefined);
 	return direction;
 };
 
 Polygon.prototype.getEdgeVector = function(idx)
 {
 	var segment = this.point2dList.getSegment(idx);
-	var vector = segment.getVector(vector);
+	var vector = segment.getVector(undefined);
 	return vector;
 };
 
@@ -344,25 +344,21 @@ Polygon.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSor
 	return resultSortedPointsIdxArray;
 };
 
-Polygon.prototype.isPolygonSplittableByVtxSegment = function(vertexSegment)
+Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 {
-	
-};
-
-Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesList)
-{
+	// PROVISIONAL.***
 	// in this case, consider the polygon is convex.***
-	if(resultTrianglesList === undefined)
-		resultTrianglesList = new TrianglesList();
+	if(resultTrianglesArray === undefined)
+		resultTrianglesArray = [];
 
 	var pointsCount = this.point2dList.getPointsCount();
 	if(pointsCount <3)
-		return resultTrianglesList;
+		return resultTrianglesArray;
 	
 	var triangle;
 	for(var i=1; i<pointsCount-1; i++)
 	{
-		triangle = resultTrianglesList.newTriangle();
+		triangle = new Triangle();
 		
 		var point0idx = this.point2dList.getPoint(0).idxInList;
 		var point1idx = this.point2dList.getPoint(i).idxInList;
@@ -371,13 +367,16 @@ Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesList)
 		triangle.vtxIdx0 = point0idx;
 		triangle.vtxIdx1 = point1idx;
 		triangle.vtxIdx2 = point2idx;
+		
+		resultTrianglesArray.push(triangle);
 	}
 	
-	return resultTrianglesList;
+	return resultTrianglesArray;
 };
 
 Polygon.prototype.getVbo = function(resultVbo)
 {
+	// PROVISIONAL.***
 	// return positions, normals and indices.***
 	if(resultVbo === undefined)
 		resultVbo = new VBOVertexIdxCacheKey();
@@ -412,18 +411,66 @@ Polygon.prototype.getVbo = function(resultVbo)
 	// now calculate triangles indices.***
 	this.point2dList.setIdxInList(); // use this function instead a map.***
 	
-	var trianglesList = new TrianglesList();
+	var trianglesArray = [];
 	var convexPolygonsCount = this.convexPolygonsArray.length;
 	for(var i=0; i<convexPolygonsCount; i++)
 	{
 		var convexPolygon = this.convexPolygonsArray[i];
-		trianglesList = convexPolygon.getTrianglesConvexPolygon(trianglesList);
+		trianglesArray = convexPolygon.getTrianglesConvexPolygon(trianglesArray); // provisional.***
 	}
-	trianglesList.getFaceDataArray(resultVbo);
+	TrianglesList.getVboFaceDataArray(trianglesArray, resultVbo);
 
 	return resultVbo;
 };
 
+Polygon.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
+{
+	// PROVISIONAL.***
+	// return positions, normals and indices.***
+	if(resultVbo === undefined)
+		resultVbo = new VBOVertexIdxCacheKey();
+	
+	// 1rst, obtain pos, nor.***
+	var posArray = [];
+	var norArray = [];
+	var point;
+	var normal;
+	if(concavePolygon.normal > 0)
+		normal = 1;
+	else
+		normal = -1;
+		
+	var pointsCount = concavePolygon.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		point = concavePolygon.point2dList.getPoint(i);
+		
+		posArray.push(point.x);
+		posArray.push(point.y);
+		posArray.push(0.0);
+		
+		norArray.push(0);
+		norArray.push(0);
+		norArray.push(normal*255);
+	}
+	
+	resultVbo.posVboDataArray = Float32Array.from(posArray);
+	resultVbo.norVboDataArray = Int8Array.from(norArray);
+	
+	// now calculate triangles indices.***
+	concavePolygon.point2dList.setIdxInList(); // use this function instead a map.***
+	
+	var trianglesArray = [];
+	var convexPolygonsCount = convexPolygonsArray.length;
+	for(var i=0; i<convexPolygonsCount; i++)
+	{
+		var convexPolygon = convexPolygonsArray[i];
+		trianglesArray = convexPolygon.getTrianglesConvexPolygon(trianglesArray); // provisional.***
+	}
+	TrianglesList.getVboFaceDataArray(trianglesArray, resultVbo);
+
+	return resultVbo;
+};
 
 
 

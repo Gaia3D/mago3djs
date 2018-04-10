@@ -70,6 +70,9 @@ Line2D.prototype.getPerpendicularLeft = function(point)
  */
 Line2D.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
+	if(point === undefined)
+		return undefined;
+	
 	if(projectedPoint === undefined)
 		projectedPoint = new Point2D();
 	

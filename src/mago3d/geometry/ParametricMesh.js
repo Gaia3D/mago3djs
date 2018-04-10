@@ -14,10 +14,8 @@ var ParametricMesh = function()
 	}
 	
 	this.vtxProfilesList; // class: VtxProfilesList.***
-	this.trianglesMatrix;
-	this.profile;
-	this.vboKeyContainer;//VBOVertexIdxCacheKey
-	this.bbox;
+	this.profile; // class: Profile. is a 2d object.***
+	this.vboKeyContainer;//VBOVertexIdxCacheKeyContainer.***
 };
 
 /**
@@ -25,11 +23,6 @@ var ParametricMesh = function()
  */
 ParametricMesh.prototype.deleteObjects = function() 
 {
-	if(this.trianglesMatrix)
-		this.trianglesMatrix.deleteObjects();
-	
-	this.trianglesMatrix = undefined;
-	
 	if(this.profile)
 		this.profile.deleteObjects();
 	
@@ -45,8 +38,73 @@ ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
 {
 	if(resultVBOCacheKeys === undefined)
 		resultVBOCacheKeys = new VBOVertexIdxCacheKey();
+
+	// must separate vbo groups by surfaces.***
+	var surfaceIndependentMesh = this.getSurfaceIndependentMesh(undefined);
+	surfaceIndependentMesh.getVbo(resultVBOCacheKeys);
 	
+	return resultVBOCacheKeys;
+};
+
+ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh)
+{
+	if(resultMesh === undefined)
+		resultMesh = new Mesh();
+
+	// must separate vbo groups by surfaces.***
+	var mesh = this.vtxProfilesList.getMesh(undefined);
+	resultMesh = mesh.getCopySurfaceIndependetMesh(undefined);
+	resultMesh.calculateVerticesNormals();
 	
+	return resultMesh;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ParametricMesh.prototype.revolve = function(profile, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
+{
+	if(profile === undefined)
+		return undefined;
+	
+	if(this.vtxProfilesList === undefined)
+		this.vtxProfilesList = new VtxProfilesList();
+	
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.***
+	// make the base-vtxProfile.***
+	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile(profile);
+	
+	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
+	
+	// calculate the translation.***
+	var line2d = revolveSegment2d.getLine();
+	var origin2d = new Point2D(0,0);
+	var translationVector = line2d.getProjectedPoint(origin2d);
+	translationVector.inverse();
+	
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	var rotAxis2d = revolveSegment2d.getDirection();
+	var rotAxis = new Point3D(rotAxis2d.x, rotAxis2d.y, 0);
+	rotAxis.unitary();
+	
+	for(var i=0; i<revolveSegmentsCount; i++)
+	{
+		// calculate rotation.***
+		quaternion.rotationAngDeg(increAngDeg*(i+1), rotAxis.x, rotAxis.y, rotAxis.z);
+		rotMat.rotationByQuaternion(quaternion);
+		
+		// test top profile.***
+		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(translationVector.x, translationVector.y, 0);
+		nextVtxProfile.transformPointsByMatrix4(rotMat);
+		nextVtxProfile.translate(-translationVector.x, -translationVector.y, 0);
+	}
 };
 
 /**
@@ -60,6 +118,11 @@ ParametricMesh.prototype.extrude = function(profile, extrusionDist, extrudeSegme
 	if(this.vtxProfilesList === undefined)
 		this.vtxProfilesList = new VtxProfilesList();
 	
+
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.***
 	// make the base-vtxProfile.***
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
 	baseVtxProfile.makeByProfile(profile);
@@ -67,15 +130,14 @@ ParametricMesh.prototype.extrude = function(profile, extrusionDist, extrudeSegme
 	if(extrusionVector === undefined)
 		extrusionVector = new Point3D(0, 0, 1);
 	
-	// test with a 1 segment extrusion.***
-	var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
-	nextVtxProfile.copyFrom(baseVtxProfile);
-	nextVtxProfile.translate(0, 0, extrusionDist);
-	
-	// now make the triangles.***
-	
-	
-	var hola = 0;
+	var increDist = extrusionDist/extrudeSegmentsCount;
+	for(var i=0; i<extrudeSegmentsCount; i++)
+	{
+		// test with a 1 segment extrusion.***
+		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(0, 0, increDist*(i+1));
+	}
 };
 
 

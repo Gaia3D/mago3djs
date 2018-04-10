@@ -82,38 +82,116 @@ Profile.prototype.hasHoles = function()
  * @returns vertexList
  */
  
-Profile.prototype.getVBO = function(resultVBOCacheKeys) 
+Profile.prototype.getVBO = function(resultVbo) 
 {
 	if(this.outerRing === undefined)
-		return resultVBOCacheKeys;
+		return resultVbo;
+	
+	var generalPolygon = this.getGeneralPolygon(undefined);
+	generalPolygon.getVbo(resultVbo);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
+ 
+Profile.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesData) 
+{
+	if(this.outerRing === undefined)
+		return resultVbo;
+	
+	var generalPolygon = this.getGeneralPolygon(undefined);
+	
+	if(resultGeneralIndicesData === undefined)
+		resultGeneralIndicesData = [];
+	
+	// 1rst, set idxInList all points.***
+	this.outerRing.polygon.point2dList.setIdxInList();
+	
+	if(this.innerRingsList !== undefined)
+	{
+		var innerRingsCount = this.innerRingsList.getRingsCount();
+		for(var i=0; i<innerRingsCount; i++)
+		{
+			var innerRing = this.innerRingsList.getRing(i);
+			innerRing.polygon.point2dList.setIdxInList();
+		}
+	}
+	
+	var convexDatas;
+	var convexPolygon;
+	var indexData;
+	var currRing;
+	var ringIdxInList;
+	var point;
+	var convexPolygonsCount = generalPolygon.convexPolygonsArray.length;
+	for(var i=0; i<convexPolygonsCount; i++)
+	{
+		convexPolygon = generalPolygon.convexPolygonsArray[i];
+		convexDatas = [];
+		var pointsCount = convexPolygon.point2dList.getPointsCount();
+		for(var j=0; j<pointsCount; j++)
+		{
+			point = convexPolygon.point2dList.getPoint(j);
+			indexData = point.indexData;
+			currRing = indexData.owner;
+			indexData.idxInList = point.idxInList;
+			if(currRing === this.outerRing)
+			{
+				ringIdxInList = -1;
+			}
+			else{
+				ringIdxInList = this.innerRingsList.getRingIdx(currRing);
+			}
+			indexData.ownerIdx = ringIdxInList;
+			convexDatas.push(indexData);
+		}
+		resultGeneralIndicesData.push(convexDatas);
+	}
+	
+	return resultGeneralIndicesData;
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
+ 
+Profile.prototype.getGeneralPolygon = function(generalPolygon) 
+{
+	// this returns a holesTessellatedPolygon, and inside it has convexPolygons.***
+	this.checkNormals(); // here makes outer & inner's polygons.***
 	
 	if(!this.hasHoles())
 	{
-		var outerRing = this.outerRing;
-		outerRing.makePolygon();
-		outerRing.polygon.convexPolygonsArray = [];
-		var concavePointsIndices = outerRing.polygon.calculateNormal(concavePointsIndices);
-		outerRing.polygon.convexPolygonsArray = outerRing.polygon.tessellate(concavePointsIndices, outerRing.polygon.convexPolygonsArray);
-
-		outerRing.polygon.getVbo(resultVBOCacheKeys);
+		// Simply, put all points of outerPolygon into generalPolygon(computingPolygon).***
+		if(generalPolygon === undefined)
+			generalPolygon = new Polygon();
+		
+		if(generalPolygon.point2dList === undefined)
+			generalPolygon.point2dList = new Point2DList();
+		
+		var outerPolygon = this.outerRing.polygon;
+		var point;
+		var outerPointsCount = outerPolygon.point2dList.getPointsCount();
+		for(var i=0; i<outerPointsCount; i++)
+		{
+			point = outerPolygon.point2dList.getPoint(i);
+			generalPolygon.point2dList.addPoint(outerPolygon.point2dList.getPoint(i));
+		}
 	}
 	else{
 		// 1rst, check normals congruences.***
-		this.checkNormals();
-		var resultHolesEliminatedPolygons = this.tessellate(resultHolesEliminatedPolygons);
-		
-		if(resultHolesEliminatedPolygons.length > 0)
-		{
-			// there are only one polygon in "resultHolesEliminatedPolygons".***
-			var polygon = resultHolesEliminatedPolygons[0]; // there are only 1 polygon.***
-			
-			polygon.convexPolygonsArray = [];
-			var concavePointsIndices = polygon.calculateNormal(concavePointsIndices);
-			polygon.convexPolygonsArray = polygon.tessellate(concavePointsIndices, polygon.convexPolygonsArray);
-			polygon.getVbo(resultVBOCacheKeys);
-		}
-		var hola = 0;
+		generalPolygon = this.tessellateHoles(generalPolygon);
 	}
+	
+	generalPolygon.convexPolygonsArray = [];
+	var concavePointsIndices = generalPolygon.calculateNormal(concavePointsIndices);
+	generalPolygon.convexPolygonsArray = generalPolygon.tessellate(concavePointsIndices, generalPolygon.convexPolygonsArray);
+	
+	return generalPolygon;
 };
 
 /**
@@ -135,10 +213,11 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 	var newPoint;
 	var outerPoint;
 	var currIdx = outerPointIdx;
+	
 	while(!finished && i<outerPointsCount)
 	{
 		outerPoint = outerPolygon.point2dList.getPoint(currIdx);
-		newPoint = resultPolygon.point2dList.newPoint(outerPoint.x, outerPoint.y);
+		resultPolygon.point2dList.addPoint(outerPoint);
 		
 		currIdx = outerPolygon.point2dList.getNextIdx(currIdx);
 		if(currIdx === outerPointIdx)
@@ -147,12 +226,11 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 			
 			// must add the firstPoint point.***
 			outerPoint = outerPolygon.point2dList.getPoint(currIdx);
-			newPoint = resultPolygon.point2dList.newPoint(outerPoint.x, outerPoint.y);
+			resultPolygon.point2dList.addPoint(outerPoint);
 		}
 		
 		i++;
 	}
-	
 	// now add innerPolygon's points.***
 	var innerPointsCount = innerPolygon.point2dList.getPointsCount();
 	finished = false;
@@ -163,7 +241,7 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 	while(!finished && i<innerPointsCount)
 	{
 		innerPoint = innerPolygon.point2dList.getPoint(currIdx);
-		newPoint = resultPolygon.point2dList.newPoint(innerPoint.x, innerPoint.y);
+		resultPolygon.point2dList.addPoint(innerPoint);
 		
 		currIdx = innerPolygon.point2dList.getNextIdx(currIdx);
 		if(currIdx === innerPointIdx)
@@ -171,7 +249,7 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
 			finished = true;
 			// must add the firstPoint point.***
 			innerPoint = innerPolygon.point2dList.getPoint(currIdx);
-			newPoint = resultPolygon.point2dList.newPoint(innerPoint.x, innerPoint.y);
+			resultPolygon.point2dList.addPoint(innerPoint);
 		}
 		
 		i++;
@@ -184,12 +262,13 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.eliminateHolePolygon = function(outerPolygon, innerPolygon, innerPointIdx, resultPolygon) 
+Profile.prototype.eliminateHolePolygon = function(computingPolygon, innerRing, innerPointIdx, resultPolygon) 
 {
 	// 1rst, make a sorted by dist of points of outer to "innerPoint".***
 	var resultSortedPointsIdxArray = [];
+	var innerPolygon = innerRing.polygon;
 	var innerPoint = innerPolygon.point2dList.getPoint(innerPointIdx);
-	resultSortedPointsIdxArray = outerPolygon.getPointsIdxSortedByDistToPoint(innerPoint, resultSortedPointsIdxArray);
+	resultSortedPointsIdxArray = computingPolygon.getPointsIdxSortedByDistToPoint(innerPoint, resultSortedPointsIdxArray);
 	
 	var outerSortedPointsCount = resultSortedPointsIdxArray.length;
 	var splitSegment = new Segment2D();;
@@ -200,17 +279,17 @@ Profile.prototype.eliminateHolePolygon = function(outerPolygon, innerPolygon, in
 	while(!finished && i<outerSortedPointsCount)
 	{
 		outPointIdx = resultSortedPointsIdxArray[i];
-		outPoint = outerPolygon.point2dList.getPoint(outPointIdx);
+		outPoint = computingPolygon.point2dList.getPoint(outPointIdx);
 		splitSegment.setPoints(outPoint, innerPoint);
 		
-		// check if splitSegment intersects the outerPolygon or any innerPolygons.***
-		if(outerPolygon.intersectionWithSegment(splitSegment) || innerPolygon.intersectionWithSegment(splitSegment))
+		// check if splitSegment intersects the computingPolygon or any innerPolygons.***
+		if(computingPolygon.intersectionWithSegment(splitSegment) || innerPolygon.intersectionWithSegment(splitSegment))
 		{
 			i++;
 			continue;
 		}
 		
-		resultPolygon = this.eliminateHolePolygonBySplitPoints(outerPolygon, innerPolygon, outPointIdx, innerPointIdx, resultPolygon);
+		resultPolygon = this.eliminateHolePolygonBySplitPoints(computingPolygon, innerPolygon, outPointIdx, innerPointIdx, resultPolygon);
 		finished = true;
 		
 		i++;
@@ -226,83 +305,94 @@ Profile.prototype.eliminateHolePolygon = function(outerPolygon, innerPolygon, in
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.tessellate = function(resultHolesEliminatedPolygons) 
+Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon) 
 {
 	if(this.outerRing === undefined)
-		return undefined;
+		return resultHolesEliminatedPolygon;
 	
-	if(resultHolesEliminatedPolygons === undefined)
-		resultHolesEliminatedPolygons = [];
+	if(!this.hasHoles())
+		return resultHolesEliminatedPolygon;
 	
-	if(this.hasHoles())
+	if(resultHolesEliminatedPolygon === undefined)
+		resultHolesEliminatedPolygon = new Polygon();
+	
+	var hole;
+	var holeIdx;
+	var holePolygon;
+	var objectAux;
+	var innerPointIdx;
+	var innersBRect;
+	
+	// prepare outerRing if necessary.***
+	var outerRing = this.outerRing;
+	if(outerRing.polygon === undefined)
+		outerRing.makePolygon();
+	var outerPolygon = outerRing.polygon;
+	var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
+	
+	// make a innerRingsArray copy.***
+	var innerRingsArray = [];
+	var innerRingsCount = this.innerRingsList.getRingsCount();
+	for(var i=0; i<innerRingsCount; i++)
 	{
-		var hole;
-		var holeIdx;
-		var holePolygon;
-		var objectAux;
-		var innerPointIdx;
-		var innersBRect;
-		
-		// prepare outerRing if necessary.***
-		var outerRing = this.outerRing;
-		if(outerRing.polygon === undefined)
-			outerRing.makePolygon();
-		var outerPolygon = outerRing.polygon;
-		var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
-		
-		// make a innerRingsArray copy.***
-		var innerRingsArray = [];
-		var innerRingsCount = this.innerRingsList.getRingsCount();
-		for(var i=0; i<innerRingsCount; i++)
-		{
-			innerRingsArray.push(this.innerRingsList.getRing(i));
-		}
-		
-		var resultPolygon = new Polygon();
-		var resultPolygonAux = new Polygon();
-		resultPolygonAux = outerPolygon.getCopy(resultPolygonAux);
-		var innersBRectLeftDownPoint = new Point2D();
-		var objectsArray = [];
-		
-		// now, for each innerRing, try to merge to outerRing by splitSegment.***
-		var innerRingsCount = innerRingsArray.length;
-		var i=0;
-		var finished = false;
-		while(!finished && i<innerRingsCount)
-		{
-			// calculate the most left-down innerRing.***
-			innersBRect = RingsList.getBoundingRectangle(innerRingsArray, innersBRect);
-			innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
-			
-			objectsArray.length = 0; // init.***
-			objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
-		
-			objectAux = objectsArray[0];
-			hole = objectAux.ring;
-			holeIdx = objectAux.ringIdx;
-			holePolygon = hole.polygon;
-			innerPointIdx = objectAux.pointIdx;
-			holePolygon.calculateNormal();
-			
-			if(this.eliminateHolePolygon(resultPolygonAux, holePolygon, innerPointIdx, resultPolygon))
-			{
-				if(innerRingsArray.length == 1)
-				{
-					finished = true;
-					break;
-				}
-				// erase the hole from innerRingsArray.***
-				innerRingsArray.splice(holeIdx, 1);
-				resultPolygonAux.deleteObjects();
-				resultPolygonAux = resultPolygon;
-				resultPolygon = new Polygon();
-			}
-			i++;
-		}
-		resultHolesEliminatedPolygons.push(resultPolygon);
+		innerRingsArray.push(this.innerRingsList.getRing(i));
 	}
 	
-	return resultHolesEliminatedPolygons;
+	var resultPolygon = new Polygon();
+	var computingPolygon = new Polygon();
+	computingPolygon.point2dList = new Point2DList();
+	
+	// put all points of outerPolygon into computingPolygon.***
+	var indexData;
+	var point;
+	var outerPointsCount = outerPolygon.point2dList.getPointsCount();
+	for(var i=0; i<outerPointsCount; i++)
+	{
+		point = outerPolygon.point2dList.getPoint(i);
+		//point.owner
+		computingPolygon.point2dList.addPoint(outerPolygon.point2dList.getPoint(i));
+	}
+	
+	var innersBRectLeftDownPoint = new Point2D();
+	var objectsArray = [];
+	
+	// now, for each innerRing, try to merge to outerRing by splitSegment.***
+	var innerRingsCount = innerRingsArray.length;
+	var i=0;
+	var finished = false;
+	while(!finished && i<innerRingsCount)
+	{
+		// calculate the most left-down innerRing.***
+		innersBRect = RingsList.getBoundingRectangle(innerRingsArray, innersBRect);
+		innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
+		
+		objectsArray.length = 0; // init.***
+		objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
+	
+		objectAux = objectsArray[0];
+		hole = objectAux.ring;
+		holeIdx = objectAux.ringIdx;
+		holePolygon = hole.polygon;
+		innerPointIdx = objectAux.pointIdx;
+		holePolygon.calculateNormal();
+		
+		if(this.eliminateHolePolygon(computingPolygon, hole, innerPointIdx, resultPolygon))
+		{
+			computingPolygon = resultPolygon;
+			
+			if(innerRingsArray.length == 1)
+			{
+				finished = true;
+				break;
+			}
+			// erase the hole from innerRingsArray.***
+			innerRingsArray.splice(holeIdx, 1);
+			resultPolygon = new Polygon();
+		}
+		i++;
+	}
+	resultHolesEliminatedPolygon = computingPolygon;
+	return resultHolesEliminatedPolygon;
 };
 
 /**
@@ -321,6 +411,9 @@ Profile.prototype.checkNormals = function()
 	var outerPolygon = outerRing.polygon;
 	var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
 	var outerNormal = outerPolygon.normal;
+	
+	if(this.innerRingsList === undefined)
+		return;
 	
 	// if there are inners, the innerNormals must be inverse of the outerNormal.***
 	var innerRing;
@@ -344,6 +437,50 @@ Profile.prototype.checkNormals = function()
 		}
 		
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
+Profile.prototype.TEST__setFigure_1 = function() 
+{
+	// complicated polygon with multiple holes.***
+	var polyLine;
+	var arc;
+	var circle;
+	var rect;
+	var point3d;
+	var star;
+	
+	// Outer ring.**************************************
+	var outerRing = this.newOuterRing();
+	/*
+	star = outerRing.newElement("STAR");
+	star.setCenterPosition(-6.5, -14);
+	star.setRadiusCount(5);
+	star.setInteriorRadius(1.2);
+	star.setExteriorRadius(3);
+	*/
+	
+	var arrowLength = 20;
+	var arrowWidth  = 2;
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(0,0); // 0
+	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.25); // 1
+	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.75); // 2
+	point3d = polyLine.newPoint2d(arrowWidth*0.5, arrowLength*0.75); // 3
+	point3d = polyLine.newPoint2d(0, arrowLength); // 3
+	
+	/*
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(-8, -11);
+	arc.setRadius(5);
+	arc.setStartAngleDegree(180.0);
+	arc.setSweepAngleDegree(90.0);
+	arc.numPointsFor360Deg = 24;
+	*/
+	
 };
 
 /**

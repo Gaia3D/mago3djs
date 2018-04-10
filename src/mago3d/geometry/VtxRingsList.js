@@ -65,6 +65,41 @@ VtxRingsList.prototype.translate = function(x, y, z)
 	}
 };
 
+VtxRingsList.prototype.transformPointsByMatrix4 = function(tMat4)
+{
+	var vtxRingsCount = this.getVtxRingsCount();
+	for(var i=0; i<vtxRingsCount; i++)
+	{
+		this.vtxRingsArray[i].transformPointsByMatrix4(tMat4);
+	}
+};
+
+VtxRingsList.prototype.getAllVertices = function(resultVerticesArray)
+{
+	if(this.vtxRingsArray === undefined)
+		return resultVerticesArray;
+	
+	var vtxRingsCount = this.getVtxRingsCount();
+	for(var i=0; i<vtxRingsCount; i++)
+	{
+		this.vtxRingsArray[i].getAllVertices(resultVerticesArray);
+	}
+	
+	return resultVerticesArray;
+};
+
+VtxRingsList.prototype.setVerticesIdxInList = function()
+{
+	if(this.vtxRingsArray === undefined)
+		return;
+	
+	var vtxRingsCount = this.getVtxRingsCount();
+	for(var i=0; i<vtxRingsCount; i++)
+	{
+		this.vtxRingsArray[i].setVerticesIdxInList();
+	}
+};
+
 
 
 

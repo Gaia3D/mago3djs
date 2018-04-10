@@ -373,7 +373,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl)
 	this.createRenderDepthShaderLego(gl);// 9.***
 	this.createSsaoShaderLego(gl);// 10.***
 
-	this.createDepthShaderBox(gl); // 11.***
+	this.triPolyhedronDepthShader = this.createDepthShaderBox(gl); // 11.***
 	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.***
 
 	this.createPngImageShader(gl); // 13.***
@@ -394,6 +394,14 @@ PostFxShadersManager.prototype.getModelRefShader = function()
 PostFxShadersManager.prototype.getModelRefSilhouetteShader = function() 
 {
 	return this.modelRefSilhouetteShader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+PostFxShadersManager.prototype.getTriPolyhedronDepthShader = function() 
+{
+	return this.triPolyhedronDepthShader;
 };
 
 /**
@@ -1055,6 +1063,8 @@ PostFxShadersManager.prototype.createDepthShaderBox = function(gl)
 
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");
+	
+	return shader;
 };
 
 // box Shader.***********************************************************************************************************************

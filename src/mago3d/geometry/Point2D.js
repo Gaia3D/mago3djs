@@ -14,6 +14,9 @@ var Point2D = function(x, y)
 	else this.x = 0.0;
 	if(y)this.y = y;
 	else this.y = 0.0;
+	
+	// aux test.***
+	this.associated;
 };
 
 /**
@@ -30,10 +33,40 @@ Point2D.prototype.deleteObjects = function()
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
+Point2D.prototype.setAssociated = function(associated) 
+{
+	// aux test.***
+	this.associated = associated;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Point2D.prototype.getAssociated = function() 
+{
+	// aux test.***
+	return this.associated;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
 Point2D.prototype.copyFrom = function(point2d) 
 {
 	this.x = point2d.x;
 	this.y = point2d.y;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Point2D.prototype.inverse = function() 
+{
+	this.x = -this.x;
+	this.y = -this.y;
 };
 
 /**
