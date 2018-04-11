@@ -1288,7 +1288,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
@@ -1310,7 +1310,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -6535,9 +6535,10 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
 			
 			// now calculate the geographicCoord of the center of the bBox.
-			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			//var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+			//var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+			//buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
 		}
 	}
 	
