@@ -5201,7 +5201,11 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
 				
-				if(nodeRoot.data.nodeId === "2119_E43GC")
+				if(nodeRoot.data.nodeId === "2216_Y98TC_B19VC_F11GC_F300C")
+				{
+					var hola = 0;
+				}
+				if(node.data.nodeId === "2216_Y98TC_B19VC_F11GC_F300C")
 				{
 					var hola = 0;
 				}
@@ -6224,10 +6228,12 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
 			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
 			
-			// now calculate the geographicCoord of the center of the bBox.
-			var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			// now calculate the geographicCoord of the center of the bBox.**********************************************************************************************
+			//var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+			//var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+			//buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+			buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
 		}
 	}
 	

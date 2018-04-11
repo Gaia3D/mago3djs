@@ -1,0 +1,657 @@
+﻿{
+  "attributes": {
+    "isPhysical": false,
+    "nodeType": "root",
+    "projectType": "ship"
+  },
+  "children": [
+    {
+      "attributes": {
+        "isPhysical": false,
+        "nodeType": "ULTRA_PE"
+      },
+      "children": [
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GP_B190P_o",
+              "data_name": "2216_Y98TC_B19VC_B19GP_B190P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GP_B190P",
+          "data_name": "2216_Y98TC_B19VC_B19GP_B190P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GP_B200P_o",
+              "data_name": "2216_Y98TC_B19VC_B19GP_B200P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GP_B200P",
+          "data_name": "2216_Y98TC_B19VC_B19GP_B200P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GP_H190P_o",
+              "data_name": "2216_Y98TC_B19VC_B19GP_H190P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GP_H190P",
+          "data_name": "2216_Y98TC_B19VC_B19GP_H190P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GP_H200P_o",
+              "data_name": "2216_Y98TC_B19VC_B19GP_H200P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GP_H200P",
+          "data_name": "2216_Y98TC_B19VC_B19GP_H200P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GS_B190S_o",
+              "data_name": "2216_Y98TC_B19VC_B19GS_B190S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GS_B190S",
+          "data_name": "2216_Y98TC_B19VC_B19GS_B190S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GS_B200S_o",
+              "data_name": "2216_Y98TC_B19VC_B19GS_B200S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GS_B200S",
+          "data_name": "2216_Y98TC_B19VC_B19GS_B200S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GS_H190S_o",
+              "data_name": "2216_Y98TC_B19VC_B19GS_H190S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GS_H190S",
+          "data_name": "2216_Y98TC_B19VC_B19GS_H190S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_B19GS_H200S_o",
+              "data_name": "2216_Y98TC_B19VC_B19GS_H200S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_B19GS_H200S",
+          "data_name": "2216_Y98TC_B19VC_B19GS_H200S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F110C_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F110C_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F110C",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F110C"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F210P_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F210P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F210P",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F210P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F210S_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F210S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F210S",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F210S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F300C_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F300C_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F300C",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F300C"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F310P_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F310P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F310P",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F310P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F310S_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F310S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F310S",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F310S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F410P_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F410P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F410P",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F410P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_F11GC_F410S_o",
+              "data_name": "2216_Y98TC_B19VC_F11GC_F410S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_F11GC_F410S",
+          "data_name": "2216_Y98TC_B19VC_F11GC_F410S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_L19GC_L190C_o",
+              "data_name": "2216_Y98TC_B19VC_L19GC_L190C_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_L19GC_L190C",
+          "data_name": "2216_Y98TC_B19VC_L19GC_L190C"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_L19GC_L200C_o",
+              "data_name": "2216_Y98TC_B19VC_L19GC_L200C_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_L19GC_L200C",
+          "data_name": "2216_Y98TC_B19VC_L19GC_L200C"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_S190P_o",
+              "data_name": "2216_Y98TC_B19VC_S190P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_S190P",
+          "data_name": "2216_Y98TC_B19VC_S190P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_S190S_o",
+              "data_name": "2216_Y98TC_B19VC_S190S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_S190S",
+          "data_name": "2216_Y98TC_B19VC_S190S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_S200P_o",
+              "data_name": "2216_Y98TC_B19VC_S200P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_S200P",
+          "data_name": "2216_Y98TC_B19VC_S200P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_S200S_o",
+              "data_name": "2216_Y98TC_B19VC_S200S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_S200S",
+          "data_name": "2216_Y98TC_B19VC_S200S"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_T160P_o",
+              "data_name": "2216_Y98TC_B19VC_T160P_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_T160P",
+          "data_name": "2216_Y98TC_B19VC_T160P"
+        },
+        {
+          "attributes": {
+            "isMain": true,
+            "isPhysical": true,
+            "nodeType": "block"
+          },
+          "children": [
+            {
+              "attributes": {
+                "isMain": false,
+                "isPhysical": true,
+                "nodeType": "block"
+              },
+              "data_group_id": 0,
+              "data_group_name": "temporary",
+              "data_id": 0,
+              "data_key": "2216_Y98TC_B19VC_T160S_o",
+              "data_name": "2216_Y98TC_B19VC_T160S_o"
+            }
+          ],
+          "data_group_id": 0,
+          "data_group_name": "temporary",
+          "data_id": 0,
+          "data_key": "2216_Y98TC_B19VC_T160S",
+          "data_name": "2216_Y98TC_B19VC_T160S"
+        }
+      ],
+      "data_group_id": 0,
+      "data_group_name": "temporary",
+      "data_id": 0,
+      "data_key": "2216_Y98TC_B19VC",
+      "data_name": "2216_Y98TC_B19VC",
+      "heading": 98.29,
+      "height": 7.5,
+      "latitude": 34.90046419,
+      "longitude": 128.59274976199998,
+      "pitch": 0,
+      "roll": 0
+    }
+  ],
+  "data_group_id": 0,
+  "data_group_name": "temporary",
+  "data_id": 0,
+  "data_key": "2216",
+  "data_name": "2216"
+}
