@@ -1288,7 +1288,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
@@ -1310,7 +1310,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1482,15 +1482,13 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		if(pMesh.vboKeyContainer === undefined)
 			pMesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
 		
-		//var vboKeys = pMesh.vboKeyContainer.newVBOVertexIdxCacheKey();
-		//profileAux.getVBO(vboKeys);
-		
-		var extrusionVector, extrusionDist, extrudeSegmentsCount;
-		var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
-		extrudeSegmentsCount = 1;
-		extrusionDist = 5.0;
+		var bIncludeBottomCap, bIncludeTopCap;
+		//var extrusionVector, extrusionDist, extrudeSegmentsCount;
+		//extrudeSegmentsCount = 1;
+		//extrusionDist = 5.0;
 		//pMesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
 		
+		var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
 		revolveAngDeg = 360.0;
 		revolveSegment2d = new Segment2D();
 		var strPoint2d = new Point2D(0, -10);
@@ -1499,8 +1497,10 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		revolveSegmentsCount = 20;
 		pMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 		
+		bIncludeBottomCap = false;
+		bIncludeTopCap = false;
 		var vboKeysExtruded = pMesh.vboKeyContainer.newVBOVertexIdxCacheKey();
-		var mesh = pMesh.getSurfaceIndependentMesh();
+		var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 		mesh.setColor(0.1, 1.0, 0.1, 1.0);
 		mesh.getVbo(vboKeysExtruded);
 		

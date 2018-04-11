@@ -46,13 +46,13 @@ ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
 	return resultVBOCacheKeys;
 };
 
-ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh)
+ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {
 	if(resultMesh === undefined)
 		resultMesh = new Mesh();
 
 	// must separate vbo groups by surfaces.***
-	var mesh = this.vtxProfilesList.getMesh(undefined);
+	var mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	resultMesh = mesh.getCopySurfaceIndependetMesh(undefined);
 	resultMesh.calculateVerticesNormals();
 	
