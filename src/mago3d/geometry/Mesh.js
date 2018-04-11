@@ -32,6 +32,33 @@ Mesh.prototype.getSurface = function(idx)
 	return this.surfacesArray[idx];
 };
 
+Mesh.prototype.addSurface = function(surface)
+{
+	if(surface === undefined)
+		return;
+	
+	if(this.surfacesArray === undefined)
+		this.surfacesArray = [];
+	
+	this.surfacesArray.push(surface);
+};
+
+Mesh.prototype.mergeMesh = function(mesh)
+{
+	if(mesh === undefined)
+		return;
+	
+	if(this.surfacesArray === undefined)
+		this.surfacesArray = [];
+	
+	var surfacesCount = mesh.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		this.addSurface(mesh.getSurface(i));
+	}
+	mesh.surfacesArray = undefined;
+};
+
 Mesh.prototype.getSurfacesCount = function()
 {
 	if(this.surfacesArray === undefined)
