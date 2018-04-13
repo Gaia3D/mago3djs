@@ -229,17 +229,6 @@ VertexList.prototype.getIdxOfVertex = function(vertex)
 
 VertexList.prototype.getVtxSegment = function(idx, resultVtxSegment)
 {
-	/*
-	var currVertex = this.getVertex(idx);
-	var nextIdx = VertexList.getNextIdx(idx, this.vertexArray);
-	var nextVertex = this.getVertex(nextIdx);
-	
-	if(resultVtxSegment === undefined)
-		resultVtxSegment = new VtxSegment(currVertex, nextVertex);
-	else{
-		resultVtxSegment.setVertices(currVertex, nextVertex);
-	}
-	*/
 	return VertexList.getVtxSegment(idx, this.vertexArray, resultVtxSegment);
 };
 

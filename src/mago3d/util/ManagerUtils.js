@@ -156,6 +156,16 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 	var zRotMatrix = new Matrix4();  // created as identity matrix.
 	
 	if (heading !== undefined && heading !== 0)
+	{ zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, 1.0); }
+
+	if (pitch !== undefined && pitch !== 0)
+	{ xRotMatrix.rotationAxisAngDeg(pitch, 1.0, 0.0, 0.0); }
+
+	if (roll !== undefined && roll !== 0)
+	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0); }
+
+	/*
+	if (heading !== undefined && heading !== 0)
 	{ zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, -1.0); }
 
 	if (pitch !== undefined && pitch !== 0)
@@ -163,6 +173,7 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 
 	if (roll !== undefined && roll !== 0)
 	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, -1.0, 0.0); }
+	*/
 
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }  // created as identity matrix.

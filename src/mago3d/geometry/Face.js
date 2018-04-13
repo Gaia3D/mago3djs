@@ -24,6 +24,14 @@ Face.prototype.getVerticesCount = function()
 	return this.vertexArray.length;
 };
 
+Face.prototype.addVertex = function(vertex)
+{
+	if(this.vertexArray === undefined)
+		this.vertexArray = [];
+	
+	this.vertexArray.push(vertex);
+};
+
 Face.prototype.getVertex = function(idx)
 {
 	if(this.vertexArray === undefined)
