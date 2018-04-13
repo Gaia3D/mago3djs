@@ -105,6 +105,12 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	
 	if(resultMesh === undefined)
 		resultMesh = new Mesh();
+	
+	if(resultMesh.vertexList === undefined)
+		resultMesh.vertexList = new VertexList();
+	
+	// 1rst, get all vertices and put it into the resultMesh.***
+	resultMesh.vertexList.vertexArray = this.getAllVertices(resultMesh.vertexList.vertexArray);
 		
 	var bottomVtxProfile, topVtxProfile;
 

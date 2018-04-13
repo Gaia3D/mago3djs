@@ -105,6 +105,85 @@ Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
 	return resultTrianglesArray;
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
+Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
+{
+	if(resultVerticesArray === undefined)
+		resultVerticesArray = [];
+	
+	// 1rst, assign vertex-IdxInList for all used vertices.***
+	var facesCount;
+	var face;
+	var surface;
+	var idxAux = 0;
+	var vtx;
+	var verticesCount;
+	var surfacesCount = this.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		facesCount = surface.getFacesCount();
+		for(var j=0; j<facesCount; j++)
+		{
+			face = surface.getFace(j);
+			verticesCount = face.getVerticesCount();
+			for(var k=0; k<verticesCount; k++)
+			{
+				vtx = face.getVertex(k);
+				if(vtx === undefined)
+					var hola = 0;
+				vtx.setIdxInList(idxAux);
+				idxAux++;
+			}
+		}
+	}
+	
+	// now, make a map of unique vertices map using "idxInList" of vertices.***
+	var verticesMap = {};
+	var surfacesCount = this.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		facesCount = surface.getFacesCount();
+		for(var j=0; j<facesCount; j++)
+		{
+			face = surface.getFace(j);
+			verticesCount = face.getVerticesCount();
+			for(var k=0; k<verticesCount; k++)
+			{
+				vtx = face.getVertex(k);
+				verticesMap[vtx.getIdxInList().toString()] = vtx;
+			}
+		}
+	}
+	
+	// finally make the unique vertices array.***
+	var vertex;
+	for (var key in verticesMap)
+	{
+		vertex = verticesMap[key];
+		resultVerticesArray.push(vertex);
+	}
+	
+	return resultVerticesArray;
+};
+
+Mesh.prototype.transformByMatrix4 = function(tMat4)
+{
+	if(this.vertexList === undefined)
+	{
+		this.vertexList = new VertexList();
+		this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+	}
+	
+	this.vertexList.transformPointsByMatrix4(tMat4);
+	this.calculateVerticesNormals();
+};
+
 Mesh.prototype.calculateVerticesNormals = function()
 {
 	// PROVISIONAL.***
@@ -128,31 +207,78 @@ Mesh.prototype.setColor = function(r, g, b, a)
 	}
 };
 
+Mesh.prototype.reverseSense = function()
+{
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surface.reverseSense();
+	}
+	
+	this.calculateVerticesNormals();
+};
+
+Mesh.prototype.getCopy = function(resultMeshCopy)
+{
+	if(this.vertexList === undefined)
+		this.vertexList = new VertexList();
+	
+	if(this.vertexList.vertexArray === undefined || this.vertexList.vertexArray.length === 0)
+		this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+	
+	if(resultMeshCopy === undefined)
+		resultMeshCopy = new Mesh();
+	
+	// 1rst copy vertexList.***
+	if(resultMeshCopy.vertexList === undefined)
+		resultMeshCopy.vertexList = new VertexList();
+	
+	resultMeshCopy.vertexList.copyFrom(this.vertexList);
+	
+	// set idxInList both vertexLists.***
+	this.vertexList.setIdxInList();
+	resultMeshCopy.vertexList.setIdxInList();
+	
+	// now copy surfaces.***
+	var surface, facesCount, face, verticesCount;
+	var vtxIdx;
+	var surfaceCopy, faceCopy, vtxCopy;
+	var vtx;
+	var surfacesCount = this.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surfaceCopy = resultMeshCopy.newSurface();
+		facesCount = surface.getFacesCount();
+		for(var j=0; j<facesCount; j++)
+		{
+			face = surface.getFace(j);
+			faceCopy = surfaceCopy.newFace();
+			verticesCount = face.getVerticesCount();
+			for(var k=0; k<verticesCount; k++)
+			{
+				vtx = face.getVertex(k);
+				vtxIdx = vtx.getIdxInList();
+				vtxCopy = resultMeshCopy.vertexList.getVertex(vtxIdx);
+				faceCopy.addVertex(vtxCopy);
+			}
+		}
+	}
+	
+	resultMeshCopy.calculateVerticesNormals();
+	
+	return resultMeshCopy;
+};
+
 Mesh.prototype.getVbo = function(resultVbo)
 {
 	if(resultVbo === undefined)
 		resultVbo = new VBOVertexIdxCacheKey();
 
 	// 1rst, make global vertices array.***
-	var globalVerticesArray = [];
-	var surfaceLocalVerticesArray = [];
-	var surface;
-	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
-	{
-		surface = this.getSurface(i);
-		surfaceLocalVerticesArray.length = 0;
-		if(surface.localVertexList !== undefined)
-		{
-			// if exist localVerticesList use it.***
-			Array.prototype.push.apply(surfaceLocalVerticesArray, surface.localVertexList.vertexArray);
-		}
-		else{
-			surfaceLocalVerticesArray = surface.getNoRepeatedVerticesArray(surfaceLocalVerticesArray);
-		}
-		
-		Array.prototype.push.apply(globalVerticesArray, surfaceLocalVerticesArray);
-	}
+	var globalVerticesArray = this.getNoRepeatedVerticesArray();
 	
 	var globalVertexList = new VertexList();
 	globalVertexList.vertexArray = globalVerticesArray;

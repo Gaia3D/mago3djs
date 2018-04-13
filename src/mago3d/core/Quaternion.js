@@ -65,7 +65,7 @@ Quaternion.prototype.rotationAngRad = function(angRad, axis_x, axis_y, axis_z)
 	if (!s < error) 
 	{
 		var c = 1.0/s;
-		var omega = -0.5 * angRad;
+		var omega = 0.5 * angRad;
 		s = Math.sin(omega);
 		this.x = axis_x * c * s;
 		this.y = axis_y * c * s;
