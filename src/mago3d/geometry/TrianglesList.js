@@ -34,6 +34,19 @@ TrianglesList.prototype.newTriangle = function(vertex0, vertex1, vertex2)
  * @param idx 변수
  * @returns vertexArray[idx]
  */
+TrianglesList.prototype.addTriangle = function(triangle) 
+{
+	if (this.trianglesArray === undefined)
+	{ this.trianglesArray = []; }
+
+	this.trianglesArray.push(triangle);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
 TrianglesList.prototype.deleteObjects = function() 
 {
 	if (this.trianglesArray === undefined)
@@ -71,8 +84,24 @@ TrianglesList.prototype.getTriangle = function(idx)
  */
 TrianglesList.prototype.assignVerticesIdx = function() 
 {
-	var trianglesCount = this.getTrianglesCount();
-	var trianglesArray = this.trianglesArray;
+	if(this.trianglesArray === undefined)
+		return;
+	
+	TrianglesList.assignVerticesIdx(this.trianglesArray);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
+TrianglesList.assignVerticesIdx = function(trianglesArray) 
+{
+	if(trianglesArray === undefined)
+		return;
+	
+	var trianglesCount = trianglesArray.length;
+	var trianglesArray = trianglesArray;
 	for(var i=0; i<trianglesCount; i++)
 	{
 		trianglesArray[i].assignVerticesIdx();
@@ -105,17 +134,28 @@ TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray)
  */
 TrianglesList.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
 {
+	resultVerticesArray = TrianglesList.getNoRepeatedVerticesArray(this.trianglesArray, resultVerticesArray);
+	return resultVerticesArray;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
+TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVerticesArray) 
+{
 	if(resultVerticesArray === undefined)
 		resultVerticesArray = [];
 	
 	// 1rst, assign vertexIdxInList for all used vertives.***
-	var trianglesCount = this.getTrianglesCount();
+	var trianglesCount = trianglesArray.length;
 	var triangle;
 	var idxAux = 0;
 	var vtx_0, vtx_1, vtx_2;
 	for(var i=0; i<trianglesCount; i++)
 	{
-		triangle = this.getTriangle(i);
+		triangle = trianglesArray[i];
 		vtx_0 = triangle.vertex0;
 		vtx_1 = triangle.vertex1;
 		vtx_2 = triangle.vertex2;
@@ -132,7 +172,7 @@ TrianglesList.prototype.getNoRepeatedVerticesArray = function(resultVerticesArra
 	var verticesMap = {};
 	for(var i=0; i<trianglesCount; i++)
 	{
-		triangle = this.getTriangle(i);
+		triangle = trianglesArray[i];
 		vtx_0 = triangle.vertex0;
 		vtx_1 = triangle.vertex1;
 		vtx_2 = triangle.vertex2;

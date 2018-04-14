@@ -455,32 +455,24 @@ Profile.prototype.TEST__setFigure_1 = function()
 	
 	// Outer ring.**************************************
 	var outerRing = this.newOuterRing();
-	/*
-	star = outerRing.newElement("STAR");
-	star.setCenterPosition(-6.5, -14);
-	star.setRadiusCount(5);
-	star.setInteriorRadius(1.2);
-	star.setExteriorRadius(3);
-	*/
-	
-	var arrowLength = 20;
-	var arrowWidth  = 2;
 	polyLine = outerRing.newElement("POLYLINE");
-	point3d = polyLine.newPoint2d(0,0); // 0
-	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.25); // 1
-	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.75); // 2
-	point3d = polyLine.newPoint2d(arrowWidth*0.5, arrowLength*0.75); // 3
-	point3d = polyLine.newPoint2d(0, arrowLength); // 3
+	point3d = polyLine.newPoint2d(7,7); // 0
+	point3d = polyLine.newPoint2d(0,7); // 1
+	point3d = polyLine.newPoint2d(0,0); // 2
+	point3d = polyLine.newPoint2d(7,0); // 3
 	
-	/*
 	arc = outerRing.newElement("ARC");
-	arc.setCenterPosition(-8, -11);
-	arc.setRadius(5);
-	arc.setStartAngleDegree(180.0);
-	arc.setSweepAngleDegree(90.0);
+	arc.setCenterPosition(7, 3.5);
+	arc.setRadius(3.5);
+	arc.setStartAngleDegree(-90.0);
+	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
-	*/
 	
+	// hole.***
+	var innerRing = this.newInnerRing();
+	rect = innerRing.newElement("RECTANGLE");
+	rect.setCenterPosition(3,3);
+	rect.setDimensions(2, 2);
 };
 
 /**
@@ -642,6 +634,8 @@ Profile.prototype.TEST__setFigureHole_2 = function()
 	arc.setSweepAngleDegree(90.0);
 	arc.numPointsFor360Deg = 24;
 	
+	
+		
 	// Hole 2.*************************************************
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");

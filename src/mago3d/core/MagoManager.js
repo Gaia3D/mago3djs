@@ -1478,48 +1478,35 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		pMesh.profile = new Profile(); // provisional.***
 		var profileAux = pMesh.profile; // provisional.***
 		
-		//profileAux.TEST__setFigureHole_2();
-		profileAux.TEST__setFigure_1();
+		profileAux.TEST__setFigureHole_2();
+		//profileAux.TEST__setFigure_1();
 		
 		if(pMesh.vboKeyContainer === undefined)
 			pMesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
 		
 		var bIncludeBottomCap, bIncludeTopCap;
-		//var extrusionVector, extrusionDist, extrudeSegmentsCount;
-		//extrudeSegmentsCount = 1;
-		//extrusionDist = 5.0;
-		//pMesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
+		var extrusionVector, extrusionDist, extrudeSegmentsCount;
+		/*
+		extrudeSegmentsCount = 120;
+		extrusionDist = 15.0;
+		pMesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
+		*/
 		
 		var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
-		revolveAngDeg = 360.0;
+		revolveAngDeg = 90.0;
 		revolveSegment2d = new Segment2D();
-		var strPoint2d = new Point2D(0, -10);
-		var endPoint2d = new Point2D(0, 10);
+		var strPoint2d = new Point2D(20, -10);
+		var endPoint2d = new Point2D(20, 10);
 		revolveSegment2d.setPoints(strPoint2d, endPoint2d);
-		revolveSegmentsCount = 4;
+		revolveSegmentsCount = 24;
 		pMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 		
-		bIncludeBottomCap = false;
-		bIncludeTopCap = false;
-		var vboKeysExtruded = pMesh.vboKeyContainer.newVBOVertexIdxCacheKey();
+		bIncludeBottomCap = true;
+		bIncludeTopCap = true;
 		var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-		mesh.setColor(0.1, 1.0, 0.1, 1.0);
-		mesh.reverseSense();
-		var tMatTest = new Matrix4();
-		
-		var mesh2 = mesh.getCopy(undefined);
-		tMatTest.rotationAxisAngDeg(-90.0, 0,0,1);
-		mesh2.transformByMatrix4(tMatTest);
-		mesh2.setColor(1.0, 0.1, 0.1, 1.0);
-		
-		var mesh3 = mesh.getCopy(undefined);
-		tMatTest.rotationAxisAngDeg(90.0, 1,0,0);
-		mesh3.transformByMatrix4(tMatTest);
-		mesh3.setColor(0.1, 0.1, 1.0, 1.0);
+		mesh.setColor(0.1, 0.5, 0.5, 1.0);
 
-		mesh.mergeMesh(mesh2);
-		mesh.mergeMesh(mesh3);
-		mesh.getVbo(vboKeysExtruded);
+		mesh.getVbo(pMesh.vboKeyContainer);
 		
 		// Now, provisionally make a geoLocationData for the nativeProject.*************************************
 		if(natProject.geoLocDataManager === undefined)
