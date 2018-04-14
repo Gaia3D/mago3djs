@@ -1146,62 +1146,66 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
 
-	// 1) Position.*********************************************
-	var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-	if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-	{ return; }
-
-	var vertices_count = vbo_vicky.vertexCount;
-	if (vertices_count === 0) 
-		return;
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-	gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-	
-	if (ssao_idx === 1) // ssao.***
+	var vbosCount = vbo_vicks_container.getVbosCount();
+	for(var i=0; i<vbosCount; i++)
 	{
-		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-		{ 
+		// 1) Position.*********************************************
+		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.***
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
+		{ return; }
+
+		var vertices_count = vbo_vicky.vertexCount;
+		if (vertices_count === 0) 
 			return;
-		}
-		
-		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-		{ 
-			gl.disableVertexAttribArray(shader.color4_loc);
-		}
-		else{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-		}
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-
-		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 		
-		
-	}
-	
-	if(bRenderLines === undefined || bRenderLines === false)
-	{
-		if(vbo_vicky.indicesCount > 0)
+		if (ssao_idx === 1) // ssao.***
 		{
-			if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
-			{ return; }
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
-			gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
+			{ 
+				return;
+			}
 			
-			//gl.uniform4fv(shader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]); //.***
-			//gl.drawElements(gl.LINE_STRIP, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
+			{ 
+				gl.disableVertexAttribArray(shader.color4_loc);
+			}
+			else{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+				gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+			}
+
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+			gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+
+			//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+			//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+			
+			
+		}
+		
+		if(bRenderLines === undefined || bRenderLines === false)
+		{
+			if(vbo_vicky.indicesCount > 0)
+			{
+				if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
+				{ return; }
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+				
+				//gl.uniform4fv(shader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]); //.***
+				//gl.drawElements(gl.LINE_STRIP, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			}
+			else{
+				gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+				//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+			}
 		}
 		else{
-			gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-			//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 		}
-	}
-	else{
-		gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 	}
 };
 

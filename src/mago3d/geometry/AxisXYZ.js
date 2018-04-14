@@ -49,34 +49,40 @@ AxisXYZ.prototype.makeMesh = function(length)
 	var bIncludeBottomCap, bIncludeTopCap;
 	var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
 	revolveAngDeg = 360.0;
+	
+	// create a rotation axis by a segment.***
 	revolveSegment2d = new Segment2D();
 	var strPoint2d = new Point2D(0, -10);
 	var endPoint2d = new Point2D(0, 10);
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	revolveSegmentsCount = 8;
+	
+	// rotate the profile and create the Y axis.***
 	pMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 	
 	bIncludeBottomCap = false;
 	bIncludeTopCap = false;
 	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	mesh.setColor(0.1, 1.0, 0.1, 1.0);
+	mesh.setColor(0.1, 1.0, 0.1, 1.0); // set the color.***
 	mesh.reverseSense();
-	var tMatTest = new Matrix4();
 	
+	// copy & rotate the mesh and create the X axis.***
+	var tMatTest = new Matrix4();
 	var mesh2 = mesh.getCopy(undefined);
 	tMatTest.rotationAxisAngDeg(-90.0, 0,0,1);
 	mesh2.transformByMatrix4(tMatTest);
-	mesh2.setColor(1.0, 0.1, 0.1, 1.0);
+	mesh2.setColor(1.0, 0.1, 0.1, 1.0); // set the color.***
 	
+	// copy & rotate the mesh and create the Z axis.***
 	var mesh3 = mesh.getCopy(undefined);
 	tMatTest.rotationAxisAngDeg(90.0, 1,0,0);
 	mesh3.transformByMatrix4(tMatTest);
-	mesh3.setColor(0.1, 0.1, 1.0, 1.0);
+	mesh3.setColor(0.1, 0.1, 1.0, 1.0); // set the color.***
 
+	// Merge all meshes into a one mesh and make a unique vbo.***
 	mesh.mergeMesh(mesh2);
 	mesh.mergeMesh(mesh3);
-	this.vboKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
-	mesh.getVbo(this.vboKey);
+	mesh.getVbo(this.vbo_vicks_container);
 };
 
 AxisXYZ.prototype.getVboKeysContainer = function()

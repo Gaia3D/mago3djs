@@ -53,7 +53,7 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
 
 	// must separate vbo groups by surfaces.***
 	var mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	resultMesh = mesh.getCopySurfaceIndependetMesh(undefined);
+	resultMesh = mesh.getCopySurfaceIndependentMesh(resultMesh);
 	resultMesh.calculateVerticesNormals();
 	
 	return resultMesh;

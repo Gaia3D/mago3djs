@@ -279,9 +279,23 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix)
 
 VertexList.prototype.setIdxInList = function()
 {
+	VertexList.setIdxInList(this.vertexArray);
+	/*
 	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
 	{
 		this.vertexArray[i].idxInList = i;
+	}
+	*/
+};
+
+VertexList.setIdxInList = function(vertexArray)
+{
+	if(vertexArray === undefined)
+		return;
+	
+	for (var i = 0, vertexCount = vertexArray.length; i < vertexCount; i++) 
+	{
+		vertexArray[i].idxInList = i;
 	}
 };
 
@@ -291,8 +305,18 @@ VertexList.prototype.setIdxInList = function()
  */
 VertexList.prototype.getVboDataArrays = function(resultVbo) 
 {
+	VertexList.getVboDataArrays(this.vertexArray, resultVbo) ;
+	return resultVbo;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param transformMatrix 변수
+ */
+VertexList.getVboDataArrays = function(vertexArray, resultVbo) 
+{
 	// returns positions, and if exist, normals, colors, texCoords.***
-	var verticesCount = this.vertexArray.length;
+	var verticesCount = vertexArray.length;
 	if(verticesCount === 0)
 		return resultVbo;
 	
@@ -308,7 +332,7 @@ VertexList.prototype.getVboDataArrays = function(resultVbo)
 	
 	for (var i = 0; i < verticesCount; i++) 
 	{
-		vertex = this.vertexArray[i];
+		vertex = vertexArray[i];
 		if(vertex.point3d === undefined)
 			continue;
 		
