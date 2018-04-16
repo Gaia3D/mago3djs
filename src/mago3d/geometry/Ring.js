@@ -20,10 +20,10 @@ var Ring = function()
  */
 Ring.prototype.deleteObjects = function()
 {
-	if(this.elemsArray !== undefined)
+	if (this.elemsArray !== undefined)
 	{
 		var elemsCount = this.elemsArray.length;
-		for(var i=0; i<elemsCount; i++)
+		for (var i=0; i<elemsCount; i++)
 		{
 			this.elemsArray[i].deleteObjects();
 			this.elemsArray[i] = undefined;
@@ -31,8 +31,8 @@ Ring.prototype.deleteObjects = function()
 		this.elemsArray = undefined;
 	}
 	
-	if(this.polygon !== undefined)
-		this.polygon.deleteObjects();
+	if (this.polygon !== undefined)
+	{ this.polygon.deleteObjects(); }
 	
 	this.polygon = undefined;
 };
@@ -45,18 +45,18 @@ Ring.prototype.newElement = function(elementTypeString)
 	var elem;
 	
 	if (elementTypeString === "ARC")
-		elem = new Arc();
+	{ elem = new Arc(); }
 	else if (elementTypeString === "CIRCLE")
-		elem = new Circle();
+	{ elem = new Circle(); }
 	else if (elementTypeString === "POLYLINE")
-		elem = new PolyLine();
+	{ elem = new PolyLine(); }
 	else if (elementTypeString === "RECTANGLE")
-		elem = new Rectangle();
+	{ elem = new Rectangle(); }
 	else if (elementTypeString === "STAR")
-		elem = new Star();
+	{ elem = new Star(); }
 	
-	if(elem === undefined)
-		return undefined;
+	if (elem === undefined)
+	{ return undefined; }
 	
 	if (this.elemsArray === undefined)
 	{ this.elemsArray = []; }
@@ -82,11 +82,11 @@ Ring.prototype.makePolygon = function()
  */
 Ring.prototype.getPolygon = function(resultPolygon)
 {
-	if(resultPolygon === undefined)
-		resultPolygon = new Polygon();
+	if (resultPolygon === undefined)
+	{ resultPolygon = new Polygon(); }
 	
-	if(resultPolygon.point2dList === undefined)
-		resultPolygon.point2dList = new Point2DList();
+	if (resultPolygon.point2dList === undefined)
+	{ resultPolygon.point2dList = new Point2DList(); }
 	
 	// reset polygon.***
 	resultPolygon.point2dList.deleteObjects();
@@ -95,7 +95,7 @@ Ring.prototype.getPolygon = function(resultPolygon)
 	// set idxData for all points.***
 	var point;
 	var pointsCount = resultPolygon.point2dList.getPointsCount();
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point = resultPolygon.point2dList.getPoint(i);
 		point.indexData = new IndexData();
@@ -128,7 +128,7 @@ Ring.prototype.getPoints = function(resultPointsArray)
 	// finally check if the 1rst point and the last point are coincidents.***
 	var totalPointsCount = resultPointsArray.length;
 	
-	if(totalPointsCount > 1)
+	if (totalPointsCount > 1)
 	{
 		// mark the last as pointType = 1
 		resultPointsArray[totalPointsCount-1].pointType = 1;
@@ -136,7 +136,7 @@ Ring.prototype.getPoints = function(resultPointsArray)
 		var errorDist = 10E-8;
 		var firstPoint = resultPointsArray[0];
 		var lastPoint = resultPointsArray[totalPointsCount-1];
-		if(firstPoint.isCoincidentToPoint(lastPoint, errorDist))
+		if (firstPoint.isCoincidentToPoint(lastPoint, errorDist))
 		{
 			// delete the last point.***
 			lastPoint = resultPointsArray.pop();

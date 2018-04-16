@@ -17,8 +17,8 @@ var Mesh = function()
 
 Mesh.prototype.newSurface = function()
 {
-	if(this.surfacesArray === undefined)
-		this.surfacesArray = [];
+	if (this.surfacesArray === undefined)
+	{ this.surfacesArray = []; }
 	
 	var surface = new Surface();
 	this.surfacesArray.push(surface);
@@ -27,33 +27,33 @@ Mesh.prototype.newSurface = function()
 
 Mesh.prototype.getSurface = function(idx)
 {
-	if(this.surfacesArray === undefined)
-		return undefined;
+	if (this.surfacesArray === undefined)
+	{ return undefined; }
 	
 	return this.surfacesArray[idx];
 };
 
 Mesh.prototype.addSurface = function(surface)
 {
-	if(surface === undefined)
-		return;
+	if (surface === undefined)
+	{ return; }
 	
-	if(this.surfacesArray === undefined)
-		this.surfacesArray = [];
+	if (this.surfacesArray === undefined)
+	{ this.surfacesArray = []; }
 	
 	this.surfacesArray.push(surface);
 };
 
 Mesh.prototype.mergeMesh = function(mesh)
 {
-	if(mesh === undefined)
-		return;
+	if (mesh === undefined)
+	{ return; }
 	
-	if(this.surfacesArray === undefined)
-		this.surfacesArray = [];
+	if (this.surfacesArray === undefined)
+	{ this.surfacesArray = []; }
 	
 	var surfacesCount = mesh.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		this.addSurface(mesh.getSurface(i));
 	}
@@ -62,8 +62,8 @@ Mesh.prototype.mergeMesh = function(mesh)
 
 Mesh.prototype.getSurfacesCount = function()
 {
-	if(this.surfacesArray === undefined)
-		return 0;
+	if (this.surfacesArray === undefined)
+	{ return 0; }
 	
 	return this.surfacesArray.length;
 };
@@ -71,12 +71,12 @@ Mesh.prototype.getSurfacesCount = function()
 Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 {
 	// In a surfaceIndependentMesh, the surfaces are disconex.***
-	if(resultMesh === undefined)
-		resultMesh = new Mesh();
+	if (resultMesh === undefined)
+	{ resultMesh = new Mesh(); }
 	
 	var surface, surfaceCopy;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		surfaceCopy = resultMesh.newSurface();
@@ -89,15 +89,15 @@ Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
 	// To call this method, the faces must be CONVEX.***
-	if(this.surfacesArray === undefined || this.surfacesArray.length === 0)
-		return resultTrianglesArray;
+	if (this.surfacesArray === undefined || this.surfacesArray.length === 0)
+	{ return resultTrianglesArray; }
 	
-	if(resultTrianglesArray === undefined)
-		resultTrianglesArray = [];
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
 	
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		resultTrianglesArray = surface.getTrianglesConvex(resultTrianglesArray);
@@ -113,8 +113,8 @@ Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
  */
 Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
 {
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
 	
 	// 1rst, assign vertex-IdxInList for all used vertices.***
 	var facesCount;
@@ -124,19 +124,19 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	var vtx;
 	var verticesCount;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		facesCount = surface.getFacesCount();
-		for(var j=0; j<facesCount; j++)
+		for (var j=0; j<facesCount; j++)
 		{
 			face = surface.getFace(j);
 			verticesCount = face.getVerticesCount();
-			for(var k=0; k<verticesCount; k++)
+			for (var k=0; k<verticesCount; k++)
 			{
 				vtx = face.getVertex(k);
-				if(vtx === undefined)
-					var hola = 0;
+				if (vtx === undefined)
+				{ var hola = 0; }
 				vtx.setIdxInList(idxAux);
 				idxAux++;
 			}
@@ -146,15 +146,15 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	// now, make a map of unique vertices map using "idxInList" of vertices.***
 	var verticesMap = {};
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		facesCount = surface.getFacesCount();
-		for(var j=0; j<facesCount; j++)
+		for (var j=0; j<facesCount; j++)
 		{
 			face = surface.getFace(j);
 			verticesCount = face.getVerticesCount();
-			for(var k=0; k<verticesCount; k++)
+			for (var k=0; k<verticesCount; k++)
 			{
 				vtx = face.getVertex(k);
 				verticesMap[vtx.getIdxInList().toString()] = vtx;
@@ -175,7 +175,7 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 
 Mesh.prototype.transformByMatrix4 = function(tMat4)
 {
-	if(this.vertexList === undefined)
+	if (this.vertexList === undefined)
 	{
 		this.vertexList = new VertexList();
 		this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
@@ -190,7 +190,7 @@ Mesh.prototype.calculateVerticesNormals = function()
 	// PROVISIONAL.***
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		surface.calculateVerticesNormals();
@@ -201,7 +201,7 @@ Mesh.prototype.setColor = function(r, g, b, a)
 {
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		surface.setColor(r, g, b, a);
@@ -212,7 +212,7 @@ Mesh.prototype.reverseSense = function()
 {
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		surface.reverseSense();
@@ -225,7 +225,7 @@ Mesh.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 {
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		resultHedgesArray = surface.getFrontierHalfEdges(resultHedgesArray);
@@ -236,18 +236,18 @@ Mesh.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 
 Mesh.prototype.getCopy = function(resultMeshCopy)
 {
-	if(this.vertexList === undefined)
-		this.vertexList = new VertexList();
+	if (this.vertexList === undefined)
+	{ this.vertexList = new VertexList(); }
 	
-	if(this.vertexList.vertexArray === undefined || this.vertexList.vertexArray.length === 0)
-		this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+	if (this.vertexList.vertexArray === undefined || this.vertexList.vertexArray.length === 0)
+	{ this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray); }
 	
-	if(resultMeshCopy === undefined)
-		resultMeshCopy = new Mesh();
+	if (resultMeshCopy === undefined)
+	{ resultMeshCopy = new Mesh(); }
 	
 	// 1rst copy vertexList.***
-	if(resultMeshCopy.vertexList === undefined)
-		resultMeshCopy.vertexList = new VertexList();
+	if (resultMeshCopy.vertexList === undefined)
+	{ resultMeshCopy.vertexList = new VertexList(); }
 	
 	resultMeshCopy.vertexList.copyFrom(this.vertexList);
 	
@@ -261,17 +261,17 @@ Mesh.prototype.getCopy = function(resultMeshCopy)
 	var surfaceCopy, faceCopy, vtxCopy;
 	var vtx;
 	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
+	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
 		surfaceCopy = resultMeshCopy.newSurface();
 		facesCount = surface.getFacesCount();
-		for(var j=0; j<facesCount; j++)
+		for (var j=0; j<facesCount; j++)
 		{
 			face = surface.getFace(j);
 			faceCopy = surfaceCopy.newFace();
 			verticesCount = face.getVerticesCount();
-			for(var k=0; k<verticesCount; k++)
+			for (var k=0; k<verticesCount; k++)
 			{
 				vtx = face.getVertex(k);
 				vtxIdx = vtx.getIdxInList();
@@ -288,15 +288,15 @@ Mesh.prototype.getCopy = function(resultMeshCopy)
 
 Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resultTrianglesListsArray)
 {
-	if(resultTrianglesListsArray === undefined)
-		resultTrianglesListsArray = [];
+	if (resultTrianglesListsArray === undefined)
+	{ resultTrianglesListsArray = []; }
 	
 	// This function returns trianglesListsArray. Each trianglesList's vertices count is lower than 65535.***
 	var shortSize = 65535;
 	var trianglesList = new TrianglesList();
 	resultTrianglesListsArray.push(trianglesList);
 	var trianglesCount = trianglesArray.length;
-	if(trianglesCount*3 <shortSize)
+	if (trianglesCount*3 <shortSize)
 	{
 		trianglesList.trianglesArray = [];
 		Array.prototype.push.apply(trianglesList.trianglesArray, trianglesArray);
@@ -307,7 +307,7 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	var globalVerticesArray = TrianglesList.getNoRepeatedVerticesArray(trianglesArray, undefined);
 	var verticesCount = globalVerticesArray.length;
 	
-	if(verticesCount <shortSize)
+	if (verticesCount <shortSize)
 	{
 		trianglesList.trianglesArray = [];
 		Array.prototype.push.apply(trianglesList.trianglesArray, trianglesArray);
@@ -319,19 +319,20 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	var trianglesCount = trianglesArray.length;
 	var triangle;
 	
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		triangle = trianglesArray[i];
-		if(triangle.vertex0.idxInList < shortSize && triangle.vertex1.idxInList< shortSize && triangle.vertex2.idxInList< shortSize)
+		if (triangle.vertex0.idxInList < shortSize && triangle.vertex1.idxInList< shortSize && triangle.vertex2.idxInList< shortSize)
 		{
 			trianglesList.addTriangle(triangle);
 		}
-		else{
+		else 
+		{
 			rejectedTrianglesArray.push(triangle);
 		}
 	};
 	
-	if(rejectedTrianglesArray.length > 0)
+	if (rejectedTrianglesArray.length > 0)
 	{
 		resultTrianglesListsArray = this.getTrianglesListsArrayBy2ByteSize(rejectedTrianglesArray, resultTrianglesListsArray);
 	}
@@ -339,10 +340,10 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 
-Mesh.prototype.getVbo = function(resultVboContainer, resultEdgedVboContainer)
+Mesh.prototype.getVbo = function(resultVboContainer)
 {
-	if(resultVboContainer === undefined)
-		resultVboContainer = new VBOVertexIdxCacheKeysContainer();
+	if (resultVboContainer === undefined)
+	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
 	// make global triangles array.***
 	var trianglesArray = this.getTrianglesConvex(undefined);
@@ -353,7 +354,7 @@ Mesh.prototype.getVbo = function(resultVboContainer, resultEdgedVboContainer)
 	var trianglesList;
 	var verticesArray;
 	var trianglesListsCount = trianglesListsArray.length;
-	for(var i=0; i<trianglesListsCount; i++)
+	for (var i=0; i<trianglesListsCount; i++)
 	{
 		trianglesList = trianglesListsArray[i];
 		verticesArray = trianglesList.getNoRepeatedVerticesArray(undefined);
@@ -363,12 +364,6 @@ Mesh.prototype.getVbo = function(resultVboContainer, resultEdgedVboContainer)
 		trianglesList.assignVerticesIdx();
 		TrianglesList.getVboFaceDataArray(trianglesList.trianglesArray, vbo);
 		
-		// now, calculate edges vbos.***
-		if(resultEdgedVboContainer !== undefined)
-		{
-			// for each vertices there are a outingHedge.***
-			
-		}
 	}
 
 	return resultVboContainer;
@@ -382,13 +377,21 @@ Mesh.prototype.getVboEdges = function(resultVboContainer)
 	var hedge;
 	var vertexArray = [];
 	var strVertex, endVertex;
-	for(var i=0; i<hedgesCount; i++)
+	for (var i=0; i<hedgesCount; i++)
 	{
 		hedge = frontierHedgesArray[i];
 		strVertex = hedge.startVertex;
 		endVertex = hedge.getEndVertex();
 		vertexArray.push(strVertex.point3d.x);
+		vertexArray.push(strVertex.point3d.y);
+		vertexArray.push(strVertex.point3d.z);
+		vertexArray.push(endVertex.point3d.x);
+		vertexArray.push(endVertex.point3d.y);
+		vertexArray.push(endVertex.point3d.z);
 	}
+	
+	var resultVbo = resultVboContainer.newVBOVertexIdxCacheKey();
+	resultVbo.posVboDataArray = Float32Array.from(vertexArray);
 };
 
 

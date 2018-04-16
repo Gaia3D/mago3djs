@@ -45,6 +45,8 @@ var Policy = function()
 	this.nearGeoIssueListEnable = false;
 	// occlusion culling
 	this.occlusionCullingEnable = false;
+	// origin axis XYZ
+	this.showOrigin = true;
 	
 	// 이미지 경로
 	this.imagePath = "";
@@ -68,6 +70,14 @@ var Policy = function()
 	this.specularColor = new Float32Array([0.6, 0.6, 0.6]);
 	
 	this.ssaoRadius = 0.15;
+};
+Policy.prototype.getShowOrigin = function() 
+{
+	return this.showOrigin;
+};
+Policy.prototype.setShowOrigin = function(showOrigin) 
+{
+	this.showOrigin = showOrigin;
 };
 
 Policy.prototype.getMagoEnable = function() 

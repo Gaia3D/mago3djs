@@ -17,8 +17,8 @@ var Surface = function()
 
 Surface.prototype.newFace = function()
 {
-	if(this.facesArray === undefined)
-		this.facesArray = [];
+	if (this.facesArray === undefined)
+	{ this.facesArray = []; }
 	
 	var face = new Face();
 	this.facesArray.push(face);
@@ -27,16 +27,16 @@ Surface.prototype.newFace = function()
 
 Surface.prototype.getFacesCount = function()
 {
-	if(this.facesArray === undefined)
-		return 0;
+	if (this.facesArray === undefined)
+	{ return 0; }
 
 	return this.facesArray.length;
 };
 
 Surface.prototype.getFace = function(idx)
 {
-	if(this.facesArray === undefined)
-		return undefined;
+	if (this.facesArray === undefined)
+	{ return undefined; }
 
 	return this.facesArray[idx];
 };
@@ -45,7 +45,7 @@ Surface.prototype.setColor = function(r, g, b, a)
 {
 	var face;
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		face.setColor(r, g, b, a);
@@ -54,25 +54,26 @@ Surface.prototype.setColor = function(r, g, b, a)
 
 Surface.prototype.addFacesArray = function(facesArray)
 {
-	if(facesArray === undefined)
-		return;
+	if (facesArray === undefined)
+	{ return; }
 	
-	if(this.facesArray === undefined)
-		this.facesArray = [];
+	if (this.facesArray === undefined)
+	{ this.facesArray = []; }
 	
 	Array.prototype.push.apply(this.facesArray, facesArray);
 };
 
 Surface.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 {
-	if(facesArray === undefined)
-		return resultHedgesArray;
+	if (this.facesArray === undefined)
+	{ return resultHedgesArray; }
 	
-	if(resultHedgesArray === undefined)
-		resultHedgesArray = [];
+	if (resultHedgesArray === undefined)
+	{ resultHedgesArray = []; }
 	
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	var face;
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		resultHedgesArray = face.getFrontierHalfEdges(resultHedgesArray);
@@ -83,14 +84,14 @@ Surface.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 
 Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 {
-	if(this.facesArray === undefined)
-		return resultSurface;
+	if (this.facesArray === undefined)
+	{ return resultSurface; }
 	
-	if(resultSurface === undefined)
-		resultSurface = new Surface();
+	if (resultSurface === undefined)
+	{ resultSurface = new Surface(); }
 	
-	if(resultSurface.localVertexList === undefined)
-		resultSurface.localVertexList = new VertexList();
+	if (resultSurface.localVertexList === undefined)
+	{ resultSurface.localVertexList = new VertexList(); }
 	
 	var resultLocalvertexList = resultSurface.localVertexList;
 	
@@ -98,7 +99,7 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 	var verticesArray = this.getNoRepeatedVerticesArray(undefined);
 	var verticesCount = verticesArray.length;
 	var vertex, vertexCopy;
-	for(var i=0; i<verticesCount; i++)
+	for (var i=0; i<verticesCount; i++)
 	{
 		vertex = verticesArray[i];
 		vertex.setIdxInList(i); // set idxInList.***
@@ -110,14 +111,14 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 	var face, faceCopy;
 	var vertexIdxInList;
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		faceCopy = resultSurface.newFace();
 		faceCopy.vertexArray = [];
 		
 		verticesCount = face.getVerticesCount();
-		for(var j=0; j<verticesCount; j++)
+		for (var j=0; j<verticesCount; j++)
 		{
 			vertex = face.getVertex(j);
 			vertexIdxInList = vertex.getIdxInList();
@@ -135,8 +136,8 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
  */
 Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
 {
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
 	
 	// 1rst, assign vertex-IdxInList for all used vertices.***
 	var facesCount = this.getFacesCount();
@@ -144,15 +145,15 @@ Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	var idxAux = 0;
 	var vtx;
 	var verticesCount;
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		verticesCount = face.getVerticesCount();
-		for(var j=0; j<verticesCount; j++)
+		for (var j=0; j<verticesCount; j++)
 		{
 			vtx = face.getVertex(j);
-			if(vtx === undefined)
-				var hola = 0;
+			if (vtx === undefined)
+			{ var hola = 0; }
 			vtx.setIdxInList(idxAux);
 			idxAux++;
 		}
@@ -160,11 +161,11 @@ Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	
 	// now, make a map of unique vertices map using "idxInList" of vertices.***
 	var verticesMap = {};
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		verticesCount = face.getVerticesCount();
-		for(var j=0; j<verticesCount; j++)
+		for (var j=0; j<verticesCount; j++)
 		{
 			vtx = face.getVertex(j);
 			verticesMap[vtx.getIdxInList().toString()] = vtx;
@@ -185,15 +186,15 @@ Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 Surface.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
 	// To call this method, the faces must be convex.***
-	if(this.facesArray === undefined || this.facesArray.length ===0)
-		return resultTrianglesArray;
+	if (this.facesArray === undefined || this.facesArray.length ===0)
+	{ return resultTrianglesArray; }
 	
-	if(resultTrianglesArray === undefined)
-		resultTrianglesArray = [];
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
 	
 	var face;
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		resultTrianglesArray = face.getTrianglesConvex(resultTrianglesArray);
@@ -207,7 +208,7 @@ Surface.prototype.calculateVerticesNormals = function()
 	// PROVISIONAL.***
 	var face;
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		face.calculateVerticesNormals();
@@ -218,7 +219,7 @@ Surface.prototype.reverseSense = function()
 {
 	var face;
 	var facesCount = this.getFacesCount();
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
 		face.reverseSense();

@@ -16,8 +16,8 @@ var IndexRange = function()
 
 IndexRange.prototype.copyFrom = function(indexRange)
 {
-	if(indexRange === undefined)
-		return;
+	if (indexRange === undefined)
+	{ return; }
 	
 	this.strIdx = indexRange.strIdx;
 	this.endIdx = indexRange.endIdx;

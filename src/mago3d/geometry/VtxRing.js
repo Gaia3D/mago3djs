@@ -17,8 +17,8 @@ var VtxRing = function()
 
 VtxRing.prototype.newElementIndexRange = function()
 {
-	if(this.elemsIndexRangesArray === undefined)
-		this.elemsIndexRangesArray = [];
+	if (this.elemsIndexRangesArray === undefined)
+	{ this.elemsIndexRangesArray = []; }
 	
 	var indexRange = new IndexRange();
 	this.elemsIndexRangesArray.push(indexRange);
@@ -27,19 +27,19 @@ VtxRing.prototype.newElementIndexRange = function()
 
 VtxRing.prototype.getElementIndexRange = function(idx)
 {
-	if(this.elemsIndexRangesArray === undefined)
-		return undefined;
+	if (this.elemsIndexRangesArray === undefined)
+	{ return undefined; }
 	
 	return this.elemsIndexRangesArray[idx];
 };
 
 VtxRing.prototype.getAllVertices = function(resultVerticesArray)
 {
-	if(this.vertexList === undefined || this.vertexList.vertexArray === undefined)
-		return resultVerticesArray;
+	if (this.vertexList === undefined || this.vertexList.vertexArray === undefined)
+	{ return resultVerticesArray; }
 	
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
 	
 	resultVerticesArray.push.apply(resultVerticesArray, this.vertexList.vertexArray);
 	
@@ -48,22 +48,22 @@ VtxRing.prototype.getAllVertices = function(resultVerticesArray)
 
 VtxRing.prototype.copyFrom = function(vtxRing)
 {
-	if(vtxRing.vertexList !== undefined)
+	if (vtxRing.vertexList !== undefined)
 	{
-		if(this.vertexList === undefined)
-			this.vertexList = new VertexList();
+		if (this.vertexList === undefined)
+		{ this.vertexList = new VertexList(); }
 		
 		this.vertexList.copyFrom(vtxRing.vertexList);
 	}
 	
-	if(vtxRing.elemsIndexRangesArray !== undefined)
+	if (vtxRing.elemsIndexRangesArray !== undefined)
 	{
-		if(this.elemsIndexRangesArray === undefined)
-			this.elemsIndexRangesArray = [];
+		if (this.elemsIndexRangesArray === undefined)
+		{ this.elemsIndexRangesArray = []; }
 		
 		var indexRange, myIndexRange;
 		var indexRangesCount = vtxRing.elemsIndexRangesArray.length;
-		for(var i=0; i<indexRangesCount; i++)
+		for (var i=0; i<indexRangesCount; i++)
 		{
 			indexRange = vtxRing.elemsIndexRangesArray[i];
 			myIndexRange = this.newElementIndexRange();
@@ -74,7 +74,7 @@ VtxRing.prototype.copyFrom = function(vtxRing)
 
 VtxRing.prototype.translate = function(x, y, z)
 {
-	if(this.vertexList !== undefined)
+	if (this.vertexList !== undefined)
 	{
 		this.vertexList.translateVertices(x, y, z);
 	}
@@ -82,7 +82,7 @@ VtxRing.prototype.translate = function(x, y, z)
 
 VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
 {
-	if(this.vertexList !== undefined)
+	if (this.vertexList !== undefined)
 	{
 		this.vertexList.transformPointsByMatrix4(tMat4);
 	}
@@ -90,14 +90,14 @@ VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
 
 VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 {
-	if(point2dList === undefined)
-		return;
+	if (point2dList === undefined)
+	{ return; }
 	
-	if(z === undefined)
-		z = 0;
+	if (z === undefined)
+	{ z = 0; }
 	
-	if(this.vertexList === undefined)
-		this.vertexList = new VertexList();
+	if (this.vertexList === undefined)
+	{ this.vertexList = new VertexList(); }
 	
 	this.vertexList.copyFromPoint2DList(point2dList, z);
 	this.calculateElementsIndicesRange();
@@ -105,14 +105,14 @@ VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 
 VtxRing.prototype.calculateElementsIndicesRange = function()
 {
-	if(this.vertexList === undefined)
-		return false;
+	if (this.vertexList === undefined)
+	{ return false; }
 	
 	var vertex;
 	var idxRange = undefined;
 	var vertexType;
 	var vertexCount = this.vertexList.getVertexCount();
-	for(var i=0; i<vertexCount; i++)
+	for (var i=0; i<vertexCount; i++)
 	{
 		vertex = this.vertexList.getVertex(i);
 		vertexType = vertex.vertexType;
@@ -124,13 +124,13 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 		//	vertexType = prevVertex.vertexType;
 		//}
 		
-		if(vertexType && vertexType === 1)
+		if (vertexType && vertexType === 1)
 		{
-			if(idxRange !== undefined)
+			if (idxRange !== undefined)
 			{
 				idxRange.endIdx = i;
 			}
-			if(i !== vertexCount)
+			if (i !== vertexCount)
 			{
 				idxRange = this.newElementIndexRange();
 				idxRange.strIdx = i;
@@ -138,8 +138,8 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 		}
 	}
 	
-	if(idxRange !== undefined)
-		idxRange.endIdx = 0;
+	if (idxRange !== undefined)
+	{ idxRange.endIdx = 0; }
 };
 
 

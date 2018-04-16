@@ -19,15 +19,15 @@ VertexList.getPrevIdx = function(idx, vertexArray)
 {
 	var verticesCount = vertexArray.length;
 	
-	if(idx < 0 || idx > verticesCount-1)
-		return undefined;
+	if (idx < 0 || idx > verticesCount-1)
+	{ return undefined; }
 	
 	var prevIdx;
 	
-	if(idx === 0)
-		prevIdx = verticesCount - 1;
+	if (idx === 0)
+	{ prevIdx = verticesCount - 1; }
 	else
-		prevIdx = idx - 1;
+	{ prevIdx = idx - 1; }
 
 	return prevIdx;
 };
@@ -36,15 +36,15 @@ VertexList.getNextIdx = function(idx, vertexArray)
 {
 	var verticesCount = vertexArray.length;
 	
-	if(idx < 0 || idx > verticesCount-1)
-		return undefined;
+	if (idx < 0 || idx > verticesCount-1)
+	{ return undefined; }
 	
 	var nextIdx;
 	
-	if(idx === verticesCount - 1)
-		nextIdx = 0;
+	if (idx === verticesCount - 1)
+	{ nextIdx = 0; }
 	else
-		nextIdx = idx + 1;
+	{ nextIdx = idx + 1; }
 
 	return nextIdx;
 };
@@ -55,9 +55,10 @@ VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
 	var nextIdx = VertexList.getNextIdx(idx, vertexArray);
 	var nextVertex = vertexArray[nextIdx];
 	
-	if(resultVtxSegment === undefined)
-		resultVtxSegment = new VtxSegment(currVertex, nextVertex);
-	else{
+	if (resultVtxSegment === undefined)
+	{ resultVtxSegment = new VtxSegment(currVertex, nextVertex); }
+	else 
+	{
 		resultVtxSegment.setVertices(currVertex, nextVertex);
 	}
 
@@ -73,9 +74,10 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
 	var currPoint = currVertex.point3d;
 	var nextPoint = nextVertex.point3d;
 	
-	if(resultVector === undefined)
-		resultVector = new Point3D(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z);
-	else{
+	if (resultVector === undefined)
+	{ resultVector = new Point3D(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z); }
+	else 
+	{
 		resultVector.setVertices(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z);
 	}
 
@@ -139,11 +141,11 @@ VertexList.prototype.copyFromPoint2DList = function(point2dList, z)
 	
 	var point2d;
 	var vertex;
-	if(z === undefined)
-		z = 0;
+	if (z === undefined)
+	{ z = 0; }
 
 	var pointsCount = point2dList.getPointsCount();
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point2d = point2dList.getPoint(i);
 		vertex = this.newVertex();
@@ -214,9 +216,9 @@ VertexList.prototype.getIdxOfVertex = function(vertex)
 	var i=0;
 	var idx = -1;
 	var found = false;
-	while(!found && i<verticesCount)
+	while (!found && i<verticesCount)
 	{
-		if(this.vertexArray[i] === vertex)
+		if (this.vertexArray[i] === vertex)
 		{
 			found = true;
 			idx = i;
@@ -290,8 +292,8 @@ VertexList.prototype.setIdxInList = function()
 
 VertexList.setIdxInList = function(vertexArray)
 {
-	if(vertexArray === undefined)
-		return;
+	if (vertexArray === undefined)
+	{ return; }
 	
 	for (var i = 0, vertexCount = vertexArray.length; i < vertexCount; i++) 
 	{
@@ -317,11 +319,11 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 {
 	// returns positions, and if exist, normals, colors, texCoords.***
 	var verticesCount = vertexArray.length;
-	if(verticesCount === 0)
-		return resultVbo;
+	if (verticesCount === 0)
+	{ return resultVbo; }
 	
-	if(resultVbo === undefined)
-		resultVbo = new VBOVertexIdxCacheKey();
+	if (resultVbo === undefined)
+	{ resultVbo = new VBOVertexIdxCacheKey(); }
 	
 	var posArray = [];
 	var norArray;
@@ -333,8 +335,8 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 	for (var i = 0; i < verticesCount; i++) 
 	{
 		vertex = vertexArray[i];
-		if(vertex.point3d === undefined)
-			continue;
+		if (vertex.point3d === undefined)
+		{ continue; }
 		
 		position = vertex.point3d;
 		posArray.push(position.x);
@@ -342,10 +344,10 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 		posArray.push(position.z);
 		
 		normal = vertex.normal;
-		if(normal)
+		if (normal)
 		{
-			if(norArray === undefined)
-				norArray = [];
+			if (norArray === undefined)
+			{ norArray = []; }
 			
 			norArray.push(normal.x*127);
 			norArray.push(normal.y*127);
@@ -353,10 +355,10 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 		}
 		
 		color = vertex.color4;
-		if(color)
+		if (color)
 		{
-			if(colArray === undefined)
-				colArray = [];
+			if (colArray === undefined)
+			{ colArray = []; }
 			
 			colArray.push(color.r*255);
 			colArray.push(color.g*255);
@@ -365,10 +367,10 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 		}
 		
 		texCoord = vertex.texCoord;
-		if(texCoord)
+		if (texCoord)
 		{
-			if(texCoordArray === undefined)
-				texCoordArray = [];
+			if (texCoordArray === undefined)
+			{ texCoordArray = []; }
 			
 			texCoordArray.push(texCoord.x);
 			texCoordArray.push(texCoord.y);
@@ -376,14 +378,14 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 	}
 	
 	resultVbo.posVboDataArray = Float32Array.from(posArray);
-	if(normal)
-		resultVbo.norVboDataArray = Int8Array.from(norArray);
+	if (normal)
+	{ resultVbo.norVboDataArray = Int8Array.from(norArray); }
 	
-	if(color)
-		resultVbo.colVboDataArray = Uint8Array.from(colArray);
+	if (color)
+	{ resultVbo.colVboDataArray = Uint8Array.from(colArray); }
 	
-	if(texCoord)
-		resultVbo.tcoordVboDataArray = Float32Array.from(texCoordArray);
+	if (texCoord)
+	{ resultVbo.tcoordVboDataArray = Float32Array.from(texCoordArray); }
 	
 	return resultVbo;
 };

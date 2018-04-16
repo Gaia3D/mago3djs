@@ -54,7 +54,7 @@ RingsList.prototype.deleteObjects = function()
 RingsList.prototype.getRingsCount = function() 
 {
 	if (this.ringsArray === undefined)
-		return 0;
+	{ return 0; }
 
 	return this.ringsArray.length;
 };
@@ -66,15 +66,15 @@ RingsList.prototype.getRingsCount = function()
 RingsList.prototype.getRingIdx = function(ring) 
 {
 	if (ring === undefined)
-		return undefined;
+	{ return undefined; }
 
 	var ringIdx;
 	var ringsCount = this.getRingsCount();
 	var find = false;
 	var i=0; 
-	while(!find && i<ringsCount)
+	while (!find && i<ringsCount)
 	{
-		if(this.getRing(i) === ring)
+		if (this.getRing(i) === ring)
 		{
 			find = true;
 			ringIdx = i;
@@ -92,7 +92,7 @@ RingsList.prototype.getRingIdx = function(ring)
 RingsList.prototype.getRing = function(idx) 
 {
 	if (this.ringsArray === undefined)
-		return undefined;
+	{ return undefined; }
 
 	return this.ringsArray[idx];
 };
@@ -104,21 +104,22 @@ RingsList.prototype.getRing = function(idx)
 RingsList.getBoundingRectangle = function(ringsArray, resultBRect) 
 {
 	if (this.resultBRect === undefined)
-		resultBRect = new BoundingRectangle();
+	{ resultBRect = new BoundingRectangle(); }
 	
 	var ring;
 	var currBRect;
 	var ringsCount = ringsArray.length;
-	for(var i=0; i<ringsCount; i++)
+	for (var i=0; i<ringsCount; i++)
 	{
 		ring = ringsArray[i];
-		if(ring.polygon === undefined)
-			ring.makePolygon();
+		if (ring.polygon === undefined)
+		{ ring.makePolygon(); }
 		
 		currBRect = ring.polygon.getBoundingRectangle(currBRect);
-		if(i === 0)
-			resultBRect.setInitByRectangle(currBRect);
-		else{
+		if (i === 0)
+		{ resultBRect.setInitByRectangle(currBRect); }
+		else 
+		{
 			resultBRect.addRectangle(currBRect);
 		}
 	}
@@ -146,15 +147,15 @@ RingsList.prototype.setIdxInList = function()
 RingsList.prototype.intersectionWithSegment = function(segment) 
 {
 	// returns true if any ring's polygon intersects with "segment".***
-	if(segment === undefined)
-		return false;
+	if (segment === undefined)
+	{ return false; }
 	
 	var intersects = false;
 	var ringsCount = this.getRingsCount();
 	var i=0;
-	while(!intersects && i<ringsCount)
+	while (!intersects && i<ringsCount)
 	{
-		if(this.ringsArray[i].intersectionWithSegment(segment))
+		if (this.ringsArray[i].intersectionWithSegment(segment))
 		{
 			intersects = true;
 		}
@@ -170,11 +171,11 @@ RingsList.prototype.intersectionWithSegment = function(segment)
  */
 RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
 {
-	if(point === undefined)
-		return resultSortedObjectsArray;
+	if (point === undefined)
+	{ return resultSortedObjectsArray; }
 	
-	if(resultSortedObjectsArray === undefined)
-		resultSortedObjectsArray = [];
+	if (resultSortedObjectsArray === undefined)
+	{ resultSortedObjectsArray = []; }
 	
 	var objectsAuxArray = [];
 	var ring;
@@ -184,11 +185,11 @@ RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorted
 	var objectAux;
 	var startIdx, endIdx, insertIdx;
 	var ringsCount = ringsArray.length;
-	for(var i=0; i<ringsCount; i++)
+	for (var i=0; i<ringsCount; i++)
 	{
 		ring = ringsArray[i];
-		if(ring.polygon === undefined)
-			ring.makePolygon();
+		if (ring.polygon === undefined)
+		{ ring.makePolygon(); }
 		ringPointIdx = ring.polygon.point2dList.getNearestPointIdxToPoint(point);
 		ringPoint = ring.polygon.point2dList.getPoint(ringPointIdx);
 		squaredDist = ringPoint.squareDistToPoint(point);
@@ -205,13 +206,13 @@ RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorted
 		objectsAuxArray.splice(insertIdx, 0, objectAux);
 	}
 	
-	if(resultSortedObjectsArray === undefined)
-		resultSortedObjectsArray = [];
+	if (resultSortedObjectsArray === undefined)
+	{ resultSortedObjectsArray = []; }
 	
 	resultSortedObjectsArray.length = 0;
 	
 	var objectsCount = objectsAuxArray.length;
-	for(var i=0; i<objectsCount; i++)
+	for (var i=0; i<objectsCount; i++)
 	{
 		resultSortedObjectsArray.push(objectsAuxArray[i]);
 	}
@@ -230,8 +231,8 @@ RingsList.getIndexToInsertBySquaredDist = function(objectsArray, object, startId
 	
 	var range = endIdx - startIdx;
 	
-	if(objectsArray.length === 0)
-		return 0;
+	if (objectsArray.length === 0)
+	{ return 0; }
 	
 	if (range < 6)
 	{

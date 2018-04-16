@@ -15,11 +15,11 @@ var Point2DList = function(x, y)
 
 Point2DList.prototype.deleteObjects = function()
 {
-	if(this.pointsArray === undefined)
-		return;
+	if (this.pointsArray === undefined)
+	{ return; }
 	
 	var pointsCount = this.pointsArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		this.pointsArray[i].deleteObjects();
 		this.pointsArray[i] = undefined;
@@ -29,19 +29,19 @@ Point2DList.prototype.deleteObjects = function()
 
 Point2DList.prototype.addPoint = function(point2d)
 {
-	if(point2d === undefined)
-		return;
+	if (point2d === undefined)
+	{ return; }
 	
-	if(this.pointsArray === undefined)
-		this.pointsArray = [];
+	if (this.pointsArray === undefined)
+	{ this.pointsArray = []; }
 
 	this.pointsArray.push(point2d);
 };
 
 Point2DList.prototype.newPoint = function(x, y)
 {
-	if(this.pointsArray === undefined)
-		this.pointsArray = [];
+	if (this.pointsArray === undefined)
+	{ this.pointsArray = []; }
 	
 	var point = new Point2D(x, y);
 	this.pointsArray.push(point);
@@ -55,8 +55,8 @@ Point2DList.prototype.getPoint = function(idx)
 
 Point2DList.prototype.getPointsCount = function()
 {
-	if(this.pointsArray === undefined)
-		return 0;
+	if (this.pointsArray === undefined)
+	{ return 0; }
 	
 	return this.pointsArray.length;
 };
@@ -66,10 +66,10 @@ Point2DList.prototype.getPrevIdx = function(idx)
 	var pointsCount = this.pointsArray.length;
 	var prevIdx;
 	
-	if(idx === 0)
-		prevIdx = pointsCount - 1;
+	if (idx === 0)
+	{ prevIdx = pointsCount - 1; }
 	else
-		prevIdx = idx - 1;
+	{ prevIdx = idx - 1; }
 
 	return prevIdx;
 };
@@ -79,10 +79,10 @@ Point2DList.prototype.getNextIdx = function(idx)
 	var pointsCount = this.pointsArray.length;
 	var nextIdx;
 	
-	if(idx === pointsCount - 1)
-		nextIdx = 0;
+	if (idx === pointsCount - 1)
+	{ nextIdx = 0; }
 	else
-		nextIdx = idx + 1;
+	{ nextIdx = idx + 1; }
 
 	return nextIdx;
 };
@@ -93,9 +93,9 @@ Point2DList.prototype.getIdxOfPoint = function(point)
 	var i=0;
 	var idx = -1;
 	var found = false;
-	while(!found && i<pointsCount)
+	while (!found && i<pointsCount)
 	{
-		if(this.pointsArray[i] === point)
+		if (this.pointsArray[i] === point)
 		{
 			found = true;
 			idx = i;
@@ -112,9 +112,10 @@ Point2DList.prototype.getSegment = function(idx, resultSegment)
 	var nextIdx = this.getNextIdx(idx);
 	var nextPoint = this.getPoint(nextIdx);
 	
-	if(resultSegment === undefined)
-		resultSegment = new Segment2D(currPoint, nextPoint);
-	else{
+	if (resultSegment === undefined)
+	{ resultSegment = new Segment2D(currPoint, nextPoint); }
+	else 
+	{
 		resultSegment.setPoints(currPoint, nextPoint);
 	}
 
@@ -124,7 +125,7 @@ Point2DList.prototype.getSegment = function(idx, resultSegment)
 Point2DList.prototype.setIdxInList = function()
 {
 	var pointsCount = this.pointsArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		this.pointsArray[i].idxInList = i;
 	}
@@ -135,14 +136,14 @@ Point2DList.prototype.setIdxInList = function()
  */
 Point2DList.prototype.getCopy = function(resultPoint2dList) 
 {
-	if(resultPoint2dList === undefined)
-		resultPoint2dList = new Point2DList();
+	if (resultPoint2dList === undefined)
+	{ resultPoint2dList = new Point2DList(); }
 	else
-		resultPoint2dList.deleteObjects();
+	{ resultPoint2dList.deleteObjects(); }
 	
 	var myPoint, copyPoint;
 	var pointsCount = this.getPointsCount();
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		myPoint = this.getPoint(i);
 		copyPoint = resultPoint2dList.newPoint(myPoint.x, myPoint.y);
@@ -160,19 +161,19 @@ Point2DList.prototype.getCopy = function(resultPoint2dList)
 Point2DList.prototype.getBoundingRectangle = function(resultBRect) 
 {
 	var pointsCount = this.getPointsCount();
-	if(pointsCount === 0)
-		return resultBRect;
+	if (pointsCount === 0)
+	{ return resultBRect; }
 	
-	if(resultBRect === undefined)
-		resultBRect = new BoundingRectangle();
+	if (resultBRect === undefined)
+	{ resultBRect = new BoundingRectangle(); }
 	
 	var point;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
-		if(i === 0)
-			resultBRect.setInit(this.getPoint(i));
+		if (i === 0)
+		{ resultBRect.setInit(this.getPoint(i)); }
 		else
-			resultBRect.addPoint(this.getPoint(i));
+		{ resultBRect.addPoint(this.getPoint(i)); }
 	}
 	
 	return resultBRect;
@@ -186,23 +187,24 @@ Point2DList.prototype.getBoundingRectangle = function(resultBRect)
  */
 Point2DList.prototype.getNearestPointIdxToPoint = function(point) 
 {
-	if(point === undefined)
-		return undefined;
+	if (point === undefined)
+	{ return undefined; }
 	
 	var currPoint, candidatePointIdx;
 	var currSquaredDist, candidateSquaredDist;
 	var pointsCount = this.getPointsCount();
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		currPoint = this.getPoint(i);
 		currSquaredDist = currPoint.squareDistToPoint(point);
-		if(candidatePointIdx === undefined)
+		if (candidatePointIdx === undefined)
 		{
 			candidatePointIdx = i;
 			candidateSquaredDist = currSquaredDist;
 		}
-		else{
-			if(currSquaredDist < candidateSquaredDist)
+		else 
+		{
+			if (currSquaredDist < candidateSquaredDist)
 			{
 				candidatePointIdx = i;
 				candidateSquaredDist = currSquaredDist;
@@ -221,19 +223,19 @@ Point2DList.prototype.getNearestPointIdxToPoint = function(point)
  */
 Point2DList.prototype.reverse = function() 
 {
-	if(this.pointsArray !== undefined)
-		this.pointsArray.reverse();
+	if (this.pointsArray !== undefined)
+	{ this.pointsArray.reverse(); }
 };
 
 Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
 {
-	if(this.pointsArray === undefined)
-		return resultSortedPointsIdxArray;
+	if (this.pointsArray === undefined)
+	{ return resultSortedPointsIdxArray; }
 	
 	// Static function.***
 	// Sorting minDist to maxDist.***
-	if(resultSortedPointsIdxArray === undefined)
-		resultSortedPointsIdxArray = [];
+	if (resultSortedPointsIdxArray === undefined)
+	{ resultSortedPointsIdxArray = []; }
 	
 	var pointsArray = this.pointsArray;
 	
@@ -243,11 +245,11 @@ Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resul
 	var squaredDist;
 	var startIdx, endIdx, insertIdx;
 	var pointsCount = pointsArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point = pointsArray[i];
-		if(point === thePoint)
-			continue;
+		if (point === thePoint)
+		{ continue; }
 		
 		squaredDist = thePoint.squareDistToPoint(point);
 		objectAux = {};
@@ -262,7 +264,7 @@ Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resul
 	
 	resultSortedPointsIdxArray.length = 0;
 	var objectsCount = objectsAuxArray.length;
-	for(var i=0; i<objectsCount; i++)
+	for (var i=0; i<objectsCount; i++)
 	{
 		resultSortedPointsIdxArray.push(objectsAuxArray[i].pointIdx);
 	}
@@ -281,8 +283,8 @@ Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obj
 	
 	var range = endIdx - startIdx;
 	
-	if(objectsArray.length === 0)
-		return 0;
+	if (objectsArray.length === 0)
+	{ return 0; }
 	
 	if (range < 6)
 	{

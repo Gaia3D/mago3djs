@@ -20,8 +20,8 @@ var MagoNativeProject = function()
 
 MagoNativeProject.prototype.newParametricMesh = function()
 {
-	if(this.meshesArray === undefined)
-		this.meshesArray = [];
+	if (this.meshesArray === undefined)
+	{ this.meshesArray = []; }
 	
 	var parametricMesh = new ParametricMesh();
 	this.meshesArray.push(parametricMesh);
@@ -30,35 +30,35 @@ MagoNativeProject.prototype.newParametricMesh = function()
 
 MagoNativeProject.prototype.deleteObjects = function()
 {
-	if(this.meshesArray === undefined)
-		return;
+	if (this.meshesArray === undefined)
+	{ return; }
 	
 	var parametricMeshesCount = this.meshesArray.length;
-	for(var i=0; i<parametricMeshesCount; i++)
+	for (var i=0; i<parametricMeshesCount; i++)
 	{
 		this.meshesArray[i].deleteObjects();
 		this.meshesArray[i] = undefined;
 	}
 	this.meshesArray = undefined;
 	
-	if(this.geoLocDataManager)
-		this.geoLocDataManager.deleteObjects();
+	if (this.geoLocDataManager)
+	{ this.geoLocDataManager.deleteObjects(); }
 	
 	this.geoLocDataManager = undefined;
 };
 
 MagoNativeProject.prototype.getMeshesCount = function()
 {
-	if(this.meshesArray === undefined)
-		return 0;
+	if (this.meshesArray === undefined)
+	{ return 0; }
 	
 	return this.meshesArray.length;
 };
 
 MagoNativeProject.prototype.getMesh = function(idx)
 {
-	if(this.meshesArray === undefined)
-		return undefined;
+	if (this.meshesArray === undefined)
+	{ return undefined; }
 	
 	return this.meshesArray[idx];
 };

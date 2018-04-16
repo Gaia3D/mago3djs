@@ -21,6 +21,7 @@ var HalfEdge = function()
 HalfEdge.prototype.setStartVertex = function(vertex)
 {
 	this.startVertex = vertex;
+	vertex.outingHedge = this;
 };
 
 HalfEdge.prototype.setNext = function(hedge)
@@ -31,7 +32,7 @@ HalfEdge.prototype.setNext = function(hedge)
 HalfEdge.prototype.setTwin = function(hedge)
 {
 	var isTwinable = HalfEdge.areTwinables(hedge, this);
-	if(isTwinable)
+	if (isTwinable)
 	{
 		this.twin = hedge;
 		hedge.twin = this;
@@ -46,27 +47,46 @@ HalfEdge.prototype.setFace = function(face)
 
 HalfEdge.prototype.getEndVertex = function()
 {
-	if(this.next === undefined)
-		return undefined;
+	if (this.next === undefined)
+	{ return undefined; }
 	
 	return this.next.startVertex;
 };
 
 HalfEdge.prototype.isFrontier = function()
 {
-	if(this.twin === undefined || this.twin === null)
-		return true;
+	if (this.twin === undefined || this.twin === null)
+	{ return true; }
 	
 	return false;
+};
+
+HalfEdge.prototype.getPrev = function()
+{
+	var currHedge = this;
+	var prevHedge;
+	var finished = false;
+	while (!finished)
+	{
+		if (currHedge.next === this)
+		{ return currHedge; }
+		
+		if (currHedge.next === undefined)
+		{ return undefined; }
+		
+		currHedge = currHedge.next;
+	}
+	
+	return undefined;
 };
 
 HalfEdge.areTwinables = function(hedgeA, hedgeB)
 {
 	// check if "hedgeA" is twinable with "hedgeB".***
-	if(hedgeA.startVertex === hedgeB.getEndVertex())
+	if (hedgeA.startVertex === hedgeB.getEndVertex())
 	{
-		if(hedgeA.getEndVertex() === hedgeB.startVertex)
-			return true;
+		if (hedgeA.getEndVertex() === hedgeB.startVertex)
+		{ return true; }
 	}
 	
 	return false;
@@ -74,23 +94,23 @@ HalfEdge.areTwinables = function(hedgeA, hedgeB)
 
 HalfEdge.getHalfEdgesLoop = function(hedge, resultHedgesArray)
 {
-	if(hedge === undefined)
-		return resultHedgesArray;
+	if (hedge === undefined)
+	{ return resultHedgesArray; }
 	
-	if(resultHedgesArray === undefined)
-		resultHedgesArray = [];
+	if (resultHedgesArray === undefined)
+	{ resultHedgesArray = []; }
 	
 	resultHedgesArray.length = 0; // init the array.***
 	
 	var startHedge = hedge;
 	var currHedge = hedge;
 	var finished = false;
-	while(!finished)
+	while (!finished)
 	{
 		resultHedgesArray.push(currHedge);
 		currHedge = currHedge.next;
-		if(currHedge === startHedge || currHedge === undefined)
-			finished = true;
+		if (currHedge === startHedge || currHedge === undefined)
+		{ finished = true; }
 	}
 	
 	return resultHedgesArray;

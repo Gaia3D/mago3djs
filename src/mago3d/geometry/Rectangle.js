@@ -17,8 +17,8 @@ var Rectangle = function()
 
 Rectangle.prototype.setCenterPosition = function(cx, cy)
 {
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point2D();
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point2D(); }
 	
 	this.centerPoint.set(cx, cy);
 };
@@ -35,11 +35,11 @@ Rectangle.prototype.setDimensions = function(width, height)
  */
 Rectangle.prototype.getPoints = function(resultPointsArray)
 {
-	if(this.centerPoint === undefined || this.width === undefined || this.height === undefined)
-		return resultPointsArray;
+	if (this.centerPoint === undefined || this.width === undefined || this.height === undefined)
+	{ return resultPointsArray; }
 	
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
 	var point;
 	var halfWidth = this.width / 2;

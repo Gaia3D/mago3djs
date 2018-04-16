@@ -1132,22 +1132,24 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx, bRenderLines)
+Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx, bRenderLines, primitiveType)
 {
 	var vbo_vicks_container = renderable.getVboKeysContainer();
 	
-	if(vbo_vicks_container === undefined)
-		return;
+	if (vbo_vicks_container === undefined)
+	{ return; }
 	
 	if (vbo_vicks_container.vboCacheKeysArray.length === 0) 
-		return;
+	{ return; }
 	
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
-
+	if (bRenderLines === undefined)
+	{ bRenderLines = false; }
+	
 	var vbosCount = vbo_vicks_container.getVbosCount();
-	for(var i=0; i<vbosCount; i++)
+	for (var i=0; i<vbosCount; i++)
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.***
@@ -1156,54 +1158,54 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
-			return;
+		{ return; }
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-		
+
 		if (ssao_idx === 1) // ssao.***
 		{
 			if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
 			{ 
-				return;
+				//return;
+				gl.disableVertexAttribArray(shader.normal3_loc);
+				gl.uniform1i(shader.bUseNormal_loc, false);
+			}
+			else 
+			{
+				gl.enableVertexAttribArray(shader.normal3_loc);
+				gl.uniform1i(shader.bUseNormal_loc, true);
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+				gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
 			}
 			
 			if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
 			{ 
 				gl.disableVertexAttribArray(shader.color4_loc);
 			}
-			else{
+			else 
+			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
 				gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
 			}
-
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-			gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-
-			//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-			
-			
 		}
 		
-		if(bRenderLines === undefined || bRenderLines === false)
+		if (bRenderLines === false)
 		{
-			if(vbo_vicky.indicesCount > 0)
+			if (vbo_vicky.indicesCount > 0)
 			{
 				if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
 				{ return; }
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
 				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-				
-				//gl.uniform4fv(shader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]); //.***
-				//gl.drawElements(gl.LINE_STRIP, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 			}
-			else{
+			else 
+			{
 				gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-				//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 			}
 		}
-		else{
+		else 
+		{
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 		}
 	}

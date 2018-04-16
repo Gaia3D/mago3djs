@@ -17,8 +17,8 @@ var HalfEdgesList = function()
 
 HalfEdgesList.prototype.newHalfEdge = function()
 {
-	if(this.hEdgesArray === undefined)
-		this.hEdgesArray = [];
+	if (this.hEdgesArray === undefined)
+	{ this.hEdgesArray = []; }
 	
 	var hedge = new HalfEdge();
 	this.hEdgesArray.push(hedge);
@@ -27,11 +27,11 @@ HalfEdgesList.prototype.newHalfEdge = function()
 
 HalfEdgesList.prototype.addHalfEdgesArray = function(hEdgesArray)
 {
-	if(hEdgesArray === undefined)
-		return;
+	if (hEdgesArray === undefined)
+	{ return; }
 	
-	if(this.hEdgesArray === undefined)
-		this.hEdgesArray = [];
+	if (this.hEdgesArray === undefined)
+	{ this.hEdgesArray = []; }
 	
 	Array.prototype.push.apply(this.hEdgesArray, hEdgesArray);
 };

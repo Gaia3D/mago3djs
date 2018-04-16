@@ -130,13 +130,14 @@ uniform float screenWidth;    \n\
 uniform float screenHeight;    \n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 vColor4Aux;\n\
+uniform bool bUseNormal;\n\
 \n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 \n\
 const int kernelSize = 16;  \n\
-const float radius = 0.15;      \n\
+const float radius = 0.5;      \n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -160,47 +161,54 @@ float getDepth(vec2 coord)\n\
 }    \n\
 \n\
 void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-    vec3 normal2 = vNormal;   \n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-        \n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
-    vec3 L = normalize(lightPos);\n\
-    float DiffuseFactor = dot(normal2, L);\n\
-    float NdotL = abs(DiffuseFactor);\n\
-    vec3 diffuse = vec3(NdotL);\n\
-    vec3 ambient = vec3(1.0);\n\
-    vec4 textureColor;\n\
-    textureColor = vcolor4;\n\
-\n\
-    gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
-    gl_FragColor.a = textureColor.w;   \n\
+{ \n\
+	vec4 textureColor;\n\
+	textureColor = vcolor4;  \n\
+	if(bUseNormal)\n\
+    {\n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+		float linearDepth = getDepth(screenPos);          \n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+		vec3 normal2 = vNormal;   \n\
+				\n\
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+		vec3 bitangent = cross(normal2, tangent);\n\
+		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+		\n\
+		float occlusion = 0.0;\n\
+		for(int i = 0; i < kernelSize; ++i)\n\
+		{    	 \n\
+			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;        \n\
+			float sampleDepth = -sample.z/far;\n\
+			float depthBufferValue = getDepth(offset.xy);				              \n\
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+			{\n\
+				occlusion +=  1.0;\n\
+			}\n\
+			\n\
+		}   \n\
+			\n\
+		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+									\n\
+		vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+		vec3 L = normalize(lightPos);\n\
+		float DiffuseFactor = dot(normal2, L);\n\
+		float NdotL = abs(DiffuseFactor);\n\
+		vec3 diffuse = vec3(NdotL);\n\
+		vec3 ambient = vec3(1.0);\n\
+		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+		gl_FragColor.a = 1.0; \n\
+	}\n\
+	else\n\
+	{\n\
+		gl_FragColor.rgb = vec3(textureColor.xyz); \n\
+		gl_FragColor.a = 1.0; \n\
+	}	\n\
 }\n\
 ";
 ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
@@ -220,6 +228,7 @@ uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec4 oneColor4;\n\
 uniform bool bUse1Color;\n\
+uniform bool bUseNormal;\n\
 uniform vec3 scale;\n\
 uniform bool bScale;\n\
 \n\
@@ -244,15 +253,17 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-   \n\
-    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
-    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
-    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
-    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
-    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+    if(bUseNormal)\n\
+    {\n\
+		vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
+		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+		uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+	}\n\
     if(bUse1Color)\n\
     {\n\
         vcolor4 = oneColor4;\n\
@@ -371,6 +382,206 @@ void main()\n\
     \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
+";
+ShaderSource.InvertedBoxFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+uniform bool textureFlipYAxis;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform float shininessValue;\n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+\n\
+varying vec3 diffuseColor;\n\
+uniform vec3 specularColor;\n\
+varying vec3 vertexPos;\n\
+\n\
+const int kernelSize = 16;  \n\
+uniform float radius;      \n\
+\n\
+uniform float ambientReflectionCoef;\n\
+uniform float diffuseReflectionCoef;  \n\
+uniform float specularReflectionCoef; \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{\n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
+void main()\n\
+{          \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+    float linearDepth = getDepth(screenPos);          \n\
+    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+\n\
+    vec3 normal2 = vNormal;\n\
+            \n\
+    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+    vec3 bitangent = cross(normal2, tangent);\n\
+    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+    \n\
+    float occlusion = 0.0;\n\
+    for(int i = 0; i < kernelSize; ++i)\n\
+    {    	 \n\
+        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+        offset.xy /= offset.w;\n\
+        offset.xy = offset.xy * 0.5 + 0.5;        \n\
+        float sampleDepth = -sample.z/far;\n\
+		if(sampleDepth > 0.49)\n\
+			continue;\n\
+        float depthBufferValue = getDepth(offset.xy);				              \n\
+        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+        {\n\
+            occlusion +=  1.0;\n\
+        }\n\
+    }   \n\
+        \n\
+    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+\n\
+    vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
+    vec3 L = normalize(lightPos - vertexPos);\n\
+    float lambertian = max(dot(normal2, L), 0.0);\n\
+    float specular = 0.0;\n\
+    if(lambertian > 0.0)\n\
+    {\n\
+        vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+        vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+        \n\
+        // Compute the specular term\n\
+        float specAngle = max(dot(R, V), 0.0);\n\
+        specular = pow(specAngle, shininessValue);\n\
+    }\n\
+	\n\
+	if(lambertian < 0.5)\n\
+    {\n\
+		lambertian = 0.5;\n\
+	}\n\
+\n\
+    vec4 textureColor;\n\
+    if(hasTexture)\n\
+    {\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+		\n\
+        if(textureColor.w == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
+    else{\n\
+        textureColor = vColor4Aux;\n\
+    }\n\
+	\n\
+	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
+\n\
+    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+}\n\
+";
+ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 projectionMatrix;  \n\
+	uniform mat4 modelViewMatrix;\n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 RefTransfMatrix;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec3 refTranslationVec;\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
+	varying vec3 vNormal;\n\
+	varying vec2 vTexCoord;  \n\
+	varying vec3 uAmbientColor;\n\
+	varying vec3 vLightWeighting;\n\
+	varying vec3 vertexPos;\n\
+	\n\
+	void main()\n\
+    {	\n\
+		vec4 rotatedPos;\n\
+		mat3 currentTMat;\n\
+		if(refMatrixType == 0)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 1)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 2)\n\
+		{\n\
+			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(RefTransfMatrix);\n\
+		}\n\
+\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+\n\
+		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
+		vec3 rotatedNormal = currentTMat * normal;\n\
+		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+		uAmbientColor = vec3(0.8);\n\
+		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		vTexCoord = texCoord;\n\
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+\n\
+        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	}\n\
 ";
 ShaderSource.LegoDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\

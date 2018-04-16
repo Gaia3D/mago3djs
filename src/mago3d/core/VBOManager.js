@@ -267,7 +267,7 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl, vboMemMa
  */
 VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function() 
 {
-	if(this.vboCacheKeysArray === undefined)return 0;
+	if (this.vboCacheKeysArray === undefined) { return 0; }
 	
 	return this.vboCacheKeysArray.length;
 };
