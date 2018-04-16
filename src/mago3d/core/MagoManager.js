@@ -3105,6 +3105,11 @@ MagoManager.prototype.manageQueue = function()
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
+				
+				// test.***
+				if(neoBuilding.buildingId === "KSJ_100")
+					var hola = 0;
+				
 				if (headerVersion[0] === "v")
 				{
 					// parse the beta version.
@@ -3157,6 +3162,11 @@ MagoManager.prototype.manageQueue = function()
 					
 					neoBuilding = lowestOctree.neoBuildingOwner;
 					headerVersion = neoBuilding.getHeaderVersion();
+					
+					// test.***
+				if(neoBuilding.buildingId === "KSJ_100")
+					var hola = 0;
+				
 					if (headerVersion[0] === "v")
 					{
 						// parse the beta version.
