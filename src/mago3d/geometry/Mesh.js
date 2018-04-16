@@ -366,6 +366,7 @@ Mesh.prototype.getVbo = function(resultVboContainer, resultEdgedVboContainer)
 		// now, calculate edges vbos.***
 		if(resultEdgedVboContainer !== undefined)
 		{
+			// for each vertices there are a outingHedge.***
 			
 		}
 	}
