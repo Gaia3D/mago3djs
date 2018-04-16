@@ -6751,6 +6751,10 @@ MagoManager.prototype.callAPI = function(api)
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 	}
+    else if (apiName === "changeOrigin")
+    {
+        //this.magoPolicy.setShowO(api.getShowOrigin());
+    }
 	else if (apiName === "changeBoundingBox") 
 	{
 		this.magoPolicy.setShowBoundingBox(api.getShowBoundingBox());

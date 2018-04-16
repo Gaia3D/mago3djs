@@ -34,6 +34,20 @@ function changeLabelAPI(managerFactoryInstance, isShow)
 }
 
 /**
+ * Origin show/hide
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} isShow true = show, false = hide
+ */
+function changeOriginAPI(managerFactoryInstance, isShow)
+{
+    if (managerFactoryInstance === null) { return; }
+
+    var api = new API("changeOrigin");
+    api.setShowOrigin(isShow);
+    managerFactoryInstance.callAPI(api);
+}
+
+/**
  * boundingBox show/hide
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} isShow true = show, false = hide

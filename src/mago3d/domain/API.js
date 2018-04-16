@@ -60,6 +60,8 @@ function API(apiName)
 	this.showOutFitting = false;
 	// label 표시/비표시
 	this.showLabelInfo = true;
+    // origin 표시/비표시
+    this.showOrigin = false;
 	// boundingBox 표시/비표시
 	this.showBoundingBox = false;
 	// 그림자 표시/비표시
@@ -265,6 +267,16 @@ API.prototype.setShowLabelInfo = function(showLabelInfo)
 {
 	this.showLabelInfo = showLabelInfo;
 };
+
+API.prototype.getShowOrigin = function()
+{
+    return this.showOrigin;
+};
+API.prototype.setShowOrigin = function(showOrigin)
+{
+    this.showOrigin = showOrigin;
+};
+
 API.prototype.getShowBoundingBox = function() 
 {
 	return this.showBoundingBox;
