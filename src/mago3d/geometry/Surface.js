@@ -52,6 +52,35 @@ Surface.prototype.setColor = function(r, g, b, a)
 	}
 };
 
+Surface.prototype.addFacesArray = function(facesArray)
+{
+	if(facesArray === undefined)
+		return;
+	
+	if(this.facesArray === undefined)
+		this.facesArray = [];
+	
+	Array.prototype.push.apply(this.facesArray, facesArray);
+};
+
+Surface.prototype.getFrontierHalfEdges = function(resultHedgesArray)
+{
+	if(facesArray === undefined)
+		return resultHedgesArray;
+	
+	if(resultHedgesArray === undefined)
+		resultHedgesArray = [];
+	
+	var facesCount = this.getFacesCount();
+	for(var i=0; i<facesCount; i++)
+	{
+		face = this.getFace(i);
+		resultHedgesArray = face.getFrontierHalfEdges(resultHedgesArray);
+	}
+	
+	return resultHedgesArray;
+};
+
 Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 {
 	if(this.facesArray === undefined)

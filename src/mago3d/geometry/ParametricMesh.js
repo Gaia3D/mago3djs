@@ -15,7 +15,8 @@ var ParametricMesh = function()
 	
 	this.vtxProfilesList; // class: VtxProfilesList.***
 	this.profile; // class: Profile. is a 2d object.***
-	this.vboKeyContainer;//VBOVertexIdxCacheKeyContainer.***
+	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.***
+	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.***
 };
 
 /**
@@ -33,7 +34,7 @@ ParametricMesh.prototype.getVboKeysContainer = function()
 {
 	return this.vboKeyContainer;
 };
-
+/*
 ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
 {
 	if(resultVBOCacheKeys === undefined)
@@ -45,6 +46,7 @@ ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
 	
 	return resultVBOCacheKeys;
 };
+*/
 
 ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {
@@ -52,8 +54,8 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
 		resultMesh = new Mesh();
 
 	// must separate vbo groups by surfaces.***
-	var mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	resultMesh = mesh.getCopySurfaceIndependentMesh(resultMesh);
+	this.mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh = this.mesh.getCopySurfaceIndependentMesh(resultMesh);
 	resultMesh.calculateVerticesNormals();
 	
 	return resultMesh;
