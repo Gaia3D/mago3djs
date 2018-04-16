@@ -30,21 +30,21 @@ var Arc = function()
  */
 Arc.prototype.deleteObjects = function()
 {
-	if(this.centerPoint !== undefined)
-		this.centerPoint.deleteObjects(); // Point3D.***
+	if (this.centerPoint !== undefined)
+	{ this.centerPoint.deleteObjects(); } // Point3D.***
 	this.centerPoint = undefined;
 	this.radius = undefined;
 	this.startAngleDeg = undefined;
 	this.sweepAngleDeg = undefined;
 	this.numPointsFor360Deg = undefined;
 	
-	if(this.startPoint !== undefined)
-		this.startPoint.deleteObjects(); 
+	if (this.startPoint !== undefined)
+	{ this.startPoint.deleteObjects(); } 
 	
 	this.startPoint = undefined;
 	
-	if(this.endPoint !== undefined)
-		this.endPoint.deleteObjects(); 
+	if (this.endPoint !== undefined)
+	{ this.endPoint.deleteObjects(); } 
 	
 	this.endPoint = undefined;
 	this.sweepSense = undefined; // 1=CCW, -1=CW.***
@@ -130,29 +130,29 @@ Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
  */
 Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
-	if(this.centerPoint === undefined)
-		return resultPointsArray;
+	if (this.centerPoint === undefined)
+	{ return resultPointsArray; }
 	
-	if(pointsCountFor360Deg)
-		this.numPointsFor360Deg = pointsCountFor360Deg
+	if (pointsCountFor360Deg)
+	{ this.numPointsFor360Deg = pointsCountFor360Deg; }
 
-	if(this.numPointsFor360Deg === undefined)
-		this.numPointsFor360Deg = 36;
+	if (this.numPointsFor360Deg === undefined)
+	{ this.numPointsFor360Deg = 36; }
 
 	// Check if exist strAng.*********************************************************************************
 	var strVector, endVector;
 	var strVectorModul;
-	if(this.startAngleDeg === undefined)
+	if (this.startAngleDeg === undefined)
 	{
-		if(this.startPoint === undefined)
-			return resultPointsArray;
+		if (this.startPoint === undefined)
+		{ return resultPointsArray; }
 		
 		strVector = new Point2D();
 		strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
 		strVectorModul = strVector.modul();
 		
 		var angRad = Math.acos(x/strVectorModul);
-		if(this.startPoint.y < 0)
+		if (this.startPoint.y < 0)
 		{
 			angRad *= -1;
 		}
@@ -161,15 +161,15 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	}
 	
 	// Check if exist radius.*********************************************************************************
-	if(this.radius === undefined)
+	if (this.radius === undefined)
 	{
 		// calculate by startPoint.***
-		if(this.startPoint === undefined)
-			return resultPointsArray;
+		if (this.startPoint === undefined)
+		{ return resultPointsArray; }
 		
-		if(strVectorModul === undefined)
+		if (strVectorModul === undefined)
 		{
-			if(strVector === undefined)
+			if (strVector === undefined)
 			{
 				strVector = new Point2D();
 				strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
@@ -181,29 +181,29 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	}
 	
 	// check if exist sweepAng.*********************************************************************************
-	if(this.sweepAngleDeg === undefined)
+	if (this.sweepAngleDeg === undefined)
 	{
-		if(this.endPoint === undefined || this.sweepSense === undefined)
-			return resultPointsArray;
+		if (this.endPoint === undefined || this.sweepSense === undefined)
+		{ return resultPointsArray; }
 		
 		endVector = new Point2D();
 		endVector.set(this.endPoint.x - this.centerPoint.x, this.endPoint.y - this.endPoint.y);
 		var endVectorModul = endPoint.modul();
 		
 		var angRad = Math.acos(x/strVectorModul);
-		if(this.endPoint.y < 0)
+		if (this.endPoint.y < 0)
 		{
 			angRad *= -1;
 		}
 		
 		this.sweepAngleDeg = angRad * 180.0/Math.PI;
 		
-		if(this.sweepSense < 0)
-			this.sweepAngleDeg = 360 - this.sweepAngleDeg;
+		if (this.sweepSense < 0)
+		{ this.sweepAngleDeg = 360 - this.sweepAngleDeg; }
 	}
 	
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
 	var pointsArray = [];
 	
@@ -238,7 +238,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	
 	// once finished, mark the 1rst point and the last point as"important point".***
 	var pointsCount = pointsArray.length;
-	if(pointsCount > 0)
+	if (pointsCount > 0)
 	{
 		pointsArray[0].pointType = 1;
 		pointsArray[pointsCount-1].pointType = 1;
@@ -247,16 +247,16 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	// now merge points into "resultPointsArray".***
 	var errorDist = 0.0001; // 0.1mm.***
 	var resultExistentPointsCount = resultPointsArray.length;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
-		if(i===0)
+		if (i===0)
 		{
-			if(resultExistentPointsCount > 0)
+			if (resultExistentPointsCount > 0)
 			{
 				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
 				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
 				point = pointsArray[i];
-				if(!lastExistentPoint.isCoincidentToPoint(point, errorDist))
+				if (!lastExistentPoint.isCoincidentToPoint(point, errorDist))
 				{
 					resultPointsArray.push(point);
 				}
@@ -274,12 +274,12 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	
 	// Last check: finally, in case of sweepAngle = 360 degrees, or is closed pointsArray, then pop the last insertedPoint.***
 	resultExistentPointsCount = resultPointsArray.length;
-	if(resultExistentPointsCount > 0)
+	if (resultExistentPointsCount > 0)
 	{
 		// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
 		var lastPoint = resultPointsArray[resultExistentPointsCount-1];
 		var firstPoint = resultPointsArray[0];
-		if(lastPoint.isCoincidentToPoint(firstPoint, errorDist))
+		if (lastPoint.isCoincidentToPoint(firstPoint, errorDist))
 		{
 			resultPointsArray.pop();
 			lastPoint.deleteObjects();

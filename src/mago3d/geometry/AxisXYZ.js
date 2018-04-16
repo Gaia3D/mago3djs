@@ -11,9 +11,9 @@ var AxisXYZ = function(length)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	if(length === undefined)
-		this.length = 60;
-	else this.length = length;
+	if (length === undefined)
+	{ this.length = 60; }
+	else { this.length = length; }
 	
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	//this.vboKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
@@ -26,8 +26,8 @@ AxisXYZ.prototype.setDimension = function(length)
 
 AxisXYZ.prototype.makeMesh = function(length)
 {
-	if(length !== undefined)
-		this.length = length;
+	if (length !== undefined)
+	{ this.length = length; }
 	
 	var pMesh = new ParametricMesh();
 		
@@ -39,7 +39,7 @@ AxisXYZ.prototype.makeMesh = function(length)
 	var arrowLength = this.length;
 	var arrowWidth  = this.length*0.1;
 	var polyLine = outerRing.newElement("POLYLINE");
-	var point3d = polyLine.newPoint2d(0,0); // 0
+	var point3d = polyLine.newPoint2d(0, 0); // 0
 	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.25); // 1
 	point3d = polyLine.newPoint2d(arrowWidth*0.25, arrowLength*0.75); // 2
 	point3d = polyLine.newPoint2d(arrowWidth*0.5, arrowLength*0.75); // 3
@@ -69,13 +69,13 @@ AxisXYZ.prototype.makeMesh = function(length)
 	// copy & rotate the mesh and create the X axis.***
 	var tMatTest = new Matrix4();
 	var mesh2 = mesh.getCopy(undefined);
-	tMatTest.rotationAxisAngDeg(-90.0, 0,0,1);
+	tMatTest.rotationAxisAngDeg(-90.0, 0, 0, 1);
 	mesh2.transformByMatrix4(tMatTest);
 	mesh2.setColor(1.0, 0.1, 0.1, 1.0); // set the color.***
 	
 	// copy & rotate the mesh and create the Z axis.***
 	var mesh3 = mesh.getCopy(undefined);
-	tMatTest.rotationAxisAngDeg(90.0, 1,0,0);
+	tMatTest.rotationAxisAngDeg(90.0, 1, 0, 0);
 	mesh3.transformByMatrix4(tMatTest);
 	mesh3.setColor(0.1, 0.1, 1.0, 1.0); // set the color.***
 
@@ -92,8 +92,8 @@ AxisXYZ.prototype.getVboKeysContainer = function()
 
 AxisXYZ.prototype.getVbo = function(resultVboKey)
 {
-	if(resultVboKey === undefined)
-		resultVboKey = new VBOVertexIdxCacheKey();
+	if (resultVboKey === undefined)
+	{ resultVboKey = new VBOVertexIdxCacheKey(); }
 	
 	if (resultVboKey.posVboDataArray === undefined)
 	{ resultVboKey.posVboDataArray = []; }
@@ -109,19 +109,19 @@ AxisXYZ.prototype.getVbo = function(resultVboKey)
 	var colors = [];
 	
 	// xAxis.***
-	positions.push(0,0,0, this.length,0,0);
-	colors.push(255,0,0,255, 255,0,0,255);
-	normals.push(0,0,255, 0,0,255);
+	positions.push(0, 0, 0, this.length, 0, 0);
+	colors.push(255, 0, 0, 255, 255, 0, 0, 255);
+	normals.push(0, 0, 255, 0, 0, 255);
 	
 	// yAxis.***
-	positions.push(0,0,0, 0,this.length,0);
-	colors.push(0,255,0,255, 0,255,0,255);
-	normals.push(0,0,255, 0,0,255);
+	positions.push(0, 0, 0, 0, this.length, 0);
+	colors.push(0, 255, 0, 255, 0, 255, 0, 255);
+	normals.push(0, 0, 255, 0, 0, 255);
 	
 	// zAxis.***
-	positions.push(0,0,0, 0,0,this.length);
-	colors.push(0,0,255,255, 0,0,255,255);
-	normals.push(255,0,0, 255,0,0);
+	positions.push(0, 0, 0, 0, 0, this.length);
+	colors.push(0, 0, 255, 255, 0, 0, 255, 255);
+	normals.push(255, 0, 0, 255, 0, 0);
 
 	resultVboKey.posVboDataArray = Float32Array.from(positions);
 	resultVboKey.colVboDataArray = Int8Array.from(colors);

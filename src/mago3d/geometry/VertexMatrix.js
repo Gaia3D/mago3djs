@@ -66,12 +66,12 @@ VertexMatrix.prototype.getVertexList = function(idx)
  */
 VertexMatrix.prototype.copyFrom = function(vertexMatrix) 
 {
-	if(vertexMatrix === undefined)
-		return;
+	if (vertexMatrix === undefined)
+	{ return; }
 	
 	var vertexList, myVertexList;
 	var vertexListsCount = vertexMatrix.vertexListsArray.length;
-	for(var i=0; i<vertexListsCount; i++)
+	for (var i=0; i<vertexListsCount; i++)
 	{
 		vertexList = vertexMatrix.getVertexList(i);
 		myVertexList = this.newVertexList();

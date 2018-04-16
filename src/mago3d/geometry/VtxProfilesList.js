@@ -17,11 +17,11 @@ var VtxProfilesList = function(x, y)
 VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFacesArray, resultMesh, elemIndexRange)
 {
 	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".***
-	if(resultFacesArray === undefined)
-		resultFacesArray = [];
+	if (resultFacesArray === undefined)
+	{ resultFacesArray = []; }
 	
-	if(resultMesh.hedgesList === undefined)
-		resultMesh.hedgesList = new HalfEdgesList();
+	if (resultMesh.hedgesList === undefined)
+	{ resultMesh.hedgesList = new HalfEdgesList(); }
 	
 	var hedgesList = resultMesh.hedgesList;
 	
@@ -30,7 +30,7 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	var face, prevFace;
 	var hedgesArray = [];
 	currIdx = elemIndexRange.strIdx;
-	while(currIdx !== elemIndexRange.endIdx)
+	while (currIdx !== elemIndexRange.endIdx)
 	{
 		nextIdx = bottomVtxRing.vertexList.getNextIdx(currIdx);
 		
@@ -49,7 +49,7 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 		hedgesArray = face.createHalfEdges(hedgesArray);
 		hedgesList.addHalfEdgesArray(hedgesArray);
 		
-		if(prevFace !== undefined)
+		if (prevFace !== undefined)
 		{
 			// set twins between face and prevFace.***
 			face.setTwinFace(prevFace);
@@ -64,8 +64,8 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 
 VtxProfilesList.prototype.newVtxProfile = function()
 {
-	if(this.vtxProfilesArray === undefined)
-		this.vtxProfilesArray = [];
+	if (this.vtxProfilesArray === undefined)
+	{ this.vtxProfilesArray = []; }
 	
 	var vtxProfile = new VtxProfile();
 	this.vtxProfilesArray.push(vtxProfile);
@@ -74,16 +74,16 @@ VtxProfilesList.prototype.newVtxProfile = function()
 
 VtxProfilesList.prototype.getVtxProfilesCount = function()
 {
-	if(this.vtxProfilesArray === undefined)
-		return 0;
+	if (this.vtxProfilesArray === undefined)
+	{ return 0; }
 	
 	return this.vtxProfilesArray.length;
 };
 
 VtxProfilesList.prototype.getVtxProfile = function(idx)
 {
-	if(this.vtxProfilesArray === undefined)
-		return undefined;
+	if (this.vtxProfilesArray === undefined)
+	{ return undefined; }
 	
 	return this.vtxProfilesArray[idx];
 };
@@ -91,12 +91,12 @@ VtxProfilesList.prototype.getVtxProfile = function(idx)
 VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 {
 	// collect all vertices of all vtxProfiles.***
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
 	
 	var vtxProfile;
 	var vtxProfilesCount = this.getVtxProfilesCount();
-	for(var i=0; i<vtxProfilesCount; i++)
+	for (var i=0; i<vtxProfilesCount; i++)
 	{
 		vtxProfile = this.getVtxProfile(i);
 		resultVerticesArray = vtxProfile.getAllVertices(resultVerticesArray);
@@ -114,20 +114,20 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	// |       |
 	// 0-------1
 	
-	if(this.vtxProfilesArray === undefined)
-		return resultTriangleMatrix;
+	if (this.vtxProfilesArray === undefined)
+	{ return resultTriangleMatrix; }
 	
 	// outerLateral.***************************************************
 	var vtxProfilesCount = this.getVtxProfilesCount();
 	
-	if(vtxProfilesCount < 2)
-		return resultTriangleMatrix;
+	if (vtxProfilesCount < 2)
+	{ return resultTriangleMatrix; }
 	
-	if(resultMesh === undefined)
-		resultMesh = new Mesh();
+	if (resultMesh === undefined)
+	{ resultMesh = new Mesh(); }
 	
-	if(resultMesh.vertexList === undefined)
-		resultMesh.vertexList = new VertexList();
+	if (resultMesh.vertexList === undefined)
+	{ resultMesh.vertexList = new VertexList(); }
 	
 	// 1rst, get all vertices and put it into the resultMesh.***
 	resultMesh.vertexList.vertexArray = this.getAllVertices(resultMesh.vertexList.vertexArray);
@@ -147,12 +147,12 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	var prevFacesArray;
 	var elemsCount = outerVtxRing.elemsIndexRangesArray.length;
 	
-	for(var i=0; i<elemsCount; i++)
+	for (var i=0; i<elemsCount; i++)
 	{
 		surface = resultMesh.newSurface();
 		prevFacesArray = undefined;
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
-		for(var j=0; j<vtxProfilesCount-1; j++)
+		for (var j=0; j<vtxProfilesCount-1; j++)
 		{
 			bottomVtxProfile = this.getVtxProfile(j);
 			topVtxProfile = this.getVtxProfile(j+1);
@@ -164,12 +164,12 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			facesArray = VtxProfilesList.getLateralFaces(bottomVtxRing, topVtxRing, facesArray, resultMesh, elemIndexRange);
 			surface.addFacesArray(facesArray);
 			
-			if(prevFacesArray !== undefined && prevFacesArray.length > 0)
+			if (prevFacesArray !== undefined && prevFacesArray.length > 0)
 			{
 				// set twins between "prevFacesArray" & "facesArray".***
 				var currFace, prevFace;
 				var facesCount = facesArray.length;
-				for(var k=0; k<facesCount; k++)
+				for (var k=0; k<facesCount; k++)
 				{
 					currFace = facesArray[k];
 					prevFace = prevFacesArray[k];
@@ -186,16 +186,16 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	// Inner laterals.************************************************************************
 	var innerVtxRing;
 	var innerRinsCount = bottomVtxProfile.getInnerVtxRingsCount();
-	for(var k=0; k<innerRinsCount; k++)
+	for (var k=0; k<innerRinsCount; k++)
 	{
 		innerVtxRing = bottomVtxProfile.getInnerVtxRing(k);
 		elemsCount = innerVtxRing.elemsIndexRangesArray.length;
-		for(var i=0; i<elemsCount; i++)
+		for (var i=0; i<elemsCount; i++)
 		{
 			surface = resultMesh.newSurface();
 			prevFacesArray = undefined;
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
-			for(var j=0; j<vtxProfilesCount-1; j++)
+			for (var j=0; j<vtxProfilesCount-1; j++)
 			{
 				bottomVtxProfile = this.getVtxProfile(j);
 				topVtxProfile = this.getVtxProfile(j+1);
@@ -207,12 +207,12 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 				facesArray = VtxProfilesList.getLateralFaces(bottomVtxRing, topVtxRing, facesArray, resultMesh, elemIndexRange);
 				surface.addFacesArray(facesArray);
 				
-				if(prevFacesArray !== undefined && prevFacesArray.length>0)
+				if (prevFacesArray !== undefined && prevFacesArray.length>0)
 				{
 					// set twins between "prevFacesArray" & "facesArray".***
 					var currFace, prevFace;
 					var facesCount = facesArray.length;
-					for(var a=0; a<facesCount; a++)
+					for (var a=0; a<facesCount; a++)
 					{
 						currFace = facesArray[a];
 						prevFace = prevFacesArray[a];
@@ -228,14 +228,14 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	}
 	
 	// Caps (bottom and top).***
-	if(this.convexFacesIndicesData === undefined)
-		return resultMesh;
+	if (this.convexFacesIndicesData === undefined)
+	{ return resultMesh; }
 	
 	var resultSurface;
 	
 	// Top profile.***********************************************************************
 	// in this case, there are a surface with multiple convex faces.***
-	if(bIncludeTopCap === undefined || bIncludeTopCap === true)
+	if (bIncludeTopCap === undefined || bIncludeTopCap === true)
 	{
 		topVtxProfile = this.getVtxProfile(vtxProfilesCount-1);
 		resultSurface = resultMesh.newSurface();
@@ -243,7 +243,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	}
 
 	// Bottom profile.***********************************************************************
-	if(bIncludeBottomCap === undefined || bIncludeBottomCap === true)
+	if (bIncludeBottomCap === undefined || bIncludeBottomCap === true)
 	{
 		bottomVtxProfile = this.getVtxProfile(0);
 		resultSurface = resultMesh.newSurface();
@@ -258,8 +258,8 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
-	if(resultSurface === undefined)
-		resultSurface = new Surface();
+	if (resultSurface === undefined)
+	{ resultSurface = new Surface(); }
 	 
 	var currRing;
 	var currVtxRing;
@@ -270,25 +270,26 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 	var face;
 	var vertex;
 	var convexFacesCount = convexFacesIndicesData.length;
-	for(var i=0; i<convexFacesCount; i++)
+	for (var i=0; i<convexFacesCount; i++)
 	{
 		face = resultSurface.newFace();
 		face.vertexArray = [];
 			
 		faceIndicesData = convexFacesIndicesData[i];
 		indicesCount = faceIndicesData.length;
-		for(var j=0; j<indicesCount; j++)
+		for (var j=0; j<indicesCount; j++)
 		{
 			indexData = faceIndicesData[j];
 			ringIdx = indexData.ownerIdx;
 			vertexIdx = indexData.idxInList;
 			
-			if(ringIdx === -1)
+			if (ringIdx === -1)
 			{
 				// is the outerRing.***
 				currVtxRing = vtxProfile.outerVtxRing;
 			}
-			else{
+			else 
+			{
 				currVtxRing = vtxProfile.innerVtxRingsList.getVtxRing(ringIdx);
 			}
 			

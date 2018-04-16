@@ -18,8 +18,8 @@ var TriSurface = function()
 
 TriSurface.prototype.newTriangle = function() 
 {
-	if(this.trianglesArray === undefined)
-		this.trianglesArray = [];
+	if (this.trianglesArray === undefined)
+	{ this.trianglesArray = []; }
 	
 	var triangle = new Triangle();
 	this.trianglesArray.push(triangle);

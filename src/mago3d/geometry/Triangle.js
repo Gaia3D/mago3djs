@@ -19,14 +19,14 @@ var Triangle= function(vertex0, vertex1, vertex2)
 	this.vtxIdx2;
 	this.normal; // plainNormal.
 	
-	if(vertex0 !== undefined)
-		this.vertex0 = vertex0;
+	if (vertex0 !== undefined)
+	{ this.vertex0 = vertex0; }
 	
-	if(vertex1 !== undefined)
-		this.vertex1 = vertex1;
+	if (vertex1 !== undefined)
+	{ this.vertex1 = vertex1; }
 	
-	if(vertex2 !== undefined)
-		this.vertex2 = vertex2;
+	if (vertex2 !== undefined)
+	{ this.vertex2 = vertex2; }
 	
 	this.hEdge;
 };
@@ -81,8 +81,8 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2)
  */
 Triangle.prototype.assignVerticesIdx = function() 
 {
-	if(this.vertex0 === undefined || this.vertex1 === undefined || this.vertex2 === undefined)
-		return;
+	if (this.vertex0 === undefined || this.vertex1 === undefined || this.vertex2 === undefined)
+	{ return; }
 	
 	this.vtxIdx0 = this.vertex0.getIdxInList();
 	this.vtxIdx1 = this.vertex1.getIdxInList();
@@ -91,10 +91,10 @@ Triangle.prototype.assignVerticesIdx = function()
 
 Triangle.prototype.getIndicesArray = function(indicesArray)
 {
-	if(indicesArray === undefined)
-		indicesArray = [];
+	if (indicesArray === undefined)
+	{ indicesArray = []; }
 	
-	if(this.vtxIdx0 !== undefined && this.vtxIdx1 !== undefined && this.vtxIdx2 !== undefined )
+	if (this.vtxIdx0 !== undefined && this.vtxIdx1 !== undefined && this.vtxIdx2 !== undefined )
 	{
 		indicesArray.push(this.vtxIdx0);
 		indicesArray.push(this.vtxIdx1);

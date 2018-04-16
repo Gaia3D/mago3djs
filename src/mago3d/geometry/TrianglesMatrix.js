@@ -16,11 +16,11 @@ var TrianglesMatrix= function()
 
 TrianglesMatrix.prototype.deleteObjects = function()
 {
-	if(this.trianglesListsArray === undefined)
-		return;
+	if (this.trianglesListsArray === undefined)
+	{ return; }
 	
 	var trianglesListsCount = this.trianglesListsArray.length;
-	for(var i=0; i<trianglesListsCount; i++)
+	for (var i=0; i<trianglesListsCount; i++)
 	{
 		this.trianglesListsArray[i].deleteObjects();
 		this.trianglesListsArray[i] = undefined;
@@ -30,24 +30,24 @@ TrianglesMatrix.prototype.deleteObjects = function()
 
 TrianglesMatrix.prototype.getTrianglesList = function(idx)
 {
-	if(this.trianglesListsArray === undefined)
-		return undefined;
+	if (this.trianglesListsArray === undefined)
+	{ return undefined; }
 	
 	return this.trianglesListsArray[idx];
 };
 
 TrianglesMatrix.prototype.getTrianglesListsCount = function()
 {
-	if(this.trianglesListsArray === undefined)
-		return 0;
+	if (this.trianglesListsArray === undefined)
+	{ return 0; }
 	
 	return this.trianglesListsArray.length;
 };
 
 TrianglesMatrix.prototype.newTrianglesList = function()
 {
-	if(this.trianglesListsArray === undefined)
-		this.trianglesListsArray = [];
+	if (this.trianglesListsArray === undefined)
+	{ this.trianglesListsArray = []; }
 	
 	var trianglesList = new TrianglesList();
 	this.trianglesListsArray.push(trianglesList);
@@ -62,7 +62,7 @@ TrianglesMatrix.prototype.newTrianglesList = function()
 TrianglesMatrix.prototype.assignVerticesIdx = function() 
 {
 	var trianglesListsCount = this.trianglesListsArray.length;
-	for(var i=0; i<trianglesListsCount; i++)
+	for (var i=0; i<trianglesListsCount; i++)
 	{
 		this.trianglesListsArray[i].assignVerticesIdx();
 	}
@@ -71,13 +71,13 @@ TrianglesMatrix.prototype.assignVerticesIdx = function()
 TrianglesMatrix.prototype.getVboFaceDataArray = function(resultVbo)
 {
 	// PROVISIONAL.***
-	if(this.trianglesListsArray === undefined)
-		return resultVbo;
+	if (this.trianglesListsArray === undefined)
+	{ return resultVbo; }
 	
 	var indicesArray = [];
 	
 	var trianglesListsCount = this.trianglesListsArray.length;
-	for(var i=0; i<trianglesListsCount; i++)
+	for (var i=0; i<trianglesListsCount; i++)
 	{
 		indicesArray = this.trianglesListsArray[i].getTrianglesIndicesArray(indicesArray);
 	}

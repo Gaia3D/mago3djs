@@ -1059,8 +1059,8 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 	
 	var range = endIdx - startIdx;
 	
-	if(range <= 0)
-		return 0;
+	if (range <= 0)
+	{ return 0; }
 	
 	if (range < 6)
 	{

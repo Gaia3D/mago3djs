@@ -40,11 +40,11 @@ function changeLabelAPI(managerFactoryInstance, isShow)
  */
 function changeOriginAPI(managerFactoryInstance, isShow)
 {
-    if (managerFactoryInstance === null) { return; }
+	if (managerFactoryInstance === null) { return; }
 
-    var api = new API("changeOrigin");
-    api.setShowOrigin(isShow);
-    managerFactoryInstance.callAPI(api);
+	var api = new API("changeOrigin");
+	api.setShowOrigin(isShow);
+	managerFactoryInstance.callAPI(api);
 }
 
 /**

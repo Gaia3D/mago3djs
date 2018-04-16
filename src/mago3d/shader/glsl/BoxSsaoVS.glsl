@@ -15,6 +15,7 @@ uniform vec3 encodedCameraPositionMCLow;
 uniform vec3 aditionalPosition;
 uniform vec4 oneColor4;
 uniform bool bUse1Color;
+uniform bool bUseNormal;
 uniform vec3 scale;
 uniform bool bScale;
 
@@ -39,15 +40,17 @@ void main()
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
-   
-    vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);
-    vLightWeighting = vec3(1.0, 1.0, 1.0);
-    uAmbientColor = vec3(0.8, 0.8, 0.8);
-    vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);
-    vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);
-    vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;
-    float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
+    if(bUseNormal)
+    {
+		vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);
+		vLightWeighting = vec3(1.0, 1.0, 1.0);
+		uAmbientColor = vec3(0.8, 0.8, 0.8);
+		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);
+		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
+	}
     if(bUse1Color)
     {
         vcolor4 = oneColor4;

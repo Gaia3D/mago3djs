@@ -378,13 +378,14 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 		rootNode = node.getRoot();
 		
 		var longitude, latitude;
-		if(rootNode.data.bbox.geographicCoord === undefined)
+		if (rootNode.data.bbox.geographicCoord === undefined)
 		{
 			// in this case take the data from buildingSeed.***
 			longitude = buildingSeed.geographicCoordOfBBox.longitude;
 			latitude = buildingSeed.geographicCoordOfBBox.latitude;
 		}
-		else{
+		else 
+		{
 			longitude = rootNode.data.bbox.geographicCoord.longitude;
 			latitude = rootNode.data.bbox.geographicCoord.latitude;
 		}

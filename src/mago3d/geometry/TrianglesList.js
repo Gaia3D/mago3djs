@@ -50,10 +50,10 @@ TrianglesList.prototype.addTriangle = function(triangle)
 TrianglesList.prototype.deleteObjects = function() 
 {
 	if (this.trianglesArray === undefined)
-		return;
+	{ return; }
 	
 	var trianglesCount = this.getTrianglesCount();
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		this.trianglesArray[i].deleteObjects();
 		this.trianglesArray[i] = undefined;
@@ -63,16 +63,16 @@ TrianglesList.prototype.deleteObjects = function()
 
 TrianglesList.prototype.getTrianglesCount = function() 
 {
-	if(this.trianglesArray === undefined)
-		return 0;
+	if (this.trianglesArray === undefined)
+	{ return 0; }
 	
 	return this.trianglesArray.length;
 };
 
 TrianglesList.prototype.getTriangle = function(idx) 
 {
-	if(this.trianglesArray === undefined)
-		return undefined;
+	if (this.trianglesArray === undefined)
+	{ return undefined; }
 	
 	return this.trianglesArray[idx];
 };
@@ -84,8 +84,8 @@ TrianglesList.prototype.getTriangle = function(idx)
  */
 TrianglesList.prototype.assignVerticesIdx = function() 
 {
-	if(this.trianglesArray === undefined)
-		return;
+	if (this.trianglesArray === undefined)
+	{ return; }
 	
 	TrianglesList.assignVerticesIdx(this.trianglesArray);
 };
@@ -97,12 +97,12 @@ TrianglesList.prototype.assignVerticesIdx = function()
  */
 TrianglesList.assignVerticesIdx = function(trianglesArray) 
 {
-	if(trianglesArray === undefined)
-		return;
+	if (trianglesArray === undefined)
+	{ return; }
 	
 	var trianglesCount = trianglesArray.length;
 	var trianglesArray = trianglesArray;
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		trianglesArray[i].assignVerticesIdx();
 	}
@@ -115,11 +115,11 @@ TrianglesList.assignVerticesIdx = function(trianglesArray)
  */
 TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray) 
 {
-	if(indicesArray === undefined)
-		indicesArray = [];
+	if (indicesArray === undefined)
+	{ indicesArray = []; }
 	
 	var trianglesCount = trianglesArray.length;
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		trianglesArray[i].getIndicesArray(indicesArray);
 	}
@@ -145,15 +145,15 @@ TrianglesList.prototype.getNoRepeatedVerticesArray = function(resultVerticesArra
  */
 TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVerticesArray) 
 {
-	if(resultVerticesArray === undefined)
-		resultVerticesArray = [];
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
 	
 	// 1rst, assign vertexIdxInList for all used vertives.***
 	var trianglesCount = trianglesArray.length;
 	var triangle;
 	var idxAux = 0;
 	var vtx_0, vtx_1, vtx_2;
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		triangle = trianglesArray[i];
 		vtx_0 = triangle.vertex0;
@@ -170,7 +170,7 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 	
 	// now, make a map of unique vertices map using "idxInList" of vertices.***
 	var verticesMap = {};
-	for(var i=0; i<trianglesCount; i++)
+	for (var i=0; i<trianglesCount; i++)
 	{
 		triangle = trianglesArray[i];
 		vtx_0 = triangle.vertex0;
@@ -202,14 +202,14 @@ TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo)
 {
 	// PROVISIONAL.***
 	if (trianglesArray === undefined)
-		return resultVbo;
+	{ return resultVbo; }
 	
 	var trianglesCount = trianglesArray.length;
-	if(trianglesCount === 0)
-		return resultVbo;
+	if (trianglesCount === 0)
+	{ return resultVbo; }
 	
-	if(resultVbo === undefined)
-		resultVbo = new VBOVertexIdxCacheKey();
+	if (resultVbo === undefined)
+	{ resultVbo = new VBOVertexIdxCacheKey(); }
 
 	var indicesArray = TrianglesList.getTrianglesIndicesArray(trianglesArray, undefined);
 	resultVbo.idxVboDataArray = Int16Array.from(indicesArray);

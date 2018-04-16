@@ -70,10 +70,10 @@ Star.prototype.getPoints = function(resultPointsArray)
 	var point;
 	var x, y;
 	
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
-	for(var i=0; i<this.radiusCount; i++)
+	for (var i=0; i<this.radiusCount; i++)
 	{
 		// exterior.***
 		x = this.centerPoint.x + this.exteriorRadius * Math.cos(currAngRad);
