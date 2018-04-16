@@ -728,6 +728,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		// 	}
 		// },
 		// magoManager 상태
+		getViewer: function()
+		{
+			return viewer;
+		},
 		getMagoManagerState: function() 
 		{
 			return magoManagerState;

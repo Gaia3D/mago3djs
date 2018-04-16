@@ -12,8 +12,9 @@ var Face = function()
 	}
 
 	this.vertexArray;
-	this.halfEdge;
+	this.hEdge;
 	this.planeNormal;
+	this.surfaceOwner;
 };
 
 Face.prototype.getVerticesCount = function()
@@ -101,6 +102,116 @@ Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 	}
 	
 	return resultTrianglesArray;
+};
+
+Face.prototype.setTwinHalfEdge = function(hedge)
+{
+	var twined = false;
+	var finished = false;
+	var startHEdge = this.hEdge;
+	var currHEdge = this.hEdge;
+	while(!finished)
+	{
+		if(currHEdge.setTwin(hedge))
+			return true;
+
+		currHEdge = currHEdge.next;
+		if(currHEdge === startHEdge)
+			finished = true;
+	}
+	return twined;
+};
+
+Face.prototype.getFrontierHalfEdges = function(resultHedgesArray)
+{
+	var hedgesArray = this.getHalfEdgesLoop(undefined);
+	if(hedgesArray === undefined)
+		return resultHedgesArray;
+	
+	if(resultHedgesArray === undefined)
+		resultHedgesArray = [];
+
+	var hedgesCount = hedgesArray.length;
+	var hedge;
+	for(var i=0; i<hedgesCount; i++)
+	{
+		hedge = hedgesArray[i];
+		if(hedge.isFrontier())
+		{
+			resultHedgesArray.push(hedge);
+		}
+	}
+	return resultHedgesArray;
+};
+
+Face.prototype.getHalfEdgesLoop = function(resultHedgesArray)
+{
+	if(this.hEdge === undefined)
+		return resultHedgesArray;
+	
+	resultHedgesArray = HalfEdge.getHalfEdgesLoop(this.hEdge, resultHedgesArray);
+	return resultHedgesArray;
+};
+
+Face.prototype.setTwinFace = function(face)
+{
+	if(face === undefined)
+		return false;
+	
+	if(this.hEdge === undefined || face.hEdge === undefined)
+		return false;
+	
+	var hedgesArray = face.getHalfEdgesLoop(undefined);
+	var hedgesCount = hedgesArray.length;
+	var hedge;
+	var twined = false;
+	for(var i=0; i<hedgesCount; i++)
+	{
+		hedge = hedgesArray[i];
+		if(this.setTwinHalfEdge(hedge))
+			twined = true;
+	}
+	
+	return twined;
+};
+
+Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
+{
+	if(this.vertexArray === undefined || this.vertexArray.length === 0)
+		return resultHalfEdgesArray;
+	
+	if(resultHalfEdgesArray === undefined)
+		resultHalfEdgesArray = [];
+	
+	var vertex;
+	var hedge;
+	var verticesCount = this.getVerticesCount();
+	
+	// 1rst, create the half edges.***
+	for(var i=0; i<verticesCount; i++)
+	{
+		vertex = this.getVertex(i);
+		hedge = new HalfEdge();
+		hedge.setStartVertex(vertex);
+		hedge.setFace(this);
+		resultHalfEdgesArray.push(hedge);
+	}
+	
+	// now, for all half edges, set the nextHalfEdge.***
+	var nextHedge;
+	var nextIdx;
+	for(var i=0; i<verticesCount; i++)
+	{
+		hedge = resultHalfEdgesArray[i];
+		nextIdx = VertexList.getNextIdx(i, this.vertexArray);
+		nextHedge = resultHalfEdgesArray[nextIdx];
+		hedge.setNext(nextHedge);
+	}
+	
+	// set a hedge for this face.***
+	this.hEdge = resultHalfEdgesArray[0];
+	
+	return resultHalfEdgesArray;
 };
 
 

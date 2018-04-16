@@ -19,9 +19,10 @@ var Vertex = function(position)
 	this.normal; // class: Point3D.
 	this.texCoord; // class: Point2D.
 	this.color4; // class: Color.
+	
 	this.outHalfEdgesArray; // Array [class: HalfEdge]. 
 	this.vertexType; // 1 = important vertex.***
-	this.idxInList;
+	this.idxInList; // auxiliar var.***
 	
 	if(position)
 		this.point3d = position;

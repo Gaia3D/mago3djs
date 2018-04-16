@@ -27,6 +27,8 @@ var Triangle= function(vertex0, vertex1, vertex2)
 	
 	if(vertex2 !== undefined)
 		this.vertex2 = vertex2;
+	
+	this.hEdge;
 };
 
 /**

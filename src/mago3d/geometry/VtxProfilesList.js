@@ -14,20 +14,28 @@ var VtxProfilesList = function(x, y)
 	this.convexFacesIndicesData;
 };
 
-VtxProfilesList.getLateralSurface = function(bottomVtxRing, topVtxRing, resultSurface, elemIndexRange)
+VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFacesArray, resultMesh, elemIndexRange)
 {
 	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".***
-	if(resultSurface === undefined)
-		resultSurface = new Surface();
+	if(resultFacesArray === undefined)
+		resultFacesArray = [];
+	
+	if(resultMesh.hedgesList === undefined)
+		resultMesh.hedgesList = new HalfEdgesList();
+	
+	var hedgesList = resultMesh.hedgesList;
 	
 	var strIdx, currIdx, endIdx, nextIdx;
 	var vtx0, vtx1, vtx2, vtx3;
-	var face;
+	var face, prevFace;
+	var hedgesArray = [];
 	currIdx = elemIndexRange.strIdx;
 	while(currIdx !== elemIndexRange.endIdx)
 	{
 		nextIdx = bottomVtxRing.vertexList.getNextIdx(currIdx);
-		face = resultSurface.newFace();
+		
+		face = new Face();
+		resultFacesArray.push(face);
 		face.vertexArray = [];
 		
 		vtx0 = bottomVtxRing.vertexList.getVertex(currIdx);
@@ -35,11 +43,23 @@ VtxProfilesList.getLateralSurface = function(bottomVtxRing, topVtxRing, resultSu
 		vtx2 = topVtxRing.vertexList.getVertex(nextIdx);
 		vtx3 = topVtxRing.vertexList.getVertex(currIdx);
 		Array.prototype.push.apply(face.vertexArray, [vtx0, vtx1, vtx2, vtx3]);
+		
+		// now create hedges of the face.***
+		hedgesArray.length = 0;
+		hedgesArray = face.createHalfEdges(hedgesArray);
+		hedgesList.addHalfEdgesArray(hedgesArray);
+		
+		if(prevFace !== undefined)
+		{
+			// set twins between face and prevFace.***
+			face.setTwinFace(prevFace);
+		}
+		prevFace = face;
 
 		currIdx = nextIdx;
 	}
 	
-	return resultSurface;
+	return resultFacesArray;
 };
 
 VtxProfilesList.prototype.newVtxProfile = function()
@@ -123,11 +143,14 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	var vtx0, vtx1, vtx2, vtx3;
 	var face, surface;
 	var k;
+	var facesArray = [];
+	var prevFacesArray;
 	var elemsCount = outerVtxRing.elemsIndexRangesArray.length;
 	
 	for(var i=0; i<elemsCount; i++)
 	{
 		surface = resultMesh.newSurface();
+		prevFacesArray = undefined;
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
 		for(var j=0; j<vtxProfilesCount-1; j++)
 		{
@@ -137,7 +160,26 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			bottomVtxRing = bottomVtxProfile.outerVtxRing;
 			topVtxRing = topVtxProfile.outerVtxRing;
 			
-			surface = VtxProfilesList.getLateralSurface(bottomVtxRing, topVtxRing, surface, elemIndexRange);
+			facesArray.length = 0;
+			facesArray = VtxProfilesList.getLateralFaces(bottomVtxRing, topVtxRing, facesArray, resultMesh, elemIndexRange);
+			surface.addFacesArray(facesArray);
+			
+			if(prevFacesArray !== undefined && prevFacesArray.length > 0)
+			{
+				// set twins between "prevFacesArray" & "facesArray".***
+				var currFace, prevFace;
+				var facesCount = facesArray.length;
+				for(var k=0; k<facesCount; k++)
+				{
+					currFace = facesArray[k];
+					prevFace = prevFacesArray[k];
+					currFace.setTwinFace(prevFace);
+				}
+			}
+			
+			prevFacesArray = [];
+			Array.prototype.push.apply(prevFacesArray, facesArray);
+			
 		}
 	}
 	
@@ -151,6 +193,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		for(var i=0; i<elemsCount; i++)
 		{
 			surface = resultMesh.newSurface();
+			prevFacesArray = undefined;
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
 			for(var j=0; j<vtxProfilesCount-1; j++)
 			{
@@ -160,7 +203,26 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 				bottomVtxRing = bottomVtxProfile.getInnerVtxRing(k);
 				topVtxRing = topVtxProfile.getInnerVtxRing(k);
 				
-				surface = VtxProfilesList.getLateralSurface(bottomVtxRing, topVtxRing, surface, elemIndexRange);
+				facesArray.length = 0;
+				facesArray = VtxProfilesList.getLateralFaces(bottomVtxRing, topVtxRing, facesArray, resultMesh, elemIndexRange);
+				surface.addFacesArray(facesArray);
+				
+				if(prevFacesArray !== undefined && prevFacesArray.length>0)
+				{
+					// set twins between "prevFacesArray" & "facesArray".***
+					var currFace, prevFace;
+					var facesCount = facesArray.length;
+					for(var a=0; a<facesCount; a++)
+					{
+						currFace = facesArray[a];
+						prevFace = prevFacesArray[a];
+						currFace.setTwinFace(prevFace);
+					}
+				}
+				
+				prevFacesArray = [];
+				Array.prototype.push.apply(prevFacesArray, facesArray);
+				
 			}
 		}
 	}

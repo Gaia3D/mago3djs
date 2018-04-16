@@ -1469,6 +1469,8 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 	
 	if(this.nativeProjectsArray === undefined)
 	{
+		var viewer = this.getViewer();
+		
 		this.nativeProjectsArray = [];
 		var natProject = new MagoNativeProject();
 		this.nativeProjectsArray.push(natProject);

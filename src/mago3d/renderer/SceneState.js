@@ -41,4 +41,6 @@ var SceneState = function()
 	
 	// provisionally.***
 	this.textureFlipYAxis = false;
+	
 };
+

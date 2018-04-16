@@ -12,6 +12,7 @@ var Mesh = function()
 	}
 	this.vertexList;
 	this.surfacesArray;
+	this.hedgesList;
 };
 
 Mesh.prototype.newSurface = function()
@@ -80,53 +81,6 @@ Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 		surface = this.getSurface(i);
 		surfaceCopy = resultMesh.newSurface();
 		surfaceCopy = surface.getCopyIndependentSurface(surfaceCopy);
-	}
-	
-	return resultMesh;
-};
-
-Mesh.prototype.getCopy = function(resultMesh)
-{
-	// TODO:
-	// In a surfaceIndependentMesh, the surfaces are disconex.***
-	if(resultMesh === undefined)
-		resultMesh = new Mesh();
-	
-	// 1rst, copy the localVertexList.***
-	var verticesArray = this.getNoRepeatedVerticesArray(undefined);
-	var verticesCopyArray = [];
-	var verticesCount = verticesArray.length;
-	var vertex, vertexCopy;
-	for(var i=0; i<verticesCount; i++)
-	{
-		vertex = verticesArray[i];
-		vertex.setIdxInList(i); // set idxInList.***
-		vertexCopy = new Vertex();
-		vertexCopy.copyFrom(vertex);
-		verticesCopyArray.push(vertexCopy);
-	}
-	
-	// Now, copy the surfaces.***
-	var surface, surfaceCopy;
-	var face, faceCopy, facesCount;
-	var vertex, vertexCopy;
-	var surfacesCount = this.getSurfacesCount();
-	for(var i=0; i<surfacesCount; i++)
-	{
-		surface = this.getSurface(i);
-		surfaceCopy = resultMesh.newSurface();
-		facesCount = surface.getFacesCount();
-		for(var j=0; j<facesCount; j++)
-		{
-			face = surface.getFace(j);
-			faceCopy = surfaceCopy.newFace();
-			verticesCount = face.getVerticesCount();
-			for(var k=0; k<verticesCount; k++)
-			{
-				
-			}
-		}
-		
 	}
 	
 	return resultMesh;
@@ -267,6 +221,19 @@ Mesh.prototype.reverseSense = function()
 	this.calculateVerticesNormals();
 };
 
+Mesh.prototype.getFrontierHalfEdges = function(resultHedgesArray)
+{
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for(var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		resultHedgesArray = surface.getFrontierHalfEdges(resultHedgesArray);
+	}
+	
+	return resultHedgesArray;
+};
+
 Mesh.prototype.getCopy = function(resultMeshCopy)
 {
 	if(this.vertexList === undefined)
@@ -325,12 +292,20 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 		resultTrianglesListsArray = [];
 	
 	// This function returns trianglesListsArray. Each trianglesList's vertices count is lower than 65535.***
-	// 1rst, make global vertices array.***
 	var shortSize = 65535;
-	var globalVerticesArray = TrianglesList.getNoRepeatedVerticesArray(trianglesArray, undefined);
-	var verticesCount = globalVerticesArray.length;
 	var trianglesList = new TrianglesList();
 	resultTrianglesListsArray.push(trianglesList);
+	var trianglesCount = trianglesArray.length;
+	if(trianglesCount*3 <shortSize)
+	{
+		trianglesList.trianglesArray = [];
+		Array.prototype.push.apply(trianglesList.trianglesArray, trianglesArray);
+		return resultTrianglesListsArray;
+	}
+	
+	// 1rst, make global vertices array.***
+	var globalVerticesArray = TrianglesList.getNoRepeatedVerticesArray(trianglesArray, undefined);
+	var verticesCount = globalVerticesArray.length;
 	
 	if(verticesCount <shortSize)
 	{
@@ -343,7 +318,6 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	var rejectedTrianglesArray = [];
 	var trianglesCount = trianglesArray.length;
 	var triangle;
-	TrianglesList.assignVerticesIdx(trianglesArray);
 	
 	for(var i=0; i<trianglesCount; i++)
 	{
@@ -365,19 +339,13 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 
-Mesh.prototype.getVbo = function(resultVboContainer)
+Mesh.prototype.getVbo = function(resultVboContainer, resultEdgedVboContainer)
 {
 	if(resultVboContainer === undefined)
 		resultVboContainer = new VBOVertexIdxCacheKeysContainer();
 
-	// 1rst, make global vertices array.***
-	var globalVerticesArray = this.getNoRepeatedVerticesArray();
-	VertexList.setIdxInList(globalVerticesArray);
-	var verticesCount = globalVerticesArray.length;
-	
 	// make global triangles array.***
 	var trianglesArray = this.getTrianglesConvex(undefined);
-	TrianglesList.assignVerticesIdx(trianglesArray);
 	var trianglesCount = trianglesArray.length;
 	
 	// If vertices count > shortSize(65535), then must split the mesh.***
@@ -394,9 +362,32 @@ Mesh.prototype.getVbo = function(resultVboContainer)
 		VertexList.getVboDataArrays(verticesArray, vbo);
 		trianglesList.assignVerticesIdx();
 		TrianglesList.getVboFaceDataArray(trianglesList.trianglesArray, vbo);
+		
+		// now, calculate edges vbos.***
+		if(resultEdgedVboContainer !== undefined)
+		{
+			
+		}
 	}
 
 	return resultVboContainer;
+};
+
+Mesh.prototype.getVboEdges = function(resultVboContainer)
+{
+	// provisionally make edges by this.***
+	var frontierHedgesArray = this.getFrontierHalfEdges(undefined);
+	var hedgesCount = frontierHedgesArray.length;
+	var hedge;
+	var vertexArray = [];
+	var strVertex, endVertex;
+	for(var i=0; i<hedgesCount; i++)
+	{
+		hedge = frontierHedgesArray[i];
+		strVertex = hedge.startVertex;
+		endVertex = hedge.getEndVertex();
+		vertexArray.push(strVertex.point3d.x);
+	}
 };
 
 
