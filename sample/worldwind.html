@@ -697,6 +697,13 @@
 			<input type="radio" id="hideObjectInfo" name="objectInfo" value="false" onclick="changeObjectInfoViewMode(false);"/>
 			<label for="hideObjectInfo"> Hide </label>
 		</div>
+        <div>
+            <h3>Origin</h3>
+            <input type="radio" id="showOrigin" name="origin" value="true" onclick="changeOrigin(true);" />
+            <label for="showOrigin"> Show </label>
+            <input type="radio" id="hideOrigin" name="origin" value="false" onclick="changeOrigin(false);"/>
+            <label for="hideOrigin"> Hide </label>
+        </div>
 		<div>
 			<h3>Bounding Box</h3>
 			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
@@ -1011,10 +1018,10 @@
 <script type="text/javascript" src="../src/mago3d/geometry/AxisXYZ.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/BoundingRectangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Circle.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/IndexData.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/IndexRange.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/HalfEdge.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/HalfEdgesList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/IndexData.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/IndexRange.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Line.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Line2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/MagoNativeProject.js"></script>
@@ -1041,11 +1048,11 @@
 <script type="text/javascript" src="../src/mago3d/geometry/Vertex.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VertexList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VertexMatrix.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/VtxProfile.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/VtxProfilesList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VtxRing.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VtxRingsList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VtxSegment.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxProfile.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxProfilesList.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/Renderer.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/SceneState.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/Selection.js"></script>
@@ -1085,6 +1092,8 @@
 			changeLabel(false);
 			// object 정보 표시
 			changeObjectInfoViewMode(true);
+            // Origin 표시
+            changeOrigin(false);
 			// BoundingBox
 			changeBoundingBox(false);
 			// Selecting And Moving
@@ -1945,6 +1954,11 @@
 		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);
 		changeObjectInfoViewModeAPI(managerFactory, isShow);
 	}
+    // Origin 표시/비표시
+    function changeOrigin(isShow) {
+        $("input:radio[name='origin']:radio[value='" + isShow + "']").prop("checked", true);
+        changeOriginAPI(managerFactory, isShow);
+    }
 	// boundingBox 표시/비표시
 	function changeBoundingBox(isShow) {
 		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
