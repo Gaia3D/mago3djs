@@ -15,8 +15,10 @@ var FBO = function(gl, width, height)
 	}
 	
 	this.gl = gl;
-	this.width = width;
-	this.height = height;
+	this.width = new Int32Array(1);
+	this.height = new Int32Array(1);
+	this.width[0] = width;
+	this.height[0] = height;
 	this.fbo = gl.createFramebuffer();
 	this.depthBuffer = gl.createRenderbuffer();
 	this.colorBuffer = gl.createTexture();
@@ -59,4 +61,72 @@ FBO.prototype.unbind = function()
 {
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+FBO.prototype.deleteObjects = function(gl) 
+{
+	if(this.depthBuffer)
+		gl.deleteRenderbuffer(this.depthBuffer);
+	this.depthBuffer = undefined;
+	
+	if(this.colorBuffer)
+		gl.deleteTexture(this.colorBuffer);
+	this.colorBuffer = undefined;
+	
+	if(this.fbo)
+		gl.deleteFramebuffer(this.fbo);
+	this.fbo = undefined;
+	
+	
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

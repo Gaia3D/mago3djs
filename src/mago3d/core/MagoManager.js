@@ -175,17 +175,18 @@ var MagoManager = function()
 	this.resultRaySC = new Float32Array(3);
 	this.matrix4SC = new Matrix4();
 
-	this.unitaryBoxSC = new Box();
+	this.unitaryBoxSC = new BoxAux();
 	this.unitaryBoxSC.makeAABB(1.0, 1.0, 1.0); // make a unitary box.***
 	this.unitaryBoxSC.vBOVertexIdxCacheKey = this.unitaryBoxSC.triPolyhedron.getVBOArrayModePosNorCol(this.unitaryBoxSC.vBOVertexIdxCacheKey);
 	
 	this.axisXYZ = new AxisXYZ();
-	this.axisXYZ.vboKey = this.axisXYZ.getVbo(this.axisXYZ.vboKey);
 	
 	this.invertedBox = new Box();
-	this.invertedBox.makeAABB(0.1, 0.1, 0.1); // make a 0.1m length box.***
-	this.invertedBox.triPolyhedron.invertTrianglesSenses();
-	this.invertedBox.vBOVertexIdxCacheKey = this.invertedBox.triPolyhedron.getVBOArrayModePosNorCol(this.invertedBox.vBOVertexIdxCacheKey);
+	var mesh = this.invertedBox.makeMesh(2.5, 2.5, 2.5);
+	mesh.reverseSense();
+	//mesh.setColor(0.5, 0.5, 0.5, 0.5);
+	mesh.getVbo(this.invertedBox.vbo_vicks_container);
+	mesh.getVboEdges(this.invertedBox.vbo_vicks_containerEdges);
 
 	this.demoBlocksLoaded = false;
 
@@ -908,10 +909,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		ManagerUtils.calculateSplited3fv([cameraPosition[0], cameraPosition[1], cameraPosition[2]], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 		
 		var viewport = this.wwd.viewport;
-		sceneState.camera.frustum.aspectRatio = viewport.width/viewport.height;
+		sceneState.camera.frustum.aspectRatio[0] = viewport.width/viewport.height;
 		//sceneState.camera.frustum.near[0] = this.wwd.navigator.nearDistance;
 		sceneState.camera.frustum.near[0] = 0.1;
-		sceneState.camera.frustum.far = 1000.0;
+		sceneState.camera.frustum.far[0] = 1000.0;
 		//sceneState.camera.frustum.far[0] = this.wwd.navigator.farDistance;
 		
 		// Calculate FOV & FOVY.***
@@ -920,15 +921,15 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			var projectionMatrix = dc.navigatorState.projection;
 			var aspectRat = sceneState.camera.frustum.aspectRatio;
 			var angleAlfa = 2*Math.atan(1/(aspectRat*projectionMatrix[0]));
-			sceneState.camera.frustum.fovyRad = angleAlfa; // pendent to know the real fov in webwroldwind.***
-			sceneState.camera.frustum.fovRad = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
+			sceneState.camera.frustum.fovyRad[0] = angleAlfa; // pendent to know the real fov in webwroldwind.***
+			sceneState.camera.frustum.fovRad[0] = sceneState.camera.frustum.fovyRad*sceneState.camera.frustum.aspectRatio;
 			sceneState.camera.frustum.dirty = false;
-			sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
+			sceneState.camera.frustum.tangentOfHalfFovy[0] = Math.tan(sceneState.camera.frustum.fovyRad/2);
 		}
 
 		// screen size.***
-		sceneState.drawingBufferWidth = viewport.width;
-		sceneState.drawingBufferHeight = viewport.height;
+		sceneState.drawingBufferWidth[0] = viewport.width;
+		sceneState.drawingBufferHeight[0] = viewport.height;
 	}
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
@@ -960,17 +961,23 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.camera.frustum.far[0] = scene._frustumCommandsList[0].far; // original.***
 		//sceneState.camera.frustum.far[0] = 5000000.0;
 		sceneState.camera.frustum.near[0] = scene._frustumCommandsList[0].near;
-		sceneState.camera.frustum.fovRad = scene._camera.frustum._fov;
-		sceneState.camera.frustum.fovyRad = scene._camera.frustum._fovy;
-		sceneState.camera.frustum.aspectRatio = scene._camera.frustum._aspectRatio;
-		sceneState.camera.frustum.tangentOfHalfFovy = Math.tan(sceneState.camera.frustum.fovyRad/2);
+		sceneState.camera.frustum.fovRad[0] = scene._camera.frustum._fov;
+		sceneState.camera.frustum.fovyRad[0]= scene._camera.frustum._fovy;
+		sceneState.camera.frustum.aspectRatio[0] = scene._camera.frustum._aspectRatio;
+		sceneState.camera.frustum.tangentOfHalfFovy[0] = Math.tan(sceneState.camera.frustum.fovyRad/2);
 
 		sceneState.camera.position.set(scene.context._us._cameraPosition.x, scene.context._us._cameraPosition.y, scene.context._us._cameraPosition.z);
 		sceneState.camera.direction.set(scene._camera.direction.x, scene._camera.direction.y, scene._camera.direction.z);
 		sceneState.camera.up.set(scene._camera.up.x, scene._camera.up.y, scene._camera.up.z);
 		
-		sceneState.drawingBufferWidth = scene.drawingBufferWidth;
-		sceneState.drawingBufferHeight = scene.drawingBufferHeight;
+		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
+		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
+	}
+	
+	if(this.depthFboNeo !== undefined)
+	{
+		sceneState.ssaoNoiseScale2[0] = this.depthFboNeo.width[0]/this.noiseTexture.width;
+		sceneState.ssaoNoiseScale2[1] = this.depthFboNeo.height[0]/this.noiseTexture.height;
 	}
 	
 	// set the auxiliar camera.
@@ -1038,6 +1045,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.isLastFrustum = isLastFrustum;
 	
 	var gl = this.sceneState.gl;
+	gl.getExtension("EXT_frag_depth");
 	
 	if (gl.isContextLost())
 	{ return; }
@@ -1084,8 +1092,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 	//scene
 	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth !== this.depthFboNeo.width || this.sceneState.drawingBufferHeight !== this.depthFboNeo.height)
+	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
 	{
+		// move this to onResize.***
+		this.depthFboNeo.deleteObjects(gl);
 		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
@@ -1324,7 +1334,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.wwd.drawContext.redrawRequested = true;
 	}
 	
-	this.renderInvertedBox(gl);
+	//this.renderInvertedBox(gl);
 };
 
 /**
@@ -1868,7 +1878,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			if (this.colorAux === undefined)
 			{ this.colorAux = new Color(); }
 			
-			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.refMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
 			for (var j=0; j<currentVisibleLowestOctCount; j++)
 			{
@@ -1909,7 +1919,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			{
 
 				// LOD2.***
-				gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
+				gl.uniformMatrix4fv(currentShader.refMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 				currentVisibleLowestOctCount = currentVisibleOctreesControler.currentVisibles2.length;
 				for (var j=0; j<currentVisibleLowestOctCount; j++)
 				{
@@ -1952,7 +1962,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, visibleO
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 			var currentLod = neoBuilding.currentLod;
 			
-			gl.uniformMatrix4fv(currentShader.RefTransfMatrix, false, buildingGeoLocation.rotMatrix._floatArrays);
+			gl.uniformMatrix4fv(currentShader.refMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 			var skinLod = neoBuilding.getCurrentSkin();
 			if (skinLod === undefined)
 			{ continue; }
@@ -2781,7 +2791,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (!find) 
 	{
 		// if the building is far to camera, then delete it.
-		if (neoBuilding.distToCam > 60)
+		if (neoBuilding.distToCam > 30) // default: 60.***
 		{ this.processQueue.putNodeToDelete(node, 0); }
 		return false;
 	}
@@ -3973,7 +3983,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 
 MagoManager.prototype.renderInvertedBox = function(gl) 
 {
-	return;
+	//return;
 	
 	// call this in the end of rendering pipeline.***
 	var currentShader = this.postFxShadersManager.getInvertedBoxShader();
@@ -3981,12 +3991,9 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	
 	gl.useProgram(shaderProgram);
 	
-	gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
 	gl.enableVertexAttribArray(currentShader.normal3_loc);
 	
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
 	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
 	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
@@ -4003,7 +4010,7 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 
 	gl.uniform1i(currentShader.depthTex_loc, 0);
 	gl.uniform1i(currentShader.noiseTex_loc, 1);
-	gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
+	//gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
 
 	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
 	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
@@ -4013,7 +4020,9 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	// lighting.
 	//this.magoPolicy.setSpecularColor(api.getSpecularColor());
 	gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
-	gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius());  
+	gl.uniform1f(currentShader.ssaoRadius_loc, 1.0); 
+	gl.uniform1i(currentShader.hasTexture_loc, false);
+	gl.uniform4fv(currentShader.color4Aux_loc, [0.5,0.5,0.5,1.0]);
 
 	gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
 	gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
@@ -4025,6 +4034,7 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 	
 	// 1) LOD0 & LOD1.*********************************************************************************************************************
+		
 	var refTMatrixIdxKey = 0;
 	var minSize = 0.0;
 	var renderTexture;
@@ -4032,10 +4042,30 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	var bRenderLines = false;
 	var primitiveType = undefined;
 	
+	gl.enable(gl.BLEND);
+	gl.uniform1i(currentShader.bUseNormal_loc, true);
+	
 	if (this.isLastFrustum)
 	{
-		this.renderer.renderObject(gl, this.invertedBox, this, currentShader, ssao_idx, bRenderLines, primitiveType);
+		//this.renderer.renderObject(gl, this.invertedBox, this, currentShader, ssao_idx, bRenderLines, primitiveType);
+		var vbo_vicky = this.invertedBox.vbo_vicks_container.vboCacheKeysArray[0];
+		if (!vbo_vicky.isReadyPositions(gl, this.vboMemoryManager))
+		{ return; }
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
+		gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		
+		if (!vbo_vicky.isReadyNormals(gl, this.vboMemoryManager))
+			return;
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+		gl.vertexAttribPointer(currentShader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+				
+		if (!vbo_vicky.isReadyFaces(gl, this.vboMemoryManager)) 
+		{ return; }
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+		gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 	}
+	
+	gl.disable(gl.BLEND);
 	
 	if (currentShader)
 	{
@@ -4051,6 +4081,22 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param cameraPosition 카메라 입장에서 화면에 그리기 전에 객체를 그릴 필요가 있는지 유무를 판단하는 값
+ * @param scene 변수
+ * @param shader 변수
+ * @param renderTexture 변수
+ * @param ssao_idx 변수
+ * @param neoRefLists_array 변수
+ */
+
+MagoManager.prototype.renderDirectionalLight = function(gl, cameraPosition, shader, renderTexture, ssao_idx, visibleObjControlerNodes) 
+{
+	
 };
 
 /**
@@ -4110,7 +4156,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			if (this.noiseTexture === undefined) 
 			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
 
-			currentShader = this.postFxShadersManager.getModelRefShader();
+			currentShader = this.postFxShadersManager.getShader("modelRefSsao");
 			shaderProgram = currentShader.program;
 			
 			gl.useProgram(shaderProgram);
@@ -4119,40 +4165,9 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
-			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
-			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
-
-			gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
-			gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-			gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
-			gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
-			gl.uniform1f(currentShader.shininessValue_loc, 40.0);
-
-			gl.uniform1i(currentShader.depthTex_loc, 0);
-			gl.uniform1i(currentShader.noiseTex_loc, 1);
-			gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-
-			gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-			gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
-			
+			currentShader.bindUniformGenerals();
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-			
-			// lighting.
-			//this.magoPolicy.setSpecularColor(api.getSpecularColor());
-			gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
-			gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius());  
 
-			gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
-			gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
-			gl.uniform1f(currentShader.specularReflectionCoef_loc, this.magoPolicy.getSpecularReflectionCoef());
-			
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
@@ -4189,48 +4204,16 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		{
 			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
 
-			currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
+			currentShader = this.postFxShadersManager.getShader("lodBuildingSsao");
 			shaderProgram = currentShader.program;
 		
 			gl.useProgram(shaderProgram);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			gl.enableVertexAttribArray(currentShader.color4_loc);
-
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-
-			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
-			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
-
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
-			//-----------------------------------------------------------------------------------------------------
-			gl.uniform1i(currentShader.hasAditionalMov_loc, true);
-			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-			gl.uniform1i(currentShader.hasTexture_loc, false); // initially false.***
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-
-			gl.uniform1i(currentShader.depthTex_loc, 0);
-			gl.uniform1i(currentShader.noiseTex_loc, 1);
-			gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-			gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
-			gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-			gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
-			gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
-			gl.uniform1f(currentShader.shininessValue_loc, 40.0);
-			gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
-			gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius()*3);  
-			gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
-			gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
-			gl.uniform1f(currentShader.specularReflectionCoef_loc, this.magoPolicy.getSpecularReflectionCoef());
-
-			gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-			gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
 			
+			currentShader.bindUniformGenerals();
+
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
@@ -4262,49 +4245,17 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		if (nodesLOD3Count > 0)
 		{
 			//this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-
-			currentShader = this.postFxShadersManager.pFx_shaders_array[8]; // lodBuilding ssao.***
+			currentShader = this.postFxShadersManager.getShader("lodBuildingSsao");
+			
 			shaderProgram = currentShader.program;
 		
 			gl.useProgram(shaderProgram);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			gl.enableVertexAttribArray(currentShader.color4_loc);
-
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
-			gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
-			gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-
-			gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
-			gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
-
-			gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
-			//-----------------------------------------------------------------------------------------------------
-			gl.uniform1i(currentShader.hasAditionalMov_loc, true);
-			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-			gl.uniform1i(currentShader.hasTexture_loc, false); // initially false.***
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-
-			gl.uniform1i(currentShader.depthTex_loc, 0);
-			gl.uniform1i(currentShader.noiseTex_loc, 1);
-			gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-			gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
-			gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-			gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
-			gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
-			gl.uniform1f(currentShader.shininessValue_loc, 40.0);
-			gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
-			gl.uniform1f(currentShader.ssaoRadius_loc, this.magoPolicy.getSsaoRadius()*3);  
-			gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
-			gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
-			gl.uniform1f(currentShader.specularReflectionCoef_loc, this.magoPolicy.getSpecularReflectionCoef());
-
-			gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-			gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
 			
+			currentShader.bindUniformGenerals();
+
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
@@ -4703,7 +4654,10 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, ssao_idx) 
 {
 	if (this.axisXYZ.vbo_vicks_container.vboCacheKeysArray.length === 0)
-	{ this.axisXYZ.makeMesh(30); }
+	{ 
+		var mesh = this.axisXYZ.makeMesh(30); 
+		mesh.getVbo(this.axisXYZ.vbo_vicks_container);
+	}
 	
 	var gl = this.sceneState.gl;
 	var color;
@@ -4786,7 +4740,6 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 
 		gl.uniform3fv(currentShader.scale_loc, [1, 1, 1]); //.***
 		var buildingGeoLocation = this.getNodeGeoLocDataManager(node).getCurrentGeoLocationData();
-		gl.uniform3fv(currentShader.scale_loc, [1, 1, 1]); //.***
 		//buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
@@ -4795,16 +4748,6 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		
 		this.renderer.renderObject(gl, this.axisXYZ, this, currentShader, ssao_idx);
-		/*
-		var meshesCount = natProject.getMeshesCount();
-		for(var j=0; j<meshesCount; j++)
-		{
-			mesh = natProject.getMesh(j);
-			
-			this.renderer.renderObject(gl, mesh, this, currentShader, ssao_idx);
-			var hola = 0;
-		}
-		*/
 	}
 	
 	if (currentShader)
@@ -4945,75 +4888,38 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 {
 	// here creates the necessary shaders for mago3d.***
 	// 1) ModelReferences ssaoShader.******************************************************************************
-	var shaderName = "modelReferencesSsao";
+	var shaderName = "modelRefSsao";
 	var shader = this.postFxShadersManager.newShader(shaderName);
 	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
 	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
 
 	shader.program = gl.createProgram();
-	shader.shader_vertex = this.postFxShadersManager.getShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.postFxShadersManager.getShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
 	gl.linkProgram(shader.program);
 			
-	var uniformDataPair;
-	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvpMat4RelToEye");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	uniformDataPair.matrix4fv = this.sceneState.modelViewProjRelToEyeMatrix._floatArrays;
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
 	
-	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvMat4RelToEye");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	uniformDataPair.matrix4fv = this.sceneState.modelViewRelToEyeMatrix._floatArrays;
+	// 2) LodBuilding ssaoShader.***********************************************************************************
+	shaderName = "lodBuildingSsao";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
+	ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
 	
-	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "pMat4");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "projectionMatrix");
-	uniformDataPair.matrix4fv = this.sceneState.projectionMatrix._floatArrays;
-	
-	uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosHigh");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	uniformDataPair.vec3fv = this.sceneState.encodedCamPosHigh;
-	
-	uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosLow");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	uniformDataPair.vec3fv = this.sceneState.encodedCamPosLow;
-	
-	uniformDataPair = shader.newUniformDataPair("Matrix4fv", "normalMat4");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "normalMatrix4");
-	uniformDataPair.matrix4fv = this.sceneState.normalMatrix4._floatArrays;
-	
-	uniformDataPair = shader.newUniformDataPair("1f", "frustumFar");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "far");
-	uniformDataPair.floatValue = this.sceneState.camera.frustum.far;
-	
-	uniformDataPair = shader.newUniformDataPair("1f", "fovy");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "fov");
-	uniformDataPair.floatValue = this.sceneState.camera.frustum.fovyRad;
-	
-	uniformDataPair = shader.newUniformDataPair("1f", "aspectRatio");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
-	uniformDataPair.floatValue = this.sceneState.camera.frustum.aspectRatio;
-	
-	uniformDataPair = shader.newUniformDataPair("1i", "drawBuffWidht");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "screenWidth");
-	uniformDataPair.intValue = this.sceneState.drawingBufferWidth;
-	
-	uniformDataPair = shader.newUniformDataPair("1i", "drawBuffHeight");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "screenHeight");
-	uniformDataPair.intValue = this.sceneState.drawingBufferHeight;
-	
-	//gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-	//gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
 			
-	uniformDataPair = shader.newUniformDataPair("1i", "depthTex");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "depthTex");
-	uniformDataPair.intValue = 0;
-	
-	uniformDataPair = shader.newUniformDataPair("1i", "noiseTex");
-	uniformDataPair.uniformLocation = gl.getUniformLocation(shader.program, "noiseTex");
-	uniformDataPair.intValue = 1;
-	
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
 };
 
 /**
@@ -5035,46 +4941,6 @@ MagoManager.prototype.renderLodBuilding = function(gl, cameraPosition, scene, sh
 	}
 
 	this.renderer.renderLodBuilding(gl, lodBuilding, this, shader, ssao_idx);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param BR_Project 변수
- */
-MagoManager.prototype.createFirstTimeVBOCacheKeys = function(gl, BR_Project) 
-{
-	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	var simpleObj = BR_Project._simpleBuilding_v1._simpleObjects_array[0];
-	var vt_cacheKey = simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0];
-
-	// interleaved vertices_texCoords.***
-	vt_cacheKey._verticesArray_cacheKey = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vt_cacheKey._verticesArray_cacheKey);
-	gl.bufferData(gl.ARRAY_BUFFER, simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0].verticesArrayBuffer, gl.STATIC_DRAW);
-	simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0].verticesArrayBuffer = null;
-
-	// normals.***
-	if (simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0].normalsArrayBuffer !== undefined) 
-	{
-		vt_cacheKey._normalsArray_cacheKey = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vt_cacheKey._normalsArray_cacheKey);
-		gl.bufferData(gl.ARRAY_BUFFER, simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0].normalsArrayBuffer, gl.STATIC_DRAW);
-		simpleObj._vtCacheKeys_container._vtArrays_cacheKeys_array[0].normalsArrayBuffer = null;
-	}
-
-	// Simple building texture(create 1pixel X 1pixel bitmap).****************************************************
-	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
-	if (simpBuildingV1._simpleBuildingTexture === undefined) { simpBuildingV1._simpleBuildingTexture = gl.createTexture(); }
-
-	// Test wait for texture to load.********************************************
-	//http://stackoverflow.com/questions/19722247/webgl-wait-for-texture-to-load
-	gl.bindTexture(gl.TEXTURE_2D, simpBuildingV1._simpleBuildingTexture);
-	//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255])); // red
-	//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([90, 80, 85, 255])); // red
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([240, 240, 240, 255])); // red
-	gl.bindTexture(gl.TEXTURE_2D, null);
-	BR_Project._f4d_nailImage_readed_finished = true;
 };
 
 /**
@@ -5738,6 +5604,9 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
+				if(version === undefined)
+					continue;
+				
 				if (version[0] === 'v')
 				{
 					if (distToCamera < lod0_minDist) 

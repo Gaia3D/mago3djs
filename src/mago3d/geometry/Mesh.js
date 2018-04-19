@@ -185,6 +185,17 @@ Mesh.prototype.transformByMatrix4 = function(tMat4)
 	this.calculateVerticesNormals();
 };
 
+Mesh.prototype.translate = function(x, y, z)
+{
+	if (this.vertexList === undefined)
+	{
+		this.vertexList = new VertexList();
+		this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+	}
+	
+	this.vertexList.translateVertices(x, y, z);
+};
+
 Mesh.prototype.calculateVerticesNormals = function()
 {
 	// PROVISIONAL.***

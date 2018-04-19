@@ -446,6 +446,7 @@ void main()\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
     float linearDepth = getDepth(screenPos);          \n\
     vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+	//float testf = gl_FragDepth;\n\
 \n\
     vec3 normal2 = vNormal;\n\
             \n\
@@ -473,6 +474,8 @@ void main()\n\
     }   \n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
+	if(occlusion > 0.4)\n\
+		discard;\n\
 \n\
     vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
     vec3 L = normalize(lightPos - vertexPos);\n\
@@ -515,7 +518,9 @@ void main()\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 \n\
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+    //gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+	//gl_FragColor = vec4(1.0-gl_FragCoord.z, 1.0-gl_FragCoord.z, 1.0-gl_FragCoord.z, 0.5); \n\
+	gl_FragColor = vec4((1.0-gl_FragCoord.z) * occlusion, (1.0-gl_FragCoord.z) * occlusion, (1.0-gl_FragCoord.z) * occlusion, 0.5); \n\
 }\n\
 ";
 ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
@@ -542,6 +547,55 @@ ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
 	varying vec3 vertexPos;\n\
+	uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+uniform bool textureFlipYAxis;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform float shininessValue;\n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 vColor4Aux;\n\
+\n\
+\n\
+varying vec3 diffuseColor;\n\
+uniform vec3 specularColor;\n\
+\n\
+const int kernelSize = 16;  \n\
+uniform float radius;      \n\
+\n\
+uniform float ambientReflectionCoef;\n\
+uniform float diffuseReflectionCoef;  \n\
+uniform float specularReflectionCoef; \n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{\n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}    \n\
+\n\
 	\n\
 	void main()\n\
     {	\n\
@@ -567,7 +621,8 @@ ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
 		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		//vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		vec4 pos4 = vec4(position.xyz, 1.0);\n\
 \n\
 		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
@@ -580,7 +635,15 @@ ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 \n\
-        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+        //gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		gl_Position = projectionMatrix * pos4;\n\
+		vec3 screenCoord = gl_Position.xyz;\n\
+		screenCoord /= gl_Position.w;\n\
+		screenCoord.x = (screenCoord.x+1.)*screenWidth/2.; \n\
+		screenCoord.y = (screenCoord.y+1.)*screenHeight/2.; \n\
+		vec2 screenPos = vec2(screenCoord.x, screenCoord.y);	\n\
+		float linearDepth = getDepth(screenPos);\n\
+		gl_Position.z = -linearDepth;\n\
 	}\n\
 ";
 ShaderSource.LegoDepthFS = "#ifdef GL_ES\n\

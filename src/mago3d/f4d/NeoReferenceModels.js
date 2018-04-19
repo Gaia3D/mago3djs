@@ -137,6 +137,12 @@ NeoReference.prototype.deleteObjects = function(gl, vboMemManager)
 	this.moveVector = undefined; // Point3D.***
 
 	this.bRendered = undefined;
+	
+	if(this.vBOVertexIdxCacheKeysContainer !== undefined)
+	{
+		this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
+		this.vBOVertexIdxCacheKeysContainer = undefined;
+	}
 };
 
 //*************************************************************************************************************************************************************

@@ -34,19 +34,18 @@ ParametricMesh.prototype.getVboKeysContainer = function()
 {
 	return this.vboKeyContainer;
 };
-/*
-ParametricMesh.prototype.getVbo = function(resultVBOCacheKeys)
+
+ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {
-	if(resultVBOCacheKeys === undefined)
-		resultVBOCacheKeys = new VBOVertexIdxCacheKey();
+	if (resultMesh === undefined)
+	{ resultMesh = new Mesh(); }
 
 	// must separate vbo groups by surfaces.***
-	var surfaceIndependentMesh = this.getSurfaceIndependentMesh(undefined);
-	surfaceIndependentMesh.getVbo(resultVBOCacheKeys);
+	resultMesh = this.vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh.calculateVerticesNormals();
 	
-	return resultVBOCacheKeys;
+	return resultMesh;
 };
-*/
 
 ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {

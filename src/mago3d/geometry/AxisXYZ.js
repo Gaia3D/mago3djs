@@ -82,52 +82,10 @@ AxisXYZ.prototype.makeMesh = function(length)
 	// Merge all meshes into a one mesh and make a unique vbo.***
 	mesh.mergeMesh(mesh2);
 	mesh.mergeMesh(mesh3);
-	mesh.getVbo(this.vbo_vicks_container);
+	return mesh;
 };
 
 AxisXYZ.prototype.getVboKeysContainer = function()
 {
 	return this.vbo_vicks_container;
-};
-
-AxisXYZ.prototype.getVbo = function(resultVboKey)
-{
-	if (resultVboKey === undefined)
-	{ resultVboKey = new VBOVertexIdxCacheKey(); }
-	
-	if (resultVboKey.posVboDataArray === undefined)
-	{ resultVboKey.posVboDataArray = []; }
-
-	if (resultVboKey.colVboDataArray === undefined)
-	{ resultVboKey.colVboDataArray = []; }
-
-	if (resultVboKey.norVboDataArray === undefined)
-	{ resultVboKey.norVboDataArray = []; }
-
-	var positions = [];
-	var normals = [];
-	var colors = [];
-	
-	// xAxis.***
-	positions.push(0, 0, 0, this.length, 0, 0);
-	colors.push(255, 0, 0, 255, 255, 0, 0, 255);
-	normals.push(0, 0, 255, 0, 0, 255);
-	
-	// yAxis.***
-	positions.push(0, 0, 0, 0, this.length, 0);
-	colors.push(0, 255, 0, 255, 0, 255, 0, 255);
-	normals.push(0, 0, 255, 0, 0, 255);
-	
-	// zAxis.***
-	positions.push(0, 0, 0, 0, 0, this.length);
-	colors.push(0, 0, 255, 255, 0, 0, 255, 255);
-	normals.push(255, 0, 0, 255, 0, 0);
-
-	resultVboKey.posVboDataArray = Float32Array.from(positions);
-	resultVboKey.colVboDataArray = Int8Array.from(colors);
-	resultVboKey.norVboDataArray = Int8Array.from(normals);
-	
-	resultVboKey.vertexCount = 6;
-	
-	return resultVboKey;
 };
