@@ -46,7 +46,7 @@ var Policy = function()
 	// occlusion culling
 	this.occlusionCullingEnable = false;
 	// origin axis XYZ
-	this.showOrigin = true;
+	this.showOrigin = false;
 	
 	// 이미지 경로
 	this.imagePath = "";
