@@ -1084,7 +1084,14 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		//gl.drawArrays(gl.LINES, 0, vertices_count);
+		/*
+		gl.uniform1i(shader.bUse1Color_loc, true);
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]); //.***
+		gl.disableVertexAttribArray(shader.texCoord2_loc);
+		gl.uniform1i(shader.hasTexture_loc, false);
+		gl.drawArrays(gl.LINES, 0, vertices_count);
+		gl.enableVertexAttribArray(shader.texCoord2_loc);
+		*/
 	}
 };
 

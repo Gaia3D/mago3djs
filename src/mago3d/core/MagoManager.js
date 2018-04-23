@@ -182,7 +182,7 @@ var MagoManager = function()
 	this.axisXYZ = new AxisXYZ();
 	
 	this.invertedBox = new Box();
-	var mesh = this.invertedBox.makeMesh(2.5, 2.5, 2.5);
+	var mesh = this.invertedBox.makeMesh(1.5, 1.5, 1.5);
 	mesh.reverseSense();
 	//mesh.setColor(0.5, 0.5, 0.5, 0.5);
 	mesh.getVbo(this.invertedBox.vbo_vicks_container);
@@ -771,6 +771,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl)
 		projectFolderName = node.data.projectFolderName;
 		
 		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
+		
 		// check if this building is ready to render.***
 		//if (!neoBuilding.allFilesLoaded) // no used yet.
 		{
@@ -3983,7 +3984,21 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 
 MagoManager.prototype.renderInvertedBox = function(gl) 
 {
-	//return;
+	return;
+	
+	if(this.fakeScreenPlane === undefined)
+	{
+		this.fakeScreenPlane = {};
+		this.fakeScreenPlane.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+		var vboKey = this.fakeScreenPlane.vbo_vicks_container.newVBOVertexIdxCacheKey();
+		var posArray = [-1,-1,0,  1,-1,0,  -1,1,0,  1,-1,0,  1,1,0,  -1,1,0];
+		//var elems = [0, 1, 2,];
+		vboKey.posVboDataArray = Float32Array.from(posArray);
+		vboKey.vertexCount = 6;
+	}
+	
+	gl.depthFunc(gl.ALWAYS);
+	//gl.depthFunc(gl.NEVER);
 	
 	// call this in the end of rendering pipeline.***
 	var currentShader = this.postFxShadersManager.getInvertedBoxShader();
@@ -3992,7 +4007,7 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	gl.useProgram(shaderProgram);
 	
 	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
+	//gl.disableVertexAttribArray(currentShader.normal3_loc);
 	
 	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
 	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
@@ -4013,14 +4028,14 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	//gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
 
 	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
+	gl.uniform3fv(currentShader.kernel16_loc, this.sceneState.ssaoSphereKernel32);
 	
 	gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
 	
 	// lighting.
 	//this.magoPolicy.setSpecularColor(api.getSpecularColor());
 	gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
-	gl.uniform1f(currentShader.ssaoRadius_loc, 1.0); 
+	gl.uniform1f(currentShader.ssaoRadius_loc, 1.5); 
 	gl.uniform1i(currentShader.hasTexture_loc, false);
 	gl.uniform4fv(currentShader.color4Aux_loc, [0.5,0.5,0.5,1.0]);
 
@@ -4048,21 +4063,23 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	if (this.isLastFrustum)
 	{
 		//this.renderer.renderObject(gl, this.invertedBox, this, currentShader, ssao_idx, bRenderLines, primitiveType);
-		var vbo_vicky = this.invertedBox.vbo_vicks_container.vboCacheKeysArray[0];
+		//var vbo_vicky = this.invertedBox.vbo_vicks_container.vboCacheKeysArray[0];
+		var vbo_vicky = this.fakeScreenPlane.vbo_vicks_container.vboCacheKeysArray[0];
 		if (!vbo_vicky.isReadyPositions(gl, this.vboMemoryManager))
 		{ return; }
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 		
-		if (!vbo_vicky.isReadyNormals(gl, this.vboMemoryManager))
-			return;
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-		gl.vertexAttribPointer(currentShader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+		//if (!vbo_vicky.isReadyNormals(gl, this.vboMemoryManager))
+		//	return;
+		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+		//gl.vertexAttribPointer(currentShader.normal3_loc, 3, gl.BYTE, true, 0, 0);
 				
-		if (!vbo_vicky.isReadyFaces(gl, this.vboMemoryManager)) 
-		{ return; }
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
-		gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//if (!vbo_vicky.isReadyFaces(gl, this.vboMemoryManager)) 
+		//{ return; }
+		//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+		//gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		gl.drawArrays(gl.TRIANGLES, 0, this.fakeScreenPlane.vbo_vicks_container.vboCacheKeysArray[0].vertexCount);
 	}
 	
 	gl.disable(gl.BLEND);
@@ -4081,6 +4098,8 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	gl.depthFunc(gl.EQUAL);
 };
 
 /**
@@ -4096,6 +4115,7 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 
 MagoManager.prototype.renderDirectionalLight = function(gl, cameraPosition, shader, renderTexture, ssao_idx, visibleObjControlerNodes) 
 {
+	//this.myCameraSCX;
 	
 };
 
@@ -4198,9 +4218,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
 		
-		// 2) LOD 2.************************************************************************************************************************************
+		// 2) LOD 2, 3, 4, 5.************************************************************************************************************************************
 		var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-		if (nodesLOD2Count > 0 || nodesLOD0Count > 0)
+		var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
+		if (nodesLOD2Count > 0 || nodesLOD0Count > 0 || nodesLOD3Count>0)
 		{
 			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
 
@@ -4221,8 +4242,9 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
 			
-			this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx);
-			this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, ssao_idx);
+			this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx); // lod 0.***
+			this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, ssao_idx); // lod 2.***
+			this.renderer.renderNeoBuildingsLowLOD(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, ssao_idx); // lod 3, 4, 5.***
 			
 			if (currentShader)
 			{
@@ -4239,48 +4261,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
-		
-		// 3) LOD3, LOD4, LOD5.************************************************************************************************************************************
-		var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
-		if (nodesLOD3Count > 0)
-		{
-			//this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-			currentShader = this.postFxShadersManager.getShader("lodBuildingSsao");
-			
-			shaderProgram = currentShader.program;
-		
-			gl.useProgram(shaderProgram);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.enableVertexAttribArray(currentShader.normal3_loc);
-			gl.enableVertexAttribArray(currentShader.color4_loc);
-			
-			currentShader.bindUniformGenerals();
 
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			
-			this.renderer.renderNeoBuildingsLowLOD(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, ssao_idx);
-			
-			if (currentShader)
-			{
-				if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-				if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-				if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-				if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-			}
-			
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, null);
-		}
-		
 		// If there are an object selected, then there are a stencilBuffer.******************************************
 		if (this.nodeSelected) // if there are an object selected then there are a building selected.***
 		{
