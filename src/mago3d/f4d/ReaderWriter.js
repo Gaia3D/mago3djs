@@ -1510,8 +1510,14 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 
 	neoRefImage.onerror = function() 
 	{
-		// doesn't exist or error loading
-		return;
+		if (texture.texId === undefined) 
+		{
+			texture.texId = gl.createTexture();
+			// Test wait for texture to load.********************************************
+			gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		}
 	};
 
 	neoRefImage.src = filePath_inServer;
