@@ -138,7 +138,7 @@ NeoReference.prototype.deleteObjects = function(gl, vboMemManager)
 
 	this.bRendered = undefined;
 	
-	if(this.vBOVertexIdxCacheKeysContainer !== undefined)
+	if (this.vBOVertexIdxCacheKeysContainer !== undefined)
 	{
 		this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
 		this.vBOVertexIdxCacheKeysContainer = undefined;

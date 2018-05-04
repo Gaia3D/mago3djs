@@ -67,16 +67,16 @@ FBO.prototype.unbind = function()
  */
 FBO.prototype.deleteObjects = function(gl) 
 {
-	if(this.depthBuffer)
-		gl.deleteRenderbuffer(this.depthBuffer);
+	if (this.depthBuffer)
+	{ gl.deleteRenderbuffer(this.depthBuffer); }
 	this.depthBuffer = undefined;
 	
-	if(this.colorBuffer)
-		gl.deleteTexture(this.colorBuffer);
+	if (this.colorBuffer)
+	{ gl.deleteTexture(this.colorBuffer); }
 	this.colorBuffer = undefined;
 	
-	if(this.fbo)
-		gl.deleteFramebuffer(this.fbo);
+	if (this.fbo)
+	{ gl.deleteFramebuffer(this.fbo); }
 	this.fbo = undefined;
 	
 	
