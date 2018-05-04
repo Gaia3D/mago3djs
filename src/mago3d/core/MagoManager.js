@@ -1091,11 +1091,11 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
 		
-		//cabreadoTex = new Texture();
-		//filePath_inServer = this.magoPolicy.imagePath + "/funny.jpg";
-		//cabreadoTex.texId = gl.createTexture();
-		//this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		//this.pin.texturesArray.push(cabreadoTex);
+		cabreadoTex = new Texture();
+		filePath_inServer = this.magoPolicy.imagePath + "/funny.jpg";
+		cabreadoTex.texId = gl.createTexture();
+		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
+		this.pin.texturesArray.push(cabreadoTex);
 	
 	}
 	
