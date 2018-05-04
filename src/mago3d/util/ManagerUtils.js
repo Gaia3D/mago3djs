@@ -39,23 +39,15 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
 
-
+	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
+	
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
-		var globe = magoManager.wwd.globe;
-		var origin = new WorldWind.Vec3(0, 0, 0);
-		origin = globe.computePointFromPosition(latitude, longitude, altitude, origin);
-		
-		resultWorldPoint.set(origin[0], origin[1], origin[2]);
-		origin = undefined;
+		resultWorldPoint.set(cartesian[1], cartesian[2], cartesian[0]);
+		return resultWorldPoint;
 	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		// *if this in Cesium:
-		var position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
-		resultWorldPoint.set(position.x, position.y, position.z);
-		position = undefined;
-	}
+	
+	resultWorldPoint.set(cartesian[0], cartesian[1], cartesian[2]);
 	
 	return resultWorldPoint;
 };

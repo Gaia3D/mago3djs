@@ -12,7 +12,8 @@ var MagoManager = function()
 	}
 
 	// F4D Data structure & objects.*****************************************
-	this.terranTile = new TerranTile();
+	//this.terranTile = new TerranTile();
+	this.tinTerrainManager = new TinTerrainManager();
 	this.renderer = new Renderer();
 	this.selectionCandidates = new SelectionCandidates();
 	this.shadersManager = new ShadersManager();
@@ -113,6 +114,7 @@ var MagoManager = function()
 	this.fileRequestControler = new FileRequestControler();
 	this.visibleObjControlerOctrees = new VisibleObjectsController(); 
 	this.visibleObjControlerNodes = new VisibleObjectsController(); 
+	this.visibleObjControlerTerrain = new VisibleObjectsController(); 
 	
 	this.boundingSphere_Aux; 
 	this.radiusAprox_aux;
@@ -975,7 +977,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
 	}
 	
-	if(this.depthFboNeo !== undefined)
+	if (this.depthFboNeo !== undefined)
 	{
 		sceneState.ssaoNoiseScale2[0] = this.depthFboNeo.width[0]/this.noiseTexture.width;
 		sceneState.ssaoNoiseScale2[1] = this.depthFboNeo.height[0]/this.noiseTexture.height;
@@ -1085,6 +1087,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		cabreadoTex = new Texture();
 		filePath_inServer = this.magoPolicy.imagePath + "/new.png";
+		cabreadoTex.texId = gl.createTexture();
+		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
+		this.pin.texturesArray.push(cabreadoTex);
+		
+		cabreadoTex = new Texture();
+		filePath_inServer = this.magoPolicy.imagePath + "/funny.jpg";
 		cabreadoTex.texId = gl.createTexture();
 		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
 		this.pin.texturesArray.push(cabreadoTex);
@@ -3986,12 +3994,12 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 {
 	return;
 	
-	if(this.fakeScreenPlane === undefined)
+	if (this.fakeScreenPlane === undefined)
 	{
 		this.fakeScreenPlane = {};
 		this.fakeScreenPlane.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 		var vboKey = this.fakeScreenPlane.vbo_vicks_container.newVBOVertexIdxCacheKey();
-		var posArray = [-1,-1,0,  1,-1,0,  -1,1,0,  1,-1,0,  1,1,0,  -1,1,0];
+		var posArray = [-1, -1, 0,  1, -1, 0,  -1, 1, 0,  1, -1, 0,  1, 1, 0,  -1, 1, 0];
 		//var elems = [0, 1, 2,];
 		vboKey.posVboDataArray = Float32Array.from(posArray);
 		vboKey.vertexCount = 6;
@@ -4037,7 +4045,7 @@ MagoManager.prototype.renderInvertedBox = function(gl)
 	gl.uniform3fv(currentShader.specularColor_loc, [0.7, 0.7, 0.7]);
 	gl.uniform1f(currentShader.ssaoRadius_loc, 1.5); 
 	gl.uniform1i(currentShader.hasTexture_loc, false);
-	gl.uniform4fv(currentShader.color4Aux_loc, [0.5,0.5,0.5,1.0]);
+	gl.uniform4fv(currentShader.color4Aux_loc, [0.5, 0.5, 0.5, 1.0]);
 
 	gl.uniform1f(currentShader.ambientReflectionCoef_loc, this.magoPolicy.getAmbientReflectionCoef());
 	gl.uniform1f(currentShader.diffuseReflectionCoef_loc, this.magoPolicy.getDiffuseReflectionCoef());
@@ -4234,6 +4242,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.enableVertexAttribArray(currentShader.color4_loc);
 			
 			currentShader.bindUniformGenerals();
+			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
@@ -4426,7 +4435,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			}
 			
 			// draw the axis.***
-			if(this.magoPolicy.getShowOrigin())
+			if (this.magoPolicy.getShowOrigin())
 			{
 				node = this.nodeSelected;
 				//var geoLocDataManager = this.getNodeGeoLocDataManager(node);
@@ -4504,6 +4513,59 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.disableVertexAttribArray(currentShader.position3_loc);
 			
 		}
+		
+		// Test TinTerrain.**************************************************************************
+		// Test TinTerrain.**************************************************************************
+		if (this.testTinTerrain !== undefined && this.testTinTerrain.vboKeyContainer !== undefined)
+		{
+			currentShader = this.postFxShadersManager.getShader("tinTerrain");
+			shaderProgram = currentShader.program;
+		
+			gl.useProgram(shaderProgram);
+			gl.enableVertexAttribArray(currentShader.position3_loc);
+			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+			//gl.disableVertexAttribArray(currentShader.normal3_loc);
+			//gl.disableVertexAttribArray(currentShader.color4_loc);
+			
+			currentShader.bindUniformGenerals();
+
+			var tex = this.pin.texturesArray[4];
+			gl.activeTexture(gl.TEXTURE2); 
+			gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+			
+			gl.uniform1i(currentShader.hasTexture_loc, true); //.***
+			gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
+			
+			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.testTinTerrain.terrainPositionHIGH);
+			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.testTinTerrain.terrainPositionLOW);
+			
+			//this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx); // lod 0.***
+			var vboKey = this.testTinTerrain.vboKeyContainer.vboCacheKeysArray[0];
+			if (vboKey.isReadyPositions(gl, this.vboMemoryManager) && vboKey.isReadyTexCoords(gl, this.vboMemoryManager) && vboKey.isReadyFaces(gl, this.vboMemoryManager))
+			{ 
+				// Positions.***
+				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
+				gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+				
+				// TexCoords.***
+				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
+				gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+				
+				var indicesCount = vboKey.indicesCount;
+
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
+				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			}
+			
+			if (currentShader)
+			{
+				if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+				if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
+				if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
+				if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+			}
+		}
+		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4901,6 +4963,24 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// 3) TinTerrain shader.****************************************************************************************
+	shaderName = "tinTerrain";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.TinTerrainVS;
+	ssao_fs_source = ShaderSource.TinTerrainFS;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
 };
 
 /**
@@ -5222,6 +5302,47 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	bDoFrustumCullingToBuildings = true;
 	this.tilesFrustumCullingFinished(this.partiallyIntersectedLowestTilesArray, cameraPosition, frustumVolume, bDoFrustumCullingToBuildings);
 	
+	// Test.***
+	//this.tinTerrainManager;
+	/*
+	if(this.cesiumTerrainProvider === undefined)
+	{
+		this.cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({ url : Cesium.IonResource.fromAssetId(3956), requestVertexNormals : true });
+	}
+	var maxDepth = 14;
+	var resultFullyIntersectedTilesNamesMap = {};
+	SmartTile.getFrustumIntersectedTilesNames(frustumVolume, maxDepth, cameraPosition, this, resultFullyIntersectedTilesNamesMap);
+	
+	if (this.testTinTerrain === undefined)
+	{ this.testTinTerrain = new TinTerrain(); }
+	
+	if (this.testTinTerrain.fileLoadState === CODE.fileLoadState.READY)
+	{
+		//var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+		var fileName = "CesiumTerrain/14_27936_11606.terrain";
+		var gl = this.sceneState.gl;
+		this.readerWriter.loadTINTerrain(gl, fileName, this.testTinTerrain, this);
+		
+	}
+	
+	
+	if (this.testTinTerrain.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+	{
+		var geographicExtent = resultFullyIntersectedTilesNamesMap["14\\27936\\11606"];
+		if (geographicExtent !== undefined)
+		{
+			this.testTinTerrain.parseData(this.testTinTerrain.dataArrayBuffer);
+			this.testTinTerrain.geographicExtent = geographicExtent;
+			this.testTinTerrain.decodeData();
+			this.testTinTerrain.makeVbo();
+		}
+		
+		if(this.cesiumTerrainProvider._ready)
+		{
+			//var terrainGeo = this.cesiumTerrainProvider.requestTileGeometry(27936, 11606, 14);
+		}
+	}
+	*/
 };
 
 /**
@@ -5585,8 +5706,8 @@ MagoManager.prototype.tilesFrustumCullingFinished = function(intersectedLowestTi
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
-				if(version === undefined)
-					continue;
+				if (version === undefined)
+				{ continue; }
 				
 				if (version[0] === 'v')
 				{

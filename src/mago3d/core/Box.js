@@ -34,32 +34,32 @@ Box.prototype.getVboKeysContainer = function()
 Box.prototype.makeMesh = function(width, length, height)
 {
 	// check dimensions of the box.***
-	if(width !== undefined)
-		this.width = width;
+	if (width !== undefined)
+	{ this.width = width; }
 	
-	if(length !== undefined)
-		this.length = length;
+	if (length !== undefined)
+	{ this.length = length; }
 	
-	if(height !== undefined)
-		this.height = height;
+	if (height !== undefined)
+	{ this.height = height; }
 	
-	if(this.width === undefined)
-		this.width = 1;
+	if (this.width === undefined)
+	{ this.width = 1; }
 	
-	if(this.length === undefined)
-		this.length = 1;
+	if (this.length === undefined)
+	{ this.length = 1; }
 	
-	if(this.height === undefined)
-		this.height = 1;
+	if (this.height === undefined)
+	{ this.height = 1; }
 	
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point3D(0,0,0);
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point3D(0, 0, 0); }
 	
-	if(this.vbo_vicks_container === undefined)
-		this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	if (this.vbo_vicks_container === undefined)
+	{ this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); }
 	
-	if(this.vbo_vicks_containerEdges === undefined)
-		this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer();
+	if (this.vbo_vicks_containerEdges === undefined)
+	{ this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer(); }
 	
 	// Create a parametric mesh.***
 	var pMesh = new ParametricMesh();
@@ -84,7 +84,7 @@ Box.prototype.makeMesh = function(width, length, height)
 	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
 	// translate the box bcos center the origen to the center of the box.***
-	mesh.translate(0,0,-this.height/2);
+	mesh.translate(0, 0, -this.height/2);
 
 	return mesh;
 };

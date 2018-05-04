@@ -194,8 +194,8 @@ var PostFxShader = function(gl)
  */
 PostFxShader.prototype.bindUniformGenerals = function()
 {
-	if(this.uniformsArrayGeneral === undefined)
-		return;
+	if (this.uniformsArrayGeneral === undefined)
+	{ return; }
 	
 	var uniformsDataPairsCount = this.uniformsArrayGeneral.length;
 	for (var i=0; i<uniformsDataPairsCount; i++)
@@ -312,16 +312,25 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 
 	// 1. ModelViewProjectionMatrixRelToEye.***
 	uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvpMat4RelToEye");
 		uniformDataPair.uniformLocation = uniformLocation;
 		uniformDataPair.matrix4fv = sceneState.modelViewProjRelToEyeMatrix._floatArrays;
 	}
 	
+	// 1. ModelViewProjectionMatrix.***
+	uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrix");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvpMat4");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.matrix4fv = sceneState.modelViewProjMatrix._floatArrays;
+	}
+	
 	// 2. modelViewMatrixRelToEye.***
 	uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "mvMat4RelToEye");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -330,7 +339,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 3. modelViewMatrix.***
 	uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "modelViewMatrix");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -339,7 +348,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 4. projectionMatrix.***
 	uniformLocation = gl.getUniformLocation(shader.program, "projectionMatrix");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "pMat4");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -348,7 +357,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 5. normalMatrix4.***
 	uniformLocation = gl.getUniformLocation(shader.program, "normalMatrix4");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "normalMat4");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -357,7 +366,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 6. encodedCameraPositionMCHigh.***
 	uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosHigh");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -366,7 +375,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 7. encodedCameraPositionMCLow.***
 	uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Vec3fv", "encodedCamPosLow");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -375,7 +384,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 8. frustumNear.***
 	uniformLocation = gl.getUniformLocation(shader.program, "near");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "frustumNear");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -384,7 +393,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 9. frustumFar.***
 	uniformLocation = gl.getUniformLocation(shader.program, "far");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "frustumFar");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -393,7 +402,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 10. fovy.***
 	uniformLocation = gl.getUniformLocation(shader.program, "fov");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "fovyRad");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -402,7 +411,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 11. aspectRatio.***
 	uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "aspectRatio");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -411,7 +420,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 12. drawBuffWidht.***
 	uniformLocation = gl.getUniformLocation(shader.program, "screenWidth");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "drawBuffWidht");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -420,7 +429,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 13. drawBuffHeight.***
 	uniformLocation = gl.getUniformLocation(shader.program, "screenHeight");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "drawBuffHeight");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -429,7 +438,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 14. depthTex.***
 	uniformLocation = gl.getUniformLocation(shader.program, "depthTex");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1i", "depthTex");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -438,7 +447,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 15. noiseTex.***
 	uniformLocation = gl.getUniformLocation(shader.program, "noiseTex");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1i", "noiseTex");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -447,7 +456,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 16. diffuseTex.***
 	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -456,7 +465,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 17. specularColor.***
 	uniformLocation = gl.getUniformLocation(shader.program, "specularColor");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Vec3fv", "specularColor");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -465,7 +474,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 18. ssaoRadius.***
 	uniformLocation = gl.getUniformLocation(shader.program, "radius");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "radius");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -474,7 +483,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 19. ambientReflectionCoef.***
 	uniformLocation = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "ambientReflectionCoef");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -483,7 +492,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 20. diffuseReflectionCoef.***
 	uniformLocation = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "diffuseReflectionCoef");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -492,7 +501,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 21. specularReflectionCoef.***
 	uniformLocation = gl.getUniformLocation(shader.program, "specularReflectionCoef");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "specularReflectionCoef");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -501,7 +510,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 22. shininessValue.***
 	uniformLocation = gl.getUniformLocation(shader.program, "shininessValue");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "shininessValue");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -510,7 +519,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 23. ssaoNoiseScale2.***
 	uniformLocation = gl.getUniformLocation(shader.program, "noiseScale");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Vec2fv", "ssaoNoiseScale2");
 		uniformDataPair.uniformLocation = uniformLocation;
@@ -519,7 +528,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	
 	// 24. ssaoKernel16.***
 	uniformLocation = gl.getUniformLocation(shader.program, "kernel");
-	if(uniformLocation !== null && uniformLocation !== undefined)
+	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
 		uniformDataPair = shader.newUniformDataPair("Vec3fv", "ssaoKernel16");
 		uniformDataPair.uniformLocation = uniformLocation;
