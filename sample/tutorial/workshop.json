@@ -1,0 +1,47 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "workshop"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "workshop"
+			},
+			"children": [],
+			"data_key": "SOCIALROOM",
+			"data_name": "SOCIALROOM",
+			"mapping_type": "origin",
+            "latitude": 37.58358288958673,
+            "longitude": 126.60890424717905,
+            "height": 0,
+            "heading": 0,
+            "pitch": 90,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "workshop"
+			},
+			"children": [],
+			"data_key": "STUDENTROOM",
+			"data_name": "STUDENTROOM",
+			"mapping_type": "origin",
+            "latitude": 37.58358288958673,
+            "longitude": 126.61055424717905,
+            "height": 10,
+            "heading": 0,
+            "pitch": 90,
+			"roll": 0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "workshop",
+	"data_name": "workshop",
+    "mapping_type": "origin"
+}
