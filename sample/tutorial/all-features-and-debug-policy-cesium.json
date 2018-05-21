@@ -61,7 +61,7 @@
   "geo_server_add_parameters_request": "GetMap",
   "geo_server_add_parameters_transparent": "true",
   "geo_server_add_parameters_format": "image/png",
-  "geo_callback_enable": "false",
+  "geo_callback_enable": "true",
   "geo_callback_apiresult": "showApiResult",
   "geo_callback_dataInfo": "showDataInfo",
   "geo_callback_selectedobject": "showSelectedObject",

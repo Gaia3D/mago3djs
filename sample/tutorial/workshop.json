@@ -18,7 +18,7 @@
             "longitude": 126.60890424717905,
             "height": 0,
             "heading": 0,
-            "pitch": 90,
+            "pitch": 0,
 			"roll": 0
 		},
 		{
@@ -34,7 +34,7 @@
             "longitude": 126.61055424717905,
             "height": 10,
             "heading": 0,
-            "pitch": 90,
+            "pitch": 0,
 			"roll": 0
 		}
 	],
