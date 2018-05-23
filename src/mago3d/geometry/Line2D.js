@@ -38,10 +38,10 @@ Line2D.prototype.getPerpendicularRight = function(point)
 {
 	var perpendicular = new Line2D();
 	
-	if(point)
-		perpendicular.point.set(point.x, point.y);
+	if (point)
+	{ perpendicular.point.set(point.x, point.y); }
 	else
-		perpendicular.point.set(this.point.x, this.point.y);
+	{ perpendicular.point.set(this.point.x, this.point.y); }
 	
 	perpendicular.direction.set(this.direction.y, -this.direction.x);
 	return perpendicular;
@@ -55,10 +55,10 @@ Line2D.prototype.getPerpendicularLeft = function(point)
 {
 	var perpendicular = new Line2D();
 	
-	if(point)
-		perpendicular.point.set(point.x, point.y);
+	if (point)
+	{ perpendicular.point.set(point.x, point.y); }
 	else
-		perpendicular.point.set(this.point.x, this.point.y);
+	{ perpendicular.point.set(this.point.x, this.point.y); }
 	
 	perpendicular.direction.set(-this.direction.y, this.direction.x);
 	return perpendicular;
@@ -70,8 +70,11 @@ Line2D.prototype.getPerpendicularLeft = function(point)
  */
 Line2D.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
-	if(projectedPoint === undefined)
-		projectedPoint = new Point2D();
+	if (point === undefined)
+	{ return undefined; }
+	
+	if (projectedPoint === undefined)
+	{ projectedPoint = new Point2D(); }
 	
 	var perpendicular = this.getPerpendicularLeft(point);
 	projectedPoint = this.intersectionWithLine(perpendicular, projectedPoint);
@@ -85,17 +88,17 @@ Line2D.prototype.getProjectedPoint = function(point, projectedPoint)
  */
 Line2D.prototype.isCoincidentPoint = function(point, error) 
 {
-	if(point === undefined)
-		return false;
+	if (point === undefined)
+	{ return false; }
 	
-	if(error === undefined)
-		error = 10E-8;
+	if (error === undefined)
+	{ error = 10E-8; }
 	
 	var projectedPoint = this.getProjectedPoint(point, projectedPoint);
 	var squaredDist = point.squareDistToPoint(projectedPoint);
 	
-	if(squaredDist < error*error)
-		return true;
+	if (squaredDist < error*error)
+	{ return true; }
 
 	return false;
 };
@@ -106,15 +109,15 @@ Line2D.prototype.isCoincidentPoint = function(point, error)
  */
 Line2D.prototype.isParallelToLine = function(line) 
 {
-	if(line === undefined)
-		return false;
+	if (line === undefined)
+	{ return false; }
 	
 	var zero = 10E-10;
 	var angRad = this.direction.angleRadToVector(line.direction);
 	
 	// if angle is zero or 180 degree, then this is parallel to "line".***
-	if(angRad < zero || Math.abs(angRad - Math.PI) < zero)
-		return true;
+	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
+	{ return true; }
 	
 	return false;
 };
@@ -125,19 +128,19 @@ Line2D.prototype.isParallelToLine = function(line)
  */
 Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint) 
 {
-	if(line === undefined)
-		return undefined;
+	if (line === undefined)
+	{ return undefined; }
 	
 	// 1rst, check that this is not parallel to "line".***
-	if(this.isParallelToLine(line))
-		return undefined;
+	if (this.isParallelToLine(line))
+	{ return undefined; }
 	
 	// now, check if this or "line" are vertical or horizontal.***
 	var intersectX;
 	var intersectY;
 	
 	var zero = 10E-10;
-	if(Math.abs(this.direction.x) < zero)
+	if (Math.abs(this.direction.x) < zero)
 	{
 		// this is a vertical line.***
 		var slope = line.direction.y / line.direction.x;
@@ -146,17 +149,18 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 		intersectX = this.point.x;
 		intersectY = slope * this.point.x + b;
 	}
-	else if(Math.abs(this.direction.y) < zero)
+	else if (Math.abs(this.direction.y) < zero)
 	{
 		// this is a horizontal line.***
 		// must check if the "line" is vertical.***
-		if(Math.abs(line.direction.x) < zero)
+		if (Math.abs(line.direction.x) < zero)
 		{
 			// "line" is vertical.***
 			intersectX = line.point.x;
 			intersectY = this.point.y;
 		}
-		else{
+		else 
+		{
 			var slope = line.direction.y / line.direction.x;
 			var b = line.point.y - slope * line.point.x;
 			
@@ -164,9 +168,10 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 			intersectY = this.point.y;
 		}	
 	}
-	else{
+	else 
+	{
 		// this is oblique.***
-		if(Math.abs(line.direction.x) < zero)
+		if (Math.abs(line.direction.x) < zero)
 		{
 			// "line" is vertical.***
 			var mySlope = this.direction.y / this.direction.x;
@@ -174,7 +179,8 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 			intersectX = line.point.x;
 			intersectY = line.point.x * mySlope + myB;
 		}
-		else{
+		else 
+		{
 			var mySlope = this.direction.y / this.direction.x;
 			var myB = this.point.y - mySlope * this.point.x;
 			
@@ -186,8 +192,8 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 		}
 	}
 	
-	if(resultIntersectPoint === undefined)
-		resultIntersectPoint = new Point2D();
+	if (resultIntersectPoint === undefined)
+	{ resultIntersectPoint = new Point2D(); }
 	
 	resultIntersectPoint.set(intersectX, intersectY);
 	return resultIntersectPoint;

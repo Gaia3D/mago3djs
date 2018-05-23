@@ -263,6 +263,17 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl, vboMemMa
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @returns vboViCacheKey
+ */
+VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function() 
+{
+	if (this.vboCacheKeysArray === undefined) { return 0; }
+	
+	return this.vboCacheKeysArray.length;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class VBOByteColorCacheKey
  */
 var VBOByteColorCacheKey = function() 

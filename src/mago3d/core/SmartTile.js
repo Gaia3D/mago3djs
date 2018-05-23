@@ -263,20 +263,31 @@ SmartTile.prototype.getBuildingSeedById = function(buildingType, buildingId)
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
 {
-	if (this.sphereExtent === undefined)
-	{ this.sphereExtent = new Sphere(); }
+	this.sphereExtent = SmartTile.computeSphereExtent(magoManager, this.minGeographicCoord, this.maxGeographicCoord, this.sphereExtent);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
+SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
+{
+	if (resultSphereExtent === undefined)
+	{ resultSphereExtent = new Sphere(); }
 	
 	// calculate worldCoord center position.
-	var midLongitude = (this.maxGeographicCoord.longitude + this.minGeographicCoord.longitude)/2;
-	var midLatitude = (this.maxGeographicCoord.latitude + this.minGeographicCoord.latitude)/2;
-	var midAltitude = (this.maxGeographicCoord.altitude + this.minGeographicCoord.altitude)/2;
+	var midLongitude = (maxGeographicCoord.longitude + minGeographicCoord.longitude)/2;
+	var midLatitude = (maxGeographicCoord.latitude + minGeographicCoord.latitude)/2;
+	var midAltitude = (maxGeographicCoord.altitude + minGeographicCoord.altitude)/2;
 	
-	this.sphereExtent.centerPoint = ManagerUtils.geographicCoordToWorldPoint(midLongitude, midLatitude, midAltitude, this.sphereExtent.centerPoint, magoManager);
+	resultSphereExtent.centerPoint = ManagerUtils.geographicCoordToWorldPoint(midLongitude, midLatitude, midAltitude, resultSphereExtent.centerPoint, magoManager);
 	
 	// calculate an aproximate radius.
 	var cornerPoint;
-	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.minGeographicCoord.altitude, cornerPoint, magoManager);
-	this.sphereExtent.r = this.sphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.3;
+	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(minGeographicCoord.longitude, minGeographicCoord.latitude, minGeographicCoord.altitude, cornerPoint, magoManager);
+
+	resultSphereExtent.r = resultSphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
+	return resultSphereExtent;
 };
 
 /**
@@ -378,13 +389,14 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 		rootNode = node.getRoot();
 		
 		var longitude, latitude;
-		if(rootNode.data.bbox.geographicCoord === undefined)
+		if (rootNode.data.bbox.geographicCoord === undefined)
 		{
 			// in this case take the data from buildingSeed.***
 			longitude = buildingSeed.geographicCoordOfBBox.longitude;
 			latitude = buildingSeed.geographicCoordOfBBox.latitude;
 		}
-		else{
+		else 
+		{
 			longitude = rootNode.data.bbox.geographicCoord.longitude;
 			latitude = rootNode.data.bbox.geographicCoord.latitude;
 		}
@@ -535,6 +547,181 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIn
 		}
 	}
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.selectTileAngleRangeByDepth = function(depth) 
+{
+	if (depth === undefined || depth < 0 || depth > 14)
+	{ return undefined; }
+	
+	if (depth === 0)
+	{ return 180; }
+	if (depth === 1)
+	{ return 90; }
+	if (depth === 2)
+	{ return 45; }
+	if (depth === 3)
+	{ return 22.5; }
+	if (depth === 4)
+	{ return 11.25; }
+	if (depth === 5)
+	{ return 5.625; }
+	if (depth === 6)
+	{ return 2.8125; }
+	if (depth === 7)
+	{ return 1.40625; }
+	if (depth === 8)
+	{ return 0.703125; }
+	if (depth === 9)
+	{ return 0.3515625; }
+	if (depth === 10)
+	{ return 0.17578125; }
+	if (depth === 11)
+	{ return 0.087890625; }
+	if (depth === 12)
+	{ return 0.043945313; }
+	if (depth === 13)
+	{ return 0.021972656; }
+	if (depth === 14)
+	{ return 0.010986328; }
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName) 
+{
+	var xMin = -180.0;
+	var yMin = -90.0;
+	var angRange = SmartTile.selectTileAngleRangeByDepth(depth) ;
+	
+	var xIndex = Math.floor((longitude - xMin)/angRange);
+	var yIndex = Math.floor((latitude - yMin)/angRange);
+	resultTileName = depth.toString() + "\\" + xIndex.toString() + "\\" + yIndex.toString();
+	return resultTileName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+ 
+SmartTile.getFrustumIntersectedTilesNames = function(frustum, maxDepth, camPos, magoManager, resultFullyIntersectedTilesNamesMap) 
+{
+	var currMinGeographicCoords = new GeographicCoord();
+	var currMaxGeographicCoords = new GeographicCoord();
+	var currDepth = 0;
+	
+	// America side.
+	currMinGeographicCoords.setLonLatAlt(-180, -90, 0);
+	currMaxGeographicCoords.setLonLatAlt(0, 90, 0);
+	currDepth = 0;
+	SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, magoManager.boundingSphere_Aux, 
+		resultFullyIntersectedTilesNamesMap);
+	
+	// Asia side.
+	currMinGeographicCoords.setLonLatAlt(0, -90, 0);
+	currMaxGeographicCoords.setLonLatAlt(180, 90, 0);
+	currDepth = 0;
+	SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, magoManager.boundingSphere_Aux, 
+		resultFullyIntersectedTilesNamesMap);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+ 
+SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap) 
+{
+	// STATIC FUNCTION.***
+	// 1rst, make a sphereExtent.***
+	
+	sphereExtentAux = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, sphereExtentAux);
+
+	var intersectionType = frustum.intersectionSphere(sphereExtentAux);
+	
+	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
+	{ return; }
+	else if (intersectionType === Constant.INTERSECTION_INSIDE)
+	{
+		var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
+		var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
+		var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
+		var geographicExtent = new GeographicExtent();
+		geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
+		geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
+		resultFullyIntersectedTilesNamesMap[tileName] = geographicExtent;
+		return;
+	}
+	else if (intersectionType === Constant.INTERSECTION_INTERSECT)
+	{
+		// check distance to camera.***
+		var distToCam = camPos.distToSphere(sphereExtentAux);
+		if (distToCam > 3000)
+		{
+			var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
+			var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
+			var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
+			var geographicExtent = new GeographicExtent();
+			geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
+			geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
+			resultFullyIntersectedTilesNamesMap[tileName] = geographicExtent;
+			return;
+		}
+		
+		if (currDepth < maxDepth)
+		{
+			// must descend.***
+			currDepth += 1;
+			var minLon = currMinGeographicCoords.longitude;
+			var minLat = currMinGeographicCoords.latitude;
+			var minAlt = currMinGeographicCoords.altitude;
+			var maxLon = currMaxGeographicCoords.longitude;
+			var maxLat = currMaxGeographicCoords.latitude;
+			var maxAlt = currMaxGeographicCoords.altitude;
+			var midLon = (minLon + maxLon)/ 2;
+			var midLat = (minLat + maxLat)/ 2;
+			
+			// subTile 1.***
+			currMaxGeographicCoords.setLonLatAlt(midLon, midLat, maxAlt);
+			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
+			
+			// subTile 2.***
+			currMinGeographicCoords.setLonLatAlt(midLon, minLat, minAlt);
+			currMaxGeographicCoords.setLonLatAlt(maxLon, midLat, maxAlt);
+			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
+			
+			// subTile 3.***
+			currMinGeographicCoords.setLonLatAlt(midLon, midLat, minAlt);
+			currMaxGeographicCoords.setLonLatAlt(maxLon, maxLat, maxAlt);
+			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
+			
+			// subTile 4.***
+			currMinGeographicCoords.setLonLatAlt(minLon, midLat, minAlt);
+			currMaxGeographicCoords.setLonLatAlt(midLon, maxLat, maxAlt);
+			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
+			
+		}
+		else 
+		{
+			var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
+			var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
+			var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
+			var geographicExtent = new GeographicExtent();
+			geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
+			geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
+			resultFullyIntersectedTilesNamesMap[tileName] = geographicExtent;
+			return;
+		}
+	}
+	
+};
+
 
 /**
  * 어떤 일을 하고 있습니까?

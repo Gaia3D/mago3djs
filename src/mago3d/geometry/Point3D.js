@@ -118,8 +118,8 @@ Point3D.prototype.scalarProduct = function(point)
  */
 Point3D.prototype.angleRadToVector = function(vector) 
 {
-	if(vector === undefined)
-		return undefined;
+	if (vector === undefined)
+	{ return undefined; }
 	
 	//******************************************************
 	//var scalarProd = this.scalarProd(vector);
@@ -132,8 +132,8 @@ Point3D.prototype.angleRadToVector = function(vector)
 	//var angDeg = alfa * 180.0/Math.PI;
 	//------------------------------------------------------
 	var error = 10E-10;
-	if(myModul < error || vecModul < error)
-		return undefined;
+	if (myModul < error || vecModul < error)
+	{ return undefined; }
 	
 	return Math.acos(this.scalarProd(vector) / (myModul * vecModul));
 };
@@ -146,13 +146,13 @@ Point3D.prototype.angleRadToVector = function(vector)
  */
 Point3D.prototype.angleDegToVector = function(vector) 
 {
-	if(vector === undefined)
-		return undefined;
+	if (vector === undefined)
+	{ return undefined; }
 	
 	var angRad = this.angleRadToVector(vector);
 	
-	if(angRad === undefined)
-		return undefined;
+	if (angRad === undefined)
+	{ return undefined; }
 		
 	return angRad * 180.0/Math.PI;
 };
@@ -182,7 +182,7 @@ Point3D.prototype.isCoincidentToPoint = function(point, errorDist)
 {
 	var squareDist = this.distToPoint(point);
 	var coincident = false;
-	if(squareDist < errorDist*errorDist)
+	if (squareDist < errorDist*errorDist)
 	{
 		coincident = true;
 	}
@@ -317,11 +317,11 @@ Point3D.prototype.getVectorToPoint = function(targetPoint, resultVector)
 {
 	// this returns a vector that points to "targetPoint" from "this".***
 	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.***
-	if(targetPoint === undefined)
-		return undefined;
+	if (targetPoint === undefined)
+	{ return undefined; }
 	
-	if(resultVector === undefined)
-		resultVector = new Point3D();
+	if (resultVector === undefined)
+	{ resultVector = new Point3D(); }
 	
 	resultVector.set(targetPoint.x - this.x, targetPoint.y - this.y, targetPoint.z - this.z);
 	

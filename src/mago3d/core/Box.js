@@ -11,23 +11,17 @@ var Box = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// vertex indices of the box.***
-	//    3----------2        7----------6      
-	//    |          |        |          |
-	//    |  bottom  |        |   top    |
-	//    |          |        |          |
-	//    0----------1        4----------5
-	
-	this.triPolyhedron = new TriPolyhedron();
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
-	this.vBOVertexIdxCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+	this.vbo_vicks_containerEdges;
+	this.centerPoint;
+	this.width;
+	this.length;
+	this.height;
+
 };
 
 /**
- * axis aligned bounding box
- * @param xLength
- * @param yLength
- * @param zLength
+ * box
  */
 Box.prototype.getVboKeysContainer = function()
 {
@@ -35,101 +29,98 @@ Box.prototype.getVboKeysContainer = function()
 };
 
 /**
- * axis aligned bounding box
- * @param xLength
- * @param yLength
- * @param zLength
+ * box
  */
-Box.prototype.makeAABB = function(xLength, yLength, zLength)
+Box.prototype.makeMesh = function(width, length, height)
 {
-	// this makes a box centered on the center of the box.***
-	var minX = -xLength/2.0;
-	var minY = -yLength/2.0;
-	var minZ = -zLength/2.0;
+	// check dimensions of the box.***
+	if (width !== undefined)
+	{ this.width = width; }
 	
-	var maxX = xLength/2.0;
-	var maxY = yLength/2.0;
-	var maxZ = zLength/2.0;
+	if (length !== undefined)
+	{ this.length = length; }
 	
-	// make 8 vertices and 6 triSurfaces.***
-	var vertexList = this.triPolyhedron.vertexList;
+	if (height !== undefined)
+	{ this.height = height; }
 	
-	// Bottom.****
-	var vertex = vertexList.newVertex(); // 0.***
-	vertex.setPosition(minX, minY, minZ);
+	if (this.width === undefined)
+	{ this.width = 1; }
 	
-	vertex = vertexList.newVertex(); // 1.***
-	vertex.setPosition(maxX, minY, minZ);
+	if (this.length === undefined)
+	{ this.length = 1; }
 	
-	vertex = vertexList.newVertex(); // 2.***
-	vertex.setPosition(maxX, maxY, minZ);
+	if (this.height === undefined)
+	{ this.height = 1; }
 	
-	vertex = vertexList.newVertex(); // 3.***
-	vertex.setPosition(minX, maxY, minZ);
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point3D(0, 0, 0); }
 	
-	// Top.***
-	vertex = vertexList.newVertex(); // 4.***
-	vertex.setPosition(minX, minY, maxZ);
+	if (this.vbo_vicks_container === undefined)
+	{ this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); }
 	
-	vertex = vertexList.newVertex(); // 5.***
-	vertex.setPosition(maxX, minY, maxZ);
+	if (this.vbo_vicks_containerEdges === undefined)
+	{ this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer(); }
 	
-	vertex = vertexList.newVertex(); // 6.***
-	vertex.setPosition(maxX, maxY, maxZ);
+	// Create a parametric mesh.***
+	var pMesh = new ParametricMesh();
+		
+	// Create a Profile2d.***
+	pMesh.profile = new Profile(); 
+	var profileAux = pMesh.profile; 
 	
-	vertex = vertexList.newVertex(); // 7.***
-	vertex.setPosition(minX, maxY, maxZ);
+	// Create a outer ring in the Profile2d.***
+	var outerRing = profileAux.newOuterRing();
+	var rect = outerRing.newElement("RECTANGLE");
+	rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
+	rect.setDimensions(this.width, this.length);
 	
+	// Extrude the Profile.***
+	var extrudeSegmentsCount = 1;
+	var extrusionVector = undefined;
+	pMesh.extrude(profileAux, this.height, extrudeSegmentsCount, extrusionVector);
 	
-	// now, create triSurfaces and triangles.***
-	var triSurface;
-	var triangle;
-	// Bottom surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(0), vertexList.getVertex(2), vertexList.getVertex(1));
+	var bIncludeBottomCap = true;
+	var bIncludeTopCap = true;
+	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(0), vertexList.getVertex(3), vertexList.getVertex(2));
-	
-	// Top surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(4), vertexList.getVertex(5), vertexList.getVertex(6));
-	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(4), vertexList.getVertex(6), vertexList.getVertex(7));
-	
-	// Front surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(0), vertexList.getVertex(1), vertexList.getVertex(5));
-	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(0), vertexList.getVertex(5), vertexList.getVertex(4));
-	
-	// Right surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(1), vertexList.getVertex(2), vertexList.getVertex(6));
-	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(1), vertexList.getVertex(6), vertexList.getVertex(5));
-	
-	// Rear surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(2), vertexList.getVertex(3), vertexList.getVertex(7));
-	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(2), vertexList.getVertex(7), vertexList.getVertex(6));
-	
-	// Left surface.***
-	triSurface = this.triPolyhedron.newTriSurface();
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(3), vertexList.getVertex(0), vertexList.getVertex(4));
-	
-	triangle = triSurface.newTriangle();
-	triangle.setVertices(vertexList.getVertex(3), vertexList.getVertex(4), vertexList.getVertex(7));
-	
+	// translate the box bcos center the origen to the center of the box.***
+	mesh.translate(0, 0, -this.height/2);
+
+	return mesh;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

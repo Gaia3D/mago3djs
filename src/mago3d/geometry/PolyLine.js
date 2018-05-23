@@ -58,14 +58,14 @@ PolyLine.prototype.getPoints = function(resultPointsArray)
 	var pointsCount = this.point2dArray.length;
 	for (var i=0; i<pointsCount; i++)
 	{
-		if(i===0)
+		if (i===0)
 		{
-			if(resultExistentPointsCount > 0)
+			if (resultExistentPointsCount > 0)
 			{
 				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
 				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
 				var point0 = this.point2dArray[i];
-				if(!lastExistentPoint.isCoincidentToPoint(point0, errorDist))
+				if (!lastExistentPoint.isCoincidentToPoint(point0, errorDist))
 				{
 					point = new Point2D();
 					point.copyFrom(this.point2dArray[i]); 

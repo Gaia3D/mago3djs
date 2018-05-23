@@ -17,8 +17,8 @@ var Rectangle = function()
 
 Rectangle.prototype.setCenterPosition = function(cx, cy)
 {
-	if(this.centerPoint === undefined)
-		this.centerPoint = new Point2D();
+	if (this.centerPoint === undefined)
+	{ this.centerPoint = new Point2D(); }
 	
 	this.centerPoint.set(cx, cy);
 };
@@ -35,11 +35,11 @@ Rectangle.prototype.setDimensions = function(width, height)
  */
 Rectangle.prototype.getPoints = function(resultPointsArray)
 {
-	if(this.centerPoint === undefined || this.width === undefined || this.height === undefined)
-		return resultPointsArray;
+	if (this.centerPoint === undefined || this.width === undefined || this.height === undefined)
+	{ return resultPointsArray; }
 	
-	if(resultPointsArray === undefined)
-		resultPointsArray = [];
+	if (resultPointsArray === undefined)
+	{ resultPointsArray = []; }
 	
 	var point;
 	var halfWidth = this.width / 2;
@@ -47,15 +47,19 @@ Rectangle.prototype.getPoints = function(resultPointsArray)
 	
 	// starting in left-down corner, go in CCW.***
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y - halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y - halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y + halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y + halfHeight);
+	point.pointType = 1; // mark as "important point".***
 	resultPointsArray.push(point);
 	
 	return resultPointsArray;

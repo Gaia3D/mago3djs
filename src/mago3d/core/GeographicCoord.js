@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  * @class GeographicCoord
  */
-var GeographicCoord = function() 
+var GeographicCoord = function(lon, lat, alt) 
 {
 	if (!(this instanceof GeographicCoord)) 
 	{
@@ -14,6 +14,15 @@ var GeographicCoord = function()
 	this.longitude;
 	this.latitude;
 	this.altitude;
+	
+	if (lon !== undefined)
+	{ this.longitude = lon; }
+	
+	if (lat !== undefined)
+	{ this.latitude = lat; }
+	
+	if (alt !== undefined)
+	{ this.altitude = alt; }
 };
 
 /**
@@ -54,3 +63,70 @@ GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude)
 	this.latitude = latitude;
 	this.altitude = altitude;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resultGeographicCoord) 
+{
+	var midLat = ( geographicCoordA.latitude + geographicCoordB.latitude) / 2.0;
+	var midLon = ( geographicCoordA.longitude + geographicCoordB.longitude) / 2.0;
+	var midAlt = ( geographicCoordA.altitude + geographicCoordB.altitude) / 2.0;
+	
+	if (resultGeographicCoord === undefined)
+	{ resultGeographicCoord = new GeographicCoord(midLon, midLat, midAlt); }
+	else 
+	{
+		resultGeographicCoord.setLonLatAlt(midLon, midLat, midAlt);
+	}
+	
+	return resultGeographicCoord;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

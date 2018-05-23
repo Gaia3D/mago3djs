@@ -478,18 +478,18 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 		if (neoBuilding.isHighLighted)
 		{
 			gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-			gl.uniform4fv(standardShader.color4Aux_loc, magoManager.highLightColor4);
+			gl.uniform4fv(standardShader.oneColor4_loc, magoManager.highLightColor4);
 		}
 		else if (neoBuilding.isColorChanged)
 		{
 			gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 			if (magoManager.objectSelected === neoReference) 
 			{
-				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+				gl.uniform4fv(standardShader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			}
 			else
 			{
-				gl.uniform4fv(standardShader.color4Aux_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a] );
+				gl.uniform4fv(standardShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a] );
 			}
 		}
 		else if (neoReference.aditionalColor)
@@ -497,11 +497,11 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			gl.uniform1i(standardShader.hasTexture_loc, false); //.***
 			if (magoManager.objectSelected === neoReference) 
 			{
-				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+				gl.uniform4fv(standardShader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			}
 			else
 			{
-				gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.aditionalColor.r, neoReference.aditionalColor.g, neoReference.aditionalColor.b, neoReference.aditionalColor.a] );
+				gl.uniform4fv(standardShader.oneColor4_loc, [neoReference.aditionalColor.r, neoReference.aditionalColor.g, neoReference.aditionalColor.b, neoReference.aditionalColor.a] );
 			}
 		}
 		else
@@ -510,7 +510,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === neoReference) 
 			{
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-				gl.uniform4fv(standardShader.color4Aux_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+				gl.uniform4fv(standardShader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 				
 				// Active stencil if the object is selected.
 				this.enableStencilBuffer(gl);
@@ -518,7 +518,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			else if (magoManager.magoPolicy.colorChangedObjectId === neoReference.objectId)
 			{
 				gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-				gl.uniform4fv(standardShader.color4Aux_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
+				gl.uniform4fv(standardShader.oneColor4_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
 			}
 			else
 			{
@@ -538,7 +538,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					else 
 					{
 						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-						gl.uniform4fv(standardShader.color4Aux_loc, [0.8, 0.8, 0.8, 1.0]);
+						gl.uniform4fv(standardShader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 					}
 				}
 				else 
@@ -547,12 +547,12 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if (neoReference.color4) 
 					{
 						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-						gl.uniform4fv(standardShader.color4Aux_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
+						gl.uniform4fv(standardShader.oneColor4_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
 					}
 					else
 					{
 						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
-						gl.uniform4fv(standardShader.color4Aux_loc, [0.8, 0.8, 0.8, 1.0]);
+						gl.uniform4fv(standardShader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 					}
 				}
 			}
@@ -571,14 +571,14 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			if (neoReference.refMatrixType === 1)
 			{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 			else if (neoReference.refMatrixType === 2)
-			{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
+			{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference._matrix4._floatArrays); } 
 		}
 		else 
 		{
 			if (neoReference.refMatrixType === 1)
 			{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 			else if (neoReference.refMatrixType === 2)
-			{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
+			{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 		}
 
 		if (neoReference.moveVector !== undefined) 
@@ -763,14 +763,14 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 				if (neoReference.refMatrixType === 1)
 				{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 				else if (neoReference.refMatrixType === 2)
-				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
+				{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference._matrix4._floatArrays); } 
 			}
 			else 
 			{
 				if (neoReference.refMatrixType === 1)
 				{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 				else if (neoReference.refMatrixType === 2)
-				{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
+				{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 			}
 
 			if (neoReference.moveVector !== undefined) 
@@ -947,7 +947,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		if (neoReference.refMatrixType === 1)
 		{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 		else if (neoReference.refMatrixType === 2)
-		{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference._matrix4._floatArrays); } 
+		{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference._matrix4._floatArrays); } 
 	}
 	else 
 	{
@@ -961,7 +961,7 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 		if (neoReference.refMatrixType === 1)
 		{ gl.uniform3fv(standardShader.refTranslationVec_loc, neoReference.refTranslationVec); }
 		else if (neoReference.refMatrixType === 2)
-		{ gl.uniformMatrix4fv(standardShader.RefTransfMatrix, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
+		{ gl.uniformMatrix4fv(standardShader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
 
 	}
 
@@ -1084,7 +1084,14 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		//gl.drawArrays(gl.LINES, 0, vertices_count);
+		/*
+		gl.uniform1i(shader.bUse1Color_loc, true);
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]); //.***
+		gl.disableVertexAttribArray(shader.texCoord2_loc);
+		gl.uniform1i(shader.hasTexture_loc, false);
+		gl.drawArrays(gl.LINES, 0, vertices_count);
+		gl.enableVertexAttribArray(shader.texCoord2_loc);
+		*/
 	}
 };
 
@@ -1132,73 +1139,82 @@ Renderer.prototype.renderLodBuildingColorSelection = function(gl, lodBuilding, m
  * @param renderTexture 변수
  * @param ssao_idx 변수
  */
-Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx, bRenderLines)
+Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, ssao_idx, bRenderLines, primitiveType)
 {
 	var vbo_vicks_container = renderable.getVboKeysContainer();
 	
-	if(vbo_vicks_container === undefined)
-		return;
+	if (vbo_vicks_container === undefined)
+	{ return; }
 	
 	if (vbo_vicks_container.vboCacheKeysArray.length === 0) 
-		return;
+	{ return; }
 	
 	// ssao_idx = -1 -> pickingMode.***
 	// ssao_idx = 0 -> depth.***
 	// ssao_idx = 1 -> ssao.***
-
-	// 1) Position.*********************************************
-	var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-	if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-	{ return; }
-
-	var vertices_count = vbo_vicky.vertexCount;
-	if (vertices_count === 0) 
-		return;
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-	gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+	if (bRenderLines === undefined)
+	{ bRenderLines = false; }
 	
-	if (ssao_idx === 1) // ssao.***
+	var vbosCount = vbo_vicks_container.getVbosCount();
+	for (var i=0; i<vbosCount; i++)
 	{
-		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-		{ 
-			return;
-		}
-		
-		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-		{ 
-			gl.disableVertexAttribArray(shader.color4_loc);
-		}
-		else{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			gl.vertexAttribPointer(shader.color4_loc, 4, gl.BYTE, true, 0, 0);
-		}
+		// 1) Position.*********************************************
+		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.***
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
+		{ return; }
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+		var vertices_count = vbo_vicky.vertexCount;
+		if (vertices_count === 0) 
+		{ return; }
 
-		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-		
-		
-	}
-	
-	if(bRenderLines === undefined || bRenderLines === false)
-	{
-		if(vbo_vicky.indicesCount > 0)
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+
+		if (ssao_idx === 1) // ssao.***
 		{
-			if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
-			{ return; }
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
-			gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
+			{ 
+				//return;
+				gl.disableVertexAttribArray(shader.normal3_loc);
+				gl.uniform1i(shader.bUseNormal_loc, false);
+			}
+			else 
+			{
+				gl.enableVertexAttribArray(shader.normal3_loc);
+				gl.uniform1i(shader.bUseNormal_loc, true);
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+				gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+			}
+			
+			if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
+			{ 
+				gl.disableVertexAttribArray(shader.color4_loc);
+			}
+			else 
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+				gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+			}
 		}
-		else{
-			gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-			//gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+		
+		if (bRenderLines === false)
+		{
+			if (vbo_vicky.indicesCount > 0)
+			{
+				if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
+				{ return; }
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			}
+			else 
+			{
+				gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+			}
 		}
-	}
-	else{
-		gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+		else 
+		{
+			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+		}
 	}
 };
 

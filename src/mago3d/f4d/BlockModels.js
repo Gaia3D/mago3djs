@@ -189,7 +189,8 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var verticesFloatValuesCount = vertexCount * 3;
 		// now padding the array to adjust to standard memory size of pool.
-		posByteSize = 4 * verticesFloatValuesCount;
+		//posByteSize = 4 * verticesFloatValuesCount;
+		posByteSize = verticesFloatValuesCount;
 		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
 		
 		block.vertexCount = vertexCount;
@@ -218,7 +219,8 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		// 3) Indices.
 		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		// now padding the array to adjust to standard memory size of pool.
-		idxByteSize = 2 * shortIndicesValuesCount;
+		//idxByteSize = 2 * shortIndicesValuesCount;
+		idxByteSize = shortIndicesValuesCount;
 		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
 
 		var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded +=1;

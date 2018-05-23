@@ -14,11 +14,11 @@ var VtxSegment = function(startVertex, endVertex)
 	this.startVertex;
 	this.endVertex;
 	
-	if(startVertex)
-		this.startVertex = startVertex;
+	if (startVertex)
+	{ this.startVertex = startVertex; }
 	
-	if(endVertex)
-		this.endVertex = endVertex;
+	if (endVertex)
+	{ this.endVertex = endVertex; }
 };
 
 VtxSegment.prototype.setVertices = function(startVertex, endVertex)
@@ -32,8 +32,8 @@ VtxSegment.prototype.getDirection = function(resultDirection)
 	// the direction is an unitary vector.***
 	var resultDirection = this.getVector();
 	
-	if(resultDirection === undefined)
-		return undefined;
+	if (resultDirection === undefined)
+	{ return undefined; }
 	
 	resultDirection.unitary();
 	return resultDirection;
@@ -41,14 +41,14 @@ VtxSegment.prototype.getDirection = function(resultDirection)
 
 VtxSegment.prototype.getVector = function(resultVector)
 {
-	if(this.startVertex === undefined || this.endVertex === undefined)
-		return undefined;
+	if (this.startVertex === undefined || this.endVertex === undefined)
+	{ return undefined; }
 	
 	var startPoint = this.startVertex.point3d;
 	var endPoint = this.endVertex.point3d;
 	
-	if(startPoint === undefined || endPoint === undefined)
-		return undefined;
+	if (startPoint === undefined || endPoint === undefined)
+	{ return undefined; }
 	
 	resultVector = startPoint.getVectorToPoint(endPoint, resultVector);
 	return resultVector;
@@ -56,8 +56,8 @@ VtxSegment.prototype.getVector = function(resultVector)
 
 VtxSegment.prototype.getLine = function(resultLine)
 {
-	if(resultLine === undefined)
-		resultLine = new Line();
+	if (resultLine === undefined)
+	{ resultLine = new Line(); }
 	
 	var dir = this.getDirection(); // unitary direction.***
 	var strPoint = this.startVertex.point3d;
@@ -80,11 +80,11 @@ VtxSegment.prototype.intersectionWithPoint = function(point, error)
 	// check if the point intersects the vtxSegment's line.***
 	var line = this.getLine();
 	
-	if(error === undefined)
-		error = 10E-8;
+	if (error === undefined)
+	{ error = 10E-8; }
 	
-	if(!line.isCoincidentPoint(point, error))
-		return Constant.INTERSECTION_OUTSIDE; // no intersection.***
+	if (!line.isCoincidentPoint(point, error))
+	{ return Constant.INTERSECTION_OUTSIDE; } // no intersection.***
 	
 	//Constant.INTERSECTION_OUTSIDE = 0;
 	//Constant.INTERSECTION_INTERSECT= 1;
@@ -97,19 +97,19 @@ VtxSegment.prototype.intersectionWithPoint = function(point, error)
 	var distB = this.endVertex.point3d.distToPoint(point);
 	var distTotal = this.getLength();
 	
-	if(distA < error)
-		return Constant.INTERSECTION_POINT_A;
+	if (distA < error)
+	{ return Constant.INTERSECTION_POINT_A; }
 	
-	if(distB < error)
-		return Constant.INTERSECTION_POINT_B;
+	if (distB < error)
+	{ return Constant.INTERSECTION_POINT_B; }
 	
-	if(distA> distTotal || distB> distTotal)
+	if (distA> distTotal || distB> distTotal)
 	{
 		return Constant.INTERSECTION_OUTSIDE;
 	}
 	
-	if(Math.abs(distA + distB - distTotal) < error)
-		return Constant.INTERSECTION_INSIDE;
+	if (Math.abs(distA + distB - distTotal) < error)
+	{ return Constant.INTERSECTION_INSIDE; }
 	
 };
 

@@ -11,11 +11,16 @@ var TriSurface = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.trianglesArray = [];
+	this.vertexList;
+	this.trianglesArray;
+	this.trianglesList;
 };
 
 TriSurface.prototype.newTriangle = function() 
 {
+	if (this.trianglesArray === undefined)
+	{ this.trianglesArray = []; }
+	
 	var triangle = new Triangle();
 	this.trianglesArray.push(triangle);
 	return triangle;
@@ -29,3 +34,5 @@ TriSurface.prototype.invertTrianglesSenses = function()
 		this.trianglesArray[i].invertSense();
 	}
 };
+
+

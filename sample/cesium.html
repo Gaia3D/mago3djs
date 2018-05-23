@@ -698,6 +698,13 @@
 			<input type="radio" id="hideObjectInfo" name="objectInfo" value="false" onclick="changeObjectInfoViewMode(false);"/>
 			<label for="hideObjectInfo"> Hide </label>
 		</div>
+        <div>
+            <h3>Origin</h3>
+            <input type="radio" id="showOrigin" name="origin" value="true" onclick="changeOrigin(true);" />
+            <label for="showOrigin"> Show </label>
+            <input type="radio" id="hideOrigin" name="origin" value="false" onclick="changeOrigin(false);"/>
+            <label for="hideOrigin"> Hide </label>
+        </div>
 		<div>
 			<h3>Bounding Box</h3>
 			<input type="radio" id="showBoundingBox" name="boundingBox" value="true" onclick="changeBoundingBox(true);" />
@@ -958,6 +965,7 @@
 <script type="text/javascript" src="../src/mago3d/core/GeographicExtent.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeoLocationData.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeometryModifier.js"></script>
+<script type="text/javascript" src="../src/mago3d/core/Globe.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GlobeTile.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/MagoManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/ManagerFactory.js"></script>
@@ -973,13 +981,9 @@
 <script type="text/javascript" src="../src/mago3d/core/SplitValue.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/TerranTile.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Texture.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/Triangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/TriPolyhedron.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/TriSurface.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/VBOManager.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/Vertex.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/VertexList.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/VertexMatrix.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/VisibleObjectsController.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/VBOMemoryManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/domain/API.js"></script>
@@ -1009,10 +1013,18 @@
 <script type="text/javascript" src="../src/mago3d/f4d/ProcessQueue.js"></script>
 <script type="text/javascript" src="../src/mago3d/f4d/ProjectTree.js"></script>
 <script type="text/javascript" src="../src/mago3d/f4d/ReaderWriter.js"></script>
+<script type="text/javascript" src="../src/mago3d/f4d/TinTerrain.js"></script>
+<script type="text/javascript" src="../src/mago3d/f4d/TinTerrainManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Arc.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/AxisXYZ.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/BoxAux.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/BoundingRectangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Circle.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Ellipsoid.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/HalfEdge.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/HalfEdgesList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/IndexData.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/IndexRange.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Line.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Line2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/MagoNativeProject.js"></script>
@@ -1024,18 +1036,26 @@
 <script type="text/javascript" src="../src/mago3d/geometry/PolyLine.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Profile.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/ProfilesList.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/HalfEdge.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Face.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Mesh.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Rectangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Ring.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/RingsList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Segment2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Star.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Surface.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Tessellator.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Triangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/TrianglesList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/TrianglesMatrix.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Vertex.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VertexList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VertexMatrix.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxRing.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxRingsList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VtxSegment.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxProfile.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/VtxProfilesList.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/Renderer.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/SceneState.js"></script>
 <script type="text/javascript" src="../src/mago3d/renderer/Selection.js"></script>
@@ -1075,6 +1095,8 @@
 			changeLabel(false);
 			// object 정보 표시
 			changeObjectInfoViewMode(true);
+            // Origin 표시
+            changeOrigin(false);
 			// BoundingBox
 			changeBoundingBox(false);
 			// Selecting And Moving
@@ -1502,7 +1524,7 @@
 			    heading: 'Click Object Info',
 			    text: [
 					'ProjectId : ' + projectId,
-			        'dataKey : ' + dataKey, 
+			        'dataKey : ' + dataKey,
 			        'objectId : ' + objectId,
 			        'latitude : ' + latitude,
 			        'longitude : ' + longitude,
@@ -1923,7 +1945,7 @@
             }
         });
     }
-	
+
 	// 설정 메뉴 시작
 	// Label 표시
 	function changeLabel(isShow) {
@@ -1935,6 +1957,12 @@
 		$("input:radio[name='objectInfo']:radio[value='" + isShow + "']").prop("checked", true);
 		changeObjectInfoViewModeAPI(managerFactory, isShow);
 	}
+    // Origin 표시/비표시
+    function changeOrigin(isShow) {
+        $("input:radio[name='origin']:radio[value='" + isShow + "']").prop("checked", true);
+        // TODO Selecting AND Moving API와 연동
+        changeOriginAPI(managerFactory, isShow);
+    }
 	// boundingBox 표시/비표시
 	function changeBoundingBox(isShow) {
 		$("input:radio[name='boundingBox']:radio[value='" + isShow + "']").prop("checked", true);
@@ -1944,6 +1972,19 @@
 	function changeObjectMove(objectMoveMode) {
 		$("input:radio[name='objectMoveMode']:radio[value='" + objectMoveMode + "']").prop("checked", true);
 		changeObjectMoveAPI(managerFactory, objectMoveMode);
+		// ALL 인 경우 Origin도 같이 표시
+        var originValue = $(':radio[name="origin"]:checked').val();
+        if(objectMoveMode === "0") {
+		    if(originValue === "true") {
+            } else {
+            }
+            changeOriginAPI(managerFactory, true);
+        } else {
+            if(originValue === "true") {
+            } else {
+                changeOriginAPI(managerFactory, false);
+            }
+        }
 	}
 	// 마우스 클릭 객체 이동 모드 변경 저장
 	$("#saveObjectMoveButton").click(function () {

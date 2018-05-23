@@ -10,10 +10,13 @@ var Point2D = function(x, y)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	if(x)this.x = x;
-	else this.x = 0.0;
-	if(y)this.y = y;
-	else this.y = 0.0;
+	if (x) { this.x = x; }
+	else { this.x = 0.0; }
+	if (y) { this.y = y; }
+	else { this.y = 0.0; }
+	
+	// aux test.***
+	this.associated;
 };
 
 /**
@@ -30,10 +33,40 @@ Point2D.prototype.deleteObjects = function()
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
+Point2D.prototype.setAssociated = function(associated) 
+{
+	// aux test.***
+	this.associated = associated;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Point2D.prototype.getAssociated = function() 
+{
+	// aux test.***
+	return this.associated;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
 Point2D.prototype.copyFrom = function(point2d) 
 {
 	this.x = point2d.x;
 	this.y = point2d.y;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Point2D.prototype.inverse = function() 
+{
+	this.x = -this.x;
+	this.y = -this.y;
 };
 
 /**
@@ -111,7 +144,7 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
 {
 	var squareDist = this.distToPoint(point);
 	var coincident = false;
-	if(squareDist < errorDist*errorDist)
+	if (squareDist < errorDist*errorDist)
 	{
 		coincident = true;
 	}
@@ -128,11 +161,11 @@ Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector)
 {
 	// this returns a vector that points to "targetPoint" from "this".***
 	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.***
-	if(targetPoint === undefined)
-		return undefined;
+	if (targetPoint === undefined)
+	{ return undefined; }
 	
-	if(resultVector === undefined)
-		resultVector = new Point2D();
+	if (resultVector === undefined)
+	{ resultVector = new Point2D(); }
 	
 	resultVector.set(targetPoint.x - this.x, targetPoint.y - this.y);
 	
@@ -168,8 +201,8 @@ Point2D.prototype.scalarProduct = function(point)
  */
 Point2D.prototype.angleRadToVector = function(vector) 
 {
-	if(vector === undefined)
-		return undefined;
+	if (vector === undefined)
+	{ return undefined; }
 	
 	//******************************************************
 	//var scalarProd = this.scalarProduct(vector);
@@ -182,8 +215,8 @@ Point2D.prototype.angleRadToVector = function(vector)
 	//var angDeg = alfa * 180.0/Math.PI;
 	//------------------------------------------------------
 	var error = 10E-10;
-	if(myModul < error || vecModul < error)
-		return undefined;
+	if (myModul < error || vecModul < error)
+	{ return undefined; }
 	
 	return Math.acos(this.scalarProduct(vector) / (myModul * vecModul));
 };
@@ -196,13 +229,13 @@ Point2D.prototype.angleRadToVector = function(vector)
  */
 Point2D.prototype.angleDegToVector = function(vector) 
 {
-	if(vector === undefined)
-		return undefined;
+	if (vector === undefined)
+	{ return undefined; }
 	
 	var angRad = this.angleRadToVector(vector);
 	
-	if(angRad === undefined)
-		return undefined;
+	if (angRad === undefined)
+	{ return undefined; }
 		
 	return angRad * 180.0/Math.PI;
 };

@@ -13,11 +13,10 @@ var ParametricMesh = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.profilesList; // class: ProfilesList
-	this.trianglesMatrix;
-	this.profile;
-	this.vboKeyContainer;//VBOVertexIdxCacheKey
-	this.bbox;
+	this.vtxProfilesList; // class: VtxProfilesList.***
+	this.profile; // class: Profile. is a 2d object.***
+	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.***
+	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.***
 };
 
 /**
@@ -25,18 +24,8 @@ var ParametricMesh = function()
  */
 ParametricMesh.prototype.deleteObjects = function() 
 {
-	if(this.profilesList)
-		this.profilesList.deleteObjects();
-	
-	this.profilesList = undefined;
-	
-	if(this.trianglesMatrix)
-		this.trianglesMatrix.deleteObjects();
-	
-	this.trianglesMatrix = undefined;
-	
-	if(this.profile)
-		this.profile.deleteObjects();
+	if (this.profile)
+	{ this.profile.deleteObjects(); }
 	
 	this.profile = undefined;
 };
@@ -46,17 +35,110 @@ ParametricMesh.prototype.getVboKeysContainer = function()
 	return this.vboKeyContainer;
 };
 
+ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
+{
+	if (resultMesh === undefined)
+	{ resultMesh = new Mesh(); }
+
+	// must separate vbo groups by surfaces.***
+	resultMesh = this.vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
+ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
+{
+	if (resultMesh === undefined)
+	{ resultMesh = new Mesh(); }
+
+	// must separate vbo groups by surfaces.***
+	this.mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh = this.mesh.getCopySurfaceIndependentMesh(resultMesh);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
-ParametricMesh.prototype.extrude = function(profile, extrusionVector, extrusionDist, extrudeSegmentsCount) 
+ParametricMesh.prototype.revolve = function(profile, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
+	if (profile === undefined)
+	{ return undefined; }
 	
+	if (this.vtxProfilesList === undefined)
+	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
-	// now, make the bottomCap, topCap, and lateral triangles.
-	this.trianglesMatrix = new TrianglesMatrix();
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
 	
+	// create vtxProfiles.***
+	// make the base-vtxProfile.***
+	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile(profile);
 	
+	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
+	
+	// calculate the translation.***
+	var line2d = revolveSegment2d.getLine();
+	var origin2d = new Point2D(0, 0);
+	var translationVector = line2d.getProjectedPoint(origin2d);
+	translationVector.inverse();
+	
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	var rotAxis2d = revolveSegment2d.getDirection();
+	var rotAxis = new Point3D(rotAxis2d.x, rotAxis2d.y, 0);
+	rotAxis.unitary();
+	
+	for (var i=0; i<revolveSegmentsCount; i++)
+	{
+		// calculate rotation.***
+		quaternion.rotationAngDeg(increAngDeg*(i+1), rotAxis.x, rotAxis.y, rotAxis.z);
+		rotMat.rotationByQuaternion(quaternion);
+		
+		// test top profile.***
+		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(translationVector.x, translationVector.y, 0);
+		nextVtxProfile.transformPointsByMatrix4(rotMat);
+		nextVtxProfile.translate(-translationVector.x, -translationVector.y, 0);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ParametricMesh.prototype.extrude = function(profile, extrusionDist, extrudeSegmentsCount, extrusionVector) 
+{
+	if (profile === undefined || extrusionDist === undefined)
+	{ return undefined; }
+	
+	if (this.vtxProfilesList === undefined)
+	{ this.vtxProfilesList = new VtxProfilesList(); }
+	
+
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.***
+	// make the base-vtxProfile.***
+	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile(profile);
+	
+	if (extrusionVector === undefined)
+	{ extrusionVector = new Point3D(0, 0, 1); }
+	
+	var increDist = extrusionDist/extrudeSegmentsCount;
+	for (var i=0; i<extrudeSegmentsCount; i++)
+	{
+		// test with a 1 segment extrusion.***
+		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(0, 0, increDist*(i+1));
+	}
 };
 
 

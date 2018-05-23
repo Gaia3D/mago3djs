@@ -38,8 +38,8 @@ Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz)
  */
 Line.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
-	if(projectedPoint === undefined)
-		projectedPoint = new Point3D();
+	if (projectedPoint === undefined)
+	{ projectedPoint = new Point3D(); }
 	
 	var plane = new Plane();
 	plane.setPointAndNormal(point.x, point.y, point.z, this.direction.x, this.direction.y, this.direction.z);
@@ -54,21 +54,21 @@ Line.prototype.getProjectedPoint = function(point, projectedPoint)
  */
 Line.prototype.isCoincidentPoint = function(point, error) 
 {
-	if(point === undefined)
-		return false;
+	if (point === undefined)
+	{ return false; }
 	
 	var projectedPoint = this.getProjectedPoint(point);
 	
-	if(projectedPoint === undefined)
-		return false;
+	if (projectedPoint === undefined)
+	{ return false; }
 	
-	if(error === undefined)
-		error = 10E-8;
+	if (error === undefined)
+	{ error = 10E-8; }
 	
 	var squaredDist = projectedPoint.squareDistToPoint(point);
 	
-	if(squaredDist < error*error)
-		return true;
+	if (squaredDist < error*error)
+	{ return true; }
 	
 	return false;
 };
