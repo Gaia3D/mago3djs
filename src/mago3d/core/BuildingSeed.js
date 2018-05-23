@@ -122,7 +122,9 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 
 		buildingNameLength = new Int32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0];
 		bytesReaded += 4;
-		var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
+		var decoder = new TextDecoder('utf-8');
+		var buildingName = decoder.decode(new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
+		//var buildingName = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ buildingNameLength)));
 		bytesReaded += buildingNameLength;
 
 		// now the geographic coords, but this is provisional coords.
