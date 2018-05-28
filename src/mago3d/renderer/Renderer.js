@@ -229,11 +229,10 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				}
 				else 
 				{
-					//gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1.texId);
-					continue;
-					//gl.uniform1i(standardShader.hasTexture_loc, false);
-					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
-					//renderTexture = false;
+					//continue;
+					gl.uniform1i(standardShader.hasTexture_loc, false);
+					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					renderTexture = false;
 				}
 			}
 
@@ -1061,8 +1060,12 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ return; }
 		}
+		else{
+			gl.uniform1i(shader.bUse1Color_loc, false);
+			gl.disableVertexAttribArray(shader.texCoord2_loc);
+		}
 
-		gl.disableVertexAttribArray(shader.color4_loc);
+		
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
@@ -1079,6 +1082,7 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		
 		if (renderTexture && vbo_vicky.meshTexcoordsCacheKey)
 		{
+			gl.disableVertexAttribArray(shader.color4_loc);
 			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
 			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
 		}
@@ -1092,6 +1096,8 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 		gl.drawArrays(gl.LINES, 0, vertices_count);
 		gl.enableVertexAttribArray(shader.texCoord2_loc);
 		*/
+		
+		gl.disableVertexAttribArray(shader.color4_loc);
 	}
 };
 

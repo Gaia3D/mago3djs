@@ -124,7 +124,7 @@ void main()
         }
     }
     else{
-        textureColor = vColor4Aux;
+        textureColor = vcolor4;
     }
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);

@@ -949,7 +949,7 @@ void main()\n\
         }\n\
     }\n\
     else{\n\
-        textureColor = vColor4Aux;\n\
+        textureColor = vcolor4;\n\
     }\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\

@@ -1233,8 +1233,11 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		// lod3, lod4, lod5.***
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
 		
-		if (this.isLastFrustum)
-		{ this.manageQueue(); }
+		// TinTerrain.***
+		// TinTerrain.*******************************************************************************************************************************
+		this.prepareVisibleTinTerrains(this.tinTerrainManager);
+		
+		this.manageQueue();
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -1294,8 +1297,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 	}
 	
-	// lightDepthRender.***
-	
+	// lightDepthRender: TODO.***
 	
 			
 	// 1) The depth render.**********************************************************************************************************************
@@ -1347,7 +1349,82 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 };
 
 /**
- * Draw building names on scene.
+ * Prepare tinTerrains.***
+ */
+MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager) 
+{
+	var maxIterations = 10;
+	var currIteration = 0;
+	
+	var terrName_geoCoords_map = tinTerrainManager.currentVisibles_terrName_geoCoords_map;
+	var terrName_tinTerrain_map = tinTerrainManager.currentTerrainsMap;
+	var tinTerrain;
+	var tinTerrainToDelete;
+	var gl = this.sceneState.gl;
+	
+	// 1) 1rst, for all current visibles terrNames, make tinTerrain if no exist.***
+	var stringAux = "11\\3491\\597";
+	for(var key in terrName_geoCoords_map)
+	{
+		if(key == "12\\6983\\1194")
+					var hola = 0;
+		tinTerrain = terrName_tinTerrain_map[key];
+		if(tinTerrain === undefined)
+		{
+			tinTerrain = new TinTerrain();
+			tinTerrain.pathName = key;
+			terrName_tinTerrain_map[key] = tinTerrain;
+			currIteration++;
+			
+			// provisionally put the "level" inside of terrain.***
+			var splittedString = key.split('\\');
+			tinTerrain.depth = splittedString[0];
+			var hola = 0;
+		}
+		else{
+			// try to erase from procesQueue_deleting if exist.***
+			this.processQueue.eraseTinTerrainToDelete(tinTerrain);
+			
+			if (tinTerrain.fileLoadState === CODE.fileLoadState.READY)
+			{
+				var fileName = "CesiumTerrain/" + tinTerrain.pathName + ".terrain";
+				this.readerWriter.loadTINTerrain(gl, fileName, tinTerrain, this);
+			}
+			else if(tinTerrain.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			{
+				// put the terrain into parseQueue.***
+				this.parseQueue.putTinTerrainToParse(tinTerrain, 0);
+			}
+			else if(tinTerrain.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && tinTerrain.vboKeyContainer === undefined)
+			{
+				var geographicExtent = tinTerrainManager.currentVisibles_terrName_geoCoords_map[tinTerrain.pathName];
+				if (geographicExtent !== undefined)
+				{
+					tinTerrain.geographicExtent = geographicExtent;
+					tinTerrain.decodeData();
+					tinTerrain.makeVbo();
+				}
+			}
+		}
+		
+		//if(currIteration > maxIterations)
+		//	break;
+	}
+	
+	// 2) 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.***
+	for(var key in terrName_tinTerrain_map)
+	{
+		tinTerrain = terrName_geoCoords_map[key];
+		if(tinTerrain === undefined)
+		{
+			tinTerrainToDelete = terrName_tinTerrain_map[key];
+			this.processQueue.putTinTerrainToDelete(tinTerrainToDelete, 0);
+		}
+	}
+}
+
+/**
+ * Prepare current visibles low LOD nodes.***
  */
 MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray) 
 {
@@ -1690,6 +1767,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	ctx.lineWidth = 4;
 	ctx.font = "20px Arial";
 	ctx.textAlign = 'center';
+	//ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.save();
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -1737,6 +1815,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			//neoBuilding = node.data.neoBuilding;
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
 			screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+			//screenCoord.x += 250;
+			//screenCoord.y += 150;
 			
 			if (screenCoord.x >= 0 && screenCoord.y >= 0)
 			{
@@ -3476,6 +3556,24 @@ MagoManager.prototype.manageQueue = function()
 			}
 		}
 	}
+	
+	// TinTerrain.***********************************************************************************************
+	// TinTerrain.***********************************************************************************************
+	var tinTerrain;
+	var terrName_geoCoords_map = this.tinTerrainManager.currentVisibles_terrName_geoCoords_map;
+	for(var key in terrName_geoCoords_map)// for all current visible tinTerrains:
+	{
+		if(key === "12\\6983\\1194")
+					var hola = 0;
+		tinTerrain = this.tinTerrainManager.currentTerrainsMap[key]; // check if exist the tinTerrain.***
+		if(tinTerrain !== undefined)
+		{
+			if(this.parseQueue.eraseTinTerrainToParse(tinTerrain)) // check if is inside of the que to parse.***
+			{
+				tinTerrain.parseData(tinTerrain.dataArrayBuffer);
+			}
+		}
+	}
 };
 
 /**
@@ -4516,8 +4614,13 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		
 		// Test TinTerrain.**************************************************************************
 		// Test TinTerrain.**************************************************************************
-		if (this.testTinTerrain !== undefined && this.testTinTerrain.vboKeyContainer !== undefined)
+		//this.tinTerrainManager
+		/*
+		if (this.tinTerrainManager !== undefined)
 		{
+			if(this.isCameraMoving)
+				var hola = 0;
+			
 			currentShader = this.postFxShadersManager.getShader("tinTerrain");
 			shaderProgram = currentShader.program;
 		
@@ -4536,25 +4639,68 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.uniform1i(currentShader.hasTexture_loc, true); //.***
 			gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 			
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.testTinTerrain.terrainPositionHIGH);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.testTinTerrain.terrainPositionLOW);
-			
-			//this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx); // lod 0.***
-			var vboKey = this.testTinTerrain.vboKeyContainer.vboCacheKeysArray[0];
-			if (vboKey.isReadyPositions(gl, this.vboMemoryManager) && vboKey.isReadyTexCoords(gl, this.vboMemoryManager) && vboKey.isReadyFaces(gl, this.vboMemoryManager))
-			{ 
-				// Positions.***
-				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
-				gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+			var renderWireframe = false;
+			var tinTerrain;
+			var currentTerrainsMap = this.tinTerrainManager.currentTerrainsMap;
+			var currentVisiblesTerrainsMap = this.tinTerrainManager.currentVisibles_terrName_geoCoords_map;
+			for(var key in currentVisiblesTerrainsMap)
+			{
+				//currentVisiblesTerrainsMap
+				tinTerrain = currentTerrainsMap[key];
+				if(tinTerrain === undefined)
+					continue;
 				
-				// TexCoords.***
-				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
-				gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+				if(tinTerrain.vboKeyContainer === undefined || tinTerrain.vboKeyContainer.vboCacheKeysArray.length === 0)
+					continue;
 				
-				var indicesCount = vboKey.indicesCount;
+				if(this.isCameraMoving)
+					var hola = 0;
+				
+				// check the texture of the terrain.***
+				if (tinTerrain.texture === undefined)
+				{
+					tinTerrain.texture = new Texture();
+					var imagesDataPath = "\\images\\ko";
+					var textureFilePath = imagesDataPath +  "\\funny_" + tinTerrain.depth + ".jpg";
+					this.readerWriter.readLegoSimpleBuildingTexture(gl, textureFilePath, tinTerrain.texture, this);
+					continue;
+				}
+				
+				gl.bindTexture(gl.TEXTURE_2D, tinTerrain.texture.texId);
+				
+				gl.uniform3fv(currentShader.buildingPosHIGH_loc, tinTerrain.terrainPositionHIGH);
+				gl.uniform3fv(currentShader.buildingPosLOW_loc, tinTerrain.terrainPositionLOW);
+				
+				//this.renderer.renderNeoBuildingsLOD2AsimetricVersion(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, ssao_idx); // lod 0.***
+				var vboKey = tinTerrain.vboKeyContainer.vboCacheKeysArray[0];
+				if (vboKey.isReadyPositions(gl, this.vboMemoryManager) && vboKey.isReadyTexCoords(gl, this.vboMemoryManager) && vboKey.isReadyFaces(gl, this.vboMemoryManager))
+				{ 
+					// Positions.***
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
+					gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+					
+					// TexCoords.***
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
+					gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+					
+					var indicesCount = vboKey.indicesCount;
 
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
-				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
+					
+					if(renderWireframe)
+					{
+						var trianglesCount = indicesCount;
+						for(var i=0; i<trianglesCount; i++)
+						{
+							gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.***
+						}
+					}
+					else
+					{
+						gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+						//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+					}
+				}
 			}
 			
 			if (currentShader)
@@ -4565,7 +4711,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			}
 		}
-		
+		*/
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5302,46 +5448,12 @@ MagoManager.prototype.doFrustumCullingSmartTiles = function(frustumVolume, camer
 	bDoFrustumCullingToBuildings = true;
 	this.tilesFrustumCullingFinished(this.partiallyIntersectedLowestTilesArray, cameraPosition, frustumVolume, bDoFrustumCullingToBuildings);
 	
-	// Test.***
-	//this.tinTerrainManager;
+	// Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.*** Test.***
 	/*
-	if(this.cesiumTerrainProvider === undefined)
-	{
-		this.cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({ url : Cesium.IonResource.fromAssetId(3956), requestVertexNormals : true });
-	}
 	var maxDepth = 14;
-	var resultFullyIntersectedTilesNamesMap = {};
-	SmartTile.getFrustumIntersectedTilesNames(frustumVolume, maxDepth, cameraPosition, this, resultFullyIntersectedTilesNamesMap);
-	
-	if (this.testTinTerrain === undefined)
-	{ this.testTinTerrain = new TinTerrain(); }
-	
-	if (this.testTinTerrain.fileLoadState === CODE.fileLoadState.READY)
-	{
-		//var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
-		var fileName = "CesiumTerrain/14_27936_11606.terrain";
-		var gl = this.sceneState.gl;
-		this.readerWriter.loadTINTerrain(gl, fileName, this.testTinTerrain, this);
-		
-	}
-	
-	
-	if (this.testTinTerrain.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-	{
-		var geographicExtent = resultFullyIntersectedTilesNamesMap["14\\27936\\11606"];
-		if (geographicExtent !== undefined)
-		{
-			this.testTinTerrain.parseData(this.testTinTerrain.dataArrayBuffer);
-			this.testTinTerrain.geographicExtent = geographicExtent;
-			this.testTinTerrain.decodeData();
-			this.testTinTerrain.makeVbo();
-		}
-		
-		if(this.cesiumTerrainProvider._ready)
-		{
-			//var terrainGeo = this.cesiumTerrainProvider.requestTileGeometry(27936, 11606, 14);
-		}
-	}
+	delete this.tinTerrainManager.currentVisibles_terrName_geoCoords_map; // init map.***
+	this.tinTerrainManager.currentVisibles_terrName_geoCoords_map = {}; // init map.***
+	SmartTile.getFrustumIntersectedTilesNames(frustumVolume, maxDepth, cameraPosition, this, this.tinTerrainManager.currentVisibles_terrName_geoCoords_map);
 	*/
 };
 
