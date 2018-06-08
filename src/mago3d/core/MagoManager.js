@@ -1108,7 +1108,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
-
+	
 	var cameraPosition = this.sceneState.camera.position;
 
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -1421,6 +1421,7 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 			this.processQueue.putTinTerrainToDelete(tinTerrainToDelete, 0);
 		}
 	}
+	
 }
 
 /**
@@ -2977,6 +2978,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
  */
 MagoManager.prototype.manageQueue = function() 
 {
+	
 	// first, delete buildings.
 	var gl = this.sceneState.gl;
 	var maxDeleteNodesCount = 8;
@@ -3563,6 +3565,7 @@ MagoManager.prototype.manageQueue = function()
 			}
 		}
 	}
+	
 };
 
 /**
@@ -4270,8 +4273,11 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		
 			if (this.noiseTexture === undefined) 
 			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-
-			currentShader = this.postFxShadersManager.getShader("modelRefSsaoSimple");
+			
+			if(MagoConfig.getPolicy().geo_light_specular_enable === "true")
+				currentShader = this.postFxShadersManager.getShader("modelRefSsaoSimple");
+			else
+				currentShader = this.postFxShadersManager.getShader("modelRefSsao");
 			shaderProgram = currentShader.program;
 			
 			gl.useProgram(shaderProgram);
@@ -4320,7 +4326,11 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		{
 			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
 
-			currentShader = this.postFxShadersManager.getShader("lodBuildingSsaoSimple");
+			if(MagoConfig.getPolicy().geo_light_specular_enable === "true")
+				currentShader = this.postFxShadersManager.getShader("lodBuildingSsaoSimple");
+			else
+				currentShader = this.postFxShadersManager.getShader("lodBuildingSsao");
+
 			shaderProgram = currentShader.program;
 		
 			gl.useProgram(shaderProgram);
