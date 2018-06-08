@@ -16,6 +16,67 @@ var ProcessQueue = function()
 	this.nodesToDeleteMap = {};
 	this.nodesToDeleteModelReferencesMap = {};
 	this.nodesToDeleteLessThanLod3Map = {};
+	this.nodesToDeleteLodMeshMap = {};
+	this.tinTerrainsToDeleteMap = {};
+};
+
+ProcessQueue.prototype.putNodeToDeleteLodMesh = function(node, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteLodMeshMap[key] = node;
+	
+	//this.nodesToDeleteLodMeshMap.set(node, aValue);
+};
+
+ProcessQueue.prototype.eraseNodeToDeleteLodMesh = function(node)
+{
+	// this erases the node from the "nodesToDeleteLessThanLod3Map".
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteLodMeshMap.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteLodMeshMap[key];
+		return true;
+	}
+	return false;
+	//return this.nodesToDeleteLodMeshMap.delete(node);
+};
+
+ProcessQueue.prototype.putTinTerrainToDelete = function(tinTerrain, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (tinTerrain === undefined)
+	{ return; }
+	
+	var key = tinTerrain.pathName;
+	this.tinTerrainsToDeleteMap[key] = tinTerrain;
+};
+
+ProcessQueue.prototype.eraseTinTerrainToDelete = function(tinTerrain)
+{
+	// this erases the tinTerrain from the "tinTerrainsToDeleteMap".
+	if (tinTerrain === undefined)
+	{ return; }
+	
+	var key = tinTerrain.pathName;
+	if (this.tinTerrainsToDeleteMap.hasOwnProperty(key)) 
+	{
+		delete this.tinTerrainsToDeleteMap[key];
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)

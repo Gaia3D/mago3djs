@@ -19,7 +19,7 @@ uniform float screenWidth;
 uniform float screenHeight;    
 uniform float shininessValue;
 uniform vec3 kernel[16];   
-uniform vec4 vColor4Aux;
+uniform vec4 oneColor4;
 
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
@@ -125,7 +125,7 @@ void main()
         }
     }
     else{
-        textureColor = vColor4Aux;
+        textureColor = oneColor4;
     }
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);

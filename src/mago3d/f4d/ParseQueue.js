@@ -17,6 +17,30 @@ var ParseQueue = function()
 	this.octreesLod0ModelsToParseMap = {};
 	this.octreesLod2LegosToParseMap = {};
 	this.skinLegosToParseMap = {};
+	this.tinTerrainsToParseMap = {};
+};
+
+ParseQueue.prototype.putTinTerrainToParse = function(tinTerrain, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.tinTerrainsToParseMap[tinTerrain.pathName] = tinTerrain;
+};
+
+ParseQueue.prototype.eraseTinTerrainToParse = function(tinTerrain)
+{
+	if (tinTerrain === undefined)
+	{ return; }
+	
+	var key = tinTerrain.pathName;
+	if (this.tinTerrainsToParseMap.hasOwnProperty(key)) 
+	{
+		delete this.tinTerrainsToParseMap[key];
+		return true;
+	}
+	return false;
 };
 
 ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControlerOctrees, magoManager, maxParsesCount)

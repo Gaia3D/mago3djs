@@ -558,7 +558,6 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 	
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
@@ -568,6 +567,9 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	//-----------------------------------------------------------------------------------------------------
 	/*
 	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.***

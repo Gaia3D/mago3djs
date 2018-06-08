@@ -230,6 +230,24 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager)
  * @param texture 변수
  * @returns texId
  */
+NeoBuilding.prototype.deleteLodMesh = function(gl, lod, vboMemoryManager) 
+{
+	if (this.lodMeshesMap !== undefined)
+	{
+		var legoSkin = this.lodMeshesMap[lod];
+		if(legoSkin !== undefined)
+		{
+			legoSkin.deleteObjects(gl, vboMemoryManager);
+			legoSkin = undefined;
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
 NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	if (this.bboxAbsoluteCenterPos === undefined)
@@ -432,6 +450,18 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	
 	//return skinLego;
 	
+		var lodBuildingData = this.getLodBuildingData(this.currentLod);
+		if (lodBuildingData === undefined)
+		{ return; }
+		
+		//textureFileName = lodBuildingData.textureFileName;
+		var lodString = lodBuildingData.geometryFileName;
+		skinLego = this.lodMeshesMap[lodString];
+		
+		if(skinLego !== undefined && skinLego.isReadyToRender())
+			return skinLego;
+		
+	
 	if (this.currentLod === 0)
 	{
 		skinLego = this.lodMeshesMap.lod0;
@@ -540,44 +570,7 @@ NeoBuilding.prototype.getCurrentSkin = function()
 		}
 		
 	}
-	/*
-	if (this.currentLod === 3)
-	{
-		skinLego = this.lodMeshesArray[0];
-		if (skinLego === undefined || !skinLego.isReadyToRender())
-		{
-			skinLego = this.lodMeshesArray[1];
-			if (skinLego === undefined || !skinLego.isReadyToRender())
-			{
-				skinLego = this.lodMeshesArray[2];
-			}
-		}
-	}
-	else if (this.currentLod === 4)
-	{
-		skinLego = this.lodMeshesArray[1];
-		if (skinLego === undefined || !skinLego.isReadyToRender())
-		{
-			skinLego = this.lodMeshesArray[2];
-			if (skinLego === undefined || !skinLego.isReadyToRender())
-			{
-				skinLego = this.lodMeshesArray[0];
-			}
-		}
-	}
-	else if (this.currentLod === 5)
-	{
-		skinLego = this.lodMeshesArray[2];
-		if (skinLego === undefined || !skinLego.isReadyToRender())
-		{
-			skinLego = this.lodMeshesArray[1];
-			if (skinLego === undefined || !skinLego.isReadyToRender())
-			{
-				skinLego = this.lodMeshesArray[0];
-			}
-		}
-	}
-	*/
+
 	return skinLego;
 };
 

@@ -9,13 +9,15 @@ var TinTerrain = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	this.owner; // undefined if depth = 0.***
 	this.geographicExtent;
 	this.fileLoadState = 0;
 	this.dataArrayBuffer;
 	this.vboKeyContainer; // class: VBOVertexIdxCacheKeysContainer.***
 	this.terrainPositionHIGH;
 	this.terrainPositionLOW;
+	this.pathName; // example: "14//4567//516".***
+	this.texture;
 };
 
 TinTerrain.prototype.zigZagDecode = function(value)
@@ -99,7 +101,7 @@ TinTerrain.prototype.decodeData = function()
 	{
 		lonArray[i] = minLon + uValues[i]*lonRangeDivShortMax;
 		latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
-		altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax + 20.0;
+		altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;// + 55.0;
 		
 		// make texcoords.***
 		this.texCoordsArray[i*2] = uValues[i]/shortMax;
