@@ -1366,12 +1366,10 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 	
 	// 1) 1rst, for all current visibles terrNames, make tinTerrain if no exist.***
 	var stringAux = "11\\3491\\597";
-	for (var key in terrName_geoCoords_map)
+	for(var key in terrName_geoCoords_map)
 	{
-		if (key == "12\\6983\\1194")
-		{ var hola = 0; }
 		tinTerrain = terrName_tinTerrain_map[key];
-		if (tinTerrain === undefined)
+		if(tinTerrain === undefined)
 		{
 			tinTerrain = new TinTerrain();
 			tinTerrain.pathName = key;
@@ -1383,8 +1381,7 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 			tinTerrain.depth = splittedString[0];
 			var hola = 0;
 		}
-		else 
-		{
+		else{
 			// try to erase from procesQueue_deleting if exist.***
 			this.processQueue.eraseTinTerrainToDelete(tinTerrain);
 			
@@ -1393,12 +1390,12 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 				var fileName = "CesiumTerrain/" + tinTerrain.pathName + ".terrain";
 				this.readerWriter.loadTINTerrain(gl, fileName, tinTerrain, this);
 			}
-			else if (tinTerrain.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			else if(tinTerrain.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				// put the terrain into parseQueue.***
 				this.parseQueue.putTinTerrainToParse(tinTerrain, 0);
 			}
-			else if (tinTerrain.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && tinTerrain.vboKeyContainer === undefined)
+			else if(tinTerrain.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && tinTerrain.vboKeyContainer === undefined)
 			{
 				var geographicExtent = tinTerrainManager.currentVisibles_terrName_geoCoords_map[tinTerrain.pathName];
 				if (geographicExtent !== undefined)
@@ -1415,16 +1412,16 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 	}
 	
 	// 2) 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.***
-	for (var key in terrName_tinTerrain_map)
+	for(var key in terrName_tinTerrain_map)
 	{
 		tinTerrain = terrName_geoCoords_map[key];
-		if (tinTerrain === undefined)
+		if(tinTerrain === undefined)
 		{
 			tinTerrainToDelete = terrName_tinTerrain_map[key];
 			this.processQueue.putTinTerrainToDelete(tinTerrainToDelete, 0);
 		}
 	}
-};
+}
 
 /**
  * Prepare current visibles low LOD nodes.***
@@ -3555,14 +3552,12 @@ MagoManager.prototype.manageQueue = function()
 	// TinTerrain.***********************************************************************************************
 	var tinTerrain;
 	var terrName_geoCoords_map = this.tinTerrainManager.currentVisibles_terrName_geoCoords_map;
-	for (var key in terrName_geoCoords_map)// for all current visible tinTerrains:
+	for(var key in terrName_geoCoords_map)// for all current visible tinTerrains:
 	{
-		if (key === "12\\6983\\1194")
-		{ var hola = 0; }
 		tinTerrain = this.tinTerrainManager.currentTerrainsMap[key]; // check if exist the tinTerrain.***
-		if (tinTerrain !== undefined)
+		if(tinTerrain !== undefined)
 		{
-			if (this.parseQueue.eraseTinTerrainToParse(tinTerrain)) // check if is inside of the que to parse.***
+			if(this.parseQueue.eraseTinTerrainToParse(tinTerrain)) // check if is inside of the que to parse.***
 			{
 				tinTerrain.parseData(tinTerrain.dataArrayBuffer);
 			}

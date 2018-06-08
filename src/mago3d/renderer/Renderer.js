@@ -1064,9 +1064,8 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ return; }
 		}
-		else 
-		{
-			//gl.uniform1i(shader.bUse1Color_loc, false);
+		else{
+			gl.uniform1i(shader.bUse1Color_loc, false);
 			gl.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 
