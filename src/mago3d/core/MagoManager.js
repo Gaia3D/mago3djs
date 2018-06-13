@@ -21,6 +21,13 @@ var MagoManager = function()
 	this.vBOManager = new VBOManager();
 	this.readerWriter = new ReaderWriter();
 	this.magoPolicy = new Policy();
+	this.magoPolicy.setLod0DistInMeters(MagoConfig.getPolicy().geo_lod0);
+	this.magoPolicy.setLod1DistInMeters(MagoConfig.getPolicy().geo_lod1);
+	this.magoPolicy.setLod2DistInMeters(MagoConfig.getPolicy().geo_lod2);
+	this.magoPolicy.setLod3DistInMeters(MagoConfig.getPolicy().geo_lod3);
+	this.magoPolicy.setLod4DistInMeters(MagoConfig.getPolicy().geo_lod4);
+	this.magoPolicy.setLod5DistInMeters(MagoConfig.getPolicy().geo_lod5);
+	
 	this.smartTileManager = new SmartTileManager();
 	this.processQueue = new ProcessQueue();
 	this.parseQueue = new ParseQueue();
@@ -6516,6 +6523,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.***
 		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
 	}
+	
+	this.selectedObjectNotice(this.buildingSelected);
 };
 
 /**
