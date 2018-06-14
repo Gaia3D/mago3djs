@@ -2888,7 +2888,11 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	{
 		// if the building is far to camera, then delete it.
 		if (neoBuilding.distToCam > 30) // default: 60.***
-		{ this.processQueue.putNodeToDelete(node, 0); }
+		{ 
+			//this.processQueue.putNodeToDelete(node, 0);
+			// provisonal
+			this.processQueue.putNodeToDeleteModelReferences(node, 0);
+		}
 		return false;
 	}
 	else 
