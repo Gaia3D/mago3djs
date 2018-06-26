@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * cesium을 관리
+ * Main Mago class.
  * @class MagoManager
  */
 var MagoManager = function() 
