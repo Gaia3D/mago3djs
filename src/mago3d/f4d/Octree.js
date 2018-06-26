@@ -112,8 +112,9 @@ Octree.prototype.deleteObjectsLego = function(gl, vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
+ * Deletes all objects of the octree.
+ * @param gl : current gl.
+ * @param vboMemManager : gpu memory manager
  */
 Octree.prototype.deleteObjects = function(gl, vboMemManager) 
 {
