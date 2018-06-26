@@ -820,10 +820,14 @@
 	<li onclick="gotoProject('sejong.json', '127.26557490316421', '36.5010938719156', '320', '3')">Sejong City</li>
 </ul>
 
-<div id="magoContainer" class="mapWrap">
+<div style="padding-left:0px; padding-top:0px;">
+	<div style="margin-left:0px; margin-top:0px;">
+		<div id="magoContainer" class="mapWrap">
+		</div>
+		<canvas id="objectLabel"></canvas>
+	</div>
 </div>
-<canvas id="objectLabel"></canvas>
-
+	
 <div class="dataAttributeDialog" title="Data Detail Info">
 	<div><b>Geo Spatial Info</b></div>
 	<table class="list-table scope-col" style="width: 100%;">
@@ -961,6 +965,7 @@
 <script type="text/javascript" src="../src/mago3d/core/FileRequestControler.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/FirstPersonView.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Frustum.js"></script>
+<script type="text/javascript" src="../src/mago3d/core/FrustumVolumeControl.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeographicCoord.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeographicExtent.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeoLocationData.js"></script>
@@ -2122,6 +2127,36 @@
         $("#movePitch").val(pitch);
         $("#moveRoll").val(roll);
     }
+	
+	function getPosition(el) {
+  var xPos = 0;
+  var yPos = 0;
+ 
+  while (el) {
+    if (el.tagName == "BODY") {
+      // deal with browser quirks with body/window/document and page scroll
+      var xScroll = el.scrollLeft || document.documentElement.scrollLeft;
+      var yScroll = el.scrollTop || document.documentElement.scrollTop;
+ 
+      xPos += (el.offsetLeft - xScroll + el.clientLeft);
+      yPos += (el.offsetTop - yScroll + el.clientTop);
+    } else {
+      // for all other non-BODY elements
+      xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+      yPos += (el.offsetTop - el.scrollTop + el.clientTop);
+    }
+ 
+    el = el.offsetParent;
+  }
+  return {
+    x: xPos,
+    y: yPos
+  };
+}
+
+var myElement = document.querySelector("#magoContainer"); 
+var position = getPosition(myElement);
+console.log("The image is located at: " + position.x + ", " + position.y);
 </script>
 </body>
 </html>

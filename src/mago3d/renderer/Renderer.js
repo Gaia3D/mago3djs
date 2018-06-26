@@ -145,7 +145,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx) 
+Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visibleNodesArray, magoManager, shader, renderTexture, ssao_idx) 
 {
 	var node;
 	var rootNode;
@@ -179,9 +179,9 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		}
 		
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
 		for (var j=0; j<lowestOctreesCount; j++) 
 		{
@@ -192,35 +192,36 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				lowestOctree.lego = new Lego();
 				lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
 				lowestOctree.lego.legoKey = lowestOctree.octreeKey + "_lego";
+				continue;
 			}
-
-			if (neoBuilding === undefined)
-			{ continue; }
+			
+			if(lowestOctree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+				continue;
 
 			// if the building is highlighted, the use highlight oneColor4.*********************
 			if (ssao_idx === 1)
 			{
 				if (neoBuilding.isHighLighted)
 				{
-					gl.uniform1i(standardShader.bUse1Color_loc, true);
-					gl.uniform4fv(standardShader.oneColor4_loc, this.highLightColor4); //.***
+					gl.uniform1i(shader.bUse1Color_loc, true);
+					gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
 				}
 				else if (neoBuilding.isColorChanged)
 				{
-					gl.uniform1i(standardShader.bUse1Color_loc, true);
-					gl.uniform4fv(standardShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+					gl.uniform1i(shader.bUse1Color_loc, true);
+					gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
 				}
 				else
 				{
-					gl.uniform1i(standardShader.bUse1Color_loc, false);
+					gl.uniform1i(shader.bUse1Color_loc, false);
 				}
 				//----------------------------------------------------------------------------------
 				renderTexture = true;
 				if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId)
 				{
-					gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+					gl.enableVertexAttribArray(shader.texCoord2_loc);
 					//gl.activeTexture(gl.TEXTURE2); 
-					gl.uniform1i(standardShader.hasTexture_loc, true);
+					gl.uniform1i(shader.hasTexture_loc, true);
 					if (lastExtureId !== neoBuilding.simpleBuilding3x3Texture.texId)
 					{
 						gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
@@ -230,13 +231,20 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				else 
 				{
 					//continue;
-					gl.uniform1i(standardShader.hasTexture_loc, false);
-					gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					gl.uniform1i(shader.hasTexture_loc, false);
+					gl.disableVertexAttribArray(shader.texCoord2_loc);
 					renderTexture = false;
 				}
 			}
+			
+			// If data is compressed, then set uniforms.***
+			//gl.uniform1i(shader.posDataByteSize_loc, 2);
+			//gl.uniform1i(shader.texCoordByteSize_loc, 2);
+			//var bbox = lowestOctree.lego.bbox;
+			//gl.uniform3fv(shader.compressionMaxPoint_loc, [bbox.maxX, bbox.maxY, bbox.maxZ]); //.***
+			//gl.uniform3fv(shader.compressionMinPoint_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
 
-			this.renderLodBuilding(gl, lowestOctree.lego, magoManager, standardShader, ssao_idx, renderTexture);
+			this.renderLodBuilding(gl, lowestOctree.lego, magoManager, shader, ssao_idx, renderTexture);
 		}
 		
 		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
@@ -252,7 +260,7 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx) 
+Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, magoManager, shader, renderTexture, ssao_idx) 
 {
 	var node;
 	var rootNode;
@@ -276,6 +284,9 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		if (skinLego === undefined)
 		{ continue; }
 	
+		if(skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			continue;
+	
 		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
@@ -283,9 +294,9 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		}
 			
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
 		//if (skinLego.dataArrayBuffer === undefined) 
 		//{ continue; }
@@ -295,25 +306,25 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		{
 			if (neoBuilding.isHighLighted)
 			{
-				gl.uniform1i(standardShader.bUse1Color_loc, true);
-				gl.uniform4fv(standardShader.oneColor4_loc, this.highLightColor4); //.***
+				gl.uniform1i(shader.bUse1Color_loc, true);
+				gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
 			}
 			else if (neoBuilding.isColorChanged)
 			{
-				gl.uniform1i(standardShader.bUse1Color_loc, true);
-				gl.uniform4fv(standardShader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+				gl.uniform1i(shader.bUse1Color_loc, true);
+				gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
 			}
 			else
 			{
-				gl.uniform1i(standardShader.bUse1Color_loc, false);
+				gl.uniform1i(shader.bUse1Color_loc, false);
 			}
 			//----------------------------------------------------------------------------------
 			renderTexture = true;
 			if (skinLego.texture !== undefined && skinLego.texture.texId)
 			{
-				gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+				gl.enableVertexAttribArray(shader.texCoord2_loc);
 				//gl.activeTexture(gl.TEXTURE2); 
-				gl.uniform1i(standardShader.hasTexture_loc, true);
+				gl.uniform1i(shader.hasTexture_loc, true);
 				if (lastExtureId !== skinLego.texture.texId)
 				{
 					gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
@@ -324,18 +335,25 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 			{
 				if (magoManager.textureAux_1x1 !== undefined)
 				{
-					gl.enableVertexAttribArray(standardShader.texCoord2_loc);
+					gl.enableVertexAttribArray(shader.texCoord2_loc);
 					//gl.activeTexture(gl.TEXTURE2); 
-					gl.uniform1i(standardShader.hasTexture_loc, true);
+					gl.uniform1i(shader.hasTexture_loc, true);
 					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
-					//gl.uniform1i(standardShader.hasTexture_loc, false);
-					//gl.disableVertexAttribArray(standardShader.texCoord2_loc);
+					//gl.uniform1i(shader.hasTexture_loc, false);
+					//gl.disableVertexAttribArray(shader.texCoord2_loc);
 					//renderTexture = false;
 				}
 			}
 		}
+		
+		// If data is compressed, then set uniforms.***
+		//gl.uniform1i(shader.posDataByteSize_loc, 2);
+		//gl.uniform1i(shader.texCoordByteSize_loc, 2);
+		//var bbox = skinLego.bbox;
+		//gl.uniform3fv(shader.compressionMaxPoint_loc, [bbox.maxX, bbox.maxY, bbox.maxZ]); //.***
+		//gl.uniform3fv(shader.compressionMinPoint_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
 
-		this.renderLodBuilding(gl, skinLego, magoManager, standardShader, ssao_idx, renderTexture);
+		this.renderLodBuilding(gl, skinLego, magoManager, shader, ssao_idx, renderTexture);
 		skinLego = undefined;
 		
 		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
@@ -543,6 +561,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 				else 
 				{
 					// if no render texture, then use a color.***
+					gl.uniform1i(standardShader.bUse1Color_loc, true); //.***
 					if (neoReference.color4) 
 					{
 						gl.uniform1i(standardShader.hasTexture_loc, false); //.***
@@ -856,8 +875,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	if (myBlocksList === undefined)
 	{ return; }
 
-	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
-	{ return; }
+	//if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)// && !magoManager.isCameraMoving)
+	//{ return; }
 
 	if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) { return; }
 
@@ -869,6 +888,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersionColorSelection = function(gl
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
 		var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.currentVisibleIndices[k]];
+		if (neoReference === undefined)
+		{ continue; }
 		
 		if (neoReference.renderingFase === magoManager.renderingFase)
 		{ continue; }
@@ -915,8 +936,8 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 	if (myBlocksList === undefined)
 	{ return; }
 
-	if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
-	{ return; }
+	//if (myBlocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && !magoManager.isCameraMoving)
+	//{ return; }
 
 	if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
 	{ return; }
@@ -933,7 +954,8 @@ Renderer.prototype.renderNeoReferenceAsimetricVersionColorSelection = function(g
 	if (maxSizeToRender && (block.radius < maxSizeToRender))
 	{ return; }
 	
-	if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)
+	//if (magoManager.isCameraMoving && block.isSmallObj && magoManager.objectSelected !== neoReference)
+	if (block.isSmallObj && magoManager.objectSelected !== neoReference)
 	{ return; }
 	
 	// End checking textures loaded.------------------------------------------------------------------------------------
@@ -1060,7 +1082,8 @@ Renderer.prototype.renderLodBuilding = function(gl, lodBuilding, magoManager, sh
 			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ return; }
 		}
-		else{
+		else 
+		{
 			gl.uniform1i(shader.bUse1Color_loc, false);
 			gl.disableVertexAttribArray(shader.texCoord2_loc);
 		}

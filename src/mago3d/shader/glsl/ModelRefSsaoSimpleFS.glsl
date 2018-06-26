@@ -89,25 +89,6 @@ void main()
         
     occlusion = 1.0 - occlusion / float(kernelSize);
 
-    vec3 lightPos = vec3(20.0, 60.0, 20.0);
-    vec3 L = normalize(lightPos - vertexPos);
-    float lambertian = max(dot(normal2, L), 0.0);
-    float specular = 0.0;
-    if(lambertian > 0.0)
-    {
-        vec3 R = reflect(-L, normal2);      // Reflected light vector
-        vec3 V = normalize(-vertexPos); // Vector to viewer
-        
-        // Compute the specular term
-        float specAngle = max(dot(R, V), 0.0);
-        specular = pow(specAngle, shininessValue);
-    }
-	
-	if(lambertian < 0.5)
-    {
-		lambertian = 0.5;
-	}
-
     vec4 textureColor;
     if(hasTexture)
     {
@@ -128,7 +109,5 @@ void main()
         textureColor = oneColor4;
     }
 	
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
+	gl_FragColor = vec4((textureColor.xyz) * occlusion, 1.0); 
 }

@@ -333,6 +333,26 @@ Matrix4.prototype.aproxEqual = function(value, valueToCompare, error)
 };
 
 /**
+ * Returns if the arrayA equal to the arrayB.
+ * @returns {boolean} are equal.
+ */
+Matrix4.areEqualArrays = function(arrayA, arrayB) 
+{
+	var areEqual = true;
+	var i=0;
+	while (areEqual && i<16)
+	{
+		if (arrayA[i] !== arrayB[i])
+		{
+			areEqual = false;
+		}
+		i++;
+	}
+	
+	return areEqual;
+};
+
+/**
  * Returns if the matrix is identity.
  * @returns {boolean} matrixIsIdentity.
  */

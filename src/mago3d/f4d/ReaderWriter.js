@@ -919,6 +919,9 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			var ver1 = neoBuilding.metaData.version[2];
 			var ver2 = neoBuilding.metaData.version[4];
 			
+			if (neoBuilding.buildingId === "Tile_173078_LD_010_017_L22")
+			{ var hola = 0; }
+			
 			if (ver0 === '0' && ver1 === '0' && ver2 === '1')
 			{
 				// read materials list.
@@ -1147,10 +1150,12 @@ ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Projec
 ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, magoManager) 
 {
 	f4dTex.loadStarted = true;
+	//f4dTex.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	f4dTex.texImage = new Image();
 	f4dTex.texImage.onload = function() 
 	{
 		f4dTex.loadFinished = true;
+		//f4dTex.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 
 		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
 	};
@@ -1318,8 +1323,6 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						}
 						
 					}
-					
-					
 					
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
