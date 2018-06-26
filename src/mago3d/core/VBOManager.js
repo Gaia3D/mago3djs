@@ -59,6 +59,13 @@ var VBOVertexIdxCacheKey = function()
 	this.idxArrayByteSize;
 	this.colArrayByteSize;
 	this.tcoordArrayByteSize;
+	
+	// byteType: float, short, byte.***
+	this.posArrayByteType;
+	this.norArrayByteType;
+	this.idxArrayByteType;
+	this.colArrayByteType;
+	this.tcoordArrayByteType;
 
 	this.buffer;// delete this. provisionally put this here.***
 };

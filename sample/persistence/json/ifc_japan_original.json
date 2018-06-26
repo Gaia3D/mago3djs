@@ -1,0 +1,74 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "ifc_japan"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "PCv2_RVT2018",
+			"data_name": "橋(はし)",
+			"heading": -20,
+			"height": 80,
+			"latitude": 35.6629,
+			"longitude": 139.6843,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "B2_1SPN_2018",
+			"data_name": "ビル",
+			"heading": 75,
+			"height": 96,
+			"latitude": 35.6620,
+			"longitude": 139.6829,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "TunelSection_2018",
+			"data_name": "トンネル",
+			"heading": -18,
+			"height": 87,
+			"latitude": 35.6623,
+			"longitude": 139.6826,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Tekla Training Modell",
+			"data_name": "ビルディング",
+			"heading": 70,
+			"height": 95,
+			"latitude": 35.661978,
+			"longitude": 139.703860,
+			"pitch": 0,
+			"roll": 0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
+	"data_key": "ifc_japan",
+	"data_name": "ifc_japan"
+}

@@ -184,6 +184,18 @@ ProcessQueue.prototype.eraseNodeToDelete = function(node)
 	return false;
 };
 
+ProcessQueue.prototype.eraseNodesArrayToDelete = function(nodesToEraseArray)
+{
+	// this erases the node from the "nodesToDeleteMap".
+	var key;
+	var nodesCount = nodesToEraseArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		key = nodesToEraseArray[i].data.neoBuilding.buildingId;
+		delete this.nodesToDeleteMap[key];
+	}
+};
+
 ProcessQueue.prototype.clearAll = function()
 {
 	this.nodesToDeleteMap = {};

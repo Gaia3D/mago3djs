@@ -40,7 +40,7 @@
   "geo_lod3": "200",
   "geo_lod4": "1000",
   "geo_lod5": "50000",
-  "geo_light_specular_enable": "true",
+  "geo_light_specular_enable": "false",
   "geo_ambient_reflection_coef": "0.5",
   "geo_diffuse_reflection_coef": "1.0",
   "geo_specular_reflection_coef": "1.0",

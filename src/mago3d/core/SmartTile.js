@@ -268,9 +268,9 @@ SmartTile.prototype.TEST__hasLowestTiles_nodesArray = function()
 	var subTilesCount = lowestTilesArray.length;
 	var find = false;
 	var i=0;
-	while(!find && i<subTilesCount)
+	while (!find && i<subTilesCount)
 	{
-		if(lowestTilesArray[i].nodesArray && lowestTilesArray[i].nodesArray.length > 0)
+		if (lowestTilesArray[i].nodesArray && lowestTilesArray[i].nodesArray.length > 0)
 		{
 			return true;
 		}

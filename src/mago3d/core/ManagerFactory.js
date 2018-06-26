@@ -144,11 +144,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				pickPosition.lon = Cesium.Math.toDegrees(cartographicPosition.longitude);
 				pickPosition.alt = cartographicPosition.height;
 			}
-            if (MagoConfig.getPolicy().geo_callback_enable === "true") {
-                if (serverPolicy.geo_callback_clickposition !== '') {
-                    clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
-                }
-            }
+			if (MagoConfig.getPolicy().geo_callback_enable === "true") 
+			{
+				if (serverPolicy.geo_callback_clickposition !== '') 
+				{
+					clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+				}
+			}
 	    }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
 		magoManager.handler.setInputAction(function(movement) 
@@ -590,11 +592,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 					pickPosition.alt = terrainPosition.altitude;	
 				}
 			}
-            if (MagoConfig.getPolicy().geo_callback_enable === "true") {
-                if (serverPolicy.geo_callback_clickposition !== '') {
-                    clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
-                }
-            }
+			if (MagoConfig.getPolicy().geo_callback_enable === "true") 
+			{
+				if (serverPolicy.geo_callback_clickposition !== '') 
+				{
+					clickPositionCallback(serverPolicy.geo_callback_clickposition, pickPosition);
+				}
+			}
 		};
 		wwd.addEventListener("mouseup", mouseUpEvent, false);
 			

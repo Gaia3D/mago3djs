@@ -92,6 +92,29 @@ Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager)
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
+Octree.prototype.deleteObjectsLego = function(gl, vboMemManager) 
+{
+	if (this.lego !== undefined) 
+	{
+		// deletes the geometry and the texture.***
+		this.lego.deleteObjects(gl, vboMemManager);
+		this.lego = undefined;
+	}
+	
+	if (this.subOctrees_array !== undefined) 
+	{
+		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].deleteObjectsLego(gl, vboMemManager);
+		}
+	}
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
 Octree.prototype.deleteObjects = function(gl, vboMemManager) 
 {
 	if (this.lego !== undefined) 

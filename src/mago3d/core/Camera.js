@@ -15,8 +15,11 @@ var Camera = function()
 	this.direction = new Point3D();
 	this.up = new Point3D();
 	this.right = new Point3D();
-	this.frustum = new Frustum();
+	this.frustum = new Frustum(); // current frustum.***
+	this.bigFrustum = new Frustum(); // sum of all frustums.***
 	this.dirty = true;
+	this.frustumsArray = [];
+	this.frustumsArray.push(this.frustum);
 	
 	// auxiliar vars.
 	// points.
@@ -55,28 +58,145 @@ Camera.prototype.getDirty = function()
 	return this.dirty;
 };
 
-
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, newDirY, newDirZ, newUpX, newUpY, newUpZ )
+{
+	if (this.position.x === newPosX && this.position.y === newPosY && this.position.z === newPosZ && 
+		this.direction.x === newDirX && this.direction.y === newDirY && this.direction.z === newDirZ && 
+		this.up.x === newUpX && this.up.y === newUpY && this.up.z === newUpZ)
+	{ return false; }
+	else
+	{ return true; }
+};
 
 /**
  * 카메라
  * @class Camera
  */
-Camera.prototype.calculateFrustumPlanes = function()
+Camera.prototype.getFrustum = function(idx)
+{
+	if (this.frustumsArray[idx] === undefined)
+	{
+		this.frustumsArray[idx] = new Frustum();
+		this.frustumsArray[idx].fovRad[0] = this.frustumsArray[0].fovRad[0];
+		this.frustumsArray[idx].fovyRad[0]= this.frustumsArray[0].fovyRad[0];
+		this.frustumsArray[idx].aspectRatio[0] = this.frustumsArray[0].aspectRatio[0];
+		this.frustumsArray[idx].tangentOfHalfFovy[0] = this.frustumsArray[0].tangentOfHalfFovy[0];
+	}
+	
+	return this.frustumsArray[idx];
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.getLastFrustum = function()
+{
+	return this.getFrustum(this.frustumsArray.length - 1);
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
+{
+	var nearFarDistances;
+	var frustum;
+	for (var i=0; i<numFrustums; i++)
+	{
+		nearFarDistances = distancesArray[i];
+		frustum = this.getFrustum(i);
+		frustum.near[0] = distancesArray[i*2];
+		frustum.far[0] = distancesArray[i*2+1];
+		if (i === 0)
+		{
+			this.bigFrustum.near[0] = distancesArray[i*2];
+		}
+		else if (i === numFrustums - 1)
+		{
+			this.bigFrustum.far[0] = distancesArray[i*2+1];
+		}
+	}
+	
+	// provisionally fix the far.***
+	if (this.bigFrustum.far[0] > 20000.0)
+	{ this.bigFrustum.far[0] = 20000.0; }
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.setAspectRatioAndFovyRad = function(aspectRatio, fovyRad)
+{
+	var frustum, frustum0;
+	
+	frustum0 = this.getFrustum(0);
+	frustum0.aspectRatio[0] = aspectRatio;
+	frustum0.fovyRad[0] = fovyRad; 
+	frustum0.fovRad[0] = fovyRad*aspectRatio;
+	frustum0.tangentOfHalfFovy[0] = Math.tan(fovyRad/2);
+		
+	var frustumsCount = this.frustumsArray.length;
+	for (var i=1; i<frustumsCount; i++)
+	{
+		frustum = this.getFrustum(i);
+		frustum.aspectRatio[0] = frustum0.aspectRatio[0];
+		frustum.fovyRad[0] = frustum0.fovyRad[0]; 
+		frustum.fovRad[0] = frustum0.fovRad[0];
+		frustum.tangentOfHalfFovy[0] = frustum0.tangentOfHalfFovy[0];
+	}
+	
+	this.bigFrustum.aspectRatio[0] = frustum0.aspectRatio[0];
+	this.bigFrustum.fovyRad[0] = frustum0.fovyRad[0]; 
+	this.bigFrustum.fovRad[0] = frustum0.fovRad[0];
+	this.bigFrustum.tangentOfHalfFovy[0] = frustum0.tangentOfHalfFovy[0];
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.setCurrentFrustum = function(frustumIdx)
+{
+	this.frustum = this.getFrustum(frustumIdx);
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.calculateFrustumsPlanes = function()
 {
 	var plane;
+	var frustum0; // the 1rst frustum.***
 	
-	// calculate nearWidth, nearHeight, farWidth & farHeight.
-	var nearHeight = this.frustum.tangentOfHalfFovy*this.frustum.near*2;
-	var farHeight = this.frustum.tangentOfHalfFovy*this.frustum.far*2;
-	var nearWidth = nearHeight * this.frustum.aspectRatio;
-	var farWidht = farHeight * this.frustum.aspectRatio;
+	// Use the frustum0 to calculate nearWidth, nearHeight, farWidth & farHeight.
+	frustum0 = this.getFrustum(0);
+	var nearHeight = frustum0.tangentOfHalfFovy * frustum0.near * 2;
+	var farHeight = frustum0.tangentOfHalfFovy * frustum0.far * 2;
+	var nearWidth = nearHeight * frustum0.aspectRatio;
+	var farWidht = farHeight * frustum0.aspectRatio;
+	
+	var px = this.position.x;
+	var py = this.position.y;
+	var pz = this.position.z;
+	var dx = this.direction.x;
+	var dx = this.direction.x;
+	var dy = this.direction.y;
+	var dz = this.direction.z;
 	
 	// calculate right direction. "up" and "direction" must be unitaries.
 	this.right = this.direction.crossProduct(this.up, this.right);
 	
 	// calculate the near and far points.
-	this.nearCenterPoint.set(this.position.x + this.direction.x * this.frustum.near, this.position.y + this.direction.y * this.frustum.near, this.position.z + this.direction.z * this.frustum.near);
-	this.farCenterPoint.set(this.position.x + this.direction.x * this.frustum.far, this.position.y + this.direction.y * this.frustum.far, this.position.z + this.direction.z * this.frustum.far);
+	this.nearCenterPoint.set(px + dx * frustum0.near, py + dy * frustum0.near, pz + dz * frustum0.near);
+	this.farCenterPoint.set(px + dx * frustum0.far, py + dy * frustum0.far, pz + dz * frustum0.far);
 	
 	// far plane points.
 	this.farLeftBottomPoint.set(this.farCenterPoint.x - this.right.x*farWidht*0.5 - this.up.x*farHeight*0.5, 
@@ -88,43 +208,90 @@ Camera.prototype.calculateFrustumPlanes = function()
 		this.farLeftBottomPoint.z + this.right.z*farWidht + this.up.z*farHeight);				
 	
 	// calculate directions.
-	this.leftBottomDir.set(this.farLeftBottomPoint.x - this.position.x, this.farLeftBottomPoint.y - this.position.y, this.farLeftBottomPoint.z - this.position.z);
+	this.leftBottomDir.set(this.farLeftBottomPoint.x - px, this.farLeftBottomPoint.y - py, this.farLeftBottomPoint.z - pz);
 	this.leftBottomDir.unitary(); // no necessary.
 	
-	this.rightTopDir.set(this.farRightTopPoint.x - this.position.x, this.farRightTopPoint.y - this.position.y, this.farRightTopPoint.z - this.position.z);
+	this.rightTopDir.set(this.farRightTopPoint.x - px, this.farRightTopPoint.y - py, this.farRightTopPoint.z - pz);
 	this.rightTopDir.unitary(); // no necessary.
 	
 	// near plane.
-	plane = this.frustum.planesArray[0];
-	plane.setPointAndNormal(this.nearCenterPoint.x, this.nearCenterPoint.y, this.nearCenterPoint.z, this.direction.x, this.direction.y, this.direction.z);
+	plane = frustum0.planesArray[0];
+	plane.setPointAndNormal(this.nearCenterPoint.x, this.nearCenterPoint.y, this.nearCenterPoint.z, dx, dy, dz);
 							
 	// far plane.
-	plane = this.frustum.planesArray[1];
-	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -this.direction.x, -this.direction.y, -this.direction.z);
+	plane = frustum0.planesArray[1];
+	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 
+	// The 4 lateral planes are the same for all frustum0s.***
 	// left plane.
 	this.leftNormal = this.leftBottomDir.crossProduct(this.up, this.leftNormal);
 	this.leftNormal.unitary();
-	plane = this.frustum.planesArray[2];
-	plane.setPointAndNormal(this.position.x, this.position.y, this.position.z, this.leftNormal.x, this.leftNormal.y, this.leftNormal.z);
+	plane = frustum0.planesArray[2];
+	plane.setPointAndNormal(px, py, pz, this.leftNormal.x, this.leftNormal.y, this.leftNormal.z);
 							
 	// bottom plane.
 	this.bottomNormal = this.right.crossProduct(this.leftBottomDir, this.bottomNormal);
 	this.bottomNormal.unitary();
-	plane = this.frustum.planesArray[3];
-	plane.setPointAndNormal(this.position.x, this.position.y, this.position.z, this.bottomNormal.x, this.bottomNormal.y, this.bottomNormal.z);
+	plane = frustum0.planesArray[3];
+	plane.setPointAndNormal(px, py, pz, this.bottomNormal.x, this.bottomNormal.y, this.bottomNormal.z);
 							
 	// right plane.
 	this.rightNormal = this.up.crossProduct(this.rightTopDir, this.rightNormal);
 	this.rightNormal.unitary();
-	plane = this.frustum.planesArray[4];
-	plane.setPointAndNormal(this.position.x, this.position.y, this.position.z, this.rightNormal.x, this.rightNormal.y, this.rightNormal.z);
+	plane = frustum0.planesArray[4];
+	plane.setPointAndNormal(px, py, pz, this.rightNormal.x, this.rightNormal.y, this.rightNormal.z);
 	
 	// top plane.
 	this.topNormal = this.rightTopDir.crossProduct(this.right, this.topNormal);
 	this.topNormal.unitary();
-	plane = this.frustum.planesArray[5];
-	plane.setPointAndNormal(this.position.x, this.position.y, this.position.z, this.topNormal.x, this.topNormal.y, this.topNormal.z);
+	plane = frustum0.planesArray[5];
+	plane.setPointAndNormal(px, py, pz, this.topNormal.x, this.topNormal.y, this.topNormal.z);
+	
+	// once finished, calculate the rest of frustums.***
+	var frustum;
+	var frustumsCount = this.frustumsArray.length;
+	for (var i=1; i<frustumsCount; i++)
+	{
+		frustum = this.getFrustum(i);
+		
+		// calculate the near and far points.
+		this.nearCenterPoint.set(px + dx * frustum.near, py + dy * frustum.near, pz + dz * frustum.near);
+		this.farCenterPoint.set(px + dx * frustum.far, py + dy * frustum.far, pz + dz * frustum.far);
+		
+		// near plane.
+		plane = frustum.planesArray[0];
+		plane.setPointAndNormal(this.nearCenterPoint.x, this.nearCenterPoint.y, this.nearCenterPoint.z, dx, dy, dz);
+								
+		// far plane.
+		plane = frustum.planesArray[1];
+		plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
+		
+		// the lateral planes.***
+		for (var j=2; j<6; j++)
+		{
+			frustum.planesArray[j] = frustum0.planesArray[j];
+		}
+	}
+	
+	// finally calculate the totalFrustum.***
+	// calculate the near and far points.
+	this.nearCenterPoint.set(px + dx * this.bigFrustum.near, py + dy * this.bigFrustum.near, pz + dz * this.bigFrustum.near);
+	this.farCenterPoint.set(px + dx * this.bigFrustum.far, py + dy * this.bigFrustum.far, pz + dz * this.bigFrustum.far);
+	
+	// near plane.
+	plane = this.bigFrustum.planesArray[0];
+	plane.setPointAndNormal(this.nearCenterPoint.x, this.nearCenterPoint.y, this.nearCenterPoint.z, dx, dy, dz);
+							
+	// far plane.
+	plane = this.bigFrustum.planesArray[1];
+	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
+		
+	var lastFrustum = this.getLastFrustum();
+	for (var j=2; j<6; j++) // starting in i==2.***
+	{
+		// the bigFrustum is esqual to frustum0 except in the "far".***
+		this.bigFrustum.planesArray[j] = frustum0.planesArray[j];
+	}
 };
 
 

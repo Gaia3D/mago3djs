@@ -109,5 +109,5 @@ void main()
         textureColor = oneColor4;
     }
 	
-	gl_FragColor = vec4((textureColor.xyz)*vLightWeighting * occlusion, 1.0); 
+	gl_FragColor = vec4((textureColor.xyz) * occlusion, 1.0); 
 }

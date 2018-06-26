@@ -15,6 +15,7 @@ var Lego = function()
 
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	this.fileLoadState = CODE.fileLoadState.READY;
+	this.bbox;
 	this.dataArrayBuffer;
 	this.selColor4;
 	this.texture;
@@ -60,7 +61,7 @@ Lego.prototype.isReadyToRender = function()
  */
 Lego.prototype.deleteObjects = function(gl, vboMemManager)
 {
-	if(this.vbo_vicks_container !== undefined)
+	if (this.vbo_vicks_container !== undefined)
 	{
 		this.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
 		this.vbo_vicks_container = undefined;
@@ -79,6 +80,11 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
 		this.texture.deleteObjects(gl);
 	}
 	this.texture = undefined;
+	if(this.bbox)
+	{
+		this.bbox.deleteObjects();
+	}
+	this.bbox = undefined;
 };
 
 /**
@@ -95,7 +101,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
-	var bbox = new BoundingBox();
+	this.bbox = new BoundingBox();
+	var bbox = this.bbox;
 	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 
 	// BoundingBox
@@ -112,10 +119,33 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
 	var positionBuffer = new Float32Array(classifiedPosByteSize);
 	positionBuffer.set(stream.readFloat32Array(numPositions * 3));
+	
+	// Test: change float(4byte) data to short(2byte) data.*************************************************************
+	/*
+	var posShortBuffer = new Uint16Array(numPositions * 3);
+	var fx, fy, fz; // float values.
+	var bboxXDim = bbox.getXLength();
+	var bboxYDim = bbox.getYLength();
+	var bboxZDim = bbox.getZLength();
+	
+	for(var i=0; i<numPositions; i++)
+	{
+		fx = positionBuffer[i*3];
+		fy = positionBuffer[i*3+1];
+		fz = positionBuffer[i*3+2];
+		
+		posShortBuffer[i*3] = new Uint16Array([(fx - bbox.minX)/bboxXDim * 65535]);
+		posShortBuffer[i*3+1] = new Uint16Array([(fy - bbox.minY)/bboxYDim * 65535]);
+		posShortBuffer[i*3+2] = new Uint16Array([(fz - bbox.minZ)/bboxZDim * 65535]);
+	}
+	*/
+	// End test.---------------------------------------------------------------------------------------------------------
 
 	vboCacheKey.vertexCount = numPositions;
 	vboCacheKey.posVboDataArray = positionBuffer;
-	vboCacheKey.posArrayByteSize = classifiedPosByteSize;
+	vboCacheKey.posArrayByteSize = classifiedPosByteSize; 
+	// (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
+	//vboCacheKey.posArrayByteType = 5123; // unsigned short.***
 
 	// VBO(Normal Buffer) - i,j,k
 	var hasNormals = stream.readUint8();
@@ -155,9 +185,21 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
 		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
 		coordBuffer.set(stream.readFloat32Array(numCoords * 2));
+		
+		// Test: change float(4byte) data to short(2byte) data.*************************************************************
+		/*
+		var coordShortBuffer = new Uint16Array(2 * numCoords);
+		for(var i=0; i<numCoords; i++)
+		{
+			coordShortBuffer[i*2] = new Uint16Array([coordBuffer[i*2] * 65535]);
+			coordShortBuffer[i*2+1] = new Uint16Array([coordBuffer[i*2+1] * 65535]);
+		}
+		*/
+		// End test.---------------------------------------------------------------------------------------------------------
 
-		vboCacheKey.tcoordVboDataArray = coordBuffer;
+		vboCacheKey.tcoordVboDataArray = coordBuffer; // original.***
 		vboCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+		//vboCacheKey.tcoordArrayByteType = 5123; // unsigned short.***
 	}
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;

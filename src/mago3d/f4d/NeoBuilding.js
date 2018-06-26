@@ -166,6 +166,27 @@ NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManag
 		this.motherNeoReferencesArray[i] = undefined;
 	}
 	this.motherNeoReferencesArray = [];
+	
+	// delete textures on the GPU.***.
+	if (this.texturesLoaded)
+	{
+		var texture;
+		var texturesCount = this.texturesLoaded.length;
+		for (var i=0; i<texturesCount; i++)
+		{
+			texture = this.texturesLoaded[i];
+			if (texture)
+			{
+				if (texture.texId)
+				{
+					gl.deleteTexture(texture.texId);
+					texture.texId = undefined;
+					texture.fileLoadState = CODE.fileLoadState.READY;
+				}
+			}
+		}
+	}
+
 };
 
 /**
@@ -173,15 +194,67 @@ NeoBuilding.prototype.deleteObjectsModelReferences = function(gl, vboMemoryManag
  * @param texture 변수
  * @returns texId
  */
-NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager) 
+NeoBuilding.prototype.deleteObjectsLodMesh = function(gl, vboMemoryManager, lodMeshKey) 
 {
-	this.metaData.deleteObjects();
-	this.metaData.fileLoadState = CODE.fileLoadState.READY;
+	// TEST delete lod 3.***
+	if (this.lodMeshesMap !== undefined)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, lodMeshKey))
+		{
+			var legoSkin = this.lodMeshesMap[lodMeshKey];
+			if (legoSkin.vbo_vicks_container !== undefined)
+			{
+				legoSkin.vbo_vicks_container.deleteGlObjects(gl, vboMemoryManager);
+				legoSkin.vbo_vicks_container = undefined;
+			}
+			/*
+			legoSkin.textureName = undefined;
+			if (legoSkin.texture)
+			{
+				legoSkin.texture.deleteObjects(gl);
+			}
+			legoSkin.texture = undefined;
+			if(legoSkin.bbox)
+			{
+				legoSkin.bbox.deleteObjects();
+			}
+			legoSkin.bbox = undefined;
+			*/
+	
+			legoSkin.fileLoadState = 0;
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.deleteObjectsLod2 = function(gl, vboMemoryManager) 
+{
+	if (this.octree !== undefined)
+	{ 
+		// deletes the geometry and the texture.***
+		this.octree.deleteObjectsLego(gl, vboMemoryManager); 
+	}
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetadata) 
+{
+	if(deleteMetadata)
+	{
+		this.metaData.deleteObjects();
+		this.metaData.fileLoadState = CODE.fileLoadState.READY;
+	}
 
 	this.deleteObjectsModelReferences(gl, vboMemoryManager);
-	
-	//if(this.nodeOwner)
-	//	this.nodeOwner = undefined;
 
 	// The octree.
 	if (this.octree !== undefined)
@@ -235,7 +308,7 @@ NeoBuilding.prototype.deleteLodMesh = function(gl, lod, vboMemoryManager)
 	if (this.lodMeshesMap !== undefined)
 	{
 		var legoSkin = this.lodMeshesMap[lod];
-		if(legoSkin !== undefined)
+		if (legoSkin !== undefined)
 		{
 			legoSkin.deleteObjects(gl, vboMemoryManager);
 			legoSkin = undefined;
@@ -450,16 +523,16 @@ NeoBuilding.prototype.getCurrentSkin = function()
 	
 	//return skinLego;
 	
-		var lodBuildingData = this.getLodBuildingData(this.currentLod);
-		if (lodBuildingData === undefined)
-		{ return; }
+	var lodBuildingData = this.getLodBuildingData(this.currentLod);
+	if (lodBuildingData === undefined)
+	{ return; }
 		
-		//textureFileName = lodBuildingData.textureFileName;
-		var lodString = lodBuildingData.geometryFileName;
-		skinLego = this.lodMeshesMap[lodString];
+	//textureFileName = lodBuildingData.textureFileName;
+	var lodString = lodBuildingData.geometryFileName;
+	skinLego = this.lodMeshesMap[lodString];
 		
-		if(skinLego !== undefined && skinLego.isReadyToRender())
-			return skinLego;
+	if (skinLego !== undefined && skinLego.isReadyToRender())
+	{ return skinLego; }
 		
 	
 	if (this.currentLod === 0)
