@@ -1228,6 +1228,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		}
 		
 		// in this point, put nodes to delete lod LOWER THAN lod3 (delete lod0, lod1, lod2).***
+		/*
 		nodesCount = this.visibleObjControlerNodes.currentVisibles3.length;
 		var nodesPutted = 0;
 		for (var i=nodesCount-1; i>=0; i--) 
@@ -1265,9 +1266,11 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 					nodesPutted++;
 				}
 			}
-			if (nodesPutted > 10)
+			if (nodesPutted > 5)
 			{ break; }
+		
 		}
+		*/
 		
 		// lod3, lod4, lod5.***
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
@@ -1277,6 +1280,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		//this.prepareVisibleTinTerrains(this.tinTerrainManager);
 		//if(this.isFarestFrustum())
 			this.manageQueue();
+		//this.loadQueue.manageQueue();
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -1514,6 +1518,13 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	var gl = this.sceneState.gl;
 	var geometryDataPath = this.readerWriter.geometryDataPath;
 	
+	var lod0Dist = this.magoPolicy.getLod0DistInMeters();
+	var lod1Dist = this.magoPolicy.getLod1DistInMeters();
+	var lod2Dist = this.magoPolicy.getLod2DistInMeters();
+	var lod3Dist = this.magoPolicy.getLod3DistInMeters();
+	var lod4Dist = this.magoPolicy.getLod4DistInMeters();
+	var lod5Dist = this.magoPolicy.getLod5DistInMeters();
+	
 	var lowLodNodesCount = lowLodNodesArray.length;
 	for (var i=0; i<lowLodNodesCount; i++) 
 	{
@@ -1545,32 +1556,32 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		var lodString;
 		var lodIdx; // old.***
 		
-		if (neoBuilding.distToCam < this.magoPolicy.getLod0DistInMeters())
+		if (neoBuilding.distToCam < lod0Dist)
 		{
 			lodIdx = 0;
 			neoBuilding.currentLod = 0;
 		}
-		else if (neoBuilding.distToCam < this.magoPolicy.getLod1DistInMeters())
+		else if (neoBuilding.distToCam < lod1Dist)
 		{
 			lodIdx = 1;
 			neoBuilding.currentLod = 1;
 		}
-		else if (neoBuilding.distToCam < this.magoPolicy.getLod2DistInMeters())
+		else if (neoBuilding.distToCam < lod2Dist)
 		{
 			lodIdx = 2;
 			neoBuilding.currentLod = 2;
 		}
-		else if (neoBuilding.distToCam < this.magoPolicy.getLod3DistInMeters())
+		else if (neoBuilding.distToCam < lod3Dist)
 		{
 			lodIdx = 3;
 			neoBuilding.currentLod = 3;
 		}
-		else if (neoBuilding.distToCam < this.magoPolicy.getLod4DistInMeters())
+		else if (neoBuilding.distToCam < lod4Dist)
 		{
 			lodIdx = 4;
 			neoBuilding.currentLod = 4;
 		}
-		else if (neoBuilding.distToCam < this.magoPolicy.getLod5DistInMeters())
+		else if (neoBuilding.distToCam < lod5Dist)
 		{
 			lodIdx = 5;
 			neoBuilding.currentLod = 5;
@@ -1607,35 +1618,29 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		
 		if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
 		{
-			// load lodMesh.***
-			if (!this.fileRequestControler.isFullPlus(extraCount))
-			{
-				var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
-				this.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, this);
-			}
-			
 			// put it into fileLoadQueue.***
-			//var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+			var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+			this.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, this);
 			//this.loadQueue.putLowLodSkinData(lowLodMesh, lodMeshFilePath, 0);
 			
 			continue;
 		}
 		
-		// finally check if there are legoSimpleBuildingTexture.***
-		//if(lowLodMesh.vbo_vicks_container === undefined)
-		//	var hola = 0;
-		
 		if(lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
 			lowLodMesh.vbo_vicks_container.vboCacheKeysArray = [];
 		
-		if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+		if(lowLodMesh.fileLoadState !== CODE.fileLoadState.READY)
 		{
-			// this is the new version.***
-			if (lowLodMesh.texture === undefined)
+			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
 			{
-				lowLodMesh.texture = new Texture();
-				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
-				this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, this);
+				// this is the new version.***
+				if (lowLodMesh.texture === undefined)
+				{
+					lowLodMesh.texture = new Texture();
+					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, this); // old.***
+					//this.loadQueue.putLowLodSkinTexture(filePath_inServer, lowLodMesh.texture, 0);
+				}
 			}
 		}
 		
@@ -3823,7 +3828,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, g
 		buildingFolderName = neoBuilding.buildingFileName;
 
 		// && lowestOctree.neoRefsList_Array.length === 0)
-		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)// && !this.isCameraMoving) 
+		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)
 		{
 			// must load the legoStructure of the lowestOctree.***
 			if (!this.fileRequestControler.isFullPlus(extraCount))
@@ -3831,35 +3836,40 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, g
 				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 				var bricks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Bricks";
 				var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
-				this.readerWriter.getOctreeLegoArraybuffer(filePathInServer, lowestOctree, this);
+				this.readerWriter.getOctreeLegoArraybuffer(filePathInServer, lowestOctree, this); // old.***
+				//this.loadQueue.putLod2SkinData(lowestOctree, filePathInServer);
 			}
-			continue;
+			//continue;
 		}
 
 		// finally check if there are legoSimpleBuildingTexture.***
-		if (lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+		//if(lowestOctree.lego.fileLoadState !== CODE.fileLoadState.LOADING_READY)
 		{
-			var headerVersion = neoBuilding.getHeaderVersion();
-			if (headerVersion[0] === "v")
+			if (lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0] && lowestOctree.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
 			{
-				// this is the old version.***
-				if (neoBuilding.simpleBuilding3x3Texture === undefined)
+				var headerVersion = neoBuilding.getHeaderVersion();
+				if (headerVersion[0] === "v")
 				{
-					neoBuilding.simpleBuilding3x3Texture = new Texture();
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
-					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
+					// this is the old version.***
+					if (neoBuilding.simpleBuilding3x3Texture === undefined)
+					{
+						neoBuilding.simpleBuilding3x3Texture = new Texture();
+						var buildingFolderName = neoBuilding.buildingFileName;
+						var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
+						this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
+					}
 				}
-			}
-			else 
-			{
-				// this is the new version.***
-				if (neoBuilding.simpleBuilding3x3Texture === undefined)
+				else 
 				{
-					neoBuilding.simpleBuilding3x3Texture = new Texture();
-					var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
-					this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this);
+					// this is the new version.***
+					if (neoBuilding.simpleBuilding3x3Texture === undefined)
+					{
+						neoBuilding.simpleBuilding3x3Texture = new Texture();
+						var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
+						var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
+						this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this); // old.***
+						//this.loadQueue.putLod2SkinTexture(filePath_inServer, neoBuilding.simpleBuilding3x3Texture, 0);
+					}
 				}
 			}
 		}
@@ -5663,6 +5673,14 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var lod2_minDist = this.magoPolicy.getLod2DistInMeters();
 	var lod5_minDist = this.magoPolicy.getLod5DistInMeters();
 	var lod3_minDist;
+	
+	// get lodDistances for determine the real lod of the building.***
+	var lod0Dist = this.magoPolicy.getLod0DistInMeters();
+	var lod1Dist = this.magoPolicy.getLod1DistInMeters();
+	var lod2Dist = this.magoPolicy.getLod2DistInMeters();
+	var lod3Dist = this.magoPolicy.getLod3DistInMeters();
+	var lod4Dist = this.magoPolicy.getLod4DistInMeters();
+	var lod5Dist = this.magoPolicy.getLod5DistInMeters();
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
@@ -5719,6 +5737,18 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					
 				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
 				neoBuilding.distToCam = distToCamera;
+				if (neoBuilding.distToCam < lod0Dist)
+					neoBuilding.currentLod = 0;
+				else if (neoBuilding.distToCam < lod1Dist)
+					neoBuilding.currentLod = 1;
+				else if (neoBuilding.distToCam < lod2Dist)
+					neoBuilding.currentLod = 2;
+				else if (neoBuilding.distToCam < lod3Dist)
+					neoBuilding.currentLod = 3;
+				else if (neoBuilding.distToCam < lod4Dist)
+					neoBuilding.currentLod = 4;
+				else if (neoBuilding.distToCam < lod5Dist)
+				{ neoBuilding.currentLod = 5; }
 				
 				var frustumFar = this.magoPolicy.getFrustumFarDistance();
 				frustumFar = 20000.0;
