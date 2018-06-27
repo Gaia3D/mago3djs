@@ -258,6 +258,9 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function()
  */
 VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
+	if(this.vboCacheKeysArray === undefined)
+		return;
+	
 	var vboDatasCount = this.vboCacheKeysArray.length;
 	for (var j = 0; j < vboDatasCount; j++) 
 	{

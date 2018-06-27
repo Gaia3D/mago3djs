@@ -16,7 +16,9 @@ var ProcessQueue = function()
 	this.nodesToDeleteMap = {};
 	this.nodesToDeleteModelReferencesMap = {};
 	this.nodesToDeleteLessThanLod3Map = {};
-	this.nodesToDeleteLodMeshMap = {};
+	this.nodesToDeleteLessThanLod4Map = {};
+	this.nodesToDeleteLessThanLod5Map = {};
+	this.nodesToDeleteLodMeshMap = {}; // no used.***
 	this.tinTerrainsToDeleteMap = {};
 };
 
@@ -90,8 +92,6 @@ ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
 	
 	var key = node.data.neoBuilding.buildingId;
 	this.nodesToDeleteLessThanLod3Map[key] = node;
-	
-	//this.nodesToDeleteLessThanLod3Map.set(node, aValue);
 };
 
 ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
@@ -107,7 +107,62 @@ ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
 		return true;
 	}
 	return false;
-	//return this.nodesToDeleteLessThanLod3Map.delete(node);
+};
+
+ProcessQueue.prototype.putNodeToDeleteLessThanLod4 = function(node, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteLessThanLod4Map[key] = node;
+};
+
+ProcessQueue.prototype.eraseNodeToDeleteLessThanLod4 = function(node)
+{
+	// this erases the node from the "nodesToDeleteLessThanLod4Map".
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteLessThanLod4Map.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteLessThanLod4Map[key];
+		return true;
+	}
+	return false;
+};
+
+ProcessQueue.prototype.putNodeToDeleteLessThanLod5 = function(node, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	this.nodesToDeleteLessThanLod5Map[key] = node;
+};
+
+ProcessQueue.prototype.eraseNodeToDeleteLessThanLod5 = function(node)
+{
+	// this erases the node from the "nodesToDeleteLessThanLod5Map".
+	if (node.data === undefined || node.data.neoBuilding === undefined)
+	{ return; }
+	
+	var key = node.data.neoBuilding.buildingId;
+	if (this.nodesToDeleteLessThanLod5Map.hasOwnProperty(key)) 
+	{
+		delete this.nodesToDeleteLessThanLod5Map[key];
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)

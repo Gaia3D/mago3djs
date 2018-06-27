@@ -202,26 +202,12 @@ NeoBuilding.prototype.deleteObjectsLodMesh = function(gl, vboMemoryManager, lodM
 		if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, lodMeshKey))
 		{
 			var legoSkin = this.lodMeshesMap[lodMeshKey];
-			if (legoSkin.vbo_vicks_container !== undefined)
-			{
-				legoSkin.vbo_vicks_container.deleteGlObjects(gl, vboMemoryManager);
-				legoSkin.vbo_vicks_container = undefined;
-			}
-			/*
-			legoSkin.textureName = undefined;
-			if (legoSkin.texture)
-			{
-				legoSkin.texture.deleteObjects(gl);
-			}
-			legoSkin.texture = undefined;
-			if(legoSkin.bbox)
-			{
-				legoSkin.bbox.deleteObjects();
-			}
-			legoSkin.bbox = undefined;
-			*/
-	
-			legoSkin.fileLoadState = 0;
+			if(legoSkin === undefined)
+				return;
+			
+			delete this.lodMeshesMap[lodMeshKey];
+			legoSkin.deleteObjects(gl, vboMemoryManager);
+			legoSkin = undefined;
 		}
 	}
 };
@@ -290,6 +276,8 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetad
 			if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, key))
 			{
 				var legoSkin = this.lodMeshesMap[key];
+				if(legoSkin === undefined)
+					continue;
 				legoSkin.deleteObjects(gl, vboMemoryManager);
 				legoSkin = undefined;
 			}
