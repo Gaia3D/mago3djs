@@ -650,48 +650,58 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		
 		var increDist = 0.2;
 		var currentAlt = geoLocationData.geographicCoord.altitude || 0;
-
+		var displayData = false;
+		
 		// For Heading
 		if (event.keyCode === 'Q'.charCodeAt(0))
 		{
 			currentHeading += increDeg;
+			displayData = true;
 		}
 		else if (event.keyCode === 'A'.charCodeAt(0))
 		{
 			currentHeading -= increDeg;
+			displayData = true;
 		}
 		
 		// For Pitch
 		if (event.keyCode === 'W'.charCodeAt(0))
 		{
 			currentPitch += increDeg;
+			displayData = true;
 		}
 		else if (event.keyCode === 'S'.charCodeAt(0))
 		{
 			currentPitch -= increDeg;
+			displayData = true;
 		}
 
 		// For Roll
 		if (event.keyCode === 'E'.charCodeAt(0))
 		{
 			currentRoll += increDeg;
+			displayData = true;
 		}
 		else if (event.keyCode === 'D'.charCodeAt(0))
 		{
 			currentRoll -= increDeg;
+			displayData = true;
 		}
 		
 		// For Altitude
 		if (event.keyCode === 'Z'.charCodeAt(0))
 		{
 			currentAlt += increDist;
+			displayData = true;
 		}
 		else if (event.keyCode === 'X'.charCodeAt(0))
 		{
 			currentAlt -= increDist;
+			displayData = true;
 		}
 
-		magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
+		if(displayData)
+			magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
 
 	}, false);
 	
