@@ -700,8 +700,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			displayData = true;
 		}
 
-		if(displayData)
-			magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll);
+		if (displayData)
+		{ magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll); }
 
 	}, false);
 	

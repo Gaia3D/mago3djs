@@ -29,16 +29,16 @@ FileRequestControler.prototype.isFullHeaders = function ()
 
 FileRequestControler.prototype.isFullPlus = function (extraCount)
 {
-	if(extraCount === undefined)
-		extraCount = 0;
+	if (extraCount === undefined)
+	{ extraCount = 0; }
 	
 	return this.filesRequestedCount >= (this.maxFilesRequestedCount + extraCount); 
 };
 
 FileRequestControler.prototype.isFullPlusModelReferences = function (extraCount)
 {
-	if(extraCount === undefined)
-		extraCount = 0;
+	if (extraCount === undefined)
+	{ extraCount = 0; }
 	
 	return this.modelRefFilesRequestedCount >= (this.maxFilesRequestedCount + extraCount); 
 };

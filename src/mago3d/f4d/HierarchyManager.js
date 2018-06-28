@@ -132,14 +132,20 @@ HierarchyManager.prototype.existProject = function(projectId)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.getNodesMap = function(projectId) 
+HierarchyManager.prototype.getNodesMap = function(projectId, attributes) 
 {
 	// 1rst, check if exist.
 	var nodesMap = this.projectsMap[projectId];
 	if (nodesMap === undefined)
 	{
 		nodesMap = {};
+		if (attributes !== undefined)
+		{ nodesMap.attributes = attributes; }
 		this.projectsMap[projectId] = nodesMap;
+	}
+	else{
+		if (attributes !== undefined && nodesMap.attributes === undefined)
+		{ nodesMap.attributes = attributes; }
 	}
 	return nodesMap;
 };
@@ -150,9 +156,9 @@ HierarchyManager.prototype.getNodesMap = function(projectId)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-HierarchyManager.prototype.newNode = function(id, projectId) 
+HierarchyManager.prototype.newNode = function(id, projectId, attributes) 
 {
-	var nodesMap = this.getNodesMap(projectId);
+	var nodesMap = this.getNodesMap(projectId, attributes);
 	
 	var node = new Node();
 	node.data = {"nodeId": id};

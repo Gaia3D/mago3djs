@@ -2,7 +2,8 @@
 	"attributes": {
 		"isPhysical": false,
 		"nodeType": "root",
-		"projectType": "3ds"
+		"projectType": "3ds",
+		"specularLighting": true
 	},
 	"children": [
 		{

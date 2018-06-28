@@ -26,7 +26,7 @@ var Renderer = function()
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
-Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, standardShader, renderTexture, ssao_idx, maxSizeToRender, refMatrixIdxKey) 
+Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, shader, renderTexture, ssao_idx, maxSizeToRender, refMatrixIdxKey) 
 {
 	var node;
 	var rootNode;
@@ -65,6 +65,18 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
+		// check attributes of the project.************************************************
+		var project = magoManager.hierarchyManager.getNodesMap(node.data.projectId);
+		if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
+		{
+			var applySpecLighting = project.attributes.specularLighting;
+			if (applySpecLighting)
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, true); }
+			else
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
+		}
+		// end check attributes of the project.----------------------------------------
+		
 		if (neoBuilding.currentVisibleOctreesControler === undefined)
 		{ continue; }
 	
@@ -76,12 +88,12 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 		{
 			flipYTexCoord = false;
 		}
-		gl.uniform1i(standardShader.textureFlipYAxis_loc, flipYTexCoord);
+		gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 		
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-		gl.uniformMatrix4fv(standardShader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(standardShader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(standardShader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 			
 		if (ssao_idx === 0)
 		{
@@ -112,8 +124,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
-			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
 		}
 		
 		// LOD1.***
@@ -125,8 +137,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, st
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
-			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, standardShader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
+			//this.renderNeoRefListsGroupedVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
 		}
 		
 		if (ssao_idx === 1)
@@ -178,6 +190,18 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 			this.enableStencilBuffer(gl);
 		}
 		
+		// check attributes of the project.************************************************
+		var project = magoManager.hierarchyManager.getNodesMap(node.data.projectId);
+		if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
+		{
+			var applySpecLighting = project.attributes.specularLighting;
+			if (applySpecLighting)
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, true); }
+			else
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
+		}
+		// end check attributes of the project.----------------------------------------
+		
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
 		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
@@ -195,8 +219,8 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 				continue;
 			}
 			
-			if(lowestOctree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-				continue;
+			if (lowestOctree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			{ continue; }
 
 			// if the building is highlighted, the use highlight oneColor4.*********************
 			if (ssao_idx === 1)
@@ -284,14 +308,26 @@ Renderer.prototype.renderNeoBuildingsLowLOD = function(gl, visibleNodesArray, ma
 		if (skinLego === undefined)
 		{ continue; }
 	
-		if(skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-			continue;
+		if (skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{ continue; }
 	
 		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{
 			// active stencil buffer to draw silhouette.***
 			this.enableStencilBuffer(gl);
 		}
+		
+		// check attributes of the project.************************************************
+		var project = magoManager.hierarchyManager.getNodesMap(node.data.projectId);
+		if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
+		{
+			var applySpecLighting = project.attributes.specularLighting;
+			if (applySpecLighting)
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, true); }
+			else
+			{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
+		}
+		// end check attributes of the project.----------------------------------------
 			
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);

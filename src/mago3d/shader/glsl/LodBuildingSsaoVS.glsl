@@ -18,6 +18,7 @@ uniform vec3 aditionalPosition;
 uniform vec4 oneColor4;
 uniform bool bUse1Color;
 uniform bool hasTexture;
+uniform bool bApplySpecularLighting;
 
 varying vec3 vNormal;
 varying vec2 vTexCoord;   
@@ -25,6 +26,7 @@ varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
 varying vec4 vcolor4;
 varying vec3 vertexPos;
+varying float applySpecLighting;
 
 void main()
 {	
@@ -44,6 +46,11 @@ void main()
     vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;
     float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
     vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
+	
+	if(bApplySpecularLighting)
+			applySpecLighting = 1.0;
+		else
+			applySpecLighting = -1.0;
 
     if(bUse1Color)
     {
