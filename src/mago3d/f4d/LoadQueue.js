@@ -137,10 +137,15 @@ LoadQueue.prototype.manageQueue = function()
 		var octree = loadData.octree;
 		var filePath = loadData.filePath;
 		
-		if (loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
-		{ readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager); }
-		
-		readerWriter.getOctreeLegoArraybuffer(filePath, octree, this.magoManager);
+		if(octree.lego !== undefined)
+		{
+			if (loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
+			{ readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager); }
+			
+			readerWriter.getOctreeLegoArraybuffer(filePath, octree, this.magoManager);
+		}
+		else
+			var hola = 0;
 		
 		delete this.lod2SkinDataMap[key];
 
@@ -157,7 +162,7 @@ LoadQueue.prototype.manageQueue = function()
 	//if (remainLod2)
 	//{ return; }
 	
-	// Low lod meshes.***
+	// Low lod meshes ( lod 3, 4, 5).***
 	counter = 0;
 	for (var key in this.lowLodSkinDataMap)
 	{

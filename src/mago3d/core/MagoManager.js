@@ -1156,7 +1156,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		if (this.frustumVolumeControl === undefined)
 		{ return; }
 		
-		var frustumVolume = this.myCameraSCX.frustum;
+		//var frustumVolume = this.myCameraSCX.frustum;
+		var frustumVolume = this.myCameraSCX.bigFrustum;
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		doFrustumCullingToBuildings = true;
@@ -1290,6 +1291,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		if (this.currentFrustumIdx === 0)
 		{
+			
 			this.loadQueue.manageQueue();
 			//this.loadQueue.resetQueue();
 		}
