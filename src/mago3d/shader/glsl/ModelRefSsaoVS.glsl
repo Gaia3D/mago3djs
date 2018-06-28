@@ -16,12 +16,14 @@
 	uniform vec3 aditionalPosition;
 	uniform vec3 refTranslationVec;
 	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
+	uniform bool bApplySpecularLighting;
 
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
 	varying vec3 uAmbientColor;
 	varying vec3 vLightWeighting;
 	varying vec3 vertexPos;
+	varying float applySpecLighting;
 	
 	void main()
     {	
@@ -59,6 +61,11 @@
 		vTexCoord = texCoord;
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
+		
+		if(bApplySpecularLighting)
+			applySpecLighting = 1.0;
+		else
+			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	}

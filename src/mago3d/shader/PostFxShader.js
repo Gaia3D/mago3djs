@@ -534,8 +534,6 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.uniformLocation = uniformLocation;
 		uniformDataPair.vec3fv = sceneState.ssaoKernel16;
 	}
-	
-	
 };
 
 /**
@@ -577,6 +575,8 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.texCoordByteSize_loc = gl.getUniformLocation(shader.program, "texCoordByteSize");
 	shader.compressionMaxPoint_loc = gl.getUniformLocation(shader.program, "compressionMaxPoint");
 	shader.compressionMinPoint_loc = gl.getUniformLocation(shader.program, "compressionMinPoint");
+	
+	shader.bApplySpecularLighting_loc = gl.getUniformLocation(shader.program, "bApplySpecularLighting");
 };
 
 //*********************************************************************************************************************

@@ -202,8 +202,8 @@ NeoBuilding.prototype.deleteObjectsLodMesh = function(gl, vboMemoryManager, lodM
 		if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, lodMeshKey))
 		{
 			var legoSkin = this.lodMeshesMap[lodMeshKey];
-			if(legoSkin === undefined)
-				return;
+			if (legoSkin === undefined)
+			{ return; }
 			
 			delete this.lodMeshesMap[lodMeshKey];
 			legoSkin.deleteObjects(gl, vboMemoryManager);
@@ -234,7 +234,7 @@ NeoBuilding.prototype.deleteObjectsLod2 = function(gl, vboMemoryManager)
  */
 NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetadata) 
 {
-	if(deleteMetadata)
+	if (deleteMetadata)
 	{
 		this.metaData.deleteObjects();
 		this.metaData.fileLoadState = CODE.fileLoadState.READY;
@@ -276,8 +276,8 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetad
 			if (Object.prototype.hasOwnProperty.call(this.lodMeshesMap, key))
 			{
 				var legoSkin = this.lodMeshesMap[key];
-				if(legoSkin === undefined)
-					continue;
+				if (legoSkin === undefined)
+				{ continue; }
 				legoSkin.deleteObjects(gl, vboMemoryManager);
 				legoSkin = undefined;
 			}

@@ -20,6 +20,7 @@ uniform float screenHeight;
 uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
+uniform bool bApplyScpecularLighting;
 
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
@@ -34,6 +35,7 @@ uniform float radius;
 uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
+varying float applySpecLighting;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -89,23 +91,30 @@ void main()
         
     occlusion = 1.0 - occlusion / float(kernelSize);
 
-    vec3 lightPos = vec3(20.0, 60.0, 20.0);
-    vec3 L = normalize(lightPos - vertexPos);
-    float lambertian = max(dot(normal2, L), 0.0);
-    float specular = 0.0;
-    if(lambertian > 0.0)
-    {
-        vec3 R = reflect(-L, normal2);      // Reflected light vector
-        vec3 V = normalize(-vertexPos); // Vector to viewer
-        
-        // Compute the specular term
-        float specAngle = max(dot(R, V), 0.0);
-        specular = pow(specAngle, shininessValue);
-    }
-	
-	if(lambertian < 0.5)
-    {
-		lambertian = 0.5;
+    // Do specular lighting.***
+	float lambertian;
+	float specular;
+		
+	if(applySpecLighting> 0.0)
+	{
+		vec3 lightPos = vec3(20.0, 60.0, 20.0);
+		vec3 L = normalize(lightPos - vertexPos);
+		lambertian = max(dot(normal2, L), 0.0);
+		specular = 0.0;
+		if(lambertian > 0.0)
+		{
+			vec3 R = reflect(-L, normal2);      // Reflected light vector
+			vec3 V = normalize(-vertexPos); // Vector to viewer
+			
+			// Compute the specular term
+			float specAngle = max(dot(R, V), 0.0);
+			specular = pow(specAngle, shininessValue);
+		}
+		
+		if(lambertian < 0.5)
+		{
+			lambertian = 0.5;
+		}
 	}
 
     vec4 textureColor;
@@ -130,5 +139,13 @@ void main()
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
+    vec4 finalColor;
+	if(applySpecLighting> 0.0)
+	{
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
+	}
+	else{
+		finalColor = vec4((textureColor.xyz) * occlusion, 1.0);
+	}
+    gl_FragColor = finalColor; 
 }

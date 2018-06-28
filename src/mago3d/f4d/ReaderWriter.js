@@ -331,8 +331,8 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
  */
 ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
-	if(lowestOctree.lego === undefined)
-		return;
+	if (lowestOctree.lego === undefined)
+	{ return; }
 	
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;

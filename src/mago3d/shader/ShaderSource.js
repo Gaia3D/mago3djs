@@ -844,12 +844,14 @@ uniform float screenHeight;   \n\
 uniform float shininessValue; \n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 vColor4Aux;\n\
+uniform bool bApplyScpecularLighting;\n\
 \n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 uniform vec3 specularColor;\n\
 varying vec3 vertexPos;\n\
+varying float applySpecLighting;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;    \n\
@@ -912,24 +914,29 @@ void main()\n\
     }   \n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
-                                \n\
-    vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
-    vec3 L = normalize(lightPos - vertexPos);\n\
-    float lambertian = max(dot(normal2, L), 0.0);\n\
-    float specular = 0.0;\n\
-    if(lambertian > 0.0)\n\
-    {\n\
-        vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-        vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-        \n\
-        // Compute the specular term\n\
-        float specAngle = max(dot(R, V), 0.0);\n\
-        specular = pow(specAngle, shininessValue);\n\
-    }\n\
-	\n\
-	if(lambertian < 0.5)\n\
-    {\n\
-		lambertian = 0.5;\n\
+\n\
+	float lambertian;\n\
+	float specular;\n\
+    if(applySpecLighting > 0.0)\n\
+	{\n\
+		vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
+		vec3 L = normalize(lightPos - vertexPos);\n\
+		lambertian = max(dot(normal2, L), 0.0);\n\
+		specular = 0.0;\n\
+		if(lambertian > 0.0)\n\
+		{\n\
+			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+			\n\
+			// Compute the specular term\n\
+			float specAngle = max(dot(R, V), 0.0);\n\
+			specular = pow(specAngle, shininessValue);\n\
+		}\n\
+		\n\
+		if(lambertian < 0.5)\n\
+		{\n\
+			lambertian = 0.5;\n\
+		}\n\
 	}\n\
 \n\
     vec4 textureColor;\n\
@@ -953,8 +960,15 @@ void main()\n\
     }\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-\n\
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+	vec4 finalColor;\n\
+	if(applySpecLighting > 0.0)\n\
+	{\n\
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+	}\n\
+	else{\n\
+		finalColor = vec4((textureColor.xyz) * occlusion, 1.0);\n\
+	}\n\
+    gl_FragColor = finalColor; \n\
 }\n\
 ";
 ShaderSource.LodBuildingSsaoSimpleCompressFS = "#ifdef GL_ES\n\
@@ -1316,6 +1330,7 @@ uniform vec3 aditionalPosition;\n\
 uniform vec4 oneColor4;\n\
 uniform bool bUse1Color;\n\
 uniform bool hasTexture;\n\
+uniform bool bApplySpecularLighting;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -1323,6 +1338,7 @@ varying vec3 uAmbientColor;\n\
 varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 varying vec3 vertexPos;\n\
+varying float applySpecLighting;\n\
 \n\
 void main()\n\
 {	\n\
@@ -1342,6 +1358,11 @@ void main()\n\
     vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
     float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
     vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+	\n\
+	if(bApplySpecularLighting)\n\
+			applySpecLighting = 1.0;\n\
+		else\n\
+			applySpecLighting = -1.0;\n\
 \n\
     if(bUse1Color)\n\
     {\n\
@@ -1392,6 +1413,7 @@ uniform float radius;      \n\
 uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
+varying float applySpecLighting;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1447,23 +1469,30 @@ void main()\n\
         \n\
     occlusion = 1.0 - occlusion / float(kernelSize);\n\
 \n\
-    vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
-    vec3 L = normalize(lightPos - vertexPos);\n\
-    float lambertian = max(dot(normal2, L), 0.0);\n\
-    float specular = 0.0;\n\
-    if(lambertian > 0.0)\n\
-    {\n\
-        vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-        vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-        \n\
-        // Compute the specular term\n\
-        float specAngle = max(dot(R, V), 0.0);\n\
-        specular = pow(specAngle, shininessValue);\n\
-    }\n\
-	\n\
-	if(lambertian < 0.5)\n\
-    {\n\
-		lambertian = 0.5;\n\
+    // Do specular lighting.***\n\
+	float lambertian;\n\
+	float specular;\n\
+		\n\
+	if(applySpecLighting> 0.0)\n\
+	{\n\
+		vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
+		vec3 L = normalize(lightPos - vertexPos);\n\
+		lambertian = max(dot(normal2, L), 0.0);\n\
+		specular = 0.0;\n\
+		if(lambertian > 0.0)\n\
+		{\n\
+			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+			\n\
+			// Compute the specular term\n\
+			float specAngle = max(dot(R, V), 0.0);\n\
+			specular = pow(specAngle, shininessValue);\n\
+		}\n\
+		\n\
+		if(lambertian < 0.5)\n\
+		{\n\
+			lambertian = 0.5;\n\
+		}\n\
 	}\n\
 \n\
     vec4 textureColor;\n\
@@ -1488,7 +1517,15 @@ void main()\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 \n\
-    gl_FragColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+    vec4 finalColor;\n\
+	if(applySpecLighting> 0.0)\n\
+	{\n\
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); \n\
+	}\n\
+	else{\n\
+		finalColor = vec4((textureColor.xyz) * occlusion, 1.0);\n\
+	}\n\
+    gl_FragColor = finalColor; \n\
 }\n\
 ";
 ShaderSource.ModelRefSsaoSimpleFS = "#ifdef GL_ES\n\
@@ -1688,12 +1725,14 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	uniform vec3 aditionalPosition;\n\
 	uniform vec3 refTranslationVec;\n\
 	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+	uniform bool bApplySpecularLighting;\n\
 \n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
 	varying vec3 vertexPos;\n\
+	varying float applySpecLighting;\n\
 	\n\
 	void main()\n\
     {	\n\
@@ -1731,6 +1770,11 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+		\n\
+		if(bApplySpecularLighting)\n\
+			applySpecLighting = 1.0;\n\
+		else\n\
+			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}\n\

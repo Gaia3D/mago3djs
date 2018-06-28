@@ -44,8 +44,8 @@ var LoadQueue = function(magoManager)
 	
 	this.magoManager;
 	
-	if(magoManager !== undefined)
-		this.magoManager = magoManager;
+	if (magoManager !== undefined)
+	{ this.magoManager = magoManager; }
 	
 	this.lod2SkinDataMap = {}; // includes data & texture.***
 	
@@ -95,7 +95,7 @@ LoadQueue.prototype.putLowLodSkinTexture = function(filePath, texture, aValue)
 
 LoadQueue.prototype.resetQueue = function()
 {
-	for(var key in this.lod2SkinDataMap)
+	for (var key in this.lod2SkinDataMap)
 	{
 		var loadData = this.lod2SkinDataMap[key];
 		loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
@@ -104,7 +104,7 @@ LoadQueue.prototype.resetQueue = function()
 	this.lod2SkinDataMap = {};
 	
 	// Low lod meshes.***
-	for(var key in this.lowLodSkinDataMap)
+	for (var key in this.lowLodSkinDataMap)
 	{
 		var loadData = this.lowLodSkinDataMap[key];
 		loadData.skinMesh.fileLoadState = CODE.fileLoadState.READY;
@@ -112,7 +112,7 @@ LoadQueue.prototype.resetQueue = function()
 	
 	this.lowLodSkinDataMap = {};
 	
-	for(var key in this.lowLodSkinTextureMap)
+	for (var key in this.lowLodSkinTextureMap)
 	{
 		var loadData = this.lowLodSkinTextureMap[key];
 		loadData.texture.fileLoadState = CODE.fileLoadState.READY;
@@ -131,21 +131,21 @@ LoadQueue.prototype.manageQueue = function()
 	
 	// Lod2 meshes, 1rst load texture.***.***
 	counter = 0;
-	for(var key in this.lod2SkinDataMap)
+	for (var key in this.lod2SkinDataMap)
 	{
 		var loadData = this.lod2SkinDataMap[key];
 		var octree = loadData.octree;
 		var filePath = loadData.filePath;
 		
-		if(loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
-			readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager);
+		if (loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
+		{ readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager); }
 		
 		readerWriter.getOctreeLegoArraybuffer(filePath, octree, this.magoManager);
 		
 		delete this.lod2SkinDataMap[key];
 
 		counter++;
-		if(counter > 4)
+		if (counter > 4)
 		{
 			//this.lod2SkinDataMap = {};
 			remainLod2 = true;
@@ -154,12 +154,12 @@ LoadQueue.prototype.manageQueue = function()
 	}
 	
 	
-	if(remainLod2)
-		return;
+	//if (remainLod2)
+	//{ return; }
 	
 	// Low lod meshes.***
 	counter = 0;
-	for(var key in this.lowLodSkinDataMap)
+	for (var key in this.lowLodSkinDataMap)
 	{
 		var loadData = this.lowLodSkinDataMap[key];
 		var skinMesh = loadData.skinMesh;
@@ -168,12 +168,12 @@ LoadQueue.prototype.manageQueue = function()
 		
 		delete this.lowLodSkinDataMap[key];
 		counter++;
-		if(counter > maxFileLoad)
-			break;
+		if (counter > maxFileLoad)
+		{ break; }
 	}
 	
 	counter = 0;
-	for(var key in this.lowLodSkinTextureMap)
+	for (var key in this.lowLodSkinTextureMap)
 	{
 		var loadData = this.lowLodSkinTextureMap[key];
 		var skinMesh = loadData.skinMesh;
@@ -182,8 +182,8 @@ LoadQueue.prototype.manageQueue = function()
 		
 		delete this.lowLodSkinTextureMap[key];
 		counter++;
-		if(counter > maxFileLoad)
-			break;
+		if (counter > maxFileLoad)
+		{ break; }
 	}
 };
 

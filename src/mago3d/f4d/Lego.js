@@ -80,7 +80,7 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
 		this.texture.deleteObjects(gl);
 	}
 	this.texture = undefined;
-	if(this.bbox)
+	if (this.bbox)
 	{
 		this.bbox.deleteObjects();
 	}
