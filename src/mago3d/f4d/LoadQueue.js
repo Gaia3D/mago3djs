@@ -173,14 +173,29 @@ LoadQueue.prototype.manageQueue = function()
 		}
 	}
 	
-	
-	//if (remainLod2)
-	//{ return; }
-
-	if (this.magoManager.fileRequestControler.isFull())	
-		{ return; }
+	if (this.magoManager.fileRequestControler.isFullPlusLowLodData())	
+	{ 
+		return; 
+	}
 	
 	// Low lod meshes ( lod 3, 4, 5).***
+	counter = 0;
+	for (var key in this.lowLodSkinTextureMap)
+	{
+		var loadData = this.lowLodSkinTextureMap[key];
+		var skinMesh = loadData.skinMesh;
+		var filePath = loadData.filePath;
+		readerWriter.readLegoSimpleBuildingTexture(gl, filePath, loadData.texture, this.magoManager);
+		
+		delete this.lowLodSkinTextureMap[key];
+		loadData.deleteObjects();
+		loadData = undefined;
+		
+		counter++;
+		if (counter > maxFileLoad)
+		{ break; }
+	}
+	
 	counter = 0;
 	for (var key in this.lowLodSkinDataMap)
 	{
@@ -198,22 +213,7 @@ LoadQueue.prototype.manageQueue = function()
 		{ break; }
 	}
 	
-	counter = 0;
-	for (var key in this.lowLodSkinTextureMap)
-	{
-		var loadData = this.lowLodSkinTextureMap[key];
-		var skinMesh = loadData.skinMesh;
-		var filePath = loadData.filePath;
-		readerWriter.readLegoSimpleBuildingTexture(gl, filePath, loadData.texture, this.magoManager);
-		
-		delete this.lowLodSkinTextureMap[key];
-		loadData.deleteObjects();
-		loadData = undefined;
-		
-		counter++;
-		if (counter > maxFileLoad)
-		{ break; }
-	}
+	this.resetQueue();
 };
 
 

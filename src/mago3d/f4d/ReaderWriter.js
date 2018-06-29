@@ -380,6 +380,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoManager) 
 {
 	magoManager.fileRequestControler.filesRequestedCount += 1;
+	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
 	legoMesh.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
 	loadWithXhr(fileName).done(function(response) 
@@ -404,11 +405,15 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		console.log("xhr status = " + status);
 		if (status === 0) { legoMesh.fileLoadState = 500; }
 		//else { legoMesh.fileLoadState = status; }
-		else { legoMesh.fileLoadState = -1; }
+		else { 
+			legoMesh.fileLoadState = -1; 
+		}
 	}).always(function() 
 	{
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
 		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+		if (magoManager.fileRequestControler.lowLodDataRequestedCount < 0) { magoManager.fileRequestControler.lowLodDataRequestedCount = 0; }
 	});
 };
 
@@ -1401,7 +1406,8 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 {
 	var neoRefImage = new Image();
 	texture.fileLoadState == CODE.fileLoadState.LOADING_STARTED;
-	//magoManager.backGround_fileReadings_count ++;
+	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
+
 	neoRefImage.onload = function() 
 	{
 		if (texture.texId === undefined) 
@@ -1409,8 +1415,11 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
 		texture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED;
+		
+		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
 
 		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
+		if (magoManager.fileRequestControler.lowLodDataRequestedCount < 0) { magoManager.fileRequestControler.lowLodDataRequestedCount = 0; }
 	};
 
 	neoRefImage.onerror = function() 

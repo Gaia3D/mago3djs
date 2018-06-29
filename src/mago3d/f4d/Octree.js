@@ -1080,6 +1080,11 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.
+	if(startIdx === undefined)
+		startIdx = 0;
+	
+	if(endIdx === undefined)
+		endIdx = octreesArray.length-1;
 	
 	var range = endIdx - startIdx;
 	
