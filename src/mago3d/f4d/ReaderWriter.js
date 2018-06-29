@@ -1327,12 +1327,20 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						
 					}
 					
-					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-					gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-					gl.generateMipmap(gl.TEXTURE_2D);
-					texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
-					gl.bindTexture(gl.TEXTURE_2D, null);
+					
+					if(tga.imageData !== undefined && tga.imageData.length > 0 && texture.texId !== undefined)
+					{
+						gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+						gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
+						gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+						gl.generateMipmap(gl.TEXTURE_2D);
+						texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+						gl.bindTexture(gl.TEXTURE_2D, null);
+					}
+					else{
+						var hola = 0;
+
+					}
 				}
 			}
 		}).fail(function(status) 
