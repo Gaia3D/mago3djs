@@ -2,7 +2,8 @@
 	"attributes": {
 		"isPhysical": false,
 		"nodeType": " root ",
-		"projectType": "sea_port"
+		"projectType": "sea_port",
+		"specularLighting": true
 	},
 	"children": [
 		{

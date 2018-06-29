@@ -29,6 +29,19 @@ var LoadData = function()
 	this.texture;
 };
 
+LoadData.prototype.deleteObjects = function()
+{
+	// here deletes deletable objects.***
+	this.dataType = undefined;
+	this.distToCam = undefined;
+	this.lod = undefined;
+	this.filePath = undefined;
+	this.texFilePath = undefined;
+	this.skinMesh = undefined;
+	this.octree = undefined;
+	this.texture = undefined;
+}
+
 /**
  * LoadQueue
  * 
@@ -148,6 +161,8 @@ LoadQueue.prototype.manageQueue = function()
 			var hola = 0;
 		
 		delete this.lod2SkinDataMap[key];
+		loadData.deleteObjects();
+		loadData = undefined;
 
 		counter++;
 		if (counter > 4)
@@ -161,6 +176,9 @@ LoadQueue.prototype.manageQueue = function()
 	
 	//if (remainLod2)
 	//{ return; }
+
+	if (this.magoManager.fileRequestControler.isFull())	
+		{ return; }
 	
 	// Low lod meshes ( lod 3, 4, 5).***
 	counter = 0;
@@ -172,6 +190,9 @@ LoadQueue.prototype.manageQueue = function()
 		readerWriter.getLegoArraybuffer(filePath, skinMesh, this.magoManager);
 		
 		delete this.lowLodSkinDataMap[key];
+		loadData.deleteObjects();
+		loadData = undefined;
+		
 		counter++;
 		if (counter > maxFileLoad)
 		{ break; }
@@ -186,6 +207,9 @@ LoadQueue.prototype.manageQueue = function()
 		readerWriter.readLegoSimpleBuildingTexture(gl, filePath, loadData.texture, this.magoManager);
 		
 		delete this.lowLodSkinTextureMap[key];
+		loadData.deleteObjects();
+		loadData = undefined;
+		
 		counter++;
 		if (counter > maxFileLoad)
 		{ break; }

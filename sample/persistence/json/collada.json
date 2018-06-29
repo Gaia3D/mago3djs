@@ -2,7 +2,8 @@
 	"attributes": {
 		"isPhysical": false,
 		"nodeType": " root ",
-		"projectType": "collada"
+		"projectType": "collada",
+		"specularLighting": true
 	},
 	"children": [
 		{
