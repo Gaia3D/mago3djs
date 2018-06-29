@@ -3224,7 +3224,7 @@ MagoManager.prototype.manageQueue = function()
 	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 1;
 	
 	if (this.parseQueue.parseOctreesLod0References(gl, this.visibleObjControlerOctrees, this, maxParsesCount))
 	{
@@ -3234,7 +3234,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod1 references.
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 1;
 	if (Object.keys(this.parseQueue.octreesLod0ReferencesToParseMap).length > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -3253,8 +3253,6 @@ MagoManager.prototype.manageQueue = function()
 		
 		if (octreesParsedCount === 0)
 		{
-			///var octreesArray = Array.from(this.parseQueue.octreesLod0ReferencesToParseMap.keys());
-			///for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ReferencesToParseMap)
 			{
 				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ReferencesToParseMap, key))
@@ -3278,7 +3276,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod0 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 1;
 	if (Object.keys(this.parseQueue.octreesLod0ModelsToParseMap).length > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -3379,7 +3377,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod1 models.
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 1;
 	if (Object.keys(this.parseQueue.octreesLod0ModelsToParseMap).length > 0)
 	{
 		// 1rst parse the currently closest lowestOctrees to camera.
@@ -3427,8 +3425,6 @@ MagoManager.prototype.manageQueue = function()
 		
 		if (octreesParsedCount === 0)
 		{
-			//var octreesArray = Array.from(this.parseQueue.octreesLod0ModelsToParseMap.keys());
-			//for (var i=0; i<octreesArray.length; i++)
 			for (var key in this.parseQueue.octreesLod0ModelsToParseMap)
 			{
 				if (Object.prototype.hasOwnProperty.call(this.parseQueue.octreesLod0ModelsToParseMap, key))
@@ -3479,7 +3475,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	// parse octrees lod2 (lego).
 	octreesParsedCount = 0;
-	maxParsesCount = 3;
+	maxParsesCount = 1;
 	if (Object.keys(this.parseQueue.octreesLod2LegosToParseMap).length > 0)
 	{
 		var octreesLod0Count = this.visibleObjControlerOctrees.currentVisibles2.length;
@@ -3586,9 +3582,6 @@ MagoManager.prototype.manageQueue = function()
 			
 			if (this.parseQueue.skinLegosToParseMap.hasOwnProperty(skinLego.legoKey))
 			{
-				if (neoBuilding.buildingId === "lotte")
-				{ var hola = 0; }
-			
 				delete this.parseQueue.skinLegosToParseMap[skinLego.legoKey];
 				skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, this);
 				skinLego.dataArrayBuffer = undefined;
@@ -3657,13 +3650,6 @@ MagoManager.prototype.manageQueue = function()
 		}
 	}
 	*/
-};
-
-/**
- */
-MagoManager.prototype.TestA = function() 
-{
-	var hola = 0;
 };
 
 /**
@@ -3806,8 +3792,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 	//var counter = 0;
 	for (var i=0, length = currentVisibles.length; i<length; i++) 
 	{	
-		//if (this.fileRequestControler.isFullPlus(extraCount))	
-		//{ return; }
+		if (this.fileRequestControler.isFullPlus(extraCount))	
+		{ return; }
 		
 		lowestOctree = currentVisibles[i];
 		
@@ -3824,6 +3810,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		if (neoBuilding === undefined)
 		{ continue; }
+	
+		
 	
 		projectFolderName = neoBuilding.projectFolderName;
 		buildingFolderName = neoBuilding.buildingFileName;
@@ -3869,15 +3857,27 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 				if (neoBuilding.simpleBuilding3x3Texture === undefined)
 				{
 					neoBuilding.simpleBuilding3x3Texture = new Texture();
+					
 					var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
 					var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
 					///this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, neoBuilding.simpleBuilding3x3Texture, this); // old.***
 
 					this.loadQueue.putLod2SkinData(lowestOctree, filePathInServer, neoBuilding.simpleBuilding3x3Texture, texFilePath, 0);
+					//return;
 				}
 				else 
 				{
-					this.loadQueue.putLod2SkinData(lowestOctree, filePathInServer, undefined, undefined, 0);
+					// check texture fileLoadState.***
+					/*
+					if( neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
+					{
+						var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
+						var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
+						this.loadQueue.putLod2SkinData(lowestOctree, filePathInServer, neoBuilding.simpleBuilding3x3Texture, texFilePath, 0);
+					}
+					else if(neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+						*/
+						this.loadQueue.putLod2SkinData(lowestOctree, filePathInServer, undefined, undefined, 0);
 				}
 			}
 		}

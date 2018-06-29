@@ -183,6 +183,9 @@ Renderer.prototype.renderNeoBuildingsLOD2AsimetricVersion = function(gl, visible
 		lowestOctreesCount = neoBuilding.currentVisibleOctreesControler.currentVisibles2.length;
 		if (lowestOctreesCount === 0)
 		{ continue; }
+	
+		//if(neoBuilding.simpleBuilding3x3Texture === undefined || neoBuilding.simpleBuilding3x3Texture.texId === undefined)
+		//	continue;
 		
 		if (ssao_idx === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === neoBuilding)
 		{

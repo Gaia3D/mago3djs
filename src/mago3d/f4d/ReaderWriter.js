@@ -1400,6 +1400,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inServer, texture, magoManager) 
 {
 	var neoRefImage = new Image();
+	texture.fileLoadState == CODE.fileLoadState.LOADING_STARTED;
 	//magoManager.backGround_fileReadings_count ++;
 	neoRefImage.onload = function() 
 	{
@@ -1407,6 +1408,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 		{ texture.texId = gl.createTexture(); }
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
+		texture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED;
 
 		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
 	};
@@ -1421,6 +1423,8 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([200, 200, 200, 255])); // clear grey
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
+		
+		texture.fileLoadState == CODE.fileLoadState.READY;
 	};
 
 	neoRefImage.src = filePath_inServer;
