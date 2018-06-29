@@ -18,6 +18,7 @@ var Lego = function()
 	this.bbox;
 	this.dataArrayBuffer;
 	this.selColor4;
+	this.hasTexCoords;
 	this.texture;
 	this.textureName;
 	this.legoKey;
@@ -176,8 +177,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	}
 
 	// VBO(TextureCoord Buffer) - u,v
-	var hasTexCoords = stream.readUint8();
-	if (hasTexCoords)
+	this.hasTexCoords = stream.readUint8();
+	if (this.hasTexCoords)
 	{
 		var dataType = stream.readUint16();
 		var numCoords = stream.readUint32();
@@ -213,7 +214,7 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	{ succesfullyGpuDataBinded = false; }
 
 	// 4) Texcoord.*********************************************
-	if (hasTexCoords)
+	if (this.hasTexCoords)
 	{
 		if (!vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 		{ succesfullyGpuDataBinded = false; }

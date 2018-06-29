@@ -1196,6 +1196,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		}
 		var fileRequestExtraCount = 1;
 		
+		this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees, fileRequestExtraCount); 
 
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles0, fileRequestExtraCount); 
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles1, fileRequestExtraCount); 
@@ -1205,8 +1206,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		fileRequestExtraCount = this.visibleObjControlerOctrees.currentVisibles0.length;
 		if (fileRequestExtraCount > 2)
 		{ fileRequestExtraCount = 2; }
-		
-		this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees, fileRequestExtraCount); 
 		
 		// lod 2.
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
@@ -1274,6 +1273,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 						nodesPutted++;
 					}
 				}
+				
+					
 				if (nodesPutted > 5)
 				{ break; }
 			}
@@ -1521,11 +1522,11 @@ MagoManager.prototype.prepareVisibleTinTerrains = function(tinTerrainManager)
 MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray) 
 {
 	var lowLodDataInQueueCount = Object.keys(this.loadQueue.lowLodSkinDataMap).length;
-	if (lowLodDataInQueueCount > 3)
+	if (lowLodDataInQueueCount > 1)
 	{ return; }
 	
 	var lowLodTexturesInQueueCount = Object.keys(this.loadQueue.lowLodSkinTextureMap).length;
-	if (lowLodTexturesInQueueCount > 3)
+	if (lowLodTexturesInQueueCount > 1)
 	{ return; }
 	
 	// Prepare lod3, lod4 and lod5 meshes.***
@@ -1543,6 +1544,12 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	var lowLodNodesCount = lowLodNodesArray.length;
 	for (var i=0; i<lowLodNodesCount; i++) 
 	{
+		if (Object.keys(this.loadQueue.lowLodSkinDataMap).length > 1)
+		{ return; }
+		
+		if (Object.keys(this.loadQueue.lowLodSkinTextureMap).length > 1)
+		{ return; }
+
 		node = lowLodNodesArray[i];
 		neoBuilding = node.data.neoBuilding;
 		
@@ -1603,28 +1610,24 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 			//this.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, this);
 			this.loadQueue.putLowLodSkinData(lowLodMesh, lodMeshFilePath, 0);
 			
-			continue;
+			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
+			{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+			
 		}
 		
-		if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
-		{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
-		
-		if (lowLodMesh.fileLoadState !== CODE.fileLoadState.READY)
+		if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
 		{
-			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+			// this is the new version.***
+			if (lowLodMesh.texture === undefined)
 			{
-				// this is the new version.***
-				if (lowLodMesh.texture === undefined)
-				{
-					lowLodMesh.texture = new Texture();
-					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
-					//this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, this); // old.***
-					this.loadQueue.putLowLodSkinTexture(filePath_inServer, lowLodMesh.texture, 0);
-				}
+				lowLodMesh.texture = new Texture();
+				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+				//this.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, this); // old.***
+				this.loadQueue.putLowLodSkinTexture(filePath_inServer, lowLodMesh.texture, 0);
 			}
 		}
-		
-		if (this.fileRequestControler.isFullPlus(extraCount))	
+
+		if (this.fileRequestControler.isFullPlusLowLodData(extraCount))	
 		{ return; }
 	}
 };
@@ -3661,7 +3664,7 @@ MagoManager.prototype.manageQueue = function()
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globalVisibleObjControlerOctrees, fileRequestExtraCount) 
 {
-	if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	
+	if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	
 	{ return; }
 
 	var geometryDataPath = this.readerWriter.geometryDataPath;
@@ -3685,12 +3688,17 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		// if the lowest octree is not ready to render, then:
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED )
 		{
-			globalVisibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
+			var insert_idx = lowestOctree.getIndexToInsertBySquaredDistToEye(globalVisibleObjControlerOctrees.currentVisibles2, lowestOctree);
+			globalVisibleObjControlerOctrees.currentVisibles2.splice(insert_idx, 0, lowestOctree);
+			//globalVisibleObjControlerOctrees.currentVisibles2.push(lowestOctree); // old.***
 		}
 	}
 	
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
+		if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	
+		{ return; } 
+	
 		lowestOctree = currentVisibleOctrees[i];
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		
@@ -3703,8 +3711,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		if (lowestOctree.octree_number_name === undefined)
 		{ continue; }
 	
-		if (lowestOctree.lego === undefined || lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)
-		{ continue; }
+		//if (lowestOctree.lego === undefined || lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)
+		//{ continue; }
 	
 		buildingFolderName = neoBuilding.buildingFileName;
 		projectFolderName = neoBuilding.projectFolderName;
@@ -3715,9 +3723,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 		}
 		
-		//if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	
-		//{ return; } 
-
 		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 		{
 			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
@@ -3727,7 +3732,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			this.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, this);
-			//continue; 
 			filesLoadCounter++;
 		}
 		
@@ -3736,26 +3740,14 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 		if (blocksList === undefined)
 		{ continue; }
-		// 0 = file loading NO started.***
 		if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 		{
-			//if (this.fileRequestControler.isFullPlusModelReferences(fileRequestExtraCount))	
-			//{ return; }
-			
-			//if (this.fileRequestControler.isFullPlus(fileRequestExtraCount))	{ return; }
 			// must read blocksList.***
 			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
 			var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
 			var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 			this.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, this);
 			filesLoadCounter++;
-			//continue;
-		}
-		
-		// if the lowest octree is not ready to render, then:
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED )
-		{
-			globalVisibleObjControlerOctrees.currentVisibles2.push(lowestOctree);
 		}
 		
 		if (filesLoadCounter > maxFilesLoad)
