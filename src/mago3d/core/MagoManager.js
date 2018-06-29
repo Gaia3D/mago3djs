@@ -1235,7 +1235,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// in this point, put nodes to delete lod LOWER THAN lod3 (delete lod0, lod1, lod2).***
 		/*
-		if(this.currentFrustumIdx === 0)
+		//if(this.currentFrustumIdx === 0)
 		{
 			nodesCount = this.visibleObjControlerNodes.currentVisibles3.length;
 			var nodesPutted = 0;
@@ -2917,7 +2917,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (this.myCameraRelative === undefined)
 	{ this.myCameraRelative = new Camera(); }
 	
-	this.myCameraRelative.frustum.copyParametersFrom(this.myCameraSCX.frustum);
+	this.myCameraRelative.frustum.copyParametersFrom(this.myCameraSCX.bigFrustum);
 	this.myCameraRelative = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraRelative);
 	//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraRelative.position.x, this.myCameraRelative.position.y, this.myCameraRelative.position.z); // old.***
 	
@@ -2939,7 +2939,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		
 		// 1rst, check if there are octrees very close.
 		//var frustum0 = this.myCameraRelative.getFrustum(this.currentFrustumIdx);
-		var frustum0 = this.myCameraRelative.frustum;
+		//var frustum0 = this.myCameraRelative.frustum;
+		var frustum0 = this.myCameraRelative.bigFrustum;
 		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustum0, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
 			this.myCameraRelative.position, distLod0, distLod1, distLod2*100);
 	}
