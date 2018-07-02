@@ -530,3 +530,41 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
 		managerFactoryInstance.callAPI(api);
 	});
 }
+
+/**
+ * get coodinate relative to building
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ */
+function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint)
+{
+    if (managerFactoryInstance === null) { return; }
+
+    var api = new API("getCoordinateRelativeToBuilding");
+    api.setReturnable(true);
+    api.setProjectId(projectId);
+    api.setDataKey(dataKey);
+    api.setInputPoint(inputPoint);
+
+    return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * get absolte coodinate of building point
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ */
+function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint)
+{
+    if (managerFactoryInstance === null) { return; }
+
+    var api = new API("getAbsoluteCoodinateOfBuildingPoint");
+    api.setReturnable(true);
+    api.setProjectId(projectId);
+    api.setDataKey(dataKey);
+    api.setInputPoint(inputPoint);
+
+    return managerFactoryInstance.callAPI(api);
+}

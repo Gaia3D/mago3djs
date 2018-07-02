@@ -710,7 +710,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		// api gateway 역할
 		callAPI: function(api) 
 		{
-			magoManager.callAPI(api);
+		    if (api.getReturnable()) {
+		        return magoManager.callAPI(api);
+            } else {
+                magoManager.callAPI(api);
+            }
 		},
 		// flyTo: function(issueId, issueType, longitude, latitude, height, duration)
 		// {
