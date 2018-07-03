@@ -292,9 +292,8 @@ http:localhost/sample/worldwind.html</code></pre>
 -----
 <br><br>
 
-
 ###### Googleの翻訳を使用して
-# mago3DJS
+# <a name="japan"></a>mago3DJS
 3次元マルチブロック可視化のためのオープンソースのJavaScriptライブラリ
 
 AEC（Architecture、Engineering、Construction）領域と、伝統的な3次元空間情報（3D GIS）を統合的に管理し、可視化する次世代3次元GISプラットフォームです。室内、糸外の区別なくAECと3D GISをWebブラウザに統合されています。大容量BIM（Building Information Modelling）、JT（Jupiter Tessellation）、3D GISファイルなどを、別のプログラムをインストールすることなく、Webブラウザ上で操作してコラボレーションを行うことができます。
