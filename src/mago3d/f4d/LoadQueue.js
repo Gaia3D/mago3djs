@@ -111,6 +111,9 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lod2SkinDataMap)
 	{
 		var loadData = this.lod2SkinDataMap[key];
+		if(loadData.octree === undefined || loadData.octree.lego === undefined)
+			continue;
+		
 		loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
 	}
 	
@@ -120,6 +123,9 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lowLodSkinDataMap)
 	{
 		var loadData = this.lowLodSkinDataMap[key];
+		if(loadData.skinMesh === undefined)
+			continue;
+		
 		loadData.skinMesh.fileLoadState = CODE.fileLoadState.READY;
 	}
 	
@@ -128,6 +134,9 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lowLodSkinTextureMap)
 	{
 		var loadData = this.lowLodSkinTextureMap[key];
+		if(loadData.texture === undefined)
+			continue;
+		
 		loadData.texture.fileLoadState = CODE.fileLoadState.READY;
 	}
 	
