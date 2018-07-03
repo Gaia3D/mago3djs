@@ -7527,6 +7527,60 @@ MagoManager.prototype.callAPI = function(api)
 			DrawAPI.drawInsertIssueImage(api, this);
 		}
 	}
+	else if (apiName === "getCoordinateRelativeToBuilding") 
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		var worldPoint = api.getInputPoint();
+		var resultPoint = api.getResultPoint();
+		
+		if(projectId === undefined || dataKey === undefined || worldPoint === undefined)
+			return undefined;
+		
+		if(resultPoint === undefined)
+			resultPoint = new Point3D();
+		
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		
+		if(node === undefined)
+			return undefined;
+		
+		var geoLocDataManager = node.data.geoLocDataManager;
+		
+		if(geoLocDataManager === undefined)
+			return undefined;
+		
+		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
+		resultPoint = geoLocdata.worldCoordToLocalCoord(worldPoint, resultPoint);
+		return resultPoint;
+	}
+	else if (apiName === "getAbsoluteCoodinateOfBuildingPoint") 
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		var localPoint = api.getInputPoint();
+		var resultPoint = api.getResultPoint();
+		
+		if(projectId === undefined || dataKey === undefined || localPoint === undefined)
+			return undefined;
+		
+		if(resultPoint === undefined)
+			resultPoint = new Point3D();
+		
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		
+		if(node === undefined)
+			return undefined;
+		
+		var geoLocDataManager = node.data.geoLocDataManager;
+		
+		if(geoLocDataManager === undefined)
+			return undefined;
+		
+		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
+		resultPoint = geoLocdata.localCoordToWorldCoord(localPoint, resultPoint);
+		return resultPoint;
+	}
 };
 
 MagoManager.prototype.deleteAll = function ()

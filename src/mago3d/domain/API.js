@@ -104,6 +104,8 @@ function API(apiName)
 
 	// input x, y, z
     this.inputPoint = null;
+	// result x, y, z
+    this.resultPoint = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -500,4 +502,13 @@ API.prototype.getInputPoint = function()
 API.prototype.setInputPoint = function(inputPoint)
 {
     this.inputPoint = inputPoint;
+};
+
+API.prototype.getResultPoint = function()
+{
+    return this.resultPoint;
+};
+API.prototype.setResultPoint = function(resultPoint)
+{
+    this.resultPoint = resultPoint;
 };
