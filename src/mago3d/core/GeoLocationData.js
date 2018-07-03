@@ -251,10 +251,6 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 		absoluteCamera.position.y - this.position.y, 
 		absoluteCamera.position.z - this.position.z);
 	
-	//pointAux.set(absoluteCamera.position.x - this.position.x - this.aditionalTraslation.x, 
-	//		absoluteCamera.position.y - this.position.y - this.aditionalTraslation.y, 
-	//		absoluteCamera.position.z - this.position.z - this.aditionalTraslation.z);
-	
 	resultCamera.position = this.rotMatrixInv.transformPoint3D(pointAux, resultCamera.position);
 	
 	pointAux.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
