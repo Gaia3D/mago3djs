@@ -537,7 +537,7 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
  */
-function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint)
+function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
     if (managerFactoryInstance === null) { return; }
 
@@ -546,6 +546,7 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
     api.setProjectId(projectId);
     api.setDataKey(dataKey);
     api.setInputPoint(inputPoint);
+	api.setResultPoint(resultPoint);
 
     return managerFactoryInstance.callAPI(api);
 }
@@ -556,7 +557,7 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
  */
-function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint)
+function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
     if (managerFactoryInstance === null) { return; }
 
@@ -565,6 +566,7 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
     api.setProjectId(projectId);
     api.setDataKey(dataKey);
     api.setInputPoint(inputPoint);
+	api.setResultPoint(resultPoint);
 
     return managerFactoryInstance.callAPI(api);
 }

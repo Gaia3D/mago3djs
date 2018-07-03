@@ -237,10 +237,45 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param absoluteCamera 변수
- * @param resultCamera 변수
+ * This function transforms a local position of this geoLocation to world position.
+ * @param localCoord  instance of Point3D.
+ * @param resultWorldCoord. instance of Point3D.
+ * @returns resultWorldCoord. instance of Point3D.
+ */
+GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWorldCoord) 
+{
+	if(localCoord === undefined || this.tMatrix === undefined)
+		return undefined;
+	
+	if(resultWorldCoord === undefined)
+		resultWorldCoord = new Point3D();
+	
+	resultWorldCoord = this.tMatrix.transformPoint3D(localCoord, resultWorldCoord); 
+	return resultWorldCoord;
+};
+
+/**
+ * This function transforms an absolute position to local position for this geoLocation.
+ * @param worldCoord  instance of Point3D.
+ * @param resultLocalCoord. instance of Point3D.
+ * @returns resultLocalCoord. instance of Point3D.
+ */
+GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLocalCoord) 
+{
+	if(worldCoord === undefined || this.tMatrixInv === undefined)
+		return undefined;
+	
+	if(resultLocalCoord === undefined)
+		resultLocalCoord = new Point3D();
+	
+	resultLocalCoord = this.tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
+	return resultLocalCoord;
+};
+
+/**
+ * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ * @param absoluteCamera instance of Camera. 
+ * @param resultCamera instance of Camera. This is the transformed camera.
  * @returns resultCamera
  */
 GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera) 
