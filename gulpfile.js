@@ -19,7 +19,6 @@ var uglify = composer(uglifyjs, console);
 //var sourcemaps = require('gulp-sourcemaps');
 //var cleanCss = require('gulp-clean-css');
 var rename = require("gulp-rename");
-//var util = require('gulp-util');
 //var convertEncoding = require('gulp-convert-encoding');
 //var jasmine = require('gulp-jasmine');
 //var jasmineBrowser = require('gulp-jasmine-browser');
