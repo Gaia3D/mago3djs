@@ -16,13 +16,7 @@
 </div>
 <canvas id="objectLabel"></canvas>
 <script>
-	var agent = navigator.userAgent.toLowerCase();
-	if(agent.indexOf('chrome') < 0) { 
-		alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
-	}
-
-   	var managerFactory = null;
-	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, logMenu : false, attributeMenu : false, configMenu : false };
+	var managerFactory = null;
 	var insertIssueEnable = false;
 
 	var imagePath = "/images/ko";
@@ -41,7 +35,7 @@
 		console.log("--------- intervalCount = " + intervalCount);
 	}
 
-    // mago3d 시작, 정책 데이터 파일을 로딩
+    // mago3d start, policy loading
 	function magoStart(viewer, renderDivId, imagePath) {
 		$.ajax({
 			url: dataInformationUrl + "workshop-policy-cesium.json",
@@ -55,7 +49,8 @@
 			}
 		});
 	}
-		
+
+	// init project load
 	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
 			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);	

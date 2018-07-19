@@ -2,7 +2,8 @@
 	"attributes": {
 		"isPhysical": false,
 		"nodeType": "root",
-		"projectType": "workshop"
+		"projectType": "workshop",
+        "specularLighting": true
 	},
 	"children": [
 		{
