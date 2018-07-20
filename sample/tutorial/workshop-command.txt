@@ -2,4 +2,4 @@ link
 mklink /d "C:\mago3djs\f4d" "C:\f4d"
 
 f4d converter execute
-F4DConverter.exe -inputFolder c:\demo_f4d -outputFolder c:\f4d\workshop -log c:\demo_f4d\logTest.txt -indexing y
+F4DConverter.exe #inputFolder c:\demo_f4d #outputFolder c:\f4d\workshop #meshType 0 #log c:\demo_f4d\logTest.txt #indexing y
