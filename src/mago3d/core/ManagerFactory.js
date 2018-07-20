@@ -320,7 +320,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	function setDefaultDataset() 
 	{
 		var DEFALUT_IMAGE = "ESRI World Imagery";
-		var DEFALUT_TERRAIN = "STK World Terrain meshes";
+		var DEFALUT_TERRAIN = "Cesium World Terrain";
 		// WGS84 Ellipsoide
 		if (MagoConfig.getPolicy().geo_init_default_terrain !== null && MagoConfig.getPolicy().geo_init_default_terrain !== "") 
 		{
