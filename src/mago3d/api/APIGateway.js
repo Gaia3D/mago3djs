@@ -536,6 +536,8 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
+ * @param {string} inputPoint input x, y, z
+ * @param {string} resultPoint return point
  */
 function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
@@ -556,6 +558,8 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
+ * @param {string} inputPoint input x, y, z
+ * @param {string} resultPoint return point
  */
 function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
