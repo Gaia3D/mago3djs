@@ -11,8 +11,8 @@ var Camera = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.position = new Point3D();
-	this.direction = new Point3D();
+	this.position = new Point3D(); 
+	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
 	this.frustum = new Frustum(); // current frustum.***
@@ -186,7 +186,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	var px = this.position.x;
 	var py = this.position.y;
 	var pz = this.position.z;
-	var dx = this.direction.x;
+
 	var dx = this.direction.x;
 	var dy = this.direction.y;
 	var dz = this.direction.z;
@@ -273,7 +273,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 		}
 	}
 	
-	// finally calculate the totalFrustum.***
+	// finally calculate the totalFrustum(BigFrustum).***
 	// calculate the near and far points.
 	this.nearCenterPoint.set(px + dx * this.bigFrustum.near, py + dy * this.bigFrustum.near, pz + dz * this.bigFrustum.near);
 	this.farCenterPoint.set(px + dx * this.bigFrustum.far, py + dy * this.bigFrustum.far, pz + dz * this.bigFrustum.far);

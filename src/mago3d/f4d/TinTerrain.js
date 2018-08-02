@@ -101,7 +101,10 @@ TinTerrain.prototype.decodeData = function()
 	{
 		lonArray[i] = minLon + uValues[i]*lonRangeDivShortMax;
 		latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
-		altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;// + 55.0;
+		altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax + 2.0;
+		
+		// Test.***
+		//altArray[i] *= 3;
 		
 		// make texcoords.***
 		this.texCoordsArray[i*2] = uValues[i]/shortMax;

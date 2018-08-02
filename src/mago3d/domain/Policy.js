@@ -25,7 +25,7 @@ var Policy = function()
 	// squared far frustum 거리
 	this.frustumFarSquaredDistance = 5000000;
 	// far frustum
-	this.frustumFarDistance = 5000;
+	this.frustumFarDistance = 20000;
 
 	// highlighting
 	this.highLightedBuildings = [];

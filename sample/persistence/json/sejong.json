@@ -27,6 +27,22 @@
                 "nodeType": "sejong"
             },
             "children": [],
+            "data_key": "YJ8_1106",
+            "data_name": "YJ8_1106",
+            "latitude": 36.493827460957675,
+            "longitude": 127.25655341846449,
+            "height": 65.60302734375,
+            "mapping_type": "boundingboxcenter",
+            "heading": 0,
+            "pitch": 90,
+            "roll": 0
+        },
+        {
+            "attributes": {
+                "isPhysical": true,
+                "nodeType": "sejong"
+            },
+            "children": [],
             "data_key": "7M6_1452",
             "data_name": "7M6_1452",
             "latitude": 36.493827460957675,
