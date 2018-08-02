@@ -579,7 +579,7 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIn
  */
 SmartTile.selectTileAngleRangeByDepth = function(depth) 
 {
-	if (depth === undefined || depth < 0 || depth > 14)
+	if (depth === undefined || depth < 0 || depth > 15)
 	{ return undefined; }
 	
 	if (depth === 0)
@@ -612,6 +612,8 @@ SmartTile.selectTileAngleRangeByDepth = function(depth)
 	{ return 0.021972656; }
 	if (depth === 14)
 	{ return 0.010986328; }
+	if (depth === 15)
+	{ return 0.010986328/2.0; }
 };
 
 /**
@@ -679,8 +681,6 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 		var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
 		var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
 		var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
-		if (tileName === "12\\6983\\1194")
-		{ var hola = 0; }
 		var geographicExtent = new GeographicExtent();
 		geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
 		geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
@@ -696,8 +696,6 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 			var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
 			var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
 			var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
-			if (tileName === "12\\6983\\1194")
-			{ var hola = 0; }
 			var geographicExtent = new GeographicExtent();
 			geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
 			geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
@@ -743,8 +741,6 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 			var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
 			var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
 			var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
-			if (tileName === "12\\6983\\1194")
-			{ var hola = 0; }
 			var geographicExtent = new GeographicExtent();
 			geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
 			geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);

@@ -162,7 +162,10 @@ LoadQueue.prototype.manageQueue = function()
 		if(octree.lego !== undefined)
 		{
 			if (loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
-			{ readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager); }
+			{ 
+				readerWriter.readLegoSimpleBuildingTexture(gl, loadData.texFilePath, loadData.texture, this.magoManager); 
+				counter += 4;
+			}
 			
 			readerWriter.getOctreeLegoArraybuffer(filePath, octree, this.magoManager);
 		}
@@ -182,7 +185,7 @@ LoadQueue.prototype.manageQueue = function()
 		}
 	}
 	
-	if (this.magoManager.fileRequestControler.isFullPlusLowLodData())	
+	if (this.magoManager.fileRequestControler.isFullPlusLowLodImages())	
 	{ 
 		return; 
 	}

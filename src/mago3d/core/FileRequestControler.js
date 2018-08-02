@@ -16,6 +16,7 @@ var FileRequestControler = function()
 	this.headerFilesRequestedCount = 0;
 	this.modelRefFilesRequestedCount = 0;
 	this.lowLodDataRequestedCount = 0;
+	this.lowLodImagesRequestedCount = 0;
 };
 
 FileRequestControler.prototype.isFull = function ()
@@ -50,4 +51,12 @@ FileRequestControler.prototype.isFullPlusLowLodData = function (extraCount)
 	{ extraCount = 0; }
 	
 	return this.lowLodDataRequestedCount >= (this.maxFilesRequestedCount + extraCount); 
+};
+
+FileRequestControler.prototype.isFullPlusLowLodImages = function (extraCount)
+{
+	if (extraCount === undefined)
+	{ extraCount = 0; }
+	
+	return this.lowLodImagesRequestedCount >= (this.maxFilesRequestedCount + extraCount); 
 };

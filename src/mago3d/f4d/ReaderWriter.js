@@ -379,7 +379,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
  */
 ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoManager) 
 {
-	magoManager.fileRequestControler.filesRequestedCount += 1;
+	//magoManager.fileRequestControler.filesRequestedCount += 1;
 	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
 	legoMesh.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
@@ -410,9 +410,9 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		}
 	}).always(function() 
 	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//magoManager.fileRequestControler.filesRequestedCount -= 1;
 		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+		//if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
 		if (magoManager.fileRequestControler.lowLodDataRequestedCount < 0) { magoManager.fileRequestControler.lowLodDataRequestedCount = 0; }
 	});
 };
@@ -1406,7 +1406,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 {
 	var neoRefImage = new Image();
 	texture.fileLoadState == CODE.fileLoadState.LOADING_STARTED;
-	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
+	magoManager.fileRequestControler.lowLodImagesRequestedCount += 1;
 
 	neoRefImage.onload = function() 
 	{
@@ -1416,10 +1416,10 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
 		texture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED;
 		
-		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
+		magoManager.fileRequestControler.lowLodImagesRequestedCount -= 1;
 
 		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-		if (magoManager.fileRequestControler.lowLodDataRequestedCount < 0) { magoManager.fileRequestControler.lowLodDataRequestedCount = 0; }
+		if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 0) { magoManager.fileRequestControler.lowLodImagesRequestedCount = 0; }
 	};
 
 	neoRefImage.onerror = function() 
@@ -1434,6 +1434,9 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 		}
 		
 		texture.fileLoadState == CODE.fileLoadState.READY;
+		
+		magoManager.fileRequestControler.lowLodImagesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 0) { magoManager.fileRequestControler.lowLodImagesRequestedCount = 0; }
 	};
 
 	neoRefImage.src = filePath_inServer;
