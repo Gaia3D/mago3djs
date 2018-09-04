@@ -130,8 +130,8 @@ Ring.prototype.getPoints = function(resultPointsArray)
 	
 	if (totalPointsCount > 1)
 	{
-		// mark the last as pointType = 1
-		resultPointsArray[totalPointsCount-1].pointType = 1;
+		// mark the last as pointType = 0
+		resultPointsArray[totalPointsCount-1].pointType = 0; // delete this.***
 		
 		var errorDist = 10E-8;
 		var firstPoint = resultPointsArray[0];

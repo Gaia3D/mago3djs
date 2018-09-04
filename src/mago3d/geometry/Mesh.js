@@ -387,7 +387,9 @@ Mesh.prototype.getVboEdges = function(resultVboContainer)
 	var hedgesCount = frontierHedgesArray.length;
 	var hedge;
 	var vertexArray = [];
+	var indicesArray = [];
 	var strVertex, endVertex;
+	var index = 0;
 	for (var i=0; i<hedgesCount; i++)
 	{
 		hedge = frontierHedgesArray[i];
@@ -399,10 +401,15 @@ Mesh.prototype.getVboEdges = function(resultVboContainer)
 		vertexArray.push(endVertex.point3d.x);
 		vertexArray.push(endVertex.point3d.y);
 		vertexArray.push(endVertex.point3d.z);
+		
+		indicesArray.push(index); index++;
+		indicesArray.push(index); index++;
 	}
 	
 	var resultVbo = resultVboContainer.newVBOVertexIdxCacheKey();
 	resultVbo.posVboDataArray = Float32Array.from(vertexArray);
+	resultVbo.idxVboDataArray = Int16Array.from(indicesArray);
+	resultVbo.indicesCount = resultVbo.idxVboDataArray.length;
 };
 
 

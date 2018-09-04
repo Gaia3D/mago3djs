@@ -18,7 +18,7 @@ function API(apiName)
 	// mago3d 활성화/비활성화 여부
 	this.magoEnable = true;
 	// return
-    this.returnable = false;
+	this.returnable = false;
 
 	// api 이름
 	this.apiName = apiName;
@@ -103,9 +103,9 @@ function API(apiName)
 	this.FPVMode = false;
 
 	// input x, y, z
-    this.inputPoint = null;
+	this.inputPoint = null;
 	// result x, y, z
-    this.resultPoint = null;
+	this.resultPoint = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -119,11 +119,11 @@ API.prototype.setMagoEnable = function(magoEnable)
 
 API.prototype.getReturnable = function()
 {
-    return this.returnable;
+	return this.returnable;
 };
 API.prototype.setReturnable = function(returnable)
 {
-    this.returnable = returnable;
+	this.returnable = returnable;
 };
 
 API.prototype.getAPIName = function() 
@@ -497,18 +497,18 @@ API.prototype.setDuration = function(duration)
 
 API.prototype.getInputPoint = function()
 {
-    return this.inputPoint;
+	return this.inputPoint;
 };
 API.prototype.setInputPoint = function(inputPoint)
 {
-    this.inputPoint = inputPoint;
+	this.inputPoint = inputPoint;
 };
 
 API.prototype.getResultPoint = function()
 {
-    return this.resultPoint;
+	return this.resultPoint;
 };
 API.prototype.setResultPoint = function(resultPoint)
 {
-    this.resultPoint = resultPoint;
+	this.resultPoint = resultPoint;
 };

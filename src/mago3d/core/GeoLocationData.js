@@ -244,11 +244,11 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
  */
 GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWorldCoord) 
 {
-	if(localCoord === undefined || this.tMatrix === undefined)
-		return undefined;
+	if (localCoord === undefined || this.tMatrix === undefined)
+	{ return undefined; }
 	
-	if(resultWorldCoord === undefined)
-		resultWorldCoord = new Point3D();
+	if (resultWorldCoord === undefined)
+	{ resultWorldCoord = new Point3D(); }
 	
 	resultWorldCoord = this.tMatrix.transformPoint3D(localCoord, resultWorldCoord); 
 	return resultWorldCoord;
@@ -262,11 +262,11 @@ GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWo
  */
 GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLocalCoord) 
 {
-	if(worldCoord === undefined || this.tMatrixInv === undefined)
-		return undefined;
+	if (worldCoord === undefined || this.tMatrixInv === undefined)
+	{ return undefined; }
 	
-	if(resultLocalCoord === undefined)
-		resultLocalCoord = new Point3D();
+	if (resultLocalCoord === undefined)
+	{ resultLocalCoord = new Point3D(); }
 	
 	resultLocalCoord = this.tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
 	return resultLocalCoord;

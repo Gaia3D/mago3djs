@@ -30,6 +30,7 @@ var SceneState = function()
 	this.camera = new Camera();
 	this.drawingBufferWidth = new Int32Array([1000]);
 	this.drawingBufferHeight = new Int32Array([1000]);
+	this.mouseAction = new MouseAction();
 	
 	// lighting & ssao.***
 	this.ambientReflectionCoef = 0.45; // 0.2.
@@ -101,5 +102,39 @@ var SceneState = function()
 	// provisionally.***
 	this.textureFlipYAxis = false;
 	
+	// mouse.***
+	this.mouseButton = -1;
+	
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

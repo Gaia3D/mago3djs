@@ -16,9 +16,12 @@ var ParseQueue = function()
 	this.octreesLod0ReferencesToParseMap = {};
 	this.octreesLod0ModelsToParseMap = {};
 	this.octreesLod2LegosToParseMap = {};
+	this.octreesPCloudToParseMap = {};
 	this.skinLegosToParseMap = {};
 	this.tinTerrainsToParseMap = {};
 };
+
+
 
 ParseQueue.prototype.putTinTerrainToParse = function(tinTerrain, aValue)
 {
@@ -41,6 +44,77 @@ ParseQueue.prototype.eraseTinTerrainToParse = function(tinTerrain)
 		return true;
 	}
 	return false;
+};
+
+ParseQueue.prototype.parseOctreesPCloud = function(gl, visibleObjControlerOctrees, magoManager, maxParsesCount)
+{
+	var neoBuilding;
+	var lowestOctree;
+	var headerVersion;
+	var node;
+	var rootNode;
+	var geoLocDataManager;
+	
+	if (this.matrix4SC === undefined)
+	{ this.matrix4SC = new Matrix4(); }
+	
+	var octreesParsedCount = 0;
+	if (maxParsesCount === undefined)
+	{ maxParsesCount = 20; }
+	
+	var octreesCount = Object.keys(this.octreesLod0ReferencesToParseMap).length;
+	if (octreesCount > 0)
+	{
+		// 1rst parse the currently closest lowestOctrees to camera.
+		var octreesLod0Count = visibleObjControlerOctrees.currentVisibles0.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = visibleObjControlerOctrees.currentVisibles0[i];
+			if (this.parseOctreesLod0References(gl, lowestOctree, magoManager))
+			{
+				octreesParsedCount++;
+			}
+			else 
+			{
+				// test else.
+				//if (lowestOctree.neoReferencesMotherAndIndices)
+				//{
+				//	if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+				//	{ var hola = 0; }
+				//}
+			}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		// now clear queue.***
+		
+		
+		// if no parsed any octree, then parse some octrees of the queue.
+		if (octreesParsedCount === 0)
+		{
+			//var octreesArray = Array.from(this.octreesLod0ReferencesToParseMap.keys());
+			//var octreesArray = Object.keys(this.octreesLod0ReferencesToParseMap);
+			///for (var i=0; i<octreesArray.length; i++)
+			for (var key in this.octreesLod0ReferencesToParseMap)
+			{
+				if (Object.prototype.hasOwnProperty.call(foo, key))
+				{
+					lowestOctree = this.octreesLod0ReferencesToParseMap[key];
+					delete this.octreesLod0ReferencesToParseMap[key];
+					this.parseOctreesLod0References(gl, lowestOctree, magoManager);
+	
+					octreesParsedCount++;
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
+				}
+			}
+		}
+	}
+	
+	if (octreesParsedCount > 0)
+	{ return true; }
+	else { return false; }
 };
 
 ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControlerOctrees, magoManager, maxParsesCount)
@@ -84,6 +158,10 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 			{ break; }
 		}
 		
+		// clear queue.***
+		this.octreesLod0ReferencesToParseMap = {};
+		/*
+		
 		// if no parsed any octree, then parse some octrees of the queue.
 		if (octreesParsedCount === 0)
 		{
@@ -104,6 +182,7 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, visibleObjControl
 				}
 			}
 		}
+		*/
 	}
 	
 	if (octreesParsedCount > 0)
@@ -212,6 +291,29 @@ ParseQueue.prototype.putOctreeLod2LegosToParse = function(octree, aValue)
 ParseQueue.prototype.eraseOctreeLod2LegosToParse = function(octree)
 {
 	delete this.octreesLod2LegosToParseMap[octree.octreeKey];
+};
+
+ParseQueue.prototype.putOctreePCloudToParse = function(octree, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.octreesPCloudToParseMap[octree.octreeKey] = octree;
+};
+
+ParseQueue.prototype.eraseOctreePCloudToParse = function(octree)
+{
+	if (octree === undefined)
+	{ return false; }
+	
+	var key = octree.octreeKey;
+	if (this.octreesPCloudToParseMap.hasOwnProperty(key)) 
+	{
+		delete this.octreesPCloudToParseMap[key];
+		return true;
+	}
+	return false;
 };
 
 ParseQueue.prototype.putSkinLegosToParse = function(skinLego, aValue)

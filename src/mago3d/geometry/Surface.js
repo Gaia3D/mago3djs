@@ -82,6 +82,25 @@ Surface.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 	return resultHedgesArray;
 };
 
+Surface.prototype.getHalfEdges = function(resultHedgesArray)
+{
+	if (this.facesArray === undefined)
+	{ return resultHedgesArray; }
+	
+	if (resultHedgesArray === undefined)
+	{ resultHedgesArray = []; }
+	
+	var facesCount = this.getFacesCount();
+	var face;
+	for (var i=0; i<facesCount; i++)
+	{
+		face = this.getFace(i);
+		resultHedgesArray = face.getHalfEdgesLoop(resultHedgesArray);
+	}
+	
+	return resultHedgesArray;
+};
+
 Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 {
 	if (this.facesArray === undefined)
@@ -106,7 +125,7 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 		vertexCopy = resultLocalvertexList.newVertex();
 		vertexCopy.copyFrom(vertex);
 	}
-	
+
 	// now, copy the faces.***
 	var face, faceCopy;
 	var vertexIdxInList;
@@ -124,9 +143,38 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 			vertexIdxInList = vertex.getIdxInList();
 			faceCopy.vertexArray.push(resultLocalvertexList.getVertex(vertexIdxInList));
 		}
+		var halfEdgesArray = [];
+		faceCopy.createHalfEdges(halfEdgesArray);
 	}
 	
+	resultSurface.setTwinsFaces();
+	
 	return resultSurface;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param idx 변수
+ * @returns vertexArray[idx]
+ */
+Surface.prototype.setTwinsFaces = function() 
+{
+	// this func set twins between all faces of this surface.***
+	var facesCount = this.facesArray.length;
+	var face, face2;
+	
+	for (var i=0; i<facesCount; i++)
+	{
+		face = this.getFace(i);
+		for (var j=0; j<facesCount; j++)
+		{
+			if (i !== j)
+			{
+				face2 = this.getFace(j);
+				face.setTwinFace(face2);
+			}
+		}
+	}
 };
 
 /**

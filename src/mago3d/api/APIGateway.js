@@ -541,16 +541,16 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
  */
 function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
-    if (managerFactoryInstance === null) { return; }
+	if (managerFactoryInstance === null) { return; }
 
-    var api = new API("getCoordinateRelativeToBuilding");
-    api.setReturnable(true);
-    api.setProjectId(projectId);
-    api.setDataKey(dataKey);
-    api.setInputPoint(inputPoint);
+	var api = new API("getCoordinateRelativeToBuilding");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	api.setInputPoint(inputPoint);
 	api.setResultPoint(resultPoint);
 
-    return managerFactoryInstance.callAPI(api);
+	return managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -563,14 +563,14 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
  */
 function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
-    if (managerFactoryInstance === null) { return; }
+	if (managerFactoryInstance === null) { return; }
 
-    var api = new API("getAbsoluteCoodinateOfBuildingPoint");
-    api.setReturnable(true);
-    api.setProjectId(projectId);
-    api.setDataKey(dataKey);
-    api.setInputPoint(inputPoint);
+	var api = new API("getAbsoluteCoodinateOfBuildingPoint");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	api.setInputPoint(inputPoint);
 	api.setResultPoint(resultPoint);
 
-    return managerFactoryInstance.callAPI(api);
+	return managerFactoryInstance.callAPI(api);
 }

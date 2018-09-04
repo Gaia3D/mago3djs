@@ -149,7 +149,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		
 		strVector = new Point2D();
 		strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
-		strVectorModul = strVector.modul();
+		strVectorModul = strVector.getModul();
 		
 		var angRad = Math.acos(x/strVectorModul);
 		if (this.startPoint.y < 0)
@@ -174,7 +174,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 				strVector = new Point2D();
 				strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
 			}
-			strVectorModul = strVector.modul();
+			strVectorModul = strVector.getModul();
 		}
 		
 		this.radius = strVectorModul;
@@ -188,7 +188,7 @@ Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		
 		endVector = new Point2D();
 		endVector.set(this.endPoint.x - this.centerPoint.x, this.endPoint.y - this.endPoint.y);
-		var endVectorModul = endPoint.modul();
+		var endVectorModul = endPoint.getModul();
 		
 		var angRad = Math.acos(x/strVectorModul);
 		if (this.endPoint.y < 0)

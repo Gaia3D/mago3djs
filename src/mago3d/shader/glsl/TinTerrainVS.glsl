@@ -19,6 +19,9 @@ uniform vec3 aditionalPosition;
 uniform vec4 oneColor4;
 uniform bool bUse1Color;
 uniform bool hasTexture;
+uniform bool bIsMakingDepth;
+uniform float near;
+uniform float far;
 
 varying vec3 vNormal;
 varying vec2 vTexCoord;   
@@ -26,6 +29,7 @@ varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
 varying vec4 vcolor4;
 varying vec3 vertexPos;
+varying float depthValue;
 
 void main()
 {	
@@ -35,6 +39,14 @@ void main()
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 
+	if(bIsMakingDepth)
+	{
+		depthValue = (modelViewMatrixRelToEye * pos4).z/far;
+	}
+	else
+	{
+		vTexCoord = texCoord;
+	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	vTexCoord = texCoord;
+	
 }

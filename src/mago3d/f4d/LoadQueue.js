@@ -40,7 +40,7 @@ LoadData.prototype.deleteObjects = function()
 	this.skinMesh = undefined;
 	this.octree = undefined;
 	this.texture = undefined;
-}
+};
 
 /**
  * LoadQueue
@@ -61,11 +61,12 @@ var LoadQueue = function(magoManager)
 	{ this.magoManager = magoManager; }
 	
 	this.lod2SkinDataMap = {}; // includes data & texture.***
+	this.lod2PCloudDataMap = {}; 
 	
 	this.lowLodSkinDataMap = {};
 	this.lowLodSkinTextureMap = {};
 
-	this.referencesToLoadMap = {};
+	//this.referencesToLoadMap = {};
 };
 
 LoadQueue.prototype.putLod2SkinData = function(octree, filePath, texture, texFilePath, aValue)
@@ -80,6 +81,20 @@ LoadQueue.prototype.putLod2SkinData = function(octree, filePath, texture, texFil
 	loadData.texture = texture;
 	
 	this.lod2SkinDataMap[filePath] = loadData;
+};
+
+LoadQueue.prototype.putLod2PCloudData = function(octree, filePath, texture, texFilePath, aValue)
+{
+	// "aValue" no used yet.***
+	octree.lego.fileLoadState = CODE.fileLoadState.IN_QUEUE;
+	var loadData = new LoadData();
+	loadData.filePath = filePath;
+	loadData.octree = octree;
+	
+	loadData.texFilePath = texFilePath;
+	loadData.texture = texture;
+	
+	this.lod2PCloudDataMap[filePath] = loadData;
 };
 
 LoadQueue.prototype.putLowLodSkinData = function(skinMesh, filePath, aValue)
@@ -111,8 +126,8 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lod2SkinDataMap)
 	{
 		var loadData = this.lod2SkinDataMap[key];
-		if(loadData.octree === undefined || loadData.octree.lego === undefined)
-			continue;
+		if (loadData.octree === undefined || loadData.octree.lego === undefined)
+		{ continue; }
 		
 		loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
 	}
@@ -123,8 +138,8 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lowLodSkinDataMap)
 	{
 		var loadData = this.lowLodSkinDataMap[key];
-		if(loadData.skinMesh === undefined)
-			continue;
+		if (loadData.skinMesh === undefined)
+		{ continue; }
 		
 		loadData.skinMesh.fileLoadState = CODE.fileLoadState.READY;
 	}
@@ -134,13 +149,24 @@ LoadQueue.prototype.resetQueue = function()
 	for (var key in this.lowLodSkinTextureMap)
 	{
 		var loadData = this.lowLodSkinTextureMap[key];
-		if(loadData.texture === undefined)
-			continue;
+		if (loadData.texture === undefined)
+		{ continue; }
 		
 		loadData.texture.fileLoadState = CODE.fileLoadState.READY;
 	}
 	
 	this.lowLodSkinTextureMap = {};
+	
+	for (var key in this.lod2PCloudDataMap)
+	{
+		var loadData = this.lod2PCloudDataMap[key];
+		if (loadData.octree === undefined || loadData.octree.lego === undefined)
+		{ continue; }
+		
+		loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
+	}
+	
+	this.lod2PCloudDataMap = {};
 };
 
 LoadQueue.prototype.manageQueue = function()
@@ -159,7 +185,7 @@ LoadQueue.prototype.manageQueue = function()
 		var octree = loadData.octree;
 		var filePath = loadData.filePath;
 		
-		if(octree.lego !== undefined)
+		if (octree.lego !== undefined)
 		{
 			if (loadData.texture !== undefined && loadData.texture.fileLoadState === CODE.fileLoadState.READY)
 			{ 
@@ -170,7 +196,7 @@ LoadQueue.prototype.manageQueue = function()
 			readerWriter.getOctreeLegoArraybuffer(filePath, octree, this.magoManager);
 		}
 		else
-			var hola = 0;
+		{ var hola = 0; }
 		
 		delete this.lod2SkinDataMap[key];
 		loadData.deleteObjects();
@@ -223,6 +249,34 @@ LoadQueue.prototype.manageQueue = function()
 		counter++;
 		if (counter > maxFileLoad)
 		{ break; }
+	}
+	
+	// pCloud data.***
+	counter = 0;
+	for (var key in this.lod2PCloudDataMap)
+	{
+		var loadData = this.lod2PCloudDataMap[key];
+		var octree = loadData.octree;
+		var filePath = loadData.filePath;
+		
+		if (octree.lego !== undefined)
+		{
+			readerWriter.getOctreePCloudArraybuffer(filePath, octree, this.magoManager);
+		}
+		else
+		{ var hola = 0; }
+		
+		delete this.lod2PCloudDataMap[key];
+		loadData.deleteObjects();
+		loadData = undefined;
+
+		counter++;
+		if (counter > 4)
+		{
+			//this.lod2PCloudDataMap = {};
+			remainLod2 = true;
+			break;
+		}
 	}
 	
 	this.resetQueue();
