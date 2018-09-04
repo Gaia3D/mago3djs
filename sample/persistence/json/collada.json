@@ -117,22 +117,6 @@
 			"longitude": 126.799052,
 			"pitch": 90,
 			"roll": 0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "COLLADA"
-			},
-			"children": [],
-			"data_key": "CityGML_Building",
-			"data_name": "CityGML_Building",
-			"mapping_type": "origin",
-            "heading": 219,
-			"height": 70,
-			"latitude": 37.567219,
-			"longitude": 126.799052,
-			"pitch": 0,
-			"roll": 0
 		}
 	],
 	"parent": 0,

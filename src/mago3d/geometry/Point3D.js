@@ -82,6 +82,18 @@ Point3D.prototype.unitary = function()
 };
 
 /**
+ * 
+ * 어떤 일을 하고 있습니까?
+ */
+Point3D.prototype.isNAN = function() 
+{
+	if (isNaN(this.x) || isNaN(this.y) || isNaN(this.z) )
+	{ return true; }
+	else
+	{ return false; }
+};
+
+/**
  * nomal 계산
  * @param point 변수
  * @param resultPoint 변수
@@ -123,8 +135,8 @@ Point3D.prototype.angleRadToVector = function(vector)
 	
 	//******************************************************
 	//var scalarProd = this.scalarProd(vector);
-	var myModul = this.modul();
-	var vecModul = vector.modul();
+	var myModul = this.getModul();
+	var vecModul = vector.getModul();
 	
 	// calcule by cos.***
 	//var cosAlfa = scalarProd / (myModul * vecModul); 
@@ -135,7 +147,7 @@ Point3D.prototype.angleRadToVector = function(vector)
 	if (myModul < error || vecModul < error)
 	{ return undefined; }
 	
-	return Math.acos(this.scalarProd(vector) / (myModul * vecModul));
+	return Math.acos(this.scalarProduct(vector) / (myModul * vecModul));
 };
 
 /**

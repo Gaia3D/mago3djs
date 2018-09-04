@@ -17,4 +17,5 @@ var LodBuildingData = function()
 	this.isModelRef;
 	this.geometryFileName;
 	this.textureFileName;
+	//this.dataType; // no used yet.***
 };

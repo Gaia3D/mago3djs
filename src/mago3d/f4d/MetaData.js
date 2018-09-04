@@ -23,6 +23,11 @@ var MetaData = function()
 
 	this.bbox; // BoundingBox.***
 	this.imageLodCount;
+	
+	this.projectDataType;
+	this.offSetX;
+	this.offSetY;
+	this.offSetZ;
 
 	// Buildings octree mother size.***
 	this.oct_min_x = 0.0;
@@ -89,9 +94,6 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	{
 		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
 	}
-	
-	if (this.version[0] === '0')
-	{ var hola = 0; }
 
 	// 3) Global unique ID.*********************
 	if (this.guid === undefined) { this.guid =""; }
@@ -140,6 +142,18 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 	if (!isLarge && this.bbox.maxZ - this.bbox.minZ < 30.0) 
 	{
 		this.isSmall = true;
+	}
+	
+	// if header version is "0.0.2", then must read extra parameters.***
+	if (this.version === "0.0.2")
+	{
+		// parse dataType (unsigned short).***
+		this.projectDataType = (new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2)))[0]; bytes_readed += 2;
+		
+		// parse Project's offSet (double x 6).***
+		this.offSetX = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+		this.offSetY = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+		this.offSetZ = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
 	}
 
 	return bytes_readed;

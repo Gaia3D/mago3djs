@@ -12,7 +12,10 @@ var ReaderWriter = function()
 	}
 
 	//this.geometryDataPath = "/F4D_GeometryData";
-	this.geometryDataPath = MagoConfig.getPolicy().geo_data_path;
+	var serverPolicy = MagoConfig.getPolicy();
+	if (serverPolicy !== undefined)
+	{ this.geometryDataPath = serverPolicy.geo_data_path; }
+	
 	this.geometrySubDataPath;
 
 	this.j_counter;
@@ -346,8 +349,54 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 			{
 				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
 				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				//magoManager.parseQueue.octreesLod2LegosToParseArray.push(lowestOctree);
 				magoManager.parseQueue.putOctreeLod2LegosToParse(lowestOctree);
+			}
+			else 
+			{
+				lowestOctree = undefined;
+			}
+			arrayBuffer = null;
+		}
+		else 
+		{
+			lowestOctree.lego.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
+		else { lowestOctree.lego.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOctree, magoManager) 
+{
+	if (lowestOctree.lego === undefined)
+	{ return; }
+	
+	magoManager.fileRequestControler.filesRequestedCount += 1;
+	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (lowestOctree.lego)
+			{
+				lowestOctree.lego.dataArrayBuffer = arrayBuffer;
+				lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				magoManager.parseQueue.putOctreePCloudToParse(lowestOctree);
 			}
 			else 
 			{
@@ -405,7 +454,8 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		console.log("xhr status = " + status);
 		if (status === 0) { legoMesh.fileLoadState = 500; }
 		//else { legoMesh.fileLoadState = status; }
-		else { 
+		else 
+		{ 
 			legoMesh.fileLoadState = -1; 
 		}
 	}).always(function() 
@@ -414,243 +464,6 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
 		//if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
 		if (magoManager.fileRequestControler.lowLodDataRequestedCount < 0) { magoManager.fileRequestControler.lowLodDataRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param fileName 변수
- * @param lodBuilding 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getLodBuildingArraybuffer = function(fileName, lodBuilding, magoManager) 
-{
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			lodBuilding.dataArraybuffer = arrayBuffer;
-			lodBuilding.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			lodBuilding.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { lodBuilding.fileLoadState = 500; }
-		else { lodBuilding.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param BR_ProjectsList 변수
- * @param readerWriter 변수
- */
-ReaderWriter.prototype.getPCloudIndexFile = function(gl, fileName, BR_ProjectsList, readerWriter) 
-{
-//	magoManager.fileRequestControler.filesRequestedCount += 1;
-//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-			var pCloudProject;
-
-			var bytes_readed = 0;
-
-			var f4d_rawPathName_length = 0;
-			//			var f4d_simpleBuildingPathName_length = 0;
-			//			var f4d_nailImagePathName_length = 0;
-
-			var pCloudProjects_count = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-			for (var i=0; i<pCloudProjects_count; i++) 
-			{
-				pCloudProject = new PCloudMesh();
-				BR_ProjectsList._pCloudMesh_array.push(pCloudProject);
-				pCloudProject._header._f4d_version = 2;
-				// 1rst, read the files path names.************************************************************************************************************
-				f4d_rawPathName_length = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				for (var j=0; j<f4d_rawPathName_length; j++) 
-				{
-					pCloudProject._f4d_rawPathName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-				}
-
-				pCloudProject._f4d_headerPathName = pCloudProject._f4d_rawPathName + "/pCloud_Header.hed";
-				pCloudProject._f4d_geometryPathName = pCloudProject._f4d_rawPathName + "/pCloud_Geo.f4d";
-
-				//BP_Project._f4d_headerPathName = BP_Project._f4d_rawPathName + "_Header.hed";
-				//BP_Project._f4d_simpleBuildingPathName = BP_Project._f4d_rawPathName + "_Geom.f4d";
-				//BP_Project._f4d_nailImagePathName = BP_Project._f4d_rawPathName + "_Gaia.jpg";
-			}
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param pCloud 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getPCloudHeader = function(gl, fileName, pCloud, readerWriter, magoManager) 
-{
-	pCloud._f4d_header_readed = true;
-	//	magoManager.fileRequestControler.filesRequestedCount += 1;
-	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-
-			var bytes_readed = 0;
-			var version_string_length = 5;
-			var intAux_scratch = 0;
-			var auxScratch;
-			var header = pCloud._header;
-
-			// 1) Version(5 chars).***********
-			for (var j=0; j<version_string_length; j++)
-			{
-				header._version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// 2) Type (1 byte).**************
-			header._type = String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-
-			// 3) Global unique ID.*********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for (var j=0; j<intAux_scratch; j++)
-			{
-				header._global_unique_id += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// 4) Location.*************************
-			header._latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-			header._elevation = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			header._elevation += 60.0; // delete this. TEST.!!!
-
-			// 5) Orientation.*********************
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // yaw.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // pitch.***
-			auxScratch = new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed += 4; // roll.***
-
-			// 6) BoundingBox.************************
-			header._boundingBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._boundingBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			var isLarge = false;
-			if (header._boundingBox.maxX - header._boundingBox.minX > 40.0 || header._boundingBox.maxY - header._boundingBox.minY > 40.0) 
-			{
-				isLarge = true;
-			}
-
-			if (!isLarge && header._boundingBox.maxZ - header._boundingBox.minZ < 30.0) 
-			{
-				header.isSmall = true;
-			}
-
-			// 7) octZerothBox.***********************
-			header._octZerothBox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-			header._octZerothBox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-
-			// 8) Data file name.********************
-			intAux_scratch = readerWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			for (var j=0; j<intAux_scratch; j++) 
-			{
-				header._dataFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1;
-			}
-
-			// Now, must calculate some params of the project.**********************************************
-			// 0) PositionMatrix.************************************************************************
-			//var height = elevation;
-
-			var position = Cesium.Cartesian3.fromDegrees(header._longitude, header._latitude, header._elevation); // Old.***
-			pCloud._pCloudPosition = position;
-
-			// High and Low values of the position.****************************************************
-			var splitValue = Cesium.EncodedCartesian3.encode(position);
-			var splitVelue_X  = Cesium.EncodedCartesian3.encode(position.x);
-			var splitVelue_Y  = Cesium.EncodedCartesian3.encode(position.y);
-			var splitVelue_Z  = Cesium.EncodedCartesian3.encode(position.z);
-
-			pCloud._pCloudPositionHIGH = new Float32Array(3);
-			pCloud._pCloudPositionHIGH[0] = splitVelue_X.high;
-			pCloud._pCloudPositionHIGH[1] = splitVelue_Y.high;
-			pCloud._pCloudPositionHIGH[2] = splitVelue_Z.high;
-
-			pCloud._pCloudPositionLOW = new Float32Array(3);
-			pCloud._pCloudPositionLOW[0] = splitVelue_X.low;
-			pCloud._pCloudPositionLOW[1] = splitVelue_Y.low;
-			pCloud._pCloudPositionLOW[2] = splitVelue_Z.low;
-
-			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-
-			pCloud._f4d_header_readed_finished = true;
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
 	});
 };
 
@@ -792,65 +605,6 @@ ReaderWriter.prototype.parseObjectIndexFile = function(arrayBuffer, neoBuildings
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getNeoHeader = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
-{
-	//BR_Project._f4d_header_readed = true;
-	magoManager.fileRequestControler.filesRequestedCount += 1;
-	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			if (neoBuilding.metaData === undefined) 
-			{
-				neoBuilding.metaData = new MetaData();
-			}
-			neoBuilding.metaData.parseFileHeader(arrayBuffer, readerWriter);
-
-			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
-
-			neoBuilding.octree.setBoxSize(neoBuilding.metaData.oct_min_x, neoBuilding.metaData.oct_max_x,
-				neoBuilding.metaData.oct_min_y, neoBuilding.metaData.oct_max_y,
-				neoBuilding.metaData.oct_min_z, neoBuilding.metaData.oct_max_z);
-			
-			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
-			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
-			neoBuilding.octree.makeTree(3);
-			neoBuilding.octree.setSizesSubBoxes();
-
-			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			//if(magoManager.backGround_fileReadings_count > 0 )
-			//    magoManager.backGround_fileReadings_count -= 1; // old.***
-			//BR_Project._f4d_header_readed_finished = true;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			neoBuilding.metaData.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
-		else { neoBuilding.metaData.fileLoadState = status; }
-	}).always(function() 
-	{
-		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param fileName 변수
- * @param neoBuilding 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
 ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neoBuilding, readerWriter, magoManager) 
 {
 	function Utf8ArrayToStr(array) 
@@ -898,9 +652,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			//if(neoBuilding.buildingId === "historypark_del")
-			//var hola = 0;
-		
 			if (neoBuilding.metaData === undefined) 
 			{
 				neoBuilding.metaData = new MetaData();
@@ -923,14 +674,12 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 			
 			// now parse materialsList of the neoBuilding.
-			var ver0 = neoBuilding.metaData.version[0];
-			var ver1 = neoBuilding.metaData.version[2];
-			var ver2 = neoBuilding.metaData.version[4];
+			//var ver0 = neoBuilding.metaData.version[0];
+			//var ver1 = neoBuilding.metaData.version[2];
+			//var ver2 = neoBuilding.metaData.version[4];
 			
-			if (neoBuilding.buildingId === "Tile_173078_LD_010_017_L22")
-			{ var hola = 0; }
-			
-			if (ver0 === '0' && ver1 === '0' && ver2 === '1')
+			//if (ver0 === '0' && ver1 === '0' && ver2 === '1')
+			if (neoBuilding.metaData.version === "0.0.1" || neoBuilding.metaData.version === "0.0.2")
 			{
 				// read materials list.
 				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1333,7 +1082,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 					}
 					
 					
-					if(tga.imageData !== undefined && tga.imageData.length > 0 && texture.texId !== undefined)
+					if (tga.imageData !== undefined && tga.imageData.length > 0 && texture.texId !== undefined)
 					{
 						gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 						gl.texImage2D(gl.TEXTURE_2D, 0, rgbType, tga.header.width, tga.header.height, 0, rgbType, gl.UNSIGNED_BYTE, tga.imageData);
@@ -1342,7 +1091,8 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
 						gl.bindTexture(gl.TEXTURE_2D, null);
 					}
-					else{
+					else 
+					{
 						var hola = 0;
 
 					}
@@ -1524,108 +1274,6 @@ ReaderWriter.prototype.loadTINTerrain = function(gl, fileName, tinTerrain, magoM
 	{
 		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		//if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
-	});
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param pCloud 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- */
-ReaderWriter.prototype.getPCloudGeometry = function(gl, fileName, pCloud, readerWriter, magoManager) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-	pCloud._f4d_geometry_readed = true;
-	//	magoManager.fileRequestControler.filesRequestedCount += 1;
-	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-
-	loadWithXhr(fileName).done(function(response) 
-	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
-		{
-			// write code here.***
-			var bytes_readed = 0;
-			var startBuff;
-			var endBuff;
-
-			var meshes_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-			for (var a=0; a<meshes_count; a++) 
-			{
-				var vbo_objects_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // Almost allways is 1.***
-
-				// single interleaved buffer mode.*********************************************************************************
-				for (var i=0; i<vbo_objects_count; i++) 
-				{
-					var vbo_vertexIdx_data = pCloud.vbo_datas.newVBOVertexIdxCacheKey();
-					//var vt_cacheKey = simpObj._vtCacheKeys_container.newVertexTexcoordsArraysCacheKey();
-
-					var iDatas_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // iDatasCount = vertexCount.***
-					startBuff = bytes_readed;
-					//endBuff = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).***
-					endBuff = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).***
-
-					//vt_cacheKey._verticesArray_cacheKey = gl.createBuffer ();
-					vbo_vertexIdx_data.meshVertexCacheKey = gl.createBuffer();
-					gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vertexIdx_data.meshVertexCacheKey);
-					gl.bufferData(gl.ARRAY_BUFFER, arrayBuffer.slice(startBuff, endBuff), gl.STATIC_DRAW);
-
-					//bytes_readed = bytes_readed + (4*3+1*3+1*4)*iDatas_count; // pos(float*3) + normal(byte*3) + color4(byte*4).*** // updating data.***
-					bytes_readed = bytes_readed + (4*3+4*3+1*4)*iDatas_count; // pos(float*3) + normal(float*3) + color4(byte*4).*** // updating data.***
-
-					//vt_cacheKey._vertices_count = iDatas_count;
-					// Now, read short indices.***
-					var shortIndices_count = readerWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-					vbo_vertexIdx_data.indicesCount = shortIndices_count;
-
-					// Indices.***********************
-					startBuff = bytes_readed;
-					endBuff = bytes_readed + 2*shortIndices_count;
-					/*
-					// Test.***************************************************************************************
-					for(var counter = 0; counter<shortIndices_count; counter++)
-					{
-						var shortIdx = new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2));bytes_readed += 2;
-						if(shortIdx[0] >= iDatas_count)
-						{
-							var h=0;
-						}
-					}
-					bytes_readed -= 2*shortIndices_count;
-					// End test.------------------------------------------------------------------------------------
-					*/
-
-					vbo_vertexIdx_data.meshFacesCacheKey= gl.createBuffer();
-					gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vertexIdx_data.meshFacesCacheKey);
-					gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrayBuffer.slice(startBuff, endBuff)), gl.STATIC_DRAW);
-
-					bytes_readed = bytes_readed + 2*shortIndices_count; // updating data.***
-				}
-			}
-
-			//			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-
-			pCloud._f4d_geometry_readed_finished = true;
-			arrayBuffer = null;
-		}
-		else 
-		{
-			//			blocksList.fileLoadState = 500;
-		}
-	}).fail(function(status) 
-	{
-		console.log("xhr status = " + status);
-		//		if(status === 0) blocksList.fileLoadState = 500;
-		//		else blocksList.fileLoadState = status;
-	}).always(function() 
-	{
-		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
-		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
 	});
 };
 

@@ -7,6 +7,7 @@ uniform sampler2D noiseTex;
 uniform sampler2D diffuseTex;
 uniform bool hasTexture;
 uniform bool textureFlipYAxis;
+uniform bool bIsMakingDepth;
 varying vec3 vNormal;
 uniform mat4 projectionMatrix;
 uniform mat4 m;
@@ -27,6 +28,7 @@ varying vec3 vLightWeighting;
 varying vec3 diffuseColor;
 uniform vec3 specularColor;
 varying vec3 vertexPos;
+varying float depthValue;
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -40,7 +42,16 @@ float unpackDepth(const in vec4 rgba_depth)
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);
     float depth = dot(rgba_depth, bit_shift);
     return depth;
-}                
+} 
+
+vec4 packDepth(const in float depth)
+{
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); 
+    vec4 res = fract(depth * bit_shift);
+    res -= res.xxyz * bit_mask;
+    return res;  
+}               
 
 vec3 getViewRay(vec2 tc)
 {
@@ -58,27 +69,31 @@ float getDepth(vec2 coord)
 
 void main()
 {           
-    vec4 textureColor;
-    if(hasTexture)
-    {
-        if(textureFlipYAxis)
-        {
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-        }
-        else{
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
-        }
-		
-        if(textureColor.w == 0.0)
-        {
-            discard;
-        }
-    }
-    else{
-        textureColor = vColor4Aux;
-    }
-	
-	//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-
-    gl_FragColor = vec4(textureColor.xyz, 1.0); 
+	if(bIsMakingDepth)
+	{
+		gl_FragColor = packDepth(-depthValue);
+	}
+	else{
+		vec4 textureColor;
+		if(hasTexture)
+		{
+			if(textureFlipYAxis)
+			{
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+			}
+			else{
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+			}
+			
+			if(textureColor.w == 0.0)
+			{
+				discard;
+			}
+		}
+		else{
+			textureColor = vColor4Aux;
+		}
+		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
+		gl_FragColor = vec4(textureColor.xyz, 1.0); 
+	}
 }

@@ -219,6 +219,18 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			magoManager.cameraFPV.update(magoManager);
 		});
 	}
+	
+	// magoworld을 구현체로서 이용
+	function drawMagoWorld() 
+	{
+		var gl = viewer.magoManager.sceneState.gl;
+		var manager = viewer.magoManager;
+		manager.shadersManager.createDefaultShader(gl);
+		manager.postFxShadersManager.gl = gl;
+		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
+		manager.createDefaultShaders(gl);// A1-Use this.***
+		//viewer.renderTest();
+	};
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드
 	function draw() 
@@ -230,6 +242,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND) 
 		{
 			//initWwwMago();
+		}
+		else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD) 
+		{
+			drawMagoWorld();
 		}
 	}
 
@@ -622,6 +638,87 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
 		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
 	}
+	if (serverPolicy.geo_view_library === Constant.MAGOWORLD) 
+	{
+		var canvas = document.getElementById(containerId);
+		var glAttrs = {antialias: false, stencil: true};
+		var gl = canvas.getContext("webgl", glAttrs);
+		if (!gl)
+		{ gl = canvas.getContext("experimental-webgl", glAttrs); }
+		
+		// Problem: canvas-width initially is 300 and canvas-height = 150.***
+		canvas.width = canvas.clientWidth;
+		canvas.height = canvas.clientHeight;
+		
+		magoManager = new MagoManager();
+		var sceneState = magoManager.sceneState;
+		sceneState.textureFlipYAxis = true;
+		sceneState.gl = gl;
+		sceneState.drawingBufferWidth[0] = canvas.clientWidth;
+		sceneState.drawingBufferHeight[0] = canvas.clientHeight;
+		sceneState.camera.frustum.aspectRatio = canvas.clientWidth/canvas.clientHeight;
+		sceneState.camera.frustum.fovRad[0] = Math.PI/3*1.8;
+		sceneState.camera.frustum.fovyRad[0] = sceneState.camera.frustum.fovRad[0]/sceneState.camera.frustum.aspectRatio;
+		sceneState.camera.frustum.tangentOfHalfFovy[0] = Math.tan(sceneState.camera.frustum.fovyRad[0]/2);
+		
+		
+		// initial camera position.***
+		sceneState.camera.position.set(0.0, 0.0, 10000000.0);
+		sceneState.camera.direction.set(0.0, 0.0, -1.0);
+		sceneState.camera.up.set(0.0, 1.0, 0.0);
+		
+		// test init camera position.***
+		//sphere.r = 6378137.0;
+		sceneState.encodedCamPosHigh[0] = 0;
+		sceneState.encodedCamPosHigh[1] = 0;
+		sceneState.encodedCamPosHigh[2] = 10000000.0;
+		
+		sceneState.encodedCamPosLow[0] = 0;
+		sceneState.encodedCamPosLow[1] = 0;
+		sceneState.encodedCamPosLow[2] = 0;
+
+		
+		viewer = new MagoWorld(magoManager);
+		magoManager.magoWorld = viewer;
+		magoManager.globe = new Globe();
+		// init matrices.***
+		viewer.updateModelViewMatrixByCamera(sceneState.camera);
+		//magoManager.upDateSceneStateMatrices(sceneState);
+		
+		// event listener.***
+		canvas.addEventListener('mousedown', function(event)
+		{
+			viewer.mousedown(event);			
+		}, false);
+		
+		canvas.addEventListener('mouseup', function(event)
+		{
+			viewer.mouseup(event);			
+		}, false);
+		
+		canvas.addEventListener('mousewheel', function(event)
+		{
+			viewer.mousewheel(event); 
+		}, false);
+		
+		canvas.addEventListener('mousemove', function(event)
+		{
+			viewer.mousemove(event);
+		}, false);
+		
+		canvas.addEventListener('resize', function(event)
+		{
+			var hola = 0; // no works.***
+		}, false);
+		
+		canvas.addEventListener('keydown', function(event) // no works.***
+		{
+			viewer.keydown(event); // no works.***
+		}, false);
+
+		
+		draw();
+	}
 
 	// 이미지 경로
 	magoManager.magoPolicy.imagePath = imagePath;
@@ -710,11 +807,14 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		// api gateway 역할
 		callAPI: function(api) 
 		{
-		    if (api.getReturnable()) {
+		    if (api.getReturnable()) 
+			{
 		        return magoManager.callAPI(api);
-            } else {
-                magoManager.callAPI(api);
-            }
+			}
+			else 
+			{
+				magoManager.callAPI(api);
+			}
 		},
 		// flyTo: function(issueId, issueType, longitude, latitude, height, duration)
 		// {

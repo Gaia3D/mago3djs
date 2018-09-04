@@ -1,9 +1,6 @@
 #ifdef GL_ES
     precision highp float;
 #endif
-uniform float near;
-uniform float far;
-
 varying float depth;  
 
 vec4 packDepth(const in float depth)

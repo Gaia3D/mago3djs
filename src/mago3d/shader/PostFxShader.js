@@ -1414,6 +1414,7 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	//shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bUseNormal_loc = gl.getUniformLocation(shader.program, "bUseNormal");
 	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");

@@ -44,6 +44,114 @@ var Camera = function()
  * 카메라
  * @class Camera
  */
+Camera.prototype.copyPosDirUpFrom = function(camera)
+{
+	this.position.copyFrom(camera.position);
+	this.direction.copyFrom(camera.direction);
+	this.up.copyFrom(camera.up);
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.transformByMatrix4 = function(mat)
+{
+	// transform position, direction and up.***
+	/*
+	var camePosHIGH = new Float32Array(3);
+	var camPosLOW = new Float32Array(3);
+	var pos = vec3.clone([this.position.x, this.position.y, this.position.z]);
+	ManagerUtils.calculateSplited3fv(pos, camePosHIGH, camPosLOW);
+	
+	camePosHIGH = vec3.transformMat4(camePosHIGH, camePosHIGH, mat);
+	camPosLOW = vec3.transformMat4(camPosLOW, camPosLOW, mat);
+	this.position.set(camePosHIGH[0] + camPosLOW[0], camePosHIGH[1] + camPosLOW[1], camePosHIGH[2] + camPosLOW[2]);
+	*/
+	this.position = this.transformPoint3DByMatrix4(this.position, mat);
+	
+	if (this.rotMat === undefined)
+	{ this.rotMat = mat3.create(); }
+	
+	this.rotMat = mat3.fromMat4(this.rotMat, mat);
+
+	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
+	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.getCameraDirectionLine = function(resultLine)
+{
+	if (resultLine === undefined)
+	{ resultLine = new Line(); }
+	
+	resultLine.point.set(this.position.x, this.position.y, this.position.z);
+	resultLine.direction.set(this.direction.x, this.direction.y, this.direction.z);
+	
+	return resultLine;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.getCameraElevation = function()
+{
+	// determine camHeight.***
+	var camModul = this.position.getModul();
+	// this.equatorialRadius = 6378137.0;
+	//this.polarRadius = 6356752.3142;
+	return  camModul - 6356752.3142;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.getCameraRight = function()
+{
+	if (this.right === undefined)
+	{ this.right = new Point3D(); }
+	
+	this.right = this.direction.crossProduct(this.up, this.right);
+	return this.right;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
+{
+	var pos = vec3.clone([point.x, point.y, point.z]);
+	var tPos = vec3.create();
+	tPos = vec3.transformMat4(tPos, pos, mat);
+	point.set(tPos[0], tPos[1], tPos[2]);
+	
+	return point;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
+Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
+{
+	var pos = vec3.clone([point.x, point.y, point.z]);
+	var tPos = vec3.create();
+	tPos = vec3.transformMat3(tPos, pos, mat);
+	point.set(tPos[0], tPos[1], tPos[2]);
+	
+	return point;
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
 Camera.prototype.setDirty = function(cameraIsDirty)
 {
 	this.dirty = cameraIsDirty;
@@ -117,7 +225,7 @@ Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 		{
 			this.bigFrustum.near[0] = distancesArray[i*2];
 		}
-		else if (i === numFrustums - 1)
+		if (i === numFrustums - 1)
 		{
 			this.bigFrustum.far[0] = distancesArray[i*2+1];
 		}

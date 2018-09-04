@@ -72,6 +72,46 @@ Matrix4.prototype.getRowMajorMatrix = function()
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param angRad 변수
+ * @param axis_x 변수
+ * @param axis_y 변수
+ * @param axis_z 변수
+ */
+Matrix4.getRotationDegZXYMatrix = function(zRotDeg, xRotDeg, yRotDeg, resultMatrix4) 
+{
+	// static function.***
+	var xRotMatrix = new Matrix4();  // created as identity matrix.
+	var yRotMatrix = new Matrix4();  // created as identity matrix.
+	var zRotMatrix = new Matrix4();  // created as identity matrix.
+	
+	if (zRotDeg !== undefined && zRotDeg !== 0)
+	{ zRotMatrix.rotationAxisAngDeg(zRotDeg, 0.0, 0.0, 1.0); }
+
+	if (xRotDeg !== undefined && xRotDeg !== 0)
+	{ xRotMatrix.rotationAxisAngDeg(xRotDeg, 1.0, 0.0, 0.0); }
+
+	if (yRotDeg !== undefined && yRotDeg !== 0)
+	{ yRotMatrix.rotationAxisAngDeg(yRotDeg, 0.0, 1.0, 0.0); }
+
+
+	if (resultMatrix4 === undefined)
+	{ resultMatrix4 = new Matrix4(); }  // created as identity matrix.
+
+
+	var zRotatedTMatrix;
+	var zxRotatedTMatrix;
+	var zxyRotatedTMatrix;
+
+	zRotatedTMatrix = zRotMatrix;
+	zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+	zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+	
+	resultMatrix4 = zxyRotatedTMatrix;
+	return resultMatrix4;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param angDeg 변수
  * @param axis_x 변수
  * @param axis_y 변수
@@ -161,7 +201,20 @@ Matrix4.prototype.getIndexOfArray = function(col, row)
  */
 Matrix4.prototype.get = function(col, row) 
 {
+	if (this._floatArrays === null)
+	{ return null; }
+	
 	return this._floatArrays[this.getIndexOfArray(col, row)];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param col 변수
+ * @param row 변수
+ */
+Matrix4.prototype.set = function(col, row, value) 
+{
+	this._floatArrays[this.getIndexOfArray(col, row)] = value;
 };
 
 /**
@@ -230,6 +283,17 @@ Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 		}
 	}
 	return resultMat;
+};
+
+Matrix4.prototype.setToPerspectiveProjection = function (fovyrad, aspect, near, far) 
+{
+	var yScale = 1.0 / Math.tan(fovyrad / 2);
+	var xScale = yScale / aspect;
+	var nearmfar = near - far;
+	this.setByFloat32Array([xScale, 0, 0, 0,
+		0, yScale, 0, 0,
+		0, 0, (far + near) / nearmfar, -1,
+		0, 0, 2*far*near / nearmfar, 0 ]);
 };
 
 /**

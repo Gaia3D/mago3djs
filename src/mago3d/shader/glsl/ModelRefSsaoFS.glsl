@@ -138,14 +138,15 @@ void main()
     }
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
+	float alfa = textureColor.w;
 
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
 	{
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, 1.0); 
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, alfa); 
 	}
 	else{
-		finalColor = vec4((textureColor.xyz) * occlusion, 1.0);
+		finalColor = vec4((textureColor.xyz) * occlusion, alfa);
 	}
     gl_FragColor = finalColor; 
 }

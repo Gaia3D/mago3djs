@@ -8,6 +8,7 @@ var Constant = {};
 
 Constant.CESIUM = "cesium";
 Constant.WORLDWIND = "worldwind";
+Constant.MAGOWORLD = "magoworld";
 Constant.OBJECT_INDEX_FILE = "/objectIndexFile.ihe";
 Constant.CACHE_VERSION = "?cache_version=";
 Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP = "/SimpleBuildingTexture3x3.bmp";

@@ -143,7 +143,8 @@ HierarchyManager.prototype.getNodesMap = function(projectId, attributes)
 		{ nodesMap.attributes = attributes; }
 		this.projectsMap[projectId] = nodesMap;
 	}
-	else{
+	else 
+	{
 		if (attributes !== undefined && nodesMap.attributes === undefined)
 		{ nodesMap.attributes = attributes; }
 	}

@@ -30,6 +30,11 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
 		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
 		resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
 	}
+	else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{
+		var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
+		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.height);
+	}
 	
 	return resultGeographicCoord;
 };
@@ -41,7 +46,7 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 
 	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
 	
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
+	if (magoManager.configInformation !== undefined && magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		resultWorldPoint.set(cartesian[1], cartesian[2], cartesian[0]);
 		return resultWorldPoint;
@@ -95,7 +100,7 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
 	// this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
-	
+
 	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		// * if this in webWorldWind:
@@ -115,12 +120,12 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
 		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
 		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
 		resultGeoLocMatrix.setByFloat32Array(tMatrixColMajorArray);
+		return resultGeoLocMatrix;
 	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		// *if this in Cesium:
-		Cesium.Transforms.eastNorthUpToFixedFrame(worldPosition, undefined, resultGeoLocMatrix._floatArrays);
-	}
+
+	if (magoManager.globe === undefined)
+	{ magoManager.globe = new Globe(); }
+	magoManager.globe.transformMatrixAtCartesianPointWgs84(worldPosition.x, worldPosition.y, worldPosition.z, resultGeoLocMatrix._floatArrays);
 	
 	return resultGeoLocMatrix;
 };
@@ -548,11 +553,11 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	if (point3fv === undefined)
 	{ return undefined; }
 
-	if (resultSplitPoint3fvHigh === undefined)
-	{ resultSplitPoint3fvHigh = new Float32Array(3); }
+	if (resultSplitPoint3fvHigh === undefined) // delete unnecesary.
+	{ resultSplitPoint3fvHigh = new Float32Array(3); }// delete unnecesary.
 
-	if (resultSplitPoint3fvLow === undefined)
-	{ resultSplitPoint3fvLow = new Float32Array(3); }
+	if (resultSplitPoint3fvLow === undefined)// delete unnecesary.
+	{ resultSplitPoint3fvLow = new Float32Array(3); }// delete unnecesary.
 
 	var posSplitX = new SplitValue();
 	posSplitX = this.calculateSplitedValues(point3fv[0], posSplitX);
