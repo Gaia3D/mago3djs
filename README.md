@@ -49,7 +49,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - [node](https://nodejs.org/ko/download/)에 접속하여 Window Install(.msi) 64-bit를 설치
 - 설치가 끝난 뒤 C:\git\repository\mago3djs 디렉토리로 이동
 - mago3DJS에 필요한 node_modules를 Node Package Manager 사용하여 설치<pre><code>C:\git\repository\mago3djs> npm install</code></pre>
-- gulp는 터미널에서 모듈의 멍령어를 사용하기 위해 Global로 설치<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
+- gulp는 터미널에서 모듈의 명령어를 사용하기 위해 Global로 설치<pre><code>C:\git\repository\mago3djs> npm install -g gulp</code></pre>
 
 ### 4. F4D Converter 설치
 - [www.mago3d.com](http://www.mago3d.com/homepage/download.do) 에 접속
