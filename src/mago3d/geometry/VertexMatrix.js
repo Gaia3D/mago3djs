@@ -253,6 +253,9 @@ VertexMatrix.prototype.translateVertices = function(dx, dy, dz)
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) 
 {
+	// OLD function. Used for shadow blending cube. OLD.***
+	// TTriangles provisional is in geometryUtils.*********
+	//-----------------------------------------------------
 	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;
 	var vtxList2;
@@ -284,6 +287,60 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 			}
 		}
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param trianglesMatrix 변수
+ */
+VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLoop) 
+{
+	// condition: all the vertex lists must have the same number of vertex.***
+	var vtxList1;
+	var vtxList2;
+	var trianglesList;
+	var triangle1;
+	var triangle2;
+	var vertexCount = 0;
+	for (var i = 0, vertexListsCount = this.vertexListsArray.length; i < vertexListsCount-1; i++) 
+	{
+		vtxList1 = this.vertexListsArray[i];
+		vtxList2 = this.vertexListsArray[i+1];
+		trianglesList = trianglesMatrix.newTrianglesList();
+		
+		vertexCount = vtxList1.vertexArray.length;
+		for (var j = 0; j < vertexCount; j++) 
+		{
+			if (j === vertexCount-1) 
+			{
+				if (bLoop !== undefined && bLoop === true)
+				{
+					triangle1 = trianglesList.newTriangle();
+					triangle2 = trianglesList.newTriangle();
+					triangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(0)); 
+					triangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(0), vtxList1.getVertex(0)); 
+				}
+			}
+			else 
+			{
+				triangle1 = trianglesList.newTriangle();
+				triangle2 = trianglesList.newTriangle();
+				triangle1.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j), vtxList2.getVertex(j+1)); 
+				triangle2.setVertices(vtxList1.getVertex(j), vtxList2.getVertex(j+1), vtxList1.getVertex(j+1)); 
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param trianglesMatrix 변수
+ */
+VertexMatrix.getIndexOfArray = function(numCols, numRows, col, row) 
+{
+	// static function.***
+	var idx = col + row * numCols;
+	return idx;
 };
 
 /**

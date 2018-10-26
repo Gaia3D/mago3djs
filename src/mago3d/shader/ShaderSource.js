@@ -391,6 +391,73 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
+ShaderSource.draw_frag = "precision mediump float;\n\
+\n\
+uniform sampler2D u_wind;\n\
+uniform vec2 u_wind_min;\n\
+uniform vec2 u_wind_max;\n\
+uniform bool u_flipTexCoordY_windMap;\n\
+uniform bool u_colorScale;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+void main() {\n\
+	vec2 windMapTexCoord = v_particle_pos;\n\
+	if(u_flipTexCoordY_windMap)\n\
+	{\n\
+		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
+	}\n\
+    vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);\n\
+    float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+	\n\
+	if(u_colorScale)\n\
+	{\n\
+		speed_t *= 1.5;\n\
+		if(speed_t > 1.0)speed_t = 1.0;\n\
+		float b = 1.0 - speed_t;\n\
+		float g;\n\
+		if(speed_t > 0.5)\n\
+		{\n\
+			g = 2.0-2.0*speed_t;\n\
+		}\n\
+		else{\n\
+			g = 2.0*speed_t;\n\
+		}\n\
+		float r = speed_t;\n\
+		gl_FragColor = vec4(r,g,b,1.0);\n\
+	}\n\
+	else{\n\
+		float intensity = speed_t*3.0;\n\
+		if(intensity > 1.0)\n\
+			intensity = 1.0;\n\
+		gl_FragColor = vec4(intensity,intensity,intensity,1.0);\n\
+	}\n\
+}\n\
+";
+ShaderSource.draw_vert = "precision mediump float;\n\
+\n\
+attribute float a_index;\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform float u_particles_res;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_particles, vec2(\n\
+        fract(a_index / u_particles_res),\n\
+        floor(a_index / u_particles_res) / u_particles_res));\n\
+\n\
+    // decode current particle position from the pixel's RGBA value\n\
+    v_particle_pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a);\n\
+\n\
+    gl_PointSize = 1.0;\n\
+    gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
+}\n\
+";
 ShaderSource.InvertedBoxFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -1877,10 +1944,21 @@ void main()\n\
     vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	gl_PointSize = 1.0 + 50.0/gl_Position.z;\n\
+	gl_PointSize = 1.0 + 180.0/gl_Position.z;\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
 }";
+ShaderSource.quad_vert = "precision mediump float;\n\
+\n\
+attribute vec2 a_pos;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    v_tex_pos = a_pos;\n\
+    gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
+}\n\
+";
 ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
@@ -1949,6 +2027,19 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_PointSize = 2.0;\n\
+}\n\
+";
+ShaderSource.screen_frag = "precision mediump float;\n\
+\n\
+uniform sampler2D u_screen;\n\
+uniform float u_opacity;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_screen, 1.0 - v_tex_pos);\n\
+    // a hack to guarantee opacity fade out even with a value close to 1.0\n\
+    gl_FragColor = vec4(floor(255.0 * color * u_opacity) / 255.0);\n\
 }\n\
 ";
 ShaderSource.ShowDepthFS = "#ifdef GL_ES\n\
@@ -2258,6 +2349,50 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }";
+ShaderSource.Test_QuadFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+ \n\
+uniform sampler2D diffuseTex;  \n\
+varying vec2 vTexCoord; \n\
+void main()\n\
+{          \n\
+    vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+    gl_FragColor = textureColor; \n\
+}\n\
+";
+ShaderSource.Test_QuadVS = "attribute vec3 position;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform sampler2D diffuseTex;\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;   \n\
+\n\
+void main()\n\
+{	\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    vTexCoord = texCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
 ShaderSource.TextureA1FS = "precision mediump float;\n\
 varying vec4 vColor;\n\
 varying vec2 vTextureCoord;\n\
@@ -2528,4 +2663,826 @@ void main()\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	\n\
+}";
+ShaderSource.update_frag = "precision highp float;\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform sampler2D u_wind;\n\
+uniform vec2 u_wind_res;\n\
+uniform vec2 u_wind_min;\n\
+uniform vec2 u_wind_max;\n\
+uniform float u_rand_seed;\n\
+uniform float u_speed_factor;\n\
+uniform float u_drop_rate;\n\
+uniform float u_drop_rate_bump;\n\
+uniform bool u_flipTexCoordY_windMap;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+// pseudo-random generator\n\
+const vec3 rand_constants = vec3(12.9898, 78.233, 4375.85453);\n\
+float rand(const vec2 co) {\n\
+    float t = dot(rand_constants.xy, co);\n\
+    return fract(sin(t) * (rand_constants.z + t));\n\
+}\n\
+\n\
+// wind speed lookup; use manual bilinear filtering based on 4 adjacent pixels for smooth interpolation\n\
+vec2 lookup_wind(const vec2 uv) {\n\
+    // return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
+    vec2 px = 1.0 / u_wind_res;\n\
+    vec2 vc = (floor(uv * u_wind_res)) * px;\n\
+    vec2 f = fract(uv * u_wind_res);\n\
+    vec2 tl = texture2D(u_wind, vc).rg;\n\
+    vec2 tr = texture2D(u_wind, vc + vec2(px.x, 0)).rg;\n\
+    vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;\n\
+    vec2 br = texture2D(u_wind, vc + px).rg;\n\
+    return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
+}\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_particles, v_tex_pos);\n\
+    vec2 pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a); // decode particle position from pixel RGBA\n\
+	vec2 windMapTexCoord = pos;\n\
+	if(u_flipTexCoordY_windMap)\n\
+	{\n\
+		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
+	}\n\
+    vec2 velocity = mix(u_wind_min, u_wind_max, lookup_wind(windMapTexCoord));\n\
+    float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+    // take EPSG:4236 distortion into account for calculating where the particle moved\n\
+    float distortion = cos(radians(pos.y * 180.0 - 90.0));\n\
+    vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor;\n\
+\n\
+    // update particle position, wrapping around the date line\n\
+    pos = fract(1.0 + pos + offset);\n\
+\n\
+    // a random seed to use for the particle drop\n\
+    vec2 seed = (pos + v_tex_pos) * u_rand_seed;\n\
+\n\
+    // drop rate is a chance a particle will restart at random position, to avoid degeneration\n\
+    float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;\n\
+    float drop = step(1.0 - drop_rate, rand(seed));\n\
+\n\
+    vec2 random_pos = vec2(\n\
+        rand(seed + 1.3),\n\
+        rand(seed + 2.1));\n\
+    pos = mix(pos, random_pos, drop);\n\
+\n\
+    // encode the new particle position back into RGBA\n\
+    gl_FragColor = vec4(\n\
+        fract(pos * 255.0),\n\
+        floor(pos * 255.0) / 255.0);\n\
+}\n\
+";
+ShaderSource.vol_fs = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+\n\
+//---------------------------------------------------------\n\
+// MACROS\n\
+//---------------------------------------------------------\n\
+\n\
+#define EPS       0.0001\n\
+#define PI        3.14159265\n\
+#define HALFPI    1.57079633\n\
+#define ROOTTHREE 1.73205081\n\
+\n\
+#define EQUALS(A,B) ( abs((A)-(B)) < EPS )\n\
+#define EQUALSZERO(A) ( ((A)<EPS) && ((A)>-EPS) )\n\
+\n\
+\n\
+//---------------------------------------------------------\n\
+// CONSTANTS\n\
+//---------------------------------------------------------\n\
+\n\
+// 32 48 64 96 128\n\
+#define MAX_STEPS 64\n\
+\n\
+#define LIGHT_NUM 2\n\
+//#define uTMK 20.0\n\
+#define TM_MIN 0.05\n\
+\n\
+\n\
+//---------------------------------------------------------\n\
+// SHADER VARS\n\
+//---------------------------------------------------------\n\
+\n\
+varying vec2 vUv;\n\
+varying vec3 vPos0; // position in world coords\n\
+varying vec3 vPos1; // position in object coords\n\
+varying vec3 vPos1n; // normalized 0 to 1, for texture lookup\n\
+\n\
+uniform vec3 uOffset; // TESTDEBUG\n\
+\n\
+uniform vec3 uCamPos;\n\
+\n\
+uniform vec3 uLightP[LIGHT_NUM];  // point lights\n\
+uniform vec3 uLightC[LIGHT_NUM];\n\
+\n\
+uniform vec3 uColor;      // color of volume\n\
+uniform sampler2D uTex;   // 3D(2D) volume texture\n\
+uniform vec3 uTexDim;     // dimensions of texture\n\
+\n\
+uniform float uTMK;\n\
+\n\
+float gStepSize;\n\
+float gStepFactor;\n\
+\n\
+\n\
+//---------------------------------------------------------\n\
+// PROGRAM\n\
+//---------------------------------------------------------\n\
+\n\
+// TODO: convert world to local volume space\n\
+vec3 toLocal(vec3 p) {\n\
+  return p + vec3(0.5);\n\
+}\n\
+\n\
+float sampleVolTex(vec3 pos) {\n\
+  pos = pos + uOffset; // TESTDEBUG\n\
+  \n\
+  // note: z is up in 3D tex coords, pos.z is tex.y, pos.y is zSlice\n\
+  float zSlice = (1.0-pos.y)*(uTexDim.z-1.0);   // float value of slice number, slice 0th to 63rd\n\
+  \n\
+  // calc pixels from top of texture\n\
+  float fromTopPixels =\n\
+    floor(zSlice)*uTexDim.y +   // offset pix from top of tex, from upper slice  \n\
+    pos.z*(uTexDim.y-1.0) +     // y pos in pixels, range 0th to 63rd pix\n\
+    0.5;  // offset to center of cell\n\
+    \n\
+  // calc y tex coords of two slices\n\
+  float y0 = min( (fromTopPixels)/(uTexDim.y*uTexDim.z), 1.0);\n\
+  float y1 = min( (fromTopPixels+uTexDim.y)/(uTexDim.y*uTexDim.z), 1.0);\n\
+    \n\
+  // get (bi)linear interped texture reads at two slices\n\
+  float z0 = texture2D(uTex, vec2(pos.x, y0)).g;\n\
+  float z1 = texture2D(uTex, vec2(pos.x, y1)).g;\n\
+  \n\
+  // lerp them again (thus trilinear), using remaining fraction of zSlice\n\
+  return mix(z0, z1, fract(zSlice));\n\
+}\n\
+\n\
+// accumulate density by ray marching\n\
+float getDensity(vec3 ro, vec3 rd) {\n\
+  vec3 step = rd*gStepSize;\n\
+  vec3 pos = ro;\n\
+  \n\
+  float density = 0.0;\n\
+  \n\
+  for (int i=0; i<MAX_STEPS; ++i) {\n\
+    density += (1.0-density) * sampleVolTex(pos) * gStepFactor;\n\
+    //density += sampleVolTex(pos);\n\
+    \n\
+    pos += step;\n\
+    \n\
+    if (density > 0.95 ||\n\
+      pos.x > 1.0 || pos.x < 0.0 ||\n\
+      pos.y > 1.0 || pos.y < 0.0 ||\n\
+      pos.z > 1.0 || pos.z < 0.0)\n\
+      break;\n\
+  }\n\
+  \n\
+  return density;\n\
+}\n\
+\n\
+// calc transmittance\n\
+float getTransmittance(vec3 ro, vec3 rd) {\n\
+  vec3 step = rd*gStepSize;\n\
+  vec3 pos = ro;\n\
+  \n\
+  float tm = 1.0;\n\
+  \n\
+  for (int i=0; i<MAX_STEPS; ++i) {\n\
+    tm *= exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
+    \n\
+    pos += step;\n\
+    \n\
+    if (tm < TM_MIN ||\n\
+      pos.x > 1.0 || pos.x < 0.0 ||\n\
+      pos.y > 1.0 || pos.y < 0.0 ||\n\
+      pos.z > 1.0 || pos.z < 0.0)\n\
+      break;\n\
+  }\n\
+  \n\
+  return tm;\n\
+}\n\
+\n\
+vec4 raymarchNoLight(vec3 ro, vec3 rd) {\n\
+  vec3 step = rd*gStepSize;\n\
+  vec3 pos = ro;\n\
+  \n\
+  vec3 col = vec3(0.0);\n\
+  float tm = 1.0;\n\
+  \n\
+  for (int i=0; i<MAX_STEPS; ++i) {\n\
+    float dtm = exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
+    tm *= dtm;\n\
+    \n\
+    col += (1.0-dtm) * uColor * tm;\n\
+    \n\
+    pos += step;\n\
+    \n\
+    if (tm < TM_MIN ||\n\
+      pos.x > 1.0 || pos.x < 0.0 ||\n\
+      pos.y > 1.0 || pos.y < 0.0 ||\n\
+      pos.z > 1.0 || pos.z < 0.0)\n\
+      break;\n\
+  }\n\
+  \n\
+  float alpha = 1.0-tm;\n\
+  return vec4(col/alpha, alpha);\n\
+}\n\
+\n\
+vec4 raymarchLight(vec3 ro, vec3 rd) {\n\
+  vec3 step = rd*gStepSize;\n\
+  vec3 pos = ro;\n\
+  \n\
+  \n\
+  vec3 col = vec3(0.0);   // accumulated color\n\
+  float tm = 1.0;         // accumulated transmittance\n\
+  \n\
+  for (int i=0; i<MAX_STEPS; ++i) {\n\
+    // delta transmittance \n\
+    float dtm = exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
+    tm *= dtm;\n\
+    \n\
+    // get contribution per light\n\
+    for (int k=0; k<LIGHT_NUM; ++k) {\n\
+      vec3 ld = normalize( toLocal(uLightP[k])-pos );\n\
+      float ltm = getTransmittance(pos,ld);\n\
+      \n\
+      col += (1.0-dtm) * uColor*uLightC[k] * tm * ltm;\n\
+    }\n\
+    \n\
+    pos += step;\n\
+    \n\
+    if (tm < TM_MIN ||\n\
+      pos.x > 1.0 || pos.x < 0.0 ||\n\
+      pos.y > 1.0 || pos.y < 0.0 ||\n\
+      pos.z > 1.0 || pos.z < 0.0)\n\
+      break;\n\
+  }\n\
+  \n\
+  float alpha = 1.0-tm;\n\
+  return vec4(col/alpha, alpha);\n\
+}\n\
+\n\
+void main() {\n\
+  // in world coords, just for now\n\
+  vec3 ro = vPos1n;\n\
+  vec3 rd = normalize( ro - toLocal(uCamPos) );\n\
+  //vec3 rd = normalize(ro-uCamPos);\n\
+  \n\
+  // step_size = root_three / max_steps ; to get through diagonal  \n\
+  gStepSize = ROOTTHREE / float(MAX_STEPS);\n\
+  gStepFactor = 32.0 * gStepSize;\n\
+  \n\
+  gl_FragColor = raymarchLight(ro, rd);\n\
+  //gl_FragColor = vec4(uColor, getDensity(ro,rd));\n\
+  //gl_FragColor = vec4(vec3(sampleVolTex(pos)), 1.0);\n\
+  //gl_FragColor = vec4(vPos1n, 1.0);\n\
+  //gl_FragColor = vec4(uLightP[0], 1.0);\n\
+}";
+ShaderSource.vol_vs = "attribute vec3 aPosition;\n\
+\n\
+uniform sampler2D diffuseTex;\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec3 vPosObjectCoord;\n\
+varying vec3 vPosCameraCoord;\n\
+varying vec3 vPosWorldCoord;\n\
+\n\
+// Render a fullScreen quad (2 triangles).***\n\
+void main()\n\
+{\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";
+ShaderSource.wgs84_volumFS = "precision mediump float;\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+uniform sampler2D volumeTex;\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixInv;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;\n\
+uniform float aspectRatio;\n\
+uniform float far;\n\
+uniform float fovyRad;\n\
+uniform float tanHalfFovy;\n\
+\n\
+// volume tex definition.***\n\
+uniform int texNumCols;\n\
+uniform int texNumRows;\n\
+uniform int texNumSlices;\n\
+uniform float maxLon;\n\
+uniform float minLon;\n\
+uniform float maxLat;\n\
+uniform float minLat;\n\
+uniform float maxAlt;\n\
+uniform float minAlt;\n\
+\n\
+uniform float maxValue;\n\
+uniform float minValue;\n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+	float hfar = 2.0 * tanHalfFovy * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+} \n\
+\n\
+float squaredLength(vec3 point1, vec3 point2)\n\
+{\n\
+	float a = point1.x - point2.x;\n\
+	float b = point1.y - point2.y;\n\
+	float c = point1.z - point2.z;\n\
+	\n\
+	float sqDist = a*a + b*b + c*c;\n\
+	return sqDist;\n\
+}\n\
+\n\
+void intersectionLineSphere(float radius, vec3 rayPos, vec3 rayDir, out int intersectType, out vec3 nearIntersectPos, out vec3 farIntersectPos)\n\
+{\n\
+	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)\n\
+	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.\n\
+	\n\
+	// line:\n\
+	vec3 p1 = rayPos;\n\
+	vec3 lineDir = rayDir;\n\
+	float dist = 1000.0;// any value is ok.***\n\
+	vec3 p2 = vec3(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);\n\
+	float x1 = p1.x;\n\
+	float y1 = p1.y;\n\
+	float z1 = p1.z;\n\
+	float x2 = p2.x;\n\
+	float y2 = p2.y;\n\
+	float z2 = p2.z;\n\
+\n\
+	// sphere:\n\
+	float x3 = 0.0;\n\
+	float y3 = 0.0;\n\
+	float z3 = 0.0;\n\
+	float r = radius;\n\
+	\n\
+	// resolve:\n\
+	float x21 = (x2-x1);\n\
+	float y21 = (y2-y1);\n\
+	float z21 = (z2-z1);\n\
+	\n\
+	float a = x21*x21 + y21*y21 + z21*z21;\n\
+	\n\
+	float x13 = (x1-x3);\n\
+	float y13 = (y1-y3);\n\
+	float z13 = (z1-z3);\n\
+	\n\
+	float b = 2.0*(x21 * x13 + y21 * y13 + z21 * z13);\n\
+	\n\
+	float c = x3*x3 + y3*y3 + z3*z3 + x1*x1 + y1*y1 + z1*z1 - 2.0*(x3*x1 + y3*y1+ z3*z1) - r*r;\n\
+	\n\
+	float discriminant = b*b - 4.0*a*c;\n\
+	\n\
+	if (discriminant < 0.0)\n\
+	{\n\
+		// no intersection.***\n\
+		intersectType = 0;\n\
+	}\n\
+	else if (discriminant == 0.0)\n\
+	{\n\
+		// this is tangent.***\n\
+		intersectType = 1;\n\
+		\n\
+		float t1 = (-b)/(2.0*a);\n\
+		nearIntersectPos = vec3(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);\n\
+	}\n\
+	else\n\
+	{\n\
+		intersectType = 2;\n\
+		\n\
+		// find the nearest to p1.***\n\
+		float sqrtDiscriminant = sqrt(discriminant);\n\
+		float t1 = (-b + sqrtDiscriminant)/(2.0*a);\n\
+		float t2 = (-b - sqrtDiscriminant)/(2.0*a);\n\
+		\n\
+		// solution 1.***\n\
+		vec3 intersectPoint1 = vec3(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);\n\
+		vec3 intersectPoint2 = vec3(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);\n\
+		\n\
+		float dist1 = squaredLength(p1,intersectPoint1);\n\
+		float dist2 = squaredLength(p1,intersectPoint2);\n\
+		\n\
+		// nearIntersectPos, out vec3 farIntersectPos\n\
+		if (dist1 < dist2)\n\
+		{\n\
+			nearIntersectPos = intersectPoint1;\n\
+			farIntersectPos = intersectPoint2;\n\
+		}\n\
+		else\n\
+		{\n\
+			nearIntersectPos = intersectPoint2;\n\
+			farIntersectPos = intersectPoint1;\n\
+		}\n\
+	}\n\
+}\n\
+\n\
+float atan2(float y, float x) \n\
+{\n\
+	if(x > 0.0)\n\
+	{\n\
+		return atan(y/x);\n\
+	}\n\
+	else if(x < 0.0)\n\
+	{\n\
+		if(y >= 0.0)\n\
+		{\n\
+			return atan(y/x) + M_PI;\n\
+		}\n\
+		else{\n\
+			return atan(y/x) - M_PI;\n\
+		}\n\
+	}\n\
+	else if(x == 0.0)\n\
+	{\n\
+		if(y>0.0)\n\
+		{\n\
+			return M_PI/2.0;\n\
+		}\n\
+		else if(y<0.0)\n\
+		{\n\
+			return -M_PI/2.0;\n\
+		}\n\
+		else{\n\
+			return 0.0; // return undefined.***\n\
+		}\n\
+	}\n\
+}\n\
+\n\
+void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
+{\n\
+	// From WebWorldWind.***\n\
+	// According to H. Vermeille, \"An analytical method to transform geocentric into geodetic coordinates\"\n\
+	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf\n\
+	\n\
+	float firstEccentricitySquared = 6.69437999014E-3;\n\
+	float equatorialRadius = 6378137.0;\n\
+\n\
+	// wwwind coord type.***\n\
+	// X = point.z;\n\
+	// Y = point.x;\n\
+	// Z = point.y;\n\
+\n\
+	// magoWorld coord type.***\n\
+	float X = point.x;\n\
+	float Y = point.y;\n\
+	float Z = point.z;\n\
+	float XXpYY = X * X + Y * Y;\n\
+	float sqrtXXpYY = sqrt(XXpYY);\n\
+	float a = equatorialRadius;\n\
+	float ra2 = 1.0 / (a * a);\n\
+	float e2 = firstEccentricitySquared;\n\
+	float e4 = e2 * e2;\n\
+	float p = XXpYY * ra2;\n\
+	float q = Z * Z * (1.0 - e2) * ra2;\n\
+	float r = (p + q - e4) / 6.0;\n\
+	float h;\n\
+	float phi;\n\
+	float u;\n\
+	float evoluteBorderTest = 8.0 * r * r * r + e4 * p * q;\n\
+	float rad1;\n\
+	float rad2;\n\
+	float rad3;\n\
+	float atanAux;\n\
+	float v;\n\
+	float w;\n\
+	float k;\n\
+	float D;\n\
+	float sqrtDDpZZ;\n\
+	float e;\n\
+	float lambda;\n\
+	float s2;\n\
+	float cbrtFac = 1.0/3.0;\n\
+\n\
+	if (evoluteBorderTest > 0.0 || q != 0.0) \n\
+	{\n\
+		if (evoluteBorderTest > 0.0) \n\
+		{\n\
+			// Step 2: general case\n\
+			rad1 = sqrt(evoluteBorderTest);\n\
+			rad2 = sqrt(e4 * p * q);\n\
+\n\
+			// 10*e2 is my arbitrary decision of what Vermeille means by \"near... the cusps of the evolute\".\n\
+			if (evoluteBorderTest > 10.0 * e2) \n\
+			{\n\
+				rad3 = pow((rad1 + rad2) * (rad1 + rad2), cbrtFac);\n\
+				u = r + 0.5 * rad3 + 2.0 * r * r / rad3;\n\
+			}\n\
+			else \n\
+			{\n\
+				u = r + 0.5 * pow((rad1 + rad2) * (rad1 + rad2), cbrtFac)\n\
+					+ 0.5 * pow((rad1 - rad2) * (rad1 - rad2), cbrtFac);\n\
+			}\n\
+		}\n\
+		else \n\
+		{\n\
+			// Step 3: near evolute\n\
+			rad1 = sqrt(-evoluteBorderTest);\n\
+			rad2 = sqrt(-8.0 * r * r * r);\n\
+			rad3 = sqrt(e4 * p * q);\n\
+			atanAux = 2.0 * atan2(rad3, rad1 + rad2) / 3.0;\n\
+\n\
+			u = -4.0 * r * sin(atanAux) * cos(M_PI / 6.0 + atanAux);\n\
+		}\n\
+\n\
+		v = sqrt(u * u + e4 * q);\n\
+		w = e2 * (u + v - q) / (2.0 * v);\n\
+		k = (u + v) / (sqrt(w * w + u + v) + w);\n\
+		D = k * sqrtXXpYY / (k + e2);\n\
+		sqrtDDpZZ = sqrt(D * D + Z * Z);\n\
+\n\
+		h = (k + e2 - 1.0) * sqrtDDpZZ / k;\n\
+		phi = 2.0 * atan2(Z, sqrtDDpZZ + D);\n\
+	}\n\
+	else \n\
+	{\n\
+		// Step 4: singular disk\n\
+		rad1 = sqrt(1.0 - e2);\n\
+		rad2 = sqrt(e2 - p);\n\
+		e = sqrt(e2);\n\
+\n\
+		h = -a * rad1 * rad2 / e;\n\
+		phi = rad2 / (e * rad2 + rad1 * sqrt(p));\n\
+	}\n\
+\n\
+	// Compute lambda\n\
+	s2 = sqrt(2.0);\n\
+	if ((s2 - 1.0) * Y < sqrtXXpYY + X) \n\
+	{\n\
+		// case 1 - -135deg < lambda < 135deg\n\
+		lambda = 2.0 * atan2(Y, sqrtXXpYY + X);\n\
+	}\n\
+	else if (sqrtXXpYY + Y < (s2 + 1.0) * X) \n\
+	{\n\
+		// case 2 - -225deg < lambda < 45deg\n\
+		lambda = -M_PI * 0.5 + 2.0 * atan2(X, sqrtXXpYY - Y);\n\
+	}\n\
+	else \n\
+	{\n\
+		// if (sqrtXXpYY-Y<(s2=1)*X) {  // is the test, if needed, but it's not\n\
+		// case 3: - -45deg < lambda < 225deg\n\
+		lambda = M_PI * 0.5 - 2.0 * atan2(X, sqrtXXpYY + Y);\n\
+	}\n\
+\n\
+	float factor = 180.0 / M_PI;\n\
+	result = vec3(factor * lambda, factor * phi, h); // (longitude, latitude, altitude).***\n\
+}\n\
+\n\
+bool getValue(vec3 geoLoc, out vec4 value)\n\
+{\n\
+	// geoLoc = (longitude, latitude, altitude).***\n\
+	float lon = geoLoc.x;\n\
+	float lat = geoLoc.y;\n\
+	float alt = geoLoc.z;\n\
+	\n\
+	// 1rst, check if geoLoc intersects the volume.***\n\
+	if(lon < minLon || lon > maxLon)\n\
+		return false;\n\
+	else if(lat < minLat || lat > maxLat)\n\
+		return false;\n\
+	else if(alt < minAlt || alt > maxAlt)\n\
+		return false;\n\
+		\n\
+	// provisionally filter = NEAREST.***\n\
+	float fTexNumRows = float(texNumRows);\n\
+	float fTexNumCols = float(texNumCols);\n\
+	float fTexNumSlices = float(texNumSlices);\n\
+	float fTexTotalNumRows = float(texNumRows * texNumSlices);\n\
+	float lonRange = maxLon - minLon;\n\
+	float latRange = maxLat - minLat;\n\
+	float altRange = maxAlt - minAlt;\n\
+	float col = (lon - minLon)/lonRange * fTexNumCols;\n\
+	float row = (lat - minLat)/latRange * fTexNumRows;\n\
+	float slice = (alt - minAlt)/altRange * fTexNumSlices;\n\
+	\n\
+	slice = 5.0;\n\
+	// must calculate lonPrev, lonNext, latPrev, latNext, altPrev, altNext.***\n\
+			float lonPrev = floor(lon);\n\
+			float lonNext = ceil(lon);\n\
+			//if(lonNext == 360.0)lonNext = 0.0;\n\
+			float lonPrevDist = lon - lonPrev;\n\
+			float latPrev = floor(lat);\n\
+			float latNext = ceil(lat);\n\
+			float latPrevDist = lat - latPrev;\n\
+			float slicePrev = floor(slice);\n\
+			float sliceNext = ceil(slice);\n\
+			float slicePrevDist = slice - slicePrev;\n\
+	// now calculate colPrev, colNext, rowPrev, rowNext, slicePrev, sliceNext.***\n\
+	//float colPrev = floor(col);\n\
+	//float colNext = ceil(col);\n\
+	////if(colNext == 360.0)lonNext = 0.0;\n\
+	//float lonPrevDist = lon - lonPrev;\n\
+	//float latPrev = floor(lat);\n\
+	//float latNext = ceil(lat);\n\
+	//float latPrevDist = lat - latPrev;\n\
+	//float altPrev = floor(alt);\n\
+	//float altNext = ceil(alt);\n\
+	//float altPrevDist = alt - altPrev;\n\
+	// vertex indices of the box.***\n\
+	//    3--------2        7--------6 \n\
+	//    |        |        |        | \n\
+	//    | bottom |        |  top   | \n\
+	//    |        |        |        | \n\
+	//    0--------1        4--------5 \n\
+	float sPrev = lonPrev/fTexNumCols;\n\
+	float sNext = lonNext/fTexNumCols;\n\
+	float tPrevBottom = (latPrev+slicePrev*fTexNumRows)/fTexTotalNumRows;\n\
+	float tPrevTop = (latPrev+sliceNext*fTexNumRows)/fTexTotalNumRows;\n\
+	float tNextBottom = (latNext+slicePrev*fTexNumRows)/fTexTotalNumRows;\n\
+	float tNextTop = (latNext+sliceNext*fTexNumRows)/fTexTotalNumRows;\n\
+	vec2 tc_0 = vec2(sPrev, tPrevBottom);\n\
+	vec2 tc_1 = vec2(sNext, tPrevBottom);\n\
+	vec2 tc_2 = vec2(sNext, tNextBottom);\n\
+	vec2 tc_3 = vec2(sPrev, tNextBottom);\n\
+	\n\
+	vec2 tc_4 = vec2(sPrev, tPrevTop);\n\
+	vec2 tc_5 = vec2(sNext, tPrevTop);\n\
+	vec2 tc_6 = vec2(sNext, tNextTop);\n\
+	vec2 tc_7 = vec2(sPrev, tNextTop);\n\
+	vec4 value_0 = texture2D(volumeTex, tc_0);\n\
+	vec4 value_1 = texture2D(volumeTex, tc_1);\n\
+	vec4 value_2 = texture2D(volumeTex, tc_2);\n\
+	vec4 value_3 = texture2D(volumeTex, tc_3);\n\
+	vec4 value_4 = texture2D(volumeTex, tc_4);\n\
+	vec4 value_5 = texture2D(volumeTex, tc_5);\n\
+	vec4 value_6 = texture2D(volumeTex, tc_6);\n\
+	vec4 value_7 = texture2D(volumeTex, tc_7);\n\
+	// calculate the 4 values by longitude.***\n\
+	float resultValueFrontBottom_byLon = value_0.r*(1.0-lonPrevDist) + value_1.r*lonPrevDist;\n\
+	float resultValueRearBottom_byLon = value_3.r*(1.0-lonPrevDist) + value_2.r*lonPrevDist;\n\
+	float resultValueFrontTop_byLon = value_4.r*(1.0-lonPrevDist) + value_5.r*lonPrevDist;\n\
+	float resultValueRearTop_byLon = value_7.r*(1.0-lonPrevDist) + value_6.r*lonPrevDist;\n\
+	// calculate the 2 values by latitude.***\n\
+	float resultValueBottom_byLat = resultValueFrontBottom_byLon*(1.0 - latPrevDist) + resultValueRearBottom_byLon * latPrevDist;\n\
+	float resultValueTop_byLat = resultValueFrontTop_byLon*(1.0 - latPrevDist) + resultValueRearTop_byLon * latPrevDist;\n\
+	// calculate the 1 value by slice.***\n\
+	float resultValue_bySlice = resultValueTop_byLat*(1.0-slicePrevDist) + resultValueBottom_byLat*slicePrevDist;\n\
+	vec2 texCoord = vec2(col/fTexNumCols, (row+slice*fTexNumRows)/fTexTotalNumRows);\n\
+	value = texture2D(volumeTex, texCoord);\n\
+	//value = vec4(resultValue_bySlice, resultValue_bySlice, resultValue_bySlice, resultValue_bySlice);\n\
+	//value = value_0;\n\
+	return true;\n\
+}\n\
+\n\
+void main() {\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+	float linearDepth = 1.0; // the quad is 1m of dist of the camera.***          \n\
+    vec3 rayCamCoord = getViewRay(screenPos) * linearDepth;  \n\
+	rayCamCoord = normalize(rayCamCoord);\n\
+	\n\
+	vec3 camTarget = rayCamCoord * 10000.0;\n\
+	vec4 camPosWorld = vec4(encodedCameraPositionMCHigh + encodedCameraPositionMCLow, 1.0);\n\
+	vec4 camTargetWorld = modelViewMatrixInv * vec4(camTarget.xyz, 1.0);\n\
+	vec3 camDirWorld = camTargetWorld.xyz - camPosWorld.xyz;\n\
+	camDirWorld = normalize(camDirWorld);\n\
+\n\
+	// now, must find sampling points.***\n\
+	int intersectType = 0;\n\
+	vec3 nearP;\n\
+	vec3 farP;\n\
+	float radius = 6378137.0 + maxAlt; // equatorial radius.***\n\
+	//radius = 6250000.0 + maxAlt; // test radius.***\n\
+	\n\
+	intersectionLineSphere(radius, camPosWorld.xyz, camDirWorld, intersectType, nearP, farP);\n\
+	\n\
+	if(intersectType == 0)\n\
+	{\n\
+		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);\n\
+		//return;\n\
+		discard;\n\
+	}\n\
+		\n\
+	if(intersectType == 1)\n\
+	{\n\
+		// provisionally discard.***\n\
+		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);\n\
+		//return;\n\
+		discard;	\n\
+	}\n\
+	\n\
+	// check if nearP is rear of the camera.***\n\
+	float dist = distance(nearP, farP);\n\
+	float testDist = dist;\n\
+	if(dist > 150000.0)\n\
+		testDist = 150000.0;\n\
+	vec3 endPoint = vec3(nearP.x + camDirWorld.x * testDist, nearP.y + camDirWorld.y * testDist, nearP.z + camDirWorld.z * testDist);\n\
+	vec3 endGeoLoc;\n\
+	cartesianToGeographicWgs84(endPoint, endGeoLoc);\n\
+	vec3 strGeoLoc;\n\
+	cartesianToGeographicWgs84(nearP, strGeoLoc);\n\
+	\n\
+	// now calculate the geographicCoords of 2 points.***\n\
+	// now, depending the dist(nearP, endPoint), determine numSmples.***\n\
+	// provisionally take 16 samples.***\n\
+	float numSamples = 64.0;\n\
+	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);\n\
+	float alpha = 0.8/numSamples;\n\
+	float tempRange = maxValue - minValue;\n\
+	vec4 value;\n\
+	float totalValue = 0.0;\n\
+	int sampledsCount = 0;\n\
+	int intAux = 0;\n\
+	float increDist = testDist / numSamples;\n\
+	int c = 0;\n\
+	for(int i=0; i<128; i++)\n\
+	{\n\
+		vec3 currGeoLoc;\n\
+		vec3 currPosWorld = vec3(nearP.x + camDirWorld.x * increDist*float(c), nearP.y + camDirWorld.y * increDist*float(c), nearP.z + camDirWorld.z * increDist*float(c));\n\
+		cartesianToGeographicWgs84(currPosWorld, currGeoLoc);\n\
+		if(getValue(currGeoLoc, value))\n\
+		{\n\
+			//float realValue = value.r * tempRange + minValue*255.0;\n\
+			totalValue += (value.r);\n\
+			sampledsCount += 1;\n\
+		}\n\
+		if(sampledsCount >= 1)\n\
+		{\n\
+			break;\n\
+		}\n\
+		c++;\n\
+	}\n\
+	if(sampledsCount == 0)\n\
+	{\n\
+		discard;\n\
+	}\n\
+	float fValue = totalValue/numSamples;\n\
+	fValue = totalValue;\n\
+	if(fValue > 1.0)\n\
+	{\n\
+		gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);\n\
+		return;\n\
+	}\n\
+	float b = 1.0 - fValue;\n\
+	float g;\n\
+	if(fValue > 0.5)\n\
+	{\n\
+		g = 2.0-2.0*fValue;\n\
+	}\n\
+	else{\n\
+		g = 2.0*fValue;\n\
+	}\n\
+	float r = fValue;\n\
+	color += vec4(r,g,b,0.8);\n\
+	gl_FragColor = color;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
+ShaderSource.wgs84_volumVS = "precision mediump float;\n\
+\n\
+attribute vec3 position;\n\
+uniform mat4 projectionMatrix;\n\
+\n\
+void main()\n\
+{	\n\
+	vec4 pos = projectionMatrix * vec4(position.xyz, 1.0);\n\
+    gl_Position = pos;\n\
 }";

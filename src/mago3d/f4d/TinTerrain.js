@@ -20,6 +20,105 @@ var TinTerrain = function()
 	this.texture;
 };
 
+TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude)
+{
+	// This function makes an ellipsoidal mesh for tiles that has no elevation data.***
+	var degToRadFactor = Math.PI/180.0;
+	var minLon = this.geographicExtent.minGeographicCoord.longitude * degToRadFactor;
+	var minLat = this.geographicExtent.minGeographicCoord.latitude * degToRadFactor;
+	var maxLon = this.geographicExtent.maxGeographicCoord.longitude * degToRadFactor;
+	var maxLat = this.geographicExtent.maxGeographicCoord.latitude * degToRadFactor;
+	var lonRange = maxLon - minLon;
+	var latRange = maxLat - minLat;
+	
+	var lonIncreDeg = lonRange/lonSegments;
+	var latIncreDeg = latRange/latSegments;
+	
+	// use a vertexMatrix to make the regular net.***
+	var vertexMatrix;
+	
+	// calculate total verticesCount.***
+	var vertexCount = (lonSegments + 1)*(latSegments + 1);
+	var lonArray = new Float32Array(vertexCount);
+	var latArray = new Float32Array(vertexCount);
+	var altArray = new Float32Array(vertexCount);
+	this.texCoordsArray = new Float32Array(vertexCount*2);
+	
+	var currLon = minLon; // init startLon.***
+	var currLat = minLat; // init startLat.***
+	var idx = 0;
+	
+	// check if exist altitude.***
+	var alt = 0;
+	if (altitude)
+	{ alt = altitude; }
+	
+	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
+	{
+		currLon = minLon;
+		for (var currLonSeg = 0; currLonSeg<lonSegments+1; currLonSeg++)
+		{
+			lonArray[idx] = currLon;
+			latArray[idx] = currLat;
+			altArray[idx] = alt;
+
+			// make texcoords.***
+			this.texCoordsArray[idx*2] = (currLon - minLon)/lonRange;
+			this.texCoordsArray[idx*2+1] = (currLat - minLat)/latRange;
+			
+			if (this.texCoordsArray[idx*2] > 1.0 || this.texCoordsArray[idx*2+1] > 1.0)
+			{ var hola = 0; }
+			
+			// actualize current values.***
+			currLon += lonIncreDeg;
+			idx++;
+		}
+		currLat += latIncreDeg;
+	}
+	
+	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
+	
+	// finally make indicesArray.***
+	var numCols = lonSegments + 1;
+	var numRows = latSegments + 1;
+	this.indices = this.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
+};
+
+TinTerrain.prototype.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray)
+{
+	// given a regular net this function returns triangles indices of the net.***
+	var verticesCount = numCols * numRows;
+	var trianglesCount = (numCols-1) * (numRows-1) * 2;
+	if (resultIndicesArray === undefined)
+	{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
+	
+	var idx_1, idx_2, idx_3;
+	var idxCounter = 0;
+	
+	for (var row = 0; row<numRows-1; row++)
+	{
+		for (var col=0; col<numCols-1; col++)
+		{
+			// there are 2 triangles: triA, triB.***
+			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row);
+			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
+			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
+			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			
+			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
+			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row+1);
+			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
+			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+		}
+	}
+	
+	return resultIndicesArray;
+};
+
 TinTerrain.prototype.zigZagDecode = function(value)
 {
 	return (value >> 1) ^ (-(value & 1));

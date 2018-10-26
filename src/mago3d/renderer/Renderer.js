@@ -1075,6 +1075,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			var indicesCount;
 			if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 			{
+				indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+				/*
 				if (magoManager.objectSelected === neoReference)
 				{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
 				else
@@ -1083,6 +1085,7 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 					if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
 					{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
 				}
+				*/
 			}
 			else
 			{
@@ -1194,6 +1197,8 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 			var indicesCount;
 			if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 			{
+				indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+				/*
 				if (magoManager.objectSelected === neoReference)
 				{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
 				else 
@@ -1205,6 +1210,7 @@ Renderer.prototype.depthRenderNeoRefListsAsimetricVersion = function(gl, neoRefe
 					//if(indicesCount === 0)
 					//	indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 				}
+				*/
 			}
 			else
 			{

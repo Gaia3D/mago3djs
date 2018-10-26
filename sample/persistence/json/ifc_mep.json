@@ -21,6 +21,86 @@
 			"longitude": 126.738134,
 			"pitch": 0,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Sample_MEP_1",
+			"data_name": "Sample_MEP_1",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 65,
+			"latitude": 37.6634524316426,
+			"longitude": 126.73817586967812,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Sample_MEP_2",
+			"data_name": "Sample_MEP_2",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 67,
+			"latitude": 37.66347210164108,
+			"longitude": 126.73807534384399,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Sample_MEP_3",
+			"data_name": "Sample_MEP_3",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 69,
+			"latitude": 37.66342839082913,
+			"longitude": 126.73810660412053,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Sample_MEP_4",
+			"data_name": "Sample_MEP_4",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 71,
+			"latitude": 37.66350493967357,
+			"longitude": 126.73811161943385,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Sample_MEP_5",
+			"data_name": "Sample_MEP_5",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 63,
+			"latitude": 37.66350387300872,
+			"longitude": 126.73818390559953,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,

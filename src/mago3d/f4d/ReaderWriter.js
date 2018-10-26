@@ -1143,6 +1143,95 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	}	
 };
 
+ReaderWriter.loadBinaryData = function(fileName, dataContainer, temperatureLayer) 
+{
+	dataContainer.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			dataContainer.dataArraybuffer = arrayBuffer;
+			dataContainer.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+			
+			temperatureLayer.parseVolumeData(dataContainer);
+		}
+		else 
+		{
+			dataContainer.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("Invalid XMLHttpRequest status = " + status);
+		if (status === 0) { dataContainer.fileLoadState = 500; }
+		else { dataContainer.fileLoadState = status; }
+	}).always(function() 
+	{
+		
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param texture 변수
+ * @param neoBuilding 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.loadImage = function(gl, filePath_inServer, texture) 
+{
+	// Must know the fileExtension.***
+	var extension = filePath_inServer.split('.').pop();
+	
+	var image = new Image();
+	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
+	
+	image.onload = function() 
+	{
+		// is possible that during loading image the building was deleted. Then return.
+		if (texture.texId === undefined)
+		{
+			return;
+		}
+		
+		function createTexture(gl, filter, data, width, height) 
+		{
+			var textureAux = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, textureAux);
+			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+			if (data instanceof Uint8Array) 
+			{
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+			}
+			else 
+			{
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+			}
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+			return textureAux;
+		}
+
+		texture.texId = createTexture(gl, gl.LINEAR, image);
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+	};
+
+	image.onerror = function() 
+	{
+		// doesn't exist or error loading
+		return;
+	};
+	image.src = filePath_inServer;
+		
+};
+
 
 /**
  * 어떤 일을 하고 있습니까?

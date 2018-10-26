@@ -208,6 +208,8 @@ var MagoManager = function()
 
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
+	
+	//this.weatherStation = new WeatherStation();
 };
 
 /**
@@ -1296,6 +1298,7 @@ MagoManager.prototype.renderFakeEarth = function(ssao_idx)
 	gl.disable(gl.BLEND);
 };
 
+
 MagoManager.prototype.test_cctv = function()
 {
 	if (this.cctvList === undefined)
@@ -1646,6 +1649,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	if (this.isFarestFrustum())
 	{
 		this.test_cctv();
+		
 		
 		if (this.textureAux_1x1 === undefined) 
 		{
@@ -2022,6 +2026,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	ssao_idx = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
+	
+	////this.test_volumeRendering();
+	//this.test_windRendering();
+	//this.test_temperaturesRendering();
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
@@ -3099,6 +3109,26 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouse_y = mouseY;
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
+	
+	// test for chung.***
+	/*
+	var windowsPos = {};
+	windowsPos.x = mouseX;
+	windowsPos.y = mouseY;
+	var pickedObject = this.scene.pick(windowsPos);
+	if(pickedObject !== undefined)
+		var hola = 0;
+	
+	var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+	handler.setInputAction(function(click) {
+		var pickedObject = scene.pick(click.position);
+		if (Cesium.defined(pickedObject)) {
+			console.log(pickedObject.id instanceof Cesium.Entity);  //returns true
+			var colorProperty = Cesium.Color.YELLOW;
+			pickedObject.id.polygon.material = new Cesium.ColorMaterialProperty(colorProperty);
+		}
+	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	*/
 };
 
 /**
@@ -5657,7 +5687,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			if (this.isFarestFrustum())
 			{
-				this.drawCCTVNames(this.cctvList.camerasList);
+				//this.drawCCTVNames(this.cctvList.camerasList);
 			}
 		}
 		
@@ -6806,6 +6836,23 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	
+	// t) Test Quad shader.****************************************************************************************
+	shaderName = "testQuad";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.Test_QuadVS;
+	ssao_fs_source = ShaderSource.Test_QuadFS;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
 	
 	/*
 	// 4) ModelReferences SimpleSsaoShader.******************************************************************************

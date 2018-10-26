@@ -34,7 +34,7 @@ void main()
     vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	gl_PointSize = 1.0 + 50.0/gl_Position.z;
+	gl_PointSize = 1.0 + 150.0/gl_Position.z;
 	if(gl_PointSize > 10.0)
 		gl_PointSize = 10.0;
 }
