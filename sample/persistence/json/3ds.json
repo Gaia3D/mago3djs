@@ -871,57 +871,6 @@
 			"longitude": 126.60852238673074,
 			"pitch": 90.0,
 			"roll": 0.0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "MULTIPARASPARAGUAYPORK",
-			"data_name": "MULTIPARASPARAGUAYPORK",
-			"mapping_type": "origin",
-            "heading": -540.0,
-			"height": 46,
-			"latitude": 37.575,
-			"longitude": 126.61,
-			"pitch": 0.0,
-			"roll": 0.0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "geoRES_testdata_v1.0.0",
-			"data_name": "geoRES_testdata_v1.0.0",
-			"mapping_type": "origin",
-            "heading": -540.0,
-			"height": 46,
-			"latitude": 37.575,
-			"longitude": 126.615,
-			"pitch": 0.0,
-			"roll": 0.0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "3DS",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "Lotte0603",
-			"data_name": "Lotte0603",
-			"mapping_type": "origin",
-            "heading": -540.0,
-			"height": 46,
-			"latitude": 37.575,
-			"longitude": 126.6155,
-			"pitch": 0.0,
-			"roll": 0.0
 		}
 	],
 	"parent": 0,
