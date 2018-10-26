@@ -332,11 +332,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		}
 	}
 	
+	var DEFALUT_IMAGE = "ESRI World Imagery";
+	var DEFALUT_TERRAIN = "WGS84 Ellipsoid";
+	
 	// pick baseLayer
 	function setDefaultDataset() 
 	{
-		var DEFALUT_IMAGE = "ESRI World Imagery";
-		var DEFALUT_TERRAIN = "Cesium World Terrain";
 		// WGS84 Ellipsoide
 		if (MagoConfig.getPolicy().geo_init_default_terrain !== null && MagoConfig.getPolicy().geo_init_default_terrain !== "") 
 		{
@@ -411,6 +412,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		}
 		else 
 		{
+			if (serverPolicy.geo_cesium_ion_token !== null && serverPolicy.geo_cesium_ion_token !== "") 
+			{
+				Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
+				DEFALUT_TERRAIN = "Cesium World Terrain";
+			}
 			if (viewer === null) { viewer = new Cesium.Viewer(containerId); }
 			// 기본 지도 설정
 			setDefaultDataset();

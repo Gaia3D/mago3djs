@@ -1,0 +1,367 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "turda"
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-1-2-1-1",
+			"data_name": "Tile-1-2-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56747737306857,
+			"longitude" : 23.78042990306850,
+			"pitch": 0,
+			"roll": 0,
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-1-3-1-1",
+			"data_name": "Tile-1-3-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56871994023137,
+			"longitude" : 23.78039810117437,
+			"pitch": 0,
+			"roll": 0,
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-1-4-1-1",
+			"data_name": "Tile-1-4-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.5700353464940,
+			"longitude" : 23.78036711860646,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-1-5-1-1",
+			"data_name": "Tile-1-5-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57067799962921,
+			"longitude" : 23.78207447551183,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-2-2-1-1",
+			"data_name": "Tile-2-2-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56814437969752,
+			"longitude" : 23.78297614363855,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-2-3-1-1",
+			"data_name": "Tile-2-3-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56873773900082,
+			"longitude" : 23.78210282742236,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-2-4-1-1",
+			"data_name": "Tile-2-4-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57005648495593,
+			"longitude" : 23.78206854953895,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-2-5-1-1",
+			"data_name": "Tile-2-5-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57132204838837,
+			"longitude" : 23.78205747323619,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-3-2-1-1",
+			"data_name": "Tile-3-2-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56815026300298,
+			"longitude" : 23.78385058211769,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-3-3-1-1",
+			"data_name": "Tile-3-3-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56877106473169,
+			"longitude" : 23.78384227371057,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-3-4-1-1",
+			"data_name": "Tile-3-4-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57007526794421,
+			"longitude" : 23.78381549680116,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-3-5-1-1",
+			"data_name": "Tile-3-5-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57069261377976,
+			"longitude" : 23.78379951724341,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-4-2-1-1",
+			"data_name": "Tile-4-2-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56752206895288,
+			"longitude" : 23.78560613473965,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-4-3-1-1",
+			"data_name": "Tile-4-3-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56878749611055,
+			"longitude" : 23.78558209716591,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-4-4-1-1",
+			"data_name": "Tile-4-4-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57009216526032,
+			"longitude" : 23.78554617727931,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-4-5-1-1",
+			"data_name": "Tile-4-5-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57135424594266,
+			"longitude" : 23.78552486128802,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-5-2-1-1",
+			"data_name": "Tile-5-2-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56816752563586,
+			"longitude" : 23.78641437899711,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},		
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-5-3-1-1",
+			"data_name": "Tile-5-3-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.56880497365047,
+			"longitude" : 23.78721038414497,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-5-4-1-1",
+			"data_name": "Tile-5-4-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57009981027834,
+			"longitude" : 23.78634966123581,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "Tile-5-5-1-1",
+			"data_name": "Tile-5-5-1-1",
+			"heading": 0,
+			"height": 45,
+			"latitude" : 46.57136657456483,
+			"longitude" : 23.78717148378309,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "SOCIALROOM",
+			"data_name": "SOCIALROOM",
+			"heading": 0,
+			"height": 370,
+			"latitude" : 46.56899745167812,
+			"longitude" : 23.789327706648994,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "turda"
+			},
+			"children": [],
+			"data_key": "STUDENTROOM",
+			"data_name": "STUDENTROOM",
+			"heading": 0,
+			"height": 380,
+			"latitude" : 46.56897869832565,
+			"longitude" : 23.790184026430037,
+			"pitch": 0,
+			"roll": 0, 
+			"mapping_type": "origin"
+		}
+		
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
+	"data_key": "turda",
+	"data_name": "turda"
+}
