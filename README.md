@@ -126,6 +126,11 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
   <pre><code>"geo_init_latitude": "위도 입력",
 "geo_init_longitude": "경도 입력"</code></pre>
 
+  - Cesium ion Terrain access token 설정 
+    - mago3D JS 소스를 다운 받을 시에 기본적으로 Cesium World Terrain을 사용합니다.
+    - mago3D JS 에서 cesium terrain 적용을 위해 Cesium ion token 발급 (https://cesium.com/ion/signin)
+  <pre><code>"geo_cesium_ion_token": "cesium ion token"</code></pre>
+
 ### 7. Node Server 실행
 <pre><code>// private로 서버를 실행할경우
 C:\git\repository\mago3djs>node server.js
@@ -270,6 +275,11 @@ Add two configuration files. (data.json, policy.json)
   - Fix location (lattiude, longitude) to move when web page starts
   <pre><code>"geo_init_latitude": "Enter latitude",
 "geo_init_longitude": "Enter longitude"</code></pre>
+
+  - Cesium ion Terrain access token setting
+    - When downloading the maago3D JS source, the default is to use the Cesium World Terrain.
+    - Issued Cesium ion token for cesium terrain application in mago3D JS. (https://cesium.com/ion/signin)
+  <pre><code> "geo_cesium_ion_token": "cesium ion token" </code></pre>
 
 ### 7. Running Node Server
 <pre><code>// If you run the server privately
@@ -416,6 +426,10 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
   <pre><code>"geo_init_latitude": "緯度の入力",
 "geo_init_longitude": "硬度入力"</code></pre>
 
+  - セシウムイオン地形アクセストークンの設定
+    - maago3D JSソースをダウンロードするとき、デフォルトでセシウム世界地形が使用されます。
+    - mago3D JSにおけるセシウム地形適用のためのセシウムイオントークン発行。 （https://cesium.com/ion/signin）
+  <pre><code> "geo_cesium_ion_token"： "セシウムイオントークン" </code></pre>
 
 ### 7. Node Serverを実行
 <pre><code>//privateでサーバーを実行する場合
