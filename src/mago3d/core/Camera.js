@@ -55,19 +55,19 @@ Camera.prototype.copyPosDirUpFrom = function(camera)
  * 카메라
  * @class Camera
  */
+Camera.prototype.translate = function(translationVec)
+{
+	this.position.add(translationVec.x, translationVec.y, translationVec.z);
+};
+
+/**
+ * 카메라
+ * @class Camera
+ */
 Camera.prototype.transformByMatrix4 = function(mat)
 {
 	// transform position, direction and up.***
 	/*
-	var camePosHIGH = new Float32Array(3);
-	var camPosLOW = new Float32Array(3);
-	var pos = vec3.clone([this.position.x, this.position.y, this.position.z]);
-	ManagerUtils.calculateSplited3fv(pos, camePosHIGH, camPosLOW);
-	
-	camePosHIGH = vec3.transformMat4(camePosHIGH, camePosHIGH, mat);
-	camPosLOW = vec3.transformMat4(camPosLOW, camPosLOW, mat);
-	this.position.set(camePosHIGH[0] + camPosLOW[0], camePosHIGH[1] + camPosLOW[1], camePosHIGH[2] + camPosLOW[2]);
-	*/
 	this.position = this.transformPoint3DByMatrix4(this.position, mat);
 	
 	if (this.rotMat === undefined)
@@ -77,6 +77,11 @@ Camera.prototype.transformByMatrix4 = function(mat)
 
 	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
 	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
+	*/
+	// Calculate with our matrix4.***
+	this.position = mat.transformPoint3D(this.position, this.position);
+	this.direction = mat.rotatePoint3D(this.direction, this.direction);
+	this.up = mat.rotatePoint3D(this.up, this.up);
 };
 
 /**
@@ -101,10 +106,12 @@ Camera.prototype.getCameraDirectionLine = function(resultLine)
 Camera.prototype.getCameraElevation = function()
 {
 	// determine camHeight.***
+	var geographicCoords;
+	geographicCoords = Globe.CartesianToGeographicWgs84(this.position.x, this.position.y, this.position.z, geographicCoords);
+	var latDeg = geographicCoords.latitude;
 	var camModul = this.position.getModul();
-	// this.equatorialRadius = 6378137.0;
-	//this.polarRadius = 6356752.3142;
-	return  camModul - 6356752.3142;
+	var radius = Globe.radiusAtLatitudeDeg(latDeg);
+	return  camModul - radius;
 };
 
 /**
@@ -230,10 +237,6 @@ Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 			this.bigFrustum.far[0] = distancesArray[i*2+1];
 		}
 	}
-	
-	// provisionally fix the far.***
-	if (this.bigFrustum.far[0] > 20000.0)
-	{ this.bigFrustum.far[0] = 20000.0; }
 };
 
 /**

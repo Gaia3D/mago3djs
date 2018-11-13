@@ -78,8 +78,8 @@ MagoWorld.prototype.updateMouseCurrent = function(mouseX, mouseY)
 	var mouseAction = this.magoManager.sceneState.mouseAction;
 	
 	// if button = 1 (middleButton), then rotate camera.***
-	mouseAction.curX = mouseX;
-	mouseAction.curY = mouseY;
+	mouseAction.strX = mouseX;
+	mouseAction.strY = mouseY;
 	if (this.magoManager.sceneState.mouseButton === 0)
 	{
 		// determine worldPosition of the mouse.***
@@ -89,56 +89,53 @@ MagoWorld.prototype.updateMouseCurrent = function(mouseX, mouseY)
 	}
 	
 	// determine world position of the X,Y.***
-	mouseAction.curCamCoordPoint = this.magoManager.calculatePixelPositionCamCoord(gl, mouseAction.curX, mouseAction.curY, mouseAction.curCamCoordPoint);
-	mouseAction.curWorldPoint = this.magoManager.cameraCoordPositionToWorldCoord(mouseAction.curCamCoordPoint, mouseAction.curWorldPoint);
+	mouseAction.strCamCoordPoint = this.magoManager.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint);
+	mouseAction.strWorldPoint = this.magoManager.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint);
 	
 	// now, copy camera to curCamera.***
 	var camera = this.magoManager.sceneState.camera;
-	var curCamera = mouseAction.curCamera;
+	var strCamera = mouseAction.strCamera;
 	
-	curCamera.copyPosDirUpFrom(camera);
+	strCamera.copyPosDirUpFrom(camera);
 	
 	// copy modelViewMatrix.***
 	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;
 	var modelViewMatrixInv = this.magoManager.sceneState.modelViewMatrixInv;
-	mouseAction.curModelViewMatrix._floatArrays = mat4.copy(mouseAction.curModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
-	mouseAction.curModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.curModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
-	
-	
+	mouseAction.strModelViewMatrix._floatArrays = mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
+	mouseAction.strModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
+
 	// save the sphere pick.***
 	var camRay;
 	camRay = this.magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
-	mouseAction.curWorldPoint2 = this.magoManager.globe.intersectionLineWgs84(camRay, mouseAction.curWorldPoint2);
+	mouseAction.strWorldPoint2 = this.magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
 
 };
 
-MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera, target)
+MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 {
-	var mouseAction = this.magoManager.sceneState.mouseAction;
-	
 	var camera = this.magoManager.sceneState.camera;
 	var camPos = camera.position;
 	var camDir = camera.direction;
 	var camUp = camera.up;
 	var far = camera.frustum.far[0];
 	
-	var camRay;
-	var camTarget;
-
-	camTarget = new Float32Array(3);
-	camTarget[0] = camPos.x + camDir.x * far;
-	camTarget[1] = camPos.y + camDir.y * far;
-	camTarget[2] = camPos.z + camDir.z * far;
+	var tergetX = camPos.x + camDir.x * far;
+	var tergetY = camPos.y + camDir.y * far;
+	var tergetZ = camPos.z + camDir.z * far;
 	
-	// test comprovation.***
+	// test comprovation (posModul must be small than tergetModul).***
 	var posModul = camPos.getModul();
-	var targetModul = Math.sqrt(camTarget[0]*camTarget[0], camTarget[1]*camTarget[1], camTarget[2]*camTarget[2]);
+	var targetModul = Math.sqrt(tergetX*tergetX, tergetY*tergetY, tergetZ*tergetZ);
 	
 	if (posModul < targetModul)
 	{ var hola = 0; }
+	// End test comprobation.-------------------------------------------
 
-	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;
-	modelViewMatrix._floatArrays = mat4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget[0], camTarget[1], camTarget[2]], [camUp.x, camUp.y, camUp.z]);
+	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;																	
+	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
+																			[tergetX, tergetY, tergetZ], 
+																			[camUp.x, camUp.y, camUp.z]);
+
 };
 
 MagoWorld.prototype.mouseup = function(event)
@@ -161,41 +158,24 @@ MagoWorld.prototype.mousewheel = function(event)
 	var camUp = camera.up;
 	
 	var camHeght = camera.getCameraElevation();
-	var deltaA;
-	var deltaB;
+
+	if(isNaN(camHeght))
+		return;
+
+	// Lineal increment.***
+	//delta *= camHeght * 0.003;
 	
-	// under building...
-	if (camHeght > 20000)
-	{
-		deltaA = camHeght*camHeght * 0.000000001;
-		deltaB = camHeght * 0.01;
-	}
-	if (camHeght > 16000)
-	{
-		deltaA = camHeght*camHeght * 0.000000001;
-		deltaB = camHeght * 0.001;
-	}
-	else if (camHeght > 14000)
-	{
-		deltaA = camHeght*camHeght * 0.000000001;
-		deltaB = camHeght * 0.001;
-	}
-	else if (camHeght > 10000)
-	{
-		deltaA = camHeght*camHeght * 0.0000000001;
-		deltaB = camHeght * 0.0001;
-	}
-	else if (camHeght > 6000)
-	{
-		deltaA = camHeght*camHeght * 0.00000000001;
-		deltaB = camHeght * 0.0000001;
-	}
-	else 
-	{
-		deltaA = camHeght*camHeght * 0.00000000001;
-		deltaB = camHeght * 0.00000001;
-	}
-	delta *= deltaA + deltaB + 1;
+	// Squared increment.***
+	delta *= (camHeght*camHeght) * 0.00001 + camHeght * 0.001;
+	delta += 1;
+	
+	var maxDelta = 200000;
+	if(delta < -maxDelta)
+		delta = -maxDelta;
+	
+	if(delta > maxDelta)
+		delta = maxDelta;
+	
 	camPos.add(camDir.x * delta,  camDir.y * delta,  camDir.z * delta);
 	
 	this.updateModelViewMatrixByCamera(camera);
@@ -209,15 +189,15 @@ MagoWorld.prototype.mousemove = function(event)
 		// left button pressed.***
 		var gl = this.magoManager.sceneState.gl;
 		var sceneState = this.magoManager.sceneState;
-		var curCamera = mouseAction.curCamera;
+		var strCamera = mouseAction.strCamera; // camera of onMouseDown.***
 		var camera = this.magoManager.sceneState.camera;
 		
 		// now, calculate the angle and the rotationAxis.***
-		var curWorldPoint = mouseAction.curWorldPoint;
-		var currEarthRadius = curWorldPoint.getModul();
+		var strWorldPoint = mouseAction.strWorldPoint;
+		var strEarthRadius = strWorldPoint.getModul();
 		var nowX = event.clientX;
 		var nowY = event.clientY;
-		if (nowX === mouseAction.curX && nowY === mouseAction.curY)
+		if (nowX === mouseAction.strX && nowY === mouseAction.strY)
 		{ return; }
 		
 		var nowPoint;
@@ -232,57 +212,53 @@ MagoWorld.prototype.mousemove = function(event)
 		this.pointSC.set(camRayCamCoord[0], camRayCamCoord[1], camRayCamCoord[2]);
 
 		// now, must transform this posCamCoord to world coord.***
-		var mv_inv = mouseAction.curModelViewMatrixInv;
+		var mv_inv = mouseAction.strModelViewMatrixInv;
 		this.pointSC2 = mv_inv.rotatePoint3D(this.pointSC, this.pointSC2); // rayWorldSpace.***
 		this.pointSC2.unitary(); // rayWorldSpace.***
 		camRay = new Line();
-		camRay.setPointAndDir(curCamera.position.x, curCamera.position.y, curCamera.position.z,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.***
+		camRay.setPointAndDir(strCamera.position.x, strCamera.position.y, strCamera.position.z,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.***
 		// end calculate camRayWorldCoord.---------------
 		
 		var nowWorldPoint;
-		nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, currEarthRadius);
-		
-		if (nowWorldPoint === undefined)
-		{
-			return;
-		}
+		nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, strEarthRadius);
 
-		var curPoint = new Point3D(curWorldPoint.x, curWorldPoint.y, curWorldPoint.z);
+		if (nowWorldPoint === undefined)
+			return;
+
+		var strPoint = new Point3D(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z);
 		var nowPoint = new Point3D(nowWorldPoint[0], nowWorldPoint[1], nowWorldPoint[2]);
 		
 		var rotAxis;
-		rotAxis = curPoint.crossProduct(nowPoint, rotAxis);
+		rotAxis = strPoint.crossProduct(nowPoint, rotAxis);
 		rotAxis.unitary();
 		if (rotAxis.isNAN())
 		{ return; }
 		
-		var angRad = curPoint.angleRadToVector(nowPoint);
+		var angRad = strPoint.angleRadToVector(nowPoint);
 		if (angRad === 0 || isNaN(angRad))
 		{ return; }
 		
 		// recalculate position and direction of the camera.***
-		
-		camera.copyPosDirUpFrom(curCamera);
-		
-		var matAux = mat4.create(); // create as identity.***
-		matAux = mat4.rotate( matAux, matAux, -angRad, [rotAxis.x, rotAxis.y, rotAxis.z] );
-		camera.transformByMatrix4(matAux);
-		
+		camera.copyPosDirUpFrom(strCamera);
+	
+		var rotMat = new Matrix4();
+		rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+		camera.transformByMatrix4(rotMat);
+
 		this.updateModelViewMatrixByCamera(camera);
-		
 	}
 	else if (this.magoManager.sceneState.mouseButton === 1)
 	{
 		// middle button pressed.***
-		var curCamera = mouseAction.curCamera;
+		var strCamera = mouseAction.strCamera;
 		var camera = this.magoManager.sceneState.camera;
-		camera.copyPosDirUpFrom(curCamera);
+		camera.copyPosDirUpFrom(strCamera);
 		var camPos = camera.position;
 		var camDir = camera.direction;
 		var camUp = camera.up;
 		
 		// 1rst, determine the point of rotation.***
-		var rotPoint = mouseAction.curWorldPoint;
+		var rotPoint = mouseAction.strWorldPoint;
 		
 		// now determine the rotation axis.***
 		// the rotation axis are the camRight & normalToSurface.***
@@ -297,8 +273,8 @@ MagoWorld.prototype.mousemove = function(event)
 		// now determine camZRot & camXRot angles.***
 		var nowX = event.clientX;
 		var nowY = event.clientY;
-		var increX = nowX - mouseAction.curX;
-		var increY = nowY - mouseAction.curY;
+		var increX = nowX - mouseAction.strX;
+		var increY = nowY - mouseAction.strY;
 		
 		var zRotAngRad = increX * 0.003;
 		var xRotAngRad = increY * 0.003;
@@ -307,37 +283,24 @@ MagoWorld.prototype.mousemove = function(event)
 		{ return; }
 		
 		if (this.rotMatX === undefined)
-		{ this.rotMatX = mat4.create(); }
+		{ this.rotMatX = new Matrix4(); }
 		
 		if (this.rotMatZ === undefined)
-		{ this.rotMatZ = mat4.create(); }
+		{ this.rotMatZ = new Matrix4(); }
 		
 		if (this.rotMat === undefined)
-		{ this.rotMat = mat4.create(); }
+		{ this.rotMat = new Matrix4(); }
+	
+		this.rotMatX.rotationAxisAngRad(-xRotAngRad, xAxis.x, xAxis.y, xAxis.z);
+		this.rotMatZ.rotationAxisAngRad(-zRotAngRad, pivotPointNormal[0], pivotPointNormal[1], pivotPointNormal[2]);
+		this.rotMat = this.rotMatX.getMultipliedByMatrix(this.rotMatZ, this.rotMat);
 		
-		this.rotMatX = mat4.identity(this.rotMatX);
-		this.rotMatZ = mat4.identity(this.rotMatZ);
-		this.rotMat = mat4.identity(this.rotMat);
+		var translationVec_1 = new Point3D(-rotPoint.x, -rotPoint.y, -rotPoint.z);
+		var translationVec_2 = new Point3D(rotPoint.x, rotPoint.y, rotPoint.z);
 		
-		//ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, resultSplitPoint3fvLow)
-		
-		this.rotMatX = mat4.fromRotation(this.rotMatX, -xRotAngRad, [xAxis.x, xAxis.y, xAxis.z]);
-		this.rotMatZ = mat4.fromRotation(this.rotMatZ, -zRotAngRad, pivotPointNormal);
-		this.rotMat = mat4.multiply(this.rotMat, this.rotMatZ, this.rotMatX);
-		var translateMat_1 = mat4.create();
-		var translateMat_2 = mat4.create();
-		translateMat_1 = mat4.fromTranslation(translateMat_1, [-rotPoint.x, -rotPoint.y, -rotPoint.z]);
-		translateMat_2 = mat4.fromTranslation(translateMat_2, [rotPoint.x, rotPoint.y, rotPoint.z]);
-		
-		var totalMatPrev = mat4.create();
-		totalMatPrev = mat4.multiply(totalMatPrev, translateMat_2, this.rotMat);
-		
-		var totalMat = mat4.create();
-		totalMat = mat4.multiply(totalMat, totalMatPrev, translateMat_2);
-		
-		camera.transformByMatrix4(translateMat_1);
+		camera.translate(translationVec_1);
 		camera.transformByMatrix4(this.rotMat);
-		camera.transformByMatrix4(translateMat_2);
+		camera.translate(translationVec_2);
 		
 		this.updateModelViewMatrixByCamera(camera);
 	}

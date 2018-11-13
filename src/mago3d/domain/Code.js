@@ -16,7 +16,8 @@ CODE.fileLoadState = {
 	"LOADING_FINISHED" : 2,
 	"PARSE_STARTED"    : 3,
 	"PARSE_FINISHED"   : 4,
-	"IN_QUEUE"         : 5
+	"IN_QUEUE"         : 5,
+	"LOAD_FAILED"      : 6
 };
 
 CODE.moveMode = {

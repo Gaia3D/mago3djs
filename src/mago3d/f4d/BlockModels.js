@@ -41,6 +41,24 @@ Block.prototype.deleteObjects = function(gl, vboMemManager)
 };
 
 /**
+ * 어떤 일을 하고 있습니까?
+ * @param 
+  * @returns {boolean} returns if the Block is ready to render.
+ */
+Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
+{
+	if (maxSizeToRender && (this.radius < maxSizeToRender))
+	{ return false; }
+	
+	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
+	{ return false; }
+
+	return true;
+};
+//****************************************************************************************************
+//****************************************************************************************************
+
+/**
  * 블록 목록
  * @class BlocksList
  */

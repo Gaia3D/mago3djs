@@ -343,7 +343,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "modelViewMatrix");
 		uniformDataPair.uniformLocation = uniformLocation;
-		uniformDataPair.matrix4fv = sceneState.modelViewRelToEyeMatrix._floatArrays;
+		uniformDataPair.matrix4fv = sceneState.modelViewMatrix._floatArrays;
 	}
 	
 	// 4. projectionMatrix.***
@@ -397,7 +397,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	{
 		uniformDataPair = shader.newUniformDataPair("1f", "frustumFar");
 		uniformDataPair.uniformLocation = uniformLocation;
-		uniformDataPair.floatValue = sceneState.camera.frustum.far;
+		uniformDataPair.floatValue = sceneState.camera.frustum.far; // original.***
 	}
 	
 	// 10. fovy.***

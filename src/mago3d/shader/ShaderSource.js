@@ -1944,7 +1944,7 @@ void main()\n\
     vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	gl_PointSize = 1.0 + 180.0/gl_Position.z;\n\
+	gl_PointSize = 1.0 + 50.0/gl_Position.z;\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
 }";
@@ -3287,7 +3287,7 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 	float row = (lat - minLat)/latRange * fTexNumRows;\n\
 	float slice = (alt - minAlt)/altRange * fTexNumSlices;\n\
 	\n\
-	slice = 5.0;\n\
+	slice = 0.0; // provisionally choose a slice\n\
 	// must calculate lonPrev, lonNext, latPrev, latNext, altPrev, altNext.***\n\
 			float lonPrev = floor(lon);\n\
 			float lonNext = ceil(lon);\n\

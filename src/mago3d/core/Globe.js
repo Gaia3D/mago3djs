@@ -31,7 +31,44 @@ var Globe = function()
 
 Globe.equatorialRadius = function()
 {
-	return 6378137.0;;
+	return 6378137.0;
+};
+
+Globe.equatorialRadiusSquared = function()
+{
+	return 40680631590769.0;
+};
+
+Globe.polarRadius = function()
+{
+	return 6356752.3142;
+};
+
+Globe.polarRadiusSquared = function()
+{
+	return 40408299984087.05552164;
+};
+
+Globe.radiusAtLatitudeDeg = function(latDeg)
+{
+	// This function returns the radius of earth at the latitude "latDeg".***
+	// a = equatorialRadius, b = polarRadius.***************
+	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).*********
+	//------------------------------------------------------
+	
+	var latRad = latDeg * Math.PI/180.0;
+	var a = Globe.equatorialRadius();
+	var b = Globe.polarRadius();
+	var a2 = Globe.equatorialRadiusSquared();
+	var b2 = Globe.polarRadiusSquared();
+	
+	var sin = Math.sin(latRad);
+	var cos = Math.cos(latRad);
+	var sin2 = sin*sin;
+	var cos2 = cos*cos;
+	
+	var radius = (a*b)/(Math.sqrt(a2*sin2 + b2*cos2));
+	return radius;
 };
 
 Globe.prototype.normalizeCartesian = function(cartesian)
@@ -148,7 +185,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	{
 		// this is tangent.***
 		if (resultCartesian === undefined)
-		{ resultCartesian = new Float32Array(3); }
+		{ resultCartesian = []; } // Float32Array has no enough precision.***
 		
 		var t1 = (-b)/(2*a);
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
@@ -172,7 +209,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 		var dist2 = p1.squareDistToPoint(intersectPoint2);
 		
 		if (resultCartesian === undefined)
-		{ resultCartesian = new Float32Array(3); }
+		{ resultCartesian = []; } // Float32Array has no enough precision.***
 		
 		if (dist1 < dist2)
 		{

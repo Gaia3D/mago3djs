@@ -286,31 +286,20 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
-		
+	
 	// now calculate the inverse matrices.
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		// * if this in webWorldWind:
-		var tMatrixInv = WorldWind.Matrix.fromIdentity();
-		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
-		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
-		
-		var rotMatrixInv = WorldWind.Matrix.fromIdentity();
-		rotMatrixInv.invertMatrix(resultGeoLocationData.rotMatrix._floatArrays);
-		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInv);
-		
-		var geoLocMatrixInv = WorldWind.Matrix.fromIdentity();
-		geoLocMatrixInv.invertMatrix(resultGeoLocationData.geoLocMatrix._floatArrays);
-		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		// *if this in Cesium:
-		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
-		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
-		Cesium.Matrix4.inverseTransformation(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
-	}
-
+	var tMatrixInv = mat4.create();
+	tMatrixInv = mat4.invert(tMatrixInv, resultGeoLocationData.tMatrix._floatArrays);
+	resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
+	
+	var rotMatrixInv = mat4.create();
+	rotMatrixInv = mat4.invert(rotMatrixInv, resultGeoLocationData.rotMatrix._floatArrays );
+	resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInv);
+	
+	var geoLocMatrixInv = mat4.create();
+	geoLocMatrixInv = mat4.invert(geoLocMatrixInv, resultGeoLocationData.geoLocMatrix._floatArrays  );
+	resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
+	
 	// finally assing the pivotPoint.***
 	if (resultGeoLocationData.pivotPoint === undefined)
 	{ resultGeoLocationData.pivotPoint = new Point3D(); }

@@ -237,7 +237,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, 
+					isInterior, shader, renderTexture, ssao_idx, minSize, 0, refMatrixIdxKey);
 		}
 		
 		// LOD1.***
@@ -249,7 +250,8 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 			{ continue; }
 
-			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, isInterior, shader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
+			this.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, neoBuilding, magoManager, 
+					isInterior, shader, renderTexture, ssao_idx, minSize, 1, refMatrixIdxKey);
 		}
 		
 		if (ssao_idx === 1)
@@ -787,16 +789,8 @@ Renderer.prototype.isReadyNeoRefList = function(neoReferencesMotherAndIndices)
 {
 	if (neoReferencesMotherAndIndices === undefined)
 	{ return false; }
-	
-	var neoRefsCount = neoReferencesMotherAndIndices.neoRefsIndices.length;
-	if (neoRefsCount === 0) 
-	{ return false; }
 
-	var myBlocksList = neoReferencesMotherAndIndices.blocksList;
-	if (myBlocksList === undefined)
-	{ return false; }
-
-	if (myBlocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
+	if(!neoReferencesMotherAndIndices.isReadyToRender())
 	{ return false; }
 
 	return true;
@@ -874,6 +868,8 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	var block_idx;
 	var block;
 	var current_tex_id;
+	var last_vboPos_binded;
+	var last_vboNor_binded;
 	var texFileLoadState;
 
 	gl.activeTexture(gl.TEXTURE2); // ...***
@@ -889,7 +885,6 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 	// New version. Use occlussion indices.***
 	//var visibleIndices_count = neoReferencesMotherAndIndices.neoRefsIndices.length; // no occludeCulling mode.***
 	var visibleIndices_count = neoReferencesMotherAndIndices.currentVisibleIndices.length;
-
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
 		//var neoReference = neoReferencesMotherAndIndices.motherNeoRefsList[neoReferencesMotherAndIndices.neoRefsIndices[k]]; // no occludeCulling mode.***
@@ -1029,24 +1024,36 @@ Renderer.prototype.renderNeoRefListsAsimetricVersion = function(gl, neoReference
 			gl.uniform1i(standardShader.hasAditionalMov_loc, false);
 			gl.uniform3fv(standardShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		}
+		
+		
 
 		for (var n=0; n<cacheKeys_count; n++) // Original.***
 		{
 			//var mesh_array = block.viArraysContainer._meshArrays[n];
 			this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+				
 			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyNormals(gl, magoManager.vboMemoryManager) || !this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
 			{ continue; }
 			
 			// Positions.***
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-			gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-			//gl.vertexAttribPointer(standardShader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
+			if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey !== last_vboPos_binded)
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
+				gl.vertexAttribPointer(standardShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+				//gl.vertexAttribPointer(standardShader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
+				last_vboPos_binded = this.vbo_vi_cacheKey_aux.meshVertexCacheKey;
+			}
+			
 
 			// Normals.***
 			if (standardShader.normal3_loc !== -1) 
 			{
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-				gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+				if(this.vbo_vi_cacheKey_aux.meshNormalCacheKey !== last_vboNor_binded)
+				{
+					gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
+					gl.vertexAttribPointer(standardShader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+					last_vboNor_binded = this.vbo_vi_cacheKey_aux.meshNormalCacheKey;
+				}
 			}
 
 			if (renderTexture && neoReference.hasTexture) 

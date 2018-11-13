@@ -297,6 +297,9 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  */
 SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
 {
+	if(minGeographicCoord === undefined || maxGeographicCoord === undefined)
+		return undefined;
+	
 	if (resultSphereExtent === undefined)
 	{ resultSphereExtent = new Sphere(); }
 	
@@ -311,7 +314,7 @@ SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeo
 	var cornerPoint;
 	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(minGeographicCoord.longitude, minGeographicCoord.latitude, minGeographicCoord.altitude, cornerPoint, magoManager);
 
-	resultSphereExtent.r = resultSphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.2;
+	resultSphereExtent.r = resultSphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.1;
 	return resultSphereExtent;
 };
 
@@ -633,6 +636,7 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 	resultTileName = depth.toString() + "\\" + xIndex.toString() + "\\" + yIndex.toString();
 	return resultTileName;
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?

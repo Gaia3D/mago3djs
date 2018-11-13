@@ -237,8 +237,12 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetad
 	if (deleteMetadata)
 	{
 		this.metaData.deleteObjects();
-		this.metaData.fileLoadState = CODE.fileLoadState.READY;
+		//this.metaData.fileLoadState = CODE.fileLoadState.READY;
 	}
+	
+	// Must set ( fileLoadState = CODE.fileLoadState.READY ) bcos here deletes octree, so, must reload header 
+	// and remake the octree if necessary.***
+	this.metaData.fileLoadState = CODE.fileLoadState.READY;
 
 	this.deleteObjectsModelReferences(gl, vboMemoryManager);
 
@@ -719,4 +723,153 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 	}
 	
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType) 
+{
+	var shaderName;
+	
+	// provisionally.***
+	if(lod <= 1)
+	{
+		shaderName = "modelRefSsao";
+	}
+	else
+	{
+		shaderName = "modelRefSsao";
+	}
+	
+	return shaderName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.render = function(magoManager, shader, renderType) 
+{
+	// renderType = 0 -> depth render.***
+	// renderType = 1 -> normal render.***
+	// renderType = 2 -> colorSelection render.***
+	//--------------------------------------------
+	
+	if(this.currentLod <= 1)
+	{
+		this.renderDetailed(magoManager, shader, renderType);
+	}
+	
+	var hola = 0;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType, refMatrixIdxKey) 
+{	
+	var renderTexture = false;	
+	var gl = magoManager.sceneState.gl;
+	
+	if (renderType === 0)
+	{
+		renderTexture = false;
+	}
+	else if (renderType === 1)
+	{
+		if (this.texturesLoaded && this.texturesLoaded.length>0)
+		{
+			renderTexture = true;
+		}
+		else { renderTexture = false; }
+		
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
+		{
+			// active stencil buffer to draw silhouette.***
+			magoManager.renderer.enableStencilBuffer(gl);
+		}
+		
+	}
+	
+	var lowestOctree;
+	var refMatrixIdxKey = 0;
+	var isInterior = false; // old var.***
+	
+	// LOD0.***
+	var minSize = 0.0;
+	var lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;
+	for (var j=0; j<lowestOctreesCount; j++) 
+	{
+		lowestOctree = this.currentVisibleOctreesControler.currentVisibles0[j];
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
+		{ continue; }
+
+		//magoManager.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, this, magoManager, 
+		//		isInterior, shader, renderTexture, renderType, minSize, 0, refMatrixIdxKey);
+		
+		lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey);
+	}
+	
+	// LOD1.***
+	minSize = 0.45;
+	lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles1.length;
+	for (var j=0; j<lowestOctreesCount; j++) 
+	{
+		lowestOctree = this.currentVisibleOctreesControler.currentVisibles1[j];
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
+		{ continue; }
+
+		//magoManager.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, this, magoManager, 
+		//		isInterior, shader, renderTexture, renderType, minSize, 1, refMatrixIdxKey);
+				
+		lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey);
+	}
+	
+	if (renderType === 1)
+	{
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
+		{
+			// deactive stencil buffer to draw silhouette.***
+			magoManager.renderer.disableStencilBuffer(gl);
+		}
+		
+	}
+	
+	
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

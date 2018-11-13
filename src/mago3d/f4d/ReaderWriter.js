@@ -782,120 +782,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 	});
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param imageArrayBuffer 변수
- * @param BR_Project 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- * @param imageLod 변수
- */
-ReaderWriter.prototype.readNailImageOfArrayBuffer = function(gl, imageArrayBuffer, BR_Project, readerWriter, magoManager, imageLod) 
-{
-	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-	var blob = new Blob( [ imageArrayBuffer ], { type: "image/jpeg" } );
-	var urlCreator = window.URL || window.webkitURL;
-	var imagenUrl = urlCreator.createObjectURL(blob);
-	var simpleBuildingImage = new Image();
-
-	simpleBuildingImage.onload = function () 
-	{
-		//console.log("Image Onload");
-		if (simpBuildingV1._simpleBuildingTexture === undefined)
-		{ simpBuildingV1._simpleBuildingTexture = gl.createTexture(); }
-		handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
-		BR_Project._f4d_nailImage_readed_finished = true;
-		imageArrayBuffer = null;
-		BR_Project._simpleBuilding_v1.textureArrayBuffer = null;
-
-		if (magoManager.backGround_imageReadings_count > 0) 
-		{
-			magoManager.backGround_imageReadings_count--;
-		}
-	};
-
-	simpleBuildingImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-
-		//BR_Project._f4d_lod0Image_readed_finished = false;
-		//BR_Project._f4d_lod0Image_exists = false;
-		//if(magoManager.backGround_fileReadings_count > 0 )
-		//	  magoManager.backGround_fileReadings_count -=1;
-
-		return;
-	};
-
-	simpleBuildingImage.src = imagenUrl;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- * @param filePath_inServer 변수
- * @param BR_Project 변수
- * @param readerWriter 변수
- * @param magoManager 변수
- * @param imageLod 변수
- */
-ReaderWriter.prototype.readNailImage = function(gl, filePath_inServer, BR_Project, readerWriter, magoManager, imageLod) 
-{
-	if (imageLod === undefined) { imageLod = 3; } // The lowest lod.***
-
-	if (imageLod === 3) { BR_Project._f4d_nailImage_readed = true; }
-	else if (imageLod === 0) { BR_Project._f4d_lod0Image_readed  = true; }
-
-	if (BR_Project._simpleBuilding_v1 === undefined) { BR_Project._simpleBuilding_v1 = new SimpleBuildingV1(); }
-
-	var simpBuildingV1 = BR_Project._simpleBuilding_v1;
-
-	var simpleBuildingImage = new Image();
-	simpleBuildingImage.onload = function() 
-	{
-	/*
-		if(magoManager.render_time > 20)// for the moment is a test.***
-		{
-			if(imageLod === 3)
-				BR_Project._f4d_nailImage_readed = false;
-			else if(imageLod === 0)
-				BR_Project._f4d_lod0Image_readed  = false;
-
-			if(magoManager.backGround_fileReadings_count > 0 )
-			  magoManager.backGround_fileReadings_count -=1;
-
-			return;
-		}
-		*/
-
-		if (imageLod === 3) 
-		{
-			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._simpleBuildingTexture);
-			BR_Project._f4d_nailImage_readed_finished = true;
-		}
-		else if (imageLod === 0) 
-		{
-			if (simpBuildingV1._texture_0 === undefined) { simpBuildingV1._texture_0 = gl.createTexture(); }
-
-			handleTextureLoaded(gl, simpleBuildingImage, simpBuildingV1._texture_0);
-			BR_Project._f4d_lod0Image_readed_finished = true;
-		}
-
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-	};
-
-	simpleBuildingImage.onerror = function() 
-	{
-		// doesn't exist or error loading
-		BR_Project._f4d_lod0Image_readed_finished = false;
-		BR_Project._f4d_lod0Image_exists = false;
-		if (magoManager.backGround_fileReadings_count > 0 ) { magoManager.backGround_fileReadings_count -=1; }
-		return;
-	};
-
-	var filePath_inServer_SimpleBuildingImage = filePath_inServer;
-	simpleBuildingImage.src = filePath_inServer_SimpleBuildingImage;
-};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1184,7 +1070,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, temperatureLayer
 ReaderWriter.loadImage = function(gl, filePath_inServer, texture) 
 {
 	// Must know the fileExtension.***
-	var extension = filePath_inServer.split('.').pop();
+	//var extension = filePath_inServer.split('.').pop();
 	
 	var image = new Image();
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED; // file load started.***
@@ -1244,7 +1130,7 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inServer, texture, magoManager) 
 {
 	var neoRefImage = new Image();
-	texture.fileLoadState == CODE.fileLoadState.LOADING_STARTED;
+	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	magoManager.fileRequestControler.lowLodImagesRequestedCount += 1;
 
 	neoRefImage.onload = function() 
@@ -1253,7 +1139,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 		{ texture.texId = gl.createTexture(); }
 
 		handleTextureLoaded(gl, neoRefImage, texture.texId);
-		texture.fileLoadState == CODE.fileLoadState.LOADING_FINISHED;
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		
 		magoManager.fileRequestControler.lowLodImagesRequestedCount -= 1;
 
@@ -1329,13 +1215,12 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl 변수
  * @param filePath_inServer 변수
  * @param pCloud 변수
  * @param readerWriter 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.loadTINTerrain = function(gl, fileName, tinTerrain, magoManager) 
+ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManager) 
 {
 	//magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	tinTerrain.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
@@ -1356,6 +1241,7 @@ ReaderWriter.prototype.loadTINTerrain = function(gl, fileName, tinTerrain, magoM
 		}
 	}).fail(function(status) 
 	{
+		tinTerrain.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 		//console.log("xhr status = " + status);
 		//if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
 		//else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
@@ -1366,8 +1252,67 @@ ReaderWriter.prototype.loadTINTerrain = function(gl, fileName, tinTerrain, magoM
 	});
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param imageArrayBuffer 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, texture, magoManager) 
+{
+	// example: allowedFileTypes = ["image/png", "image/jpeg", "image/gif"];
+	var blob = new Blob( [ imageArrayBuffer ], { type: "image/png" } );
+	var urlCreator = window.URL || window.webkitURL;
+	var imagenUrl = urlCreator.createObjectURL(blob);
+	var imageFromArray = new Image();
 
-//load neoTextures
+	imageFromArray.onload = function () 
+	{
+		if (texture.texId === undefined)
+		{ texture.texId = gl.createTexture(); }
+		handleTextureLoaded(gl, imageFromArray, texture.texId);
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		imageArrayBuffer = null;
+	};
+
+	imageFromArray.onerror = function() 
+	{
+		return;
+	};
+
+	imageFromArray.src = imagenUrl;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param filePath_inServer 변수
+ * @param texture 변수
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, magoManager) 
+{
+	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	var readWriter = this;
+	loadWithXhr(filePath_inServer).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager);
+		}
+	}).fail(function(status) 
+	{
+		var hola = 0;
+		
+	}).always(function() 
+	{
+		magoManager.backGround_fileReadings_count -= 1;
+		if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
+	});
+		
+};
+
 ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL

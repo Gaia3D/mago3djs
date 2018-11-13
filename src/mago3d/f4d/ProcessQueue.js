@@ -70,7 +70,7 @@ ProcessQueue.prototype.eraseTinTerrainToDelete = function(tinTerrain)
 {
 	// this erases the tinTerrain from the "tinTerrainsToDeleteMap".
 	if (tinTerrain === undefined)
-	{ return; }
+	{ return false; }
 	
 	var key = tinTerrain.pathName;
 	if (this.tinTerrainsToDeleteMap.hasOwnProperty(key)) 
@@ -256,5 +256,248 @@ ProcessQueue.prototype.clearAll = function()
 	this.nodesToDeleteMap = {};
 	this.nodesToDeleteModelReferencesMap = {};
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustumVolume 변수
+ * @param neoVisibleBuildingsArray 변수
+ * @param cameraPosition 변수
+ * @returns neoVisibleBuildingsArray
+ */
+ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager) 
+{
+	// check if the neoBuilding id the selected building.***
+	var vboMemoryManager = magoManager.vboMemoryManager;
+	if (neoBuilding === magoManager.buildingSelected)
+	{
+		magoManager.buildingSelected = undefined;
+		magoManager.octreeSelected = undefined;
+		magoManager.objectSelected = undefined;
+	}
+	
+	neoBuilding.deleteObjects(gl, vboMemoryManager);
+	
+};
+
+ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
+{
+	var gl = magoManager.sceneState.gl;
+	var maxDeleteNodesCount = 8;
+	var nodesToDeleteCount = Object.keys(this.nodesToDeleteMap).length;
+	if (nodesToDeleteCount < maxDeleteNodesCount)
+	{ maxDeleteNodesCount = nodesToDeleteCount; }
+	
+	var neoBuilding;
+	var node;
+	var rootNode;
+	
+	// incompatibility gulp.
+	//for (var key of this.buildingsToDeleteMap.keys())
+	//{
+	//	this.deleteNeoBuilding(gl, key);
+	//	this.buildingsToDeleteMap.delete(key);
+	//	deletedCount += 1;
+	//	if (deletedCount > maxDeleteBuildingsCount)
+	//	{ break; }
+	//}
+	
+
+	for (var key in this.nodesToDeleteMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.nodesToDeleteMap, key))
+		{
+			//node = nodesToDeleteArray[i];
+			node = this.nodesToDeleteMap[key];
+			
+			if (node === undefined)
+			{ continue; }
+
+			neoBuilding = node.data.neoBuilding;
+			this.eraseNodeToDelete(node);
+			
+			if (neoBuilding === undefined)
+			{ continue; }
+		
+			var deleteMetaData = true;
+			if (key == 1)
+			{ deleteMetaData = false; }
+			this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+		}
+	}
+	
+	// now delete modelReferences of lod2Octrees.
+	var modelRefsDeletedCount = 0;
+	for (var key in this.nodesToDeleteModelReferencesMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.nodesToDeleteModelReferencesMap, key))
+		{
+			//node = nodesToDeleteModelReferencesArray[i];
+			node = this.nodesToDeleteModelReferencesMap[key];
+			
+			if (node.data === undefined)
+			{ continue; }
+		
+			neoBuilding = node.data.neoBuilding;
+			this.eraseNodeToDeleteModelReferences(neoBuilding);
+			if (neoBuilding === undefined)
+			{ continue; }
+
+			if (neoBuilding.octree)
+			{
+				neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			}
+			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+			{
+				modelRefsDeletedCount ++;
+			}
+			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			
+			if (modelRefsDeletedCount > 10)
+			{ break; }
+		}
+	}
+	
+	
+	var deletedCount = 0;
+	for (var key in this.nodesToDeleteLessThanLod3Map)
+	{
+		node = this.nodesToDeleteLessThanLod3Map[key];
+		//node = nodesToDeleteLod2Lod4Lod5Array[i];
+		if (node.data === undefined)
+		{ continue; }
+	
+		if (this.eraseNodeToDeleteLessThanLod3(node))
+		{
+			neoBuilding = node.data.neoBuilding;
+			if (neoBuilding === undefined)
+			{ continue; }
+			
+			if (neoBuilding.octree)
+			{
+				neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			}
+			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+			{
+				modelRefsDeletedCount ++;
+			}
+				
+			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+			deletedCount++;
+			
+			if (deletedCount > 10)
+			{ break; }
+		}
+	}
+	
+	deletedCount = 0;
+	for (var key in this.nodesToDeleteLessThanLod4Map)
+	{
+		node = this.nodesToDeleteLessThanLod4Map[key];
+		if (node.data === undefined)
+		{ continue; }
+	
+		if (this.eraseNodeToDeleteLessThanLod4(node))
+		{
+			neoBuilding = node.data.neoBuilding;
+			if (neoBuilding === undefined)
+			{ continue; }
+		
+			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
+			deletedCount++;
+			
+			if (deletedCount > 10)
+			{ break; }
+		}
+	}
+	
+	deletedCount = 0;
+	for (var key in this.nodesToDeleteLessThanLod5Map)
+	{
+		node = this.nodesToDeleteLessThanLod5Map[key];
+		if (node.data === undefined)
+		{ continue; }
+	
+		if (this.eraseNodeToDeleteLessThanLod5(node))
+		{
+			neoBuilding = node.data.neoBuilding;
+			if (neoBuilding === undefined)
+			{ continue; }
+		
+			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
+			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod4");
+			deletedCount++;
+			
+			if (deletedCount > 10)
+			{ break; }
+		}
+	}
+	
+	
+	// now, delete lod0, lod1, lod2.***
+	// now, delete tinTerrains.*****
+	var deletedCount = 0;
+	for (var key in this.tinTerrainsToDeleteMap)
+	{
+		var tinTerrain = this.tinTerrainsToDeleteMap[key];
+		if(tinTerrain === undefined)
+			continue;
+		
+		if (this.eraseTinTerrainToDelete(tinTerrain))
+		{
+			tinTerrain.deleteObjects(magoManager);
+			tinTerrain = undefined;
+			deletedCount++;
+		}
+		
+		if (deletedCount > 10)
+			{ break; }
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

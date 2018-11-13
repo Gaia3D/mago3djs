@@ -101,6 +101,22 @@
 			"longitude": 126.73818390559953,
 			"pitch": 0,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "MuMyeongGyo",
+			"data_name": "MuMyeongGyo",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 63,
+			"latitude": 37.6639,
+			"longitude": 126.7395,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,
