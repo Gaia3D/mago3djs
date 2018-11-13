@@ -11,24 +11,18 @@ var MouseAction = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// current.***
-	this.curX;
-	this.curY;
-	this.curCamCoordPoint;
-	this.curWorldPoint;
-	this.curWorldPoint2;
-	this.curModelViewMatrix = new Matrix4();
-	this.curModelViewMatrixInv = new Matrix4();
-	
-	// start.***
+	// start (onMouseDown point).***
 	this.strX;
 	this.strY;
 	this.strCamCoordPoint;
 	this.strWorldPoint;
+	this.strWorldPoint2;
+	this.strModelViewMatrix = new Matrix4();
+	this.strModelViewMatrixInv = new Matrix4();
 	
 	// cameraStatus.***
-	this.curCamera = new Camera();
-	this.curCameraTarget = new Float32Array([0.0, 0.0, 0.0]);
+	this.strCamera = new Camera();
+	this.strCameraTarget = new Float32Array([0.0, 0.0, 0.0]);
 	
 	// Camera rotation.***
 	this.camRotPoint = new Point3D();

@@ -48,27 +48,19 @@ Sphere.prototype.deleteObjects = function()
 
 /**
  */
-Sphere.prototype.getVbo = function(resultVboContainer)
+Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 {
 	if (resultVboContainer === undefined)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
-	var mesh;
-	
-	
+	var pMesh;
+
 	// make vbo.***
-	mesh = this.makeMesh(mesh);
+	pMesh = this.makePMesh(pMesh);
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
 	
-	// now rotate in X axis.***
-	/*
-	var rotMatAux = new Matrix4();
-	var frustum = this.camera.bigFrustum;
-	var halfFovyRad = frustum.fovyRad / 2.0;
-	rotMatAux.rotationAxisAngDeg(-90.0 - (halfFovyRad/2) * 180.0 / Math.PI, 1.0, 0.0, 0.0);
-	*/
-	var surfIndepMesh = mesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+	var surfIndepMesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
 	// now rotate in X axis.***
 	var rotMatAux = new Matrix4();
@@ -77,8 +69,13 @@ Sphere.prototype.getVbo = function(resultVboContainer)
 	
 	surfIndepMesh.setColor(0.0, 0.5, 0.9, 0.3);
 	surfIndepMesh.calculateVerticesNormals();
+	if (bTexCoords !== undefined && bTexCoords === true)
+	{
+		// calculate spherical texCoords.***
+		surfIndepMesh.calculateTexCoordsSpherical();
+	}
 	surfIndepMesh.getVbo(resultVboContainer);
-	
+
 	return resultVboContainer;
 };
 
@@ -86,13 +83,13 @@ Sphere.prototype.getVbo = function(resultVboContainer)
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
-Sphere.prototype.makeMesh = function(resultMesh) 
+Sphere.prototype.makePMesh = function(resultPMesh) 
 {
-	if (resultMesh === undefined)
-	{ resultMesh = new ParametricMesh(); }
+	if (resultPMesh === undefined)
+	{ resultPMesh = new ParametricMesh(); }
 
-	resultMesh.profile = new Profile(); 
-	var profileAux = resultMesh.profile; 
+	resultPMesh.profile = new Profile(); 
+	var profileAux = resultPMesh.profile; 
 	
 	// Outer ring.**************************************
 	var outerRing = profileAux.newOuterRing();
@@ -102,8 +99,8 @@ Sphere.prototype.makeMesh = function(resultMesh)
 	point3d = polyLine.newPoint2d(-this.r*0.01, -this.r); // 0
 	point3d = polyLine.newPoint2d(-this.r*0.01, this.r); // 1
 	
-	var startAngDeg = 95.0;
-	var endAngDeg = 265.0;
+	var startAngDeg = 95.00;
+	var endAngDeg = 265.00;
 	arc = outerRing.newElement("ARC");
 	this.sweepSense = 1;
 	arc.setCenterPosition(0.0, 0.0);
@@ -120,15 +117,15 @@ Sphere.prototype.makeMesh = function(resultMesh)
 	var endPoint2d = new Point2D(0, 1);
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	revolveSegmentsCount = 48;
-	resultMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
+	resultPMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 	/*
 	var extrusionVector
 	var extrudeSegmentsCount = 2;
 	var extrusionDist = 15.0;
-		resultMesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
+		resultPMesh.extrude(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector);
 	*/
 	
-	return resultMesh;
+	return resultPMesh;
 };
 
 

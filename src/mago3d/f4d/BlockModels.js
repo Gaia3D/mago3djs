@@ -41,6 +41,24 @@ Block.prototype.deleteObjects = function(gl, vboMemManager)
 };
 
 /**
+ * 어떤 일을 하고 있습니까?
+ * @param 
+  * @returns {boolean} returns if the Block is ready to render.
+ */
+Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
+{
+	if (maxSizeToRender && (this.radius < maxSizeToRender))
+	{ return false; }
+	
+	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
+	{ return false; }
+
+	return true;
+};
+//****************************************************************************************************
+//****************************************************************************************************
+
+/**
  * 블록 목록
  * @class BlocksList
  */
@@ -183,14 +201,24 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 	var vboMemManager = magoManager.vboMemoryManager;
 	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	// test.***
+	if(vboDatasCount > 12)
+		var hola = 0;
+	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		// 1) Positions array.
 		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		if(vertexCount > 200000)
+			var hola = 0;
+		
 		var verticesFloatValuesCount = vertexCount * 3;
 		// now padding the array to adjust to standard memory size of pool.
 		//posByteSize = 4 * verticesFloatValuesCount;
 		posByteSize = verticesFloatValuesCount;
+		
+		// test.***
 		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
 		
 		block.vertexCount = vertexCount;
@@ -208,6 +236,10 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		// now padding the array to adjust to standard memory size of pool.
 		norByteSize = 1 * normalByteValuesCount;
 		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		
+		// test*******************
+		if(classifiedNorByteSize > 8000000)
+			var hola = 0;
 		
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 1 * normalByteValuesCount;
@@ -277,6 +309,9 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		if(blockIdx === 2740)
+			var hola = 0;
 
 		// Check if block exist.
 		if (motherBlocksArray[blockIdx]) 
@@ -317,8 +352,8 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 
 		block.radius = maxLength/2.0;
 
-		bbox.deleteObjects();
-		bbox = undefined;
+		//bbox.deleteObjects();
+		//bbox = undefined;
 		
 		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
 		

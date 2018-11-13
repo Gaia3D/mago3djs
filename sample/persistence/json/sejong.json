@@ -2,7 +2,8 @@
     "attributes": {
         "isPhysical": false,
         "nodeType": " root ",
-        "projectType": "sejong"
+        "projectType": "sejong",
+		"specularLighting": true
     },
     "children": [
         {

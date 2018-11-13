@@ -208,6 +208,26 @@ Mesh.prototype.calculateVerticesNormals = function()
 	}
 };
 
+Mesh.prototype.calculateTexCoordsSpherical = function()
+{
+	var sphericalCoords = new GeographicCoord();
+	var verticesCount = this.vertexList.getVertexCount();
+	for (var i=0; i<verticesCount; i++)
+	{
+		var vertex = this.vertexList.getVertex(i);
+		var position = vertex.point3d;
+		sphericalCoords = position.getSphericalCoords(sphericalCoords);
+		
+		var u = sphericalCoords.longitude / 360.0;
+		var v;
+		var lat = sphericalCoords.latitude;
+		v = 0.5 * (90.0 + lat) / 90.0;
+		
+		if (vertex.texCoord === undefined)
+		{ vertex.texCoord = new Point2D(u, v); }
+	}
+};
+
 Mesh.prototype.setColor = function(r, g, b, a)
 {
 	var surface;

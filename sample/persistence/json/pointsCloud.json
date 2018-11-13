@@ -1,0 +1,205 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "pointsCloud",
+		"specularLighting": false
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "L001-1-0819-S1-C1_s",
+			"data_name": "L001-1-0819-S1-C1_s",
+			"heading": 0,
+			"height": 64.751499,
+			"latitude": 37.568143,
+			"longitude": 126.892024,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "L002-1-0819-S1-C1_s",
+			"data_name": "L002-1-0819-S1-C1_s",
+			"heading": 0,
+			"height": 88.322998,
+			"latitude": 37.568613,
+			"longitude": 126.895346,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "L003-1-0819-S1-C1_s",
+			"data_name": "L003-1-0819-S1-C1_s",
+			"heading": 0,
+			"height": -23.878502,
+			"latitude": 37.570264,
+			"longitude": 126.893825,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "20180922_CDB_All_group1_densified_point_cloud_part_1",
+			"data_name": "20180922_CDB_All_group1_densified_point_cloud_part_1",
+			"heading": 0,
+			"height": 61.345000,
+			"latitude": 37.522295,
+			"longitude": 127.063670,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "20180922_CDB_All_group1_densified_point_cloud_part_3",
+			"data_name": "20180922_CDB_All_group1_densified_point_cloud_part_3",
+			"heading": 0,
+			"height": 53.139500,
+			"latitude": 37.527589,
+			"longitude": 127.065543,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "20180922_CDB_All_group1_densified_point_cloud_part_4",
+			"data_name": "20180922_CDB_All_group1_densified_point_cloud_part_4",
+			"heading": 0,
+			"height": 51.640000,
+			"latitude": 37.529447,
+			"longitude": 127.068404,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "20180922_CDB_All_group1_densified_point_cloud_part_5",
+			"data_name": "20180922_CDB_All_group1_densified_point_cloud_part_5",
+			"heading": 0,
+			"height": 60.528000,
+			"latitude": 37.531447,
+			"longitude": 127.065277,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "20180922_CDB_All_group1_densified_point_cloud_part_6",
+			"data_name": "20180922_CDB_All_group1_densified_point_cloud_part_6",
+			"heading": 0,
+			"height": 64.801000,
+			"latitude": 37.531077,
+			"longitude": 127.068459,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Hwangyounggak_group1_densified_point_cloud",
+			"data_name": "Hwangyounggak_group1_densified_point_cloud",
+			"heading": 0,
+			"height": 175.840500,
+			"latitude": 35.836116,
+			"longitude": 129.290585,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Hwangyounggak_simplified_3d_mesh",
+			"data_name": "Hwangyounggak_simplified_3d_mesh",
+			"heading": 0,
+			"height": 185.840500,
+			"latitude": 35.836116,
+			"longitude": 129.290585,
+			"pitch": 0,
+			"roll": 0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  
+	"data_key": "PointsCloud",
+	"data_name": "PointsCloud"
+}

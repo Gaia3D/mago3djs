@@ -82,6 +82,36 @@ FBO.prototype.deleteObjects = function(gl)
 	
 };
 
+// static.***
+FBO.createBuffer = function(gl, data) 
+{
+	const buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+	return buffer;
+};
+
+FBO.bindFramebuffer = function(gl, framebuffer, texture) 
+{
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+	if (texture) 
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+	}
+};
+
+FBO.bindAttribute = function(gl, buffer, attribute, numComponents) 
+{
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.enableVertexAttribArray(attribute);
+	gl.vertexAttribPointer(attribute, numComponents, gl.FLOAT, false, 0, 0);
+};
+
+FBO.bindTexture = function(gl, texture, unit) 
+{
+	gl.activeTexture(gl.TEXTURE0 + unit);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+};
 
 
 

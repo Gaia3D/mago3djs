@@ -30,7 +30,7 @@
   "geo_init_camera_enable": "true",
   "geo_init_latitude": "37.58156267183209",
   "geo_init_longitude": "126.6113",
-  "geo_init_height": "1200",
+  "geo_init_height": "800000",
   "geo_init_duration": 3,
   "geo_init_default_terrain": "",
   "geo_init_default_fov": 0,

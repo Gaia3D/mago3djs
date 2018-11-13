@@ -24,7 +24,14 @@ var MetaData = function()
 	this.bbox; // BoundingBox.***
 	this.imageLodCount;
 	
+	// Project_data_type (new in version 002).***************************************
+	// 1 = 3d model data type (normal 3d with interior & exterior data).***
+	// 2 = single building skin data type (as vWorld or googleEarth data).***
+	// 3 = multi building skin data type (as Shibuya & Odaiba data).***
+	// 4 = pointsCloud data type.***			
 	this.projectDataType;
+	//-------------------------------------------------------------------------------
+	
 	this.offSetX;
 	this.offSetY;
 	this.offSetZ;

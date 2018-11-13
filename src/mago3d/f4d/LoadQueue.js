@@ -66,7 +66,7 @@ var LoadQueue = function(magoManager)
 	this.lowLodSkinDataMap = {};
 	this.lowLodSkinTextureMap = {};
 
-	//this.referencesToLoadMap = {};
+	this.tinTerrainDataMap = {};
 };
 
 LoadQueue.prototype.putLod2SkinData = function(octree, filePath, texture, texFilePath, aValue)
@@ -104,6 +104,12 @@ LoadQueue.prototype.putLowLodSkinData = function(skinMesh, filePath, aValue)
 	
 	var loadData = new LoadData();
 	loadData.dataType = 3;
+	// dataType:
+	// 1. referencesArray.
+	// 2. blocksArray.
+	// 3. skinData. (octree's skinData & lod3,4,5 skinData).
+	// 4. skinTexture.
+	
 	loadData.filePath = filePath;
 	loadData.skinMesh = skinMesh;
 	this.lowLodSkinDataMap[skinMesh.legoKey] = loadData;

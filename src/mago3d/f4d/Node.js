@@ -70,6 +70,68 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
+Node.prototype.renderContent = function(magoManager, renderType, refMatrixIdxKey) 
+{
+	// This function renders the neoBuilding if exist in "data".***
+	// renderType = 0 -> depth render.***
+	// renderType = 1 -> normal render.***
+	// renderType = 2 -> colorSelection render.***
+	//--------------------------------------------
+	
+	if(this.data === undefined)
+		return;
+	
+	var neoBuilding = this.data.neoBuilding;
+	if(neoBuilding === undefined)
+		return;
+	
+	var rootNode = this.getRoot();
+	var geoLocDataManager = rootNode.data.geoLocDataManager;
+
+	// 1rst, determine the shader.***
+	var gl = magoManager.sceneState.gl;
+	var metaData = neoBuilding.metaData;
+	var projectType = metaData.projectDataType;
+	if(projectType === undefined)
+		projectType = "";
+	var currProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	var shaderName = neoBuilding.getShaderName(neoBuilding.currentLod, projectType, renderType);
+	var shader = magoManager.postFxShadersManager.getShader(shaderName);
+	
+	if(shader.program !== currProgram)
+	{
+		// bind the shader program.***
+		gl.useProgram(shader.program);
+	}
+	
+	// check attributes of the project.************************************************
+	var project = magoManager.hierarchyManager.getNodesMap(this.data.projectId);
+	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
+	{
+		var applySpecLighting = project.attributes.specularLighting;
+		if (applySpecLighting)
+		{ gl.uniform1i(shader.bApplySpecularLighting_loc, true); }
+		else
+		{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
+	}
+	// end check attributes of the project.----------------------------------------
+	var flipYTexCoord = false;
+	if (this.data.attributes.flipYTexCoords !== undefined)
+		flipYTexCoord = this.data.attributes.flipYTexCoords;
+
+	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
+	
+	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+	
+	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Node.prototype.addChildren = function(children) 
 {
 	children.setParent(this);

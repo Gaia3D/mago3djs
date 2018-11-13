@@ -125,6 +125,45 @@ Point3D.prototype.scalarProduct = function(point)
 /**
  * nomal 계산
  * @param point 변수
+ * @returns resultPoint
+ */
+Point3D.prototype.getSphericalCoords = function(resultGeographicCoords) 
+{
+	if (resultGeographicCoords === undefined)
+	{ resultGeographicCoords = new GeographicCoord(); }
+	
+	// heading.***
+	var xyProjectedPoint = new Point2D(this.x, this.y);
+	var longitudeVectorRef = new Point2D(1.0, 0.0);
+	var headingDeg = xyProjectedPoint.angleDegToVector(longitudeVectorRef);
+	
+	if (headingDeg > 90)
+	{ var hola = 0; }
+	
+	if (this.y < 0.0)
+	{
+		headingDeg = 360.0 - headingDeg;
+	}
+	
+	// azimutal.***
+	var projectedModul = xyProjectedPoint.getModul();
+	var azimutRad = Math.atan(this.z/projectedModul);
+	var azimutDeg = azimutRad * 180.0 / Math.PI;
+	
+	if (this.z < 0.0)
+	{
+		azimutDeg *= -1.0;
+	}
+	
+	resultGeographicCoords.longitude = headingDeg;
+	resultGeographicCoords.latitude = azimutDeg;
+	
+	return resultGeographicCoords;
+};
+
+/**
+ * nomal 계산
+ * @param point 변수
  * @param resultPoint 변수
  * @returns resultPoint
  */

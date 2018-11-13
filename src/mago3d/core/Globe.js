@@ -31,7 +31,44 @@ var Globe = function()
 
 Globe.equatorialRadius = function()
 {
-	return 6378137.0;;
+	return 6378137.0;
+};
+
+Globe.equatorialRadiusSquared = function()
+{
+	return 40680631590769.0;
+};
+
+Globe.polarRadius = function()
+{
+	return 6356752.3142;
+};
+
+Globe.polarRadiusSquared = function()
+{
+	return 40408299984087.05552164;
+};
+
+Globe.radiusAtLatitudeDeg = function(latDeg)
+{
+	// This function returns the radius of earth at the latitude "latDeg".***
+	// a = equatorialRadius, b = polarRadius.***************
+	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).*********
+	//------------------------------------------------------
+	
+	var latRad = latDeg * Math.PI/180.0;
+	var a = Globe.equatorialRadius();
+	var b = Globe.polarRadius();
+	var a2 = Globe.equatorialRadiusSquared();
+	var b2 = Globe.polarRadiusSquared();
+	
+	var sin = Math.sin(latRad);
+	var cos = Math.cos(latRad);
+	var sin2 = sin*sin;
+	var cos2 = cos*cos;
+	
+	var radius = (a*b)/(Math.sqrt(a2*sin2 + b2*cos2));
+	return radius;
 };
 
 Globe.prototype.normalizeCartesian = function(cartesian)
@@ -98,6 +135,7 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
 
 Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 {
+	// function used by "MagoWorld" to paning & rotate the globe by dragging mouse.***
 	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
 	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
 	
@@ -147,7 +185,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	{
 		// this is tangent.***
 		if (resultCartesian === undefined)
-		{ resultCartesian = new Float32Array(3); }
+		{ resultCartesian = []; } // Float32Array has no enough precision.***
 		
 		var t1 = (-b)/(2*a);
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
@@ -159,8 +197,9 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	else
 	{
 		// find the nearest to p1.***
-		var t1 = (-b + Math.sqrt(discriminant))/(2*a);
-		var t2 = (-b - Math.sqrt(discriminant))/(2*a);
+		var sqrtDiscriminant = Math.sqrt(discriminant);
+		var t1 = (-b + sqrtDiscriminant)/(2*a);
+		var t2 = (-b - sqrtDiscriminant)/(2*a);
 		
 		// solution 1.***
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
@@ -170,7 +209,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 		var dist2 = p1.squareDistToPoint(intersectPoint2);
 		
 		if (resultCartesian === undefined)
-		{ resultCartesian = new Float32Array(3); }
+		{ resultCartesian = []; } // Float32Array has no enough precision.***
 		
 		if (dist1 < dist2)
 		{
@@ -208,9 +247,44 @@ Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 	return resultNormal;
 };
 
+Globe.atan2Test = function(y, x) 
+{
+	var M_PI = Math.PI;
+	if (x > 0.0)
+	{
+		return Math.atan(y/x);
+	}
+	else if (x < 0.0)
+	{
+		if (y >= 0.0)
+		{
+			return Math.atan(y/x) + M_PI;
+		}
+		else 
+		{
+			return Math.atan(y/x) - M_PI;
+		}
+	}
+	else if (x == 0.0)
+	{
+		if (y>0.0)
+		{
+			return M_PI/2.0;
+		}
+		else if (y<0.0)
+		{
+			return -M_PI/2.0;
+		}
+		else 
+		{
+			return 0.0; // return undefined.***
+		}
+	}
+};
+
 Globe.CartesianToGeographicWgs84 = function (x, y, z, result) 
 {
-	// Copied from WebWorldWind.***
+	// From WebWorldWind.***
 	// According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
 	// Journal of Geodesy, accepted 10/2010, not yet published
@@ -284,7 +358,8 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result)
 			rad1 = Math.sqrt(-evoluteBorderTest);
 			rad2 = Math.sqrt(-8 * r * r * r);
 			rad3 = Math.sqrt(e4 * p * q);
-			atan = 2 * Math.atan2(rad3, rad1 + rad2) / 3;
+			//atan = 2 * Math.atan2(rad3, rad1 + rad2) / 3;
+			atan = 2 * Globe.atan2Test(rad3, rad1 + rad2) / 3;
 
 			u = -4 * r * Math.sin(atan) * Math.cos(Math.PI / 6 + atan);
 		}
@@ -296,7 +371,8 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result)
 		sqrtDDpZZ = Math.sqrt(D * D + Z * Z);
 
 		h = (k + e2 - 1) * sqrtDDpZZ / k;
-		phi = 2 * Math.atan2(Z, sqrtDDpZZ + D);
+		//phi = 2 * Math.atan2(Z, sqrtDDpZZ + D);
+		phi = 2 * Globe.atan2Test(Z, sqrtDDpZZ + D);
 	}
 	else 
 	{
@@ -314,18 +390,21 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result)
 	if ((s2 - 1) * Y < sqrtXXpYY + X) 
 	{
 		// case 1 - -135deg < lambda < 135deg
-		lambda = 2 * Math.atan2(Y, sqrtXXpYY + X);
+		//lambda = 2 * Math.atan2(Y, sqrtXXpYY + X);
+		lambda = 2 * Globe.atan2Test(Y, sqrtXXpYY + X);
 	}
 	else if (sqrtXXpYY + Y < (s2 + 1) * X) 
 	{
 		// case 2 - -225deg < lambda < 45deg
-		lambda = -Math.PI * 0.5 + 2 * Math.atan2(X, sqrtXXpYY - Y);
+		//lambda = -Math.PI * 0.5 + 2 * Math.atan2(X, sqrtXXpYY - Y);
+		lambda = -Math.PI * 0.5 + 2 * Globe.atan2Test(X, sqrtXXpYY - Y);
 	}
 	else 
 	{
 		// if (sqrtXXpYY-Y<(s2=1)*X) {  // is the test, if needed, but it's not
 		// case 3: - -45deg < lambda < 225deg
-		lambda = Math.PI * 0.5 - 2 * Math.atan2(X, sqrtXXpYY + Y);
+		//lambda = Math.PI * 0.5 - 2 * Math.atan2(X, sqrtXXpYY + Y);
+		lambda = Math.PI * 0.5 - 2 * Globe.atan2Test(X, sqrtXXpYY + Y);
 	}
 
 	if (result === undefined)

@@ -24,6 +24,7 @@ var Octree = function(octreeOwner)
 	this.octree_number_name = 0;
 	this.neoBuildingOwnerId;
 	this.octreeKey;
+	this.lod; // lod can be 0, 1 or 2.***
 	this.distToCamera;
 	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
 	this.fileLoadState = CODE.fileLoadState.READY;
@@ -236,6 +237,35 @@ Octree.prototype.makeTree = function(treeDepth)
 			this.subOctrees_array[i].makeTree(treeDepth);
 		}
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param intNumber 변수
+ * @returns numDigits
+ */
+Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey) 
+{
+	// the content of the octree is "neoReferencesMotherAndIndices" & the netSurfaceMesh called "lego".***
+	// This function renders the "neoReferencesMotherAndIndices" or the lego.***
+	// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.***
+	if (this.neoReferencesMotherAndIndices === undefined)
+	{ return; }
+	
+	// provisionally:
+	if(this.lod < 2)
+	{
+		this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey);
+	}
+	
+	if (renderType === 0) // do depth render.***
+	{
+		magoManager.renderer.depthRenderNeoRefListsAsimetricVersion(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager,
+			isInterior, shar, renderTexture, renderType, maxSizeToRender, lod, refMatrixIdxKey);
+		return;
+	}
+
+	
 };
 
 /**
@@ -459,6 +489,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles0.push(visibleOctreesArray[i]);
+				visibleOctreesArray[i].lod = 0;
 				find = true;
 			}
 		}
@@ -469,6 +500,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles1.push(visibleOctreesArray[i]);
+				visibleOctreesArray[i].lod = 1;
 				find = true;
 			}
 		}
@@ -479,6 +511,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles2.push(visibleOctreesArray[i]);
+				visibleOctreesArray[i].lod = 2;
 				find = true;
 			}
 		}
@@ -489,6 +522,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 				if (globalVisibleObjControlerOctrees)
 				{ globalVisibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
+				visibleOctreesArray[i].lod = 3;
 				find = true;
 			}
 		}
