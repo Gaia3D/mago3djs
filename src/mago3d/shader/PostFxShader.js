@@ -679,7 +679,7 @@ PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState)
 	this.createPngImageShader(gl); // 13.***
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.***
 	
-	this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.***
+	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.***
 };
 
 /**

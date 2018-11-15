@@ -1784,6 +1784,7 @@ ShaderSource.ModelRefSsaoSimpleVS = "	attribute vec3 position;\n\
 ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
 	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
 	\n\
 	uniform mat4 buildingRotMatrix; \n\
 	uniform mat4 projectionMatrix;  \n\

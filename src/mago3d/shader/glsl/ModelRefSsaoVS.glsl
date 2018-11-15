@@ -1,6 +1,7 @@
 	attribute vec3 position;
 	attribute vec3 normal;
 	attribute vec2 texCoord;
+	attribute vec4 color4;
 	
 	uniform mat4 buildingRotMatrix; 
 	uniform mat4 projectionMatrix;  
