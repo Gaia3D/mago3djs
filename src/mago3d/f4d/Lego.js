@@ -277,6 +277,97 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	return succesfullyGpuDataBinded;
 };
 
+/**
+ * F4D Lego 자료를 읽는다
+ */
+Lego.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader)
+{
+	var gl = magoManager.sceneState.gl;
+	
+	if (this.vbo_vicks_container.vboCacheKeysArray.length === 0) 
+	{
+		return;
+	}
+	gl.frontFace(gl.CCW);
+	
+	// renderType = 0 -> depth render.***
+	// renderType = 1 -> normal render.***
+	// renderType = 2 -> colorSelection render.***
+	//--------------------------------------------
+
+	if (renderType === 0) // depth.***
+	{
+		// 1) Position.*********************************************
+		var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
+		{ return; }
+
+		var vertices_count = vbo_vicky.vertexCount;
+		if (vertices_count === 0) 
+		{
+			return;
+		}
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+	}
+	else if (renderType === 1) // color.***
+	{
+		var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+		var vertices_count = vbo_vicky.vertexCount;
+
+		if (vertices_count === 0) 
+		{
+			return;
+		}
+		
+		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
+		{ return; }
+		
+		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
+		{ return; }
+		
+		if (!renderTexture && !vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
+		{ return; }
+		
+		// 4) Texcoord.*********************************************
+		if (renderTexture)
+		{
+			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+			{ return; }
+		}
+		else 
+		{
+			gl.uniform1i(shader.bUse1Color_loc, false);
+			gl.disableVertexAttribArray(shader.texCoord2_loc);
+		}
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
+		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
+		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+
+		if (vbo_vicky.meshColorCacheKey !== undefined )
+		{
+			gl.enableVertexAttribArray(shader.color4_loc);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+			gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+		}
+		
+		if (renderTexture && vbo_vicky.meshTexcoordsCacheKey)
+		{
+			gl.disableVertexAttribArray(shader.color4_loc);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
+			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+		}
+
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+		gl.disableVertexAttribArray(shader.color4_loc);
+	}
+};
+
 
 
 

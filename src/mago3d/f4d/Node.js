@@ -94,9 +94,13 @@ Node.prototype.renderContent = function(magoManager, renderType, refMatrixIdxKey
 	var projectType = metaData.projectDataType;
 	if(projectType === undefined)
 		projectType = "";
+	
 	var currProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 	var shaderName = neoBuilding.getShaderName(neoBuilding.currentLod, projectType, renderType);
 	var shader = magoManager.postFxShadersManager.getShader(shaderName);
+	
+	if(shader === undefined)
+		return;
 	
 	if(shader.program !== currProgram)
 	{
@@ -115,6 +119,10 @@ Node.prototype.renderContent = function(magoManager, renderType, refMatrixIdxKey
 		{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
 	}
 	// end check attributes of the project.----------------------------------------
+	
+	// set the currentObjectsRendering.***
+	magoManager.renderer.currentObjectsRendering["node"] = this;
+	
 	var flipYTexCoord = false;
 	if (this.data.attributes.flipYTexCoords !== undefined)
 		flipYTexCoord = this.data.attributes.flipYTexCoords;

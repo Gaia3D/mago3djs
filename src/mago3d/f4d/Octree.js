@@ -251,20 +251,14 @@ Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, 
 	// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.***
 	if (this.neoReferencesMotherAndIndices === undefined)
 	{ return; }
-	
-	// provisionally:
+
+	// set the currentObjectsRendering.***
+	magoManager.renderer.currentObjectsRendering["octree"] = this;
+
 	if(this.lod < 2)
 	{
 		this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey);
 	}
-	
-	if (renderType === 0) // do depth render.***
-	{
-		magoManager.renderer.depthRenderNeoRefListsAsimetricVersion(gl, neoReferencesMotherAndIndices, neoBuilding, magoManager,
-			isInterior, shar, renderTexture, renderType, maxSizeToRender, lod, refMatrixIdxKey);
-		return;
-	}
-
 	
 };
 

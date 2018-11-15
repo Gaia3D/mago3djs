@@ -166,8 +166,12 @@ TinTerrain.prototype.isPrepared = function()
 	// a tinTerrain is prepared if this is parsed and vbo maked and texture binded.***
 	
 	// Provisional solution.**********************************
+	// Provisional solution.**********************************
+	// Provisional solution.**********************************
 	if(this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
 		return true;
+	// End provisional solution.------------------------------
+	// End provisional solution.------------------------------
 	// End provisional solution.------------------------------
 	
 	if(this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)

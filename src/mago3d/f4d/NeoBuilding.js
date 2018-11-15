@@ -731,16 +731,33 @@ NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType)
 {
 	var shaderName;
 	
-	// provisionally.***
-	if(lod <= 1)
-	{
-		shaderName = "modelRefSsao";
-	}
-	else
-	{
-		shaderName = "modelRefSsao";
-	}
+	// renderType = 0 -> depth render.***
+	// renderType = 1 -> normal render.***
+	// renderType = 2 -> colorSelection render.***
+	//--------------------------------------------
 	
+	if(renderType === 0)
+	{
+		if(lod <= 1)
+		{
+			shaderName = "modelRefDepth";
+		}
+	}
+	else if(renderType === 1)
+	{
+		if(lod <= 1)
+		{
+			shaderName = "modelRefSsao";
+		}
+	}
+	else if(renderType === 2)
+	{
+		if(lod <= 1)
+		{
+			shaderName = "modelRefSsao";
+		}
+	}
+
 	return shaderName;
 };
 
@@ -758,8 +775,12 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType)
 	{
 		this.renderDetailed(magoManager, shader, renderType);
 	}
+	else if(this.currentLod == 2)
+	{
+		
+	}
 	
-	var hola = 0;
+
 };
 
 /**
@@ -787,8 +808,11 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 			// active stencil buffer to draw silhouette.***
 			magoManager.renderer.enableStencilBuffer(gl);
 		}
-		
 	}
+	//else if (renderType === 2) // do nothing.***
+	
+	// set the currentObjectsRendering.***
+	magoManager.renderer.currentObjectsRendering["neoBuilding"] = this;
 	
 	var lowestOctree;
 	var refMatrixIdxKey = 0;
@@ -803,9 +827,6 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
 
-		//magoManager.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, this, magoManager, 
-		//		isInterior, shader, renderTexture, renderType, minSize, 0, refMatrixIdxKey);
-		
 		lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey);
 	}
 	
@@ -818,12 +839,21 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
 
-		//magoManager.renderer.renderNeoRefListsAsimetricVersion(gl, lowestOctree.neoReferencesMotherAndIndices, this, magoManager, 
-		//		isInterior, shader, renderTexture, renderType, minSize, 1, refMatrixIdxKey);
-				
 		lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey);
 	}
 	
+	// LOD2.***
+	lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles2.length;
+	for (var j=0; j<lowestOctreesCount; j++) 
+	{
+		//lowestOctree = this.currentVisibleOctreesControler.currentVisibles1[j];
+		//if (lowestOctree.lego === undefined) 
+		//{ continue; }
+
+		//lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey);
+	}
+	
+	// Finally:
 	if (renderType === 1)
 	{
 		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
@@ -831,10 +861,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 			// deactive stencil buffer to draw silhouette.***
 			magoManager.renderer.disableStencilBuffer(gl);
 		}
-		
 	}
-	
-	
 };
 
 
