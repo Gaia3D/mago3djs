@@ -62,7 +62,7 @@ AEC(Architecture, Engineering, Construction) 영역과 전통적인 3차원 공�
 - 변환할 데이터를 C:\demo_f4d(inputFolder)에 저장
 - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행한 다음 F4D Converter가 설치된 디렉토리로 이동
 - 다음을 실행
-<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\프로젝트명 -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
+<br>※ F4D Conveter argument 관련 설명은 [F4D Conveter](https://github.com/Gaia3D/F4DConverter)참조<pre><code>C:\F4DConverter>F4DConverter.exe #inputFolder C:\demo_f4d #outputFolder C:\f4d\프로젝트명 #log C:\demo_f4d/logTest.txt #indexing y</code></pre>
 - 변환 완료된 F4D 파일들을 mago3D JS 프로젝트에서 웹 서비스로 사용할 수 있도록 Symbolic Link 생성
   - 관리자 권한으로 Command Line Prompt(cmd.exe)를 실행하고 mago3D JS 프로젝트로 이동
   <code>C:\git\repository\mago3djs</code><br>
@@ -213,7 +213,7 @@ Generation 3D GIS platform that integrates and visualizes AEC (Architecture, Eng
 - Save the data to be converted to C:\demo_data(inputFolder)
 - Run Command Line Prompt (cmd.exe) as an administrator and move to the directory where F4D Converter is installed
 - Run
-<br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\projectname -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
+<br>※ For a description of F4D Conveter argument[F4D Conveter](https://github.com/Gaia3D/F4DConverter)<pre><code>C:\F4DConverter>F4DConverter.exe #inputFolder C:\demo_f4d #outputFolder C:\f4d\projectname #log C:\demo_f4d/logTest.txt #indexing y</code></pre>
 - Create Symbolic Link to use transformed F4D files as web service in mago3D JS project
   - Run Command Line Prompt (cmd.exe) with administrative privileges and go to mago3D JS project<br>
   <code>C:\mago3djs</code><br>
@@ -363,7 +363,7 @@ AEC（Architecture、Engineering、Construction）領域と、伝統的な3次�
 - 変換するデータをC:\demo_f4d(inputFolder)に保存
 - 管理者権限でCommand Line Prompt（cmd.exe）を実行し、F4D Converterがインストールされてディレクトリに移動
 - 次を実行し
-<br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe -inputFolder C:\demo_f4d -outputFolder C:\f4d\プロジェクト名 -log C:\demo_f4d/logTest.txt -indexing y</code></pre>
+<br>※ F4D Conveter argument 関連説明は[F4D Conveter](https://github.com/Gaia3D/F4DConverter)参照<pre><code>C:\F4DConverter>F4DConverter.exe #inputFolder C:\demo_f4d #outputFolder C:\f4d\プロジェクト名 #log C:\demo_f4d/logTest.txt #indexing y</code></pre>
 - 変換完了F4Dファイルをmago3D JSプロジェクトでは、Webサービスとして利用できるようにSymbolic Linkを作成
   - 管理者権限でCommand Line Prompt（cmd.exe）を実行して、mago3D JSプロジェクトに移動<br>
   <code>C:\mago3djs</code><br>
