@@ -487,7 +487,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				wwd.addLayer(wmsLayer);
 			};
 
-				// Called if an error occurs during WMS Capabilities document retrieval
+			// Called if an error occurs during WMS Capabilities document retrieval
 			var logError = function (jqXhr, text, exception) 
 			{
 				console.log("There was a failure retrieving the capabilities document: " + text + " exception: " + exception);
@@ -561,7 +561,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				*/
 		};
 
-			// Listen for mouse clicks.
+		// Listen for mouse clicks.
 		var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
 		clickRecognizer.button = 0;  //left mouse button
 			

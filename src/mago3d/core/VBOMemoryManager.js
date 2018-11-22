@@ -168,7 +168,7 @@ var VBOKeysWorld = function()
 	this.vboKeysNationsArray.push(this.vboKeyNation60000to150000);
 	this.vboKeyNation200000to1100000 = new VBOKeysNation(new Uint32Array([200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 1100000]), 150001);
 	this.vboKeysNationsArray.push(this.vboKeyNation200000to1100000);
-	this.vboKeyNation1500000to3000000 = new VBOKeysNation(new Uint32Array([1500000, 2000000, 2500000, 3000000]), 1100001);
+	this.vboKeyNation1500000to3000000 = new VBOKeysNation(new Uint32Array([1500000, 2000000, 2500000, 3000000, 6000000, 12000000, 24000000, 36000000, 60000000]), 1100001);
 	this.vboKeysNationsArray.push(this.vboKeyNation1500000to3000000);
 };
 
@@ -179,6 +179,8 @@ var VBOKeysWorld = function()
 VBOKeysWorld.prototype.getClassifiedBufferKey = function(gl, bufferSize) 
 {
 	// check gpuMemory limit.
+	// If current totalBytesUsed is greater than bytesLimit, then enters in mode "onlyReuse".***
+	// "onlyReuse" = no allocate GPU memory, only use the existent***
 	var onlyReuse = false;
 	if (this.totalBytesUsed > this.bytesLimit)
 	{

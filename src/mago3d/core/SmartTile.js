@@ -297,8 +297,8 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  */
 SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
 {
-	if(minGeographicCoord === undefined || maxGeographicCoord === undefined)
-		return undefined;
+	if (minGeographicCoord === undefined || maxGeographicCoord === undefined)
+	{ return undefined; }
 	
 	if (resultSphereExtent === undefined)
 	{ resultSphereExtent = new Sphere(); }

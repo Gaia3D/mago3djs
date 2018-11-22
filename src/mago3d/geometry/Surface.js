@@ -251,6 +251,25 @@ Surface.prototype.getTrianglesConvex = function(resultTrianglesArray)
 	return resultTrianglesArray;
 };
 
+Surface.prototype.getTriangles = function(resultTrianglesArray)
+{
+	if (this.facesArray === undefined || this.facesArray.length ===0)
+	{ return resultTrianglesArray; }
+	
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
+	
+	var face;
+	var facesCount = this.getFacesCount();
+	for (var i=0; i<facesCount; i++)
+	{
+		face = this.getFace(i);
+		resultTrianglesArray = face.getTessellatedTriangles(resultTrianglesArray);
+	}
+	
+	return resultTrianglesArray;
+};
+
 Surface.prototype.calculateVerticesNormals = function()
 {
 	// PROVISIONAL.***

@@ -36,6 +36,7 @@ uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
 varying float applySpecLighting;
+uniform bool bApplySsao;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -59,37 +60,42 @@ float getDepth(vec2 coord)
 }    
 
 void main()
-{          
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 
-    float linearDepth = getDepth(screenPos);          
-    vec3 origin = getViewRay(screenPos) * linearDepth;   
+{
+	float occlusion = 0.0;
+	vec3 normal2 = vNormal;
+	if(bApplySsao)
+	{          
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 
+		float linearDepth = getDepth(screenPos);          
+		vec3 origin = getViewRay(screenPos) * linearDepth;   
 
-    vec3 normal2 = vNormal;
-            
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
-    vec3 bitangent = cross(normal2, tangent);
-    mat3 tbn = mat3(tangent, bitangent, normal2);        
-    
-    float occlusion = 0.0;
-    for(int i = 0; i < kernelSize; ++i)
-    {    	 
-        vec3 sample = origin + (tbn * kernel[i]) * radius;
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		
-        offset.xy /= offset.w;
-        offset.xy = offset.xy * 0.5 + 0.5;        
-        float sampleDepth = -sample.z/far;
-		if(sampleDepth > 0.49)
-			continue;
-        float depthBufferValue = getDepth(offset.xy);				              
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)
-        {
-            occlusion +=  1.0;
-        }
-    }   
-        
-    occlusion = 1.0 - occlusion / float(kernelSize);
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
+		vec3 bitangent = cross(normal2, tangent);
+		mat3 tbn = mat3(tangent, bitangent, normal2);        
+		
+		for(int i = 0; i < kernelSize; ++i)
+		{    	 
+			vec3 sample = origin + (tbn * kernel[i]) * radius;
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);		
+			offset.xy /= offset.w;
+			offset.xy = offset.xy * 0.5 + 0.5;        
+			float sampleDepth = -sample.z/far;
+			if(sampleDepth > 0.49)
+				continue;
+			float depthBufferValue = getDepth(offset.xy);				              
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)
+			{
+				occlusion +=  1.0;
+			}
+		}   
+			
+		occlusion = 1.0 - occlusion / float(kernelSize);
+	}
+	else{
+		occlusion = 1.0;
+	}
 
     // Do specular lighting.***
 	float lambertian;

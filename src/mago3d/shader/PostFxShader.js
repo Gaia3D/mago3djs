@@ -158,7 +158,19 @@ Uniform1iDataPair.prototype.bindUniform = function()
 	this.gl.uniform1i(this.uniformLocation, this.intValue);
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class AttribLocationState
+ */
+var AttribLocationState = function() 
+{
+	if (!(this instanceof AttribLocationState)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	this.attribLocationEnabled = false;
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -173,7 +185,7 @@ var PostFxShader = function(gl)
 	}
 	this.gl = gl;
 	this.name;
-	this.attribLocationCacheObj = {};
+	this.attribLocationCacheObj = {}; // old.***
 	this.uniformsArrayGeneral = []; // this array has the same uniforms that "uniformsCacheObj".***
 	this.uniformsMapGeneral = {}; // this object has the same uniforms that "uniformsArray".***
 	
@@ -185,6 +197,112 @@ var PostFxShader = function(gl)
 	this.shader_vertex;
 	this.shader_fragment;
 	
+	// current buffers binded.***
+	this.last_vboPos_binded;
+	this.last_vboNor_binded;
+	this.last_vboIdx_binded;
+	this.last_tex_id;
+	this.last_isAditionalMovedZero = false;
+	this.last_vboTexCoord_binded; // no used.***
+	
+	// attribLocations state management.***
+	this.attribLocationStateArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.resetLastBuffersBinded = function()
+{
+	this.last_vboPos_binded = undefined;
+	this.last_vboNor_binded = undefined;
+	this.last_vboIdx_binded = undefined;
+	this.last_vboTexCoord_binded = undefined; // no used.***
+	this.last_tex_id = undefined; // todo: must distinguish by channel.***
+	this.last_isAditionalMovedZero = false;
+	
+	if (this.attribLocationStateArray)
+	{
+		var attribLocsCount = this.attribLocationStateArray.length;
+		for (var i=0; i<attribLocsCount; i++)
+		{
+			var attribLocationState = this.attribLocationStateArray[i];
+			if (attribLocationState !== undefined)
+			{
+				attribLocationState.attribLocationEnabled = undefined;
+				this.attribLocationStateArray[i] = undefined;
+			}
+		}
+		this.attribLocationStateArray.length = 0;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
+{
+	if (attribLocation < 0)
+	{ return; }
+	
+	var attribLocationState = this.attribLocationStateArray[attribLocation];
+	if (attribLocationState === undefined)
+	{
+		attribLocationState = new AttribLocationState();
+		this.attribLocationStateArray[attribLocation] = attribLocationState;
+		attribLocationState.attribLocationEnabled = false;
+	}
+
+	if (!attribLocationState.attribLocationEnabled)
+	{
+		this.gl.enableVertexAttribArray(attribLocation);
+		attribLocationState.attribLocationEnabled = true;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.disableVertexAttribArray = function(attribLocation)
+{
+	if (attribLocation < 0)
+	{ return; }
+	
+	var attribLocationState = this.attribLocationStateArray[attribLocation];
+	if (attribLocationState === undefined)
+	{
+		attribLocationState = new AttribLocationState();
+		this.attribLocationStateArray[attribLocation] = attribLocationState;
+		attribLocationState.attribLocationEnabled = true;
+	}
+
+	if (attribLocationState.attribLocationEnabled)
+	{
+		this.gl.disableVertexAttribArray(attribLocation);
+		attribLocationState.attribLocationEnabled = false;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.useProgram = function()
+{
+	var gl = this.gl;
+	var currProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	if (currProgram !== this.program)
+	{
+		gl.useProgram(this.program);
+	}
+	this.resetLastBuffersBinded();
 };
 
 /**
@@ -568,6 +686,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	
 	// compression data, for shaders with data compressed.***
 	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.***
@@ -980,6 +1099,7 @@ PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sc
 PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) 
 {
 	var shader = new PostFxShader(this.gl);
+	shader.name = "ColorSelectionShaderModelRef";
 	this.pFx_shaders_array.push(shader);
 
 	var ssao_vs_source = ShaderSource.ColorSelectionSsaoVS;
@@ -1511,6 +1631,7 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 {
 	// 14.***
 	var shader = new PostFxShader(this.gl);
+	shader.name = "SilhouetteShaderModelRef";
 	this.pFx_shaders_array.push(undefined);
 
 	var ssao_vs_source = ShaderSource.SilhouetteVS;

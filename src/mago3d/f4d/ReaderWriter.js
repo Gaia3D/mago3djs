@@ -20,6 +20,10 @@ var ReaderWriter = function()
 
 	this.j_counter;
 	this.k_counter;
+	this.referencesList_requested = 0;
+	this.blocksList_requested = 0;
+	this.octreesSkinLegos_requested = 0;
+	this.skinLegos_requested = 0;
 
 	this.gl;
 	this.incre_latAng = 0.001;
@@ -256,6 +260,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
+	this.blocksList_requested++;
+	
 	loadWithXhr(fileName).done(function(response) 
 	{	
 		var arrayBuffer = response;
@@ -279,6 +285,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 		else { blocksList.fileLoadState = status; }
 	}).always(function() 
 	{
+		magoManager.readerWriter.blocksList_requested--;
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
 	});
@@ -292,8 +299,13 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
  */
 ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
 {
+	if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+	{ return; }
+	
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	
+	this.referencesList_requested++;
 	
 	loadWithXhr(fileName).done(function(response) 
 	{
@@ -312,15 +324,16 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 		}
 		else 
 		{
-			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500;
+			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 		}
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
+		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOAD_FAILED; }
 		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
 	}).always(function() 
 	{
+		magoManager.readerWriter.referencesList_requested--;
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
 	});
@@ -336,7 +349,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 {
 	if (lowestOctree.lego === undefined)
 	{ return; }
-	
+	this.octreesSkinLegos_requested ++;
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
@@ -368,6 +381,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 		else { lowestOctree.lego.fileLoadState = status; }
 	}).always(function() 
 	{
+		magoManager.readerWriter.octreesSkinLegos_requested --;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
 	});
@@ -428,6 +442,7 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
  */
 ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoManager) 
 {
+	this.skinLegos_requested++;
 	//magoManager.fileRequestControler.filesRequestedCount += 1;
 	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
 	legoMesh.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
@@ -460,6 +475,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		}
 	}).always(function() 
 	{
+		magoManager.readerWriter.skinLegos_requested--;
 		//magoManager.fileRequestControler.filesRequestedCount -= 1;
 		magoManager.fileRequestControler.lowLodDataRequestedCount -= 1;
 		//if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
@@ -662,6 +678,9 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
+			
+			if (neoBuilding.buildingId === "Lotte0603")
+			{ var hola = 0; }
 
 			// now, parse octreeAsimetric.***
 			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);

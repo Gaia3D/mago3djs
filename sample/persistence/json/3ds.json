@@ -879,13 +879,30 @@
 				"flipYTexCoords": true
 			},
 			"children": [],
-			"data_key": "MuMyeongGyo",
-			"data_name": "MuMyeongGyo",
+			"data_key": "geoRES_testdata_v1.0.0",
+			"data_name": "geoRES_testdata_v1.0.0",
 			"mapping_type": "origin",
-            "heading": 0.0,
+            "heading": -540.0,
 			"height": 46,
-			"latitude": 37.578229113252064,
-			"longitude": 126.62,
+			"latitude": 37.575,
+			"longitude": 126.615,
+			"pitch": 0.0,
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "Lotte0603",
+			"data_name": "Lotte0603",
+			"mapping_type": "boundingboxcenter",
+            "heading": -540.0,
+			"height": 40.87,
+			"latitude": 37.575,
+			"longitude": 126.6155,
 			"pitch": 0.0,
 			"roll": 0.0
 		}

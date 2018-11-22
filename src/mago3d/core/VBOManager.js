@@ -2,18 +2,6 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class VBOManager
- */
-var VBOManager = function() 
-{
-	if (!(this instanceof VBOManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
  * @class Buffer
  */
 var Buffer = function() 
@@ -129,7 +117,10 @@ VBOVertexIdxCacheKey.prototype.isReadyPositions = function(gl, vboMemManager)
 	if (this.meshVertexCacheKey === undefined) 
 	{
 		if (this.posVboDataArray === undefined) { return false; }
-		
+		if (this.posArrayByteSize === undefined)
+		{
+			this.posArrayByteSize = this.posVboDataArray.length;
+		}
 		this.meshVertexCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.posArrayByteSize);
 		if (this.meshVertexCacheKey === undefined)
 		{ return false; }
@@ -150,6 +141,10 @@ VBOVertexIdxCacheKey.prototype.isReadyNormals = function(gl, vboMemManager)
 	if (this.meshNormalCacheKey === undefined) 
 	{
 		if (this.norVboDataArray === undefined) { return false; }
+		if (this.norArrayByteSize === undefined)
+		{
+			this.norArrayByteSize = this.norVboDataArray.length;
+		}
 
 		this.meshNormalCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.norArrayByteSize);
 		if (this.meshNormalCacheKey === undefined)
@@ -171,6 +166,10 @@ VBOVertexIdxCacheKey.prototype.isReadyFaces = function(gl, vboMemManager)
 	if (this.meshFacesCacheKey === undefined) 
 	{
 		if (this.idxVboDataArray === undefined) { return false; }
+		if (this.idxArrayByteSize === undefined)
+		{
+			this.idxArrayByteSize = this.idxVboDataArray.length;
+		}
 
 		this.meshFacesCacheKey = vboMemManager.getClassifiedElementKey(gl, this.idxArrayByteSize);
 		if (this.meshFacesCacheKey === undefined)
@@ -192,6 +191,10 @@ VBOVertexIdxCacheKey.prototype.isReadyTexCoords = function(gl, vboMemManager)
 	if (this.meshTexcoordsCacheKey === undefined) 
 	{
 		if (this.tcoordVboDataArray === undefined) { return false; }
+		if (this.tcoordArrayByteSize === undefined)
+		{
+			this.tcoordArrayByteSize = this.tcoordVboDataArray.length;
+		}
 
 		this.meshTexcoordsCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.tcoordArrayByteSize);
 		if (this.meshTexcoordsCacheKey === undefined)
@@ -214,6 +217,10 @@ VBOVertexIdxCacheKey.prototype.isReadyColors = function(gl, vboMemManager)
 	if (this.meshColorCacheKey === undefined) 
 	{
 		if (this.colVboDataArray === undefined) { return false; }
+		if (this.colArrayByteSize === undefined)
+		{
+			this.colArrayByteSize = this.colVboDataArray.length;
+		}
 		
 		this.meshColorCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.colArrayByteSize);
 		if (this.meshColorCacheKey === undefined)

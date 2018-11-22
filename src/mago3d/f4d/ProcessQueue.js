@@ -444,8 +444,8 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	for (var key in this.tinTerrainsToDeleteMap)
 	{
 		var tinTerrain = this.tinTerrainsToDeleteMap[key];
-		if(tinTerrain === undefined)
-			continue;
+		if (tinTerrain === undefined)
+		{ continue; }
 		
 		if (this.eraseTinTerrainToDelete(tinTerrain))
 		{
@@ -455,7 +455,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 		}
 		
 		if (deletedCount > 10)
-			{ break; }
+		{ break; }
 	}
 };
 

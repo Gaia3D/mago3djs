@@ -4,19 +4,29 @@
  * 영역 박스
  * @class Box
  */
-var Box = function() 
+var Box = function(width, length, height) 
 {
 	if (!(this instanceof Box)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+	this.mesh;
+	this.vbo_vicks_container;
 	this.vbo_vicks_containerEdges;
 	this.centerPoint;
 	this.width;
 	this.length;
 	this.height;
+	
+	if (width !== undefined)
+	{ this.width = width; }
+	
+	if (length !== undefined)
+	{ this.length = length; }
+	
+	if (height !== undefined)
+	{ this.height = height; }
 
 };
 
@@ -26,6 +36,19 @@ var Box = function()
 Box.prototype.getVboKeysContainer = function()
 {
 	return this.vbo_vicks_container;
+};
+
+/**
+ * box
+ */
+Box.prototype.render = function(magoManager, shader)
+{
+	if (this.mesh === undefined)
+	{
+		this.mesh = this.makeMesh(this.width, this.length, this.height);
+	}
+
+	this.mesh.render(magoManager, shader);
 };
 
 /**

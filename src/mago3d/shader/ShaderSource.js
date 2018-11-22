@@ -1487,6 +1487,7 @@ uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 varying float applySpecLighting;\n\
+uniform bool bApplySsao;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1510,37 +1511,42 @@ float getDepth(vec2 coord)\n\
 }    \n\
 \n\
 void main()\n\
-{          \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-    float linearDepth = getDepth(screenPos);          \n\
-    vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
+{\n\
+	float occlusion = 0.0;\n\
+	vec3 normal2 = vNormal;\n\
+	if(bApplySsao)\n\
+	{          \n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
+		float linearDepth = getDepth(screenPos);          \n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 \n\
-    vec3 normal2 = vNormal;\n\
-            \n\
-    vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-    vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-    vec3 bitangent = cross(normal2, tangent);\n\
-    mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-    \n\
-    float occlusion = 0.0;\n\
-    for(int i = 0; i < kernelSize; ++i)\n\
-    {    	 \n\
-        vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-        vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-        offset.xy /= offset.w;\n\
-        offset.xy = offset.xy * 0.5 + 0.5;        \n\
-        float sampleDepth = -sample.z/far;\n\
-		if(sampleDepth > 0.49)\n\
-			continue;\n\
-        float depthBufferValue = getDepth(offset.xy);				              \n\
-        float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-        if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-        {\n\
-            occlusion +=  1.0;\n\
-        }\n\
-    }   \n\
-        \n\
-    occlusion = 1.0 - occlusion / float(kernelSize);\n\
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+		vec3 bitangent = cross(normal2, tangent);\n\
+		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
+		\n\
+		for(int i = 0; i < kernelSize; ++i)\n\
+		{    	 \n\
+			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;        \n\
+			float sampleDepth = -sample.z/far;\n\
+			if(sampleDepth > 0.49)\n\
+				continue;\n\
+			float depthBufferValue = getDepth(offset.xy);				              \n\
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+			{\n\
+				occlusion +=  1.0;\n\
+			}\n\
+		}   \n\
+			\n\
+		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+	}\n\
+	else{\n\
+		occlusion = 1.0;\n\
+	}\n\
 \n\
     // Do specular lighting.***\n\
 	float lambertian;\n\
@@ -3277,83 +3283,16 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 		return false;\n\
 		\n\
 	// provisionally filter = NEAREST.***\n\
-	float fTexNumRows = float(texNumRows);\n\
-	float fTexNumCols = float(texNumCols);\n\
-	float fTexNumSlices = float(texNumSlices);\n\
-	float fTexTotalNumRows = float(texNumRows * texNumSlices);\n\
 	float lonRange = maxLon - minLon;\n\
 	float latRange = maxLat - minLat;\n\
 	float altRange = maxAlt - minAlt;\n\
-	float col = (lon - minLon)/lonRange * fTexNumCols;\n\
-	float row = (lat - minLat)/latRange * fTexNumRows;\n\
-	float slice = (alt - minAlt)/altRange * fTexNumSlices;\n\
+	float col = (lon - minLon)/lonRange * float(texNumCols);\n\
+	float row = (lat - minLat)/latRange * float(texNumRows);\n\
+	float slice = (alt - minAlt)/altRange * float(texNumSlices);\n\
 	\n\
-	slice = 0.0; // provisionally choose a slice\n\
-	// must calculate lonPrev, lonNext, latPrev, latNext, altPrev, altNext.***\n\
-			float lonPrev = floor(lon);\n\
-			float lonNext = ceil(lon);\n\
-			//if(lonNext == 360.0)lonNext = 0.0;\n\
-			float lonPrevDist = lon - lonPrev;\n\
-			float latPrev = floor(lat);\n\
-			float latNext = ceil(lat);\n\
-			float latPrevDist = lat - latPrev;\n\
-			float slicePrev = floor(slice);\n\
-			float sliceNext = ceil(slice);\n\
-			float slicePrevDist = slice - slicePrev;\n\
-	// now calculate colPrev, colNext, rowPrev, rowNext, slicePrev, sliceNext.***\n\
-	//float colPrev = floor(col);\n\
-	//float colNext = ceil(col);\n\
-	////if(colNext == 360.0)lonNext = 0.0;\n\
-	//float lonPrevDist = lon - lonPrev;\n\
-	//float latPrev = floor(lat);\n\
-	//float latNext = ceil(lat);\n\
-	//float latPrevDist = lat - latPrev;\n\
-	//float altPrev = floor(alt);\n\
-	//float altNext = ceil(alt);\n\
-	//float altPrevDist = alt - altPrev;\n\
-	// vertex indices of the box.***\n\
-	//    3--------2        7--------6 \n\
-	//    |        |        |        | \n\
-	//    | bottom |        |  top   | \n\
-	//    |        |        |        | \n\
-	//    0--------1        4--------5 \n\
-	float sPrev = lonPrev/fTexNumCols;\n\
-	float sNext = lonNext/fTexNumCols;\n\
-	float tPrevBottom = (latPrev+slicePrev*fTexNumRows)/fTexTotalNumRows;\n\
-	float tPrevTop = (latPrev+sliceNext*fTexNumRows)/fTexTotalNumRows;\n\
-	float tNextBottom = (latNext+slicePrev*fTexNumRows)/fTexTotalNumRows;\n\
-	float tNextTop = (latNext+sliceNext*fTexNumRows)/fTexTotalNumRows;\n\
-	vec2 tc_0 = vec2(sPrev, tPrevBottom);\n\
-	vec2 tc_1 = vec2(sNext, tPrevBottom);\n\
-	vec2 tc_2 = vec2(sNext, tNextBottom);\n\
-	vec2 tc_3 = vec2(sPrev, tNextBottom);\n\
-	\n\
-	vec2 tc_4 = vec2(sPrev, tPrevTop);\n\
-	vec2 tc_5 = vec2(sNext, tPrevTop);\n\
-	vec2 tc_6 = vec2(sNext, tNextTop);\n\
-	vec2 tc_7 = vec2(sPrev, tNextTop);\n\
-	vec4 value_0 = texture2D(volumeTex, tc_0);\n\
-	vec4 value_1 = texture2D(volumeTex, tc_1);\n\
-	vec4 value_2 = texture2D(volumeTex, tc_2);\n\
-	vec4 value_3 = texture2D(volumeTex, tc_3);\n\
-	vec4 value_4 = texture2D(volumeTex, tc_4);\n\
-	vec4 value_5 = texture2D(volumeTex, tc_5);\n\
-	vec4 value_6 = texture2D(volumeTex, tc_6);\n\
-	vec4 value_7 = texture2D(volumeTex, tc_7);\n\
-	// calculate the 4 values by longitude.***\n\
-	float resultValueFrontBottom_byLon = value_0.r*(1.0-lonPrevDist) + value_1.r*lonPrevDist;\n\
-	float resultValueRearBottom_byLon = value_3.r*(1.0-lonPrevDist) + value_2.r*lonPrevDist;\n\
-	float resultValueFrontTop_byLon = value_4.r*(1.0-lonPrevDist) + value_5.r*lonPrevDist;\n\
-	float resultValueRearTop_byLon = value_7.r*(1.0-lonPrevDist) + value_6.r*lonPrevDist;\n\
-	// calculate the 2 values by latitude.***\n\
-	float resultValueBottom_byLat = resultValueFrontBottom_byLon*(1.0 - latPrevDist) + resultValueRearBottom_byLon * latPrevDist;\n\
-	float resultValueTop_byLat = resultValueFrontTop_byLon*(1.0 - latPrevDist) + resultValueRearTop_byLon * latPrevDist;\n\
-	// calculate the 1 value by slice.***\n\
-	float resultValue_bySlice = resultValueTop_byLat*(1.0-slicePrevDist) + resultValueBottom_byLat*slicePrevDist;\n\
-	vec2 texCoord = vec2(col/fTexNumCols, (row+slice*fTexNumRows)/fTexTotalNumRows);\n\
+	slice = 0.0;\n\
+	vec2 texCoord = vec2(col/float(texNumCols), (row+slice)/float(texNumRows*texNumSlices));\n\
 	value = texture2D(volumeTex, texCoord);\n\
-	//value = vec4(resultValue_bySlice, resultValue_bySlice, resultValue_bySlice, resultValue_bySlice);\n\
-	//value = value_0;\n\
 	return true;\n\
 }\n\
 \n\
@@ -3424,7 +3363,7 @@ void main() {\n\
 		cartesianToGeographicWgs84(currPosWorld, currGeoLoc);\n\
 		if(getValue(currGeoLoc, value))\n\
 		{\n\
-			//float realValue = value.r * tempRange + minValue*255.0;\n\
+			float realValue = value.r * tempRange + minValue*255.0;\n\
 			totalValue += (value.r);\n\
 			sampledsCount += 1;\n\
 		}\n\
