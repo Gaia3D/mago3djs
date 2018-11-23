@@ -480,11 +480,12 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	// Spaces.************************************************
 	this.renderSpaces = magoManager.tempSettings.renderSpaces;
 	this.spacesAlpha = magoManager.tempSettings.spacesAlpha;
-	shader.enableVertexAttribArray(shader.normal3_loc); 
+	
+	if(renderType === 1)
+		shader.enableVertexAttribArray(shader.normal3_loc); 
+	
 	if(this.renderSpaces)
 	{
-		
-		
 		refMatrixType = 0;
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, this.spacesAlpha]);

@@ -2524,6 +2524,8 @@ MagoManager.prototype.renderGeometryColorCoding = function(gl, visibleObjControl
 		
 		currentShader.useProgram();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
 
 		gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
@@ -4060,6 +4062,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			gl.activeTexture(gl.TEXTURE2);
 			gl.bindTexture(gl.TEXTURE_2D, null);
+			
+			gl.useProgram(null);
 		}
 		
 		// If there are an object selected, then there are a stencilBuffer.******************************************
@@ -4079,9 +4083,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				
 				// do as the "getSelectedObjectPicking".**********************************************************
 				currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
-				currentShader.resetLastBuffersBinded();
-				var shaderProgram = currentShader.program;
-				gl.useProgram(shaderProgram);
+				currentShader.useProgram();
 				
 				currentShader.enableVertexAttribArray(currentShader.position3_loc);
 				currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
@@ -4140,6 +4142,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 					if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 					if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 				}
+				
+				gl.useProgram(null);
 			}
 			
 			// new. Render the silhouette by lod3 or lod4 or lod5 mesh***
@@ -4159,9 +4163,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				{
 					// do as the "getSelectedObjectPicking".**********************************************************
 					currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
-					currentShader.resetLastBuffersBinded();
-					var shaderProgram = currentShader.program;
-					gl.useProgram(shaderProgram);
+					currentShader.useProgram();
 					
 					gl.enableVertexAttribArray(currentShader.position3_loc);
 					
@@ -4398,16 +4400,9 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		}
 
 	}
-	
-	
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (currentShader === undefined)
-	{
-		currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
-		shaderProgram = currentShader.program;
-	}
-	
+	currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 	if (currentShader)
 	{
 		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
@@ -4415,7 +4410,25 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 	}
-
+	
+	currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
+	if (currentShader)
+	{
+		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
+		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
+		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+	}
+	
+	currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
+	if (currentShader)
+	{
+		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
+		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
+		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+	}
+	
 	gl.depthRange(0.0, 1.0);	
 };
 
@@ -4743,6 +4756,9 @@ MagoManager.prototype.renderGeometryDepth = function(gl, ssao_idx, visibleObjCon
 
 		currentShader.useProgram();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+		currentShader.disableVertexAttribArray(currentShader.color4_loc);
 		currentShader.bindUniformGenerals();
 
 		// RenderDepth for all buildings.***
@@ -4754,7 +4770,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, ssao_idx, visibleObjCon
 		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, ssao_idx, minSize, 0, refTMatrixIdxKey);
 		
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
-	
+		gl.useProgram(null);
 	}
 	
 	// tin terrain.***
@@ -4762,6 +4778,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, ssao_idx, visibleObjCon
 	{
 		var bDepth = true;
 		this.tinTerrainManager.render(this, bDepth);
+		gl.useProgram(null);
 	}
 };
 

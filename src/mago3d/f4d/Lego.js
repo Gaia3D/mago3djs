@@ -325,6 +325,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		rendered = true;
+		
 	}
 	else if (renderType === 1) // color.***
 	{
@@ -370,6 +371,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+		
+		
 		rendered = true;
 		shader.disableVertexAttribArray(shader.color4_loc);
 	}

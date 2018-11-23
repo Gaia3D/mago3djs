@@ -176,6 +176,18 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	gl.enable(gl.CULL_FACE);
 	gl.frontFace(gl.CCW);
 	
+	if(renderType === 2)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+	}
+	if(renderType === 0)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+	}
+	
 	var flipYTexCoord = false;
 	
 	// do render.

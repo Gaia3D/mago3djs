@@ -311,6 +311,11 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 			shader.last_isAditionalMovedZero = true;
 		}
 	}
+	
+	// Test check.***
+	if(magoManager.objectSelected === this)
+		var hola = 0;
+	
 	var vboKey;
 	for (var n=0; n<cacheKeys_count; n++) // Original.***
 	{
@@ -403,6 +408,15 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 		//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		
+		//var glError = gl.getError();
+		//if(glError !== gl.NO_ERROR)
+		//	var hola = 0;
+		
+		// Test check.***
+	if(magoManager.objectSelected === this)
+		var hola = 0;
+		
 	}
 		
 	return true;
@@ -1434,16 +1448,30 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		renderTexture = false; // reassign value for this var.***
 	}
 	
+	if(renderType === 2)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+	}
+	if(renderType === 0)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+	}
+	
 	var gl = magoManager.sceneState.gl;
 
-	gl.activeTexture(gl.TEXTURE2); // ...***
 	if (renderTexture) 
 	{
+		gl.activeTexture(gl.TEXTURE2); // ...***
 		if (renderType === 1) { gl.uniform1i(shader.hasTexture_loc, true); } //.***
 	}
 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	shader.last_tex_id = magoManager.textureAux_1x1;
+	
+	
 
 	// New version. Use occlussion indices.***
 	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.***
