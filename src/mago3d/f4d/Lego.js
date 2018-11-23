@@ -363,7 +363,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, true); }//.ppp
 			//---------------------------------------------------------------------------
 			
-			if (shader.color4_loc != -1){ shader.disableVertexAttribArray(shader.color4_loc); }
+			shader.disableVertexAttribArray(shader.color4_loc); 
 			shader.enableVertexAttribArray(shader.texCoord2_loc);
 			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
 			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);

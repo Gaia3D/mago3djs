@@ -402,7 +402,7 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 
-Mesh.prototype.render = function(magoManager, shader)
+Mesh.prototype.render = function(magoManager, shader, renderType)
 {
 	var vboMemManager = magoManager.vboMemoryManager;
 	
@@ -431,7 +431,7 @@ Mesh.prototype.render = function(magoManager, shader)
 		}
 		
 		// Normals.***
-		if (shader.normal3_loc !== -1) 
+		if (shader.normal3_loc && shader.normal3_loc !== -1) 
 		{
 			if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
 			{

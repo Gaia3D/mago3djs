@@ -893,7 +893,8 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": true,
+				"hasTopology": true
 			},
 			"children": [],
 			"data_key": "Lotte0603",

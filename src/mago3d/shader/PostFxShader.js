@@ -246,7 +246,7 @@ PostFxShader.prototype.resetLastBuffersBinded = function()
  */
 PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
 {
-	if (attribLocation < 0)
+	if (attribLocation === undefined || attribLocation < 0)
 	{ return; }
 	
 	var attribLocationState = this.attribLocationStateArray[attribLocation];
@@ -271,7 +271,7 @@ PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
  */
 PostFxShader.prototype.disableVertexAttribArray = function(attribLocation)
 {
-	if (attribLocation < 0)
+	if (attribLocation === undefined || attribLocation < 0)
 	{ return; }
 	
 	var attribLocationState = this.attribLocationStateArray[attribLocation];

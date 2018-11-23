@@ -41,14 +41,14 @@ Box.prototype.getVboKeysContainer = function()
 /**
  * box
  */
-Box.prototype.render = function(magoManager, shader)
+Box.prototype.render = function(magoManager, shader, renderType)
 {
 	if (this.mesh === undefined)
 	{
 		this.mesh = this.makeMesh(this.width, this.length, this.height);
 	}
 
-	this.mesh.render(magoManager, shader);
+	this.mesh.render(magoManager, shader, renderType);
 };
 
 /**

@@ -953,7 +953,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	
 	if (renderType === 2)
 	{
-		selCandidates = magoManager.selectionCandidates;
+		selCandidates = magoManager.selectionManager;
 		selectionColor = magoManager.selectionColor;
 		renderTexture = false; // reassign value for this var.***
 		currentNode = currentObjectsRendering.curNode;
@@ -1009,7 +1009,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		var colorAux;
 		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
 		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionCandidates.setCandidates(idxKey, undefined, undefined, this, currentNode);
+		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
 		
 		gl.uniform1i(shader.hasTexture_loc, false); //.***
 		gl.uniform4fv(shader.color4Aux_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);

@@ -90,25 +90,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// 1rst, determine the shader.***
 	var gl = magoManager.sceneState.gl;
-	var metaData = neoBuilding.metaData;
-	var projectType = metaData.projectDataType;
-	if (projectType === undefined)
-	{ projectType = ""; }
-	
-	/*
-	var currProgram = gl.getParameter(gl.CURRENT_PROGRAM);
-	var shaderName = neoBuilding.getShaderName(neoBuilding.currentLod, projectType, renderType);
-	var shader = magoManager.postFxShadersManager.getShader(shaderName);
-	
-	if(shader === undefined)
-		return;
-	
-	if(shader.program !== currProgram)
-	{
-		// bind the shader program.***
-		gl.useProgram(shader.program);
-	}
-	*/
 	
 	// check attributes of the project.************************************************
 	var project = magoManager.hierarchyManager.getNodesMap(this.data.projectId);
@@ -136,25 +117,38 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
-	if (neoBuilding.buildingId !== "Lotte0603")
+	// renderWithTopology === 0 -> render only Building.***
+	// renderWithTopology === 1 -> render only Topology.***
+	// renderWithTopology === 2 -> render both.***
+	if (neoBuilding.network)
 	{
+		if(magoManager.tempSettings.renderWithTopology === 0 || magoManager.tempSettings.renderWithTopology === 2)
+		{
+			neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+		}
+	}
+	else{
 		neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 	}
 	
+	
 	// Test.***
-	if (neoBuilding.buildingId === "Lotte0603")
+	if (neoBuilding.network)
 	{
-		// render the topology.***
-		if (renderType !== 2)
+		if(magoManager.tempSettings.renderWithTopology === 1 || magoManager.tempSettings.renderWithTopology === 2)
 		{
-			gl.uniform1i(shader.bApplySsao_loc, false); // no apply ssao.***
-			gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
-			var network = magoManager.network;
-			if (network)
+			// render the topology.***
+			if (renderType !== 0)
 			{
-				network.render(magoManager, shader);
+				gl.uniform1i(shader.bApplySsao_loc, false); // no apply ssao.***
+				gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+				var network = neoBuilding.network;
+				if (network)
+				{
+					network.render(magoManager, shader, renderType);
+				}
+				gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao default.***
 			}
-			gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao default.***
 		}
 	}
 };

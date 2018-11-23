@@ -246,7 +246,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	
 	if (renderType === 2)
 	{
-		selCandidates = magoManager.selectionCandidates;
+		selCandidates = magoManager.selectionManager;
 		selectionColor = magoManager.selectionColor;
 		renderTexture = false; // reassign value for this var.***
 		currentNode = currentObjectsRendering.curNode;
@@ -274,7 +274,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 	else if (renderType === 2)
 	{
-		neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); // new.
+		neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); 
 		var idxKey = selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 
 		selCandidates.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
@@ -332,7 +332,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (renderType === 1)
 		{
 			// Normals.***
-			if (shader.normal3_loc !== -1) 
+			if (shader.normal3_loc && shader.normal3_loc !== -1) 
 			{
 				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
 				{
