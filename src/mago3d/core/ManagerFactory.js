@@ -739,7 +739,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
 
-		var nodeSelected = magoManager.selectionCandidates.currentNodeSelected;
+		var nodeSelected = magoManager.selectionManager.currentNodeSelected;
 		if (nodeSelected === undefined)
 		{ return; }
 		var rootNodeSelected = nodeSelected.getRoot();
