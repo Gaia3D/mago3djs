@@ -778,6 +778,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 		
 		// Check if this node has topologyData.***
+		/*
 		if(node.data && node.data.attributes && node.data.attributes.hasTopology)
 		{
 			if(neoBuilding.network === undefined)
@@ -808,6 +809,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			}
 	
 		}
+		*/
 		
 		// check if this building is ready to render.***
 		//if (!neoBuilding.allFilesLoaded) // no used yet.
@@ -2519,18 +2521,16 @@ MagoManager.prototype.renderGeometryColorCoding = function(gl, visibleObjControl
 		var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 		var renderTexture = false;
 
-		// Set uniforms.***************
-		var currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
+		var currentShader = this.postFxShadersManager.getShader("modelRefColorCoding"); 
 		
 		currentShader.useProgram();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
 		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-
-		gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-		gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-		gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
 		
+		currentShader.bindUniformGenerals();
+		
+		gl.disable(gl.CULL_FACE);
 		// do the colorCoding render.***
 		var minSizeToRender = 0.0;
 		var renderType = 2;
@@ -2538,6 +2538,7 @@ MagoManager.prototype.renderGeometryColorCoding = function(gl, visibleObjControl
 		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 
+		gl.enable(gl.CULL_FACE);
 		currentShader.disableVertexAttribArray(currentShader.position3_loc);
 		gl.useProgram(null);
 	}
@@ -3989,6 +3990,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	gl.frontFace(gl.CCW);	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
+	gl.enable(gl.CULL_FACE);
 	
 	var currentShader;
 	var shaderProgram;
@@ -4048,6 +4050,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
 			currentShader.last_tex_id = this.textureAux_1x1;
 			
+			
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
 			var renderType = 1;
@@ -4063,6 +4066,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.activeTexture(gl.TEXTURE2);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			
+			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
 		
@@ -4134,14 +4138,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				gl.disable(gl.STENCIL_TEST);
 				gl.depthRange(0, 1);// return to the normal value.***
 				gl.disableVertexAttribArray(currentShader.position3_loc);
-				
-				if (currentShader)
-				{
-					if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-					if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-					if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-					if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-				}
+				currentShader.disableVertexAttribArrayAll();
 				
 				gl.useProgram(null);
 			}
@@ -4216,13 +4213,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 					gl.depthRange(0, 1);// return to the normal value.***
 					gl.disableVertexAttribArray(currentShader.position3_loc);
 					
-					if (currentShader)
-					{
-						if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-						if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-						if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-						if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-					}
+					currentShader.disableVertexAttribArrayAll();
 				}
 				
 			}
@@ -4259,7 +4250,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			if (this.pin.positionBuffer === undefined)
 			{ this.pin.createPinCenterBottom(gl); }
 			
-			currentShader = this.postFxShadersManager.pFx_shaders_array[13]; // png image shader.***
+			currentShader = this.postFxShadersManager.pngImageShader; // png image shader.***
 			currentShader.resetLastBuffersBinded();
 			
 			shaderProgram = currentShader.program;
@@ -4305,21 +4296,9 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.depthRange(0, 1);
 			gl.useProgram(null);
 			gl.bindTexture(gl.TEXTURE_2D, null);
-			gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.disableVertexAttribArray(currentShader.position3_loc);
+			currentShader.disableVertexAttribArrayAll();
 			
 		}
-		
-		// Test TinTerrain.**************************************************************************
-		// Test TinTerrain.**************************************************************************
-		// render tiles, rendertiles.***
-		
-		if (this.tinTerrainManager !== undefined)
-		{
-			var bDepth = false;
-			this.tinTerrainManager.render(this, bDepth);
-		}
-		
 		
 		// test renders.***
 		// render cctv.***
@@ -4367,6 +4346,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			{
 				//this.drawCCTVNames(this.cctvList.camerasList);
 			}
+			
+			currentShader.disableVertexAttribArrayAll();
 		}
 		
 		// PointsCloud.****************************************************************************************
@@ -4385,49 +4366,44 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.bindUniformGenerals();
 
 			this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, ssao_idx); // lod0.***
-			
-			if (currentShader)
-			{
-				currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
-				currentShader.disableVertexAttribArray(currentShader.position3_loc); 
-				currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
-				currentShader.disableVertexAttribArray(currentShader.color4_loc); 
-				currentShader = undefined;
-			}
+			currentShader.disableVertexAttribArrayAll();
 			
 			gl.useProgram(null);
 
 		}
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
+		currentShader.disableVertexAttribArrayAll();
+		
+		currentShader = this.postFxShadersManager.getShader("modelRefColorCoding");  // color selection shader.***
+		currentShader.disableVertexAttribArrayAll();
+		
+		currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
+		currentShader.disableVertexAttribArrayAll();
+		
+		// Test TinTerrain.**************************************************************************
+		// Test TinTerrain.**************************************************************************
+		// render tiles, rendertiles.***
+		
+		if (this.tinTerrainManager !== undefined)
+		{
+			var bDepth = false;
+			this.tinTerrainManager.render(this, bDepth);
+		}
 
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
-	if (currentShader)
-	{
-		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 	}
 	
-	currentShader = this.postFxShadersManager.pFx_shaders_array[5]; // color selection shader.***
-	if (currentShader)
-	{
-		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-	}
+	currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
+	currentShader.disableVertexAttribArrayAll();
+	
+	currentShader = this.postFxShadersManager.getShader("modelRefColorCoding");  // color selection shader.***
+	currentShader.disableVertexAttribArrayAll();
 	
 	currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
-	if (currentShader)
-	{
-		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-	}
+	currentShader.disableVertexAttribArrayAll();
+
+	
 	
 	gl.depthRange(0.0, 1.0);	
 };
@@ -4748,7 +4724,8 @@ MagoManager.prototype.renderGeometryDepth = function(gl, ssao_idx, visibleObjCon
 	
 	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-	if (nodesLOD0Count > 0 || nodesLOD2Count > 0)
+	var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
+	if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
 	{
 		currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
 		currentShader.resetLastBuffersBinded();
@@ -4823,16 +4800,15 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
 	
-	// 2) LodBuilding ssaoShader.***********************************************************************************
-	shaderName = "lodBuildingSsao";
-	shader = this.postFxShadersManager.newShader(shaderName);
-	ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
-	ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
-	
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+	// 2) ModelReferences colorCoding shader.***********************************************************************
+	var shaderName = "modelRefColorCoding";
+	var shader = this.postFxShadersManager.newShader(shaderName);
+	var showDepth_vs_source = ShaderSource.ColorSelectionSsaoVS;
+	var showDepth_fs_source = ShaderSource.ColorSelectionSsaoFS;
 
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
 	gl.linkProgram(shader.program);
@@ -4896,59 +4872,6 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
-	/*
-	// 4) ModelReferences SimpleSsaoShader.******************************************************************************
-	var shaderName = "modelRefSsaoSimple";
-	var shader = this.postFxShadersManager.newShader(shaderName);
-	var ssao_vs_source = ShaderSource.ModelRefSsaoSimpleVS;
-	var ssao_fs_source = ShaderSource.ModelRefSsaoSimpleFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-			
-	shader.createUniformGenerals(gl, shader, this.sceneState);
-	shader.createUniformLocals(gl, shader, this.sceneState);
-	
-	// 5) LodBuilding SimpleSsaoShader.***********************************************************************************
-	shaderName = "lodBuildingSsaoSimple";
-	shader = this.postFxShadersManager.newShader(shaderName);
-	ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
-	ssao_fs_source = ShaderSource.LodBuildingSsaoSimpleFS;
-	
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-			
-	shader.createUniformGenerals(gl, shader, this.sceneState);
-	shader.createUniformLocals(gl, shader, this.sceneState);
-	
-	// 6) LodBuilding SimpleSsaoShader.***********************************************************************************
-	shaderName = "lodBuildingSsaoSimpleCompressed";
-	shader = this.postFxShadersManager.newShader(shaderName);
-	ssao_vs_source = ShaderSource.LodBuildingSsaoSimpleCompressVS;
-	ssao_fs_source = ShaderSource.LodBuildingSsaoSimpleCompressFS;
-	
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-			
-	shader.createUniformGenerals(gl, shader, this.sceneState);
-	shader.createUniformLocals(gl, shader, this.sceneState);
-	*/
 };
 
 /**

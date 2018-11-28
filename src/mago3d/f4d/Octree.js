@@ -470,7 +470,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		magoManager.selectionManager.setCandidates(idxKey, undefined, this, neoBuilding, currentNode);
 		
 		gl.uniform1i(shader.hasTexture_loc, false); //.***
-		gl.uniform4fv(shader.color4Aux_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	
 	return this.lego.render(magoManager, renderType, renderTexture, shader);

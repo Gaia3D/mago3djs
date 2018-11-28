@@ -121,7 +121,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.pin.texturesArray[4];
+	var tex = magoManager.pin.texturesArray[4]; // provisional.***
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
@@ -150,6 +150,12 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 		tinTerrain.render(currentShader, magoManager, bDepth);
 	}
+
+	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
+	currentShader.disableVertexAttribArray(currentShader.position3_loc); 
+	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
+	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
+	gl.useProgram(null);
 };
 
 

@@ -280,7 +280,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		selCandidates.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
 		if (neoReference.selColor4) 
 		{
-			gl.uniform4fv(shader.color4Aux_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
+			gl.uniform4fv(shader.oneColor4_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
 		}
 	}
 	// End check color or texture of reference object.-----------------------------------------------------------------------------

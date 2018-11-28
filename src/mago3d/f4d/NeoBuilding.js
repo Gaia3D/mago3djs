@@ -1012,7 +1012,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
 		
 		gl.uniform1i(shader.hasTexture_loc, false); //.***
-		gl.uniform4fv(shader.color4Aux_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***

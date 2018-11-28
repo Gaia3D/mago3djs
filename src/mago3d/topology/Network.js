@@ -307,7 +307,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 			var selColor4 = selectionColor.getAvailableColor(undefined); // new.
 			var idxKey = selectionColor.decodeColor3(selColor4.r, selColor4.g, selColor4.b);
 			selManager.setCandidateCustom(idxKey, selFamilyNameNodes, node);
-			gl.uniform4fv(shader.color4Aux_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
+			gl.uniform4fv(shader.oneColor4_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
 
 			nodeMaster.box.render(magoManager, shader, renderType);
 			
@@ -341,7 +341,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 				var selColor4 = selectionColor.getAvailableColor(undefined); // new.
 				var idxKey = selectionColor.decodeColor3(selColor4.r, selColor4.g, selColor4.b);
 				selManager.setCandidateCustom(idxKey, selFamilyNameEdges, edge);
-				gl.uniform4fv(shader.color4Aux_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
+				gl.uniform4fv(shader.oneColor4_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
 				gl.drawArrays(gl.LINES, i*2, 2);
 			}
 		}

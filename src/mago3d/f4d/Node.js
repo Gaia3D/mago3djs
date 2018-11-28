@@ -120,6 +120,10 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// renderWithTopology === 0 -> render only Building.***
 	// renderWithTopology === 1 -> render only Topology.***
 	// renderWithTopology === 2 -> render both.***
+	
+	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+	/*
+	// Test.***
 	if (neoBuilding.network)
 	{
 		if(magoManager.tempSettings.renderWithTopology === 0 || magoManager.tempSettings.renderWithTopology === 2)
@@ -131,8 +135,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 	}
 	
-	
-	// Test.***
 	if (neoBuilding.network)
 	{
 		if(magoManager.tempSettings.renderWithTopology === 1 || magoManager.tempSettings.renderWithTopology === 2)
@@ -151,6 +153,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 			}
 		}
 	}
+	*/
 };
 
 /**

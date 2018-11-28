@@ -185,12 +185,6 @@ TinTerrain.prototype.isPrepared = function()
 		this.vboKeyContainer.vboCacheKeysArray === undefined || 
 		this.vboKeyContainer.vboCacheKeysArray.length === 0)
 	{ return false; }
-		
-	if (this.texture === undefined)
-	{ return false; }
-	
-	if (this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-	{ return false; }
 	
 	return true;
 };
@@ -342,6 +336,10 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 				else
 				{
 					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+					
+					var glError = gl.getError();
+					if(glError !== gl.NO_ERROR)
+						var hola = 0;
 					/*
 					gl.disableVertexAttribArray(currentShader.texCoord2_loc);
 					gl.uniform1i(currentShader.hasTexture_loc, false); //.***
@@ -356,7 +354,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 		}
 		else 
 		{
-		// render the owner tinTerrain.***
+			// render the owner tinTerrain.***
 			if (this.owner !== undefined)
 			{ this.owner.render(currentShader, magoManager, bDepth); }
 		}
