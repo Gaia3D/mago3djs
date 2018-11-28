@@ -20,15 +20,15 @@ var GeographicExtent = function()
  */
 GeographicExtent.prototype.deleteObjects = function() 
 {
-	if(this.minGeographicCoord !== undefined)
+	if (this.minGeographicCoord !== undefined)
 	{
 		this.minGeographicCoord.deleteObjects();
 		this.minGeographicCoord = undefined;
 	}
 	
-	if(this.maxGeographicCoord !== undefined)
+	if (this.maxGeographicCoord !== undefined)
 	{
 		this.maxGeographicCoord.deleteObjects();
 		this.maxGeographicCoord = undefined;
 	}
-}
+};

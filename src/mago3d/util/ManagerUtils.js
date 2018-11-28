@@ -44,39 +44,16 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
 
-	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
-	
 	if (magoManager.configInformation !== undefined && magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		resultWorldPoint.set(cartesian[1], cartesian[2], cartesian[0]);
 		return resultWorldPoint;
 	}
 	
+	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
 	resultWorldPoint.set(cartesian[0], cartesian[1], cartesian[2]);
 	
 	return resultWorldPoint;
-};
-
-ManagerUtils.getTransformationMatrixInPoint = function(point, resultTMatrix, resultMatrixInv, magoManager) 
-{
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		;//
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		if (resultTMatrix === undefined)
-		{ resultTMatrix = new Matrix4(); }
-		
-		Cesium.Transforms.eastNorthUpToFixedFrame(new Cesium.Cartesian3(point.x, point.y, point.z), undefined, resultTMatrix._floatArrays);
-		
-		if (resultMatrixInv)
-		{
-			Cesium.Matrix4.inverseTransformation(resultTMatrix._floatArrays, resultMatrixInv._floatArrays);
-		}
-	}
-	
-	return resultTMatrix;
 };
 
 ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) 

@@ -96,7 +96,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			if (skinLego === undefined)
 			{ continue; }
 			
-			if(this.eraseSkinLegosToParse(skinLego))
+			if (this.eraseSkinLegosToParse(skinLego))
 			{
 				skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, magoManager);
 				skinLego.dataArrayBuffer = undefined;
@@ -106,7 +106,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			if (skinsParsedCount > maxParsesCount)
 			{ break; }
 		}
-		
+		/*
 		if (skinsParsedCount === 0)
 		{
 			for (var key in this.skinLegosToParseMap)
@@ -143,7 +143,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 				
 			}
 		}
-		
+		*/
 		
 	}
 };
@@ -215,7 +215,7 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 		for (var i=0; i<octreesLod0Count; i++)
 		{
 			lowestOctree = octreesArray[i];
-			if(this.eraseOctreeLod2LegosToParse(lowestOctree))
+			if (this.eraseOctreeLod2LegosToParse(lowestOctree))
 			{
 				if (lowestOctree.lego === undefined)
 				{ continue; }
@@ -228,7 +228,7 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
 		}
-		
+		/*
 		if (octreesParsedCount === 0)
 		{
 			for (var key in this.octreesLod2LegosToParseMap)
@@ -249,7 +249,7 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 
 			}
 		}
-		
+		*/
 		if (octreesParsedCount > 0)
 		{
 			if (magoManager.selectionFbo)
@@ -274,7 +274,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 		{
 			lowestOctree = octreesArray[i];
 			
-			if(this.eraseOctreeLod0ModelsToParse(lowestOctree))
+			if (this.eraseOctreeLod0ModelsToParse(lowestOctree))
 			{
 				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 				{ continue; }
@@ -309,7 +309,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
 		}
-		
+		/*
 		if (octreesParsedCount === 0)
 		{
 			for (var key in this.octreesLod0ModelsToParseMap)
@@ -351,6 +351,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				
 			}
 		}
+		*/
 		
 		
 		if (octreesParsedCount > 0)
@@ -382,7 +383,7 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
 		}
-		
+		/*
 		if (octreesParsedCount === 0)
 		{
 			for (var key in this.octreesLod0ReferencesToParseMap)
@@ -396,6 +397,7 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 				}
 			}
 		}
+		*/
 
 		if (octreesParsedCount > 0)
 		{
@@ -408,7 +410,7 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 ParseQueue.prototype.parseOctreesLod0References = function(gl, lowestOctree, magoManager)
 {
 	var parsed = false;
-	if(this.eraseOctreeLod0ReferencesToParse(lowestOctree))
+	if (this.eraseOctreeLod0ReferencesToParse(lowestOctree))
 	{
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 		{ return false; }
@@ -449,13 +451,13 @@ ParseQueue.prototype.parseOctreesLod0References = function(gl, lowestOctree, mag
 		{
 			// parse beta version.
 			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
-					magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
+				magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 		}
 		else 
 		{
 			// parse vesioned.
 			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
-					magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
+				magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
 		}
 		lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
@@ -478,7 +480,7 @@ ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
 ParseQueue.prototype.eraseOctreeLod0ReferencesToParse = function(octree)
 {
 	var key = octree.octreeKey;
-	if(this.octreesLod0ReferencesToParseMap.hasOwnProperty(key))
+	if (this.octreesLod0ReferencesToParseMap.hasOwnProperty(key))
 	{
 		delete this.octreesLod0ReferencesToParseMap[key];
 		return true;
@@ -498,7 +500,7 @@ ParseQueue.prototype.putOctreeLod0ModelsToParse = function(octree, aValue)
 ParseQueue.prototype.eraseOctreeLod0ModelsToParse = function(octree)
 {
 	var key = octree.octreeKey;
-	if(this.octreesLod0ModelsToParseMap.hasOwnProperty(key))
+	if (this.octreesLod0ModelsToParseMap.hasOwnProperty(key))
 	{
 		delete this.octreesLod0ModelsToParseMap[key];
 		return true;
@@ -518,7 +520,7 @@ ParseQueue.prototype.putOctreeLod2LegosToParse = function(octree, aValue)
 ParseQueue.prototype.eraseOctreeLod2LegosToParse = function(octree)
 {
 	var key = octree.octreeKey;
-	if(this.octreesLod2LegosToParseMap.hasOwnProperty(key))
+	if (this.octreesLod2LegosToParseMap.hasOwnProperty(key))
 	{
 		delete this.octreesLod2LegosToParseMap[key];
 		return true;
@@ -561,7 +563,7 @@ ParseQueue.prototype.putSkinLegosToParse = function(skinLego, aValue)
 ParseQueue.prototype.eraseSkinLegosToParse = function(skinLego)
 {
 	var key = skinLego.legoKey;
-	if(this.skinLegosToParseMap.hasOwnProperty(key))
+	if (this.skinLegosToParseMap.hasOwnProperty(key))
 	{
 		delete this.skinLegosToParseMap[key];
 		return true;

@@ -31,7 +31,7 @@ TriPolyhedron.prototype.invertTrianglesSenses = function()
 	}
 };
 
-TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey) 
+TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey, vboMemManager) 
 {
 	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
 	if (resultVBOVertexIdxCacheKey === undefined)
@@ -139,20 +139,27 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 	}
 
 	var vertexCount = resultVBOVertexIdxCacheKey.vertexCount;
-	resultVBOVertexIdxCacheKey.norVboDataArray = new Int8Array(vertexCount*3);
-	resultVBOVertexIdxCacheKey.colVboDataArray = new Uint8Array(vertexCount*4);
-	resultVBOVertexIdxCacheKey.posVboDataArray = new Float32Array(vertexCount*3);
 	
-	for (var i = 0; i < vertexCount * 3; i++) 
-	{
-		resultVBOVertexIdxCacheKey.posVboDataArray[i] = positionArray[i];
-		resultVBOVertexIdxCacheKey.norVboDataArray[i] = normalsArray[i];
-	}
+	///******************************************************************************
+	// Positions.***
+	var posByteSize = vertexCount * 3;
+	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+	resultVBOVertexIdxCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
+	resultVBOVertexIdxCacheKey.posVboDataArray.set(positionArray);
 	
-	for (var i = 0; i < vertexCount * 4; i++) 
-	{
-		resultVBOVertexIdxCacheKey.colVboDataArray[i] = colorsArray[i];
-	}
+	// Normals.***
+	var norByteSize = vertexCount * 3;
+	var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+	resultVBOVertexIdxCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
+	resultVBOVertexIdxCacheKey.norVboDataArray.set(normalsArray);
+	
+	// Colors.***
+	var colByteSize = vertexCount * 4;
+	var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+	resultVBOVertexIdxCacheKey.colVboDataArray = new Uint8Array(classifiedColByteSize);
+	resultVBOVertexIdxCacheKey.colVboDataArray.set(colorsArray);
+	
+	///******************************************************************************
 
 	positionArray = undefined;
 	normalsArray = undefined;

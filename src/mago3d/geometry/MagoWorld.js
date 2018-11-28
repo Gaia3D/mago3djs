@@ -133,8 +133,8 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 
 	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;																	
 	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
-																			[tergetX, tergetY, tergetZ], 
-																			[camUp.x, camUp.y, camUp.z]);
+		[tergetX, tergetY, tergetZ], 
+		[camUp.x, camUp.y, camUp.z]);
 
 };
 
@@ -159,8 +159,8 @@ MagoWorld.prototype.mousewheel = function(event)
 	
 	var camHeght = camera.getCameraElevation();
 
-	if(isNaN(camHeght))
-		return;
+	if (isNaN(camHeght))
+	{ return; }
 
 	// Lineal increment.***
 	//delta *= camHeght * 0.003;
@@ -170,11 +170,11 @@ MagoWorld.prototype.mousewheel = function(event)
 	delta += 1;
 	
 	var maxDelta = 200000;
-	if(delta < -maxDelta)
-		delta = -maxDelta;
+	if (delta < -maxDelta)
+	{ delta = -maxDelta; }
 	
-	if(delta > maxDelta)
-		delta = maxDelta;
+	if (delta > maxDelta)
+	{ delta = maxDelta; }
 	
 	camPos.add(camDir.x * delta,  camDir.y * delta,  camDir.z * delta);
 	
@@ -223,7 +223,7 @@ MagoWorld.prototype.mousemove = function(event)
 		nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, strEarthRadius);
 
 		if (nowWorldPoint === undefined)
-			return;
+		{ return; }
 
 		var strPoint = new Point3D(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z);
 		var nowPoint = new Point3D(nowWorldPoint[0], nowWorldPoint[1], nowWorldPoint[2]);

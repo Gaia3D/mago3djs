@@ -198,9 +198,8 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
  * @param idx 변수
  * @returns vertexArray[idx]
  */
-TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo) 
+TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo, vboMemManager) 
 {
-	// PROVISIONAL.***
 	if (trianglesArray === undefined)
 	{ return resultVbo; }
 	
@@ -212,7 +211,12 @@ TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo)
 	{ resultVbo = new VBOVertexIdxCacheKey(); }
 
 	var indicesArray = TrianglesList.getTrianglesIndicesArray(trianglesArray, undefined);
-	resultVbo.idxVboDataArray = Int16Array.from(indicesArray);
+	
+	var idxByteSize = indicesArray.length;
+	var classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
+	resultVbo.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
+	resultVbo.idxVboDataArray.set(indicesArray);
+	
 	resultVbo.indicesCount = resultVbo.idxVboDataArray.length;
 	return resultVbo;
 };

@@ -202,16 +202,16 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	// test.***
-	if(vboDatasCount > 12)
-		var hola = 0;
+	if (vboDatasCount > 12)
+	{ var hola = 0; }
 	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		// 1) Positions array.
 		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
-		if(vertexCount > 200000)
-			var hola = 0;
+		if (vertexCount > 200000)
+		{ var hola = 0; }
 		
 		var verticesFloatValuesCount = vertexCount * 3;
 		// now padding the array to adjust to standard memory size of pool.
@@ -236,10 +236,6 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		// now padding the array to adjust to standard memory size of pool.
 		norByteSize = 1 * normalByteValuesCount;
 		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		
-		// test*******************
-		if(classifiedNorByteSize > 8000000)
-			var hola = 0;
 		
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 1 * normalByteValuesCount;
@@ -271,8 +267,8 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
 
-		vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
-		vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
+		vboViCacheKey.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
+		vboViCacheKey.idxVboDataArray.set(new Uint16Array(arrayBuffer.slice(startBuff, endBuff)));
 		vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
 		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
 		vboViCacheKey.indicesCount = shortIndicesValuesCount;
@@ -310,9 +306,6 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 	{
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
-		if(blockIdx === 2740)
-			var hola = 0;
-
 		// Check if block exist.
 		if (motherBlocksArray[blockIdx]) 
 		{

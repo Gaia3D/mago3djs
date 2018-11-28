@@ -305,9 +305,9 @@ VertexList.setIdxInList = function(vertexArray)
  * 어떤 일을 하고 있습니까?
  * @param transformMatrix 변수
  */
-VertexList.prototype.getVboDataArrays = function(resultVbo) 
+VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager) 
 {
-	VertexList.getVboDataArrays(this.vertexArray, resultVbo) ;
+	VertexList.getVboDataArrays(this.vertexArray, resultVbo, vboMemManager) ;
 	return resultVbo;
 };
 
@@ -315,7 +315,7 @@ VertexList.prototype.getVboDataArrays = function(resultVbo)
  * 어떤 일을 하고 있습니까?
  * @param transformMatrix 변수
  */
-VertexList.getVboDataArrays = function(vertexArray, resultVbo) 
+VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager) 
 {
 	// returns positions, and if exist, normals, colors, texCoords.***
 	var verticesCount = vertexArray.length;
@@ -377,15 +377,35 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo)
 		}
 	}
 	
-	resultVbo.posVboDataArray = Float32Array.from(posArray);
+	// Use vboMemManager to determine classified memorySize( if use memory pool).***
+	var posByteSize = verticesCount * 3;
+	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+	resultVbo.posVboDataArray = new Float32Array(classifiedPosByteSize);
+	resultVbo.posVboDataArray.set(posArray);
+	
 	if (normal)
-	{ resultVbo.norVboDataArray = Int8Array.from(norArray); }
+	{ 
+		var norByteSize = verticesCount * 3;
+		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		resultVbo.norVboDataArray = new Int8Array(classifiedNorByteSize);
+		resultVbo.norVboDataArray.set(norArray);
+	}
 	
 	if (color)
-	{ resultVbo.colVboDataArray = Uint8Array.from(colArray); }
+	{ 
+		var colByteSize = verticesCount * 4;
+		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+		resultVbo.colVboDataArray = new Uint8Array(classifiedColByteSize);
+		resultVbo.colVboDataArray.set(colArray);
+	}
 	
 	if (texCoord)
-	{ resultVbo.tcoordVboDataArray = Float32Array.from(texCoordArray); }
+	{ 
+		var texCoordByteSize = verticesCount * 2;
+		var classifiedTexCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordByteSize);
+		resultVbo.tcoordVboDataArray = new Float32Array(classifiedTexCoordByteSize);
+		resultVbo.tcoordVboDataArray.set(texCoordArray);
+	}
 	
 	return resultVbo;
 };

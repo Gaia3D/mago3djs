@@ -13,6 +13,8 @@ var Mesh = function()
 	this.vertexList;
 	this.surfacesArray;
 	this.hedgesList;
+	
+	this.vboKeysContainer;
 };
 
 Mesh.prototype.newSurface = function()
@@ -84,6 +86,25 @@ Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 	}
 	
 	return resultMesh;
+};
+
+Mesh.prototype.getTriangles = function(resultTrianglesArray)
+{
+	if (this.surfacesArray === undefined || this.surfacesArray.length === 0)
+	{ return resultTrianglesArray; }
+	
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
+	
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		resultTrianglesArray = surface.getTriangles(resultTrianglesArray);
+	}
+	
+	return resultTrianglesArray;
 };
 
 Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
@@ -171,6 +192,16 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	}
 	
 	return resultVerticesArray;
+};
+
+Mesh.prototype.getVertexList = function()
+{
+	if (this.vertexList === undefined)
+	{
+		this.vertexList = new VertexList();
+	}
+	
+	return this.vertexList;
 };
 
 Mesh.prototype.transformByMatrix4 = function(tMat4)
@@ -371,13 +402,64 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 
-Mesh.prototype.getVbo = function(resultVboContainer)
+Mesh.prototype.render = function(magoManager, shader, renderType)
+{
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	if (this.vboKeysContainer === undefined)
+	{
+		this.vboKeysContainer = this.getVbo(this.vboKeysContainer, vboMemManager);
+	}
+	
+	var gl = magoManager.sceneState.gl;
+	
+	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
+	for (var i=0; i<vboKeysCount; i++)
+	{
+		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
+		if (!vboKey.isReadyPositions(gl, vboMemManager) || 
+			!vboKey.isReadyNormals(gl, vboMemManager) || 
+			!vboKey.isReadyFaces(gl, vboMemManager))
+		{ return false; }
+		
+		// Positions.***
+		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
+		{
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
+			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+			shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
+		}
+		
+		// Normals.***
+		if (shader.normal3_loc && shader.normal3_loc !== -1) 
+		{
+			if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
+			{
+				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
+				gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+				shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
+			}
+		}
+		
+		// Indices.***
+		if (vboKey.meshFacesCacheKey !== shader.last_vboIdx_binded)
+		{
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
+			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
+		}
+		
+		gl.drawElements(gl.TRIANGLES, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
+	}
+};
+
+Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 {
 	if (resultVboContainer === undefined)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
 	// make global triangles array.***
-	var trianglesArray = this.getTrianglesConvex(undefined);
+	//var trianglesArray = this.getTrianglesConvex(undefined); // for convex faces (faster).***
+	var trianglesArray = this.getTriangles(undefined);
 	var trianglesCount = trianglesArray.length;
 	
 	// If vertices count > shortSize(65535), then must split the mesh.***
@@ -391,9 +473,38 @@ Mesh.prototype.getVbo = function(resultVboContainer)
 		verticesArray = trianglesList.getNoRepeatedVerticesArray(undefined);
 		var vbo = resultVboContainer.newVBOVertexIdxCacheKey();
 		VertexList.setIdxInList(verticesArray);
-		VertexList.getVboDataArrays(verticesArray, vbo);
+		VertexList.getVboDataArrays(verticesArray, vbo, vboMemManager);
 		trianglesList.assignVerticesIdx();
-		TrianglesList.getVboFaceDataArray(trianglesList.trianglesArray, vbo);
+		TrianglesList.getVboFaceDataArray(trianglesList.trianglesArray, vbo, vboMemManager);
+		
+	}
+
+	return resultVboContainer;
+};
+
+Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManager)
+{
+	if (resultVboContainer === undefined)
+	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
+
+	// make global triangles array.***
+	var trianglesArray = this.getTrianglesConvex(undefined); // for convex faces (faster).***
+	var trianglesCount = trianglesArray.length;
+	
+	// If vertices count > shortSize(65535), then must split the mesh.***
+	var trianglesListsArray = this.getTrianglesListsArrayBy2ByteSize(trianglesArray, undefined);
+	var trianglesList;
+	var verticesArray;
+	var trianglesListsCount = trianglesListsArray.length;
+	for (var i=0; i<trianglesListsCount; i++)
+	{
+		trianglesList = trianglesListsArray[i];
+		verticesArray = trianglesList.getNoRepeatedVerticesArray(undefined);
+		var vbo = resultVboContainer.newVBOVertexIdxCacheKey();
+		VertexList.setIdxInList(verticesArray);
+		VertexList.getVboDataArrays(verticesArray, vbo, vboMemManager);
+		trianglesList.assignVerticesIdx();
+		TrianglesList.getVboFaceDataArray(trianglesList.trianglesArray, vbo, vboMemManager);
 		
 	}
 

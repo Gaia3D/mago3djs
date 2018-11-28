@@ -56,8 +56,8 @@ TinTerrainManager.prototype.init = function()
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
 {
-	if(maxDepth === undefined)
-		maxDepth = this.maxDepth;
+	if (maxDepth === undefined)
+	{ maxDepth = this.maxDepth; }
 	
 	this.visibleTilesArray.length = 0;
 	this.noVisibleTilesArray.length = 0;
@@ -75,7 +75,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// For the visible tinTerrains prepare its.***
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.***
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	for(var i=0; i<visiblesTilesCount; i++)
+	for (var i=0; i<visiblesTilesCount; i++)
 	{
 		tinTerrain = this.visibleTilesArray[i];
 		tinTerrain.prepareTinTerrain(magoManager, this);
@@ -85,20 +85,20 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// Deleting rule: If a tinTerrain has children, then delete first the children.***
 	var deletedCount = 0;
 	var noVisiblesTilesCount = this.noVisibleTilesArray.length;
-	for(var i=0; i<visiblesTilesCount; i++)
+	for (var i=0; i<visiblesTilesCount; i++)
 	{
 		tinTerrain = this.noVisibleTilesArray[i];
-		if(tinTerrain !== undefined)
+		if (tinTerrain !== undefined)
 		{
-			if(tinTerrain.depth > 2)
+			if (tinTerrain.depth > 2)
 			{
 				tinTerrain.deleteTinTerrain(magoManager);
 				deletedCount++;
 			}
 		}
 		
-		if(deletedCount > 5)
-			break;
+		if (deletedCount > 5)
+		{ break; }
 	}
 	
 };
@@ -112,16 +112,16 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 	gl.useProgram(shaderProgram);
 	gl.enableVertexAttribArray(currentShader.position3_loc);
-	if(bDepth)
-		gl.disableVertexAttribArray(currentShader.texCoord2_loc);
+	if (bDepth)
+	{ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
 	else
-		gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+	{ gl.enableVertexAttribArray(currentShader.texCoord2_loc); }
 	//gl.disableVertexAttribArray(currentShader.normal3_loc);
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.pin.texturesArray[4];
+	var tex = magoManager.pin.texturesArray[4]; // provisional.***
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
@@ -131,7 +131,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 	var flipTexCoordY = true;
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-		flipTexCoordY = false;
+	{ flipTexCoordY = false; }
 	gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.***
 	
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -150,6 +150,12 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 		tinTerrain.render(currentShader, magoManager, bDepth);
 	}
+
+	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
+	currentShader.disableVertexAttribArray(currentShader.position3_loc); 
+	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
+	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
+	gl.useProgram(null);
 };
 
 

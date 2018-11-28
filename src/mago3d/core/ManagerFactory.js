@@ -487,7 +487,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				wwd.addLayer(wmsLayer);
 			};
 
-				// Called if an error occurs during WMS Capabilities document retrieval
+			// Called if an error occurs during WMS Capabilities document retrieval
 			var logError = function (jqXhr, text, exception) 
 			{
 				console.log("There was a failure retrieving the capabilities document: " + text + " exception: " + exception);
@@ -561,7 +561,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				*/
 		};
 
-			// Listen for mouse clicks.
+		// Listen for mouse clicks.
 		var clickRecognizer = new WorldWind.ClickRecognizer(wwd, handleClick);
 		clickRecognizer.button = 0;  //left mouse button
 			
@@ -739,72 +739,76 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
 
-		var nodeSelected = magoManager.selectionCandidates.currentNodeSelected;
+		var nodeSelected = magoManager.selectionManager.currentNodeSelected;
 		if (nodeSelected === undefined)
 		{ return; }
 		var rootNodeSelected = nodeSelected.getRoot();
 		var geoLocationData = rootNodeSelected.data.geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }
 
-		var increDeg = 3.0;
-		var currentHeading = geoLocationData.heading || 0;
-		var currentPitch = geoLocationData.pitch || 0;
-		var currentRoll = geoLocationData.roll || 0;
-		
-		var increDist = 0.2;
-		var currentAlt = geoLocationData.geographicCoord.altitude || 0;
-		var displayData = false;
-		
-		// For Heading
-		if (event.keyCode === 'Q'.charCodeAt(0))
+		if(magoManager.magoPolicy.objectMoveMode === CODE.moveMode.ALL)
 		{
-			currentHeading += increDeg;
-			displayData = true;
-		}
-		else if (event.keyCode === 'A'.charCodeAt(0))
-		{
-			currentHeading -= increDeg;
-			displayData = true;
-		}
-		
-		// For Pitch
-		if (event.keyCode === 'W'.charCodeAt(0))
-		{
-			currentPitch += increDeg;
-			displayData = true;
-		}
-		else if (event.keyCode === 'S'.charCodeAt(0))
-		{
-			currentPitch -= increDeg;
-			displayData = true;
-		}
+			var increDeg = 3.0;
+			var currentHeading = geoLocationData.heading || 0;
+			var currentPitch = geoLocationData.pitch || 0;
+			var currentRoll = geoLocationData.roll || 0;
+			
+			var increDist = 0.2;
+			var currentAlt = geoLocationData.geographicCoord.altitude || 0;
+			var displayData = false;
+			
+			// For Heading
+			if (event.keyCode === 'Q'.charCodeAt(0))
+			{
+				currentHeading += increDeg;
+				displayData = true;
+			}
+			else if (event.keyCode === 'A'.charCodeAt(0))
+			{
+				currentHeading -= increDeg;
+				displayData = true;
+			}
+			
+			// For Pitch
+			if (event.keyCode === 'W'.charCodeAt(0))
+			{
+				currentPitch += increDeg;
+				displayData = true;
+			}
+			else if (event.keyCode === 'S'.charCodeAt(0))
+			{
+				currentPitch -= increDeg;
+				displayData = true;
+			}
 
-		// For Roll
-		if (event.keyCode === 'E'.charCodeAt(0))
-		{
-			currentRoll += increDeg;
-			displayData = true;
-		}
-		else if (event.keyCode === 'D'.charCodeAt(0))
-		{
-			currentRoll -= increDeg;
-			displayData = true;
-		}
-		
-		// For Altitude
-		if (event.keyCode === 'Z'.charCodeAt(0))
-		{
-			currentAlt += increDist;
-			displayData = true;
-		}
-		else if (event.keyCode === 'X'.charCodeAt(0))
-		{
-			currentAlt -= increDist;
-			displayData = true;
-		}
+			// For Roll
+			if (event.keyCode === 'E'.charCodeAt(0))
+			{
+				currentRoll += increDeg;
+				displayData = true;
+			}
+			else if (event.keyCode === 'D'.charCodeAt(0))
+			{
+				currentRoll -= increDeg;
+				displayData = true;
+			}
+			
+			// For Altitude
+			if (event.keyCode === 'Z'.charCodeAt(0))
+			{
+				currentAlt += increDist;
+				displayData = true;
+			}
+			else if (event.keyCode === 'X'.charCodeAt(0))
+			{
+				currentAlt -= increDist;
+				displayData = true;
+			}
 
-		if (displayData)
-		{ magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, currentAlt, currentHeading, currentPitch, currentRoll); }
+			if (displayData)
+			{ magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, 
+							currentAlt, currentHeading, currentPitch, currentRoll); }
+		}
 
 	}, false);
 	

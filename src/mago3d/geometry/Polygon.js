@@ -10,7 +10,7 @@ var Polygon = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	// This is a 2D polygon.***
 	this.point2dList;
 	this.normal; // polygon sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
 	this.convexPolygonsArray; // tessellation result.***
@@ -136,6 +136,10 @@ Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 
 Polygon.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
 {
+	// Note: to call this function, before must call "calculateNormal" that returns "concaveVerticesIndices".***
+	// Note: in 2D, "normal" is -1=(cw) or 1=(ccw).***
+	//----------------------------------------------------------------------------------------------------------
+	
 	var concaveVerticesCount = concaveVerticesIndices.length;
 	
 	if (concaveVerticesCount === 0)

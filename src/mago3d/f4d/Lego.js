@@ -51,7 +51,7 @@ Lego.prototype.isReadyToRender = function()
 	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
-	if (this.texture === undefined || this.texture.texId === undefined)
+	if (this.texture === undefined || this.texture.texId === undefined) // In the future, a skin can has no texture. TODO:
 	{ return false; }
 	
 	return true;
@@ -130,6 +130,9 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
 	var positionBuffer;
 	
+	if (classifiedPosByteSize === -1)
+	{ var hola = 0; }
+	
 	if (this.bPositionsCompressed)
 	{
 		positionBuffer = new Uint16Array(classifiedPosByteSize);
@@ -172,7 +175,6 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	this.hasIndices = stream.readInt8();
 	
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	
 };
 
 /**
@@ -280,13 +282,14 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 /**
  * F4D Lego 자료를 읽는다
  */
-Lego.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader)
+Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 {
+	var rendered = false;
 	var gl = magoManager.sceneState.gl;
 	
 	if (this.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
-		return;
+		return false;
 	}
 	gl.frontFace(gl.CCW);
 	
@@ -294,53 +297,48 @@ Lego.prototype.render = function(magoManager, neoBuilding, renderType, renderTex
 	// renderType = 1 -> normal render.***
 	// renderType = 2 -> colorSelection render.***
 	//--------------------------------------------
+	
+	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+	if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
+	{ return false; }
 
-	if (renderType === 0) // depth.***
+	if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
+	{ return false; }
+		
+	if (!renderTexture && !vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
+	{ return false; }
+
+	var vertices_count = vbo_vicky.vertexCount;
+	if (vertices_count === 0) 
 	{
+		return false;
+	}
+
+	if (renderType === 0 || renderType === 2) // depth or colorSelection.***
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+		
 		// 1) Position.*********************************************
-		var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ return; }
-
-		var vertices_count = vbo_vicky.vertexCount;
-		if (vertices_count === 0) 
-		{
-			return;
-		}
-
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
 		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+		rendered = true;
+		
 	}
 	else if (renderType === 1) // color.***
 	{
-		var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		var vertices_count = vbo_vicky.vertexCount;
-
-		if (vertices_count === 0) 
-		{
-			return;
-		}
-		
-		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ return; }
-		
-		if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
-		{ return; }
-		
-		if (!renderTexture && !vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
-		{ return; }
-		
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{
 			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-			{ return; }
+			{ return false; }
 		}
 		else 
 		{
 			gl.uniform1i(shader.bUse1Color_loc, false);
-			gl.disableVertexAttribArray(shader.texCoord2_loc);
+			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
@@ -349,23 +347,37 @@ Lego.prototype.render = function(magoManager, neoBuilding, renderType, renderTex
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
 		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
 
-		if (vbo_vicky.meshColorCacheKey !== undefined )
-		{
-			gl.enableVertexAttribArray(shader.color4_loc);
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-		}
+		// TODO:
+		//if (vbo_vicky.meshColorCacheKey !== undefined )
+		//{
+		//if(shader.color4_loc != -1)shader.enableVertexAttribArray(shader.color4_loc);
+		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
+		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+		//}
 		
 		if (renderTexture && vbo_vicky.meshTexcoordsCacheKey)
 		{
-			gl.disableVertexAttribArray(shader.color4_loc);
+			// Provisionally flip tex coords here.***************************************
+			if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+			{ gl.uniform1i(shader.textureFlipYAxis_loc, false); }//.ppp
+			else
+			{ gl.uniform1i(shader.textureFlipYAxis_loc, true); }//.ppp
+			//---------------------------------------------------------------------------
+			
+			shader.disableVertexAttribArray(shader.color4_loc); 
+			shader.enableVertexAttribArray(shader.texCoord2_loc);
 			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
 			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		gl.disableVertexAttribArray(shader.color4_loc);
+		
+		
+		rendered = true;
+		shader.disableVertexAttribArray(shader.color4_loc);
 	}
+	
+	return rendered;
 };
 
 

@@ -11,12 +11,13 @@ var TinTerrain = function(owner)
 	}
 	this.owner; // undefined if depth = 0.***
 	this.depth; 
-	if(owner)
+	if (owner)
 	{
 		this.owner = owner;
 		this.depth = owner.depth + 1;
 	}
-	else{
+	else 
+	{
 		this.depth = 0;
 	}
 	
@@ -49,46 +50,46 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	var gl = magoManager.sceneState.gl;
 	
 	// delete all tree under this tinTerrain. no delete tiles if depth < 2.******
-	if(this.childMap !== undefined)
+	if (this.childMap !== undefined)
 	{
 		// subTile 0 (Left-Up).***
-		var subTile_LU = this.childMap["LU"];
-		if(subTile_LU !== undefined)
+		var subTile_LU = this.childMap.LU;
+		if (subTile_LU !== undefined)
 		{
 			subTile_LU.deleteObjects(magoManager);
-			delete this.childMap["LU"];
+			delete this.childMap.LU;
 		}
 		
 		// subTile 1 (Left-Down).***
-		var subTile_LD = this.childMap["LD"];
-		if(subTile_LD !== undefined)
+		var subTile_LD = this.childMap.LD;
+		if (subTile_LD !== undefined)
 		{
 			subTile_LD.deleteObjects(magoManager);
-			delete this.childMap["LD"];
+			delete this.childMap.LD;
 		}
 		
 		// subTile 2 (Right-Up).***
-		var subTile_RU = this.childMap["RU"];
-		if(subTile_RU !== undefined)
+		var subTile_RU = this.childMap.RU;
+		if (subTile_RU !== undefined)
 		{
 			subTile_RU.deleteObjects(magoManager);
-			delete this.childMap["RU"];
+			delete this.childMap.RU;
 		}
 		
 		// subTile 3 (Right-Down).***
-		var subTile_RD = this.childMap["RD"];
-		if(subTile_RD !== undefined)
+		var subTile_RD = this.childMap.RD;
+		if (subTile_RD !== undefined)
 		{
 			subTile_RD.deleteObjects(magoManager);
-			delete this.childMap["RD"];
+			delete this.childMap.RD;
 		}
 		
 		this.childMap = undefined;
 	}
 	
 	// no delete tiles if depth < 2.***
-	if(this.depth < 2)
-		return;
+	if (this.depth < 2)
+	{ return; }
 		
 	// now delete objects of this tinTerrain.***
 	this.owner = undefined;
@@ -101,13 +102,13 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	this.Y = undefined; // index Y.***
 	
 	// Tile extent.***
-	if(this.geographicExtent !== undefined)
+	if (this.geographicExtent !== undefined)
 	{
 		this.geographicExtent.deleteObjects();
 		this.geographicExtent = undefined;
 	}
 	
-	if(this.sphereExtent !== undefined)
+	if (this.sphereExtent !== undefined)
 	{
 		this.sphereExtent.deleteObjects();
 		this.sphereExtent = undefined;
@@ -117,7 +118,7 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	this.fileLoadState = 0;
 	this.dataArrayBuffer = undefined;
 	
-	if(this.vboKeyContainer !== undefined)
+	if (this.vboKeyContainer !== undefined)
 	{
 		this.vboKeyContainer.deleteGlObjects(gl, magoManager.vboMemoryManager);
 		this.vboKeyContainer = undefined; // class: VBOVertexIdxCacheKeysContainer.***
@@ -129,7 +130,7 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	this.indexName = undefined;
 	this.pathName = undefined; // example: "14//4567//516".***
 	
-	if(this.texture !== undefined)
+	if (this.texture !== undefined)
 	{
 		this.texture.deleteObjects(gl);
 		this.texture = undefined;
@@ -142,20 +143,20 @@ TinTerrain.prototype.getPathName = function()
 	// this returns a string as: L//X//Y.
 	// example: "14//4567//516".***
 	return this.depth.toString() + "\\" + this.X.toString() + "\\" + this.Y.toString();
-}
+};
 
 TinTerrain.prototype.setGeographicExtent = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt)
 {
-	if(this.geographicExtent === undefined)
-		this.geographicExtent = new GeographicExtent();
+	if (this.geographicExtent === undefined)
+	{ this.geographicExtent = new GeographicExtent(); }
 	
 	var geoExtent = this.geographicExtent;
 	
-	if(geoExtent.minGeographicCoord === undefined)
-		geoExtent.minGeographicCoord = new GeographicCoord();
+	if (geoExtent.minGeographicCoord === undefined)
+	{ geoExtent.minGeographicCoord = new GeographicCoord(); }
 	
-	if(geoExtent.maxGeographicCoord === undefined)
-		geoExtent.maxGeographicCoord = new GeographicCoord();
+	if (geoExtent.maxGeographicCoord === undefined)
+	{ geoExtent.maxGeographicCoord = new GeographicCoord(); }
 	
 	geoExtent.minGeographicCoord.setLonLatAlt(minLon, minLat, minAlt);
 	geoExtent.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
@@ -168,28 +169,22 @@ TinTerrain.prototype.isPrepared = function()
 	// Provisional solution.**********************************
 	// Provisional solution.**********************************
 	// Provisional solution.**********************************
-	if(this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
-		return true;
+	if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
+	{ return true; }
 	// End provisional solution.------------------------------
 	// End provisional solution.------------------------------
 	// End provisional solution.------------------------------
 	
-	if(this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-		return false;
+	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+	{ return false; }
 	
-	if(this.texture === undefined || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-		return false;
+	if (this.texture === undefined || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{ return false; }
 	
-	if(this.vboKeyContainer === undefined || 
+	if (this.vboKeyContainer === undefined || 
 		this.vboKeyContainer.vboCacheKeysArray === undefined || 
 		this.vboKeyContainer.vboCacheKeysArray.length === 0)
-		return false;
-		
-	if (this.texture === undefined)
-		return false;
-	
-	if (this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-		return false;
+	{ return false; }
 	
 	return true;
 };
@@ -199,7 +194,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 	// This function 1- loads file & 2- parses file & 3- makes vbo.***
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.***
 	
-	if(this.owner === undefined || this.owner.isPrepared())
+	if (this.owner === undefined || this.owner.isPrepared())
 	{
 		// 1rst, try to erase from procesQueue_deleting if exist.***
 		magoManager.processQueue.eraseTinTerrainToDelete(this);
@@ -219,18 +214,18 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
 		{
 			this.decodeData();
-			this.makeVbo();
+			this.makeVbo(magoManager.vboMemoryManager);
 		}
 		else if (this.texture === undefined)
 		{
 			var gl = magoManager.sceneState.gl;
 			this.texture = new Texture();
 			
-					// Provisionally test.******************************************************************************************
-					var imagesDataPath = "\\images\\ko";
-					var textureFilePath = imagesDataPath +  "\\funny_" + this.depth + ".jpg";
-					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, textureFilePath, this.texture, magoManager);
-					// End test.----------------------------------------------------------------------------------------------------
+			// Provisionally test.******************************************************************************************
+			var imagesDataPath = "\\images\\ko";
+			var textureFilePath = imagesDataPath +  "\\funny_" + this.depth + ".jpg";
+			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, textureFilePath, this.texture, magoManager);
+			// End test.----------------------------------------------------------------------------------------------------
 					
 			var geoServURL = tinTerrainManager.geoServURL;
 			var L = this.depth;
@@ -254,8 +249,8 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 
 TinTerrain.prototype.hasChildren = function()
 {
-	if(this.childMap !== undefined && this.childMap.length > 0)
-		return true;
+	if (this.childMap !== undefined && this.childMap.length > 0)
+	{ return true; }
 	
 	return false;
 };
@@ -264,10 +259,10 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 {
 	// The quadTree must be deleted lowest-quads first.***
 	// Check if this has child. If this has child, then, 1rst delete child.***
-	if(this.hasChildren())
+	if (this.hasChildren())
 	{
 		// Delete children 1rst.***
-		for(var key in this.childMap)
+		for (var key in this.childMap)
 		{
 			var child = this.childMap[key];
 			child.deleteTinTerrain(magoManager);
@@ -275,7 +270,8 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 		
 		return false;
 	}
-	else{
+	else
+	{
 		// 1rst, delete from parse-queue if exist.***
 		magoManager.parseQueue.eraseTinTerrainToParse(this);
 		// put this tinTerrain into deleteQueue.***
@@ -284,8 +280,8 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 		// now, must erase from myOwner-childrenMap.***
 		delete this.owner.childMap[this.indexName];
 		
-		if(this.owner.childMap.length === 0)
-			this.owner.childMap = undefined;
+		if (this.owner.childMap.length === 0)
+		{ this.owner.childMap = undefined; }
 		
 		return true;
 	}
@@ -293,12 +289,12 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 {
-	if(this.owner === undefined || this.owner.isPrepared())
+	if (this.owner === undefined || this.owner.isPrepared())
 	{
-		if(this.isPrepared())
+		if (this.isPrepared())
 		{
-			if(this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.***
-				return;
+			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.***
+			{ return; }
 			
 			// render this tinTerrain.***
 			var gl = magoManager.sceneState.gl;
@@ -319,7 +315,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 				gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
 				
 				// TexCoords.***
-				if(!bDepth)
+				if (!bDepth)
 				{
 					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
 					gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
@@ -340,6 +336,10 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 				else
 				{
 					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+					
+					var glError = gl.getError();
+					if(glError !== gl.NO_ERROR)
+						var hola = 0;
 					/*
 					gl.disableVertexAttribArray(currentShader.texCoord2_loc);
 					gl.uniform1i(currentShader.hasTexture_loc, false); //.***
@@ -352,13 +352,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 				}
 			}
 		}
-		else{
-		// render the owner tinTerrain.***
-		if(this.owner !== undefined)
-			this.owner.render(currentShader, magoManager, bDepth);
+		else 
+		{
+			// render the owner tinTerrain.***
+			if (this.owner !== undefined)
+			{ this.owner.render(currentShader, magoManager, bDepth); }
 		}
 	}
-	else{
+	else 
+	{
 		// render the owner tinTerrain.***
 		this.owner.render(currentShader, magoManager, bDepth);
 	}
@@ -366,13 +368,13 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray)
 {
-	if(this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)
-		return;
+	if (this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)
+	{ return; }
 	
 	var currMinGeographicCoords = this.geographicExtent.minGeographicCoord;
 	var currMaxGeographicCoords = this.geographicExtent.maxGeographicCoord;
 		
-	if(this.sphereExtent === undefined)
+	if (this.sphereExtent === undefined)
 	{
 		this.sphereExtent = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, this.sphereExtent);
 	}
@@ -433,12 +435,12 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			// |              |              |
 			// +--------------+--------------+
 				
-			if(this.childMap === undefined)
-				this.childMap = {};
+			if (this.childMap === undefined)
+			{ this.childMap = {}; }
 			
 			// subTile 0 (Left-Up).***
-			var subTile_LU = this.childMap["LU"];
-			if(subTile_LU === undefined)
+			var subTile_LU = this.childMap.LU;
+			if (subTile_LU === undefined)
 			{
 				// if no exist -> create it.***
 				subTile_LU = new TinTerrain(this);
@@ -446,12 +448,12 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				subTile_LU.Y = curY*2;
 				subTile_LU.setGeographicExtent(minLon, midLat, minAlt,  midLon, maxLat, maxAlt); 
 				subTile_LU.indexName = "LU";
-				this.childMap["LU"] = subTile_LU;
+				this.childMap.LU = subTile_LU;
 			}
 			
 			// subTile 1 (Left-Down).***
-			var subTile_LD = this.childMap["LD"];
-			if(subTile_LD === undefined)
+			var subTile_LD = this.childMap.LD;
+			if (subTile_LD === undefined)
 			{
 				// if no exist -> create it.***
 				subTile_LD = new TinTerrain(this);
@@ -459,31 +461,31 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				subTile_LD.Y = curY*2+1;
 				subTile_LD.setGeographicExtent(minLon, minLat, minAlt,  midLon, midLat, maxAlt); 
 				subTile_LD.indexName = "LD";
-				this.childMap["LD"] = subTile_LD;
+				this.childMap.LD = subTile_LD;
 			}
 			
 			// subTile 2 (Right-Up).***
-			var subTile_RU = this.childMap["RU"];
-			if(subTile_RU === undefined)
+			var subTile_RU = this.childMap.RU;
+			if (subTile_RU === undefined)
 			{
 				subTile_RU = new TinTerrain(this);
 				subTile_RU.X = curX*2+1;
 				subTile_RU.Y = curY*2;
 				subTile_RU.setGeographicExtent(midLon, midLat, minAlt,  maxLon, maxLat, maxAlt); 
 				subTile_RU.indexName = "RU";
-				this.childMap["RU"] = subTile_RU;
+				this.childMap.RU = subTile_RU;
 			}
 			
 			// subTile 3 (Right-Down).***
-			var subTile_RD = this.childMap["RD"];
-			if(subTile_RD === undefined)
+			var subTile_RD = this.childMap.RD;
+			if (subTile_RD === undefined)
 			{
 				subTile_RD = new TinTerrain(this);
 				subTile_RD.X = curX*2+1;
 				subTile_RD.Y = curY*2+1;
 				subTile_RD.setGeographicExtent(midLon, minLat, minAlt,  maxLon, midLat, maxAlt);
 				subTile_RD.indexName = "RD";
-				this.childMap["RD"] = subTile_RD;
+				this.childMap.RD = subTile_RD;
 			}
 			
 			// now, do frustumCulling for each childTiles.***
@@ -606,7 +608,7 @@ TinTerrain.prototype.zigZagDecode = function(value)
 	return (value >> 1) ^ (-(value & 1));
 };
 
-TinTerrain.prototype.makeVbo = function()
+TinTerrain.prototype.makeVbo = function(vboMemManager)
 {
 	if (this.cartesiansArray === undefined)
 	{ return; }
@@ -631,9 +633,26 @@ TinTerrain.prototype.makeVbo = function()
 	{ this.vboKeyContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
 	var vboKey = this.vboKeyContainer.newVBOVertexIdxCacheKey();
-	vboKey.posVboDataArray = this.cartesiansArray;
-	vboKey.tcoordVboDataArray = this.texCoordsArray;
-	vboKey.idxVboDataArray = this.indices;
+	
+	// Positions.***
+	var vertexCount = coordsCount;
+	var posByteSize = vertexCount * 3;
+	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+	vboKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
+	vboKey.posVboDataArray.set(this.cartesiansArray);
+	
+	// TexCoords.***
+	var tCoordByteSize = 2 * vertexCount;
+	var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+	vboKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+	vboKey.tcoordVboDataArray.set(this.texCoordsArray);
+		
+	// Indices.***
+	var idxByteSize = this.indices.length;
+	var classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
+	vboKey.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
+	vboKey.idxVboDataArray.set(this.indices);
+		
 	vboKey.indicesCount = this.indices.length;
 	/*
 	if (normal)
@@ -690,8 +709,8 @@ TinTerrain.prototype.decodeData = function()
 		
 		// debug.***
 		var debugAlt = altArray[i];
-		if(debugAlt > 257)
-			var hola = 0;
+		if (debugAlt > 257)
+		{ var hola = 0; }
 		
 		// make texcoords.***
 		this.texCoordsArray[i*2] = uValues[i]/shortMax;
@@ -755,8 +774,8 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 		this.hValues[i] = height;
 		
 		// debug.***
-		if(height > 0)
-			var hola = 0;
+		if (height > 0)
+		{ var hola = 0; }
 	}
 	
 	// 3. indices.***

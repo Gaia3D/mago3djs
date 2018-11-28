@@ -241,25 +241,273 @@ Octree.prototype.makeTree = function(treeDepth)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.prepareData = function(magoManager) 
+{
+	// Function no used. Under construction.***
+	// This function prepares data in function of the current lod.***
+	if (this.lod < 2)
+	{
+		// Must prepare modelRefList data.***
+		this.prepareModelReferencesListData(magoManager);
+	}
+	else if (this.lod >= 2)
+	{
+		// Must prepare skin data.***
+		this.prepareSkinData(magoManager);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.prepareSkinData = function(magoManager) 
+{
+	if (this.octree_number_name === undefined)
+	{ return; }
+	
+	if (this.lego === undefined) 
+	{
+		this.lego = new Lego();
+		this.lego.fileLoadState = CODE.fileLoadState.READY;
+		this.lego.legoKey = this.octreeKey + "_lego";
+	}
+
+	var neoBuilding = this.neoBuildingOwner;
+	if (neoBuilding === undefined)
+	{ return; }
+	
+	var gl = magoManager.sceneState.gl;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+	var projectFolderName = neoBuilding.projectFolderName;
+	var buildingFolderName = neoBuilding.buildingFileName;
+	
+	var headerVersion = neoBuilding.getHeaderVersion();
+
+	if (this.lego.fileLoadState === CODE.fileLoadState.READY)
+	{
+		// must load the legoStructure of the lowestOctree.***
+		var subOctreeNumberName = this.octree_number_name.toString();
+		var bricks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Bricks";
+		var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
+
+		// finally check if there are legoSimpleBuildingTexture.***
+		if (headerVersion[0] === "v")
+		{
+			if (this.lego.vbo_vicks_container.vboCacheKeysArray[0] && this.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+			{
+				// this is the old version.***
+				if (neoBuilding.simpleBuilding3x3Texture === undefined)
+				{
+					neoBuilding.simpleBuilding3x3Texture = new Texture();
+					var buildingFolderName = neoBuilding.buildingFileName;
+					var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
+				}
+				
+				// Direct loading.***
+				if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
+				{ 
+					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
+				}
+				
+				magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
+				
+			}
+			else 
+			{
+				// there are no texture in this project.***
+				magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
+				
+			}
+		}
+		else 
+		{
+			// This is the version 001.***
+			if (neoBuilding.simpleBuilding3x3Texture === undefined)
+			{
+				neoBuilding.simpleBuilding3x3Texture = new Texture();
+			}
+
+			var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
+			var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
+
+			// Direct loading.***
+			if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
+			{ 
+				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
+			}
+			
+			magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.prepareModelReferencesListData = function(magoManager) 
+{
+	var neoBuilding = this.neoBuildingOwner;
+		
+	// 1rst check possibles errors.***
+	if (neoBuilding === undefined)
+	{ return; }
+	
+	if (this.triPolyhedronsCount === 0) 
+	{ return; }
+	
+	if (this.octree_number_name === undefined)
+	{ return; }
+
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+	var buildingFolderName = neoBuilding.buildingFileName;
+	var projectFolderName = neoBuilding.projectFolderName;
+	
+	if (this.neoReferencesMotherAndIndices === undefined)
+	{
+		this.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
+		this.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+	}
+	
+	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
+	{
+		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
+		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
+
+		var subOctreeNumberName = this.octree_number_name.toString();
+		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+		var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+		magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
+	}
+	
+	// 4 = parsed.***
+	// now, check if the blocksList is loaded & parsed.***
+	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
+	if (blocksList === undefined)
+	{ return; }
+	if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
+	{
+		// must read blocksList.***
+		var subOctreeNumberName = this.octree_number_name.toString();
+		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
+		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+		magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, this, magoManager);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param intNumber 변수
  * @returns numDigits
  */
-Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey) 
+Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, renderTexture, shader) 
+{
+	var gl = magoManager.sceneState.gl;
+	if (this.lego === undefined) 
+	{
+		this.lego = new Lego();
+		this.lego.fileLoadState = CODE.fileLoadState.READY;
+		this.lego.legoKey = this.octreeKey + "_lego";
+		return false;
+	}
+	
+	if (this.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+	{ return false; }
+
+	// if the building is highlighted, the use highlight oneColor4.*********************
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+	if (renderType === 1)
+	{
+		// Solve the color or texture of the skin.***
+		if (neoBuilding.isHighLighted)
+		{
+			gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
+		}
+		else if (neoBuilding.isColorChanged)
+		{
+			gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+		}
+		else
+		{
+			gl.uniform1i(shader.bUse1Color_loc, false);
+		}
+		//----------------------------------------------------------------------------------
+		renderTexture = true;
+		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId)
+		{
+			// Provisionally flip tex coords here.***
+			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
+			gl.uniform1i(shader.hasTexture_loc, true);
+			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
+			{
+				//gl.activeTexture(gl.TEXTURE2); 
+				gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
+				shader.last_tex_id = neoBuilding.simpleBuilding3x3Texture.texId;
+			}
+		}
+		else 
+		{
+			// Todo: If this building lod2 has no texture, then render with colors.***
+			//gl.uniform1i(shader.hasTexture_loc, false);
+			//shader.disableVertexAttribArray(shader.texCoord2_loc);
+			//renderTexture = false;
+			//-------------------------------------------------------------------------
+			
+			// If texture is no ready then return.***
+			return false;
+		}
+	}
+	else if (renderType === 2)
+	{
+		// Color selction mode.***
+		var colorAux;
+		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
+		var currentNode = currentObjectsRendering.curNode;
+		magoManager.selectionManager.setCandidates(idxKey, undefined, this, neoBuilding, currentNode);
+		
+		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+	}
+	
+	return this.lego.render(magoManager, renderType, renderTexture, shader);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param intNumber 변수
+ * @returns numDigits
+ */
+Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey, flipYTexCoord) 
 {
 	// the content of the octree is "neoReferencesMotherAndIndices" & the netSurfaceMesh called "lego".***
 	// This function renders the "neoReferencesMotherAndIndices" or the lego.***
-	// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.***
-	if (this.neoReferencesMotherAndIndices === undefined)
-	{ return; }
+	var rendered = false;
+	var gl = magoManager.sceneState.gl;
 
-	// set the currentObjectsRendering.***
-	magoManager.renderer.currentObjectsRendering["octree"] = this;
-
-	if(this.lod < 2)
+	if (this.lod < 2)
 	{
-		this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey);
+		// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.***
+		if (this.neoReferencesMotherAndIndices === undefined)
+		{ return; }
+		gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);//.ppp
+		rendered = this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey);
+		if (!rendered)
+		{
+			// render the skinLego.***
+			rendered = this.renderSkin(magoManager, neoBuilding, renderType, renderTexture, shader);
+		}
+	}
+	else if (this.lod === 2)
+	{
+		// Render the skinLego.***
+		rendered = this.renderSkin(magoManager, neoBuilding, renderType, renderTexture, shader);
 	}
 	
+	return rendered;
 };
 
 /**
@@ -516,7 +764,7 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 				if (globalVisibleObjControlerOctrees)
 				{ globalVisibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]); }
 				visibleObjControlerOctrees.currentVisibles3.push(visibleOctreesArray[i]);
-				visibleOctreesArray[i].lod = 3;
+				visibleOctreesArray[i].lod = 3; // must be 3!!!
 				find = true;
 			}
 		}
@@ -702,6 +950,7 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles0, this.lowestOctrees_array[i]); }
 				visibleObjControlerOctrees.currentVisibles0.push(this.lowestOctrees_array[i]);
+				this.lowestOctrees_array[i].lod = 0;
 				find = true;
 			}
 		}
@@ -712,6 +961,7 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles1, this.lowestOctrees_array[i]); }
 				visibleObjControlerOctrees.currentVisibles1.push(this.lowestOctrees_array[i]);
+				this.lowestOctrees_array[i].lod = 1;
 				find = true;
 			}
 		}
@@ -722,6 +972,7 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 				if (globalVisibleObjControlerOctrees)
 				{ this.putOctreeInEyeDistanceSortedArray(globalVisibleObjControlerOctrees.currentVisibles2, this.lowestOctrees_array[i]); }
 				visibleObjControlerOctrees.currentVisibles2.push(this.lowestOctrees_array[i]);
+				this.lowestOctrees_array[i].lod = 2;
 				find = true;
 			}
 		}
@@ -732,6 +983,7 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 				if (globalVisibleObjControlerOctrees)
 				{ globalVisibleObjControlerOctrees.currentVisibles3.push(this.lowestOctrees_array[i]); }
 				visibleObjControlerOctrees.currentVisibles3.push(this.lowestOctrees_array[i]);
+				this.lowestOctrees_array[i].lod = 3;
 				find = true;
 			}
 		}

@@ -158,7 +158,19 @@ Uniform1iDataPair.prototype.bindUniform = function()
 	this.gl.uniform1i(this.uniformLocation, this.intValue);
 };
 
-
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class AttribLocationState
+ */
+var AttribLocationState = function() 
+{
+	if (!(this instanceof AttribLocationState)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	this.attribLocationEnabled = false;
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -173,7 +185,7 @@ var PostFxShader = function(gl)
 	}
 	this.gl = gl;
 	this.name;
-	this.attribLocationCacheObj = {};
+	this.attribLocationCacheObj = {}; // old.***
 	this.uniformsArrayGeneral = []; // this array has the same uniforms that "uniformsCacheObj".***
 	this.uniformsMapGeneral = {}; // this object has the same uniforms that "uniformsArray".***
 	
@@ -185,6 +197,127 @@ var PostFxShader = function(gl)
 	this.shader_vertex;
 	this.shader_fragment;
 	
+	// current buffers binded.***
+	this.last_vboPos_binded;
+	this.last_vboNor_binded;
+	this.last_vboIdx_binded;
+	this.last_tex_id;
+	this.last_isAditionalMovedZero = false;
+	this.last_vboTexCoord_binded; // no used.***
+	
+	// attribLocations state management.***
+	this.attribLocationStateArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.resetLastBuffersBinded = function()
+{
+	this.last_vboPos_binded = undefined;
+	this.last_vboNor_binded = undefined;
+	this.last_vboIdx_binded = undefined;
+	this.last_vboTexCoord_binded = undefined; // no used.***
+	this.last_tex_id = undefined; // todo: must distinguish by channel.***
+	this.last_isAditionalMovedZero = false;
+	
+	if (this.attribLocationStateArray)
+	{
+		var attribLocsCount = this.attribLocationStateArray.length;
+		for (var i=0; i<attribLocsCount; i++)
+		{
+			var attribLocationState = this.attribLocationStateArray[i];
+			if (attribLocationState !== undefined)
+			{
+				attribLocationState.attribLocationEnabled = undefined;
+				this.attribLocationStateArray[i] = undefined;
+			}
+		}
+		this.attribLocationStateArray.length = 0;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
+{
+	if (attribLocation === undefined || attribLocation < 0)
+	{ return; }
+	
+	var attribLocationState = this.attribLocationStateArray[attribLocation];
+	if (attribLocationState === undefined)
+	{
+		attribLocationState = new AttribLocationState();
+		this.attribLocationStateArray[attribLocation] = attribLocationState;
+		attribLocationState.attribLocationEnabled = false;
+	}
+
+	if (!attribLocationState.attribLocationEnabled)
+	{
+		this.gl.enableVertexAttribArray(attribLocation);
+		attribLocationState.attribLocationEnabled = true;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.disableVertexAttribArrayAll = function()
+{
+	// Provisional function.***
+	var gl = this.gl;
+	if (this.texCoord2_loc !== -1){ gl.disableVertexAttribArray(this.texCoord2_loc); }
+	if (this.position3_loc !== -1){ gl.disableVertexAttribArray(this.position3_loc); }
+	if (this.normal3_loc !== -1){ gl.disableVertexAttribArray(this.normal3_loc); }
+	if (this.color4_loc !== -1){ gl.disableVertexAttribArray(this.color4_loc); }
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.disableVertexAttribArray = function(attribLocation)
+{
+	if (attribLocation === undefined || attribLocation < 0)
+	{ return; }
+	
+	var attribLocationState = this.attribLocationStateArray[attribLocation];
+	if (attribLocationState === undefined)
+	{
+		attribLocationState = new AttribLocationState();
+		this.attribLocationStateArray[attribLocation] = attribLocationState;
+		attribLocationState.attribLocationEnabled = true;
+	}
+
+	if (attribLocationState.attribLocationEnabled)
+	{
+		this.gl.disableVertexAttribArray(attribLocation);
+		attribLocationState.attribLocationEnabled = false;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
+PostFxShader.prototype.useProgram = function()
+{
+	var gl = this.gl;
+	var currProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	if (currProgram !== this.program)
+	{
+		gl.useProgram(this.program);
+	}
+	this.resetLastBuffersBinded();
 };
 
 /**
@@ -310,7 +443,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	var uniformDataPair;
 	var uniformLocation;
 
-	// 1. ModelViewProjectionMatrixRelToEye.***
+	// 1. ModelViewProjectionMatrixRelToEye.***              
 	uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -568,6 +701,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	
 	// compression data, for shaders with data compressed.***
 	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.***
@@ -655,39 +789,13 @@ PostFxShadersManager.prototype.createShader = function(gl, source, type, typeStr
  */
 PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState) 
 {
-	this.createRenderDepthShader(gl); // 0.***
-	this.createSsaoShader(gl); // 1.***
-	this.createBlurShader(gl); // 2.***
-
-	// Now, create shaders for modelReference geometries.****
-	this.createRenderDepthShaderModelRef(gl); // 3.***
-	this.modelRefShader = this.createSsaoShaderModelRef(gl); // 4.***
-	//this.createBlurShader_ModelRef(gl); // 5.***
-
-	this.createColorSelectionShaderModelRef(gl);// 5.***
-	this.createSimpleDepthShaderModelRef(gl);// 6.***
-
-	this.createRenderDepthShaderLODBuilding(gl);// 7.***
-	this.lodBuildingShader = this.createSsaoShaderLODBuilding(gl);// 8.***
-
-	this.createRenderDepthShaderLego(gl);// 9.***
-	this.createSsaoShaderLego(gl);// 10.***
-
 	this.triPolyhedronDepthShader = this.createDepthShaderBox(gl); // 11.***
 	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.***
 
-	this.createPngImageShader(gl); // 13.***
+	this.pngImageShader = this.createPngImageShader(gl); // 13.***
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.***
 	
 	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.***
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-PostFxShadersManager.prototype.getModelRefShader = function() 
-{
-	return this.modelRefShader;
 };
 
 /**
@@ -722,616 +830,6 @@ PostFxShadersManager.prototype.getInvertedBoxShader = function()
 	return this.invertedBoxShader;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createBlurShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var blur_vs_source = ShaderSource.BlurVS;
-	var blur_fs_source = ShaderSource.BlurFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, blur_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, blur_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-
-	shader.texelSize_loc = gl.getUniformLocation(shader.program, "texelSize");
-	shader.colorTex_loc = gl.getUniformLocation(shader.program, "colorTex");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.SsaoVS;
-	var ssao_fs_source = ShaderSource.SsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShader = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.ShowDepthVS;
-	var showDepth_fs_source = ShaderSource.ShowDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Ref Model.***********************************************************************************************************************
-// Ref Model.***********************************************************************************************************************
-// Ref Model.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderModelRef = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(undefined); // old.***
-
-	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
-	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.***
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow"); // sceneState.***
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye"); // sceneState.***
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye"); // sceneState.***
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.***
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.***
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	//*********************************************************************************
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near"); // sceneState.***
-	shader.far_loc = gl.getUniformLocation(shader.program, "far"); // sceneState.***
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov"); // sceneState.***
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio"); // sceneState.***
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.***
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.***
-	
-	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); // no used.***
-	
-	// lighting.
-	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
-	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius");  
-
-	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
-	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
-	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
-	
-	return shader;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderModelRef = function(gl, sceneState) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
-	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Selection shader.***********************************************************************************************************************
-// Selection shader.***********************************************************************************************************************
-// Selection shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createColorSelectionShaderModelRef = function(gl) 
-{
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.ColorSelectionSsaoVS;
-	var ssao_fs_source = ShaderSource.ColorSelectionSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
-	shader.refTranslationVec_loc = gl.getUniformLocation(shader.program, "refTranslationVec");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-};
-
-// SimpleDepth shader.***********************************************************************************************************************
-// SimpleDepth shader.***********************************************************************************************************************
-// SimpleDepth shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSimpleDepthShaderModelRef = function(gl) 
-{
-	// no used.!!!!!!!!!!!!!!!
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.SimpleDepthSsaoVS;
-	var ssao_fs_source = ShaderSource.SimpleDepthSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-
-	//shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// LOD 2 Building Shader.***********************************************************************************************************************
-// LOD 2 Building Shader.***********************************************************************************************************************
-// LOD 2 Building Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderLODBuilding = function(gl) 
-{
-	// 8.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.LodBuildingSsaoVS;
-	var ssao_fs_source = ShaderSource.LodBuildingSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
-	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
-
-	//*********************************************************************************
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	//shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-	shader.specularColor_loc = gl.getUniformLocation(shader.program, "specularColor");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-	shader.ssaoRadius_loc = gl.getUniformLocation(shader.program, "radius"); 
-	
-	shader.ambientReflectionCoef_loc = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
-	shader.diffuseReflectionCoef_loc = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
-	shader.specularReflectionCoef_loc = gl.getUniformLocation(shader.program, "specularReflectionCoef");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
-{
-	// 7.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
-	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-// Lego Shader.***********************************************************************************************************************
-// Lego Shader.***********************************************************************************************************************
-// Lego Shader.***********************************************************************************************************************
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createSsaoShaderLego = function(gl) 
-{
-	// 10.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.LegoSsaoVS;
-	var ssao_fs_source = ShaderSource.LegoSsaoFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
-	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
-	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
-
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	// ssao uniforms.**********************************************************************
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-
-	// uniform samplers.***
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.****
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLego = function(gl) 
-{
-	// 9.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LegoDepthVS;
-	var showDepth_fs_source = ShaderSource.LegoDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
-
-
-
-
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createRenderDepthShaderLODBuilding = function(gl) 
-{
-	// 7.***
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var showDepth_vs_source = ShaderSource.LodBuildingDepthVS;
-	var showDepth_fs_source = ShaderSource.LodBuildingDepthFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, showDepth_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	gl.linkProgram(shader.program);
-
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-
-	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
-	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
-	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
-
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-};
 
 // box depth Shader.***********************************************************************************************************************
 // box depth Shader.***********************************************************************************************************************
@@ -1497,6 +995,7 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl)
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_texcoord");
 	
 	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
+	return shader;
 	
 };
 
@@ -1511,6 +1010,7 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 {
 	// 14.***
 	var shader = new PostFxShader(this.gl);
+	shader.name = "SilhouetteShaderModelRef";
 	this.pFx_shaders_array.push(undefined);
 
 	var ssao_vs_source = ShaderSource.SilhouetteVS;

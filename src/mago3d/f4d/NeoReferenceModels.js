@@ -99,14 +99,10 @@ NeoReference.prototype.hasKeyMatrix = function(idxKey)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param magoManager.
   * @returns {boolean} returns if the neoReference is ready to render.
  */
-NeoReference.prototype.isReadyToRender = function(magoManager) 
+NeoReference.prototype.isReadyToRender = function() 
 {
-	if (this.renderingFase === magoManager.renderingFase)
-	{ return false; }
-
 	if (this.tMatrixAuxArray === undefined)
 	{
 		//this.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);
@@ -114,6 +110,315 @@ NeoReference.prototype.isReadyToRender = function(magoManager)
 		return false;
 	}
 	
+	return true;
+};
+
+/**
+ * Renders the content.
+ */
+NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoBuilding, shader, currentObjectsRendering) 
+{
+	var gl = magoManager.sceneState.gl;
+	
+	// Check the color or texture of reference object.
+	if (neoBuilding.isHighLighted)
+	{
+		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform4fv(shader.oneColor4_loc, magoManager.highLightColor4);
+	}
+	else if (neoBuilding.isColorChanged)
+	{
+		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		if (magoManager.objectSelected === this) 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+		}
+		else
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a] );
+		}
+	}
+	else if (this.aditionalColor)
+	{
+		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		if (magoManager.objectSelected === this) 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+		}
+		else
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a] );
+		}
+	}
+	else
+	{
+		// Normal rendering.
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === this) 
+		{
+			gl.uniform1i(shader.hasTexture_loc, false); //.***
+			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
+			
+			// Active stencil if the object is selected.
+			magoManager.renderer.enableStencilBuffer(gl);
+		}
+		else if (magoManager.magoPolicy.colorChangedObjectId === this.objectId)
+		{
+			gl.uniform1i(shader.hasTexture_loc, false); //.***
+			gl.uniform4fv(shader.oneColor4_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
+		}
+		else
+		{
+			if (this.hasTexture) 
+			{
+				if (this.texture !== undefined && this.texture.texId !== undefined) 
+				{
+					gl.uniform1i(shader.hasTexture_loc, true); //.***
+					if (shader.last_tex_id !== this.texture.texId) 
+					{
+						gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
+						shader.last_tex_id = this.texture.texId;
+					}
+					else
+					{ var hola = 0; }
+				}
+				else 
+				{
+					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.0, 0.8, 1.0]);
+				}
+			}
+			else 
+			{
+				// if no render texture, then use a color.***
+				gl.uniform1i(shader.bUse1Color_loc, true); //.***
+				if (this.color4) 
+				{
+					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform4fv(shader.oneColor4_loc, [this.color4.r/255.0, this.color4.g/255.0, this.color4.b/255.0, this.color4.a/255.0]);
+				}
+				else
+				{
+					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
+				}
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param magoManager.
+  * @returns {boolean} returns if the neoReference was rendered.
+ */
+NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, minSizeToRender) 
+{
+	var neoReference = this;
+	
+	if (!neoReference.isReadyToRender())
+	{ return false; }
+
+	// Check if the texture is loaded.
+	//if (neoReference.texture !== undefined || neoReference.materialId != -1)
+	if (neoReference.hasTexture)// && neoReference.texture !== undefined)
+	{
+		// note: in the future use only "neoReference.materialId".
+		var texFileLoadState = neoBuilding.manageNeoReferenceTexture(neoReference, magoManager);
+		if (texFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+		{ return false; }
+	
+		if (neoReference.texture === undefined)
+		{ return false; }
+	
+		if (neoReference.texture.texId === undefined)
+		{ return false; }
+	}
+	
+	// vars.***
+	if (shader.name === undefined)
+	{ var hola = 0; }
+	
+	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
+	var selCandidates;
+	var selectionColor;
+	var currentNode;
+	var currentOctree;
+	
+	if (renderType === 2)
+	{
+		selCandidates = magoManager.selectionManager;
+		selectionColor = magoManager.selectionColor;
+		renderTexture = false; // reassign value for this var.***
+		currentNode = currentObjectsRendering.curNode;
+		currentOctree = currentObjectsRendering.curOctree;
+	}
+	
+	var gl = magoManager.sceneState.gl;
+	
+	var block_idx = neoReference._block_idx;
+	var block = neoBuilding.motherBlocksArray[block_idx];
+	
+	if (block === undefined)
+	{ return false; }
+	
+	if (magoManager.mouseLeftDown || magoManager.mouseMiddleDown)
+	{ minSizeToRender = 0.5; }
+	
+	if (!block.isReadyToRender(neoReference, magoManager, minSizeToRender))
+	{ return false; }
+
+	// Check the color or texture of reference object.***************************************************************************
+	if (renderType === 1)
+	{
+		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
+	}
+	else if (renderType === 2)
+	{
+		neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); 
+		var idxKey = selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
+
+		selCandidates.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
+		if (neoReference.selColor4) 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
+		}
+	}
+	// End check color or texture of reference object.-----------------------------------------------------------------------------
+	
+	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
+	// Must applicate the transformMatrix of the reference object.***
+
+	gl.uniform1i(shader.refMatrixType_loc, neoReference.refMatrixType);
+
+	if (neoReference.refMatrixType === 1)
+	{ gl.uniform3fv(shader.refTranslationVec_loc, neoReference.refTranslationVec); }
+	else if (neoReference.refMatrixType === 2)
+	{ gl.uniformMatrix4fv(shader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
+	
+
+	if (neoReference.moveVector !== undefined) 
+	{
+		gl.uniform1i(shader.hasAditionalMov_loc, true);
+		gl.uniform3fv(shader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.***
+		shader.last_isAditionalMovedZero = false;
+	}
+	else 
+	{
+		if (!shader.last_isAditionalMovedZero)
+		{
+			gl.uniform1i(shader.hasAditionalMov_loc, false);
+			gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+			shader.last_isAditionalMovedZero = true;
+		}
+	}
+	
+	// Test check.***
+	if(magoManager.objectSelected === this)
+		var hola = 0;
+	
+	var vboKey;
+	for (var n=0; n<cacheKeys_count; n++) // Original.***
+	{
+		//var mesh_array = block.viArraysContainer._meshaderrays[n];
+		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+		if (!vboKey.isReadyPositions(gl, magoManager.vboMemoryManager) || 
+			!vboKey.isReadyNormals(gl, magoManager.vboMemoryManager) || 
+			!vboKey.isReadyFaces(gl, magoManager.vboMemoryManager))
+		{ return false; }
+		
+		// Positions.***
+		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
+		{
+			gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
+			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+			shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
+		}
+
+		if (renderType === 1)
+		{
+			// Normals.***
+			if (shader.normal3_loc && shader.normal3_loc !== -1) 
+			{
+				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
+				{
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
+					gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+					shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
+				}
+			}
+
+			// TexCoords.***
+			if (renderTexture && neoReference.hasTexture) 
+			{
+				if (block.vertexCount <= neoReference.vertexCount) 
+				{
+					var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+					if (!refVboData.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+					{ return false; }
+
+					shader.enableVertexAttribArray(shader.texCoord2_loc);
+					gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
+					gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+				}
+				else 
+				{
+					shader.disableVertexAttribArray(shader.texCoord2_loc); 
+				}
+			}
+			else 
+			{
+				shader.disableVertexAttribArray(shader.texCoord2_loc); 
+			}
+		}
+
+		// Indices.***
+		var indicesCount;
+		if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
+		{
+			indicesCount = vboKey.indicesCount;
+			
+			////if (magoManager.objectSelected === neoReference)
+			////{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
+			////else
+			////{
+			////	indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
+			////	if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
+			////	{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
+			////}
+			
+		}
+		else
+		{
+			if (magoManager.thereAreUrgentOctrees)
+			{
+				indicesCount = vboKey.bigTrianglesIndicesCount;
+				if (indicesCount > vboKey.indicesCount)
+				{ indicesCount = vboKey.indicesCount; }
+			}
+			else 
+			{
+				indicesCount = vboKey.indicesCount;
+			}
+		}
+		if (vboKey.meshFacesCacheKey !== shader.last_vboIdx_binded)
+		{
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
+			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
+		}
+		
+		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+		//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		
+		//var glError = gl.getError();
+		//if(glError !== gl.NO_ERROR)
+		//	var hola = 0;
+		
+		// Test check.***
+	if(magoManager.objectSelected === this)
+		var hola = 0;
+		
+	}
+		
 	return true;
 };
 
@@ -306,7 +611,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
  */
 NeoReferencesMotherAndIndices.prototype.isReadyToRender = function() 
 {
-	if(this.neoRefsIndices === undefined || this.neoRefsIndices.length === 0) 
+	if (this.neoRefsIndices === undefined || this.neoRefsIndices.length === 0) 
 	{ return false; }
 
 	if (this.blocksList === undefined)
@@ -398,12 +703,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
 			
-			neoRef.objectId = objectId;
+			//neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
 			// 2) Block's Idx.***
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			neoRef._block_idx = blockIdx;
 
 			// 3) Transform Matrix4.***
 			// in versioned mode read the matrixType first.
@@ -415,36 +719,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			else if (matrixType === 1)
 			{
 				// read the translation vector.
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				bytes_readed += 4 * 3;
 			}
 			else if (matrixType === 2)
 			{
 				// read the transformation matrix.
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-				readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+				bytes_readed += 4 * 16;
 			}
 
 			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (has_1_color) 
 			{
@@ -1153,140 +1436,42 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 /**
  * Renders the content.
  */
-NeoReferencesMotherAndIndices.prototype.solveReferenceColorOrTexture = function(magoManager, neoBuilding, neoReference, shader, last_tex_id) 
-{
-	var gl = magoManager.sceneState.gl;
-	
-	// Check the color or texture of reference object.
-	if (neoBuilding.isHighLighted)
-	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
-		gl.uniform4fv(shader.oneColor4_loc, magoManager.highLightColor4);
-	}
-	else if (neoBuilding.isColorChanged)
-	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
-		if (magoManager.objectSelected === neoReference) 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-		}
-		else
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a] );
-		}
-	}
-	else if (neoReference.aditionalColor)
-	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
-		if (magoManager.objectSelected === neoReference) 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-		}
-		else
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [neoReference.aditionalColor.r, neoReference.aditionalColor.g, neoReference.aditionalColor.b, neoReference.aditionalColor.a] );
-		}
-	}
-	else
-	{
-		// Normal rendering.
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === neoReference) 
-		{
-			gl.uniform1i(shader.hasTexture_loc, false); //.***
-			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-			
-			// Active stencil if the object is selected.
-			magoManager.renderer.enableStencilBuffer(gl);
-		}
-		else if (magoManager.magoPolicy.colorChangedObjectId === neoReference.objectId)
-		{
-			gl.uniform1i(shader.hasTexture_loc, false); //.***
-			gl.uniform4fv(shader.oneColor4_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
-		}
-		else
-		{
-			
-			if (neoReference.hasTexture) 
-			{
-				if (neoReference.texture !== undefined && neoReference.texture.texId !== undefined) 
-				{
-					//textureBinded = true;
-					gl.uniform1i(shader.hasTexture_loc, true); //.***
-					if (last_tex_id !== neoReference.texture.texId) 
-					{
-						gl.bindTexture(gl.TEXTURE_2D, neoReference.texture.texId);
-						last_tex_id = neoReference.texture.texId;
-					}
-				}
-				else 
-				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
-					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
-				}
-			}
-			else 
-			{
-				// if no render texture, then use a color.***
-				gl.uniform1i(shader.bUse1Color_loc, true); //.***
-				if (neoReference.color4) 
-				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
-					gl.uniform4fv(shader.oneColor4_loc, [neoReference.color4.r/255.0, neoReference.color4.g/255.0, neoReference.color4.b/255.0, neoReference.color4.a/255.0]);
-				}
-				else
-				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
-					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
-				}
-			}
-		}
-	}
-};
-
-/**
- * Renders the content.
- */
 NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey) 
 {
-	if (!this.isReadyToRender())
-	{ return; }
-
-	var cacheKeys_count;
-	var block_idx;
-	var block;
-	var last_tex_id;
-	var texFileLoadState;
-	var last_vboPos_binded;
-	var last_vboNor_binded;
-	var last_vboIdx_binded;
-	var last_isAditionalMovedZero = false; // must be initialized as "false".***
+	var allRendered = true;
 	
-	// vars for colorSelection.***
-	var selCandidates;
-	var selectionColor;
-	var currentObjectsRendering;
-	var currentNode;
-	var currentOctree;
+	if (!this.isReadyToRender())
+	{ return false; }
+	
+	if (renderType === 2)
+	{
+		renderTexture = false; // reassign value for this var.***
+	}
 	
 	if(renderType === 2)
 	{
-		selCandidates = magoManager.selectionCandidates;
-		selectionColor = magoManager.selectionColor;
-		renderTexture = false; // reassign value for this var.***
-		currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
-		currentNode = currentObjectsRendering["node"];
-		currentOctree = currentObjectsRendering["octree"];
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+	}
+	if(renderType === 0)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.normal3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
 	}
 	
 	var gl = magoManager.sceneState.gl;
 
-	gl.activeTexture(gl.TEXTURE2); // ...***
 	if (renderTexture) 
 	{
+		gl.activeTexture(gl.TEXTURE2); // ...***
 		if (renderType === 1) { gl.uniform1i(shader.hasTexture_loc, true); } //.***
 	}
 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+	shader.last_tex_id = magoManager.textureAux_1x1;
+	
+	
 
 	// New version. Use occlussion indices.***
 	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.***
@@ -1297,180 +1482,23 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		//var neoReference = this.motherNeoRefsList[this.neoRefsIndices[k]]; // no occludeCulling mode.***
 		var neoReference = this.motherNeoRefsList[this.currentVisibleIndices[k]];
 		
-		if(neoReference === undefined)
-			continue;
-		
-		if (!neoReference.isReadyToRender(magoManager))
+		if (neoReference === undefined)
 		{ continue; }
-	
-		// Check if the texture is loaded.
-		//if (neoReference.texture !== undefined || neoReference.materialId != -1)
-		if (neoReference.hasTexture)// && neoReference.texture !== undefined)
-		{
-			// note: in the future use only "neoReference.materialId".
-			texFileLoadState = neoBuilding.manageNeoReferenceTexture(neoReference, magoManager);
-			if (texFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-			{ continue; }
 		
-			if (neoReference.texture === undefined)
-			{ continue; }
-		
-			if (neoReference.texture.texId === undefined)
-			{ continue; }
-		}
-
-		block_idx = neoReference._block_idx;
-		block = neoBuilding.motherBlocksArray[block_idx];
-		
-		if(block === undefined)
-			continue;
-		
-		if(!block.isReadyToRender(neoReference, magoManager, maxSizeToRender))
+		// Check renderingFase.***
+		if (neoReference.renderingFase === magoManager.renderingFase)
 		{ continue; }
-
-		// Check the color or texture of reference object.***************************************************************************
-		if(renderType === 1)
-		{
-			this.solveReferenceColorOrTexture(magoManager, neoBuilding, neoReference, shader, last_tex_id);
-		}
-		else if(renderType === 2)
-		{
-			neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); // new.
-			var idxKey = selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
-
-
-			selCandidates.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
-			if (neoReference.selColor4) 
-			{
-				gl.uniform4fv(shader.color4Aux_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
-			}
-		}
-		// End chec color or texture of reference object.-----------------------------------------------------------------------------
 		
-		cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
-		// Must applicate the transformMatrix of the reference object.***
-	
-		gl.uniform1i(shader.refMatrixType_loc, neoReference.refMatrixType);
-
-		if (neoReference.refMatrixType === 1)
-		{ gl.uniform3fv(shader.refTranslationVec_loc, neoReference.refTranslationVec); }
-		else if (neoReference.refMatrixType === 2)
-		{ gl.uniformMatrix4fv(shader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
-		
-
-		if (neoReference.moveVector !== undefined) 
+		// Render the referenceObject.***
+		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
 		{
-			gl.uniform1i(shader.hasAditionalMov_loc, true);
-			gl.uniform3fv(shader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.***
-			last_isAditionalMovedZero = false;
-		}
-		else 
-		{
-			if(!last_isAditionalMovedZero)
-			{
-				gl.uniform1i(shader.hasAditionalMov_loc, false);
-				gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-				last_isAditionalMovedZero = true;
-			}
+			allRendered = false;
 		}
 
-		for (var n=0; n<cacheKeys_count; n++) // Original.***
-		{
-			//var mesh_array = block.viArraysContainer._meshaderrays[n];
-			this.vbo_vi_cacheKey_aux = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-			if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager) || 
-				!this.vbo_vi_cacheKey_aux.isReadyNormals(gl, magoManager.vboMemoryManager) || 
-				!this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
-			{ continue; }
-			
-			// Positions.***
-			if(this.vbo_vi_cacheKey_aux.meshVertexCacheKey !== last_vboPos_binded)
-			{
-				gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-				gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-				last_vboPos_binded = this.vbo_vi_cacheKey_aux.meshVertexCacheKey;
-			}
-			
-			if(renderType === 1)
-			{
-				// Normals.***
-				if (shader.normal3_loc !== -1) 
-				{
-					if(this.vbo_vi_cacheKey_aux.meshNormalCacheKey !== last_vboNor_binded)
-					{
-						gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-						gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-						last_vboNor_binded = this.vbo_vi_cacheKey_aux.meshNormalCacheKey;
-					}
-				}
-
-				// TexCoords.***
-				if (renderTexture && neoReference.hasTexture) 
-				{
-					if (block.vertexCount <= neoReference.vertexCount) 
-					{
-						var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-						if (!refVboData.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-						{ continue; }
-
-						gl.enableVertexAttribArray(shader.texCoord2_loc);
-						gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
-						gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
-					}
-					else 
-					{
-						if (shader.texCoord2_loc !== -1) { gl.disableVertexAttribArray(shader.texCoord2_loc); }
-					}
-				}
-				else 
-				{
-					if (shader.texCoord2_loc !== -1) { gl.disableVertexAttribArray(shader.texCoord2_loc); }
-				}
-			}
-
-			// Indices.***
-			var indicesCount;
-			if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
-			{
-				indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-				/*
-				if (magoManager.objectSelected === neoReference)
-				{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
-				else
-				{
-					indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-					if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
-					{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
-				}
-				*/
-			}
-			else
-			{
-				if (magoManager.thereAreUrgentOctrees)
-				{
-					indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-					if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
-					{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
-				}
-				else 
-				{
-					indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
-				}
-			}
-			if(this.vbo_vi_cacheKey_aux.meshFacesCacheKey !== last_vboIdx_binded)
-			{
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
-				last_vboIdx_binded = this.vbo_vi_cacheKey_aux.meshFacesCacheKey;
-			}
-			
-			gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-			//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
-		}
-
-
+		// Swap renderingFase.***
 		neoReference.swapRenderingFase();
 		
-		if(renderType === 1)
+		if (renderType === 1)
 		{
 			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === neoReference)
 			{
@@ -1479,6 +1507,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 			}
 		}
 	}
+	
+	return allRendered;
 };
 
 

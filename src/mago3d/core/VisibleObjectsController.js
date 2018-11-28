@@ -38,6 +38,22 @@ VisibleObjectsController.prototype.clear = function()
 
 /**
  */
+VisibleObjectsController.prototype.getAllVisibles = function() 
+{
+	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	return resultVisiblesArray;
+};
+
+/**
+ */
+VisibleObjectsController.prototype.get01Visibles = function() 
+{
+	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1);
+	return resultVisiblesArray;
+};
+
+/**
+ */
 VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
 {
 	// this do a dicotomic search of idx in a ordered table.
