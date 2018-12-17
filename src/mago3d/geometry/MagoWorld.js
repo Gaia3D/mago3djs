@@ -106,10 +106,12 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	mouseAction.strModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
 	// save the sphere pick.***
-	var camRay;
-	camRay = magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
-	mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
-
+	if(magoManager.globe !== undefined)
+	{
+		var camRay;
+		camRay = magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
+		mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
+	}
 };
 
 MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
