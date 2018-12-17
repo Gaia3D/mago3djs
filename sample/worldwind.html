@@ -1022,11 +1022,12 @@
 <script type="text/javascript" src="../src/mago3d/f4d/ReaderWriter.js"></script>
 <script type="text/javascript" src="../src/mago3d/f4d/TinTerrain.js"></script>
 <script type="text/javascript" src="../src/mago3d/f4d/TinTerrainManager.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Arc.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Arc2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/AxisXYZ.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/BoxAux.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/BoundingRectangle.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Circle.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Circle2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/CuttingPlane.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Ellipsoid.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/HalfEdge.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/HalfEdgesList.js"></script>
@@ -1035,21 +1036,22 @@
 <script type="text/javascript" src="../src/mago3d/geometry/Line.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Line2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/MagoNativeProject.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/MagoWorld.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/ParametricMesh.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point3D.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Polygon.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/PolyLine.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Profile.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/ProfilesList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Polygon2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/PolyLine2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Profile2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Profiles2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Face.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Mesh.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Rectangle.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Ring.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/RingsList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Rectangle2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Ring2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Rings2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Segment2D.js"></script>
-<script type="text/javascript" src="../src/mago3d/geometry/Star.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Star2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Surface.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Tessellator.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Triangle.js"></script>
@@ -1077,6 +1079,17 @@
 <script type="text/javascript" src="../src/mago3d/extern/tga.js"></script>
 <script type="text/javascript" src="../src/mago3d/extern/DataStream.js"></script>
 <script type="text/javascript" src="../src/mago3d/extern/gl-matrix.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/GMLDataContainer.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/Objects/CellSpaceMember.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/Objects/SurfaceMember.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/Objects/StateMember.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/Objects/TransitionMember.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/JsonParsor_1_0_1.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/IndoorGML/js/JsonParsor_1_0_3.js"></script>
+<script type="text/javascript" src="../src/mago3d/topology/Network.js"></script>
+<script type="text/javascript" src="../src/mago3d/topology/NetworkEdge.js"></script>
+<script type="text/javascript" src="../src/mago3d/topology/NetworkNode.js"></script>
+<script type="text/javascript" src="../src/mago3d/topology/NetworkSpace.js"></script>
 <script>
 	var agent = navigator.userAgent.toLowerCase();
 	if(agent.indexOf('chrome') < 0) { 

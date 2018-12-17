@@ -68,46 +68,47 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude)
 MagoWorld.prototype.mousedown = function(event)
 {
 	this.magoManager.sceneState.mouseButton = event.button;
-	this.updateMouseCurrent(event.clientX, event.clientY);
+	MagoWorld.updateMouseStartClick(event.clientX, event.clientY, this.magoManager);
 	this.magoManager.isCameraMoving = true;
 };
 
-MagoWorld.prototype.updateMouseCurrent = function(mouseX, mouseY)
+MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 {
-	var gl = this.magoManager.sceneState.gl;
-	var mouseAction = this.magoManager.sceneState.mouseAction;
+	var gl = magoManager.sceneState.gl;
+	var mouseAction = magoManager.sceneState.mouseAction;
 	
 	// if button = 1 (middleButton), then rotate camera.***
 	mouseAction.strX = mouseX;
 	mouseAction.strY = mouseY;
-	if (this.magoManager.sceneState.mouseButton === 0)
+	if (magoManager.sceneState.mouseButton === 0)
 	{
 		// determine worldPosition of the mouse.***
-		this.magoManager.bPicking = true;
-		//this.magoManager.mouse_x = mouseX;
-		//this.magoManager.mouse_y = mouseY;
+		magoManager.bPicking = true;
+		//magoManager.mouse_x = mouseX;
+		//magoManager.mouse_y = mouseY;
 	}
 	
 	// determine world position of the X,Y.***
-	mouseAction.strCamCoordPoint = this.magoManager.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint);
-	mouseAction.strWorldPoint = this.magoManager.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint);
+	mouseAction.strLinealDepth = magoManager.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux);
+	mouseAction.strCamCoordPoint = magoManager.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint);
+	mouseAction.strWorldPoint = magoManager.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint);
 	
 	// now, copy camera to curCamera.***
-	var camera = this.magoManager.sceneState.camera;
+	var camera = magoManager.sceneState.camera;
 	var strCamera = mouseAction.strCamera;
 	
 	strCamera.copyPosDirUpFrom(camera);
 	
 	// copy modelViewMatrix.***
-	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;
-	var modelViewMatrixInv = this.magoManager.sceneState.modelViewMatrixInv;
+	var modelViewMatrix = magoManager.sceneState.modelViewMatrix;
+	var modelViewMatrixInv = magoManager.sceneState.modelViewMatrixInv;
 	mouseAction.strModelViewMatrix._floatArrays = mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
 	mouseAction.strModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
 	// save the sphere pick.***
 	var camRay;
-	camRay = this.magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
-	mouseAction.strWorldPoint2 = this.magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
+	camRay = magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
+	mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
 
 };
 
@@ -205,13 +206,13 @@ MagoWorld.prototype.mousemove = function(event)
 		
 		camRayCamCoord = this.magoManager.getRayCamSpace(nowX, nowY, camRayCamCoord);
 		
-		// now calculate rayWorldCoord.***
+		// Now calculate rayWorldCoord.***
 		if (this.pointSC === undefined)
 		{ this.pointSC = new Point3D(); }
 		
 		this.pointSC.set(camRayCamCoord[0], camRayCamCoord[1], camRayCamCoord[2]);
 
-		// now, must transform this posCamCoord to world coord.***
+		// Now, must transform this posCamCoord to world coord, but with the "mouseAction.strModelViewMatrixInv".***
 		var mv_inv = mouseAction.strModelViewMatrixInv;
 		this.pointSC2 = mv_inv.rotatePoint3D(this.pointSC, this.pointSC2); // rayWorldSpace.***
 		this.pointSC2.unitary(); // rayWorldSpace.***
@@ -225,7 +226,7 @@ MagoWorld.prototype.mousemove = function(event)
 		if (nowWorldPoint === undefined)
 		{ return; }
 
-		var strPoint = new Point3D(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z);
+		var strPoint = new Point3D(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z); // copy point3d.***
 		var nowPoint = new Point3D(nowWorldPoint[0], nowWorldPoint[1], nowWorldPoint[2]);
 		
 		var rotAxis;

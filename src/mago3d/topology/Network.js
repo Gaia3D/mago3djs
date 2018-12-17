@@ -361,8 +361,6 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	}
 	
 	// Check if ready smallBox and bigBox.***
-	
-	
 	var selectionColor = magoManager.selectionColor;
 	selectionColor.init(); 
 	
@@ -392,7 +390,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	shader.disableVertexAttribArray(shader.texCoord2_loc); 
 	shader.enableVertexAttribArray(shader.normal3_loc); 
 	
-	gl.uniform1i(shader.hasTexture_loc, false); //.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 	
 	if (!shader.last_isAditionalMovedZero)
@@ -409,6 +407,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	
 	if (nodesCount > 0 )//&& !magoManager.isCameraMoving)
 	{
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		var refMatrixType = 1; // translation-type.***
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		gl.uniform4fv(shader.oneColor4_loc, [0.3, 0.3, 0.9, 1.0]);
@@ -444,6 +443,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		{ 
 			shader.disableVertexAttribArray(shader.texCoord2_loc); 
 			shader.disableVertexAttribArray(shader.normal3_loc); 
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			refMatrixType = 0;
 			gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 			gl.uniform4fv(shader.oneColor4_loc, [0.1, 0.1, 0.6, 1.0]);
@@ -486,6 +486,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	
 	if(this.renderSpaces)
 	{
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		refMatrixType = 0;
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, this.spacesAlpha]);

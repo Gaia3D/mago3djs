@@ -14,11 +14,16 @@ var MouseAction = function()
 	// start (onMouseDown point).***
 	this.strX;
 	this.strY;
+	this.strLinealDepth;
 	this.strCamCoordPoint;
 	this.strWorldPoint;
 	this.strWorldPoint2;
 	this.strModelViewMatrix = new Matrix4();
 	this.strModelViewMatrixInv = new Matrix4();
+	
+	// For objects selection in oneFrustum.***
+	this.strWorldPointAux;
+	this.strLocationAux;
 	
 	// cameraStatus.***
 	this.strCamera = new Camera();
@@ -28,6 +33,36 @@ var MouseAction = function()
 	this.camRotPoint = new Point3D();
 	this.camRotAxis = new Point3D();
 	
+};
+
+MouseAction.prototype.clearStartPositionsAux = function()
+{
+	if(this.strWorldPointAux)
+	{
+		this.strWorldPointAux.deleteObjects();
+	}
+	this.strWorldPointAux = undefined;
+		
+	if(this.strLocationAux)
+	{
+		this.strLocationAux.deleteObjects();
+	}
+	this.strLocationAux = undefined;
+};
+
+MouseAction.prototype.claculateStartPositionsAux = function(magoManager)
+{
+	var strLinDepth = this.strLinealDepth;
+					
+	// calculate the strWorldPos.***
+	var frustumFar = 100000000.0;
+	var strRealDepth = strLinDepth*frustumFar;
+	// now, find the 3d position of the pixel in camCoord.****
+	magoManager.resultRaySC = magoManager.getRayCamSpace(this.strX, this.strY, magoManager.resultRaySC);
+	var strCamPos = new Point3D();
+	strCamPos.set(magoManager.resultRaySC[0] * strRealDepth, magoManager.resultRaySC[1] * strRealDepth, magoManager.resultRaySC[2] * strRealDepth);
+	this.strWorldPointAux = magoManager.cameraCoordPositionToWorldCoord(strCamPos, this.strWorldPointAux);
+	this.strLocationAux = ManagerUtils.pointToGeographicCoord(this.strWorldPointAux, undefined, magoManager);
 };
 
 MouseAction.prototype.saveCurrentToStart = function()

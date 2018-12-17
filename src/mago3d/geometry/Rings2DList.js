@@ -1,11 +1,11 @@
 'use strict';
 /**
 * 어떤 일을 하고 있습니까?
-* @class RingsList
+* @class Rings2DList
 */
-var RingsList = function() 
+var Rings2DList = function() 
 {
-	if (!(this instanceof RingsList)) 
+	if (!(this instanceof Rings2DList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -18,12 +18,12 @@ var RingsList = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.newRing = function() 
+Rings2DList.prototype.newRing = function() 
 {
 	if (this.ringsArray === undefined)
 	{ this.ringsArray = []; }
 	
-	var ring = new Ring();
+	var ring = new Ring2D();
 	this.ringsArray.push(ring);
 	
 	return ring;
@@ -33,7 +33,7 @@ RingsList.prototype.newRing = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.deleteObjects = function() 
+Rings2DList.prototype.deleteObjects = function() 
 {
 	if (this.ringsArray)
 	{
@@ -51,7 +51,7 @@ RingsList.prototype.deleteObjects = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getRingsCount = function() 
+Rings2DList.prototype.getRingsCount = function() 
 {
 	if (this.ringsArray === undefined)
 	{ return 0; }
@@ -63,7 +63,7 @@ RingsList.prototype.getRingsCount = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getRingIdx = function(ring) 
+Rings2DList.prototype.getRingIdx = function(ring) 
 {
 	if (ring === undefined)
 	{ return undefined; }
@@ -89,7 +89,7 @@ RingsList.prototype.getRingIdx = function(ring)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getRing = function(idx) 
+Rings2DList.prototype.getRing = function(idx) 
 {
 	if (this.ringsArray === undefined)
 	{ return undefined; }
@@ -101,7 +101,7 @@ RingsList.prototype.getRing = function(idx)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.getBoundingRectangle = function(ringsArray, resultBRect) 
+Rings2DList.getBoundingRectangle = function(ringsArray, resultBRect) 
 {
 	if (this.resultBRect === undefined)
 	{ resultBRect = new BoundingRectangle(); }
@@ -131,7 +131,7 @@ RingsList.getBoundingRectangle = function(ringsArray, resultBRect)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.setIdxInList = function() 
+Rings2DList.prototype.setIdxInList = function() 
 {
 	var ringsCount = this.ringsArray.length;
 	for (var i=0; i<ringsCount; i++)
@@ -144,7 +144,7 @@ RingsList.prototype.setIdxInList = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.intersectionWithSegment = function(segment) 
+Rings2DList.prototype.intersectionWithSegment = function(segment) 
 {
 	// returns true if any ring's polygon intersects with "segment".***
 	if (segment === undefined)
@@ -169,7 +169,7 @@ RingsList.prototype.intersectionWithSegment = function(segment)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
+Rings2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
 {
 	if (point === undefined)
 	{ return resultSortedObjectsArray; }
@@ -202,7 +202,7 @@ RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorted
 		startIdx = 0;
 		endIdx = objectsAuxArray.length - 1;
 		
-		insertIdx = RingsList.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
+		insertIdx = Rings2DList.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
 		objectsAuxArray.splice(insertIdx, 0, objectAux);
 	}
 	
@@ -224,7 +224,7 @@ RingsList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorted
  * 어떤 일을 하고 있습니까?
  * @returns result_idx
  */
-RingsList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
+Rings2DList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.

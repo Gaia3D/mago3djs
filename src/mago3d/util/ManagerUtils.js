@@ -25,16 +25,22 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
 		origin = globe.computePositionFromPoint(point.x, point.y, point.z, origin);
 		resultGeographicCoord.setLonLatAlt(origin.longitude, origin.latitude, origin.altitude);
 	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	{
-		var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
-		resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-	{
+	else{
 		var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
-		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.height);
+		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.altitude);
 	}
+	/*
+	//else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	//{
+	//	var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
+	//	resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
+	//}
+	//else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	//{
+	//	var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
+	//	resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.height);
+	//}
+	*/
 	
 	return resultGeographicCoord;
 };
@@ -46,6 +52,7 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 
 	if (magoManager.configInformation !== undefined && magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
+		var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
 		resultWorldPoint.set(cartesian[1], cartesian[2], cartesian[0]);
 		return resultWorldPoint;
 	}

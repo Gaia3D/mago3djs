@@ -123,12 +123,12 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	// Check the color or texture of reference object.
 	if (neoBuilding.isHighLighted)
 	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		gl.uniform4fv(shader.oneColor4_loc, magoManager.highLightColor4);
 	}
 	else if (neoBuilding.isColorChanged)
 	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		if (magoManager.objectSelected === this) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -140,7 +140,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	}
 	else if (this.aditionalColor)
 	{
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		if (magoManager.objectSelected === this) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -155,7 +155,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		// Normal rendering.
 		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === this) 
 		{
-			gl.uniform1i(shader.hasTexture_loc, false); //.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			
 			// Active stencil if the object is selected.
@@ -163,7 +163,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		}
 		else if (magoManager.magoPolicy.colorChangedObjectId === this.objectId)
 		{
-			gl.uniform1i(shader.hasTexture_loc, false); //.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
 		}
 		else
@@ -172,7 +172,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 			{
 				if (this.texture !== undefined && this.texture.texId !== undefined) 
 				{
-					gl.uniform1i(shader.hasTexture_loc, true); //.***
+					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
 					if (shader.last_tex_id !== this.texture.texId) 
 					{
 						gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
@@ -183,7 +183,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 				}
 				else 
 				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.0, 0.8, 1.0]);
 				}
 			}
@@ -193,12 +193,12 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 				gl.uniform1i(shader.bUse1Color_loc, true); //.***
 				if (this.color4) 
 				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 					gl.uniform4fv(shader.oneColor4_loc, [this.color4.r/255.0, this.color4.g/255.0, this.color4.b/255.0, this.color4.a/255.0]);
 				}
 				else
 				{
-					gl.uniform1i(shader.hasTexture_loc, false); //.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 				}
 			}
@@ -1448,6 +1448,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		renderTexture = false; // reassign value for this var.***
 	}
 	
+	var gl = magoManager.sceneState.gl;
+	
 	if(renderType === 2)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
@@ -1460,12 +1462,13 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		shader.disableVertexAttribArray(shader.color4_loc);
 	}
 	
-	var gl = magoManager.sceneState.gl;
-
 	if (renderTexture) 
 	{
 		gl.activeTexture(gl.TEXTURE2); // ...***
-		if (renderType === 1) { gl.uniform1i(shader.hasTexture_loc, true); } //.***
+		if (renderType === 1) 
+		{ 
+			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
+		} 
 	}
 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);

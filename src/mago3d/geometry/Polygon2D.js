@@ -2,22 +2,22 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Polygon
+ * @class Polygon2D
  */
-var Polygon = function() 
+var Polygon2D = function() 
 {
-	if (!(this instanceof Polygon)) 
+	if (!(this instanceof Polygon2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// This is a 2D polygon.***
 	this.point2dList;
-	this.normal; // polygon sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
+	this.normal; // Polygon2D sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
 	this.convexPolygonsArray; // tessellation result.***
 	this.bRect; // boundary rectangle.***
 };
 
-Polygon.prototype.deleteObjects = function()
+Polygon2D.prototype.deleteObjects = function()
 {
 	if (this.point2dList !== undefined)
 	{
@@ -28,7 +28,7 @@ Polygon.prototype.deleteObjects = function()
 	this.normal = undefined;
 };
 
-Polygon.prototype.getBoundingRectangle = function(resultBRect)
+Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 {
 	if (this.point2dList === undefined)
 	{ return resultBRect; }
@@ -37,7 +37,7 @@ Polygon.prototype.getBoundingRectangle = function(resultBRect)
 	return resultBRect;
 };
 
-Polygon.prototype.getEdgeDirection = function(idx)
+Polygon2D.prototype.getEdgeDirection = function(idx)
 {
 	// the direction is unitary vector.***
 	var segment = this.point2dList.getSegment(idx);
@@ -45,26 +45,26 @@ Polygon.prototype.getEdgeDirection = function(idx)
 	return direction;
 };
 
-Polygon.prototype.getEdgeVector = function(idx)
+Polygon2D.prototype.getEdgeVector = function(idx)
 {
 	var segment = this.point2dList.getSegment(idx);
 	var vector = segment.getVector(undefined);
 	return vector;
 };
 
-Polygon.prototype.reverseSense = function()
+Polygon2D.prototype.reverseSense = function()
 {
 	if (this.point2dList !== undefined)
 	{ this.point2dList.reverse(); }
 };
 
-Polygon.prototype.getCopy = function(resultCopyPolygon)
+Polygon2D.prototype.getCopy = function(resultCopyPolygon)
 {
 	if (this.point2dList === undefined)
 	{ return resultCopyPolygon; }
 	
 	if (resultCopyPolygon === undefined)
-	{ resultCopyPolygon = new Polygon(); }
+	{ resultCopyPolygon = new Polygon2D(); }
 	
 	// copy the point2dList and the normal.***
 	if (resultCopyPolygon.point2dList === undefined)
@@ -78,7 +78,7 @@ Polygon.prototype.getCopy = function(resultCopyPolygon)
 	return resultCopyPolygon;
 };
 
-Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
+Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
 	// must check if the verticesCount is 3. Then is a convex polygon.***
 	
@@ -134,7 +134,7 @@ Polygon.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 };
 
 
-Polygon.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
+Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
 {
 	// Note: to call this function, before must call "calculateNormal" that returns "concaveVerticesIndices".***
 	// Note: in 2D, "normal" is -1=(cw) or 1=(ccw).***
@@ -237,7 +237,7 @@ Polygon.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsAr
 	return convexPolygonsArray;
 };
 
-Polygon.prototype.intersectionWithSegment = function(segment)
+Polygon2D.prototype.intersectionWithSegment = function(segment)
 {
 	// "segment" cut a polygons edge.***
 	// "segment" coincident with a polygons vertex.***
@@ -273,13 +273,13 @@ Polygon.prototype.intersectionWithSegment = function(segment)
 	return false;
 };
 
-Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArray)
+Polygon2D.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArray)
 {
 	if (resultSplittedPolygonsArray === undefined)
 	{ resultSplittedPolygonsArray = []; }
 	
 	// polygon A. idx1 -> idx2.***
-	var polygon_A = new Polygon();
+	var polygon_A = new Polygon2D();
 	polygon_A.point2dList = new Point2DList();
 	polygon_A.point2dList.pointsArray = [];
 	
@@ -310,7 +310,7 @@ Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArra
 	resultSplittedPolygonsArray.push(polygon_A);
 	
 	// polygon B. idx2 -> idx1.***
-	var polygon_B = new Polygon();
+	var polygon_B = new Polygon2D();
 	polygon_B.point2dList = new Point2DList();
 	polygon_B.point2dList.pointsArray = [];
 	
@@ -341,7 +341,7 @@ Polygon.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArra
 	return resultSplittedPolygonsArray;
 };
 
-Polygon.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
+Polygon2D.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
 {
 	// Static function.***
 	// Sorting minDist to maxDist.***
@@ -353,7 +353,7 @@ Polygon.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSor
 	return resultSortedPointsIdxArray;
 };
 
-Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
+Polygon2D.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 {
 	// PROVISIONAL.***
 	// in this case, consider the polygon is convex.***
@@ -383,7 +383,7 @@ Polygon.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 	return resultTrianglesArray;
 };
 
-Polygon.prototype.getVbo = function(resultVbo)
+Polygon2D.prototype.getVbo = function(resultVbo)
 {
 	// PROVISIONAL.***
 	// return positions, normals and indices.***
@@ -432,7 +432,7 @@ Polygon.prototype.getVbo = function(resultVbo)
 	return resultVbo;
 };
 
-Polygon.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
+Polygon2D.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
 {
 	// PROVISIONAL.***
 	// return positions, normals and indices.***

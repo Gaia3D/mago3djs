@@ -33,6 +33,14 @@ Face.prototype.addVertex = function(vertex)
 	this.vertexArray.push(vertex);
 };
 
+Face.prototype.addVerticesArray = function(verticesArray)
+{
+	if (this.vertexArray === undefined)
+	{ this.vertexArray = []; }
+	
+	Array.prototype.push.apply(this.vertexArray, verticesArray);
+};
+
 Face.prototype.getVertex = function(idx)
 {
 	if (this.vertexArray === undefined)
@@ -157,7 +165,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 	
 	// Create a temp polygon2d.***
-	var polygon2d = new Polygon();
+	var polygon2d = new Polygon2D();
 	if (polygon2d.point2dList === undefined)
 	{ polygon2d.point2dList = new Point2DList(); }
 	var point2dList = polygon2d.point2dList;

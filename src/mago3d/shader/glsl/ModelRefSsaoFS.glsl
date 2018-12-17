@@ -5,7 +5,6 @@
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
-uniform bool hasTexture;
 uniform bool textureFlipYAxis;
 varying vec3 vNormal;
 uniform mat4 projectionMatrix;
@@ -20,7 +19,9 @@ uniform float screenHeight;
 uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
+varying vec4 aColor4; // color from attributes
 uniform bool bApplyScpecularLighting;
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
@@ -124,7 +125,7 @@ void main()
 	}
 
     vec4 textureColor;
-    if(hasTexture)
+    if(colorType == 2)
     {
         if(textureFlipYAxis)
         {
@@ -139,8 +140,13 @@ void main()
             discard;
         }
     }
-    else{
+    else if(colorType == 0)
+	{
         textureColor = oneColor4;
+    }
+	else if(colorType == 1)
+	{
+        textureColor = aColor4;
     }
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);

@@ -3,11 +3,12 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class ProfilesList
+ * @class Profiles2DList
  */
-var ProfilesList = function() 
+var Profiles2DList = function() 
 {
-	if (!(this instanceof ProfilesList)) 
+	// Class no used.***
+	if (!(this instanceof Profiles2DList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -20,12 +21,12 @@ var ProfilesList = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-ProfilesList.prototype.newProfile = function() 
+Profiles2DList.prototype.newProfile = function() 
 {
 	if (this.profilesArray === undefined)
 	{ this.profilesArray = []; }
 	
-	var profile = new Profile();
+	var profile = new Profile2D();
 	this.profilesArray.push(profile);
 	return profile;
 };
@@ -34,7 +35,7 @@ ProfilesList.prototype.newProfile = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-ProfilesList.prototype.deleteObjects = function() 
+Profiles2DList.prototype.deleteObjects = function() 
 {
 	if (this.profilesArray)
 	{

@@ -107,6 +107,8 @@ Plane.prototype.intersectionSphere = function(sphere)
 	var sphereCenter = sphere.centerPoint;
 	
 	// calculate the distance by dotProduct.***
+	// sphere centerPoint = (x1, y1, z1), distance = |ax1 + by1 + cz1 + d|/sqrt(a*a +b*b + c*c*).
+	// note: the module sqrt(a*a +b*b + c*c*) = 1, so no necessary divide distance by module.***
 	var distance = sphereCenter.x * this.a + sphereCenter.y * this.b + sphereCenter.z * this.c + this.d;
 
 	if (distance < -sphere.r)

@@ -2,23 +2,23 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Ring
+ * @class Ring2D
  */
-var Ring = function() 
+var Ring2D = function() 
 {
-	if (!(this instanceof Ring)) 
+	if (!(this instanceof Ring2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
 	this.elemsArray;
-	this.polygon; // auxiliar.***
+	this.polygon; // auxiliar polygon2D.***
 };
 
 /**
- * @class Ring
+ * @class Ring2D
  */
-Ring.prototype.deleteObjects = function()
+Ring2D.prototype.deleteObjects = function()
 {
 	if (this.elemsArray !== undefined)
 	{
@@ -38,22 +38,22 @@ Ring.prototype.deleteObjects = function()
 };
 
 /**
- * @class Ring
+ * @class Ring2D
  */
-Ring.prototype.newElement = function(elementTypeString)
+Ring2D.prototype.newElement = function(elementTypeString)
 {
 	var elem;
 	
 	if (elementTypeString === "ARC")
-	{ elem = new Arc(); }
+	{ elem = new Arc2D(); }
 	else if (elementTypeString === "CIRCLE")
-	{ elem = new Circle(); }
+	{ elem = new Circle2D(); }
 	else if (elementTypeString === "POLYLINE")
-	{ elem = new PolyLine(); }
+	{ elem = new PolyLine2D(); }
 	else if (elementTypeString === "RECTANGLE")
-	{ elem = new Rectangle(); }
+	{ elem = new Rectangle2D(); }
 	else if (elementTypeString === "STAR")
-	{ elem = new Star(); }
+	{ elem = new Star2D(); }
 	
 	if (elem === undefined)
 	{ return undefined; }
@@ -68,9 +68,9 @@ Ring.prototype.newElement = function(elementTypeString)
 
 /**
  * returns the points array of the ring.
- * @class Ring
+ * @class Ring2D
  */
-Ring.prototype.makePolygon = function()
+Ring2D.prototype.makePolygon = function()
 {
 	this.polygon = this.getPolygon(this.polygon);
 	return this.polygon;
@@ -78,12 +78,12 @@ Ring.prototype.makePolygon = function()
 
 /**
  * returns the points array of the ring.
- * @class Ring
+ * @class Ring2D
  */
-Ring.prototype.getPolygon = function(resultPolygon)
+Ring2D.prototype.getPolygon = function(resultPolygon)
 {
 	if (resultPolygon === undefined)
-	{ resultPolygon = new Polygon(); }
+	{ resultPolygon = new Polygon2D(); }
 	
 	if (resultPolygon.point2dList === undefined)
 	{ resultPolygon.point2dList = new Point2DList(); }
@@ -107,9 +107,9 @@ Ring.prototype.getPolygon = function(resultPolygon)
 
 /**
  * returns the points array of the ring.
- * @class Ring
+ * @class Ring2D
  */
-Ring.prototype.getPoints = function(resultPointsArray)
+Ring2D.prototype.getPoints = function(resultPointsArray)
 {
 	if (resultPointsArray === undefined)
 	{ resultPointsArray = []; }
