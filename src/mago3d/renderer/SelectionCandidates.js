@@ -21,7 +21,7 @@ var SelectionCandidateFamily = function()
  */
 SelectionCandidateFamily.prototype.setCandidate = function(idxKey, candidate)
 {
-	if(idxKey && candidate)
+	if(idxKey !== undefined && candidate)
 	{
 		this.candidatesMap[idxKey] = candidate;
 	}
@@ -33,6 +33,7 @@ SelectionCandidateFamily.prototype.setCandidate = function(idxKey, candidate)
 SelectionCandidateFamily.prototype.clearCandidate = function()
 {
 	this.candidatesMap = {};
+	this.currentSelected = undefined;
 };
 
 /**

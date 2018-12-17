@@ -2,17 +2,17 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Arc
+ * @class Arc2D
  */
-var Arc = function() 
+var Arc2D = function() 
 {
-	if (!(this instanceof Arc)) 
+	if (!(this instanceof Arc2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// sweeping in CounterClockWise is positive.***
 	// zero startAngle is in "X" axis positive.***
-	this.centerPoint; // Point3D.***
+	this.centerPoint; // Point2D.***
 	this.radius;
 	this.startAngleDeg;
 	this.sweepAngleDeg;
@@ -25,10 +25,10 @@ var Arc = function()
 };
 
 /**
- * Set the center position of arc.
- * @class Arc
+ * Set the center position of Arc2D.
+ * @class Arc2D
  */
-Arc.prototype.deleteObjects = function()
+Arc2D.prototype.deleteObjects = function()
 {
 	if (this.centerPoint !== undefined)
 	{ this.centerPoint.deleteObjects(); } // Point3D.***
@@ -52,9 +52,9 @@ Arc.prototype.deleteObjects = function()
 
 /**
  * Set the center position of arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setCenterPosition = function(cx, cy)
+Arc2D.prototype.setCenterPosition = function(cx, cy)
 {
 	if (this.centerPoint === undefined)
 	{ this.centerPoint = new Point2D(); }
@@ -64,27 +64,27 @@ Arc.prototype.setCenterPosition = function(cx, cy)
 
 /**
  * Set the center position of arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setRadius = function(radius)
+Arc2D.prototype.setRadius = function(radius)
 {
 	this.radius = radius;
 };
 
 /**
  * Set the start angle of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setStartAngleDegree = function(startAngleDegree)
+Arc2D.prototype.setStartAngleDegree = function(startAngleDegree)
 {
 	this.startAngleDeg = startAngleDegree;
 };
 
 /**
  * Set the start angle of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setStartPoint = function(x, y)
+Arc2D.prototype.setStartPoint = function(x, y)
 {
 	// If no exist startAngle, then use this to calculate startAngle.***
 	if (this.startPoint === undefined)
@@ -95,9 +95,9 @@ Arc.prototype.setStartPoint = function(x, y)
 
 /**
  * Set the start angle of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setEndPoint = function(x, y)
+Arc2D.prototype.setEndPoint = function(x, y)
 {
 	// If no exist sweepAngle, then use this to calculate sweepAngle.***
 	if (this.endPoint === undefined)
@@ -108,27 +108,27 @@ Arc.prototype.setEndPoint = function(x, y)
 
 /**
  * Set the start angle of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setSense = function(sense)
+Arc2D.prototype.setSense = function(sense)
 {
 	this.sweepSense = sense; // 1=CCW, -1=CW.***
 };
 
 /**
  * Set the sweep angle of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.setSweepAngleDegree = function(sweepAngleDegree)
+Arc2D.prototype.setSweepAngleDegree = function(sweepAngleDegree)
 {
 	this.sweepAngleDeg = sweepAngleDegree;
 };
 
 /**
  * Returns the points of the arc.
- * @class Arc
+ * @class Arc2D
  */
-Arc.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
+Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
 	if (this.centerPoint === undefined)
 	{ return resultPointsArray; }

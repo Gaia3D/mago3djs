@@ -27,13 +27,13 @@ var GeoLocationData = function(geoLocationDataName)
 	this.position;   // Point3D().***
 	this.positionHIGH; // Float32Array[3].***
 	this.positionLOW; // Float32Array[3].***
-	this.pivotPoint; // Point3D().*** // Actually position = pivotPoint.
+	this.pivotPoint; // Point3D().*** // Actual position = pivotPoint.
 	
 	// F4D Matrix4.****
-	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev).***
-	this.geoLocMatrixInv; // this is just the cartographic transformation matrixInv determined by (lon, lat, elev).***
-	this.tMatrix;      // this contains translation & rotations.***
-	this.tMatrixInv;   // this contains translation & rotations.***
+	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
+	this.geoLocMatrixInv; // this is just the cartographic transformation matrixInv determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
+	this.tMatrix;      // this contains translation & rotations (heading-pitch-roll).***
+	this.tMatrixInv;   // this contains translation & rotations (heading-pitch-roll).***
 	this.rotMatrix;    // this contains only rotation.***
 	this.rotMatrixInv; // this contains only rotation.***
 	

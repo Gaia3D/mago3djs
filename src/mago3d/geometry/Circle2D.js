@@ -2,11 +2,11 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Circle
+ * @class Circle2D
  */
-var Circle = function() 
+var Circle2D = function() 
 {
-	if (!(this instanceof Circle)) 
+	if (!(this instanceof Circle2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -19,9 +19,9 @@ var Circle = function()
 
 /**
  * Set the center position of Circle.
- * @class Circle
+ * @class Circle2D
  */
-Circle.prototype.setCenterPosition = function(cx, cy)
+Circle2D.prototype.setCenterPosition = function(cx, cy)
 {
 	if (this.centerPoint === undefined)
 	{ this.centerPoint = new Point2D(); }
@@ -31,18 +31,18 @@ Circle.prototype.setCenterPosition = function(cx, cy)
 
 /**
  * Set the center position of Circle.
- * @class Circle
+ * @class Circle2D
  */
-Circle.prototype.setRadius = function(radius)
+Circle2D.prototype.setRadius = function(radius)
 {
 	this.radius = radius;
 };
 
 /**
  * Returns the points of the arc.
- * @class Arc
+ * @class Circle2D
  */
-Circle.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
+Circle2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
 	if (pointsCountFor360Deg)
 	{ this.numPointsFor360Deg = pointsCountFor360Deg; }
@@ -54,7 +54,7 @@ Circle.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	if (this.centerPoint === undefined || this.radius === undefined)
 	{ return resultPointsArray; }
 	
-	var arc = new Arc();
+	var arc = new Arc2D();
 	arc.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
 	
 	arc.setRadius(this.radius);

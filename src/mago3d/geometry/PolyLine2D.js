@@ -2,11 +2,11 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class PolyLine
+ * @class PolyLine2D
  */
-var PolyLine = function() 
+var PolyLine2D = function() 
 {
-	if (!(this instanceof PolyLine)) 
+	if (!(this instanceof PolyLine2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -16,9 +16,9 @@ var PolyLine = function()
 
 /**
  * Creates a new Point2D.
- * @class PolyLine
+ * @class PolyLine2D
  */
-PolyLine.prototype.newPoint2d = function(x, y)
+PolyLine2D.prototype.newPoint2d = function(x, y)
 {
 	if (this.point2dArray === undefined)
 	{ this.point2dArray = []; }
@@ -30,9 +30,9 @@ PolyLine.prototype.newPoint2d = function(x, y)
 
 /**
  * Creates a new Point2D.
- * @class PolyLine
+ * @class PolyLine2D
  */
-PolyLine.prototype.deleteObjects = function()
+PolyLine2D.prototype.deleteObjects = function()
 {
 	var pointsCount = this.point2dArray.length;
 	for (var i=0; i<pointsCount; i++)
@@ -45,9 +45,9 @@ PolyLine.prototype.deleteObjects = function()
 
 /**
  * Creates a new Point2D.
- * @class PolyLine
+ * @class PolyLine2D
  */
-PolyLine.prototype.getPoints = function(resultPointsArray)
+PolyLine2D.prototype.getPoints = function(resultPointsArray)
 {
 	if (resultPointsArray === undefined)
 	{ resultPointsArray = []; }

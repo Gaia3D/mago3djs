@@ -439,7 +439,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		{
 			// Provisionally flip tex coords here.***
 			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
-			gl.uniform1i(shader.hasTexture_loc, true);
+			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
 				//gl.activeTexture(gl.TEXTURE2); 
@@ -450,7 +450,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		else 
 		{
 			// Todo: If this building lod2 has no texture, then render with colors.***
-			//gl.uniform1i(shader.hasTexture_loc, false);
+			//gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			//shader.disableVertexAttribArray(shader.texCoord2_loc);
 			//renderTexture = false;
 			//-------------------------------------------------------------------------
@@ -469,7 +469,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		var currentNode = currentObjectsRendering.curNode;
 		magoManager.selectionManager.setCandidates(idxKey, undefined, this, neoBuilding, currentNode);
 		
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	

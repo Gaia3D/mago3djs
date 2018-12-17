@@ -46,6 +46,7 @@ Box.prototype.render = function(magoManager, shader, renderType)
 	if (this.mesh === undefined)
 	{
 		this.mesh = this.makeMesh(this.width, this.length, this.height);
+		return;
 	}
 
 	this.mesh.render(magoManager, shader, renderType);
@@ -88,7 +89,7 @@ Box.prototype.makeMesh = function(width, length, height)
 	var pMesh = new ParametricMesh();
 		
 	// Create a Profile2d.***
-	pMesh.profile = new Profile(); 
+	pMesh.profile = new Profile2D(); 
 	var profileAux = pMesh.profile; 
 	
 	// Create a outer ring in the Profile2d.***

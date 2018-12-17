@@ -18,6 +18,7 @@
 	uniform vec3 refTranslationVec;
 	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 	uniform bool bApplySpecularLighting;
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
@@ -25,6 +26,7 @@
 	varying vec3 vLightWeighting;
 	varying vec3 vertexPos;
 	varying float applySpecLighting;
+	varying vec4 aColor4; // color from attributes
 	
 	void main()
     {	
@@ -69,4 +71,7 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+		
+		if(colorType == 1)
+			aColor4 = color4;
 	}

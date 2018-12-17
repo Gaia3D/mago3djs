@@ -31,7 +31,7 @@ AxisXYZ.prototype.makeMesh = function(length)
 	
 	var pMesh = new ParametricMesh();
 		
-	pMesh.profile = new Profile(); 
+	pMesh.profile = new Profile2D(); 
 	var profileAux = pMesh.profile; 
 	
 	// create a halfArrow profile.***

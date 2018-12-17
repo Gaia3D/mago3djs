@@ -908,7 +908,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 				var lowestOctreesCount2 = this.currentVisibleOctreesControler.currentVisibles2.length;
 				
 				// If octreesRenderedsCount is minor than 60% of total of visibleOctrees, then render the buildingSkin.***
-				if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.6)
+				if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
 				{ this.renderSkin(magoManager, shader, renderType); }
 			}
 		}
@@ -969,23 +969,24 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		{
 			gl.uniform1i(shader.bUse1Color_loc, true);
 			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
+			renderTexture = false;
 		}
 		else if (this.isColorChanged)
 		{
 			gl.uniform1i(shader.bUse1Color_loc, true);
 			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a]); //.***
+			renderTexture = false;
 		}
 		else
 		{
 			gl.uniform1i(shader.bUse1Color_loc, false);
 		}
 		//----------------------------------------------------------------------------------
-		renderTexture = true;
-		if (skinLego.texture !== undefined && skinLego.texture.texId)
+		if (skinLego.texture !== undefined && skinLego.texture.texId && renderTexture)
 		{
 			
 			shader.enableVertexAttribArray(shader.texCoord2_loc);
-			gl.uniform1i(shader.hasTexture_loc, true);
+			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
 			if (shader.last_tex_id !== skinLego.texture.texId)
 			{
 				gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
@@ -995,11 +996,14 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		else 
 		{
 			//return;
-			if (magoManager.textureAux_1x1 !== undefined)
+			if (magoManager.textureAux_1x1 !== undefined && renderTexture)
 			{
 				shader.enableVertexAttribArray(shader.texCoord2_loc);
-				gl.uniform1i(shader.hasTexture_loc, true);
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
 				gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+			}
+			else{
+				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			}
 		}
 	}
@@ -1011,7 +1015,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
 		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
 		
-		gl.uniform1i(shader.hasTexture_loc, false); //.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	

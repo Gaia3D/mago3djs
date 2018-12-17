@@ -1,11 +1,11 @@
 'use strict';
 /**
 * 어떤 일을 하고 있습니까?
-* @class Rectangle
+* @class Rectangle2D
 */
-var Rectangle = function() 
+var Rectangle2D = function() 
 {
-	if (!(this instanceof Rectangle)) 
+	if (!(this instanceof Rectangle2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -15,7 +15,7 @@ var Rectangle = function()
 	this.height;
 };
 
-Rectangle.prototype.setCenterPosition = function(cx, cy)
+Rectangle2D.prototype.setCenterPosition = function(cx, cy)
 {
 	if (this.centerPoint === undefined)
 	{ this.centerPoint = new Point2D(); }
@@ -23,7 +23,7 @@ Rectangle.prototype.setCenterPosition = function(cx, cy)
 	this.centerPoint.set(cx, cy);
 };
 
-Rectangle.prototype.setDimensions = function(width, height)
+Rectangle2D.prototype.setDimensions = function(width, height)
 {
 	this.width = width;
 	this.height = height;
@@ -31,9 +31,9 @@ Rectangle.prototype.setDimensions = function(width, height)
 
 /**
  * Returns the points of the Rectangle.
- * @class Rectangle
+ * @class Rectangle2D
  */
-Rectangle.prototype.getPoints = function(resultPointsArray)
+Rectangle2D.prototype.getPoints = function(resultPointsArray)
 {
 	if (this.centerPoint === undefined || this.width === undefined || this.height === undefined)
 	{ return resultPointsArray; }

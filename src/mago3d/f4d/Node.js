@@ -122,8 +122,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// renderWithTopology === 2 -> render both.***
 	
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
-	/*
+	
 	// Test.***
+	/*
 	if (neoBuilding.network)
 	{
 		if(magoManager.tempSettings.renderWithTopology === 0 || magoManager.tempSettings.renderWithTopology === 2)
@@ -137,6 +138,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	
 	if (neoBuilding.network)
 	{
+		// Note: topology data is loaded (if exist) when loads the metaData in "prepareNeoBuildingsAsimetricVersion" in magoManager.***
 		if(magoManager.tempSettings.renderWithTopology === 1 || magoManager.tempSettings.renderWithTopology === 2)
 		{
 			// render the topology.***

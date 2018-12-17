@@ -402,13 +402,14 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 
-Mesh.prototype.render = function(magoManager, shader, renderType)
+Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
 	var vboMemManager = magoManager.vboMemoryManager;
 	
 	if (this.vboKeysContainer === undefined)
 	{
 		this.vboKeysContainer = this.getVbo(this.vboKeysContainer, vboMemManager);
+		return;
 	}
 	
 	var gl = magoManager.sceneState.gl;
@@ -447,8 +448,13 @@ Mesh.prototype.render = function(magoManager, shader, renderType)
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
 			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
 		}
+		var primitive;
+		if(glPrimitive)
+			primitive = glPrimitive;
+		else
+			primitive = gl.TRIANGLES;
 		
-		gl.drawElements(gl.TRIANGLES, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 };
 
@@ -458,7 +464,6 @@ Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
 	// make global triangles array.***
-	//var trianglesArray = this.getTrianglesConvex(undefined); // for convex faces (faster).***
 	var trianglesArray = this.getTriangles(undefined);
 	var trianglesCount = trianglesArray.length;
 	

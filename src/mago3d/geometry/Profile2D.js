@@ -3,27 +3,27 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Profile
+ * @class Profile2D
  */
-var Profile = function() 
+var Profile2D = function() 
 {
-	if (!(this instanceof Profile)) 
+	if (!(this instanceof Profile2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.outerRing; // one Ring. 
-	this.innerRingsList; // class: RingsList. 
+	this.outerRing; // one Ring2D. 
+	this.innerRingsList; // class: Rings2DList. 
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.newOuterRing = function() 
+Profile2D.prototype.newOuterRing = function() 
 {
 	if (this.outerRing === undefined)
-	{ this.outerRing = new Ring(); }
+	{ this.outerRing = new Ring2D(); }
 	else 
 	{
 		this.outerRing.deleteObjects();
@@ -36,10 +36,10 @@ Profile.prototype.newOuterRing = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.newInnerRing = function() 
+Profile2D.prototype.newInnerRing = function() 
 {
 	if (this.innerRingsList === undefined)
-	{ this.innerRingsList = new RingsList(); }
+	{ this.innerRingsList = new Rings2DList(); }
 	
 	var innerRing = this.innerRingsList.newRing();
 	
@@ -50,7 +50,7 @@ Profile.prototype.newInnerRing = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.deleteObjects = function() 
+Profile2D.prototype.deleteObjects = function() 
 {
 	if (this.outerRing)
 	{
@@ -70,7 +70,7 @@ Profile.prototype.deleteObjects = function()
  * @returns vertexList
  */
 
-Profile.prototype.hasHoles = function() 
+Profile2D.prototype.hasHoles = function() 
 {
 	if (this.innerRingsList === undefined || this.innerRingsList.getRingsCount() === 0)
 	{ return false; }
@@ -83,7 +83,7 @@ Profile.prototype.hasHoles = function()
  * @returns vertexList
  */
  
-Profile.prototype.getVBO = function(resultVbo) 
+Profile2D.prototype.getVBO = function(resultVbo) 
 {
 	if (this.outerRing === undefined)
 	{ return resultVbo; }
@@ -97,7 +97,7 @@ Profile.prototype.getVBO = function(resultVbo)
  * @returns vertexList
  */
  
-Profile.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesData) 
+Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesData) 
 {
 	if (this.outerRing === undefined)
 	{ return resultVbo; }
@@ -161,7 +161,7 @@ Profile.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesData)
  * @returns vertexList
  */
  
-Profile.prototype.getGeneralPolygon = function(generalPolygon) 
+Profile2D.prototype.getGeneralPolygon = function(generalPolygon) 
 {
 	// this returns a holesTessellatedPolygon, and inside it has convexPolygons.***
 	this.checkNormals(); // here makes outer & inner's polygons.***
@@ -170,7 +170,7 @@ Profile.prototype.getGeneralPolygon = function(generalPolygon)
 	{
 		// Simply, put all points of outerPolygon into generalPolygon(computingPolygon).***
 		if (generalPolygon === undefined)
-		{ generalPolygon = new Polygon(); }
+		{ generalPolygon = new Polygon2D(); }
 		
 		if (generalPolygon.point2dList === undefined)
 		{ generalPolygon.point2dList = new Point2DList(); }
@@ -201,10 +201,10 @@ Profile.prototype.getGeneralPolygon = function(generalPolygon)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, innerPolygon, outerPointIdx, innerPointIdx, resultPolygon) 
+Profile2D.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, innerPolygon, outerPointIdx, innerPointIdx, resultPolygon) 
 {
 	if (resultPolygon === undefined)
-	{ resultPolygon = new Polygon(); }
+	{ resultPolygon = new Polygon2D(); }
 	
 	if (resultPolygon.point2dList === undefined)
 	{ resultPolygon.point2dList = new Point2DList(); }
@@ -265,7 +265,7 @@ Profile.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, inn
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.eliminateHolePolygon = function(computingPolygon, innerRing, innerPointIdx, resultPolygon) 
+Profile2D.prototype.eliminateHolePolygon = function(computingPolygon, innerRing, innerPointIdx, resultPolygon) 
 {
 	// 1rst, make a sorted by dist of points of outer to "innerPoint".***
 	var resultSortedPointsIdxArray = [];
@@ -308,7 +308,7 @@ Profile.prototype.eliminateHolePolygon = function(computingPolygon, innerRing, i
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon) 
+Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon) 
 {
 	if (this.outerRing === undefined)
 	{ return resultHolesEliminatedPolygon; }
@@ -317,7 +317,7 @@ Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	{ return resultHolesEliminatedPolygon; }
 	
 	if (resultHolesEliminatedPolygon === undefined)
-	{ resultHolesEliminatedPolygon = new Polygon(); }
+	{ resultHolesEliminatedPolygon = new Polygon2D(); }
 	
 	var hole;
 	var holeIdx;
@@ -341,8 +341,8 @@ Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 		innerRingsArray.push(this.innerRingsList.getRing(i));
 	}
 	
-	var resultPolygon = new Polygon();
-	var computingPolygon = new Polygon();
+	var resultPolygon = new Polygon2D();
+	var computingPolygon = new Polygon2D();
 	computingPolygon.point2dList = new Point2DList();
 	
 	// put all points of outerPolygon into computingPolygon.***
@@ -366,11 +366,11 @@ Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	while (!finished && i<innerRingsCount)
 	{
 		// calculate the most left-down innerRing.***
-		innersBRect = RingsList.getBoundingRectangle(innerRingsArray, innersBRect);
+		innersBRect = Rings2DList.getBoundingRectangle(innerRingsArray, innersBRect);
 		innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
 		
 		objectsArray.length = 0; // init.***
-		objectsArray = RingsList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
+		objectsArray = Rings2DList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
 	
 		objectAux = objectsArray[0];
 		hole = objectAux.ring;
@@ -390,7 +390,7 @@ Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 			}
 			// erase the hole from innerRingsArray.***
 			innerRingsArray.splice(holeIdx, 1);
-			resultPolygon = new Polygon();
+			resultPolygon = new Polygon2D();
 		}
 		i++;
 	}
@@ -402,7 +402,7 @@ Profile.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.checkNormals = function() 
+Profile2D.prototype.checkNormals = function() 
 {
 	if (this.outerRing === undefined)
 	{ return; }
@@ -446,7 +446,7 @@ Profile.prototype.checkNormals = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.TEST__setFigure_1 = function() 
+Profile2D.prototype.TEST__setFigure_1 = function() 
 {
 	// complicated polygon with multiple holes.***
 	var polyLine;
@@ -482,7 +482,7 @@ Profile.prototype.TEST__setFigure_1 = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Profile.prototype.TEST__setFigureHole_2 = function() 
+Profile2D.prototype.TEST__setFigureHole_2 = function() 
 {
 	// complicated polygon with multiple holes.***
 	var polyLine;

@@ -2,11 +2,11 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class Star
+ * @class Star2D
  */
-var Star = function() 
+var Star2D = function() 
 {
-	if (!(this instanceof Star)) 
+	if (!(this instanceof Star2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -21,9 +21,9 @@ var Star = function()
 
 /**
  * Set the center position of Star.
- * @class Star
+ * @class Star2D
  */
-Star.prototype.setCenterPosition = function(cx, cy)
+Star2D.prototype.setCenterPosition = function(cx, cy)
 {
 	if (this.centerPoint === undefined)
 	{ this.centerPoint = new Point2D(); }
@@ -32,9 +32,9 @@ Star.prototype.setCenterPosition = function(cx, cy)
 };
 
 /**
- * @class Star
+ * @class Star2D
  */
-Star.prototype.setInteriorRadius = function(radius)
+Star2D.prototype.setInteriorRadius = function(radius)
 {
 	this.interiorRadius = radius;
 };
@@ -42,24 +42,24 @@ Star.prototype.setInteriorRadius = function(radius)
 /**
  * @class Star
  */
-Star.prototype.setExteriorRadius = function(radius)
+Star2D.prototype.setExteriorRadius = function(radius)
 {
 	this.exteriorRadius = radius;
 };
 
 /**
- * @class Star
+ * @class Star2D
  */
-Star.prototype.setRadiusCount = function(rediusCount)
+Star2D.prototype.setRadiusCount = function(rediusCount)
 {
 	this.radiusCount = rediusCount;
 };
 
 /**
  * Returns the points of the Star.
- * @class Star
+ * @class Star2D
  */
-Star.prototype.getPoints = function(resultPointsArray)
+Star2D.prototype.getPoints = function(resultPointsArray)
 {
 	// star has an arrow to up.***
 	var increAngDeg = 360 / this.radiusCount;

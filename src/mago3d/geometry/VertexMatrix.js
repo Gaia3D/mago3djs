@@ -291,6 +291,130 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, texCoords2Array, colors4Array, numCols, numRows, resultVertexMatrix) 
+{
+	if(positions3Array === undefined)
+		return;
+	
+	if(resultVertexMatrix === undefined)
+		resultVertexMatrix = new VertexMatrix();
+	
+	var vertexList;
+	var vertex;
+	var px, py, pz;
+	var nx, ny, nz;
+	var tx, ty;
+	var r, g, b, a;
+	for(var r=0; r<numRows; r++)
+	{
+		vertexList = resultVertexMatrix.newVertexList();
+		for(var c=0; c<numCols; c++)
+		{
+			vertex = vertexList.newVertex();
+			px = positions3Array[c*3];
+			py = positions3Array[c*3+1];
+			pz = positions3Array[c*3+2];
+			
+			vertex.setPosition(px, py, pz);
+			
+			if(normals3Array)
+			{
+				nx = normals3Array[c*3];
+				ny = normals3Array[c*3+1];
+				nz = normals3Array[c*3+2];
+				vertex.setNormal(nx, ny, nz);
+			}
+			
+			if(texCoords2Array)
+			{
+				tx = texCoords2Array[c*2];
+				ty = texCoords2Array[c*2+1];
+				vertex.setTexCoord(tx, ty);
+			}
+			
+			if(colors4Array)
+			{
+				r = colors4Array[c*4];
+				g = colors4Array[c*4+1];
+				b = colors4Array[c*4+2];
+				a = colors4Array[c*4+3];
+				vertex.setColorRGBA(r, g, b, a);
+			}
+		}
+	}
+	
+	return resultVertexMatrix;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultSurface 변수
+ */
+VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultSurface, bLoop) 
+{
+	if(resultSurface === undefined)
+		resultSurface = new Surface();
+	
+	// condition: all the vertex lists must have the same number of vertex.***
+	
+	var face;
+	var vertexCount = vertexListDown.vertexArray.length;
+	var vertex_0, vertex_1, vertex_2, vertex_3;
+	
+	for (var j = 0; j < vertexCount; j++) 
+	{
+		if (j === vertexCount-1) 
+		{
+			if (bLoop !== undefined && bLoop === true)
+			{
+				face = resultSurface.newFace();
+				vertex_0 = vertexListDown.getVertex(j);
+				vertex_1 = vertexListDown.getVertex(0);
+				vertex_2 = vertexListUp.getVertex(0);
+				vertex_3 = vertexListUp.getVertex(j);
+				face.addVerticesArray([vertex_0, vertex_1, vertex_2, vertex_3]);
+			}
+		}
+		else 
+		{
+			face = resultSurface.newFace();
+			vertex_0 = vertexListDown.getVertex(j);
+			vertex_1 = vertexListDown.getVertex(j+1);
+			vertex_2 = vertexListUp.getVertex(j+1);
+			vertex_3 = vertexListUp.getVertex(j);
+			face.addVerticesArray([vertex_0, vertex_1, vertex_2, vertex_3]);
+		}
+	}
+	
+	return resultSurface;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param resultSurface 변수
+ */
+VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop) 
+{
+	if(resultSurface === undefined)
+		resultSurface = new Surface();
+	
+	// condition: all the vertex lists must have the same number of vertex.***
+	var vtxList1;
+	var vtxList2;
+	var vertexCount = 0;
+	for (var i = 0, vertexListsCount = vertexMatrix.vertexListsArray.length; i < vertexListsCount-1; i++) 
+	{
+		vertexListDown = vertexMatrix.vertexListsArray[i];
+		vertexListUp = vertexMatrix.vertexListsArray[i+1];
+		resultSurface = VertexMatrix.makeFacesBetweenVertexLists(vertexListDown, vertexListUp, resultSurface, bLoop);
+	}
+	
+	return resultSurface;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param trianglesMatrix 변수
  */
 VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLoop) 

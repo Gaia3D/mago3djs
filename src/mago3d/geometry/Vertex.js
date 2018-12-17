@@ -133,7 +133,24 @@ Vertex.prototype.copyFrom = function(vertex)
  */
 Vertex.prototype.setPosition = function(x, y, z) 
 {
+	if(this.point3d === undefined)
+		this.point3d = new Point3D();
+	
 	this.point3d.set(x, y, z);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Vertex.prototype.setTexCoord = function(s, t) 
+{
+	if (this.texCoord === undefined)
+		{ this.texCoord = new Point2D(); }
+	
+	this.texCoord.set(s, t);
 };
 
 /**

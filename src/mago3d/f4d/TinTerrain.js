@@ -28,6 +28,13 @@ var TinTerrain = function(owner)
 	this.X; // index X.***
 	this.Y; // index Y.***
 	
+	// positions(x, y, z), normals, texCoords, colors & indices array.***
+	this.cartesiansArray;
+	this.normalsArray;
+	this.texCoordsArray;
+	this.colorsArray;
+	this.indices;
+	
 	// Tile extent.***
 	this.geographicExtent;
 	this.sphereExtent;
@@ -504,9 +511,21 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	}
 };
 
-TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude)
+TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude, altitudesSlice)
+{
+	// This function makes an ellipsoidal mesh for tiles.***
+	// 1rst, make the cartesiansArray:
+	this.makeMeshVirtually(lonSegments, latSegments, altitude, altitudesSlice);
+	
+	// now, with "this.cartesiansArray" & "this.indicesArray" make a mesh.***
+	
+	
+};
+
+TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, altitude, altitudesSlice)
 {
 	// This function makes an ellipsoidal mesh for tiles that has no elevation data.***
+	// note: "altitude" & "altitudesSlice" are optionals.***
 	var degToRadFactor = Math.PI/180.0;
 	var minLon = this.geographicExtent.minGeographicCoord.longitude * degToRadFactor;
 	var minLat = this.geographicExtent.minGeographicCoord.latitude * degToRadFactor;
@@ -536,6 +555,8 @@ TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude)
 	var alt = 0;
 	if (altitude)
 	{ alt = altitude; }
+
+	// Note: If exist "altitudesSlice", then use it.***
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{
@@ -544,7 +565,13 @@ TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude)
 		{
 			lonArray[idx] = currLon;
 			latArray[idx] = currLat;
-			altArray[idx] = alt;
+			// Now set the altitude.***
+			if(altitudesSlice)
+			{
+				altArray[idx] = altitudesSlice.getValue(currLonSeg, currLatSeg);
+			}
+			else
+				altArray[idx] = alt;
 
 			// make texcoords.***
 			this.texCoordsArray[idx*2] = (currLon - minLon)/lonRange;

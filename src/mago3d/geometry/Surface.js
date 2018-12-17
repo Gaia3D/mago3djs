@@ -13,6 +13,7 @@ var Surface = function()
 	
 	this.facesArray;
 	this.localVertexList; // vertices used only for this surface.***
+	this.localHedgesList;
 };
 
 Surface.prototype.newFace = function()
