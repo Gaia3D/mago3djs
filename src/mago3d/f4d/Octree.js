@@ -415,27 +415,27 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 	{ return false; }
 
 	// if the building is highlighted, the use highlight oneColor4.*********************
+	renderTexture = true;
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
 	if (renderType === 1)
 	{
 		// Solve the color or texture of the skin.***
 		if (neoBuilding.isHighLighted)
 		{
-			gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
+			renderTexture = false;
 		}
 		else if (neoBuilding.isColorChanged)
 		{
-			gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+			renderTexture = false;
 		}
-		else
-		{
-			gl.uniform1i(shader.bUse1Color_loc, false);
-		}
+
 		//----------------------------------------------------------------------------------
-		renderTexture = true;
-		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId)
+		
+		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 		{
 			// Provisionally flip tex coords here.***
 			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp

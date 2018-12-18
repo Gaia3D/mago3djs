@@ -2130,9 +2130,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	
 	////this.test_volumeRendering();
-	//this.weatherStation.test_renderWindLayer(this);
-	//this.weatherStation.test_renderTemperatureLayer(this);
-	//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
+	if(this.weatherStation)
+	{
+		this.weatherStation.test_renderWindLayer(this);
+		//this.weatherStation.test_renderTemperatureLayer(this);
+		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
+	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		
@@ -4246,6 +4249,16 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	}
 	if (ssao_idx === 1) 
 	{
+		// check changesHistory.
+		this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
+		this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
+		
+		this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles2);
+		this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
+		
+		this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles3);
+		this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
+			
 		// ssao render.************************************************************************************************************
 		var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 		var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
@@ -4256,16 +4269,6 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 			
-			// check changesHistory.
-			this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
-			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
-			
-			this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles2);
-			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-			
-			this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles3);
-			this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
-		
 			if (this.noiseTexture === undefined) 
 			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
 			
@@ -6893,4 +6896,4 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	}
 
 	return true;
-};;
+};

@@ -967,19 +967,21 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	{
 		if (this.isHighLighted)
 		{
-			gl.uniform1i(shader.bUse1Color_loc, true);
+			//gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
 			renderTexture = false;
 		}
 		else if (this.isColorChanged)
 		{
-			gl.uniform1i(shader.bUse1Color_loc, true);
+			//gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a]); //.***
 			renderTexture = false;
 		}
 		else
 		{
-			gl.uniform1i(shader.bUse1Color_loc, false);
+			//gl.uniform1i(shader.bUse1Color_loc, false);
 		}
 		//----------------------------------------------------------------------------------
 		if (skinLego.texture !== undefined && skinLego.texture.texId && renderTexture)

@@ -510,10 +510,12 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 	var e2a = 1.0 - e2;
 	var v;
 	var h;
-	var resultCartesian;
 	
 	var coordsCount = lonArray.length;
-	resultCartesianArray = new Float32Array(coordsCount*3);
+	if(resultCartesianArray === undefined)
+	{
+		resultCartesianArray = new Float32Array(coordsCount*3);
+	}
 	for (var i=0; i<coordsCount; i++)
 	{
 		lonRad = lonArray[i];
