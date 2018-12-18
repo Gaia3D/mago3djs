@@ -658,10 +658,13 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	vboKey.posVboDataArray.set(this.cartesiansArray);
 	
 	// TexCoords.***
-	var tCoordByteSize = 2 * vertexCount;
-	var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-	vboKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
-	vboKey.tcoordVboDataArray.set(this.texCoordsArray);
+	if(this.texCoordsArray)
+	{
+		var tCoordByteSize = 2 * vertexCount;
+		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
+		vboKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
+		vboKey.tcoordVboDataArray.set(this.texCoordsArray);
+	}
 		
 	// Indices.***
 	var idxByteSize = this.indices.length;
@@ -676,8 +679,14 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	
 	if (color)
 	{ vboKey.colVboDataArray = Uint8Array.from(colArray); }
+	this.cartesiansArray;
+	this.normalsArray;
+	this.texCoordsArray;
+	this.colorsArray;
+	this.indices;
+	*/
 	
-*/
+	
 };
 
 TinTerrain.prototype.decodeData = function()
