@@ -46,7 +46,7 @@ var TinTerrain = function(owner)
 	this.terrainPositionHIGH;
 	this.terrainPositionLOW;
 	
-	this.indexName; // example "LU".***
+	this.indexName; // example: "LU".***
 	this.pathName; // example: "14//4567//516".***
 	this.texture;
 	this.visible;
@@ -509,17 +509,6 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			return;
 		}
 	}
-};
-
-TinTerrain.prototype.makeMesh = function(lonSegments, latSegments, altitude, altitudesSlice)
-{
-	// This function makes an ellipsoidal mesh for tiles.***
-	// 1rst, make the cartesiansArray:
-	this.makeMeshVirtually(lonSegments, latSegments, altitude, altitudesSlice);
-	
-	// now, with "this.cartesiansArray" & "this.indicesArray" make a mesh.***
-	
-	
 };
 
 TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, altitude, altitudesSlice)
