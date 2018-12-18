@@ -210,7 +210,7 @@ var MagoManager = function()
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
 	
-	//this.weatherStation = new WeatherStation();
+	this.weatherStation = new WeatherStation();
 	
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
@@ -2132,8 +2132,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	////this.test_volumeRendering();
 	if(this.weatherStation)
 	{
-		this.weatherStation.test_renderWindLayer(this);
-		//this.weatherStation.test_renderTemperatureLayer(this);
+		//this.weatherStation.test_renderWindLayer(this);
+		
+		this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
 	}
 	
@@ -6513,6 +6514,8 @@ MagoManager.prototype.callAPI = function(api)
 								var neoBuilding = node.data.neoBuilding;
 								if (neoBuilding === undefined)
 								{ continue; }
+							
+								neoBuilding.isColorChanged = false;
 								
 								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
 								if (refObjectArray === undefined)
