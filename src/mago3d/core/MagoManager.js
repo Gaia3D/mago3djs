@@ -1023,9 +1023,23 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			this.isCameraMoved = true;
 		}
 		
-		sceneState.camera.position.set(scene.context._us._cameraPosition.x, scene.context._us._cameraPosition.y, scene.context._us._cameraPosition.z);
-		sceneState.camera.direction.set(scene._camera.direction.x, scene._camera.direction.y, scene._camera.direction.z);
-		sceneState.camera.up.set(scene._camera.up.x, scene._camera.up.y, scene._camera.up.z);
+		// Set cam dir & up by modelViewMatrix.***
+		var modelViewMatInv = sceneState.modelViewMatrixInv;
+		var camPosX = modelViewMatInv._floatArrays[12];
+		var camPosY = modelViewMatInv._floatArrays[13];
+		var camPosZ = modelViewMatInv._floatArrays[14];
+		
+		var camDirX = -modelViewMatInv._floatArrays[8];
+		var camDirY = -modelViewMatInv._floatArrays[9];
+		var camDirZ = -modelViewMatInv._floatArrays[10];
+		
+		var camUpX = modelViewMatInv._floatArrays[4];
+		var camUpY = modelViewMatInv._floatArrays[5];
+		var camUpZ = modelViewMatInv._floatArrays[6];
+		
+		sceneState.camera.position.set(camPosX, camPosY, camPosZ);
+		sceneState.camera.direction.set(camDirX, camDirY, camDirZ);
+		sceneState.camera.up.set(camUpX, camUpY, camUpZ);
 		
 		
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
@@ -1149,9 +1163,25 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 			distancesArray[i*2+1] = this.scene._frustumCommandsList[i].far;
 		}
 		
-		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
-		resultCamera.direction.set(camera.direction.x, camera.direction.y, camera.direction.z);
-		resultCamera.up.set(camera.up.x, camera.up.y, camera.up.z);
+		// Set cam dir & up by modelViewMatrix.***
+		var sceneState = this.sceneState;
+		var modelViewMatInv = sceneState.modelViewMatrixInv;
+		var camPosX = modelViewMatInv._floatArrays[12];
+		var camPosY = modelViewMatInv._floatArrays[13];
+		var camPosZ = modelViewMatInv._floatArrays[14];
+		
+		var camDirX = -modelViewMatInv._floatArrays[8];
+		var camDirY = -modelViewMatInv._floatArrays[9];
+		var camDirZ = -modelViewMatInv._floatArrays[10];
+		
+		var camUpX = modelViewMatInv._floatArrays[4];
+		var camUpY = modelViewMatInv._floatArrays[5];
+		var camUpZ = modelViewMatInv._floatArrays[6];
+		
+		resultCamera.position.set(camPosX, camPosY, camPosZ);
+		resultCamera.direction.set(camDirX, camDirY, camDirZ);
+		resultCamera.up.set(camUpX, camUpY, camUpZ);
+		
 		frustum = resultCamera.getFrustum(frustumIdx);
 		frustum.near[0] = currentFrustumNear;
 		frustum.far[0] = currentFrustumFar;
@@ -2134,8 +2164,36 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	{
 		//this.weatherStation.test_renderWindLayer(this);
 		
-		this.weatherStation.test_renderTemperatureLayer(this);
+		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
+		/*
+		var renderType = 1;
+		var currentShader;
+			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.useProgram();
+			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
+			
+			if (this.noiseTexture === undefined) 
+			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
+			
+			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+			gl.enableVertexAttribArray(currentShader.position3_loc);
+			gl.enableVertexAttribArray(currentShader.normal3_loc);
+			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+			
+			currentShader.bindUniformGenerals();
+			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.activeTexture(gl.TEXTURE2); 
+			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
+			currentShader.last_tex_id = this.textureAux_1x1;
+		this.weatherStation.test_renderTemperatureMesh(this, currentShader, renderType);
+		*/
 	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
