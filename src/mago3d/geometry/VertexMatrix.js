@@ -351,14 +351,14 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
  * 어떤 일을 하고 있습니까?
  * @param resultSurface 변수
  */
-VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultSurface, bLoop) 
+VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop) 
 {
-	if(resultSurface === undefined)
-		resultSurface = new Surface();
+	if(resultFacesArray === undefined)
+		resultFacesArray = [];
 	
 	// condition: all the vertex lists must have the same number of vertex.***
 	
-	var face;
+	var face, faceLast;
 	var vertexCount = vertexListDown.vertexArray.length;
 	var vertex_0, vertex_1, vertex_2, vertex_3;
 	
@@ -368,7 +368,7 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 		{
 			if (bLoop !== undefined && bLoop === true)
 			{
-				face = resultSurface.newFace();
+				face = new Face();
 				vertex_0 = vertexListDown.getVertex(j);
 				vertex_1 = vertexListDown.getVertex(0);
 				vertex_2 = vertexListUp.getVertex(0);
@@ -378,16 +378,25 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 		}
 		else 
 		{
-			face = resultSurface.newFace();
+			face = new Face();
 			vertex_0 = vertexListDown.getVertex(j);
 			vertex_1 = vertexListDown.getVertex(j+1);
 			vertex_2 = vertexListUp.getVertex(j+1);
 			vertex_3 = vertexListUp.getVertex(j);
 			face.addVerticesArray([vertex_0, vertex_1, vertex_2, vertex_3]);
 		}
+		
+		if(faceLast === undefined)
+			faceLast = face;
+		else{
+			face.setTwinFace(faceLast);
+			faceLast = face;
+		}
+		
+		resultFacesArray.push(face);
 	}
 	
-	return resultSurface;
+	return resultFacesArray;
 };
 
 /**
@@ -402,12 +411,26 @@ VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop)
 	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;
 	var vtxList2;
+	var vertexListDown, vertexListUp;
+	var resultFacesArray = [];
+	var resultFacesArrayLast;
 	var vertexCount = 0;
 	for (var i = 0, vertexListsCount = vertexMatrix.vertexListsArray.length; i < vertexListsCount-1; i++) 
 	{
 		vertexListDown = vertexMatrix.vertexListsArray[i];
 		vertexListUp = vertexMatrix.vertexListsArray[i+1];
-		resultSurface = VertexMatrix.makeFacesBetweenVertexLists(vertexListDown, vertexListUp, resultSurface, bLoop);
+		resultFacesArray = VertexMatrix.makeFacesBetweenVertexLists(vertexListDown, vertexListUp, resultFacesArray, bLoop);
+		
+		if(resultFacesArrayLast === undefined)
+			resultFacesArrayLast = resultFacesArray;
+		else{
+			Surface.setTwinsFacesBetweenFacesArrays_regularQuadGrid(resultFacesArray, resultFacesArrayLast);
+			resultFacesArrayLast = resultFacesArray;
+		}
+		
+		resultSurface.addFacesArray(resultFacesArray);
+		
+		resultFacesArray.length = 0;
 	}
 	
 	return resultSurface;

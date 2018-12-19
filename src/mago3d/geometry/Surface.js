@@ -155,6 +155,55 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+Surface.setTwinsFacesBetweenFaceAndFacesArrays = function(face, facesArray, bIsRegularQuadGrid) 
+{
+	// if the faces pertains a regular-quad-grid, then there are only ONE twin between the "face" & the "facesArray".***
+	if(facesArray === undefined)
+		return false;
+	
+	var twined = false;
+	var facesCount = facesArray.length;
+	var face_A;
+	for(var i=0; i<facesCount; i++)
+	{
+		face_A = facesArray[i];
+		if(face_A.setTwinFace(face))
+		{
+			twined = true;
+			if(bIsRegularQuadGrid)
+			{
+				// if faces are from a regular quad grid, there are only 1 twin possible.***
+				return true;
+			}
+		}
+	}
+	
+	return twined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Surface.setTwinsFacesBetweenFacesArrays_regularQuadGrid = function(facesArray_A, facesArray_B) 
+{
+	// Faces are rectangles in a rectangle grid.***
+	if(facesArray_A === undefined || facesArray_B === undefined)
+		return false;
+	
+	var bIsRegularQuadGrid = true;
+	var faces_A_count = facesArray_A.length;
+	var face_A, face_B;
+	for(var i=0; i<faces_A_count; i++)
+	{
+		face_A = facesArray_A[i];
+		face_B = facesArray_B[i];
+		face_A.setTwinFace(face_B);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param idx 변수
  * @returns vertexArray[idx]
  */
