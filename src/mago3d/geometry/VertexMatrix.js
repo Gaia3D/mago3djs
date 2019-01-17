@@ -351,49 +351,178 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
  * 어떤 일을 하고 있습니까?
  * @param resultSurface 변수
  */
-VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop) 
+VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop, bClockWise) 
 {
 	if(resultFacesArray === undefined)
 		resultFacesArray = [];
 	
 	// condition: all the vertex lists must have the same number of vertex.***
 	
-	var face, faceLast;
+	//  3   3-------------2  +   +-------------+  +   +-------------+  +   +-------------+
+	//  | \   \           |  | \   \           |  | \   \           |  | \   \           |
+	//  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
+	//  |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
+	//  |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
+	//  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
+	//  |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
+	//  0-------------1   1  +-------------+   +  +-------------+   +  +-------------+   +
+	
+	//  +   +-------------+  +   +-------------+  +   +-------------+  +   +-------------+
+	//  | \   \           |  | \   \           |  | \   \           |  | \   \           |
+	//  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
+	//  |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
+	//  |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
+	//  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
+	//  |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
+	//  +-------------+   +  +-------------+   +  +-------------+   +  +-------------+   +
+	
+	var face_A, face_B;
+	var hedge_A, hedge_B;
+	var faceLast_B;
 	var vertexCount = vertexListDown.vertexArray.length;
 	var vertex_0, vertex_1, vertex_2, vertex_3;
+	if(bClockWise === undefined)
+		bClockWise = false;
 	
-	for (var j = 0; j < vertexCount; j++) 
+	var resultHalfEdgesArray_A = [];
+	var resultHalfEdgesArray_B = [];
+	var vtx0_idx, vtx1_idx, vtx2_idx, vtx3_idx;
+	
+	if(bClockWise)
 	{
-		if (j === vertexCount-1) 
+		for (var j = 0; j < vertexCount; j++) 
 		{
-			if (bLoop !== undefined && bLoop === true)
+			resultHalfEdgesArray_A.length = 0;
+			resultHalfEdgesArray_B.length = 0;
+			if (j < vertexCount-1) 
 			{
-				face = new Face();
 				vertex_0 = vertexListDown.getVertex(j);
-				vertex_1 = vertexListDown.getVertex(0);
-				vertex_2 = vertexListUp.getVertex(0);
+				vertex_1 = vertexListDown.getVertex(j+1);
+				vertex_2 = vertexListUp.getVertex(j+1);
 				vertex_3 = vertexListUp.getVertex(j);
-				face.addVerticesArray([vertex_0, vertex_1, vertex_2, vertex_3]);
+				
+				face_A = new Face();
+				face_B = new Face();
+				
+				face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
+				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				
+				face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
+				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				
+				// Now, set twins between face_A & face_B.***
+				//hedge_A.setTwin(hedge_B);
+				resultFacesArray.push(face_A);
+				resultFacesArray.push(face_B);
 			}
+			else 
+			{
+				if (bLoop !== undefined && bLoop === true)
+				{
+					vertex_0 = vertexListDown.getVertex(j);
+					vertex_1 = vertexListDown.getVertex(0);
+					vertex_2 = vertexListUp.getVertex(0);
+					vertex_3 = vertexListUp.getVertex(j);
+					
+					face_A = new Face();
+					face_B = new Face();
+					
+					face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
+					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					
+					face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
+					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					
+					// Now, set twins between face_A & face_B.***
+					//hedge_A.setTwin(hedge_B);
+					resultFacesArray.push(face_A);
+					resultFacesArray.push(face_B);
+				}
+			}
+			
+			if(faceLast_B === undefined)
+				faceLast_B = face_B;
+			else{
+				//face_A.setTwinFace(faceLast_B);
+				faceLast_B = face_B;
+			}
+			
+			
 		}
-		else 
+	}
+	else
+	{
+		for (var j = 0; j < vertexCount; j++) 
 		{
-			face = new Face();
-			vertex_0 = vertexListDown.getVertex(j);
-			vertex_1 = vertexListDown.getVertex(j+1);
-			vertex_2 = vertexListUp.getVertex(j+1);
-			vertex_3 = vertexListUp.getVertex(j);
-			face.addVerticesArray([vertex_0, vertex_1, vertex_2, vertex_3]);
+			resultHalfEdgesArray_A.length = 0;
+			resultHalfEdgesArray_B.length = 0;
+
+			if (j < vertexCount - 1) 
+			{
+				vertex_0 = vertexListDown.getVertex(j);
+				vertex_1 = vertexListDown.getVertex(j+1);
+				vertex_2 = vertexListUp.getVertex(j+1);
+				vertex_3 = vertexListUp.getVertex(j);
+				
+				face_A = new Face();
+				face_B = new Face();
+				
+				face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
+				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				
+				face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
+				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				
+				// Now, set twins between face_A & face_B.***
+				//hedge_A.setTwin(hedge_B);
+				
+				resultFacesArray.push(face_A);
+				resultFacesArray.push(face_B);
+			}
+			else 
+			{
+				if (bLoop !== undefined && bLoop === true)
+				{
+					vertex_0 = vertexListDown.getVertex(j);
+					vertex_1 = vertexListDown.getVertex(0);
+					vertex_2 = vertexListUp.getVertex(0);
+					vertex_3 = vertexListUp.getVertex(j);
+					
+					face_A = new Face();
+					face_B = new Face();
+					
+					face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
+					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					
+					face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
+					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					
+					// Now, set twins between face_A & face_B.***
+					//hedge_A.setTwin(hedge_B);
+					
+					resultFacesArray.push(face_A);
+					resultFacesArray.push(face_B);
+				}
+				
+			}
+			
+			if(faceLast_B === undefined)
+				faceLast_B = face_B;
+			else{
+				//face_A.setTwinFace(faceLast_B);
+				faceLast_B = face_B;
+			}
+			
+			
 		}
-		
-		if(faceLast === undefined)
-			faceLast = face;
-		else{
-			face.setTwinFace(faceLast);
-			faceLast = face;
-		}
-		
-		resultFacesArray.push(face);
 	}
 	
 	return resultFacesArray;
@@ -403,7 +532,7 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
  * 어떤 일을 하고 있습니까?
  * @param resultSurface 변수
  */
-VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop) 
+VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWise) 
 {
 	if(resultSurface === undefined)
 		resultSurface = new Surface();
@@ -415,18 +544,20 @@ VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop)
 	var resultFacesArray = [];
 	var resultFacesArrayLast;
 	var vertexCount = 0;
-	for (var i = 0, vertexListsCount = vertexMatrix.vertexListsArray.length; i < vertexListsCount-1; i++) 
+	var vertexListsCount = vertexMatrix.vertexListsArray.length;
+	for (var i = 0; i <vertexListsCount-1; i++) 
 	{
 		vertexListDown = vertexMatrix.vertexListsArray[i];
 		vertexListUp = vertexMatrix.vertexListsArray[i+1];
-		resultFacesArray = VertexMatrix.makeFacesBetweenVertexLists(vertexListDown, vertexListUp, resultFacesArray, bLoop);
-		
+		resultFacesArray = VertexMatrix.makeFacesBetweenVertexLists(vertexListDown, vertexListUp, resultFacesArray, bLoop, bClockWise);
+		/*
 		if(resultFacesArrayLast === undefined)
 			resultFacesArrayLast = resultFacesArray;
 		else{
 			Surface.setTwinsFacesBetweenFacesArrays_regularQuadGrid(resultFacesArray, resultFacesArrayLast);
 			resultFacesArrayLast = resultFacesArray;
 		}
+		*/
 		
 		resultSurface.addFacesArray(resultFacesArray);
 		

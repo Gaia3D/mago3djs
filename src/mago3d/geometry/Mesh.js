@@ -27,6 +27,14 @@ Mesh.prototype.newSurface = function()
 	return surface;
 };
 
+Mesh.prototype.getHalfEdgesList = function()
+{
+	if (this.hedgesList === undefined)
+	{ this.hedgesList = new HalfEdgesList(); }
+
+	return this.hedgesList;
+};
+
 Mesh.prototype.getSurface = function(idx)
 {
 	if (this.surfacesArray === undefined)
@@ -413,6 +421,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	}
 	
 	var gl = magoManager.sceneState.gl;
+	var primitive;
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -423,6 +432,8 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 			!vboKey.isReadyFaces(gl, vboMemManager))
 		{ return false; }
 		
+		vboKey.isReadyColors(gl, vboMemManager);
+		
 		// Positions.***
 		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
 		{
@@ -432,14 +443,57 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		}
 		
 		// Normals.***
-		if (shader.normal3_loc && shader.normal3_loc !== -1) 
+		if (vboKey.meshNormalCacheKey)
 		{
-			if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
+			if (shader.normal3_loc && shader.normal3_loc !== -1) 
 			{
-				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
-				gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-				shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
+				shader.enableVertexAttribArray(shader.normal3_loc);
+				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
+				{
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
+					gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+					shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
+				}
 			}
+		}
+		else{
+			shader.disableVertexAttribArray(shader.normal3_loc);
+		}
+		
+		// Colors.***
+		if (vboKey.meshColorCacheKey)
+		{
+			if (shader.color4_loc && shader.color4_loc !== -1) 
+			{
+				shader.enableVertexAttribArray(shader.color4_loc);
+				if (vboKey.meshColorCacheKey !== shader.last_vboCol_binded)
+				{
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshColorCacheKey);
+					gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
+					shader.last_vboCol_binded = vboKey.meshColorCacheKey;
+				}
+			}
+		}
+		else{
+			shader.disableVertexAttribArray(shader.color4_loc);
+		}
+		
+		// TexCoords.***
+		if (vboKey.meshTexcoordsCacheKey)
+		{
+			if (shader.texCoord2_loc && shader.texCoord2_loc !== -1) 
+			{
+				shader.enableVertexAttribArray(shader.texCoord2_loc);
+				if (vboKey.meshTexcoordsCacheKey !== shader.last_vboTexCoord_binded)
+				{
+					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
+					gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+					shader.last_vboTexCoord_binded = vboKey.meshTexcoordsCacheKey;
+				}
+			}
+		}
+		else{
+			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 		
 		// Indices.***
@@ -448,7 +502,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
 			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
 		}
-		var primitive;
+		
 		if(glPrimitive)
 			primitive = glPrimitive;
 		else

@@ -47,6 +47,8 @@ var Policy = function()
 	this.occlusionCullingEnable = false;
 	// origin axis XYZ
 	this.showOrigin = false;
+	// mago generalMode
+	this.magoMode = CODE.magoMode.NORMAL;
 	
 	// 이미지 경로
 	this.imagePath = "";
@@ -184,6 +186,15 @@ Policy.prototype.getObjectMoveMode = function()
 Policy.prototype.setObjectMoveMode = function(objectMoveMode) 
 {
 	this.objectMoveMode = objectMoveMode;
+};
+
+Policy.prototype.getMagoMode = function() 
+{
+	return this.magoMode;
+};
+Policy.prototype.setMagoMode = function(magoMode) 
+{
+	this.magoMode = magoMode;
 };
 
 Policy.prototype.getIssueInsertEnable = function() 

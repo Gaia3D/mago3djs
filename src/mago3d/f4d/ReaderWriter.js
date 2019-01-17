@@ -213,14 +213,18 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end)
 	return int8_value;
 };
 
-function loadWithXhr(fileName) 
+function loadWithXhr(fileName, xhr, timeOut) 
 {
 	// 1) 사용될 jQuery Deferred 객체를 생성한다.
 	var deferred = $.Deferred();
 	
-	var xhr = new XMLHttpRequest();
+	if(xhr === undefined)
+		xhr = new XMLHttpRequest();
+	
 	xhr.open("GET", fileName, true);
-	xhr.responseType = "arraybuffer";;
+	xhr.responseType = "arraybuffer";
+	if(timeOut !== undefined)
+		xhr.timeout = timeOut; // time in milliseconds
 	  
 	// 이벤트 핸들러를 등록한다.
 	xhr.onload = function() 
@@ -235,6 +239,12 @@ function loadWithXhr(fileName)
 			// 3.1) DEFERRED를 해결한다. (모든 done()...을 동작시킬 것이다.)
 			deferred.resolve(xhr.response);
 		} 
+	};
+	
+	xhr.ontimeout = function (e) 
+	{
+		// XMLHttpRequest timed out.***
+		deferred.reject(-1);
 	};
 	
 	xhr.onerror = function(e) 
@@ -259,10 +269,13 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	var xhr;
+	//xhr = new XMLHttpRequest();
+	blocksList.xhr = xhr;
 	
 	this.blocksList_requested++;
 	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName, xhr).done(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -282,6 +295,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
 		if (status === 0) { blocksList.fileLoadState = 500; }
+		else if (status === -1) { blocksList.fileLoadState = CODE.fileLoadState.READY; }
 		else { blocksList.fileLoadState = status; }
 	}).always(function() 
 	{
@@ -304,10 +318,12 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 	
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	var xhr;
+	//xhr = new XMLHttpRequest();
+	lowestOctree.neoReferencesMotherAndIndices.xhr = xhr;
 	
 	this.referencesList_requested++;
-	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName, xhr).done(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -329,8 +345,12 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 	}).fail(function(status) 
 	{
 		console.log("xhr status = " + status);
-		if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOAD_FAILED; }
-		else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
+		if (status === 0) 
+		{ lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOAD_FAILED; }
+		else if (status === -1) 
+		{ lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.READY; }
+		else 
+		{ lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
 	}).always(function() 
 	{
 		magoManager.readerWriter.referencesList_requested--;
@@ -353,7 +373,10 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	loadWithXhr(fileName).done(function(response) 
+	var xhr = new XMLHttpRequest();
+	lowestOctree.lego.xhr = xhr;
+	
+	loadWithXhr(fileName, xhr).done(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -447,7 +470,11 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 	magoManager.fileRequestControler.lowLodDataRequestedCount += 1;
 	legoMesh.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	loadWithXhr(fileName).done(function(response) 
+	var xhr;
+	//xhr = new XMLHttpRequest();
+	legoMesh.xhr = xhr;
+	
+	loadWithXhr(fileName, xhr).done(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1048,7 +1075,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	}	
 };
 
-ReaderWriter.loadBinaryData = function(fileName, dataContainer, temperatureLayer) 
+ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer) 
 {
 	dataContainer.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
@@ -1061,7 +1088,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, temperatureLayer
 			dataContainer.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
 			
-			temperatureLayer.parseVolumeData(dataContainer);
+			weatherLayer.parseData(dataContainer);
 		}
 		else 
 		{

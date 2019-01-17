@@ -106,6 +106,9 @@ function API(apiName)
 	this.inputPoint = null;
 	// result x, y, z
 	this.resultPoint = null;
+	
+	// General magoMode.***
+	this.magoMode = CODE.magoMode.NORMAL;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -485,7 +488,14 @@ API.prototype.setFPVMode = function(value)
 {
 	this.FPVMode = value;
 };
-
+API.prototype.getMagoMode = function()
+{
+	return this.magoMode;
+};
+API.prototype.setMagoMode = function(value)
+{
+	this.magoMode = value;
+};
 API.prototype.getDuration = function()
 {
 	return this.duration;

@@ -62,6 +62,10 @@ MouseAction.prototype.claculateStartPositionsAux = function(magoManager)
 	var strCamPos = new Point3D();
 	strCamPos.set(magoManager.resultRaySC[0] * strRealDepth, magoManager.resultRaySC[1] * strRealDepth, magoManager.resultRaySC[2] * strRealDepth);
 	this.strWorldPointAux = magoManager.cameraCoordPositionToWorldCoord(strCamPos, this.strWorldPointAux);
+	
+	if(this.strWorldPointAux === undefined)
+		var hola = 0;
+	
 	this.strLocationAux = ManagerUtils.pointToGeographicCoord(this.strWorldPointAux, undefined, magoManager);
 };
 

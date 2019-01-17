@@ -118,6 +118,8 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 		{
 			crossProd = 1;
 		}
+		else
+			continue;
 		// calcule by cos.***
 		// cosAlfa = scalarProd / (strModul * endModul); (but strVecModul = 1 & endVecModul = 1), so:
 		var cosAlfa = scalarProd;

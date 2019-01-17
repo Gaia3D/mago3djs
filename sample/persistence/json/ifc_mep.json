@@ -48,9 +48,9 @@
 			"data_name": "01_KyoDe(A1, A2), KyoGak(P1~P38)_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -64,9 +64,9 @@
 			"data_name": "01_AsphaltPoJang_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -80,9 +80,9 @@
 			"data_name": "01_BonSeon_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -96,9 +96,9 @@
 			"data_name": "01_DeJi",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -112,9 +112,9 @@
 			"data_name": "01_GongJoDuctJiHa1chungGongJoKiKyeSil-1_BP",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -128,9 +128,9 @@
 			"data_name": "01_JeongGoJang_BA",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -144,9 +144,9 @@
 			"data_name": "01_JeongGoJang_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -160,9 +160,9 @@
 			"data_name": "01_JeonGuiSeolBi_BE",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -176,9 +176,9 @@
 			"data_name": "01_JiJangMul_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -192,9 +192,9 @@
 			"data_name": "02_DeJi",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -208,9 +208,9 @@
 			"data_name": "02_DeokSongNeGakGoSokHoaDoRoHoengDanKyoRyang(PotalRamenSTEEL Box)_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -224,9 +224,9 @@
 			"data_name": "02_GongJoDuctJiHa1chungGongJoGuiKyeSil-2_BP",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -240,9 +240,9 @@
 			"data_name": "02_GuengGuBu_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -256,9 +256,9 @@
 			"data_name": "02_WeBuChulIpGu1,2_BA",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -272,9 +272,9 @@
 			"data_name": "02_WeBuChulIpGu1,2_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -288,9 +288,9 @@
 			"data_name": "03_BonSeonHwanGuiGu6(BeGui),JibSuJeong_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -304,9 +304,9 @@
 			"data_name": "03_DeJi",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -320,9 +320,9 @@
 			"data_name": "03_GongJoDuctJiHa1chungDeHapSil_BP",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -336,9 +336,249 @@
 			"data_name": "03_GuengMun(TYPE-1)_BS",
 			"mapping_type": "origin",
             "heading": 0,
-			"height": 10,
-			"latitude": 37.6639,
-			"longitude": 126.75,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS",
+			"data_name": "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "03_JoGyeong_BA",
+			"data_name": "03_JoGyeong_BA",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "04_BonSeonHwanGuiGu7(GubGui)_BS",
+			"data_name": "04_BonSeonHwanGuiGu7(GubGui)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "04_DeJi",
+			"data_name": "04_DeJi",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "04_GongJoDuctJiHa2chung_BP",
+			"data_name": "04_GongJoDuctJiHa2chung_BP",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "04_GuengMun(TYPE-2)_BS",
+			"data_name": "04_GuengMun(TYPE-2)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "04_WangSukCheonHoengDanGyoRyang(pscBags+Extradosed+pscBags)_BS",
+			"data_name": "04_WangSukCheonHoengDanGyoRyang(pscBags+Extradosed+pscBags)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "05_DeJi",
+			"data_name": "05_DeJi",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "05_SiJeomBuOngByeok_BS",
+			"data_name": "05_SiJeomBuOngByeok_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "05_SoBangBeGuanJiHa1chung_BF",
+			"data_name": "05_SoBangBeGuanJiHa1chung_BF",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "05_ToeGyeWon_JinJeobDoRoHoengDanGyoRyang(GyeongSaAChi)_BS",
+			"data_name": "05_ToeGyeWon_JinJeobDoRoHoengDanGyoRyang(GyeongSaAChi)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "06_BamSeolDulGuGanHoengDanGyoRyang(pscBags)_BS",
+			"data_name": "06_BamSeolDulGuGanHoengDanGyoRyang(pscBags)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "06_DeJi",
+			"data_name": "06_DeJi",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "06_SoBangBeGuanJiHa2chung_BF",
+			"data_name": "06_SoBangBeGuanJiHa2chung_BF",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "07_GugJiDo86HoSeonHoengDanGyoRyang(BangSaHengEoAChi)_BS",
+			"data_name": "07_GugJiDo86HoSeonHoengDanGyoRyang(BangSaHengEoAChi)_BS",
+			"mapping_type": "origin",
+            "heading": 0,
+			"height": 40,
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
 		}

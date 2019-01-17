@@ -254,6 +254,20 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
 }
 
 /**
+ * 1인칭, 3인칭 모드 개발중...
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {boolean} flag true = 활성화, false = 비활성화
+ */
+function changeMagoModeAPI(managerFactoryInstance, flag)
+{
+	if (managerFactoryInstance === null) { return; } 
+	
+	var api = new API("changeMagoMode");
+	api.setMagoMode(flag);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
  * 현재 위치 근처 issue list. false인 경우 clear
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} flag true = 활성화, false = 비활성화

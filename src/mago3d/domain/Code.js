@@ -26,5 +26,20 @@ CODE.moveMode = {
 	"NONE"   : "2"
 };
 
+CODE.magoMode = {
+	"NORMAL"  : 0,
+	"DRAWING" : 1
+};
+
+CODE.modelerMode = {
+	"INACTIVE"  : 0,
+	"DRAWING_POLYLINE" : 1
+};
+
+CODE.modelerDrawingState = {
+	"NO_STARTED"  : 0,
+	"STARTED" : 1
+};
+
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";

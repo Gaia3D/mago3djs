@@ -200,10 +200,11 @@ var PostFxShader = function(gl)
 	// current buffers binded.***
 	this.last_vboPos_binded;
 	this.last_vboNor_binded;
+	this.last_vboCol_binded;
 	this.last_vboIdx_binded;
 	this.last_tex_id;
 	this.last_isAditionalMovedZero = false;
-	this.last_vboTexCoord_binded; // no used.***
+	this.last_vboTexCoord_binded; 
 	
 	// attribLocations state management.***
 	this.attribLocationStateArray = [];

@@ -24,12 +24,41 @@ var Color = function()
 	this.a = 1;
 };
 
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gray 변수
+ */
+Color.grayToRGB_MagoStyle = function(gray, resultColor) 
+{
+	if(resultColor === undefined)
+		resultColor = new Color();
+	
+	if(gray > 1.0)gray = 1.0;
+	else if(gray<0.0)gray = 0.0;
+	
+	var r, g, b;
+	
+	r = -gray + 1.0;
+	
+	if(gray > 0.5)
+	{
+		g = -gray*2.0 + 2.0; 
+	}
+	else{
+		g = gray*2.0;
+	}
+	
+	b = gray;
+	
+	resultColor.setRGB(r, g, b);
+	
+	return resultColor;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param red 변수
- * @param green 변수
- * @param blue 변수
- * @param alpha 변수
  */
 Color.prototype.copyFrom = function(color) 
 {
@@ -41,10 +70,6 @@ Color.prototype.copyFrom = function(color)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param red 변수
- * @param green 변수
- * @param blue 변수
- * @param alpha 변수
  */
 Color.prototype.deleteObjects = function() 
 {

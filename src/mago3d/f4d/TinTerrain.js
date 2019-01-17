@@ -539,6 +539,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var currLon = minLon; // init startLon.***
 	var currLat = minLat; // init startLat.***
 	var idx = 0;
+	var s, t;
 	
 	// check if exist altitude.***
 	var alt = 0;
@@ -563,8 +564,11 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 				altArray[idx] = alt;
 
 			// make texcoords.***
-			this.texCoordsArray[idx*2] = (currLon - minLon)/lonRange;
-			this.texCoordsArray[idx*2+1] = (currLat - minLat)/latRange;
+			s = (currLon - minLon)/lonRange;
+			t = (currLat - minLat)/latRange;
+			
+			this.texCoordsArray[idx*2] = s;
+			this.texCoordsArray[idx*2+1] = t;
 			
 			if (this.texCoordsArray[idx*2] > 1.0 || this.texCoordsArray[idx*2+1] > 1.0)
 			{ var hola = 0; }
@@ -654,23 +658,20 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	var vertexCount = coordsCount;
 	var posByteSize = vertexCount * 3;
 	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	vboKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-	vboKey.posVboDataArray.set(this.cartesiansArray);
+	vboKey.posVboDataArray = this.cartesiansArray; // Float32Array.***
 	
 	// TexCoords.***
 	if(this.texCoordsArray)
 	{
 		var tCoordByteSize = 2 * vertexCount;
 		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-		vboKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
-		vboKey.tcoordVboDataArray.set(this.texCoordsArray);
+		vboKey.tcoordVboDataArray = this.texCoordsArray; // Float32Array.***
 	}
 		
 	// Indices.***
 	var idxByteSize = this.indices.length;
 	var classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-	vboKey.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
-	vboKey.idxVboDataArray.set(this.indices);
+	vboKey.idxVboDataArray = this.indices; // Uint16Array.***
 		
 	vboKey.indicesCount = this.indices.length;
 	/*

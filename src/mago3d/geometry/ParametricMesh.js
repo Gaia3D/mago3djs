@@ -63,21 +63,21 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
 /**
  * 어떤 일을 하고 있습니까?
  */
-ParametricMesh.prototype.revolve = function(profile, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
+ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
-	if (profile === undefined)
+	if (profile2d === undefined)
 	{ return undefined; }
 	
 	if (this.vtxProfilesList === undefined)
 	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
-	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
-	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
 	
 	// create vtxProfiles.***
 	// make the base-vtxProfile.***
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByProfile(profile);
+	baseVtxProfile.makeByProfile(profile2d);
 	
 	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
 	
@@ -111,22 +111,22 @@ ParametricMesh.prototype.revolve = function(profile, revolveAngDeg, revolveSegme
 /**
  * 어떤 일을 하고 있습니까?
  */
-ParametricMesh.prototype.extrude = function(profile, extrusionDist, extrudeSegmentsCount, extrusionVector) 
+ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {
-	if (profile === undefined || extrusionDist === undefined)
+	if (profile2d === undefined || extrusionDist === undefined)
 	{ return undefined; }
 	
 	if (this.vtxProfilesList === undefined)
 	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
 
-	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile before creating vtxProfiles.***
-	this.vtxProfilesList.convexFacesIndicesData = profile.getConvexFacesIndicesData(undefined);
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
+	this.vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
 	
 	// create vtxProfiles.***
 	// make the base-vtxProfile.***
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByProfile(profile);
+	baseVtxProfile.makeByProfile(profile2d);
 	
 	if (extrusionVector === undefined)
 	{ extrusionVector = new Point3D(0, 0, 1); }

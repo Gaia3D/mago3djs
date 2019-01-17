@@ -4,15 +4,40 @@
  * 어떤 일을 하고 있습니까?
  * @class Buffer
  */
-var Buffer = function() 
+var VboBuffer = function() 
 {
-	if (!(this instanceof Buffer)) 
+	if (!(this instanceof VboBuffer)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
 	this.dataArray;
-	this.dataArrayByteLength = 0;
+	this.dataLength; 
+	this.dataType; // byteType: float, short, byte.***
+	this.key;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VboBuffer.prototype.isReady = function(gl, vboMemManager) 
+{
+	if (this.key === undefined) 
+	{
+		if (this.dataArray === undefined) { return false; }
+		if (this.dataLength === undefined)
+		{
+			this.dataLength = this.dataArray.length;
+		}
+		this.key = vboMemManager.getClassifiedBufferKey(gl, this.dataLength);
+		if (this.key === undefined)
+		{ return false; }
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.key);
+		gl.bufferData(gl.ARRAY_BUFFER, this.dataArray, gl.STATIC_DRAW);
+		this.dataArray = undefined;
+		return true;
+	}
+	return true;
 };
 
 /**
@@ -29,6 +54,8 @@ var VBOVertexIdxCacheKey = function()
 	this.indicesCount = -1;
 	this.vertexCount = -1;
 	this.bigTrianglesIndicesCount = -1;
+	
+	this.vboBufferPos;
 
 	this.meshVertexCacheKey;
 	this.meshFacesCacheKey;
@@ -36,11 +63,12 @@ var VBOVertexIdxCacheKey = function()
 	this.meshColorCacheKey;
 	this.meshTexcoordsCacheKey;
 
-	this.posVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
-	this.norVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
-	this.idxVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
-	this.colVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
-	this.tcoordVboDataArray; // to store data here, and when necessary bind to gl and delete it.***
+	// Now, arrays to store data, and when necessary bind to gl and delete it.***
+	this.posVboDataArray; // Usually Float32Array.***
+	this.norVboDataArray; // Usually Int8Array.***
+	this.idxVboDataArray; // Usually UInt16Array.***
+	this.colVboDataArray; // Usually Uint8Array.***
+	this.tcoordVboDataArray; // Usually Float32Array.***
 	
 	this.posArrayByteSize;
 	this.norArrayByteSize;
@@ -54,9 +82,132 @@ var VBOVertexIdxCacheKey = function()
 	this.idxArrayByteType;
 	this.colArrayByteType;
 	this.tcoordArrayByteType;
+	
+	this.existPositions;
+	this.existNormals;
+	this.existColors;
+	this.existTexCoords;
+	this.existIndices;
+	
 
 	this.buffer;// delete this. provisionally put this here.***
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager) 
+{
+	if(posDataArray === undefined)
+		return;
+	
+	var verticesFloatValuesCount = posDataArray.length;
+	var classifiedPosByteSize = verticesFloatValuesCount; // Init value.***
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(verticesFloatValuesCount);
+		this.posVboDataArray = new Float32Array(classifiedPosByteSize);
+		this.posVboDataArray.set(posDataArray);
+	}
+	else{
+		this.posVboDataArray = posDataArray;
+	}
+	this.vertexCount = verticesFloatValuesCount/3;
+	//this.posArrayByteSize = classifiedPosByteSize; 
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemManager) 
+{
+	if(norDataArray === undefined)
+		return;
+	
+	var normalByteValuesCount = norDataArray.length;
+	var classifiedNorByteSize = normalByteValuesCount; // Init value.***
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(normalByteValuesCount);
+		this.norVboDataArray = new Int8Array(classifiedNorByteSize);
+		this.norVboDataArray.set(norDataArray);
+	}
+	else{
+		this.norVboDataArray = norDataArray;
+	}
+	//this.norArrayByteSize = classifiedNorByteSize;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemManager) 
+{
+	if(idxDataArray === undefined)
+		return;
+	
+	var shortIndicesValuesCount = idxDataArray.length;
+	var classifiedIdxByteSize = shortIndicesValuesCount; // Init value.***
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(shortIndicesValuesCount);
+		this.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
+		this.idxVboDataArray.set(idxDataArray);
+	}
+	else{
+		this.idxVboDataArray = idxDataArray;
+	}
+	this.indicesCount = shortIndicesValuesCount;
+	//this.norArrayByteSize = classifiedIdxByteSize;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemManager) 
+{
+	if(colDataArray === undefined)
+		return;
+	
+	var colorByteValuesCount = colDataArray.length;
+	var classifiedColByteSize = colorByteValuesCount;
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colorByteValuesCount);
+		this.colVboDataArray = new Uint8Array(classifiedColByteSize);
+		this.colVboDataArray.set(colDataArray);
+	}
+	else{
+		this.colVboDataArray = colDataArray;
+	}
+	//this.colArrayByteSize = classifiedColByteSize;
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray, vboMemManager) 
+{
+	if(texCoordDataArray === undefined)
+		return;
+	
+	var texCoordsFloatValuesCount = texCoordDataArray.length;
+	var classifiedTCoordByteSize = texCoordsFloatValuesCount;
+	
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordsFloatValuesCount);
+		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
+		coordBuffer.set(texCoordDataArray);
+		this.tcoordVboDataArray = coordBuffer; 
+	}
+	else{
+		this.tcoordVboDataArray = texCoordDataArray;
+	}
+	//this.tcoordArrayByteSize = classifiedTCoordByteSize;
+};
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -289,45 +440,7 @@ VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function()
 	return this.vboCacheKeysArray.length;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @class VBOByteColorCacheKey
- */
-var VBOByteColorCacheKey = function() 
-{
-	if (!(this instanceof VBOByteColorCacheKey)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
 
-	this.meshColorsCacheKey = null;
-	this.meshTexcoordsCacheKey = null;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class VBOByteColorCacheKeysContainer
- */
-var VBOByteColorCacheKeysContainer = function() 
-{
-	if (!(this instanceof VBOByteColorCacheKeysContainer)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.vboByteColorsCacheKeysArray = [];
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @return vboByteColCacheKey
- */
-VBOByteColorCacheKeysContainer.prototype.newVBOByteColorsCacheKey = function() 
-{
-	var vboByteColCacheKey = new VBOByteColorCacheKey();
-	this.vboByteColorsCacheKeysArray.push(vboByteColCacheKey);
-	return vboByteColCacheKey;
-};
 
 
 

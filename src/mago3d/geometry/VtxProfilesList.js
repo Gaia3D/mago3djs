@@ -20,10 +20,7 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	if (resultFacesArray === undefined)
 	{ resultFacesArray = []; }
 	
-	if (resultMesh.hedgesList === undefined)
-	{ resultMesh.hedgesList = new HalfEdgesList(); }
-	
-	var hedgesList = resultMesh.hedgesList;
+	var hedgesList = resultMesh.getHalfEdgesList();
 	
 	var strIdx, currIdx, endIdx, nextIdx;
 	var vtx0, vtx1, vtx2, vtx3;

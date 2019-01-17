@@ -234,6 +234,71 @@ void main() {\n\
     gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
 }\n\
 ";
+ShaderSource.draw_vert3D = "precision mediump float;\n\
+\n\
+	// This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
+attribute float a_index;\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform float u_particles_res;\n\
+uniform mat4 ModelViewProjectionMatrix;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+vec4 geographicToWorldCoord(float lonDeg, float latDeg, float alt)\n\
+{\n\
+	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)\n\
+	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum\n\
+	// a = semi-major axis.\n\
+	// e2 = firstEccentricitySquared.\n\
+	// v = a / sqrt(1 - e2 * sin2(lat)).\n\
+	// x = (v+h)*cos(lat)*cos(lon).\n\
+	// y = (v+h)*cos(lat)*sin(lon).\n\
+	// z = [v*(1-e2)+h]*sin(lat).\n\
+	float degToRadFactor = M_PI/180.0;\n\
+	float equatorialRadius = 6378137.0; // meters.\n\
+	float firstEccentricitySquared = 6.69437999014E-3;\n\
+	float lonRad = lonDeg * degToRadFactor;\n\
+	float latRad = latDeg * degToRadFactor;\n\
+	float cosLon = cos(lonRad);\n\
+	float cosLat = cos(latRad);\n\
+	float sinLon = sin(lonRad);\n\
+	float sinLat = sin(latRad);\n\
+	float a = equatorialRadius;\n\
+	float e2 = firstEccentricitySquared;\n\
+	float v = a/sqrt(1.0 - e2 * sinLat * sinLat);\n\
+	float h = alt;\n\
+	\n\
+	vec4 resultCartesian = vec4((v+h)*cosLat*cosLon, (v+h)*cosLat*sinLon, (v*(1.0-e2)+h)*sinLat, 1.0);\n\
+	return resultCartesian;\n\
+}\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_particles, vec2(\n\
+        fract(a_index / u_particles_res),\n\
+        floor(a_index / u_particles_res) / u_particles_res));\n\
+\n\
+    // decode current particle position from the pixel's RGBA value\n\
+    v_particle_pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a);\n\
+\n\
+    gl_PointSize = 1.0;\n\
+    vec4 pos2d = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
+	\n\
+	// Now, must calculate geographic coords of the pos2d.***\n\
+	float longitudeDeg = -180.0 + pos2d.x * 360.0;\n\
+	float latitudeDeg = 90.0 - pos2d.y * 180.0;\n\
+	float altitude = 0.0;\n\
+	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
+	vec4 worldPos = geographicToWorldCoord(longitudeDeg, latitudeDeg, altitude);\n\
+	\n\
+	// Now calculate the position on camCoord.***\n\
+	\n\
+	gl_Position = ModelViewProjectionMatrix * worldPos;\n\
+}\n\
+";
 ShaderSource.InvertedBoxFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -953,200 +1018,10 @@ ShaderSource.Test_QuadFS = "#ifdef GL_ES\n\
 #endif\n\
  \n\
 uniform sampler2D diffuseTex;  \n\
-uniform float diffuseTexWidth;    \n\
-uniform float diffuseTexHeight;    \n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform mat4 modelViewMatrixInv;\n\
-uniform float tanHalfFovy;\n\
-uniform float aspectRatio;\n\
-uniform float far;\n\
-uniform float maxLon;\n\
-uniform float minLon;\n\
-uniform float maxLat;\n\
-uniform float minLat;\n\
 varying vec2 vTexCoord; \n\
 void main()\n\
-{\n\
-	float real_col = vTexCoord.s * diffuseTexWidth;\n\
-	float real_row = vTexCoord.t * diffuseTexHeight;\n\
-	float col = floor(real_col);\n\
-	float row = floor(real_row);\n\
-	// Now, determine s,t min & s,t max.***\n\
-	float sMin = col/diffuseTexWidth;\n\
-	float tMin = row/diffuseTexHeight;\n\
-	float sMax = (col+1.0)/diffuseTexWidth;\n\
-	float tMax = (row+1.0)/diffuseTexHeight;\n\
-		// Analyze the color of the closest pixels.***\n\
-		vec4 texCol_wn = texture2D(diffuseTex, vec2((col-1.0)/diffuseTexWidth, (row+1.0)/diffuseTexHeight));\n\
-		vec4 texCol_n = texture2D(diffuseTex, vec2((col)/diffuseTexWidth, (row+1.0)/diffuseTexHeight));\n\
-		vec4 texCol_en = texture2D(diffuseTex, vec2((col+1.0)/diffuseTexWidth, (row+1.0)/diffuseTexHeight));\n\
-		\n\
-		vec4 texCol_w = texture2D(diffuseTex, vec2((col-1.0)/diffuseTexWidth, (row)/diffuseTexHeight));\n\
-		vec4 texCol_c = texture2D(diffuseTex, vec2((col)/diffuseTexWidth, (row)/diffuseTexHeight));\n\
-		vec4 texCol_e = texture2D(diffuseTex, vec2((col+1.0)/diffuseTexWidth, (row)/diffuseTexHeight));\n\
-		\n\
-		vec4 texCol_ws = texture2D(diffuseTex, vec2((col-1.0)/diffuseTexWidth, (row-1.0)/diffuseTexHeight));\n\
-		vec4 texCol_s = texture2D(diffuseTex, vec2((col)/diffuseTexWidth, (row-1.0)/diffuseTexHeight));\n\
-		vec4 texCol_es = texture2D(diffuseTex, vec2((col+1.0)/diffuseTexWidth, (row-1.0)/diffuseTexHeight));\n\
-		vec4 totalCol = vec4(0.0, 0.0, 0.0, 0.0);\n\
-		float count = 0.0;\n\
-		float alfaLim = 0.2;\n\
-		bool ws = false;\n\
-		bool s = false;\n\
-		bool es = false;\n\
-		bool e = false;\n\
-		bool en = false;\n\
-		bool n = false;\n\
-		bool wn = false;\n\
-		bool w = false;\n\
-		if(texCol_wn.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			wn = true;\n\
-		}\n\
-		if(texCol_n.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			n = true;\n\
-		}\n\
-		if(texCol_en.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			en = true;\n\
-		}\n\
-		\n\
-		\n\
-		if(texCol_w.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			w = true;\n\
-		}\n\
-		if(texCol_c.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-		}\n\
-		if(texCol_e.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			e = true;\n\
-		}\n\
-		\n\
-		\n\
-		if(texCol_ws.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			ws = true;\n\
-		}\n\
-		if(texCol_s.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			s = true;\n\
-		}\n\
-		if(texCol_es.a > alfaLim)\n\
-		{\n\
-			count++;\n\
-			es = true;\n\
-		}\n\
-		// now, determine in what zone is inside of the pixel.***\n\
-		float leftDist = vTexCoord.s - sMin;\n\
-		float bottomDist = vTexCoord.t - tMin;\n\
-		float relative_s = 0.5*(leftDist / (sMax-sMin))+0.5;\n\
-		float relative_t = 0.5*(bottomDist / (tMax-tMin))+0.5;\n\
-		float radius = sqrt(relative_s*relative_s + relative_t*relative_t);\n\
-		float relCount = 0.0;\n\
-		vec4 textureColor;\n\
-		if(texCol_c.a > alfaLim)\n\
-		{\n\
-			totalCol += texCol_c;\n\
-			relCount++;\n\
-		}\n\
-		//if(radius > 0.4)\n\
-		{\n\
-			if(relative_s < 0.0)\n\
-			{\n\
-				if(relative_t < 0.0)\n\
-				{\n\
-					// west-south.***\n\
-					if(w)\n\
-					{\n\
-						totalCol += texCol_w*(1.0-leftDist);\n\
-						relCount++;\n\
-					}\n\
-					if(ws)\n\
-					{\n\
-						totalCol += texCol_ws*(1.0-leftDist);\n\
-						relCount++;\n\
-					}\n\
-					if(s)\n\
-					{\n\
-						totalCol += texCol_s*(1.0-bottomDist);\n\
-						relCount++;\n\
-					}\n\
-				}\n\
-				else{\n\
-					// west-north.***\n\
-					if(w)\n\
-					{\n\
-						totalCol += texCol_w*(1.0-leftDist);\n\
-						relCount++;\n\
-					}\n\
-					if(wn)\n\
-					{\n\
-						totalCol += texCol_wn*(1.0-leftDist);\n\
-						relCount++;\n\
-					}\n\
-					if(n)\n\
-					{\n\
-						totalCol += texCol_n*(bottomDist);\n\
-						relCount++;\n\
-					}\n\
-				}\n\
-			}\n\
-			else{\n\
-				if(relative_t < 0.0)\n\
-				{\n\
-					// east-south.***\n\
-					if(s)\n\
-					{\n\
-						totalCol += texCol_s*(1.0-bottomDist);\n\
-						relCount++;\n\
-					}\n\
-					if(es)\n\
-					{\n\
-						totalCol += texCol_es*(1.0-bottomDist);\n\
-						relCount++;\n\
-					}\n\
-					if(e)\n\
-					{\n\
-						totalCol += texCol_e*(leftDist);\n\
-						relCount++;\n\
-					}\n\
-				}\n\
-				else{\n\
-					// east-north.***\n\
-					if(e)\n\
-					{\n\
-						totalCol += texCol_e*(leftDist);\n\
-						relCount++;\n\
-					}\n\
-					if(en)\n\
-					{\n\
-						totalCol += texCol_en*(bottomDist);\n\
-						relCount++;\n\
-					}\n\
-					if(n)\n\
-					{\n\
-						totalCol += texCol_n*(bottomDist);\n\
-						relCount++;\n\
-					}\n\
-				}\n\
-			}\n\
-		}\n\
-		//if(count < 6.0)\n\
-		//	discard;\n\
-		textureColor = vec4(totalCol/relCount);\n\
-		//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+{          \n\
+    vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
     gl_FragColor = textureColor; \n\
 }\n\
 ";

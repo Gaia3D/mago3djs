@@ -141,9 +141,8 @@ Vertex.prototype.setPosition = function(x, y, z)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * @param s 변수
+ * @param t 변수
  */
 Vertex.prototype.setTexCoord = function(s, t) 
 {
@@ -155,9 +154,6 @@ Vertex.prototype.setTexCoord = function(s, t)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param r 변수
- * @param g 변수
- * @param b 변수
  */
 Vertex.prototype.setColorRGB = function(r, g, b) 
 {
@@ -168,10 +164,6 @@ Vertex.prototype.setColorRGB = function(r, g, b)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param r 변수
- * @param g 변수
- * @param b 변수
- * @param alpha 변수
  */
 Vertex.prototype.setColorRGBA = function(r, g, b, alpha) 
 {
@@ -182,10 +174,6 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param r 변수
- * @param g 변수
- * @param b 변수
- * @param alpha 변수
  */
 Vertex.prototype.setNormal = function(nx, ny, nz) 
 {
@@ -196,14 +184,33 @@ Vertex.prototype.setNormal = function(nx, ny, nz)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param dirX 변수
- * @param dirY 변수
- * @param dirZ 변수
- * @param distance 변수
+ */
+Vertex.prototype.getNormal = function() 
+{
+	if (this.normal === undefined) { this.normal = new Point3D(); }
+	
+	return this.normal;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 Vertex.prototype.translate = function(dx, dy, dz) 
 {
 	this.point3d.add(dx, dy, dz);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Vertex.prototype.getOutingHEdges = function(resultHedgesArray) 
+{
+	if(resultHedgesArray === undefined)
+		resultHedgesArray = [];
+	
+	// todo:
+	
+	return resultHedgesArray;
 };
 
 

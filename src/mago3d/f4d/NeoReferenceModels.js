@@ -498,6 +498,7 @@ var NeoReferencesMotherAndIndices = function()
 	
 	this.currentVisibleIndices = [];
 	this.currentVisibleMRG; // MRG = ModelReferencedGroup (for new format).
+	this.xhr;
 };
 
 /**
@@ -594,8 +595,20 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx)
  */
 NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
 {
+	if(this.xhr !== undefined)
+	{
+		this.xhr.abort();
+		this.xhr = undefined;
+	}
+	
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	this.neoRefsIndices = undefined;
+	
+	if(this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== CODE.fileLoadState.READY)
+	{
+		this.blocksList.xhr.abort();
+		this.blocksList.xhr = undefined;
+	}
 	this.blocksList = undefined;
 
 	this.fileLoadState = undefined;
@@ -922,7 +935,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * dim;
-						colByteSize = daya_bytes * verticesFloatValuesCount;
+						//colByteSize = daya_bytes * verticesFloatValuesCount; // error...
+						colByteSize = verticesFloatValuesCount;
 						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
 						
 						neoRef.vertexCount = vertexCount; // no necessary.***
@@ -953,17 +967,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
-						// example: posByteSize = 4 * verticesFloatValuesCount;
-						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
-						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-						
+
 						neoRef.vertexCount = vertexCount; // no necessary.***
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
-						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
+
+						var texCoordDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+						vboViCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
+		
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
 						
 						// send data to gpu.
@@ -1473,12 +1484,11 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 	shader.last_tex_id = magoManager.textureAux_1x1;
-	
-	
 
 	// New version. Use occlussion indices.***
 	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.***
 	var visibleIndices_count = this.currentVisibleIndices.length;
+	var noRenderedsCount = 0;
 
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
@@ -1495,7 +1505,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		// Render the referenceObject.***
 		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
 		{
-			allRendered = false;
+			noRenderedsCount ++;
 		}
 
 		// Swap renderingFase.***
@@ -1510,6 +1520,9 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 			}
 		}
 	}
+	
+	if((visibleIndices_count - noRenderedsCount)/visibleIndices_count < 0.4)
+		allRendered = false;
 	
 	return allRendered;
 };

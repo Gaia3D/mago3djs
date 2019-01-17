@@ -194,11 +194,29 @@ Surface.setTwinsFacesBetweenFacesArrays_regularQuadGrid = function(facesArray_A,
 	var bIsRegularQuadGrid = true;
 	var faces_A_count = facesArray_A.length;
 	var face_A, face_B;
-	for(var i=0; i<faces_A_count; i++)
+	for(var i=0; i<faces_A_count-1; i++)
 	{
 		face_A = facesArray_A[i];
-		face_B = facesArray_B[i];
-		face_A.setTwinFace(face_B);
+		face_B = facesArray_B[i+1];
+		if(!face_A.setTwinFace(face_B))
+		{
+			face_A = facesArray_A[i+1];
+			face_B = facesArray_B[i];
+			if(!face_A.setTwinFace(face_B))
+			{
+				face_A = facesArray_A[i];
+				face_B = facesArray_B[i];
+				if(!face_A.setTwinFace(face_B))
+				{
+					face_A = facesArray_A[i+1];
+					face_B = facesArray_B[i+1];
+					if(!face_A.setTwinFace(face_B))
+					{
+						// do nothing.***
+					}
+				}
+			}
+		}
 	}
 };
 

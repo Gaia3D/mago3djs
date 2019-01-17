@@ -97,7 +97,9 @@
 <script type="text/javascript" src="../src/mago3d/geometry/Line2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/MagoNativeProject.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/MagoWorld.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Modeler.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/ParametricMesh.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/PlaneGrid.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point3D.js"></script>
@@ -906,6 +908,14 @@
 			<input type="radio" id="mode1PV" name="viewMode" value ="true" onclick="changeViewMode(true);"/>
 			<label for="mode1PV"> First Person Mode </label>
 		</div>
+		
+		<div>
+			<h3>Mago Mode</h3>
+			<input type="radio" id="magoModeNormal" name="magoMode" value ="false" onclick="changeMagoMode(false);"/>
+			<label for="magoModeNormal"> Normal </label>
+			<input type="radio" id="magoModeDrawing" name="magoMode" value ="true" onclick="changeMagoMode(true);"/>
+			<label for="magoModeDrawing"> Drawing </label>
+		</div>
 	</div>
 </div>
 
@@ -922,6 +932,15 @@
 
 
 <body>
+<button type="button">Draw</button>
+<ul class="nav">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	<li id="myIssueMenu" class="issue" data-tooltip-text="Shows the latest 10 issues sorted chronologically from the entire Issue List.">Issue
+		<br/><span id="issueListCount">4</span></li>
+	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
+</ul>
 
 <div style="position: absolute; width:100%; height:100%; margin-top:0; padding:0; overflow:hidden;">
 	<canvas id="magoContainer" style="width:100%; height:100%">
@@ -929,6 +948,7 @@
     </canvas>
 	<canvas id="objectLabel"></canvas>
 </div>
+
 <script>
 	var managerFactory = null;
 	var insertIssueEnable = false;
@@ -1058,6 +1078,39 @@
 
 	function render(){
 	   magoWorld.renderScene();
+	}
+	
+	// Menu slide.****************************************************************************************************************************
+	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, logMenu : false, attributeMenu : false, configMenu : false };
+	$("#configMenu").click(function() {
+		menuSlideControl("configMenu");
+	});
+	function menuSlideControl(menuName) {
+		var compareMenuState = menuObject[menuName];
+		for(var key in menuObject) {
+		    // state 값 변경하고, css 변경
+			if(key === menuName) {
+			    var value = menuObject[key];
+				if(value) {
+					$("#" + menuName).removeClass("on");
+					$("#menuContent").hide();
+					$("#" + menuName + "Content").hide();
+				} else {
+					$("#" + menuName).addClass("on");
+					$("#menuContent").show();
+					$("#" + menuName + "Content").show();
+				}
+				menuObject[menuName] = !compareMenuState;
+			} else {
+				$("#" + key).removeClass("on");
+				$("#" + key + "Content").hide();
+			}
+		}
+	}
+	
+	function changeMagoMode(magoMode) {
+		$("input:radio[name='magoMode']:radio[value='" + magoMode + "']").prop("checked", true);
+		changeMagoModeAPI(managerFactory, magoMode);
 	}
 
 </script>

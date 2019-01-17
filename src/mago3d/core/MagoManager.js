@@ -970,15 +970,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
 		Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
-		/*
-		for(var i=0; i<16; i++)
-		{
-			sceneState.modelViewProjRelToEyeMatrix._floatArrays[i] = uniformState._modelViewProjectionRelativeToEye[i];
-			sceneState.modelViewProjMatrix._floatArrays[i] = uniformState._modelViewProjection[i];
-			sceneState.modelViewRelToEyeMatrix._floatArrays[i] = uniformState._modelViewRelativeToEye[i];
-			sceneState.modelViewRelToEyeMatrixInv._floatArrays[i] = sceneState.modelViewRelToEyeMatrix._floatArrays[i];
-		}
-		*/
 		
 		sceneState.modelViewRelToEyeMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewRelToEyeMatrixInv._floatArrays);// original.***
 		
@@ -1006,24 +997,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.camera.setCurrentFrustum(0);
 
 		// now, determine if the camera was moved.***
-		var camNewPosX = scene.context._us._cameraPosition.x;
-		var camNewPosY = scene.context._us._cameraPosition.y;
-		var camNewPosZ = scene.context._us._cameraPosition.z;
-		
-		var camNewDirX = scene._camera.direction.x;
-		var camNewDirY = scene._camera.direction.y;
-		var camNewDirZ = scene._camera.direction.z;
-		
-		var camNewUpX = scene._camera.up.x;
-		var camNewUpY = scene._camera.up.y;
-		var camNewUpZ = scene._camera.up.z;
-		
-		if (sceneState.camera.isCameraMoved(camNewPosX, camNewPosY, camNewPosZ, camNewDirX, camNewDirY, camNewDirZ, camNewUpX, camNewUpY, camNewUpZ ))
-		{
-			this.isCameraMoved = true;
-		}
-		
-		// Set cam dir & up by modelViewMatrix.***
+		// Find cam dir & up by modelViewMatrix.***
 		var modelViewMatInv = sceneState.modelViewMatrixInv;
 		var camPosX = modelViewMatInv._floatArrays[12];
 		var camPosY = modelViewMatInv._floatArrays[13];
@@ -1037,10 +1011,14 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var camUpY = modelViewMatInv._floatArrays[5];
 		var camUpZ = modelViewMatInv._floatArrays[6];
 		
+		if (sceneState.camera.isCameraMoved(camPosX, camPosY, camPosZ, camDirX, camDirY, camDirZ, camUpX, camUpY, camUpZ ))
+		{
+			this.isCameraMoved = true;
+		}
+		
 		sceneState.camera.position.set(camPosX, camPosY, camPosZ);
 		sceneState.camera.direction.set(camDirX, camDirY, camDirZ);
 		sceneState.camera.up.set(camUpX, camUpY, camUpZ);
-		
 		
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
@@ -1226,145 +1204,6 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
 		resultCamera.calculateFrustumsPlanes();
 	}
-};
-
-MagoManager.prototype.renderFakeEarth = function(ssao_idx)
-{
-	if (ssao_idx === undefined)
-	{ ssao_idx = 1; }
-	
-	if (this.fakeEarth === undefined)
-	{
-		var natProject = new MagoNativeProject();
-		
-		// create a sphere.***
-		//equatorialRadius = 6378137.0;
-		var sphere = new Sphere();
-		sphere.r = 6378137.0;
-		//sphere.r = 100.0;
-		var pMesh = new ParametricMesh();
-		//pMesh = sphere.makeMesh(pMesh);
-		sphere.mesh = pMesh;
-		
-		pMesh.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		pMesh.vboKeyContainer = sphere.getVbo(pMesh.vboKeyContainer);
-		
-		this.fakeEarth = sphere;
-	}
-	//---------------------------------------------------------------------------------------------------------------
-	
-	var gl = this.sceneState.gl;
-	var color;
-	var node;
-	var currentShader;
-	if (ssao_idx === 0)
-	{
-		currentShader = this.postFxShadersManager.getTriPolyhedronDepthShader(); // triPolyhedron ssao.***
-		gl.disable(gl.BLEND);
-	}
-	if (ssao_idx === 1)
-	{
-		currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // triPolyhedron ssao.***
-		gl.enable(gl.BLEND);
-	}
-	
-	var shaderProgram = currentShader.program;
-	
-	gl.frontFace(gl.CCW);
-	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
-	
-	
-	gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
-	gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
-
-	gl.uniform1f(currentShader.near_loc, this.sceneState.camera.frustum.near);
-	gl.uniform1f(currentShader.far_loc, this.sceneState.camera.frustum.far);
-	
-	//gl.uniform1f(currentShader.near_loc, 1.0);
-	//gl.uniform1f(currentShader.far_loc, 1000.0);
-	
-	gl.uniform1i(currentShader.bApplySsao_loc, false);
-
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, this.sceneState.normalMatrix4._floatArrays);
-	//-----------------------------------------------------------------------------------------------------------
-		
-	if (ssao_idx === 1)
-	{
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-		// provisionally render all native projects.***
-		gl.enableVertexAttribArray(currentShader.normal3_loc);
-		gl.enableVertexAttribArray(currentShader.color4_loc);
-
-		gl.uniform1i(currentShader.bUse1Color_loc, false);
-		if (color)
-		{
-			gl.uniform4fv(currentShader.oneColor4_loc, [color.r, color.g, color.b, 1.0]); //.***
-		}
-		else 
-		{
-			gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
-		}
-		
-		gl.uniform1i(currentShader.bUseNormal_loc, true);
-		
-		gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, this.sceneState.modelViewMatrix._floatArrays);
-		gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, this.sceneState.projectionMatrix._floatArrays);
-
-		gl.uniform1i(currentShader.depthTex_loc, 0);
-		gl.uniform1i(currentShader.noiseTex_loc, 1);
-		gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-		gl.uniform1f(currentShader.fov_loc, this.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
-		gl.uniform1f(currentShader.aspectRatio_loc, this.sceneState.camera.frustum.aspectRatio);
-		gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
-		gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
-
-
-		gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
-		gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-	}
-	
-	var neoBuilding;
-	var natProject, mesh;
-
-	// Render the fake earth.***************************************************
-
-		
-	gl.uniform3fv(currentShader.scale_loc, [1, 1, 1]); //.***
-		
-	gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, [1.0, 0.0, 0.0, 0.0,    0.0, 1.0, 0.0, 0.0,    0.0, 0.0, 1.0, 0.0,    0.0, 0.0, 0.0, 1.0]);
-	gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
-	gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
-	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-		
-	mesh = this.fakeEarth.mesh;
-	this.renderer.renderObject(gl, mesh, this, currentShader, ssao_idx, false);
-
-	// End render fake earth.---------------------------------------------------------------
-	
-	if (currentShader)
-	{
-		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
-		if (currentShader.position3_loc !== -1){ gl.disableVertexAttribArray(currentShader.position3_loc); }
-		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
-		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-	}
-	
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-	gl.activeTexture(gl.TEXTURE2); 
-	gl.bindTexture(gl.TEXTURE_2D, null);
-	
-	gl.disable(gl.BLEND);
 };
 
 
@@ -2141,8 +1980,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
-	//this.renderFakeEarth(ssao_idx); // test.***
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
@@ -2160,10 +1998,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	
 	////this.test_volumeRendering();
+	
 	if(this.weatherStation)
 	{
 		//this.weatherStation.test_renderWindLayer(this);
-		
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
 		/*
@@ -2172,6 +2010,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
+			gl.enable(gl.BLEND);
 			
 			if (this.noiseTexture === undefined) 
 			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
@@ -2180,10 +2019,18 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
+			
+			gl.uniform1i(currentShader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
+
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
 			currentShader.bindUniformGenerals();
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+			
+			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]));
+			gl.uniform3fv(currentShader.buildingPosHIGH_loc, new Float32Array([0,0,0]));
+			gl.uniform3fv(currentShader.buildingPosLOW_loc, new Float32Array([0,0,0]));
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
@@ -2192,17 +2039,21 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
 			currentShader.last_tex_id = this.textureAux_1x1;
-		this.weatherStation.test_renderTemperatureMesh(this, currentShader, renderType);
+		//this.weatherStation.test_renderTemperatureMesh(this, currentShader, renderType);
+		this.weatherStation.test_renderPrecipitationMesh(this, currentShader, renderType);
+		gl.disable(gl.BLEND);
+		
+		currentShader.disableVertexAttribArrayAll();
 		*/
 	}
+	
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
-	//this.renderFakeEarth(ssao_idx); // test.***
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -2219,6 +2070,15 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		gl.activeTexture(gl.TEXTURE0);
 		this.wwd.drawContext.redrawRequested = true;
 	}
+};
+
+/**
+ * 
+ */
+MagoManager.prototype.processDraw = function() 
+{
+	// If magoMode === CODE.magoMode.DRAWING, then do drawing process.***
+	
 };
 
 /**
@@ -2431,10 +2291,22 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	var canvas = document.getElementById("objectLabel");
 	if (canvas === undefined)
 	{ return; }
+
+	var magoDiv = document.getElementById('magoContainer');
+	var offsetLeft = magoDiv.offsetLeft;
+	var offsetTop = magoDiv.offsetTop;
+	var offsetWidth = magoDiv.offsetWidth;
+	var offsetHeight = magoDiv.offsetHeight;
 	
 	canvas.style.opacity = 1.0;
 	canvas.width = this.sceneState.drawingBufferWidth;
 	canvas.height = this.sceneState.drawingBufferHeight;
+	var canvasStyleLeft = offsetLeft.toString()+"px";
+	var canvasStyleTop = offsetTop.toString()+"px";
+	canvas.style.left = canvasStyleLeft;
+	canvas.style.top = canvasStyleTop;
+	canvas.style.position = "absolute";
+	
 	var ctx = canvas.getContext("2d");
 	//ctx.strokeStyle = 'SlateGrey';
 	//ctx.strokeStyle = 'MidnightBlue';
@@ -2477,10 +2349,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		rootNodesMap[key] = nodeRoot;
 	}
 	
-	//var rootNodesArray = Object.values(rootNodesMap);
-	//var rootNodesKeysArray = Object.keys(rootNodesMap);
-	//var nodesCount = rootNodesKeysArray.length;
-	//for (var i=0; i<nodesCount; i++)
+
 	for (var key in rootNodesMap)
 	{
 		if (Object.prototype.hasOwnProperty.call(rootNodesMap, key))
@@ -2492,8 +2361,6 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			//neoBuilding = node.data.neoBuilding;
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
 			screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
-			//screenCoord.x += 250;
-			//screenCoord.y += 150;
 			
 			if (screenCoord.x >= 0 && screenCoord.y >= 0)
 			{
@@ -3030,6 +2897,18 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
 	
+	if (this.currentFrustumIdx === 0)
+		var hola = 0;
+	else if (this.currentFrustumIdx > 0)
+		var hola = 0;
+	
+	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
+	{
+		
+	}
+	
+	
+	
 	// Test.**********************************************************************************************************************
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
 	if(selGeneralObjects)
@@ -3495,7 +3374,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 					
 					// New Test.*******************************************************
 					var camRay = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, undefined);
-					var strWorldPoint = mouseAction.strWorldPointAux;
+					var strWorldPoint = mouseAction.strWorldPointAux; // original.***
+					////var strWorldPoint = mouseAction.strWorldPoint;
 					if(strWorldPoint)
 					{
 						var strEarthRadius = strWorldPoint.getModul();
@@ -4686,8 +4566,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		
 		if (this.tinTerrainManager !== undefined)
 		{
-			var bDepth = false;
-			this.tinTerrainManager.render(this, bDepth);
+			var bDepthRender = false; // This is no depth render.***
+			this.tinTerrainManager.render(this, bDepthRender);
 		}
 
 	}
@@ -6874,6 +6754,10 @@ MagoManager.prototype.callAPI = function(api)
 		var geoLocdata = geoLocDataManager.getCurrentGeoLocationData();
 		resultPoint = geoLocdata.localCoordToWorldCoord(localPoint, resultPoint);
 		return resultPoint;
+	}
+	else if (apiName === "changeMagoMode") 
+	{
+		var hola = 0;
 	}
 };
 

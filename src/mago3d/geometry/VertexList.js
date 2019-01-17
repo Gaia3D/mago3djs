@@ -84,6 +84,13 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
 	return resultVector;
 };
 
+VertexList.getDirection = function(idx, vertexArray, resultDir)
+{
+	resultDir = VertexList.getVector(idx, vertexArray, resultDir);
+	resultDir.unitary();
+	return resultDir;
+};
+
 VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 {
 	var currVector = VertexList.getVector(idx, vertexArray, undefined);
@@ -325,12 +332,53 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	if (resultVbo === undefined)
 	{ resultVbo = new VBOVertexIdxCacheKey(); }
 	
-	var posArray = [];
-	var norArray;
-	var colArray;
-	var texCoordArray;
-	
 	var vertex, position, normal, color, texCoord;
+	
+	// 1rst, check if exist normals, colors & texCoords.***
+	var hasNormals = false;
+	var hasColors = false;
+	var hasTexCoords = false;
+	
+	// Take the 1rst vertex.***
+	vertex = vertexArray[0];
+	if (vertex.point3d === undefined)
+		{ return resultVbo; }
+	
+	if(vertex.normal !== undefined)
+		hasNormals = true;
+	
+	if(vertex.color4 !== undefined)
+		hasColors = true;
+	
+	if(vertex.texCoord !== undefined)
+		hasTexCoords = true;
+	
+	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).***
+	// Positions.***
+	var posByteSize = verticesCount * 3;
+	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+	resultVbo.posVboDataArray = new Float32Array(classifiedPosByteSize);
+	
+	if (hasNormals)
+	{ 
+		var norByteSize = verticesCount * 3;
+		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
+		resultVbo.norVboDataArray = new Int8Array(classifiedNorByteSize);
+	}
+	
+	if (hasColors)
+	{ 
+		var colByteSize = verticesCount * 4;
+		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
+		resultVbo.colVboDataArray = new Uint8Array(classifiedColByteSize);
+	}
+	
+	if (hasTexCoords)
+	{ 
+		var texCoordByteSize = verticesCount * 2;
+		var classifiedTexCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordByteSize);
+		resultVbo.tcoordVboDataArray = new Float32Array(classifiedTexCoordByteSize);
+	}
 	
 	for (var i = 0; i < verticesCount; i++) 
 	{
@@ -339,74 +387,36 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 		{ continue; }
 		
 		position = vertex.point3d;
-		posArray.push(position.x);
-		posArray.push(position.y);
-		posArray.push(position.z);
+
+		resultVbo.posVboDataArray[i*3] = position.x;
+		resultVbo.posVboDataArray[i*3+1] = position.y;
+		resultVbo.posVboDataArray[i*3+2] = position.z;
 		
-		normal = vertex.normal;
-		if (normal)
+		if (hasNormals)
 		{
-			if (norArray === undefined)
-			{ norArray = []; }
-			
-			norArray.push(normal.x*127);
-			norArray.push(normal.y*127);
-			norArray.push(normal.z*127);
+			normal = vertex.normal;
+			resultVbo.norVboDataArray[i*3] = normal.x*127;
+			resultVbo.norVboDataArray[i*3+1] = normal.y*127;
+			resultVbo.norVboDataArray[i*3+2] = normal.z*127;
 		}
 		
-		color = vertex.color4;
-		if (color)
+		if (hasColors)
 		{
-			if (colArray === undefined)
-			{ colArray = []; }
-			
-			colArray.push(color.r*255);
-			colArray.push(color.g*255);
-			colArray.push(color.b*255);
-			colArray.push(color.a*255);
+			color = vertex.color4;
+			resultVbo.colVboDataArray[i*4] = color.r*255;
+			resultVbo.colVboDataArray[i*4+1] = color.g*255;
+			resultVbo.colVboDataArray[i*4+2] = color.b*255;
+			resultVbo.colVboDataArray[i*4+3] = color.a*255;
 		}
 		
-		texCoord = vertex.texCoord;
-		if (texCoord)
+		if (hasTexCoords)
 		{
-			if (texCoordArray === undefined)
-			{ texCoordArray = []; }
-			
-			texCoordArray.push(texCoord.x);
-			texCoordArray.push(texCoord.y);
+			texCoord = vertex.texCoord;
+			resultVbo.tcoordVboDataArray[i*2] = texCoord.x;
+			resultVbo.tcoordVboDataArray[i*2+1] = texCoord.y;
 		}
 	}
-	
-	// Use vboMemManager to determine classified memorySize( if use memory pool).***
-	var posByteSize = verticesCount * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	resultVbo.posVboDataArray = new Float32Array(classifiedPosByteSize);
-	resultVbo.posVboDataArray.set(posArray);
-	
-	if (normal)
-	{ 
-		var norByteSize = verticesCount * 3;
-		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		resultVbo.norVboDataArray = new Int8Array(classifiedNorByteSize);
-		resultVbo.norVboDataArray.set(norArray);
-	}
-	
-	if (color)
-	{ 
-		var colByteSize = verticesCount * 4;
-		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-		resultVbo.colVboDataArray = new Uint8Array(classifiedColByteSize);
-		resultVbo.colVboDataArray.set(colArray);
-	}
-	
-	if (texCoord)
-	{ 
-		var texCoordByteSize = verticesCount * 2;
-		var classifiedTexCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordByteSize);
-		resultVbo.tcoordVboDataArray = new Float32Array(classifiedTexCoordByteSize);
-		resultVbo.tcoordVboDataArray.set(texCoordArray);
-	}
-	
+
 	return resultVbo;
 };
 

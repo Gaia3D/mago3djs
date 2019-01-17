@@ -68,22 +68,22 @@ Face.prototype.setColor = function(r, g, b, a)
 Face.prototype.getPlaneNormal = function()
 {
 	if (this.planeNormal === undefined)
-	{ this.calculateVerticesNormals(); }
+	{ 
+		//this.calculateVerticesNormals(); 
+		this.calculatePlaneNormal();
+	} 
 	
 	return this.planeNormal;
 };
 
-Face.prototype.calculateVerticesNormals = function()
+Face.prototype.calculatePlaneNormal = function()
 {
-	// This function calculates normals for concave faces.***
-	// Provisionally calculate the plane normal and assign to the vertices.***
-	var finished = false;
-	var verticesCount = this.vertexArray.length;
-
+	// Note: face must be planar.***
 	if (this.planeNormal === undefined)
 	{ this.planeNormal = new Point3D(); }
-	
+
 	this.planeNormal.set(0, 0, 0);
+	var verticesCount = this.vertexArray.length;
 	for (var i=0; i<verticesCount; i++)
 	{
 		var prevIdx = VertexList.getPrevIdx(i, this.vertexArray);
@@ -102,9 +102,26 @@ Face.prototype.calculateVerticesNormals = function()
 		this.planeNormal.add(crossProd.x*alfa, crossProd.y*alfa, crossProd.z*alfa);
 	}
 	this.planeNormal.unitary();
+	
+	return this.planeNormal;
+};
+
+Face.prototype.calculateVerticesNormals = function()
+{
+	// This function calculates normals for concave faces.***
+	// Provisionally calculate the plane normal and assign to the vertices.***
+	var verticesCount = this.vertexArray.length;
+
+	if (this.planeNormal === undefined)
+	{ this.calculatePlaneNormal(); }
+	
+	var normal;
 	var verticesCount = this.getVerticesCount();
 	for (var i=0; i<verticesCount; i++)
 	{
+		//normal = this.vertexArray[i].getNormal();
+		//normal.addPoint(this.planeNormal);
+		//normal.unitary();
 		this.vertexArray[i].setNormal(this.planeNormal.x, this.planeNormal.y, this.planeNormal.z);
 	}
 };
@@ -160,6 +177,15 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	if (resultTrianglesArray === undefined)
 	{ resultTrianglesArray = []; }
 
+	var verticesCount = this.getVerticesCount();
+	if(verticesCount <= 3)
+	{
+		// This is a triangle, so no need to tessellate.***
+		resultTrianglesArray = this.getTrianglesConvex(resultTrianglesArray);
+		return resultTrianglesArray;
+	}
+	
+
 	// 1rst, must project the face to a plane and process to tessellate in 2d.***
 	var normal = this.getPlaneNormal();
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
@@ -174,7 +200,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	if (bestPlaneToProject === 0) // plane-xy.***
 	{
 		// project this face into a xy plane.***
-		var verticesCount = this.getVerticesCount();
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = this.getVertex(i);
@@ -189,7 +214,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	else if (bestPlaneToProject === 1) // plane-yz.***
 	{
 		// project this face into a yz plane.***
-		var verticesCount = this.getVerticesCount();
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = this.getVertex(i);
@@ -204,7 +228,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	else if (bestPlaneToProject === 2) // plane-xz.***
 	{
 		// project this face into a xz plane.***
-		var verticesCount = this.getVerticesCount();
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = this.getVertex(i);
@@ -221,6 +244,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 		// some times normal = (nan, nan, nan).
 		return resultTrianglesArray;
 	}
+	
 	
 	// Now, tessellate the polygon2D.***
 	// Before tessellate, we must know if there are concavePoints.***

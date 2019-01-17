@@ -74,6 +74,7 @@ var BlocksList = function()
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
+	this.xhr; // file request.***
 };
 
 /**
@@ -112,6 +113,12 @@ BlocksList.prototype.getBlock = function(idx)
  */
 BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
+	if(this.xhr !== undefined)
+	{
+		this.xhr.abort();
+		this.xhr = undefined;
+	}
+	
 	if (this.blocksArray === undefined) { return; }
 
 	for (var i = 0, blocksCount = this.blocksArray.length; i < blocksCount; i++ ) 
@@ -213,41 +220,29 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		if (vertexCount > 200000)
 		{ var hola = 0; }
 		
+		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+		
 		var verticesFloatValuesCount = vertexCount * 3;
-		// now padding the array to adjust to standard memory size of pool.
-		//posByteSize = 4 * verticesFloatValuesCount;
-		posByteSize = verticesFloatValuesCount;
-		
-		// test.***
-		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-		
 		block.vertexCount = vertexCount;
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-		vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-		vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
+		var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+		vboViCacheKey.setDataArrayPos(posDataArray, vboMemManager);
+
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 		
 		// 2) Normals.
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var normalByteValuesCount = vertexCount * 3;
-		// now padding the array to adjust to standard memory size of pool.
-		norByteSize = 1 * normalByteValuesCount;
-		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 1 * normalByteValuesCount;
-		vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
-		vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
+		var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+		vboViCacheKey.setDataArrayNor(norDataArray, vboMemManager);
+
 		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 		
 		// 3) Indices.
 		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		// now padding the array to adjust to standard memory size of pool.
-		//idxByteSize = 2 * shortIndicesValuesCount;
 		idxByteSize = shortIndicesValuesCount;
 		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
 
@@ -266,12 +261,10 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 		vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+		var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
+		vboViCacheKey.setDataArrayIdx(idxDataArray, vboMemManager);
 
-		vboViCacheKey.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
-		vboViCacheKey.idxVboDataArray.set(new Uint16Array(arrayBuffer.slice(startBuff, endBuff)));
-		vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
 		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-		vboViCacheKey.indicesCount = shortIndicesValuesCount;
 	}
 	
 	return bytesReaded;
@@ -481,40 +474,30 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var verticesFloatValuesCount = vertexCount * 3;
-			// now padding the array to adjust to standard memory size of pool.
-			posByteSize = 4 * verticesFloatValuesCount;
-			classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
+			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 			
 			block.vertexCount = vertexCount;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			vboViCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-			vboViCacheKey.posVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.posArrayByteSize = classifiedPosByteSize; 
+			var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.setDataArrayPos(posDataArray, vboMemManager);
+
 			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 			
 			// 2) Normals.
 			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 			bytesReaded += 4;
 			var normalByteValuesCount = vertexCount * 3;
-			// now padding the array to adjust to standard memory size of pool.
-			norByteSize = 1 * normalByteValuesCount;
-			classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-			
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 1 * normalByteValuesCount;
-			vboViCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
-			vboViCacheKey.norVboDataArray.set(new Int8Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.norArrayByteSize = classifiedNorByteSize;
+			var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.setDataArrayNor(norDataArray, vboMemManager);
+			
 			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 			
 			// 3) Indices.
 			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			// now padding the array to adjust to standard memory size of pool.
-			idxByteSize = 2 * shortIndicesValuesCount;
-			classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-			
+
 			bytesReaded += 4;
 			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
 			bytesReaded +=1;
@@ -534,22 +517,11 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
 			startBuff = bytesReaded;
 			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+			var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
+			vboViCacheKey.setDataArrayIdx(idxDataArray, vboMemManager);
 
-			vboViCacheKey.idxVboDataArray = new Int16Array(classifiedIdxByteSize);
-			vboViCacheKey.idxVboDataArray.set(new Int16Array(arrayBuffer.slice(startBuff, endBuff)));
-			vboViCacheKey.idxArrayByteSize = classifiedIdxByteSize;
 			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
-			vboViCacheKey.indicesCount = shortIndicesValuesCount;
 
-			posByteSize;
-			norByteSize;
-			idxByteSize;
-			
-			classifiedPosByteSize;
-			classifiedNorByteSize;
-			classifiedIdxByteSize;
-			
-			//var hola = 0;
 			
 			// test.
 			if (!vboViCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))

@@ -22,6 +22,7 @@ var Lego = function()
 	this.texture;
 	this.textureName;
 	this.legoKey;
+	this.xhr;
 	
 	// extra vars.***
 	this.renderableType; // triangles, lines, points, etc.***
@@ -67,6 +68,14 @@ Lego.prototype.isReadyToRender = function()
  */
 Lego.prototype.deleteObjects = function(gl, vboMemManager)
 {
+	/*
+	if(this.xhr !== undefined)// && this.fileLoadState === CODE.fileLoadState.LOADING_STARTED)
+	{
+		this.xhr.abort();
+		this.xhr = undefined;
+	}
+	*/
+	
 	if (this.vbo_vicks_container !== undefined)
 	{
 		this.vbo_vicks_container.deleteGlObjects(gl, vboMemManager);
@@ -144,11 +153,11 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 		positionBuffer.set(stream.readFloat32Array(verticesCount * 3));
 	}
 	
-	vboCacheKey.vertexCount = verticesCount;
-	vboCacheKey.posVboDataArray = positionBuffer;
-	vboCacheKey.posArrayByteSize = classifiedPosByteSize; 
+	vboCacheKey.setDataArrayPos(positionBuffer, vboMemManager);
+
 	// (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
 	vboCacheKey.posArrayByteType = 5123; // unsigned short.***
+	
 	
 	// normals.***
 	this.hasNormals = stream.readInt8();
@@ -158,13 +167,8 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	if (this.hasColors)
 	{
 		var numColors = verticesCount;
-		var colByteSize = numColors * 4;
-		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-		var colorBuffer = new Uint8Array(classifiedColByteSize);
-		colorBuffer.set(stream.readUint8Array(numColors * 4));
-
-		vboCacheKey.colVboDataArray = colorBuffer;
-		vboCacheKey.colArrayByteSize = classifiedColByteSize;
+		var colDataArray = stream.readUint8Array(numColors * 4);
+		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
 		vboCacheKey.colArrayByteType = 5121; // unsigned byte.***
 	}
 	
@@ -205,14 +209,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 
 	// VBO(Position Buffer) - x,y,z
 	var numPositions = stream.readUint32();
-	var posByteSize = numPositions * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	var positionBuffer = new Float32Array(classifiedPosByteSize);
-	positionBuffer.set(stream.readFloat32Array(numPositions * 3));
-
-	vboCacheKey.vertexCount = numPositions;
-	vboCacheKey.posVboDataArray = positionBuffer;
-	vboCacheKey.posArrayByteSize = classifiedPosByteSize; 
+	var posDataArray = stream.readFloat32Array(numPositions * 3);
+	vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
 	// (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
 	//vboCacheKey.posArrayByteType = 5123; // unsigned short.***
 
@@ -221,13 +219,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	if (hasNormals) 
 	{
 		var numNormals = stream.readUint32();
-		var norByteSize = numNormals * 3;
-		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		var normalBuffer = new Int8Array(classifiedNorByteSize);
-		normalBuffer.set(stream.readInt8Array(numNormals * 3));
-
-		vboCacheKey.norVboDataArray = normalBuffer;
-		vboCacheKey.norArrayByteSize = classifiedNorByteSize;
+		var norDataArray = stream.readInt8Array(numNormals * 3);
+		vboCacheKey.setDataArrayNor(norDataArray, vboMemManager);
 	}
 
 	// VBO(Color Buffer) - r,g,b,a
@@ -235,13 +228,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	if (hasColors)
 	{
 		var numColors = stream.readUint32();
-		var colByteSize = numColors * 4;
-		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-		var colorBuffer = new Uint8Array(classifiedColByteSize);
-		colorBuffer.set(stream.readUint8Array(numColors * 4));
-
-		vboCacheKey.colVboDataArray = colorBuffer;
-		vboCacheKey.colArrayByteSize = classifiedColByteSize;
+		var colDataArray = stream.readUint8Array(numColors * 4);
+		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
 	}
 
 	// VBO(TextureCoord Buffer) - u,v
@@ -250,14 +238,8 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	{
 		var dataType = stream.readUint16();
 		var numCoords = stream.readUint32();
-		var tCoordByteSize = 2 * numCoords;
-		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
-		coordBuffer.set(stream.readFloat32Array(numCoords * 2));
-
-		vboCacheKey.tcoordVboDataArray = coordBuffer; // original.***
-		vboCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
-		//vboCacheKey.tcoordArrayByteType = 5123; // unsigned short.***
+		var texCoordDataArray = stream.readFloat32Array(numCoords * 2);
+		vboCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
 	}
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
