@@ -197,13 +197,6 @@ var MagoManager = function()
 	this.unitaryBoxSC.vBOVertexIdxCacheKey = this.unitaryBoxSC.triPolyhedron.getVBOArrayModePosNorCol(this.unitaryBoxSC.vBOVertexIdxCacheKey, this.vboMemoryManager);
 	
 	this.axisXYZ = new AxisXYZ();
-	
-	this.invertedBox = new Box();
-	var mesh = this.invertedBox.makeMesh(1.5, 1.5, 1.5);
-	mesh.reverseSense();
-	//mesh.setColor(0.5, 0.5, 0.5, 0.5);
-	mesh.getVbo(this.invertedBox.vbo_vicks_container, this.vboMemoryManager);
-	mesh.getVboEdges(this.invertedBox.vbo_vicks_containerEdges, this.vboMemoryManager);
 
 	this.demoBlocksLoaded = false;
 
@@ -350,7 +343,30 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
 	texture.width = w;
 	texture.height = h;
 	return texture;
-}
+};
+
+/**
+ * object 를 그리는 두가지 종류의 function을 호출
+ */
+MagoManager.prototype.init = function(gl) 
+{
+	this.bInit = true;
+	
+	if(this.sceneState.gl === undefined)
+		this.sceneState.gl = gl;
+	if(this.vboMemoryManager.gl === undefined)
+		this.vboMemoryManager.gl = gl;
+	
+	if(this.invertedBox === undefined)
+	{
+		this.invertedBox = new Box();
+		var mesh = this.invertedBox.makeMesh(1.5, 1.5, 1.5);
+		mesh.reverseSense();
+		//mesh.setColor(0.5, 0.5, 0.5, 0.5);
+		mesh.getVbo(this.invertedBox.vbo_vicks_container, this.vboMemoryManager);
+		mesh.getVboEdges(this.invertedBox.vbo_vicks_containerEdges, this.vboMemoryManager);
+	}
+};
 
 /**
  * object 를 그리는 두가지 종류의 function을 호출
@@ -393,11 +409,14 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		{
 			var gl = scene.context._gl;
 			gl.getExtension("EXT_frag_depth");
+			
+			if(!this.bInit)
+				this.init(gl);
 		
 			if (gl.isContextLost())
 			{ return; }
 
-			this.sceneState.gl = gl;
+			
 		}
 
 		this.startRender(scene, isLastFrustum, this.currentFrustumIdx, numFrustums);
@@ -1207,339 +1226,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 };
 
 
-MagoManager.prototype.test_cctv = function()
-{
-	if (this.cctvList === undefined)
-	{
-		this.cctvList = new CCTVList();
-		
-		/*
-		var longitude = 126.61090424717905;
-		var latitude = 37.58158288958673;
-		var altitude = 80.0;
-		*/
-		
-		var far = 10.0;
-		var altitude = 60.0;
-		
-		// 2- create a cctv.*********************************************************************************
-		var cctv = this.cctvList.new_CCTV("0000100001000T");
-		var longitude = 128.606641;
-		var latitude = 35.902546;
-		var altitude_0000100001000T = 74.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_0000100001000T, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_0000100001000T, cctv.camera.position, this);
-		var frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 3- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("0000100002000T");
-		longitude = 128.606341;
-		latitude = 35.901937;
-		var altitude_0000100002000T = 82.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_0000100002000T, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_0000100002000T, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 4- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("0000100003000T");
-		longitude = 128.606641;
-		latitude = 35.902156;
-		var altitude_0000100003000T = 80.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_0000100003000T, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_0000100003000T, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 5- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("0000100004000T");
-		longitude = 128.606641;
-		latitude = 35.902106;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_0000100003000T, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_0000100003000T, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 6- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV-1");
-		cctv.minHeading = 45.0;
-		cctv.maxHeading = 180.0;
-		longitude = 127.054720;
-		latitude = 37.540641;
-		var altitude_CCTV_1 = 47.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_CCTV_1, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_CCTV_1, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 7- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV-2");
-		longitude = 127.055259;
-		latitude = 37.544781;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 8- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV-3");
-		longitude = 127.043323;
-		latitude = 37.548298;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 9- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV-4");
-		longitude = 127.056880;
-		latitude = 37.544136;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 10- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV-5");
-		longitude = 127.054847;
-		latitude = 37.544761;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 11- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV10");
-		longitude = 127.056265;
-		latitude = 37.542031;
-		var altitude_CCTV10 = 43.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_CCTV10, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_CCTV10, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 12- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV11");
-		cctv.minHeading = -150.0;
-		cctv.maxHeading = -35.0;
-		longitude = 127.054967;
-		latitude = 37.539409;
-		var altitude_CCTV11 = 45.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_CCTV11, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_CCTV11, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 13- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV13");
-		cctv.minHeading = 90.0;
-		cctv.maxHeading = 240.0;
-		longitude = 127.055030;
-		latitude = 37.540139;
-		var altitude_CCTV13 = 46.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_CCTV13, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_CCTV13, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 14- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV14");
-		longitude = 127.056001;
-		latitude = 37.539940;
-		var altitude_CCTV14 = 47.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude_CCTV14, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude_CCTV14, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 15- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV6");
-		longitude = 127.057016;
-		latitude = 37.544093;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 16- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV7");
-		cctv.minHeading = -140.0;
-		cctv.maxHeading = 0.0;
-		longitude = 127.056593;
-		latitude = 37.543283;
-		altitude = 45.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 17- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV8");
-		longitude = 127.055027;
-		latitude = 37.545001;
-		altitude = 60.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 18- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("CCTV9");
-		longitude = 127.057023;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 19- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("공원3-22");
-		longitude = 127.057024;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 20- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("공원4-42");
-		longitude = 127.057025;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 21- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("교행1-51");
-		longitude = 127.057026;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 22- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("자치15-31123");
-		longitude = 127.057027;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-		// 23- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("자치6-13");
-		longitude = 127.057028;
-		latitude = 37.544420;
-		//altitude = 70.0;
-		
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
-		cctv.camera.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, cctv.camera.position, this);
-		frustum = cctv.camera.bigFrustum;
-		frustum.far = far;
-		cctv.vboKeyContainer  = new VBOVertexIdxCacheKeysContainer();
-		cctv.vboKeyContainer = cctv.getVbo(cctv.vboKeyContainer);
-		cctv.calculateRotationMatrix();
-		
-	}
-};
+
 
 /**
  * start rendering.
@@ -1600,7 +1287,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 	if (this.isFarestFrustum())
 	{
-		//this.test_cctv();
 		if (this.textureAux_1x1 === undefined) 
 		{
 			this.textureAux_1x1 = gl.createTexture();
@@ -1980,7 +1666,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
@@ -1996,8 +1682,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 	ssao_idx = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
-	
-	////this.test_volumeRendering();
 	
 	if(this.weatherStation)
 	{
@@ -2053,7 +1737,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -2159,7 +1843,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		mesh.setColor(0.1, 0.5, 0.5, 1.0);
 
 		mesh.getVbo(pMesh.vboKeyContainer, this.vboMemoryManager);
-		mesh.getVboEdges(pMesh.vboKeyContainerEdges);
+		mesh.getVboEdges(pMesh.vboKeyContainerEdges, this.vboMemoryManager);
 		
 		// Now, provisionally make a geoLocationData for the nativeProject.*************************************
 		if (natProject.geoLocDataManager === undefined)
@@ -2203,6 +1887,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 	gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao.***
 	gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
 	gl.uniform1i(currentShader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform1i(currentShader.bApplySpecularLighting_loc, true); // turn off specular lighting.***
 	
 	// -------------------------------------
 	
@@ -2242,6 +1927,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 	var natProject, pMesh;
 	var geoLocDataManager;
 	var buildingGeoLocation;
+	var bRenderLines = false;
 	var nativeProjectsCount = this.nativeProjectsArray.length;
 	for (var i=0; i<nativeProjectsCount; i++)
 	{
@@ -2260,7 +1946,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		for (var j=0; j<meshesCount; j++)
 		{
 			pMesh = natProject.getMesh(j);
-			this.renderer.renderObject(gl, pMesh, this, currentShader, ssao_idx);
+			this.renderer.renderObject(gl, pMesh, this, currentShader, ssao_idx, bRenderLines);
 		}
 	}
 	
@@ -2646,7 +2332,7 @@ MagoManager.prototype.calculatePixelLinearDepth = function(gl, pixelX, pixelY, d
 	gl.readPixels(pixelX, this.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
 	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
-	var linearDepth = zDepth /= 256.0; // LinearDepth. Convert to 0 to 1.0 range depth.***
+	var linearDepth = zDepth /= 256.0; // LinearDepth. Convert 0 to 1.0 range depth.***
 	return linearDepth;
 };
 
@@ -2885,6 +2571,109 @@ MagoManager.prototype.setCameraMotion = function(state)
  * @param gl 변수
  * @param scene 변수
  */
+MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
+{
+	if (this.objectMoved)
+	{
+		this.objectMoved = false;
+		var nodeSelected = this.selectionManager.currentNodeSelected;
+		if (nodeSelected === undefined)
+		{ return; }
+		
+		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
+	}
+	
+	this.isCameraMoving = false;
+	this.mouseLeftDown = false;
+	this.mouseDragging = false;
+	this.selObjMovePlane = undefined;
+	this.mustCheckIfDragging = true;
+	this.thereAreStartMovePoint = false;
+
+	this.dateSC = new Date();
+	this.currentTimeSC = this.dateSC.getTime();
+	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
+	if (miliSecondsUsed < 1500) 
+	{
+		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
+		{
+			this.bPicking = true;
+		}
+	}
+	
+	this.setCameraMotion(true);
+	
+	// Clear startPositions of mouseAction.***
+	var mouseAction = this.sceneState.mouseAction;
+	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
+{
+	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
+	//--------------------------------------------------------------------------------------------
+	
+	//if (this.currentFrustumIdx === 0)
+	//	var hola = 0;
+	//else if (this.currentFrustumIdx > 0)
+	//	var hola = 0;
+
+	// Test for drawing mode.******************************************************************
+	this.magoMode = CODE.magoMode.DRAWING;
+	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
+	{
+		// Test code.***
+		if(this.modeler === undefined)
+			this.modeler = new Modeler();
+		
+		if(this.modeler.planeGrid === undefined)
+		{
+			// Calculate the click position and create the planeGrid geoLocation.***
+			this.modeler.createPlaneGrid();
+			this.modeler.planeGrid.makeVbo(this.vboMemoryManager);
+		
+			// Check if this is MagoWorld or Cesium.***
+			var geoCoord;
+			if (this.configInformation.geo_view_library === Constant.CESIUM)
+			{
+				var camera = this.scene.frameState.camera;
+				var scene = this.scene;
+				var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
+				var worldPosCesium = scene.globe.pick(ray, scene);
+				geoCoord = Globe.CartesianToGeographicWgs84(worldPosCesium.x, worldPosCesium.y, worldPosCesium.z, undefined);
+			}
+			else{
+				var mouseAction = this.sceneState.mouseAction;
+				var strWorldPoint = mouseAction.strWorldPoint;
+				geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
+			}
+			
+			if(this.modeler.planeGrid.geoLocDataManager === undefined)
+				this.modeler.planeGrid.geoLocDataManager = new GeoLocationDataManager();
+			
+			var geoLocDataManager = this.modeler.planeGrid.geoLocDataManager;
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			return;
+		}
+		
+		// For each "click" add point2d to the modeler's polyLine2d.***
+		
+		
+		var hola = 0;
+	}
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
 MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY) 
 {
 	this.dateSC = new Date();
@@ -2896,19 +2685,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	//this.isCameraMoving = true;
 	
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
-	
-	if (this.currentFrustumIdx === 0)
-		var hola = 0;
-	else if (this.currentFrustumIdx > 0)
-		var hola = 0;
-	
-	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
-	{
-		
-	}
-	
-	
-	
+
 	// Test.**********************************************************************************************************************
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
 	if(selGeneralObjects)
@@ -2959,47 +2736,7 @@ MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node)
 	MagoConfig.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
 };
 
-/**
- * 선택 객체를 asimetric mode 로 이동
- * @param gl 변수
- * @param scene 변수
- */
-MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
-{
-	if (this.objectMoved)
-	{
-		this.objectMoved = false;
-		var nodeSelected = this.selectionManager.currentNodeSelected;
-		if (nodeSelected === undefined)
-		{ return; }
-		
-		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
-	}
-	
-	this.isCameraMoving = false;
-	this.mouseLeftDown = false;
-	this.mouseDragging = false;
-	this.selObjMovePlane = undefined;
-	this.mustCheckIfDragging = true;
-	this.thereAreStartMovePoint = false;
 
-	this.dateSC = new Date();
-	this.currentTimeSC = this.dateSC.getTime();
-	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
-	if (miliSecondsUsed < 1500) 
-	{
-		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
-		{
-			this.bPicking = true;
-		}
-	}
-	
-	this.setCameraMotion(true);
-	
-	// Clear startPositions of mouseAction.***
-	var mouseAction = this.sceneState.mouseAction;
-	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
-};
 
 /**
  * 선택 객체를 asimetric mode 로 이동
@@ -4315,7 +4052,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				gl.enable(gl.DEPTH_TEST);// return to the normal state.***
 				gl.disable(gl.STENCIL_TEST);
 				gl.depthRange(0, 1);// return to the normal value.***
-				gl.disableVertexAttribArray(currentShader.position3_loc);
+				//gl.disableVertexAttribArray(currentShader.position3_loc);
 				currentShader.disableVertexAttribArrayAll();
 				
 				gl.useProgram(null);
@@ -4480,6 +4217,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		
 		// test renders.***
 		// render cctv.***
+		/*
+		this.test_cctv();
 		var cctvsCount = 0;
 		if (this.cctvList !== undefined)
 		{
@@ -4499,6 +4238,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 				
 			currentShader.bindUniformGenerals();
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+			
+			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
@@ -4522,11 +4263,12 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			if (this.isFarestFrustum())
 			{
-				//this.drawCCTVNames(this.cctvList.camerasList);
+				this.drawCCTVNames(this.cctvList.camerasList);
 			}
 			
 			currentShader.disableVertexAttribArrayAll();
 		}
+		*/
 		
 		// PointsCloud.****************************************************************************************
 		// PointsCloud.****************************************************************************************
@@ -4569,6 +4311,57 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			var bDepthRender = false; // This is no depth render.***
 			this.tinTerrainManager.render(this, bDepthRender);
 		}
+		
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		if(this.modeler !== undefined)
+		{
+			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.useProgram();
+			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
+			
+			if (this.noiseTexture === undefined) 
+			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
+			
+			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+			gl.enableVertexAttribArray(currentShader.position3_loc);
+			gl.enableVertexAttribArray(currentShader.normal3_loc);
+			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+			
+			currentShader.bindUniformGenerals();
+			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.activeTexture(gl.TEXTURE2); 
+			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
+			currentShader.last_tex_id = this.textureAux_1x1;
+			
+			
+			var refTMatrixIdxKey = 0;
+			var minSizeToRender = 0.0;
+			var renderType = 1;
+			var refMatrixIdxKey =0; // provisionally set this var here.***
+			this.modeler.render(this, currentShader);
+			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			
+			currentShader.disableVertexAttribArrayAll();
+			gl.useProgram(null);
+
+		}
 
 	}
 	
@@ -4594,6 +4387,21 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
 	var canvas = document.getElementById("objectLabel");
 	if (canvas === undefined)
 	{ return; }
+
+	var magoDiv = document.getElementById('magoContainer');
+	var offsetLeft = magoDiv.offsetLeft;
+	var offsetTop = magoDiv.offsetTop;
+	var offsetWidth = magoDiv.offsetWidth;
+	var offsetHeight = magoDiv.offsetHeight;
+	
+	canvas.style.opacity = 1.0;
+	canvas.width = this.sceneState.drawingBufferWidth;
+	canvas.height = this.sceneState.drawingBufferHeight;
+	var canvasStyleLeft = offsetLeft.toString()+"px";
+	var canvasStyleTop = offsetTop.toString()+"px";
+	canvas.style.left = canvasStyleLeft;
+	canvas.style.top = canvasStyleTop;
+	canvas.style.position = "absolute";
 	
 	canvas.style.opacity = 1.0;
 	canvas.width = this.sceneState.drawingBufferWidth;

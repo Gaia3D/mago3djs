@@ -195,6 +195,291 @@
 			"longitude": 129.290585,
 			"pitch": 0,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+000_+000_+000",
+			"data_name": "Tile_+000_+000_+000",
+			"heading": 0,
+			"height": 166.917633,
+			"latitude": 37.367766,
+			"longitude": 127.926547,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+000_+001_+000",
+			"data_name": "Tile_+000_+001_+000",
+			"heading": 0,
+			"height": 179.105606,
+			"latitude": 37.369290,
+			"longitude": 127.926565,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+000_+002_+000",
+			"data_name": "Tile_+000_+002_+000",
+			"heading": 0,
+			"height": 172.615768,
+			"latitude": 37.371002,
+			"longitude": 127.926586,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+000_+003_+000",
+			"data_name": "Tile_+000_+003_+000",
+			"heading": 0,
+			"height": 158.569580,
+			"latitude": 37.372534,
+			"longitude": 127.926605,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+001_+000_+000",
+			"data_name": "Tile_+001_+000_+000",
+			"heading": 0,
+			"height": 136.002838,
+			"latitude": 37.367750,
+			"longitude": 127.928629,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+001_+001_+000",
+			"data_name": "Tile_+001_+001_+000",
+			"heading": 0,
+			"height": 165.566971,
+			"latitude": 37.369274,
+			"longitude": 127.928648,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+001_+002_+000",
+			"data_name": "Tile_+001_+002_+000",
+			"heading": 0,
+			"height": 141.618225,
+			"latitude": 37.370137,
+			"longitude": 127.927558,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+002_+000_+000",
+			"data_name": "Tile_+002_+000_+000",
+			"heading": 0,
+			"height": 150.567184,
+			"latitude": 37.367733,
+			"longitude": 127.930774,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+002_+001_+000",
+			"data_name": "Tile_+002_+001_+000",
+			"heading": 0,
+			"height": 137.164413,
+			"latitude": 37.369257,
+			"longitude": 127.930793,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+002_+002_+000",
+			"data_name": "Tile_+002_+002_+000",
+			"heading": 0,
+			"height": 148.851685,
+			"latitude": 37.370969,
+			"longitude": 127.930814,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+002_+003_+000",
+			"data_name": "Tile_+002_+003_+000",
+			"heading": 0,
+			"height": 146.922256,
+			"latitude": 37.372501,
+			"longitude": 127.930833,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+003_+000_+000",
+			"data_name": "Tile_+003_+000_+000",
+			"heading": 0,
+			"height": 142.466202,
+			"latitude": 37.367716,
+			"longitude": 127.932859,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+003_+001_+000",
+			"data_name": "Tile_+003_+001_+000",
+			"heading": 0,
+			"height": 144.151505,
+			"latitude": 37.369240,
+			"longitude": 127.932878,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+003_+002_+000",
+			"data_name": "Tile_+003_+002_+000",
+			"heading": 0,
+			"height": 141.998764,
+			"latitude": 37.370952,
+			"longitude": 127.932900,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "Tile_+003_+003_+000",
+			"data_name": "Tile_+003_+003_+000",
+			"heading": 0,
+			"height": 151.681747,
+			"latitude": 37.372484,
+			"longitude": 127.932919,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,

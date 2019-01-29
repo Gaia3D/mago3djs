@@ -49,6 +49,7 @@ var Renderer = function()
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
+ 
 Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, shader, renderWireframe) 
 {
 	if (vboContainer === undefined)
@@ -63,38 +64,17 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 	{
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
 		this.vbo_vi_cacheKey_aux = vboContainer.vboCacheKeysArray[n];
-		if (!this.vbo_vi_cacheKey_aux.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ continue; }
-	
-		if (!this.vbo_vi_cacheKey_aux.isReadyNormals(gl, magoManager.vboMemoryManager))
-		{ 
-			// disable normals.***
-			
-		}
 		
-		if (!this.vbo_vi_cacheKey_aux.isReadyFaces(gl, magoManager.vboMemoryManager))
-		{ 
-			// disable indices.***
-			
-		}
+		if(!this.vbo_vi_cacheKey_aux.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
 		
-		// Positions.***
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshVertexCacheKey);
-		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-		//gl.vertexAttribPointer(shader.attribLocationCacheObj["position"], 3, gl.FLOAT, false,0,0);
+		if(!this.vbo_vi_cacheKey_aux.bindDataNormal(shader, magoManager.vboMemoryManager))
+			return false;
+		
+		if(!this.vbo_vi_cacheKey_aux.bindDataIndice(shader, magoManager.vboMemoryManager))
+			return false;
 
-		// Normals.***
-		if (shader.normal3_loc !== -1 && this.renderNormals) 
-		{
-			gl.enableVertexAttribArray(shader.normal3_loc); 
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshNormalCacheKey);
-			gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-		}
-		else 
-		{
-			gl.disableVertexAttribArray(shader.normal3_loc); 
-		}
-
+		/*
 		if (shader.texCoord2_loc !== -1 && this.renderTexture) 
 		{
 			if (!this.vbo_vi_cacheKey_aux.isReadyTexCoords(gl, magoManager.vboMemoryManager))
@@ -108,6 +88,7 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 		{
 			if (shader.texCoord2_loc !== -1) { gl.disableVertexAttribArray(shader.texCoord2_loc); }
 		}
+		*/
 
 		// Indices.***
 		if (magoManager.isCameraMoving)
@@ -119,7 +100,7 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 			indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
 		}
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
+		//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshFacesCacheKey);
 		
 		if (renderWireframe)
 		{
@@ -133,10 +114,12 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 	}
 };
 
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
+ 
 Renderer.prototype.renderVbo = function(gl, shader, vboPosKey, vboNorKey, vboColKey, vboTexCoordKey, vboIdxKey) 
 {
 	if (vboPosKey !== shader.last_vboPos_binded)
@@ -146,6 +129,7 @@ Renderer.prototype.renderVbo = function(gl, shader, vboPosKey, vboNorKey, vboCol
 		shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
 	}
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -213,114 +197,66 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
  */
 Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao_idx, renderTexture, distToCam, lod, posCompressed) 
 {
+	// Note: "pCloud" is "Lego" class.***
 	if (pCloud.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
 		return;
 	}
 	gl.frontFace(gl.CCW);
+	
+	var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+	var vertices_count = vbo_vicky.vertexCount;
+	
+	if (vertices_count === 0) 
+		return;
 
 	if (ssao_idx === 0) // depth.***
 	{
 		// 1) Position.*********************************************
-		var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ return; }
-
-		var vertices_count = vbo_vicky.vertexCount;
-		if (vertices_count === 0) 
-		{
-			return;
-		}
-		
 		shader.disableVertexAttribArray(shader.color4_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc); // provisionally has no normals.***
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-		gl.vertexAttribPointer(shader.position3_loc, 3, gl.UNSIGNED_SHORT, false, 0, 0);
+		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
+		
 		gl.drawArrays(gl.POINTS, 0, vertices_count);
 	}
 	else if (ssao_idx === 1) // ssao.***
 	{
-		var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-		var vertices_count = vbo_vicky.vertexCount;
-
-		if (vertices_count === 0) 
-		{
-			return;
-		}
-		
-		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ 
-			return; 
-		}
-		
-		//if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
-		//{ return; }
-		
-		if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
-		{ 
-			return; 
-		}
-		
-		// 4) Texcoord.*********************************************
-		/*
-		if (renderTexture)
-		{
-			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-			{ return; }
-		}
-		else 
-		{
-			gl.uniform1i(shader.bUse1Color_loc, false);
-			gl.disableVertexAttribArray(shader.texCoord2_loc);
-		}
-		*/
-		if (vbo_vicky.meshVertexCacheKey === undefined)
-		{ var hola = 0; }
-		
-		if (vbo_vicky.meshColorCacheKey === undefined)
-		{ var hola = 0; }
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-		if (posCompressed)
-		{
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.UNSIGNED_SHORT, false, 0, 0);
-		}
-		else 
-		{
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-		}
-
-		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-		//gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-
-		if (vbo_vicky.meshColorCacheKey !== undefined )
-		{
-			shader.enableVertexAttribArray(shader.color4_loc);
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-			gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-		}
-		else 
-		{
-			shader.disableVertexAttribArray(shader.color4_loc);
-		}
-		
-		//if (renderTexture && vbo_vicky.meshTexcoordsCacheKey)
-		//{
-		//	gl.disableVertexAttribArray(shader.color4_loc);
-		//	gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
-		//	gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
-		//}
 		if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 		{
 			vertices_count = Math.floor(vertices_count/5);
 			if (vertices_count === 0)
-			{ 
 				return; 
-			}
 		}
 		
+		if (distToCam < 100)
+		{
+			// Render all points.***
+			vertices_count = Math.floor(vertices_count/4);
+		}
+		else if (distToCam < 200)
+		{
+			vertices_count = Math.floor(vertices_count/16);
+		}
+		else if (distToCam < 400)
+		{
+			vertices_count = Math.floor(vertices_count/32);
+		}
+		else if (distToCam < 800)
+		{
+			vertices_count = Math.floor(vertices_count/64);
+		}
+		else if (distToCam < 1600)
+		{
+			vertices_count = Math.floor(vertices_count/128);
+		}
+		else
+		{
+			vertices_count = Math.floor(vertices_count/256);
+		}
+		/*
 		if (distToCam < 100)
 		{
 			// Render all points.***
@@ -345,19 +281,21 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		{
 			vertices_count = Math.floor(vertices_count/32);
 		}
+		*/
 		
 		if (vertices_count <= 0)
 		{ 
 			return; 
 		}
 
+		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
+
+		if(vbo_vicky.vboBufferCol !== undefined && !vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			return false;
+		
 		gl.drawArrays(gl.POINTS, 0, vertices_count);
 		
-		if (vbo_vicky.meshVertexCacheKey === undefined)
-		{ var hola = 0; }
-		
-		if (vbo_vicky.meshColorCacheKey === undefined)
-		{ var hola = 0; }
 	}
 	
 	
@@ -449,7 +387,6 @@ Renderer.prototype.enableStencilBuffer = function(gl)
 	//gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
 	gl.stencilOp(gl.KEEP, gl.REPLACE, gl.REPLACE);
 	gl.enable(gl.POLYGON_OFFSET_FILL);
-	//gl.disable(gl.CULL_FACE);
 };
 
 Renderer.prototype.disableStencilBuffer = function(gl)
@@ -457,7 +394,6 @@ Renderer.prototype.disableStencilBuffer = function(gl)
 	gl.disable(gl.STENCIL_TEST);
 	gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
 	gl.disable(gl.POLYGON_OFFSET_FILL);
-	//gl.enable(gl.CULL_FACE);
 };
 
 /**
@@ -482,56 +418,41 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 
 	if (bRenderLines === undefined)
 	{ bRenderLines = false; }
+
+	// disable All AttribPointer.***
+	shader.disableVertexAttribArrayAll(); // init.***
 	
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
 		// 1) Position.*********************************************
 		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.***
-		if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-		{ return; }
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
 		{ return; }
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
 
 		if (ssao_idx === 1) // ssao.***
 		{
-			if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-			{ 
-				//return;
-				gl.disableVertexAttribArray(shader.normal3_loc);
-				gl.uniform1i(shader.bUseNormal_loc, false);
-			}
-			else 
-			{
-				gl.enableVertexAttribArray(shader.normal3_loc);
-				gl.uniform1i(shader.bUseNormal_loc, true);
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-				gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-			}
+			if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+				return false;
+
+			if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+				return false;
 			
-			if (!vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager)) // do this optional. TODO.***
-			{ 
-				gl.disableVertexAttribArray(shader.color4_loc);
-			}
-			else 
-			{
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-				gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-			}
+			// TexCoords todo:
 		}
 		
 		if (bRenderLines === false)
 		{
 			if (vbo_vicky.indicesCount > 0)
 			{
-				if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
-				{ return; }
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
+				if(!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
+					return false;
+
 				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 			}
 			else 
@@ -541,12 +462,6 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		}
 		else 
 		{
-			/*
-			if (!vbo_vicky.isReadyFaces(gl, magoManager.vboMemoryManager)) 
-				{ return; }
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo_vicky.meshFacesCacheKey);
-				gl.drawElements(gl.LINE_STRIP, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-				*/
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 		}
 	}

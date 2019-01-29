@@ -4,7 +4,7 @@
  * PlaneGrid on 3D space. 
  * @class PlaneGrid
  */
-var PlaneGrid = function() 
+var PlaneGrid = function(width, height, numCols, numRows) 
 {
 	if (!(this instanceof PlaneGrid)) 
 	{
@@ -12,13 +12,15 @@ var PlaneGrid = function()
 	}
 	
 	//this.plane; // plane 3d.***
-	this.geoLocationData;
+	this.geoLocDataManager;
 	this.width;
 	this.height;
 	this.altitude = 0.0;
 	this.numCols;
 	this.numRows;
-	this.vboKeyContainer;
+	this.vboKeysContainer;
+	
+	this.setSize(width, height, numCols, numRows);
 };
 
 /**
@@ -42,78 +44,80 @@ PlaneGrid.prototype.setSize = function(width, height, numCols, numRows)
 /**
  * 어떤 일을 하고 있습니까?
  */
-PlaneGrid.prototype.render = function(magoManager) 
+PlaneGrid.prototype.render = function(magoManager, shader) 
 {
-	if(this.vboKeyContainer === undefined)
+	if(this.vboKeysContainer === undefined)
 		return;
+	
+	var gl = magoManager.sceneState.gl;
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	// Set uniforms.***
+	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, geoLoc.rotMatrix._floatArrays);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, geoLoc.positionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, geoLoc.positionLOW);
+	
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+	gl.uniform1i(shader.hasAditionalMov_loc, false);
+	shader.disableVertexAttribArray(shader.texCoord2_loc); // Grid has no texCoords.***
+	
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]);
+	
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false); // turn off specular lighting.***
+	
+	// disable All AttribPointer.***
+	shader.disableVertexAttribArrayAll(); // init.***
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
 	{
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
-		if (!vboKey.isReadyPositions(gl, vboMemManager))
-		{ return false; }
-		
-		if (!vboKey.isReadyPositions(gl, vboMemManager) || 
-			!vboKey.isReadyNormals(gl, vboMemManager) || 
-			!vboKey.isReadyFaces(gl, vboMemManager))
-		{ return false; }
-		
-		vboKey.isReadyColors(gl, vboMemManager);
-		
+
 		// Positions.***
-		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
-		{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-			shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
-		}
-		
+		if(vboKey.vboBufferPos!== undefined && !vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
+
 		// Normals.***
-		if (vboKey.meshNormalCacheKey)
+		if(vboKey.vboBufferNor!== undefined)
 		{
-			if (shader.normal3_loc && shader.normal3_loc !== -1) 
-			{
-				shader.enableVertexAttribArray(shader.normal3_loc);
-				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
-					gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-					shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
-				}
-			}
+			if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else{
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
-		
+
 		// Colors.***
-		if (vboKey.meshColorCacheKey)
+		if(vboKey.vboBufferCol!== undefined)
 		{
-			if (shader.color4_loc && shader.color4_loc !== -1) 
-			{
-				shader.enableVertexAttribArray(shader.color4_loc);
-				if (vboKey.meshColorCacheKey !== shader.last_vboCol_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshColorCacheKey);
-					gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-					shader.last_vboCol_binded = vboKey.meshColorCacheKey;
-				}
-			}
+			if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else{
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
+		// TexCoords.***
+		if(vboKey.vboBufferTCoord!== undefined)
+		{
+			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+				return false;
+		}
+		else{
+			shader.disableVertexAttribArray(shader.texCoord2_loc);
+		}
+		
 		//gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
-		gl.drawArrays(gl.LINES, 0, vertices_count);
+		gl.drawArrays(gl.LINES, 0, vboKey.vertexCount);
 	}
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-PlaneGrid.prototype.makeVbo = function() 
+PlaneGrid.prototype.makeVbo = function(vboMemManager) 
 {
 	// Calculate positions.***
 	var halfWidth = this.width/2;
@@ -125,10 +129,10 @@ PlaneGrid.prototype.makeVbo = function()
 	var rightUpPoint = new Point3D(halfWidth, halfHeight, alt);
 	var leftUpPoint = new Point3D(-halfWidth, halfHeight, alt);
 	
-	var increX = this.width/(this.numCols + 1);
-	var increY = this.height/(this.numRows + 1);
+	var increX = this.width/(this.numCols - 1);
+	var increY = this.height/(this.numRows - 1);
 	
-	var pointsCount = this.numCols * this.numRows;
+	var pointsCount = this.numCols * 2 + this.numRows * 2;
 	var positionsArray = new Float32Array(pointsCount*3);
 	
 	// Now, calculate all lines points.***
@@ -154,7 +158,7 @@ PlaneGrid.prototype.makeVbo = function()
 	// Horizontal lines.***
 	x1 = leftDownPoint.x; // left.***
 	x2 = rightDownPoint.x; // right.***
-	for(var row = 0; row<this.numRows; row++)
+	for(var row = 0; row < this.numRows; row++)
 	{
 		y1 = leftDownPoint.y + row * increY;
 		y2 = y1;
@@ -166,12 +170,13 @@ PlaneGrid.prototype.makeVbo = function()
 		positionsArray[idx] = alt; idx++;
 	}
 	
-	if(this.vboKeyContainer === undefined)
-		this.vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
+	if(this.vboKeysContainer === undefined)
+		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
 	
-	var vbo = this.vboKeyContainer.newVBOVertexIdxCacheKey();
-	vbo.posVboDataArray = positionsArray;
-	vbo.vertexCount = pointsCount;
+	var vbo = this.vboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(positionsArray, vboMemManager);
+	
+	
 };
 
 

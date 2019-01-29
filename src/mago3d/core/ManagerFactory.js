@@ -162,6 +162,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
 	    }, Cesium.ScreenSpaceEventType.RIGHT_UP);
+		
+		magoManager.handler.setInputAction(function(movement) 
+		{
+			magoManager.mouseActionLeftClick(movement.position.x, movement.position.y);
+	    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	}
 
 	// cesium을 구현체로서 이용
@@ -225,6 +230,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		var gl = viewer.magoManager.sceneState.gl;
 		var manager = viewer.magoManager;
+		manager.vboMemoryManager.gl = gl;
 		manager.shadersManager.createDefaultShader(gl);
 		manager.postFxShadersManager.gl = gl;
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
@@ -641,6 +647,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		};
 		wwd.addEventListener("mousemove", mouseMoveEvent, false);
 		
+		
 		wwd.goToAnimator.travelTime = MagoConfig.getPolicy().geo_init_duration * 1000;
 		wwd.goTo(new WorldWind.Position(MagoConfig.getPolicy().geo_init_latitude, MagoConfig.getPolicy().geo_init_longitude, MagoConfig.getPolicy().geo_init_height));
 	}
@@ -710,6 +717,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		canvas.addEventListener('mousemove', function(event)
 		{
 			viewer.mousemove(event);
+		}, false);
+		
+		canvas.addEventListener('click', function(event)
+		{
+			viewer.mouseclick(event);
 		}, false);
 		
 		canvas.addEventListener('resize', function(event)

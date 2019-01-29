@@ -32,6 +32,18 @@ PolyLine2D.prototype.newPoint2d = function(x, y)
  * Creates a new Point2D.
  * @class PolyLine2D
  */
+PolyLine2D.prototype.getPointsCount = function()
+{
+	if(this.point2dArray === undefined)
+		return 0;
+	
+	return this.point2dArray.length;
+};
+
+/**
+ * Creates a new Point2D.
+ * @class PolyLine2D
+ */
 PolyLine2D.prototype.deleteObjects = function()
 {
 	var pointsCount = this.point2dArray.length;

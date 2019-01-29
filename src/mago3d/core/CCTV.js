@@ -123,7 +123,7 @@ CCTV.prototype.calculateRotationMatrix = function()
 
 /**
  */
-CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges)
+CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vboMemManager)
 {
 	if (resultVboContainer === undefined)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
@@ -157,8 +157,8 @@ CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges)
 	surfIndepMesh.transformByMatrix4(rotMatAux);
 	surfIndepMesh.setColor(0.0, 0.5, 0.9, 0.3);
 	
-	surfIndepMesh.getVbo(resultVboContainer);
-	surfIndepMesh.getVboEdges(this.vboKeyContainerEdges);
+	surfIndepMesh.getVbo(resultVboContainer, vboMemManager);
+	surfIndepMesh.getVboEdges(this.vboKeyContainerEdges, vboMemManager);
 	
 	return resultVboContainer;
 };
@@ -218,7 +218,7 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	if (resultMesh === undefined)
 	{ resultMesh = new ParametricMesh(); }
 
-	resultMesh.profile = new Profile(); 
+	resultMesh.profile = new Profile2D(); 
 	var profileAux = resultMesh.profile; 
 	
 	// camera geometry values.***
@@ -252,6 +252,7 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	arc.setStartAngleDegree(startAngDeg);
 	arc.setSweepAngleDegree(endAngDeg - startAngDeg);
 	arc.numPointsFor360Deg = 36;
+	//arc.numPointsFor360Deg = 12; // test.*** // test.*** // test.*** // test.*** // test.*** // test.***
 	
 	// now revolve.***
 	var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
@@ -261,6 +262,7 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	var endPoint2d = new Point2D(1, 0);
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	revolveSegmentsCount = 6;
+	//revolveSegmentsCount = 1; // test.*** // test.*** // test.*** // test.*** // test.*** // test.*** // test.***
 	resultMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 	
 	return resultMesh;

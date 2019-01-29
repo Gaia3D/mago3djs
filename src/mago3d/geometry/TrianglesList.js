@@ -115,13 +115,20 @@ TrianglesList.assignVerticesIdx = function(trianglesArray)
  */
 TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray) 
 {
-	if (indicesArray === undefined)
-	{ indicesArray = []; }
-	
+	// 1rst, calculate indices count.***
 	var trianglesCount = trianglesArray.length;
+	var indicesCount = trianglesCount * 3;
+	
+	
+	if (indicesArray === undefined)
+	{ indicesArray = new Uint16Array(indicesCount); }
+	
+	var idx = 0;
 	for (var i=0; i<trianglesCount; i++)
 	{
-		trianglesArray[i].getIndicesArray(indicesArray);
+		indicesArray[i*3] = trianglesArray[i].vtxIdx0;
+		indicesArray[i*3+1] = trianglesArray[i].vtxIdx1;
+		indicesArray[i*3+2] = trianglesArray[i].vtxIdx2;
 	}
 	
 	return indicesArray;
@@ -211,13 +218,8 @@ TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo, vboMemMa
 	{ resultVbo = new VBOVertexIdxCacheKey(); }
 
 	var indicesArray = TrianglesList.getTrianglesIndicesArray(trianglesArray, undefined);
+	resultVbo.setDataArrayIdx(indicesArray, vboMemManager);
 	
-	var idxByteSize = indicesArray.length;
-	var classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-	resultVbo.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
-	resultVbo.idxVboDataArray.set(indicesArray);
-	
-	resultVbo.indicesCount = resultVbo.idxVboDataArray.length;
 	return resultVbo;
 };
 
