@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  * @class Buffer
  */
-var VboBuffer = function() 
+var VboBuffer = function(dataTarget) 
 {
 	if (!(this instanceof VboBuffer)) 
 	{
@@ -13,13 +13,67 @@ var VboBuffer = function()
 
 	this.dataArray;
 	this.dataLength; 
-	this.dataType; // byteType: float, short, byte.***
+	this.dataGlType; // (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
 	this.key;
+	this.dataTarget; // gl.ARRAY_BUFFER, gl.ELEMENT_ARRAY_BUFFER. In WebGl2 added(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, gl.TRANSFORM_FEEDBACK_BUFFER, gl.UNIFORM_BUFFER, gl.PIXEL_PACK_BUFFER, gl.PIXEL_UNPACK_BUFFER).***
+
+	if(dataTarget !== undefined)
+		this.dataTarget = dataTarget;
+	else 
+		this.dataTarget = 34962; // 34962 = gl.ARRAY_BUFFER. Default value.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
+VboBuffer.prototype.deleteGlObjects = function(vboMemManager) 
+{
+	if(this.key !== undefined)
+	{
+		var gl = vboMemManager.gl;
+		
+		if(this.dataTarget === gl.ARRAY_BUFFER)
+			vboMemManager.storeClassifiedBufferKey(gl, this.key, this.dataLength);
+		else if(this.dataTarget === gl.ELEMENT_ARRAY_BUFFER)
+			vboMemManager.storeClassifiedElementKey(gl, this.key, this.dataLength);
+	}
+	
+	this.dataArray = undefined;
+	this.dataLength = undefined; 
+	this.dataGlType = undefined; 
+	this.key = undefined;
+	this.dataTarget = undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager) 
+{
+	if(dataArray === undefined)
+		return;
+	
+	this.dataGlType = VboBuffer.getGlTypeOfArray(dataArray);
+	
+	var arrayElemsCount = dataArray.length;
+	var classifiedPosByteSize = arrayElemsCount; // Init value.***
+	if(vboMemManager.enableMemoryManagement)
+	{
+		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(arrayElemsCount);
+		this.dataArray = VboBuffer.newTypedArray(classifiedPosByteSize, this.dataGlType);
+		this.dataArray.set(dataArray);
+	}
+	else{
+		this.dataArray = dataArray;
+	}
+	this.dataLength = arrayElemsCount;
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ 
 VboBuffer.prototype.isReady = function(gl, vboMemManager) 
 {
 	if (this.key === undefined) 
@@ -32,12 +86,83 @@ VboBuffer.prototype.isReady = function(gl, vboMemManager)
 		this.key = vboMemManager.getClassifiedBufferKey(gl, this.dataLength);
 		if (this.key === undefined)
 		{ return false; }
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.key);
-		gl.bufferData(gl.ARRAY_BUFFER, this.dataArray, gl.STATIC_DRAW);
+		gl.bindBuffer(this.dataTarget, this.key);
+		gl.bufferData(this.dataTarget, this.dataArray, gl.STATIC_DRAW);
 		this.dataArray = undefined;
 		return true;
 	}
 	return true;
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+ /*
+VboBuffer.prototype.bindData = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
+	
+	var gl = shader.gl;
+	if(!this.isReady(gl, vboMemManager))
+		return false;
+	
+	if (shader.position3_loc !== undefined && shader.position3_loc !== -1) 
+	{
+		if (this.meshVertexCacheKey !== shader.last_vboPos_binded)
+		{
+			shader.enableVertexAttribArray(shader.position3_loc);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.meshVertexCacheKey);
+			gl.vertexAttribPointer(shader.position3_loc, 3, this.posGlType, false, 0, 0);
+			shader.last_vboPos_binded = this.meshVertexCacheKey;
+		}
+		return true;
+	}
+	else shader.disableVertexAttribArray(shader.position3_loc);
+	
+	return false;
+};
+*/
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VboBuffer.getGlTypeOfArray = function(dataArray) 
+{
+	var glType = -1;
+	if(dataArray.constructor === Float32Array)
+		glType = 5126; // gl.FLOAT.***
+	else if(dataArray.constructor === Int16Array)
+		glType = 5122; // gl.SHORT.***
+	else if(dataArray.constructor === Uint16Array)
+		glType = 5123; // gl.UNSIGNED_SHORT.***
+	else if(dataArray.constructor === Int8Array)
+		glType = 5120; // gl.BYTE.***
+	else if(dataArray.constructor === Uint8Array)
+		glType = 5121; // gl.UNSIGNED_BYTE.***
+	
+	return glType;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VboBuffer.newTypedArray = function(arrayLength, glType) 
+{
+	var typedArray;
+	if(glType === 5126)// gl.FLOAT.***
+		typedArray = new Float32Array(arrayLength);
+	else if(glType === 5122)// gl.SHORT.***
+		typedArray = new Int16Array(arrayLength);
+	else if(glType === 5123)// gl.UNSIGNED_SHORT.***
+		typedArray = new Uint16Array(arrayLength);
+	else if(glType === 5120)// gl.BYTE.***
+		typedArray = new Int8Array(arrayLength);
+	else if(glType === 5121)// gl.UNSIGNED_BYTE.***
+		typedArray = new Uint8Array(arrayLength);
+		
+	return typedArray;
 };
 
 /**
@@ -56,41 +181,161 @@ var VBOVertexIdxCacheKey = function()
 	this.bigTrianglesIndicesCount = -1;
 	
 	this.vboBufferPos;
+	this.vboBufferNor;
+	this.vboBufferIdx;
+	this.vboBufferCol;
+	this.vboBufferTCoord;
 
-	this.meshVertexCacheKey;
-	this.meshFacesCacheKey;
-	this.meshNormalCacheKey;
-	this.meshColorCacheKey;
-	this.meshTexcoordsCacheKey;
+};
 
-	// Now, arrays to store data, and when necessary bind to gl and delete it.***
-	this.posVboDataArray; // Usually Float32Array.***
-	this.norVboDataArray; // Usually Int8Array.***
-	this.idxVboDataArray; // Usually UInt16Array.***
-	this.colVboDataArray; // Usually Uint8Array.***
-	this.tcoordVboDataArray; // Usually Float32Array.***
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
 	
-	this.posArrayByteSize;
-	this.norArrayByteSize;
-	this.idxArrayByteSize;
-	this.colArrayByteSize;
-	this.tcoordArrayByteSize;
+	var gl = shader.gl;
+	var vboBufferPos = this.vboBufferPos;
+	if(!vboBufferPos.isReady(gl, vboMemManager))
+		return false;
 	
-	// byteType: float, short, byte.***
-	this.posArrayByteType;
-	this.norArrayByteType;
-	this.idxArrayByteType;
-	this.colArrayByteType;
-	this.tcoordArrayByteType;
-	
-	this.existPositions;
-	this.existNormals;
-	this.existColors;
-	this.existTexCoords;
-	this.existIndices;
-	
+	if (shader.position3_loc !== undefined && shader.position3_loc !== -1) 
+	{
+		shader.enableVertexAttribArray(shader.position3_loc);
+		if (vboBufferPos.key !== shader.last_vboPos_binded)
+		{
+			gl.bindBuffer(vboBufferPos.dataTarget, vboBufferPos.key);
+			gl.vertexAttribPointer(shader.position3_loc, 3, vboBufferPos.dataGlType, false, 0, 0);
+			shader.last_vboPos_binded = vboBufferPos.key;
+		}
+		return true;
+	}
+	else shader.disableVertexAttribArray(shader.position3_loc);
+	return false;
+};
 
-	this.buffer;// delete this. provisionally put this here.***
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
+	
+	var vboBufferNor = this.vboBufferNor;
+	if(vboBufferNor === undefined)
+	{
+		shader.disableVertexAttribArray(shader.normal3_loc);
+		return true; // Return "true" bcos there are no "normal" data, that is different that having "normal" data and not prepared yet.***
+	}
+	
+	var gl = shader.gl;
+	if(!vboBufferNor.isReady(gl, vboMemManager))
+		return false;
+	
+	if (shader.normal3_loc !== undefined && shader.normal3_loc !== -1) 
+	{
+		shader.enableVertexAttribArray(shader.normal3_loc);
+		if (vboBufferNor.key !== shader.last_vboNor_binded)
+		{
+			gl.bindBuffer(vboBufferNor.dataTarget, vboBufferNor.key);
+			gl.vertexAttribPointer(shader.normal3_loc, 3, vboBufferNor.dataGlType, true, 0, 0);
+			shader.last_vboNor_binded = vboBufferNor.key;
+		}
+		return true;
+	}
+	else shader.disableVertexAttribArray(shader.normal3_loc);
+	return false;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
+	
+	var vboBufferTCoord = this.vboBufferTCoord;
+	if(vboBufferTCoord === undefined)
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		return true; // Return "true" bcos there are no "tCoord" data, that is different that having "tCoord" data and not prepared yet.***
+	}
+	
+	var gl = shader.gl;
+	if(!vboBufferTCoord.isReady(gl, vboMemManager))
+		return false;
+	if (shader.texCoord2_loc !== undefined && shader.texCoord2_loc !== -1) 
+	{
+		shader.enableVertexAttribArray(shader.texCoord2_loc);
+		if (vboBufferTCoord.key !== shader.last_vboTexCoord_binded)
+		{
+			gl.bindBuffer(vboBufferTCoord.dataTarget, vboBufferTCoord.key);
+			gl.vertexAttribPointer(shader.texCoord2_loc, 2, vboBufferTCoord.dataGlType, false, 0, 0);
+			shader.last_vboTexCoord_binded = vboBufferTCoord.key;
+		}
+		return true;
+	}
+	else shader.disableVertexAttribArray(shader.texCoord2_loc);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
+	
+	var vboBufferCol = this.vboBufferCol;
+	if(vboBufferCol === undefined)
+	{
+		shader.disableVertexAttribArray(shader.color4_loc);
+		return true; // Return "true" bcos there are no "color" data, that is different that having "color" data and not prepared yet.***
+	}
+	
+	var gl = shader.gl;
+	if(!vboBufferCol.isReady(gl, vboMemManager))
+		return false;
+
+	if (shader.color4_loc !== undefined && shader.color4_loc !== -1) 
+	{
+		shader.enableVertexAttribArray(shader.color4_loc);
+		if (vboBufferCol.key !== shader.last_vboCol_binded)
+		{
+			gl.bindBuffer(vboBufferCol.dataTarget, vboBufferCol.key);
+			gl.vertexAttribPointer(shader.color4_loc, 4, vboBufferCol.dataGlType, true, 0, 0);
+			shader.last_vboCol_binded = vboBufferCol.key;
+		}
+		return true;
+	}
+	else shader.disableVertexAttribArray(shader.color4_loc);
+	return false;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager) 
+{
+	if(shader === undefined)
+		return false;
+	
+	var gl = shader.gl;
+	
+	var vboBufferIdx = this.vboBufferIdx;
+	if(!vboBufferIdx.isReady(gl, vboMemManager))
+		return false;
+	
+	if (vboBufferIdx.key !== shader.last_vboIdx_binded)
+	{
+		gl.bindBuffer(vboBufferIdx.dataTarget, vboBufferIdx.key);
+		shader.last_vboIdx_binded = vboBufferIdx.key;
+	}
+	return true;
 };
 
 /**
@@ -101,19 +346,12 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
 	if(posDataArray === undefined)
 		return;
 	
-	var verticesFloatValuesCount = posDataArray.length;
-	var classifiedPosByteSize = verticesFloatValuesCount; // Init value.***
-	if(vboMemManager.enableMemoryManagement)
-	{
-		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(verticesFloatValuesCount);
-		this.posVboDataArray = new Float32Array(classifiedPosByteSize);
-		this.posVboDataArray.set(posDataArray);
-	}
-	else{
-		this.posVboDataArray = posDataArray;
-	}
-	this.vertexCount = verticesFloatValuesCount/3;
-	//this.posArrayByteSize = classifiedPosByteSize; 
+	var gl = vboMemManager.gl;
+	if(this.vboBufferPos === undefined)
+		this.vboBufferPos = new VboBuffer(gl.ARRAY_BUFFER);
+	
+	this.vboBufferPos.setDataArray(posDataArray, vboMemManager);
+	this.vertexCount = this.vboBufferPos.dataLength/3;
 };
 
 /**
@@ -121,21 +359,11 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemManager) 
 {
-	if(norDataArray === undefined)
-		return;
+	var gl = vboMemManager.gl;
+	if(this.vboBufferNor === undefined)
+		this.vboBufferNor = new VboBuffer(gl.ARRAY_BUFFER);
 	
-	var normalByteValuesCount = norDataArray.length;
-	var classifiedNorByteSize = normalByteValuesCount; // Init value.***
-	if(vboMemManager.enableMemoryManagement)
-	{
-		classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(normalByteValuesCount);
-		this.norVboDataArray = new Int8Array(classifiedNorByteSize);
-		this.norVboDataArray.set(norDataArray);
-	}
-	else{
-		this.norVboDataArray = norDataArray;
-	}
-	//this.norArrayByteSize = classifiedNorByteSize;
+	this.vboBufferNor.setDataArray(norDataArray, vboMemManager);
 };
 
 /**
@@ -143,22 +371,12 @@ VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemManager) 
 {
-	if(idxDataArray === undefined)
-		return;
+	var gl = vboMemManager.gl;
+	if(this.vboBufferIdx === undefined)
+		this.vboBufferIdx = new VboBuffer(gl.ELEMENT_ARRAY_BUFFER);
 	
-	var shortIndicesValuesCount = idxDataArray.length;
-	var classifiedIdxByteSize = shortIndicesValuesCount; // Init value.***
-	if(vboMemManager.enableMemoryManagement)
-	{
-		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(shortIndicesValuesCount);
-		this.idxVboDataArray = new Uint16Array(classifiedIdxByteSize);
-		this.idxVboDataArray.set(idxDataArray);
-	}
-	else{
-		this.idxVboDataArray = idxDataArray;
-	}
-	this.indicesCount = shortIndicesValuesCount;
-	//this.norArrayByteSize = classifiedIdxByteSize;
+	this.vboBufferIdx.setDataArray(idxDataArray, vboMemManager);
+	this.indicesCount = this.vboBufferIdx.dataLength;
 };
 
 /**
@@ -166,22 +384,12 @@ VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemManager) 
 {
-	if(colDataArray === undefined)
-		return;
 	
-	var colorByteValuesCount = colDataArray.length;
-	var classifiedColByteSize = colorByteValuesCount;
-	if(vboMemManager.enableMemoryManagement)
-	{
-		classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colorByteValuesCount);
-		this.colVboDataArray = new Uint8Array(classifiedColByteSize);
-		this.colVboDataArray.set(colDataArray);
-	}
-	else{
-		this.colVboDataArray = colDataArray;
-	}
-	//this.colArrayByteSize = classifiedColByteSize;
+	var gl = vboMemManager.gl;
+	if(this.vboBufferCol === undefined)
+		this.vboBufferCol = new VboBuffer(gl.ARRAY_BUFFER);
 	
+	this.vboBufferCol.setDataArray(colDataArray, vboMemManager);
 };
 
 /**
@@ -189,23 +397,12 @@ VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray, vboMemManager) 
 {
-	if(texCoordDataArray === undefined)
-		return;
+	var gl = vboMemManager.gl;
 	
-	var texCoordsFloatValuesCount = texCoordDataArray.length;
-	var classifiedTCoordByteSize = texCoordsFloatValuesCount;
+	if(this.vboBufferTCoord === undefined)
+		this.vboBufferTCoord = new VboBuffer(gl.ARRAY_BUFFER);
 	
-	if(vboMemManager.enableMemoryManagement)
-	{
-		classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordsFloatValuesCount);
-		var coordBuffer = new Float32Array(classifiedTCoordByteSize);
-		coordBuffer.set(texCoordDataArray);
-		this.tcoordVboDataArray = coordBuffer; 
-	}
-	else{
-		this.tcoordVboDataArray = texCoordDataArray;
-	}
-	//this.tcoordArrayByteSize = classifiedTCoordByteSize;
+	this.vboBufferTCoord.setDataArray(texCoordDataArray, vboMemManager);
 };
 
 
@@ -215,176 +412,36 @@ VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray
  */
 VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
-	if (this.meshVertexCacheKey) 
+	if(this.vboBufferPos !== undefined)
 	{
-		vboMemManager.storeClassifiedBufferKey(gl, this.meshVertexCacheKey, this.posArrayByteSize);
-		this.meshVertexCacheKey = undefined;
+		this.vboBufferPos.deleteGlObjects(vboMemManager);	
+		this.vboBufferPos = undefined;
 	}
-	this.posVboDataArray = undefined;
-
-	if (this.meshNormalCacheKey) 
+	if(this.vboBufferNor !== undefined)
 	{
-		vboMemManager.storeClassifiedBufferKey(gl, this.meshNormalCacheKey, this.norArrayByteSize);
-		this.meshNormalCacheKey = undefined;
+		this.vboBufferNor.deleteGlObjects(vboMemManager);	
+		this.vboBufferNor = undefined;
 	}
-	this.norVboDataArray = undefined;
-
-	if (this.meshColorCacheKey) 
+	if(this.vboBufferIdx !== undefined)
 	{
-		vboMemManager.storeClassifiedBufferKey(gl, this.meshColorCacheKey, this.colArrayByteSize);
-		this.meshColorCacheKey = undefined;
+		this.vboBufferIdx.deleteGlObjects(vboMemManager);	
+		this.vboBufferIdx = undefined;
 	}
-	this.colVboDataArray = undefined;
-
-	if (this.meshTexcoordsCacheKey) 
+	if(this.vboBufferCol !== undefined)
 	{
-		vboMemManager.storeClassifiedBufferKey(gl, this.meshTexcoordsCacheKey, this.tcoordArrayByteSize);
-		this.meshTexcoordsCacheKey = undefined;
+		this.vboBufferCol.deleteGlObjects(vboMemManager);	
+		this.vboBufferCol = undefined;
 	}
-	this.tcoordVboDataArray = undefined;
-
-	if (this.meshFacesCacheKey) 
+	if(this.vboBufferTCoord !== undefined)
 	{
-		vboMemManager.storeClassifiedElementKey(gl, this.meshFacesCacheKey, this.idxArrayByteSize);
-		this.meshFacesCacheKey = undefined;
+		this.vboBufferTCoord.deleteGlObjects(vboMemManager);	
+		this.vboBufferTCoord = undefined;
 	}
-	this.idxVboDataArray = undefined;
-	
-	this.posArrayByteSize = undefined;
-	this.norArrayByteSize = undefined;
-	this.idxArrayByteSize = undefined;
-	this.colArrayByteSize = undefined;
-	this.tcoordArrayByteSize = undefined;
-
-	this.buffer = undefined;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @return boolean
- */
-VBOVertexIdxCacheKey.prototype.isReadyPositions = function(gl, vboMemManager) 
-{
-	if (this.meshVertexCacheKey === undefined) 
-	{
-		if (this.posVboDataArray === undefined) { return false; }
-		if (this.posArrayByteSize === undefined)
-		{
-			this.posArrayByteSize = this.posVboDataArray.length;
-		}
-		this.meshVertexCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.posArrayByteSize);
-		if (this.meshVertexCacheKey === undefined)
-		{ return false; }
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshVertexCacheKey);
-		gl.bufferData(gl.ARRAY_BUFFER, this.posVboDataArray, gl.STATIC_DRAW);
-		this.posVboDataArray = undefined;
-		return true;
-	}
-	return true;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @return boolean
- */
-VBOVertexIdxCacheKey.prototype.isReadyNormals = function(gl, vboMemManager) 
-{
-	if (this.meshNormalCacheKey === undefined) 
-	{
-		if (this.norVboDataArray === undefined) { return false; }
-		if (this.norArrayByteSize === undefined)
-		{
-			this.norArrayByteSize = this.norVboDataArray.length;
-		}
-
-		this.meshNormalCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.norArrayByteSize);
-		if (this.meshNormalCacheKey === undefined)
-		{ return false; }
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshNormalCacheKey);
-		gl.bufferData(gl.ARRAY_BUFFER, this.norVboDataArray, gl.STATIC_DRAW);
-		this.norVboDataArray = undefined;
-		return true;
-	}
-	return true;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @return boolean
- */
-VBOVertexIdxCacheKey.prototype.isReadyFaces = function(gl, vboMemManager) 
-{
-	if (this.meshFacesCacheKey === undefined) 
-	{
-		if (this.idxVboDataArray === undefined) { return false; }
-		if (this.idxArrayByteSize === undefined)
-		{
-			this.idxArrayByteSize = this.idxVboDataArray.length;
-		}
-
-		this.meshFacesCacheKey = vboMemManager.getClassifiedElementKey(gl, this.idxArrayByteSize);
-		if (this.meshFacesCacheKey === undefined)
-		{ return false; }
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.meshFacesCacheKey);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.idxVboDataArray, gl.STATIC_DRAW);
-		this.idxVboDataArray = undefined;
-		return true;
-	}
-	return true;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @return boolean
- */
-VBOVertexIdxCacheKey.prototype.isReadyTexCoords = function(gl, vboMemManager) 
-{
-	if (this.meshTexcoordsCacheKey === undefined) 
-	{
-		if (this.tcoordVboDataArray === undefined) { return false; }
-		if (this.tcoordArrayByteSize === undefined)
-		{
-			this.tcoordArrayByteSize = this.tcoordVboDataArray.length;
-		}
-
-		this.meshTexcoordsCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.tcoordArrayByteSize);
-		if (this.meshTexcoordsCacheKey === undefined)
-		{ return false; }
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshTexcoordsCacheKey);
-		gl.bufferData(gl.ARRAY_BUFFER, this.tcoordVboDataArray, gl.STATIC_DRAW);
-		this.tcoordVboDataArray = undefined;
-
-		return true;
-	}
-	return true;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @return boolean
- */
-VBOVertexIdxCacheKey.prototype.isReadyColors = function(gl, vboMemManager) 
-{
-	if (this.meshColorCacheKey === undefined) 
-	{
-		if (this.colVboDataArray === undefined) { return false; }
-		if (this.colArrayByteSize === undefined)
-		{
-			this.colArrayByteSize = this.colVboDataArray.length;
-		}
-		
-		this.meshColorCacheKey = vboMemManager.getClassifiedBufferKey(gl, this.colArrayByteSize);
-		if (this.meshColorCacheKey === undefined)
-		{ return false; }
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.meshColorCacheKey);
-		gl.bufferData(gl.ARRAY_BUFFER, this.colVboDataArray, gl.STATIC_DRAW);
-		this.colVboDataArray = undefined;
-		
-		return true;
-	}
-	return true;
-};
-
+// VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
+// VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
+// VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
 /**
  * 어떤 일을 하고 있습니까?
  * @class VBOVertexIdxCacheKeysContainer

@@ -70,6 +70,7 @@ MagoWorld.prototype.mousedown = function(event)
 	this.magoManager.sceneState.mouseButton = event.button;
 	MagoWorld.updateMouseStartClick(event.clientX, event.clientY, this.magoManager);
 	this.magoManager.isCameraMoving = true;
+	
 };
 
 MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
@@ -146,6 +147,16 @@ MagoWorld.prototype.mouseup = function(event)
 	this.magoManager.sceneState.mouseButton = -1;
 	this.magoManager.bPicking = false;
 	this.magoManager.isCameraMoving = false;
+};
+
+MagoWorld.prototype.mouseclick = function(event)
+{
+	if(event.button === 0)
+	{
+		var mouseX = event.clientX;
+		var mouseY = event.clientY;
+		this.magoManager.mouseActionLeftClick(mouseX, mouseY);
+	}
 };
 
 MagoWorld.prototype.mousewheel = function(event)

@@ -338,7 +338,7 @@ Surface.prototype.getTriangles = function(resultTrianglesArray)
 	return resultTrianglesArray;
 };
 
-Surface.prototype.calculateVerticesNormals = function()
+Surface.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
 	// PROVISIONAL.***
 	var face;
@@ -346,7 +346,7 @@ Surface.prototype.calculateVerticesNormals = function()
 	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
-		face.calculateVerticesNormals();
+		face.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 	}
 };
 

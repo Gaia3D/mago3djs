@@ -321,31 +321,16 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	{
 		//var mesh_array = block.viArraysContainer._meshaderrays[n];
 		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-		if (!vboKey.isReadyPositions(gl, magoManager.vboMemoryManager) || 
-			!vboKey.isReadyNormals(gl, magoManager.vboMemoryManager) || 
-			!vboKey.isReadyFaces(gl, magoManager.vboMemoryManager))
-		{ return false; }
 		
 		// Positions.***
-		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
-		{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-			shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
-		}
+		if(!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
 
 		if (renderType === 1)
 		{
 			// Normals.***
-			if (shader.normal3_loc && shader.normal3_loc !== -1) 
-			{
-				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
-					gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-					shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
-				}
-			}
+			if(!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+				return false;
 
 			// TexCoords.***
 			if (renderTexture && neoReference.hasTexture) 
@@ -353,12 +338,8 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 				if (block.vertexCount <= neoReference.vertexCount) 
 				{
 					var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-					if (!refVboData.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-					{ return false; }
-
-					shader.enableVertexAttribArray(shader.texCoord2_loc);
-					gl.bindBuffer(gl.ARRAY_BUFFER, refVboData.meshTexcoordsCacheKey);
-					gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+					if(!refVboData.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+						return false;
 				}
 				else 
 				{
@@ -400,22 +381,11 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 				indicesCount = vboKey.indicesCount;
 			}
 		}
-		if (vboKey.meshFacesCacheKey !== shader.last_vboIdx_binded)
-		{
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
-			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
-		}
+		if(!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+			return false;
 		
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 		//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
-		
-		//var glError = gl.getError();
-		//if(glError !== gl.NO_ERROR)
-		//	var hola = 0;
-		
-		// Test check.***
-	if(magoManager.objectSelected === this)
-		var hola = 0;
 		
 	}
 		
@@ -944,9 +914,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
 						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
 						// TODO: Float32Array or UintArray depending of dataType.***
-						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
-						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
-						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
+						var colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+						vboViCacheKey.setDataArrayColor(colVboDataArray, vboMemManager);
+
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
 						
 						// send data to gpu.
@@ -978,10 +948,12 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
 						
 						// send data to gpu.
+						/*
 						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 						{
 							this.succesfullyGpuDataBinded = false;
 						}
+						*/
 					}
 				}
 			}
@@ -1351,11 +1323,6 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
 						
-						// send data to gpu.
-						if (!vboViCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
 					}
 				}
 			}

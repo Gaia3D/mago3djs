@@ -257,6 +257,8 @@ var VBOMemoryManager = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	this.gl;
+	
 	// if "enableMemoryManagement" == false -> no management of the gpu memory.
 	this.enableMemoryManagement = false;
 	

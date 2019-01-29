@@ -221,7 +221,10 @@ Mesh.prototype.transformByMatrix4 = function(tMat4)
 	}
 	
 	this.vertexList.transformPointsByMatrix4(tMat4);
-	this.calculateVerticesNormals();
+	
+	// If rotate a mesh, must recalculate normals.***
+	var bForceRecalculatePlaneNormal = true;
+	this.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 };
 
 Mesh.prototype.translate = function(x, y, z)
@@ -235,7 +238,7 @@ Mesh.prototype.translate = function(x, y, z)
 	this.vertexList.translateVertices(x, y, z);
 };
 
-Mesh.prototype.calculateVerticesNormals = function()
+Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
 	// PROVISIONAL.***
 	var surface;
@@ -243,7 +246,7 @@ Mesh.prototype.calculateVerticesNormals = function()
 	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
-		surface.calculateVerticesNormals();
+		surface.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 	}
 };
 
@@ -427,81 +430,44 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	for (var i=0; i<vboKeysCount; i++)
 	{
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
-		if (!vboKey.isReadyPositions(gl, vboMemManager) || 
-			!vboKey.isReadyNormals(gl, vboMemManager) || 
-			!vboKey.isReadyFaces(gl, vboMemManager))
-		{ return false; }
-		
-		vboKey.isReadyColors(gl, vboMemManager);
 		
 		// Positions.***
-		if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
-		{
-			gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
-			gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-			shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
-		}
+		if(!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
 		
 		// Normals.***
-		if (vboKey.meshNormalCacheKey)
+		if (vboKey.vboBufferNor)
 		{
-			if (shader.normal3_loc && shader.normal3_loc !== -1) 
-			{
-				shader.enableVertexAttribArray(shader.normal3_loc);
-				if (vboKey.meshNormalCacheKey !== shader.last_vboNor_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshNormalCacheKey);
-					gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
-					shader.last_vboNor_binded = vboKey.meshNormalCacheKey;
-				}
-			}
+			if(!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else{
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
 		
 		// Colors.***
-		if (vboKey.meshColorCacheKey)
+		if (vboKey.vboBufferCol)
 		{
-			if (shader.color4_loc && shader.color4_loc !== -1) 
-			{
-				shader.enableVertexAttribArray(shader.color4_loc);
-				if (vboKey.meshColorCacheKey !== shader.last_vboCol_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshColorCacheKey);
-					gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-					shader.last_vboCol_binded = vboKey.meshColorCacheKey;
-				}
-			}
+			if(!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else{
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
 		// TexCoords.***
-		if (vboKey.meshTexcoordsCacheKey)
+		if (vboKey.vboBufferTCoord)
 		{
-			if (shader.texCoord2_loc && shader.texCoord2_loc !== -1) 
-			{
-				shader.enableVertexAttribArray(shader.texCoord2_loc);
-				if (vboKey.meshTexcoordsCacheKey !== shader.last_vboTexCoord_binded)
-				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
-					gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
-					shader.last_vboTexCoord_binded = vboKey.meshTexcoordsCacheKey;
-				}
-			}
+			if(!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else{
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 		
 		// Indices.***
-		if (vboKey.meshFacesCacheKey !== shader.last_vboIdx_binded)
-		{
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
-			shader.last_vboIdx_binded = vboKey.meshFacesCacheKey;
-		}
+		if(!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+			return false;
 		
 		if(glPrimitive)
 			primitive = glPrimitive;
@@ -570,14 +536,15 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 	return resultVboContainer;
 };
 
-Mesh.prototype.getVboEdges = function(resultVboContainer)
+Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 {
 	// provisionally make edges by this.***
 	var frontierHedgesArray = this.getFrontierHalfEdges(undefined);
 	var hedgesCount = frontierHedgesArray.length;
 	var hedge;
-	var vertexArray = [];
-	var indicesArray = [];
+	var verticesCount = hedgesCount * 2;
+	var vertexArray = new Float32Array(verticesCount*3);
+	var indicesArray = new Uint16Array(verticesCount);
 	var strVertex, endVertex;
 	var index = 0;
 	for (var i=0; i<hedgesCount; i++)
@@ -585,21 +552,20 @@ Mesh.prototype.getVboEdges = function(resultVboContainer)
 		hedge = frontierHedgesArray[i];
 		strVertex = hedge.startVertex;
 		endVertex = hedge.getEndVertex();
-		vertexArray.push(strVertex.point3d.x);
-		vertexArray.push(strVertex.point3d.y);
-		vertexArray.push(strVertex.point3d.z);
-		vertexArray.push(endVertex.point3d.x);
-		vertexArray.push(endVertex.point3d.y);
-		vertexArray.push(endVertex.point3d.z);
+		vertexArray[i*6] = strVertex.point3d.x;
+		vertexArray[i*6+1] = strVertex.point3d.y;
+		vertexArray[i*6+2] = strVertex.point3d.z;
+		vertexArray[i*6+3] = endVertex.point3d.x;
+		vertexArray[i*6+4] = endVertex.point3d.y;
+		vertexArray[i*6+5] = endVertex.point3d.z;
 		
-		indicesArray.push(index); index++;
-		indicesArray.push(index); index++;
+		indicesArray[i*2] = index; index++;
+		indicesArray[i*2+1] = index; index++;
 	}
 	
 	var resultVbo = resultVboContainer.newVBOVertexIdxCacheKey();
-	resultVbo.posVboDataArray = Float32Array.from(vertexArray);
-	resultVbo.idxVboDataArray = Int16Array.from(indicesArray);
-	resultVbo.indicesCount = resultVbo.idxVboDataArray.length;
+	resultVbo.setDataArrayPos(vertexArray, vboMemManager);
+	resultVbo.setDataArrayIdx(indicesArray, vboMemManager);
 };
 
 

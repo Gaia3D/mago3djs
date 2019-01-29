@@ -313,51 +313,47 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
 			
 			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0];
-			if (vboKey.isReadyPositions(gl, magoManager.vboMemoryManager) && 
-				vboKey.isReadyTexCoords(gl, magoManager.vboMemoryManager) && 
-				vboKey.isReadyFaces(gl, magoManager.vboMemoryManager))
-			{ 
-				// Positions.***
-				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
-				gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-				
-				// TexCoords.***
-				if (!bDepth)
+			
+			// Positions.***
+			if(!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
+				return false;
+		
+			// TexCoords.***
+			if (!bDepth)
+			{
+				if(!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
+					return false;
+			}
+			
+			// Normals.***
+			// todo:
+			
+			// Colors.***
+			// todo:
+			
+			// Indices.***
+			if(!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
+				return false;
+			
+			var indicesCount = vboKey.indicesCount;
+			
+			if (renderWireframe)
+			{
+				var trianglesCount = indicesCount;
+				for (var i=0; i<trianglesCount; i++)
 				{
-					gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshTexcoordsCacheKey);
-					gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
-				}
-				
-				var indicesCount = vboKey.indicesCount;
-
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboKey.meshFacesCacheKey);
-				
-				if (renderWireframe)
-				{
-					var trianglesCount = indicesCount;
-					for (var i=0; i<trianglesCount; i++)
-					{
-						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.***
-					}
-				}
-				else
-				{
-					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-					
-					var glError = gl.getError();
-					if(glError !== gl.NO_ERROR)
-						var hola = 0;
-					/*
-					gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-					gl.uniform1i(currentShader.hasTexture_loc, false); //.***
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]);
-					gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
-					
-					gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-					gl.uniform1i(currentShader.hasTexture_loc, true); //.***
-					*/
+					gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.***
 				}
 			}
+			else
+			{
+				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+				
+				//var glError = gl.getError();
+				//if(glError !== gl.NO_ERROR)
+				//	var hola = 0;
+			}
+
 		}
 		else 
 		{
@@ -655,26 +651,19 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	var vboKey = this.vboKeyContainer.newVBOVertexIdxCacheKey();
 	
 	// Positions.***
-	var vertexCount = coordsCount;
-	var posByteSize = vertexCount * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	vboKey.posVboDataArray = this.cartesiansArray; // Float32Array.***
+	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
 	
 	// TexCoords.***
 	if(this.texCoordsArray)
 	{
-		var tCoordByteSize = 2 * vertexCount;
-		var classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
-		vboKey.tcoordVboDataArray = this.texCoordsArray; // Float32Array.***
+		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
 	}
 		
 	// Indices.***
-	var idxByteSize = this.indices.length;
-	var classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-	vboKey.idxVboDataArray = this.indices; // Uint16Array.***
+	vboKey.setDataArrayIdx(this.indices, vboMemManager);
 		
-	vboKey.indicesCount = this.indices.length;
 	/*
+	// Todo:
 	if (normal)
 	{ vboKey.norVboDataArray = Int8Array.from(norArray); }
 	

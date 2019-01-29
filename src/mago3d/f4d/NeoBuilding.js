@@ -532,7 +532,7 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 			lodToLoad = lod;
 			break;
 		}
-		if (lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+		if (lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 		{
 			// this is the new version.***
 			if (lowLodMeshAux.texture === undefined)
@@ -863,7 +863,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		
 	}
 	
-	if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
+	if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 	{
 		// this is the new version.***
 		if (lowLodMesh.texture === undefined)

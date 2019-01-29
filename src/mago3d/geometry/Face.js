@@ -93,6 +93,9 @@ Face.prototype.calculatePlaneNormal = function()
 		startVec.unitary();
 		endVec.unitary();
 		
+		if(startVec.isNAN() || endVec.isNAN())
+			continue;
+		
 		var crossProd = startVec.crossProduct(endVec, undefined); // Point3D.
 		var scalarProd = startVec.scalarProduct(endVec);
 		
@@ -106,12 +109,15 @@ Face.prototype.calculatePlaneNormal = function()
 	return this.planeNormal;
 };
 
-Face.prototype.calculateVerticesNormals = function()
+Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
 	// This function calculates normals for concave faces.***
 	// Provisionally calculate the plane normal and assign to the vertices.***
 	var verticesCount = this.vertexArray.length;
 
+	if(bForceRecalculatePlaneNormal !== undefined && bForceRecalculatePlaneNormal)
+		this.calculatePlaneNormal();
+	
 	if (this.planeNormal === undefined)
 	{ this.calculatePlaneNormal(); }
 	

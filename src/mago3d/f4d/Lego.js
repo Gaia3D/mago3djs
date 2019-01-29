@@ -136,47 +136,46 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	// read bPositionsCompressed. If this var is true -> positions is in uShort).***
 	this.bPositionsCompressed = stream.readInt8();
 	var posByteSize = verticesCount * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
 	var positionBuffer;
 	
-	if (classifiedPosByteSize === -1)
-	{ var hola = 0; }
 	
 	if (this.bPositionsCompressed)
 	{
-		positionBuffer = new Uint16Array(classifiedPosByteSize);
-		positionBuffer.set(stream.readUint16Array(verticesCount * 3));
+		vboCacheKey.setDataArrayPos(stream.readUint16Array(verticesCount * 3), vboMemManager);
 	}
 	else 
 	{
-		positionBuffer = new Float32Array(classifiedPosByteSize);
-		positionBuffer.set(stream.readFloat32Array(verticesCount * 3));
+		vboCacheKey.setDataArrayPos(stream.readFloat32Array(verticesCount * 3), vboMemManager);
 	}
-	
-	vboCacheKey.setDataArrayPos(positionBuffer, vboMemManager);
 
-	// (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
-	vboCacheKey.posArrayByteType = 5123; // unsigned short.***
-	
-	
 	// normals.***
 	this.hasNormals = stream.readInt8();
+	if(this.hasNormals)
+	{
+		// todo:
+	}
 	
 	// colors.***
 	this.hasColors = stream.readInt8();
 	if (this.hasColors)
 	{
 		var numColors = verticesCount;
-		var colDataArray = stream.readUint8Array(numColors * 4);
-		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
-		vboCacheKey.colArrayByteType = 5121; // unsigned byte.***
+		vboCacheKey.setDataArrayCol(stream.readUint8Array(numColors * 4), vboMemManager);
 	}
 	
 	// texCoords.***
 	this.hasTexCoords = stream.readInt8();
+	if(this.hasTexCoords)
+	{
+		// todo:
+	}
 	
 	// indices.***
 	this.hasIndices = stream.readInt8();
+	if(this.hasIndices)
+	{
+		// todo:
+	}
 	
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
@@ -211,8 +210,7 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 	var numPositions = stream.readUint32();
 	var posDataArray = stream.readFloat32Array(numPositions * 3);
 	vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
-	// (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
-	//vboCacheKey.posArrayByteType = 5123; // unsigned short.***
+
 
 	// VBO(Normal Buffer) - i,j,k
 	var hasNormals = stream.readUint8();
@@ -244,21 +242,7 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	
-	var succesfullyGpuDataBinded = true;
-	if (!vboCacheKey.isReadyPositions(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-	if (!vboCacheKey.isReadyNormals(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-	if (!vboCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
-	{ succesfullyGpuDataBinded = false; }
-
-	// 4) Texcoord.*********************************************
-	if (this.hasTexCoords)
-	{
-		if (!vboCacheKey.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-		{ succesfullyGpuDataBinded = false; }
-	}	
-	return succesfullyGpuDataBinded;
+	return true;
 };
 
 /**
@@ -281,14 +265,6 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 	//--------------------------------------------
 	
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
-	if (!vbo_vicky.isReadyPositions(gl, magoManager.vboMemoryManager))
-	{ return false; }
-
-	if (!vbo_vicky.isReadyNormals(gl, magoManager.vboMemoryManager))
-	{ return false; }
-		
-	if (!renderTexture && !vbo_vicky.isReadyColors(gl, magoManager.vboMemoryManager))
-	{ return false; }
 
 	var vertices_count = vbo_vicky.vertexCount;
 	if (vertices_count === 0) 
@@ -303,8 +279,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		shader.disableVertexAttribArray(shader.color4_loc);
 		
 		// 1) Position.*********************************************
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
+		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
+
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		rendered = true;
 		
@@ -314,8 +291,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{
-			if (!vbo_vicky.isReadyTexCoords(gl, magoManager.vboMemoryManager))
-			{ return false; }
+			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 		else 
 		{
@@ -323,11 +300,11 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshVertexCacheKey);
-		gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshNormalCacheKey);
-		gl.vertexAttribPointer(shader.normal3_loc, 3, gl.BYTE, true, 0, 0);
+		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+			return false;
+		
+		if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+			return false;
 
 		// TODO:
 		//if (vbo_vicky.meshColorCacheKey !== undefined )
@@ -337,7 +314,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
 		//}
 		
-		if (renderTexture && vbo_vicky.meshTexcoordsCacheKey)
+		if (renderTexture && vbo_vicky.vboBufferTCoord !== undefined)
 		{
 			// Provisionally flip tex coords here.***************************************
 			if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
@@ -347,9 +324,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 			//---------------------------------------------------------------------------
 			
 			shader.disableVertexAttribArray(shader.color4_loc); 
-			shader.enableVertexAttribArray(shader.texCoord2_loc);
-			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshTexcoordsCacheKey);
-			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
+			
+			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+				return false;
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);

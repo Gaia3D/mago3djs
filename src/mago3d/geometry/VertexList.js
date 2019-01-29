@@ -354,30 +354,28 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 		hasTexCoords = true;
 	
 	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).***
+	var posVboDataArray, norVboDataArray, colVboDataArray, tcoordVboDataArray;
+	
 	// Positions.***
 	var posByteSize = verticesCount * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	resultVbo.posVboDataArray = new Float32Array(classifiedPosByteSize);
+	posVboDataArray = new Float32Array(posByteSize);
 	
 	if (hasNormals)
 	{ 
 		var norByteSize = verticesCount * 3;
-		var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-		resultVbo.norVboDataArray = new Int8Array(classifiedNorByteSize);
+		norVboDataArray = new Int8Array(norByteSize);
 	}
 	
 	if (hasColors)
 	{ 
 		var colByteSize = verticesCount * 4;
-		var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-		resultVbo.colVboDataArray = new Uint8Array(classifiedColByteSize);
+		colVboDataArray = new Uint8Array(colByteSize);
 	}
 	
 	if (hasTexCoords)
 	{ 
 		var texCoordByteSize = verticesCount * 2;
-		var classifiedTexCoordByteSize = vboMemManager.getClassifiedBufferSize(texCoordByteSize);
-		resultVbo.tcoordVboDataArray = new Float32Array(classifiedTexCoordByteSize);
+		tcoordVboDataArray = new Float32Array(texCoordByteSize);
 	}
 	
 	for (var i = 0; i < verticesCount; i++) 
@@ -388,33 +386,50 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 		
 		position = vertex.point3d;
 
-		resultVbo.posVboDataArray[i*3] = position.x;
-		resultVbo.posVboDataArray[i*3+1] = position.y;
-		resultVbo.posVboDataArray[i*3+2] = position.z;
+		posVboDataArray[i*3] = position.x;
+		posVboDataArray[i*3+1] = position.y;
+		posVboDataArray[i*3+2] = position.z;
 		
 		if (hasNormals)
 		{
 			normal = vertex.normal;
-			resultVbo.norVboDataArray[i*3] = normal.x*127;
-			resultVbo.norVboDataArray[i*3+1] = normal.y*127;
-			resultVbo.norVboDataArray[i*3+2] = normal.z*127;
+			norVboDataArray[i*3] = normal.x*127;
+			norVboDataArray[i*3+1] = normal.y*127;
+			norVboDataArray[i*3+2] = normal.z*127;
 		}
 		
 		if (hasColors)
 		{
 			color = vertex.color4;
-			resultVbo.colVboDataArray[i*4] = color.r*255;
-			resultVbo.colVboDataArray[i*4+1] = color.g*255;
-			resultVbo.colVboDataArray[i*4+2] = color.b*255;
-			resultVbo.colVboDataArray[i*4+3] = color.a*255;
+			colVboDataArray[i*4] = color.r*255;
+			colVboDataArray[i*4+1] = color.g*255;
+			colVboDataArray[i*4+2] = color.b*255;
+			colVboDataArray[i*4+3] = color.a*255;
 		}
 		
 		if (hasTexCoords)
 		{
 			texCoord = vertex.texCoord;
-			resultVbo.tcoordVboDataArray[i*2] = texCoord.x;
-			resultVbo.tcoordVboDataArray[i*2+1] = texCoord.y;
+			tcoordVboDataArray[i*2] = texCoord.x;
+			tcoordVboDataArray[i*2+1] = texCoord.y;
 		}
+	}
+	
+	resultVbo.setDataArrayPos(posVboDataArray, vboMemManager);
+	
+	if (hasNormals)
+	{
+		resultVbo.setDataArrayNor(norVboDataArray, vboMemManager);
+	}
+	
+	if (hasColors)
+	{
+		resultVbo.setDataArrayCol(colVboDataArray, vboMemManager);
+	}
+	
+	if (hasTexCoords)
+	{
+		resultVbo.setDataArrayTexCoord(tcoordVboDataArray, vboMemManager);
 	}
 
 	return resultVbo;

@@ -32,13 +32,20 @@ CODE.magoMode = {
 };
 
 CODE.modelerMode = {
-	"INACTIVE"  : 0,
+	"INACTIVE"         : 0,
 	"DRAWING_POLYLINE" : 1
 };
 
 CODE.modelerDrawingState = {
 	"NO_STARTED"  : 0,
-	"STARTED" : 1
+	"STARTED"     : 1
+};
+
+CODE.modelerDrawingElement = {
+	"NOTHING"      : 0,
+	"POINTS"       : 1,
+	"LINES"        : 2,
+	"POLYLINES"    : 3
 };
 
 CODE.PROJECT_ID_PREFIX = "projectId_";
