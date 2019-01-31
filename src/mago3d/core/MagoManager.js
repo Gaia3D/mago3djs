@@ -1400,17 +1400,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
 		}
 		
-		/*
-		// in this point, put octrees of lod2 to the deletingQueue to delete the lod0 data.
-		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
-		for (var i=nodesCount-1; i>=0; i--) 
-		{
-			// inversed "for" because delete 1rst farest.***
-			node = this.visibleObjControlerNodes.currentVisibles2[i];
-			this.processQueue.putNodeToDeleteModelReferences(node, 0);
-		}
-		*/
-		
 		// lod3, lod4, lod5.***
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles2);
@@ -2622,7 +2611,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	//	var hola = 0;
 	//else if (this.currentFrustumIdx > 0)
 	//	var hola = 0;
-
+	/*
 	// Test for drawing mode.******************************************************************
 	this.magoMode = CODE.magoMode.DRAWING;
 	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
@@ -2667,6 +2656,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		
 		var hola = 0;
 	}
+	*/
 };
 
 /**
@@ -3264,7 +3254,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (!find) 
 	{
 		// If the building is far to camera, then delete it.
-		if (neoBuilding.distToCam > 60) // default: 60.***
+		if (neoBuilding.distToCam > 100) // default: 60.***
 		{ this.processQueue.putNodeToDeleteModelReferences(node, 1); }
 		
 		// TODO: must check if some part of the building is in parseQueue.***
@@ -3305,6 +3295,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 MagoManager.prototype.manageQueue = function() 
 {
 	var gl = this.sceneState.gl;
+	
+	
 
 	// 1rst, manage deleting queue.***************
 	this.processQueue.manageDeleteQueue(this);
@@ -3312,6 +3304,7 @@ MagoManager.prototype.manageQueue = function()
 	// 2nd, parse pendent data.**********************************************************************************
 	// is desirable to parse octrees references ordered by the current eye distance.
 	// in the "visibleObjControlerOctrees" there are the octrees sorted by distance, so must use it.
+	this.parseQueue.initCounters();
 	
 	// parse octrees lod0 & lod1 references.***
 	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
@@ -3326,6 +3319,7 @@ MagoManager.prototype.manageQueue = function()
 
 	// parse PCloud octree.***
 	this.parseQueue.parseArrayOctreesPCloud(gl, this.visibleObjControlerOctrees.currentVisiblesAux, this);
+	this.parseQueue.parseArrayOctreesPCloudPartition(gl, this.visibleObjControlerOctrees.currentVisiblesAux, this);
 
 	// parse skin-lego.***
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles3, this);
@@ -3374,9 +3368,6 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistancePointsCloudType = fun
 	{ return; }
 	
 	var extraCount = fileRequestExtraCount;
-	
-	//var currentVisibles = [].concat(globalVisibleObjControlerOctrees.currentVisibles0, globalVisibleObjControlerOctrees.currentVisibles1,
-	//	globalVisibleObjControlerOctrees.currentVisibles2, globalVisibleObjControlerOctrees.currentVisibles3);
 		
 	var currentVisibles = globalVisibleObjControlerOctrees.getAllVisibles();
 	//var currentVisibles = globalVisibleObjControlerOctrees.currentVisiblesAux;
@@ -3412,21 +3403,26 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistancePointsCloudType = fun
 		neoBuilding = lowestOctree.neoBuildingOwner;
 		if (neoBuilding === undefined)
 		{ continue; }
-
-		projectFolderName = neoBuilding.projectFolderName;
-		buildingFolderName = neoBuilding.buildingFileName;
-
-		if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)
-		{
-			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
-			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-			var filePathInServer = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-			this.loadQueue.putLod2PCloudData(lowestOctree, filePathInServer, undefined, undefined, 0);
-
-		}
+	
+		var projectDataType = neoBuilding.metaData.projectDataType;
 		
-		if (Object.keys(this.loadQueue.lod2PCloudDataMap).length > 5)
-		{ return; }
+		if(projectDataType !== undefined && projectDataType === 4) // projectDataType = 4 (pointsCloudType building).***
+		{
+			projectFolderName = neoBuilding.projectFolderName;
+			buildingFolderName = neoBuilding.buildingFileName;
+
+			if (lowestOctree.lego.fileLoadState === CODE.fileLoadState.READY)
+			{
+				var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+				var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+				var filePathInServer = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+				this.loadQueue.putLod2PCloudData(lowestOctree, filePathInServer, undefined, undefined, 0);
+
+			}
+			
+			if (Object.keys(this.loadQueue.lod2PCloudDataMap).length > 5)
+			{ return; }
+		}
 	} 
 };
 
@@ -5180,7 +5176,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					// provisional test for pointsCloud data.************
 					var metaData = neoBuilding.metaData;
 					var projectsType = metaData.projectDataType;
-					if (projectsType && projectsType === 4)
+					if (projectsType && (projectsType === 4 || projectsType === 5))
 					{
 						// Project_data_type (new in version 002).***
 						// 1 = 3d model data type (normal 3d with interior & exterior data).***

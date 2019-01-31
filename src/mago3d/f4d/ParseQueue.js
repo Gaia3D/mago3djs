@@ -17,12 +17,15 @@ var ParseQueue = function()
 	this.octreesLod0ModelsToParseMap = {};
 	this.octreesLod2LegosToParseMap = {};
 	this.octreesPCloudToParseMap = {};
+	this.octreesPCloudPartitionToParseMap = {}; 
 	this.skinLegosToParseMap = {};
 	this.tinTerrainsToParseMap = {};
 	
 	this.maxNumParses = 1; // default 1.***
+	
+	// Test for pCloudPartitions.***
+	this.pCloudPartitionsParsed = 0;
 };
-
 
 
 ParseQueue.prototype.putTinTerrainToParse = function(tinTerrain, aValue)
@@ -150,6 +153,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 
 ParseQueue.prototype.parseArrayOctreesPCloud = function(gl, octreesArray, magoManager)
 {
+	// Test function.***
 	if (Object.keys(this.octreesPCloudToParseMap).length > 0)
 	{
 		var maxParsesCount = this.maxNumParses;
@@ -188,6 +192,78 @@ ParseQueue.prototype.parseArrayOctreesPCloud = function(gl, octreesArray, magoMa
 					lowestOctree.lego.dataArrayBuffer = undefined;
 					
 					octreesParsedCount++;
+				}
+				if (octreesParsedCount > maxParsesCount)
+				{ break; }	
+				
+			}
+		}
+		
+		if (octreesParsedCount > 0)
+		{
+			if (this.selectionFbo)
+			{ this.selectionFbo.dirty = true; }
+		}
+	}
+};
+
+ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArray, magoManager)
+{
+	// Test function.***
+	if (Object.keys(this.octreesPCloudPartitionToParseMap).length > 0)
+	{
+		var maxParsesCount = this.maxNumParses;
+		var octreesParsedCount = 0;
+		var lowestOctree;
+		
+		var octreesLod0Count = octreesArray.length;
+		for (var i=0; i<octreesLod0Count; i++)
+		{
+			lowestOctree = octreesArray[i];
+			
+			// Check if has pCloudPartitions.***
+			if(lowestOctree.pCloudPartitionsArray === undefined)
+				continue;
+			
+			var pCloudPartitionsCount = lowestOctree.pCloudPartitionsArray.length;
+			for(var j=0; j<pCloudPartitionsCount; j++)
+			{
+				var pCloudPartition = lowestOctree.pCloudPartitionsArray[j];
+				if(this.eraseOctreePCloudPartitionToParse(pCloudPartition))
+				{
+					pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
+					octreesParsedCount++;
+				}
+			}
+			
+			//if (this.eraseOctreePCloudPartitionToParse(lowestOctree))
+			//{
+				//if (lowestOctree.lego === undefined)
+				//{ continue; }
+				
+				//lowestOctree.lego.parsePointsCloudData(gl, lowestOctree.lego.dataArrayBuffer, magoManager);
+				//lowestOctree.lego.dataArrayBuffer = undefined;
+				
+				//octreesParsedCount++;
+			//}
+			if (octreesParsedCount > maxParsesCount)
+			{ break; }
+		}
+		
+		if (octreesParsedCount === 0)
+		{
+			for (var key in this.octreesPCloudPartitionToParseMap)
+			{
+				lowestOctree = this.octreesPCloudPartitionToParseMap[key];
+				if (this.eraseOctreePCloudPartitionToParse(lowestOctree))
+				{
+					//if (lowestOctree.lego === undefined)
+					//{ continue; }
+					
+					//lowestOctree.lego.parsePointsCloudData(lowestOctree.lego.dataArrayBuffer, gl, magoManager);
+					//lowestOctree.lego.dataArrayBuffer = undefined;
+					
+					//octreesParsedCount++;
 				}
 				if (octreesParsedCount > maxParsesCount)
 				{ break; }	
@@ -551,6 +627,29 @@ ParseQueue.prototype.eraseOctreePCloudToParse = function(octree)
 	return false;
 };
 
+ParseQueue.prototype.putOctreePCloudPartitionToParse = function(pCloudPartitionLego, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.octreesPCloudPartitionToParseMap[pCloudPartitionLego.legoKey] = pCloudPartitionLego;
+};
+
+ParseQueue.prototype.eraseOctreePCloudPartitionToParse = function(pCloudPartitionLego)
+{
+	if (pCloudPartitionLego === undefined)
+	{ return false; }
+	
+	var key = pCloudPartitionLego.legoKey;
+	if (this.octreesPCloudPartitionToParseMap.hasOwnProperty(key)) 
+	{
+		delete this.octreesPCloudPartitionToParseMap[key];
+		return true;
+	}
+	return false;
+};
+
 ParseQueue.prototype.putSkinLegosToParse = function(skinLego, aValue)
 {
 	// provisionally "aValue" can be anything.
@@ -576,7 +675,6 @@ ParseQueue.prototype.clearAll = function()
 	this.octreesLod0ReferencesToParseMap = {};
 	this.octreesLod0ModelsToParseMap = {};
 	this.octreesLod2LegosToParseMap = {};
-	
 };
 
 ParseQueue.prototype.eraseAny = function(octree)
@@ -584,6 +682,11 @@ ParseQueue.prototype.eraseAny = function(octree)
 	this.eraseOctreeLod0ReferencesToParse(octree);
 	this.eraseOctreeLod0ModelsToParse(octree);
 	this.eraseOctreeLod2LegosToParse(octree);
+};
+
+ParseQueue.prototype.initCounters = function()
+{
+	this.pCloudPartitionsParsed = 0;
 };
 
 

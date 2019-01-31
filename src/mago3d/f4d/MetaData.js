@@ -28,7 +28,8 @@ var MetaData = function()
 	// 1 = 3d model data type (normal 3d with interior & exterior data).***
 	// 2 = single building skin data type (as vWorld or googleEarth data).***
 	// 3 = multi building skin data type (as Shibuya & Odaiba data).***
-	// 4 = pointsCloud data type.***			
+	// 4 = pointsCloud data type.***
+	// 5 = pointsCloud data type pyramidOctree test.***	
 	this.projectDataType;
 	//-------------------------------------------------------------------------------
 	

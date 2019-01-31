@@ -109,13 +109,11 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
  */
 Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 {
+	// Provisional.***
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
 	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	
 	var verticesCount = stream.readInt32();
-	
-	if (verticesCount > 70000000)
-	{ var hola = 0; }
 	
 	var vboMemManager = magoManager.vboMemoryManager;
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
