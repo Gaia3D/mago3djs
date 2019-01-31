@@ -883,6 +883,13 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
  */
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord) 
 {
+	// Check metaData.projectDataType.***
+	if(this.metaData.projectDataType === 5)
+	{
+		// Render pointsCloud pyramidMode.***
+		return;
+	}
+	
 	if (this.currentLod <= 2)
 	{
 		// There are buildings that are only skin, so check projectType of the building.***

@@ -117,9 +117,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 
-	// renderWithTopology === 0 -> render only Building.***
-	// renderWithTopology === 1 -> render only Topology.***
-	// renderWithTopology === 2 -> render both.***
+	// magoManager.tempSettings.renderWithTopology === 0 -> render only Building.***
+	// magoManager.tempSettings.renderWithTopology === 1 -> render only Topology.***
+	// magoManager.tempSettings.renderWithTopology === 2 -> render both.***
 	
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 	

@@ -24,6 +24,7 @@ var ReaderWriter = function()
 	this.blocksList_requested = 0;
 	this.octreesSkinLegos_requested = 0;
 	this.skinLegos_requested = 0;
+	this.pCloudPartitions_requested = 0;
 
 	this.gl;
 	this.incre_latAng = 0.001;
@@ -463,6 +464,45 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
  * @param fileName 파일명
  * @param magoManager 변수
  */
+ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, lowestOctree, pCloudPartitionLego, magoManager) 
+{
+	pCloudPartitionLego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	magoManager.readerWriter.pCloudPartitions_requested++;
+	
+	loadWithXhr(fileName).done(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (lowestOctree && pCloudPartitionLego)
+			{
+				pCloudPartitionLego.dataArrayBuffer = arrayBuffer;
+				pCloudPartitionLego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				magoManager.parseQueue.putOctreePCloudPartitionToParse(pCloudPartitionLego);
+			}
+			arrayBuffer = null;
+		}
+		else 
+		{
+			pCloudPartitionLego.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { pCloudPartitionLego.fileLoadState = 500; }
+		else { pCloudPartitionLego.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.readerWriter.pCloudPartitions_requested--;
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param magoManager 변수
+ */
 ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoManager) 
 {
 	this.skinLegos_requested++;
@@ -699,33 +739,33 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			{
 				neoBuilding.metaData = new MetaData();
 			}
-			var bytesReaded = neoBuilding.metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
+			var metaData = neoBuilding.metaData;
+			var bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
 			
 			// Now, make the neoBuilding's octree.***
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 			
-			if (neoBuilding.buildingId === "Lotte0603")
-			{ var hola = 0; }
+			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
+			if(metaData.projectDataType === 5)
+				bytesReaded = neoBuilding.octree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+			else
+				bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
 
-			// now, parse octreeAsimetric.***
-			bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
-
-			neoBuilding.metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
-			neoBuilding.metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
-			neoBuilding.metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
-			neoBuilding.metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
-			neoBuilding.metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
+			metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
+			metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
+			metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
+			metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
+			metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
+			metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
 			
 			// now parse materialsList of the neoBuilding.
 			//var ver0 = neoBuilding.metaData.version[0];
 			//var ver1 = neoBuilding.metaData.version[2];
 			//var ver2 = neoBuilding.metaData.version[4];
 			
-			//if (ver0 === '0' && ver1 === '0' && ver2 === '1')
-			if (neoBuilding.metaData.version === "0.0.1" || neoBuilding.metaData.version === "0.0.2")
+			if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
 			{
 				// read materials list.
 				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -806,7 +846,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 				}
 			}
 
-			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 
 			//BR_Project._f4d_header_readed_finished = true;
 			arrayBuffer = undefined;
