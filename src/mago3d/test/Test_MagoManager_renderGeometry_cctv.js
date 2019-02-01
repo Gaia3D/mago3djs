@@ -366,6 +366,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	}
 	if (ssao_idx === 1) 
 	{
+		
 		// check changesHistory.
 		this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 		this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
@@ -425,6 +426,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+		
 		
 		// If there are an object selected, then there are a stencilBuffer.******************************************
 		if (this.nodeSelected) // if there are an object selected then there are a building selected.***
@@ -655,7 +657,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.disableVertexAttribArrayAll();
 			
 		}
-		
+		/*
 		// test renders.***
 		// render cctv.***
 		this.test_cctv();
@@ -708,6 +710,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			currentShader.disableVertexAttribArrayAll();
 		}
+		*/
 		
 		// PointsCloud.****************************************************************************************
 		// PointsCloud.****************************************************************************************
@@ -723,9 +726,11 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 			
 			currentShader.bindUniformGenerals();
+			currentShader.resetLastBuffersBinded();
 
 			this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, ssao_idx); // lod0.***
 			currentShader.disableVertexAttribArrayAll();
+			//currentShader.resetLastBuffersBinded();
 			
 			gl.useProgram(null);
 

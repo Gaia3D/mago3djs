@@ -140,30 +140,40 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 
 	var vertexCount = resultVBOVertexIdxCacheKey.vertexCount;
 	
+	var float32PosArray = new Float32Array(vertexCount*3);
+	float32PosArray.set(positionArray);
+	
+	var int8NorArray = new Int8Array(vertexCount*3);
+	int8NorArray.set(normalsArray);
+	
+	var uint8ColArray = new Uint8Array(vertexCount*4);
+	uint8ColArray.set(colorsArray);
+	
 	///******************************************************************************
 	// Positions.***
-	var posByteSize = vertexCount * 3;
-	var classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(posByteSize);
-	resultVBOVertexIdxCacheKey.posVboDataArray = new Float32Array(classifiedPosByteSize);
-	resultVBOVertexIdxCacheKey.posVboDataArray.set(positionArray);
+	resultVBOVertexIdxCacheKey.setDataArrayPos(float32PosArray, vboMemManager);
 	
 	// Normals.***
-	var norByteSize = vertexCount * 3;
-	var classifiedNorByteSize = vboMemManager.getClassifiedBufferSize(norByteSize);
-	resultVBOVertexIdxCacheKey.norVboDataArray = new Int8Array(classifiedNorByteSize);
-	resultVBOVertexIdxCacheKey.norVboDataArray.set(normalsArray);
+	resultVBOVertexIdxCacheKey.setDataArrayNor(int8NorArray, vboMemManager);
 	
 	// Colors.***
-	var colByteSize = vertexCount * 4;
-	var classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
-	resultVBOVertexIdxCacheKey.colVboDataArray = new Uint8Array(classifiedColByteSize);
-	resultVBOVertexIdxCacheKey.colVboDataArray.set(colorsArray);
-	
+	resultVBOVertexIdxCacheKey.setDataArrayCol(uint8ColArray, vboMemManager);
 	///******************************************************************************
-
-	positionArray = undefined;
-	normalsArray = undefined;
-	colorsArray = undefined;
 
 	return resultVBOVertexIdxCacheKey;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

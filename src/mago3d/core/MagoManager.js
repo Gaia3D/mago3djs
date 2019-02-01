@@ -192,10 +192,7 @@ var MagoManager = function()
 	this.resultRaySC = new Float32Array(3);
 	this.matrix4SC = new Matrix4();
 
-	this.unitaryBoxSC = new BoxAux();
-	this.unitaryBoxSC.makeAABB(1.0, 1.0, 1.0); // make a unitary box.***
-	this.unitaryBoxSC.vBOVertexIdxCacheKey = this.unitaryBoxSC.triPolyhedron.getVBOArrayModePosNorCol(this.unitaryBoxSC.vBOVertexIdxCacheKey, this.vboMemoryManager);
-	
+	//this.unitaryBoxSC;
 	this.axisXYZ = new AxisXYZ();
 
 	this.demoBlocksLoaded = false;
@@ -1787,7 +1784,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function(ssao_idx) 
 {
 	// 1rst, make the test object if no exist.***
-	//return;
+	return;
 	
 	if (this.nativeProjectsArray === undefined)
 	{
@@ -2611,9 +2608,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	//	var hola = 0;
 	//else if (this.currentFrustumIdx > 0)
 	//	var hola = 0;
-	/*
+	
 	// Test for drawing mode.******************************************************************
-	this.magoMode = CODE.magoMode.DRAWING;
+	//this.magoMode = CODE.magoMode.DRAWING;
 	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		// Test code.***
@@ -2656,7 +2653,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		
 		var hola = 0;
 	}
-	*/
+	
 };
 
 /**
@@ -4273,6 +4270,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		{
 			currentShader = this.postFxShadersManager.getShader("pointsCloud");
 			currentShader.useProgram();
+			
+			currentShader.resetLastBuffersBinded();
 
 			currentShader.enableVertexAttribArray(currentShader.position3_loc);
 			currentShader.enableVertexAttribArray(currentShader.color4_loc);
@@ -4464,15 +4463,22 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
 
 MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color, bRenderLines) 
 {
+	if(nodesArray === undefined || nodesArray.length === 0)
+		return;
+	
+	if(this.unitaryBoxSC === undefined)
+	{
+		this.unitaryBoxSC = new BoxAux();
+		this.unitaryBoxSC.makeAABB(1.0, 1.0, 1.0); // make a unitary box.***
+		this.unitaryBoxSC.vBOVertexIdxCacheKey = this.unitaryBoxSC.triPolyhedron.getVBOArrayModePosNorCol(this.unitaryBoxSC.vBOVertexIdxCacheKey, this.vboMemoryManager);
+	}
+	
 	var node;
 	var currentShader = this.postFxShadersManager.getTriPolyhedronShader(); // box ssao.***
 	var shaderProgram = currentShader.program;
 	gl.enable(gl.BLEND);
 	gl.frontFace(gl.CCW);
 	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
-	gl.enableVertexAttribArray(currentShader.normal3_loc);
-	gl.disableVertexAttribArray(currentShader.color4_loc);
 
 	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
@@ -4524,6 +4530,8 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 	var nodesCount = nodesArray.length;
 	for (var b=0; b<nodesCount; b++)
 	{
+		currentShader.resetLastBuffersBinded();
+		
 		node = nodesArray[b];
 		neoBuilding = node.data.neoBuilding;
 
@@ -4538,7 +4546,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		this.renderer.renderObject(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, bRenderLines);
 	}
-	
+	/*
 	if (currentShader)
 	{
 		if (currentShader.texCoord2_loc !== -1){ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
@@ -4546,6 +4554,8 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 		if (currentShader.normal3_loc !== -1){ gl.disableVertexAttribArray(currentShader.normal3_loc); }
 		if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 	}
+	*/
+	currentShader.resetLastBuffersBinded();
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
