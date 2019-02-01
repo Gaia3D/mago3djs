@@ -228,34 +228,35 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 			if (vertices_count === 0)
 				return; 
 		}
-		/*
+		
 		if (distToCam < 100)
 		{
 			// Render all points.***
-			vertices_count = Math.floor(vertices_count/4);
+			//vertices_count = Math.floor(vertices_count/4);
 		}
 		else if (distToCam < 200)
 		{
-			vertices_count = Math.floor(vertices_count/16);
+			vertices_count = Math.floor(vertices_count/4);
 		}
 		else if (distToCam < 400)
 		{
-			vertices_count = Math.floor(vertices_count/32);
+			vertices_count = Math.floor(vertices_count/16);
 		}
 		else if (distToCam < 800)
 		{
-			vertices_count = Math.floor(vertices_count/64);
+			vertices_count = Math.floor(vertices_count/32);
 		}
 		else if (distToCam < 1600)
 		{
-			vertices_count = Math.floor(vertices_count/128);
+			vertices_count = Math.floor(vertices_count/64);
 		}
 		else
 		{
-			vertices_count = Math.floor(vertices_count/256);
+			vertices_count = Math.floor(vertices_count/128);
 		}
-		*/
 		
+		
+		/*
 		if (distToCam < 100)
 		{
 			// Render all points.***
@@ -280,7 +281,7 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		{
 			vertices_count = Math.floor(vertices_count/32);
 		}
-		
+		*/
 		
 		if (vertices_count <= 0)
 		{ 
@@ -290,7 +291,7 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 			return false;
 
-		if(vbo_vicky.vboBufferCol !== undefined && !vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+		if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
 			return false;
 		
 		gl.drawArrays(gl.POINTS, 0, vertices_count);
@@ -382,17 +383,28 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		}
 		else if(projectDataType !== undefined && projectDataType === 5)
 		{
+			if (magoManager.myCameraRelative === undefined)
+			{ magoManager.myCameraRelative = new Camera(); }
+
+			var relativeCam = magoManager.myCameraRelative;
+			relativeCam.frustum.copyParametersFrom(magoManager.myCameraSCX.bigFrustum);
+			relativeCam = buildingGeoLocation.getTransformedRelativeCamera(magoManager.sceneState.camera, relativeCam);
+			
+			var renderType = 1;// testing.***
+			neoBuilding.octree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
+			/*
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
 				lowestOctree = allVisibles[j];
+				lowestOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
 				
-				var renderType = 1;// testing.***
-				lowestOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader);
-				
-				//gl.bindBuffer(gl.ARRAY_BUFFER, null);
+				////gl.bindBuffer(gl.ARRAY_BUFFER, null);
 			}
+			*/
 		}
 	}
+	
+	shader.disableVertexAttribArrayAll();
 };
 
 Renderer.prototype.enableStencilBuffer = function(gl)
@@ -437,9 +449,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	if (bRenderLines === undefined)
 	{ bRenderLines = false; }
 
-	// disable All AttribPointer.***
-	shader.disableVertexAttribArrayAll(); // init.***
-	
+
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
@@ -481,6 +491,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		else 
 		{
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
+			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
 	}
 };

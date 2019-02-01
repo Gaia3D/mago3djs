@@ -2238,3 +2238,168 @@ void main()\n\
     gl_FragColor = finalColor; \n\
 }\n\
 ";
+ShaderSource.BoxSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D noiseTex;\n\
+uniform sampler2D diffuseTex;\n\
+uniform bool hasTexture;\n\
+varying vec3 vNormal;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform float fov;\n\
+uniform float aspectRatio;\n\
+uniform float screenWidth;\n\
+uniform float screenHeight;\n\
+uniform vec3 kernel[16];\n\
+uniform vec4 vColor4Aux;\n\
+uniform bool bUseNormal;\n\
+\n\
+varying vec2 vTexCoord;\n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+const int kernelSize = 16;\n\
+const float radius = 0.5;\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}\n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;\n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);\n\
+    return ray;\n\
+}\n\
+\n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{\n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+	vec4 textureColor;\n\
+	textureColor = vcolor4;\n\
+	if(bUseNormal)\n\
+    {\n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+		float linearDepth = getDepth(screenPos);\n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;\n\
+		vec3 normal2 = vNormal;\n\
+			\n\
+		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+		vec3 bitangent = cross(normal2, tangent);\n\
+		mat3 tbn = mat3(tangent, bitangent, normal2);\n\
+		\n\
+		float occlusion = 0.0;\n\
+		for(int i = 0; i < kernelSize; ++i)\n\
+		{    \n\
+			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;\n\
+			float sampleDepth = -sample.z/far;\n\
+			float depthBufferValue = getDepth(offset.xy);\n\
+			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
+			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+			{\n\
+				occlusion +=  1.0;\n\
+			}\n\
+			\n\
+		}   \n\
+			\n\
+		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+									\n\
+		vec3 lightPos = vec3(10.0, 10.0, 10.0);\n\
+		vec3 L = normalize(lightPos);\n\
+		float DiffuseFactor = dot(normal2, L);\n\
+		float NdotL = abs(DiffuseFactor);\n\
+		vec3 diffuse = vec3(NdotL);\n\
+		vec3 ambient = vec3(1.0);\n\
+		gl_FragColor.rgb = vec3((textureColor.xyz)*vLightWeighting * occlusion); \n\
+		gl_FragColor.a = 1.0; \n\
+	}\n\
+	else\n\
+	{\n\
+		gl_FragColor.rgb = vec3(textureColor.xyz); \n\
+		gl_FragColor.a = 1.0; \n\
+	}	\n\
+}\n\
+";
+ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec4 color4;\n\
+\n\
+uniform mat4 projectionMatrix;  \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform mat4 buildingRotMatrix;  \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec4 oneColor4;\n\
+uniform bool bUse1Color;\n\
+uniform bool bUseNormal;\n\
+uniform vec3 scale;\n\
+uniform bool bScale;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec2 vTexCoord;  \n\
+varying vec3 uAmbientColor;\n\
+varying vec3 vLightWeighting;\n\
+varying vec4 vcolor4;\n\
+\n\
+void main()\n\
+{	\n\
+    vec4 position2 = vec4(position.xyz, 1.0);\n\
+    if(bScale)\n\
+    {\n\
+        position2.x *= scale.x;\n\
+        position2.y *= scale.y;\n\
+        position2.z *= scale.z;\n\
+    }\n\
+    vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz + aditionalPosition.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    if(bUseNormal)\n\
+    {\n\
+		vec4 rotatedNormal = buildingRotMatrix * vec4(normal.xyz, 1.0);\n\
+		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
+		uAmbientColor = vec3(0.8, 0.8, 0.8);\n\
+		vec3 uLightingDirection = vec3(0.5, 0.5, 0.5);\n\
+		vec3 directionalLightColor = vec3(0.6, 0.6, 0.6);\n\
+		vNormal = (normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz;\n\
+		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+	}\n\
+    if(bUse1Color)\n\
+    {\n\
+        vcolor4 = oneColor4;\n\
+    }\n\
+    else\n\
+    {\n\
+        vcolor4 = color4;\n\
+    }\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+}\n\
+";

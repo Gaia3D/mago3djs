@@ -529,25 +529,45 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	if(this.pCloudPartitionsArray === undefined)
 		this.pCloudPartitionsArray = [];
 	
-	var partitionsCount = this.pCloudPartitionsArray.length;
-	
-	if(partitionsCount === 0)
+	for(var i=0; i<this.pCloudPartitionsCount; i++)
 	{
-		// There is no data so, independently of the lod, must load data.***
-		var readWriter = magoManager.readerWriter;
-		var pCloudPartitionLego = new Lego();
-		this.pCloudPartitionsArray.push(pCloudPartitionLego);
-		pCloudPartitionLego.legoKey = this.octreeKey + "_0";
-		
-		var projectFolderName = neoBuilding.projectFolderName;
-		var buildingFolderName = neoBuilding.buildingFileName;
-		var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-		var subOctreeNumberName = this.octree_number_name.toString();
-		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-		var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_0"; // in this case the fileName is fixed.***
-		
-		readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+		if( i < this.pCloudPartitionsArray.length )
+		{
+			var pCloudPartition = this.pCloudPartitionsArray[i];
+			if(pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			{
+				// Parse data.***
+				if(magoManager.parseQueue.pCloudPartitionsParsed < 5)
+				{
+					var gl = magoManager.sceneState.gl;
+					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
+					magoManager.parseQueue.pCloudPartitionsParsed++;
+				}
+				if(magoManager.parseQueue.pCloudPartitionsParsed >= 5)
+				return;
+			}
+			
+		}
+		else
+		{
+			// Create the pCloudPartition.***
+			var readWriter = magoManager.readerWriter;
+			var pCloudPartitionLego = new Lego();
+			this.pCloudPartitionsArray.push(pCloudPartitionLego);
+			pCloudPartitionLego.legoKey = this.octreeKey + "_0";
+			
+			var projectFolderName = neoBuilding.projectFolderName;
+			var buildingFolderName = neoBuilding.buildingFileName;
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			var subOctreeNumberName = this.octree_number_name.toString();
+			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+			var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_0"; // in this case the fileName is fixed.***
+			
+			readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+			return;
+		}
 	}
+	
 };
 
 
@@ -556,7 +576,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
  * @param intNumber 변수
  * @returns numDigits
  */
-Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader) 
+Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader, relativeCam) 
 {
 	// Test function to render octreePyramid-pointsCloud.***
 	// 1rst, check the number of partitions of data.***
@@ -569,7 +589,9 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	var magoPolicy = magoManager.magoPolicy;
 	var camera = magoManager.sceneState.camera;
 	var cullingVolume = camera.frustum;
-	var cameraPosition = camera.position;
+	
+	// To calculate distToCamera use the relativeCamera.***
+	var cameraPosition = relativeCam.position;
 	var distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
 	
 	// Provisionally, determine the LOD level by "distToCam".***
@@ -584,20 +606,24 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		// Check if pCloud data is loaded.***
 		this.preparePCloudData(magoManager, neoBuilding);
 		
-		//gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
-		//var bbox = lowestOctree.lego.bbox;
-		//gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
-		//gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
+		var ssao_idx = 1;
 		
 		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
 		for(var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
-			if(pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			if(pCloudPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
 			{
+				// render.***
+				var posCompressed = pCloudPartition.bPositionsCompressed;
+				gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
+				var bbox = pCloudPartition.bbox;
+				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
+				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
 				
+				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, ssao_idx, distToCamera, this.lod);
 			}
-			//magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, ssao_idx, distToCamera, this.lod, posCompressed);
+
 		}
 		
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
