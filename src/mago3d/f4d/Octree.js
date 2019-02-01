@@ -529,7 +529,17 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	if(this.pCloudPartitionsArray === undefined)
 		this.pCloudPartitionsArray = [];
 	
-	for(var i=0; i<this.pCloudPartitionsCount; i++)
+	var pCloudPartitionsCount = this.pCloudPartitionsCount;
+	
+	if(this.lod === 0 && pCloudPartitionsCount>1)
+			var hola = 0;
+		
+	if(this.lod === 1)
+		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
+	else if(this.lod > 1)
+		pCloudPartitionsCount = 1;
+	
+	for(var i=0; i<pCloudPartitionsCount; i++)
 	{
 		if( i < this.pCloudPartitionsArray.length )
 		{
@@ -561,7 +571,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 			var subOctreeNumberName = this.octree_number_name.toString();
 			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-			var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_0"; // in this case the fileName is fixed.***
+			var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
 			
 			readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
 			return;
@@ -588,7 +598,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	// Determine the distance from camera.***
 	var magoPolicy = magoManager.magoPolicy;
 	var camera = magoManager.sceneState.camera;
-	var cullingVolume = camera.frustum;
+	var cullingVolume = relativeCam.bigFrustum;
 	
 	// To calculate distToCamera use the relativeCamera.***
 	var cameraPosition = relativeCam.position;
@@ -596,6 +606,9 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	
 	// Provisionally, determine the LOD level by "distToCam".***
 	this.lod = magoPolicy.getLod(distToCamera);
+	
+	// Provisionally compare "this.lod" with "this.octreeLevel".***
+	
 	
 	var gl = magoManager.sceneState.gl;
 	var ssao_idx = 1;
@@ -609,6 +622,15 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		var ssao_idx = 1;
 		
 		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
+		
+		if(this.lod === 0 && pCloudPartitionsCount>1)
+			var hola = 0;
+		
+		if(this.lod === 1)
+			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
+		else if(this.lod > 1)
+			pCloudPartitionsCount = 1;
+		
 		for(var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
@@ -628,25 +650,10 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
-			//this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, result_octreesArray, boundingSphere_scratch);
+			var subOctree = this.subOctrees_array[i];
+			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
 		}
 	}
-	/*
-	else if (frustumCull === Constant.INTERSECTION_INTERSECT  ) 
-	{
-		if (this.subOctrees_array.length === 0) 
-		{
-			//result_octreesArray.push(this);
-		}
-		else 
-		{
-			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
-			{
-				//this.subOctrees_array[i].getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, result_octreesArray, boundingSphere_scratch);
-			}
-		}
-	}
-	*/
 };
 
 /**
