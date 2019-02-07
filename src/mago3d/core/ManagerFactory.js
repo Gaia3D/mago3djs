@@ -876,6 +876,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		getMagoManagerState: function() 
 		{
 			return magoManagerState;
+		},
+		getMagoManager: function() 
+		{
+			return magoManager;
 		}
 	};
 };

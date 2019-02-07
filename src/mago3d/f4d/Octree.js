@@ -564,7 +564,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 			var readWriter = magoManager.readerWriter;
 			var pCloudPartitionLego = new Lego();
 			this.pCloudPartitionsArray.push(pCloudPartitionLego);
-			pCloudPartitionLego.legoKey = this.octreeKey + "_0";
+			pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
 			
 			var projectFolderName = neoBuilding.projectFolderName;
 			var buildingFolderName = neoBuilding.buildingFileName;
@@ -653,6 +653,11 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 			var subOctree = this.subOctrees_array[i];
 			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
 		}
+	}
+	else
+	{
+		// Delete unnecessary objects.***
+		
 	}
 };
 
