@@ -335,6 +335,18 @@ MagoManager.prototype.test_cctv = function()
 	}
 };
 
+MagoManager.prototype.testButtonOnClick = function() 
+{
+	// Test to reorient a camera.***
+	if (this.cctvList === undefined)
+		return;
+	
+	var cam = this.cctvList.getCCTVByName("CCTV6");
+	var timeInSeconds = 0.5;
+	cam.setOrientation(0.0, 0, 86, timeInSeconds);
+	var hola = 0;
+};
+
 MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, renderTexture, ssao_idx, visibleObjControlerNodes) 
 {
 	gl.frontFace(gl.CCW);	
@@ -657,7 +669,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			currentShader.disableVertexAttribArrayAll();
 			
 		}
-		/*
+		
 		// test renders.***
 		// render cctv.***
 		this.test_cctv();
@@ -669,48 +681,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		if (cctvsCount > 0)
 		{
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
-			currentShader.resetLastBuffersBinded();
-			shaderProgram = currentShader.program;
-				
-			gl.useProgram(shaderProgram);
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
-			gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.enableVertexAttribArray(currentShader.normal3_loc);
-				
-			currentShader.bindUniformGenerals();
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-			
-			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+			this.cctvList.render(this, currentShader );
 
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			currentShader.last_tex_id = this.textureAux_1x1;
-				
-			this.renderer.renderTexture = false;
-			var currTime = new Date().getTime();
-				
-			
-			for (var i=0; i<cctvsCount; i++)
-			{
-				var cctv = this.cctvList.getCCTV(i);
-				cctv.updateHeading(currTime);
-				cctv.render(gl, this, currentShader);
-				
-			}
-			
-			if (this.isFarestFrustum())
-			{
-				this.drawCCTVNames(this.cctvList.camerasList);
-			}
-			
-			currentShader.disableVertexAttribArrayAll();
 		}
-		*/
+		
 		
 		// PointsCloud.****************************************************************************************
 		// PointsCloud.****************************************************************************************

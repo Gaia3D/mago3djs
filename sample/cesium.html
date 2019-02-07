@@ -40,6 +40,7 @@
 	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
 </ul>
 
+
 <div id="menuContent" class="navContents">
 	<div class="alignRight">
 		<button type="button" id="menuContentClose" class="navClose">닫기</button>
@@ -2175,6 +2176,14 @@
 var myElement = document.querySelector("#magoContainer"); 
 var position = getPosition(myElement);
 console.log("The image is located at: " + position.x + ", " + position.y);
+
+// TestButton.***
+function TestButtonFunction()
+{
+	var magoManager = managerFactory.getMagoManager();
+	// Do the test.***
+	magoManager.testButtonOnClick();
+};
 </script>
 </body>
 </html>

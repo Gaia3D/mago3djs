@@ -228,15 +228,14 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 			if (vertices_count === 0)
 				return; 
 		}
-		/*
-		if (distToCam < 100)
+		
+		if (distToCam < 80)
 		{
 			// Render all points.***
-			//vertices_count = Math.floor(vertices_count/4);
 		}
 		else if (distToCam < 200)
 		{
-			vertices_count = Math.floor(vertices_count/4);
+			vertices_count = Math.floor(vertices_count/8);
 		}
 		else if (distToCam < 400)
 		{
@@ -254,9 +253,9 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		{
 			vertices_count = Math.floor(vertices_count/128);
 		}
-		*/
 		
 		
+		/*
 		if (distToCam < 100)
 		{
 			// Render all points.***
@@ -281,7 +280,7 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		{
 			vertices_count = Math.floor(vertices_count/32);
 		}
-		
+		*/
 		
 		if (vertices_count <= 0)
 		{ 
