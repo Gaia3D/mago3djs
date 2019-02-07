@@ -20,6 +20,37 @@ var ProcessQueue = function()
 	this.nodesToDeleteLessThanLod5Map = {};
 	this.nodesToDeleteLodMeshMap = {}; // no used.***
 	this.tinTerrainsToDeleteMap = {};
+	
+	// Test.***
+	this.octreeToDeletePCloudsMap = {};
+};
+
+ProcessQueue.prototype.putOctreeToDeletePCloud = function(octree, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (octree === undefined)
+	{ return; }
+	
+	var key = octree.octreeKey;
+	this.octreeToDeletePCloudsMap[key] = octree;
+};
+
+ProcessQueue.prototype.eraseOctreeToDeletePCloud = function(octree)
+{
+	// this erases the octree from the "octreeToDeletePCloudsMap".
+	if (octree === undefined)
+	{ return false; }
+	
+	var key = octree.octreeKey;
+	if (this.octreeToDeletePCloudsMap.hasOwnProperty(key)) 
+	{
+		delete this.octreeToDeletePCloudsMap[key];
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.putNodeToDeleteLodMesh = function(node, aValue)
@@ -455,6 +486,25 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 		}
 		
 		if (deletedCount > 10)
+		{ break; }
+	}
+	
+	// PointsCloud.***
+	var deletedCount = 0;
+	for (var key in this.octreeToDeletePCloudsMap)
+	{
+		var octree = this.octreeToDeletePCloudsMap[key];
+		if (octree === undefined)
+		{ continue; }
+		
+		if (this.eraseOctreeToDeletePCloud(octree))
+		{
+			octree.deletePCloudObjects(gl, magoManager.vboMemoryManager);
+			octree = undefined;
+			deletedCount++;
+		}
+		
+		if (deletedCount > 5)
 		{ break; }
 	}
 };

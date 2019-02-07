@@ -263,9 +263,9 @@ MagoManager.prototype.test_cctv = function()
 		cctv.calculateRotationMatrix();
 		
 		// 19- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("공원3-22");
-		longitude = 127.057024;
-		latitude = 37.544420;
+		//cctv = this.cctvList.new_CCTV("공원3-22");
+		//longitude = 127.057024;
+		//latitude = 37.544420;
 		//altitude = 70.0;
 		
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
@@ -277,9 +277,9 @@ MagoManager.prototype.test_cctv = function()
 		cctv.calculateRotationMatrix();
 		
 		// 20- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("공원4-42");
-		longitude = 127.057025;
-		latitude = 37.544420;
+		//cctv = this.cctvList.new_CCTV("공원4-42");
+		//longitude = 127.057025;
+		//latitude = 37.544420;
 		//altitude = 70.0;
 		
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
@@ -291,9 +291,9 @@ MagoManager.prototype.test_cctv = function()
 		cctv.calculateRotationMatrix();
 		
 		// 21- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("교행1-51");
-		longitude = 127.057026;
-		latitude = 37.544420;
+		//cctv = this.cctvList.new_CCTV("교행1-51");
+		//longitude = 127.057026;
+		//latitude = 37.544420;
 		//altitude = 70.0;
 		
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
@@ -305,9 +305,9 @@ MagoManager.prototype.test_cctv = function()
 		cctv.calculateRotationMatrix();
 		
 		// 22- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("자치15-31123");
-		longitude = 127.057027;
-		latitude = 37.544420;
+		//cctv = this.cctvList.new_CCTV("자치15-31123");
+		//longitude = 127.057027;
+		//latitude = 37.544420;
 		//altitude = 70.0;
 		
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
@@ -319,9 +319,9 @@ MagoManager.prototype.test_cctv = function()
 		cctv.calculateRotationMatrix();
 		
 		// 23- create a cctv.*********************************************************************************
-		cctv = this.cctvList.new_CCTV("자치6-13");
-		longitude = 127.057028;
-		latitude = 37.544420;
+		//cctv = this.cctvList.new_CCTV("자치6-13");
+		//longitude = 127.057028;
+		//latitude = 37.544420;
 		//altitude = 70.0;
 		
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, 0.0, 0.0, 0.0, cctv.geoLocationData, this);
