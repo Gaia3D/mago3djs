@@ -164,6 +164,9 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 		}
 		this.neoRefsList_Array = undefined;
 	}
+	
+	// before deleteting child:
+	this.deletePCloudObjects(gl, vboMemManager);
 
 	if (this.subOctrees_array !== undefined) 
 	{
@@ -173,6 +176,40 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 			this.subOctrees_array[i] = undefined;
 		}
 		this.subOctrees_array = undefined;
+	}
+	
+	
+};
+
+/**
+ * Deletes pointsCloud objects of the octree.
+ * @param gl : current gl.
+ * @param vboMemManager : gpu memory manager
+ */
+Octree.prototype.deletePCloudObjects = function(gl, vboMemManager) 
+{
+	//this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
+	//this.pCloudPartitionsArray;
+	
+	if(this.pCloudPartitionsArray === undefined)
+		return;
+	
+	var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
+	for(var i=0; i<pCloudPartitionsCount; i++)
+	{
+		var pCloudPartition = this.pCloudPartitionsArray[i];
+		// Note: provisionally "pCloudPartition" is a lego class object.***
+		pCloudPartition.deleteObjects(gl, vboMemManager);
+	}
+	
+	this.pCloudPartitionsArray = undefined;
+	
+	// Now, delete child.***
+	var childsCount = this.subOctrees_array.length;
+	for(var i=0; i<childsCount; i++)
+	{
+		var subOctree = this.subOctrees_array[i];
+		subOctree.deletePCloudObjects(gl, vboMemManager);
 	}
 };
 
@@ -656,8 +693,11 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	}
 	else
 	{
-		// Delete unnecessary objects.***
-		
+		// Delete unnecessary objects if ditToCam is big.***
+		if(distToCamera > 50.0)
+		{
+			magoManager.processQueue.putOctreeToDeletePCloud(this);
+		}
 	}
 };
 
