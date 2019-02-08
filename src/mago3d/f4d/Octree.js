@@ -567,9 +567,6 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 		this.pCloudPartitionsArray = [];
 	
 	var pCloudPartitionsCount = this.pCloudPartitionsCount;
-	
-	if(this.lod === 0 && pCloudPartitionsCount>1)
-			var hola = 0;
 		
 	if(this.lod === 1)
 		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
@@ -589,6 +586,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
+					return;
 				}
 				if(magoManager.parseQueue.pCloudPartitionsParsed >= 2)
 				return;
@@ -658,6 +656,9 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	{
 		// Check if pCloud data is loaded.***
 		this.preparePCloudData(magoManager, neoBuilding);
+		
+		// Erase from deleting queue.***
+		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
 		var ssao_idx = 1;
 		
