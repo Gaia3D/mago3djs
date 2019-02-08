@@ -260,8 +260,8 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 					//if (lowestOctree.lego === undefined)
 					//{ continue; }
 					
-					//lowestOctree.lego.parsePointsCloudData(lowestOctree.lego.dataArrayBuffer, gl, magoManager);
-					//lowestOctree.lego.dataArrayBuffer = undefined;
+					pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
+					octreesParsedCount++;
 					
 					//octreesParsedCount++;
 				}

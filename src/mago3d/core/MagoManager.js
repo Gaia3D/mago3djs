@@ -788,7 +788,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
-	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3);
+	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3, visibleObjControlerNodes.currentVisiblesAux);
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
 		node = currentVisibleNodes[i];
