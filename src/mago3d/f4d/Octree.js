@@ -586,10 +586,10 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
-					return;
+					return true;
 				}
 				if(magoManager.parseQueue.pCloudPartitionsParsed >= 2)
-				return;
+				return true;
 			}
 			
 		}
@@ -611,10 +611,12 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 				var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
 				
 				readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
-				return;
+				return true;
 			}
 		}
 	}
+	
+	return false;
 	
 };
 
@@ -624,7 +626,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
  * @param intNumber 변수
  * @returns numDigits
  */
-Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader, relativeCam) 
+Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData) 
 {
 	// Test function to render octreePyramid-pointsCloud.***
 	// 1rst, check the number of partitions of data.***
@@ -655,22 +657,34 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	if (frustumCull !== Constant.INTERSECTION_OUTSIDE ) 
 	{
 		// Check if pCloud data is loaded.***
-		this.preparePCloudData(magoManager, neoBuilding);
+		if(bPrepareData)
+		{
+			if(this.preparePCloudData(magoManager, neoBuilding))
+			{
+				bPrepareData = false;
+			}
+		}
 		
 		// Erase from deleting queue.***
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
 		var ssao_idx = 1;
+		if(this.pCloudPartitionsArray === undefined)
+			return;
 		
 		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
 		
-		if(this.lod === 0 && pCloudPartitionsCount>1)
-			var hola = 0;
-		
 		if(this.lod === 1)
+		{
 			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
+			if(pCloudPartitionsCount > 10)
+				pCloudPartitionsCount = 10;
+		}
 		else if(this.lod > 1)
 			pCloudPartitionsCount = 1;
+		
+		// Test.***
+		//pCloudPartitionsCount = 1;
 		
 		for(var i=0; i<pCloudPartitionsCount; i++)
 		{
@@ -692,7 +706,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
 			var subOctree = this.subOctrees_array[i];
-			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
+			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
 		}
 	}
 	else
