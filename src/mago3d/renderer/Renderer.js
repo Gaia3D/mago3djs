@@ -391,7 +391,8 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 			relativeCam = buildingGeoLocation.getTransformedRelativeCamera(magoManager.sceneState.camera, relativeCam);
 			relativeCam.calculateFrustumsPlanes();
 			var renderType = 1;// testing.***
-			neoBuilding.octree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
+			var bPrepareData = true;
+			neoBuilding.octree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
 			/*
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
