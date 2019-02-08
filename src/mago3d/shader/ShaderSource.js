@@ -834,11 +834,11 @@ void main()\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
-	gl_PointSize = 1.0 + gl_Position.z/200.0;\n\
+	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
+	if(gl_PointSize < 3.0)\n\
+		gl_PointSize = 3.0;\n\
 }";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\

@@ -478,7 +478,7 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 			{
 				pCloudPartitionLego.dataArrayBuffer = arrayBuffer;
 				pCloudPartitionLego.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.putOctreePCloudPartitionToParse(pCloudPartitionLego);
+				//magoManager.parseQueue.putOctreePCloudPartitionToParse(pCloudPartitionLego); // NO. Old. Now parse directly.***
 			}
 			arrayBuffer = null;
 		}
@@ -494,6 +494,8 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 	}).always(function() 
 	{
 		magoManager.readerWriter.pCloudPartitions_requested--;
+		if(magoManager.readerWriter.pCloudPartitions_requested < 0)
+			magoManager.readerWriter.pCloudPartitions_requested = 0;
 	});
 };
 
@@ -739,6 +741,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			{
 				neoBuilding.metaData = new MetaData();
 			}
+			
 			var metaData = neoBuilding.metaData;
 			var bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
 			
