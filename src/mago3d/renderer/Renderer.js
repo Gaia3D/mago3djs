@@ -65,14 +65,14 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
 		this.vbo_vi_cacheKey_aux = vboContainer.vboCacheKeysArray[n];
 		
-		if(!this.vbo_vi_cacheKey_aux.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!this.vbo_vi_cacheKey_aux.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
-		if(!this.vbo_vi_cacheKey_aux.bindDataNormal(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!this.vbo_vi_cacheKey_aux.bindDataNormal(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
-		if(!this.vbo_vi_cacheKey_aux.bindDataIndice(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!this.vbo_vi_cacheKey_aux.bindDataIndice(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		/*
 		if (shader.texCoord2_loc !== -1 && this.renderTexture) 
@@ -158,12 +158,12 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	gl.enable(gl.CULL_FACE);
 	gl.frontFace(gl.CCW);
 	
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
 	}
-	if(renderType === 0)
+	if (renderType === 0)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
@@ -206,7 +206,7 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 	var vertices_count = vbo_vicky.vertexCount;
 	
 	if (vertices_count === 0) 
-		return;
+	{ return; }
 	
 	shader.disableVertexAttribArray(shader.color4_loc);
 	shader.disableVertexAttribArray(shader.normal3_loc); // provisionally has no normals.***
@@ -215,8 +215,8 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 	if (ssao_idx === 0) // depth.***
 	{
 		// 1) Position.*********************************************
-		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
 		gl.drawArrays(gl.POINTS, 0, vertices_count);
 	}
@@ -226,7 +226,7 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		{
 			vertices_count = Math.floor(vertices_count/5);
 			if (vertices_count === 0)
-				return; 
+			{ return; } 
 		}
 		/*
 		if (distToCam < 80)
@@ -288,11 +288,11 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 			return; 
 		}
 
-		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
-		if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
 		gl.drawArrays(gl.POINTS, 0, vertices_count);
 		
@@ -339,7 +339,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		
-		if(projectDataType !== undefined && projectDataType === 4)
+		if (projectDataType !== undefined && projectDataType === 4)
 		{
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
@@ -381,7 +381,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 				gl.bindBuffer(gl.ARRAY_BUFFER, null);
 			}
 		}
-		else if(projectDataType !== undefined && projectDataType === 5)
+		else if (projectDataType !== undefined && projectDataType === 5)
 		{
 			if (magoManager.myCameraRelative === undefined)
 			{ magoManager.myCameraRelative = new Camera(); }
@@ -461,16 +461,16 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		if (vertices_count === 0) 
 		{ return; }
 
-		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		if (ssao_idx === 1) // ssao.***
 		{
-			if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+			{ return false; }
 
-			if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			{ return false; }
 			
 			// TexCoords todo:
 		}
@@ -479,8 +479,8 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		{
 			if (vbo_vicky.indicesCount > 0)
 			{
-				if(!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
-					return false;
+				if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
+				{ return false; }
 
 				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 			}

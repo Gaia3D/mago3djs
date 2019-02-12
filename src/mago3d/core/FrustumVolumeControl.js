@@ -33,9 +33,12 @@ FrustumVolumeControl.prototype.initArrays = function()
 	var frustumVolumeObject;
 	for (var key in this.frustumVolumensMap)
 	{
-		frustumVolumeObject = this.frustumVolumensMap[key];
-		frustumVolumeObject.fullyIntersectedLowestTilesArray.length = 0;
-		frustumVolumeObject.partiallyIntersectedLowestTilesArray.length = 0;
-		frustumVolumeObject.visibleNodes.initArrays();
+		if (Object.prototype.hasOwnProperty.call(this.frustumVolumensMap, key)) 
+		{
+			frustumVolumeObject = this.frustumVolumensMap[key];
+			frustumVolumeObject.fullyIntersectedLowestTilesArray.length = 0;
+			frustumVolumeObject.partiallyIntersectedLowestTilesArray.length = 0;
+			frustumVolumeObject.visibleNodes.initArrays();
+		}
 	}
 };

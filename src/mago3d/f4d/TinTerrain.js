@@ -271,8 +271,11 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 		// Delete children 1rst.***
 		for (var key in this.childMap)
 		{
-			var child = this.childMap[key];
-			child.deleteTinTerrain(magoManager);
+			if (Object.prototype.hasOwnProperty.call(this.childMap, key))
+			{
+				var child = this.childMap[key];
+				child.deleteTinTerrain(magoManager);
+			}
 		}
 		
 		return false;
@@ -315,14 +318,14 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0];
 			
 			// Positions.***
-			if(!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
+			{ return false; }
 		
 			// TexCoords.***
 			if (!bDepth)
 			{
-				if(!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
-					return false;
+				if (!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
+				{ return false; }
 			}
 			
 			// Normals.***
@@ -332,8 +335,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 			// todo:
 			
 			// Indices.***
-			if(!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
+			{ return false; }
 			
 			var indicesCount = vboKey.indicesCount;
 			
@@ -552,12 +555,12 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			lonArray[idx] = currLon;
 			latArray[idx] = currLat;
 			// Now set the altitude.***
-			if(altitudesSlice)
+			if (altitudesSlice)
 			{
 				altArray[idx] = altitudesSlice.getValue(currLonSeg, currLatSeg);
 			}
 			else
-				altArray[idx] = alt;
+			{ altArray[idx] = alt; }
 
 			// make texcoords.***
 			s = (currLon - minLon)/lonRange;
@@ -654,7 +657,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
 	
 	// TexCoords.***
-	if(this.texCoordsArray)
+	if (this.texCoordsArray)
 	{
 		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
 	}

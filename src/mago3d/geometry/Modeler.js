@@ -25,8 +25,8 @@ var Modeler = function()
  */
 Modeler.prototype.addPointToPolyline = function(point2d) 
 {
-	if(this.polyLine2d === undefined)
-		this.polyLine2d = new PolyLine2D();
+	if (this.polyLine2d === undefined)
+	{ this.polyLine2d = new PolyLine2D(); }
 	
 	this.polyLine2d.newPoint2d(point2d.x, point2d.y);
 };
@@ -38,12 +38,12 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 Modeler.prototype.render = function(magoManager, shader) 
 {
 	// 1rst, render the planeGrid if exist.***
-	if(this.planeGrid !== undefined)
+	if (this.planeGrid !== undefined)
 	{
 		this.planeGrid.render(magoManager, shader);
 	}
 	
-	if(this.polyLine2d !== undefined)
+	if (this.polyLine2d !== undefined)
 	{
 		// Provisionally render the polyLine2d on the sketch plane here.***
 		var points2dCount = this.polyLine2d.getPointsCount();
@@ -57,19 +57,19 @@ Modeler.prototype.render = function(magoManager, shader)
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 
 {
 	// Test function.***
-	if(width === undefined)
-		width = 500.0;
+	if (width === undefined)
+	{ width = 500.0; }
 	
-	if(height === undefined)
-		height = 500.0;
+	if (height === undefined)
+	{ height = 500.0; }
 	
-	if(numCols === undefined)
-		numCols = 50;
+	if (numCols === undefined)
+	{ numCols = 50; }
 	
-	if(numRows === undefined)
-		numRows = 50;
+	if (numRows === undefined)
+	{ numRows = 50; }
 	
-	if(this.planeGrid === undefined)
+	if (this.planeGrid === undefined)
 	{
 		this.planeGrid = new PlaneGrid(width, height, numCols, numRows);
 	}

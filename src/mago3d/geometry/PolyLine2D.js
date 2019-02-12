@@ -34,8 +34,8 @@ PolyLine2D.prototype.newPoint2d = function(x, y)
  */
 PolyLine2D.prototype.getPointsCount = function()
 {
-	if(this.point2dArray === undefined)
-		return 0;
+	if (this.point2dArray === undefined)
+	{ return 0; }
 	
 	return this.point2dArray.length;
 };

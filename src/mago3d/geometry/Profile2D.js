@@ -383,7 +383,7 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 		{
 			computingPolygon = resultPolygon;
 			
-			if (innerRingsArray.length == 1)
+			if (innerRingsArray.length === 1)
 			{
 				finished = true;
 				break;

@@ -28,17 +28,17 @@ var PlaneGrid = function(width, height, numCols, numRows)
  */
 PlaneGrid.prototype.setSize = function(width, height, numCols, numRows) 
 {
-	if(width !== undefined)
-		this.width = width;
+	if (width !== undefined)
+	{ this.width = width; }
 	
-	if(height !== undefined)
-		this.height = height;
+	if (height !== undefined)
+	{ this.height = height; }
 	
-	if(numCols !== undefined)
-		this.numCols = numCols;
+	if (numCols !== undefined)
+	{ this.numCols = numCols; }
 	
-	if(numRows !== undefined)
-		this.numRows = numRows;
+	if (numRows !== undefined)
+	{ this.numRows = numRows; }
 };
 
 /**
@@ -46,8 +46,8 @@ PlaneGrid.prototype.setSize = function(width, height, numCols, numRows)
  */
 PlaneGrid.prototype.render = function(magoManager, shader) 
 {
-	if(this.vboKeysContainer === undefined)
-		return;
+	if (this.vboKeysContainer === undefined)
+	{ return; }
 	
 	var gl = magoManager.sceneState.gl;
 	var vboMemManager = magoManager.vboMemoryManager;
@@ -76,36 +76,39 @@ PlaneGrid.prototype.render = function(magoManager, shader)
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 
 		// Positions.***
-		if(vboKey.vboBufferPos!== undefined && !vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (vboKey.vboBufferPos!== undefined && !vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		// Normals.***
-		if(vboKey.vboBufferNor!== undefined)
+		if (vboKey.vboBufferNor!== undefined)
 		{
-			if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
 
 		// Colors.***
-		if(vboKey.vboBufferCol!== undefined)
+		if (vboKey.vboBufferCol!== undefined)
 		{
-			if(!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
 		// TexCoords.***
-		if(vboKey.vboBufferTCoord!== undefined)
+		if (vboKey.vboBufferTCoord!== undefined)
 		{
-			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 		
@@ -143,7 +146,7 @@ PlaneGrid.prototype.makeVbo = function(vboMemManager)
 	// Vertical lines. "y" are constant.***
 	y1 = leftDownPoint.y; // down.***
 	y2 = leftUpPoint.y; // up.***
-	for(var col = 0; col < this.numCols; col++)
+	for (var col = 0; col < this.numCols; col++)
 	{
 		x1 = leftDownPoint.x + col * increX;
 		x2 = x1;
@@ -158,7 +161,7 @@ PlaneGrid.prototype.makeVbo = function(vboMemManager)
 	// Horizontal lines.***
 	x1 = leftDownPoint.x; // left.***
 	x2 = rightDownPoint.x; // right.***
-	for(var row = 0; row < this.numRows; row++)
+	for (var row = 0; row < this.numRows; row++)
 	{
 		y1 = leftDownPoint.y + row * increY;
 		y2 = y1;
@@ -170,8 +173,8 @@ PlaneGrid.prototype.makeVbo = function(vboMemManager)
 		positionsArray[idx] = alt; idx++;
 	}
 	
-	if(this.vboKeysContainer === undefined)
-		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+	if (this.vboKeysContainer === undefined)
+	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
 	var vbo = this.vboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(positionsArray, vboMemManager);

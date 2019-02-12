@@ -265,7 +265,7 @@ Globe.atan2Test = function(y, x)
 			return Math.atan(y/x) - M_PI;
 		}
 	}
-	else if (x == 0.0)
+	else if (x === 0.0)
 	{
 		if (y>0.0)
 		{
@@ -332,7 +332,7 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result)
 		lambda,
 		s2;
 
-	if (evoluteBorderTest > 0 || q != 0) 
+	if (evoluteBorderTest > 0 || q !== 0) 
 	{
 		if (evoluteBorderTest > 0) 
 		{
@@ -512,7 +512,7 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 	var h;
 	
 	var coordsCount = lonArray.length;
-	if(resultCartesianArray === undefined)
+	if (resultCartesianArray === undefined)
 	{
 		resultCartesianArray = new Float32Array(coordsCount*3);
 	}

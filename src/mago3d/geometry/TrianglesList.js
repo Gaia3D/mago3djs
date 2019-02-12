@@ -193,8 +193,11 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 	var vertex;
 	for (var key in verticesMap)
 	{
-		vertex = verticesMap[key];
-		resultVerticesArray.push(vertex);
+		if (Object.prototype.hasOwnProperty.call(verticesMap, key))
+		{
+			vertex = verticesMap[key];
+			resultVerticesArray.push(vertex);
+		}
 	}
 	
 	return resultVerticesArray;

@@ -342,16 +342,16 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	// Take the 1rst vertex.***
 	vertex = vertexArray[0];
 	if (vertex.point3d === undefined)
-		{ return resultVbo; }
+	{ return resultVbo; }
 	
-	if(vertex.normal !== undefined)
-		hasNormals = true;
+	if (vertex.normal !== undefined)
+	{ hasNormals = true; }
 	
-	if(vertex.color4 !== undefined)
-		hasColors = true;
+	if (vertex.color4 !== undefined)
+	{ hasColors = true; }
 	
-	if(vertex.texCoord !== undefined)
-		hasTexCoords = true;
+	if (vertex.texCoord !== undefined)
+	{ hasTexCoords = true; }
 	
 	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).***
 	var posVboDataArray, norVboDataArray, colVboDataArray, tcoordVboDataArray;

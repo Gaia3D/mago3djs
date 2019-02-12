@@ -63,12 +63,12 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 	
 	// Now, calculate angularSpeeds.***
 	// Heading.***
-	if(this.targetHeading !== undefined)
+	if (this.targetHeading !== undefined)
 	{
 		var increHeading = this.targetHeading - this.heading;
 		this.headingAngularSpeed = increHeading/transitionTimeSec;
 		
-		if(this.headingAngularSpeed === 0)
+		if (this.headingAngularSpeed === 0)
 		{
 			this.targetHeading = undefined;
 			this.headingAngularSpeed = undefined;
@@ -76,12 +76,12 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 	}
 	
 	// Pitch.***
-	if(this.targetPitch !== undefined)
+	if (this.targetPitch !== undefined)
 	{
 		var increPitch = this.targetPitch - this.pitch;
 		this.pitchAngularSpeed = increPitch/transitionTimeSec;
 		
-		if(this.pitchAngularSpeed === 0)
+		if (this.pitchAngularSpeed === 0)
 		{
 			this.targetPitch = undefined;
 			this.pitchAngularSpeed = undefined;
@@ -89,12 +89,12 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 	}
 	
 	// Roll.***
-	if(this.targetRoll !== undefined)
+	if (this.targetRoll !== undefined)
 	{
 		var increRoll = this.targetRoll - this.roll;
 		this.rollAngularSpeed = increRoll/transitionTimeSec;
 		
-		if(this.rollAngularSpeed === 0)
+		if (this.rollAngularSpeed === 0)
 		{
 			this.targetRoll = undefined;
 			this.rollAngularSpeed = undefined;
@@ -107,8 +107,8 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 CCTV.prototype.updateOrientation = function(currTime)
 {
 	// Check if camera is rotating.***
-	if(this.targetHeading === undefined && this.targetPitch === undefined && this.targetRoll === undefined)
-		return;
+	if (this.targetHeading === undefined && this.targetPitch === undefined && this.targetRoll === undefined)
+	{ return; }
 	
 	if (this.lastTime === undefined)
 	{ this.lastTime = currTime; }
@@ -116,29 +116,30 @@ CCTV.prototype.updateOrientation = function(currTime)
 	var timeAmount = (currTime - this.lastTime)/1000;
 	
 	// Heading.***
-	if(this.headingAngularSpeed !== undefined)
+	if (this.headingAngularSpeed !== undefined)
 	{
 		this.heading += timeAmount * this.headingAngularSpeed;
 		// Check if heading arrived to targetHeading.***
-		if(this.headingAngularSpeed > 0)
+		if (this.headingAngularSpeed > 0)
 		{
 			// Camera is rotating ccw.***
-			if(this.heading >= this.targetHeading)
+			if (this.heading >= this.targetHeading)
 			{
 				this.heading = this.targetHeading;
 				this.targetHeading = undefined;
 			}
 		}
-		else{
+		else 
+		{
 			// Camera is rotating cw.***
-			if(this.heading <= this.targetHeading)
+			if (this.heading <= this.targetHeading)
 			{
 				this.heading = this.targetHeading;
 				this.targetHeading = undefined;
 			}
 		}
 		
-		if(this.headingAngularSpeed === 0)
+		if (this.headingAngularSpeed === 0)
 		{
 			this.targetHeading = undefined;
 			this.headingAngularSpeed = undefined;
@@ -146,30 +147,31 @@ CCTV.prototype.updateOrientation = function(currTime)
 	}
 	
 	// Pitch.***
-	if(this.pitchAngularSpeed !== undefined)
+	if (this.pitchAngularSpeed !== undefined)
 	{
 		this.pitch += timeAmount * this.pitchAngularSpeed;
 		
 		// Check if pitch arrived to targetPitch.***
-		if(this.pitchAngularSpeed > 0)
+		if (this.pitchAngularSpeed > 0)
 		{
 			// Camera is rotating ccw.***
-			if(this.pitch >= this.targetPitch)
+			if (this.pitch >= this.targetPitch)
 			{
 				this.pitch = this.targetPitch;
 				this.targetPitch = undefined;
 			}
 		}
-		else{
+		else
+		{
 			// Camera is rotating cw.***
-			if(this.pitch <= this.targetPitch)
+			if (this.pitch <= this.targetPitch)
 			{
 				this.pitch = this.targetPitch;
 				this.targetPitch = undefined;
 			}
 		}
 		
-		if(this.pitchAngularSpeed === 0)
+		if (this.pitchAngularSpeed === 0)
 		{
 			this.targetPitch = undefined;
 			this.pitchAngularSpeed = 0;
@@ -177,29 +179,30 @@ CCTV.prototype.updateOrientation = function(currTime)
 	}
 	
 	// Roll.***
-	if(this.rollAngularSpeed !== undefined)
+	if (this.rollAngularSpeed !== undefined)
 	{
 		this.roll += timeAmount * this.rollAngularSpeed;
 		// Check if pitch arrived to targetPitch.***
-		if(this.rollAngularSpeed > 0)
+		if (this.rollAngularSpeed > 0)
 		{
 			// Camera is rotating ccw.***
-			if(this.roll >= this.targetRoll)
+			if (this.roll >= this.targetRoll)
 			{
 				this.roll = this.targetRoll;
 				this.targetRoll = undefined;
 			}
 		}
-		else{
+		else 
+		{
 			// Camera is rotating cw.***
-			if(this.roll <= this.targetRoll)
+			if (this.roll <= this.targetRoll)
 			{
 				this.roll = this.targetRoll;
 				this.targetRoll = undefined;
 			}
 		}
 		
-		if(this.rollAngularSpeed === 0)
+		if (this.rollAngularSpeed === 0)
 		{
 			this.targetRoll = undefined;
 			this.rollAngularSpeed = undefined;
@@ -704,10 +707,10 @@ CCTVList.prototype.getCCTVByName = function(cameraName)
 	var camerasCount = this.getCCTVCount();
 	var i=0;
 	var cam, resultCam;
-	while(!find && i<camerasCount)
+	while (!find && i<camerasCount)
 	{
 		cam = this.getCCTV(i);
-		if(cam.name === cameraName)
+		if (cam.name === cameraName)
 		{
 			resultCam = cam;
 			find = true;
@@ -731,8 +734,8 @@ CCTVList.prototype.render = function(magoManager, shader)
 {
 	var cctvsCount = this.getCCTVCount();
 	
-	if(cctvsCount === 0)
-		return;
+	if (cctvsCount === 0)
+	{ return; }
 	
 	var gl = magoManager.sceneState.gl;
 	shader.resetLastBuffersBinded();

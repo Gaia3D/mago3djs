@@ -195,8 +195,11 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	var vertex;
 	for (var key in verticesMap)
 	{
-		vertex = verticesMap[key];
-		resultVerticesArray.push(vertex);
+		if (Object.prototype.hasOwnProperty.call(verticesMap, key))
+		{
+			vertex = verticesMap[key];
+			resultVerticesArray.push(vertex);
+		}
 	}
 	
 	return resultVerticesArray;
@@ -432,47 +435,50 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 		
 		// Positions.***
-		if(!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
 		// Normals.***
 		if (vboKey.vboBufferNor)
 		{
-			if(!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
 		
 		// Colors.***
 		if (vboKey.vboBufferCol)
 		{
-			if(!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
 		// TexCoords.***
 		if (vboKey.vboBufferTCoord)
 		{
-			if(!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
-		else{
+		else 
+		{
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 		
 		// Indices.***
-		if(!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
-		if(glPrimitive)
-			primitive = glPrimitive;
+		if (glPrimitive)
+		{ primitive = glPrimitive; }
 		else
-			primitive = gl.TRIANGLES;
+		{ primitive = gl.TRIANGLES; }
 		
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}

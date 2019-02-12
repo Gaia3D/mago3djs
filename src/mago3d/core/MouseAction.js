@@ -37,13 +37,13 @@ var MouseAction = function()
 
 MouseAction.prototype.clearStartPositionsAux = function()
 {
-	if(this.strWorldPointAux)
+	if (this.strWorldPointAux)
 	{
 		this.strWorldPointAux.deleteObjects();
 	}
 	this.strWorldPointAux = undefined;
 		
-	if(this.strLocationAux)
+	if (this.strLocationAux)
 	{
 		this.strLocationAux.deleteObjects();
 	}
@@ -63,8 +63,8 @@ MouseAction.prototype.claculateStartPositionsAux = function(magoManager)
 	strCamPos.set(magoManager.resultRaySC[0] * strRealDepth, magoManager.resultRaySC[1] * strRealDepth, magoManager.resultRaySC[2] * strRealDepth);
 	this.strWorldPointAux = magoManager.cameraCoordPositionToWorldCoord(strCamPos, this.strWorldPointAux);
 	
-	if(this.strWorldPointAux === undefined)
-		var hola = 0;
+	if (this.strWorldPointAux === undefined)
+	{ var hola = 0; }
 	
 	this.strLocationAux = ManagerUtils.pointToGeographicCoord(this.strWorldPointAux, undefined, magoManager);
 };

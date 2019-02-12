@@ -37,15 +37,15 @@ CODE.modelerMode = {
 };
 
 CODE.modelerDrawingState = {
-	"NO_STARTED"  : 0,
-	"STARTED"     : 1
+	"NO_STARTED" : 0,
+	"STARTED"    : 1
 };
 
 CODE.modelerDrawingElement = {
-	"NOTHING"      : 0,
-	"POINTS"       : 1,
-	"LINES"        : 2,
-	"POLYLINES"    : 3
+	"NOTHING"   : 0,
+	"POINTS"    : 1,
+	"LINES"     : 2,
+	"POLYLINES" : 3
 };
 
 CODE.PROJECT_ID_PREFIX = "projectId_";

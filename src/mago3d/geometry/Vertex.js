@@ -133,8 +133,8 @@ Vertex.prototype.copyFrom = function(vertex)
  */
 Vertex.prototype.setPosition = function(x, y, z) 
 {
-	if(this.point3d === undefined)
-		this.point3d = new Point3D();
+	if (this.point3d === undefined)
+	{ this.point3d = new Point3D(); }
 	
 	this.point3d.set(x, y, z);
 };
@@ -147,7 +147,7 @@ Vertex.prototype.setPosition = function(x, y, z)
 Vertex.prototype.setTexCoord = function(s, t) 
 {
 	if (this.texCoord === undefined)
-		{ this.texCoord = new Point2D(); }
+	{ this.texCoord = new Point2D(); }
 	
 	this.texCoord.set(s, t);
 };
@@ -205,8 +205,8 @@ Vertex.prototype.translate = function(dx, dy, dz)
  */
 Vertex.prototype.getOutingHEdges = function(resultHedgesArray) 
 {
-	if(resultHedgesArray === undefined)
-		resultHedgesArray = [];
+	if (resultHedgesArray === undefined)
+	{ resultHedgesArray = []; }
 	
 	// todo:
 	

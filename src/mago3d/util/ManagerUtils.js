@@ -25,7 +25,8 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
 		origin = globe.computePositionFromPoint(point.x, point.y, point.z, origin);
 		resultGeographicCoord.setLonLatAlt(origin.longitude, origin.latitude, origin.altitude);
 	}
-	else{
+	else 
+	{
 		var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
 		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.altitude);
 	}

@@ -38,13 +38,13 @@ GeographicExtent.prototype.deleteObjects = function()
  */
 GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt) 
 {
-	if(this.minGeographicCoord === undefined)
-		this.minGeographicCoord = new GeographicCoord();
+	if (this.minGeographicCoord === undefined)
+	{ this.minGeographicCoord = new GeographicCoord(); }
 	
 	this.minGeographicCoord.setLonLatAlt(minLon, minLat, minAlt);
 	
-	if(this.maxGeographicCoord === undefined)
-		this.maxGeographicCoord = new GeographicCoord();
+	if (this.maxGeographicCoord === undefined)
+	{ this.maxGeographicCoord = new GeographicCoord(); }
 	
 	this.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
 };

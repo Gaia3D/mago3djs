@@ -758,7 +758,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var geoLocationData = rootNodeSelected.data.geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLocationData === undefined)		{ return; }
 
-		if(magoManager.magoPolicy.objectMoveMode === CODE.moveMode.ALL)
+		if (magoManager.magoPolicy.objectMoveMode === CODE.moveMode.ALL)
 		{
 			var increDeg = 3.0;
 			var currentHeading = geoLocationData.heading || 0;
@@ -818,8 +818,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			}
 
 			if (displayData)
-			{ magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, 
-							currentAlt, currentHeading, currentPitch, currentRoll); }
+			{
+				magoManager.changeLocationAndRotationNode(nodeSelected, geoLocationData.geographicCoord.latitude, geoLocationData.geographicCoord.longitude, 
+					currentAlt, currentHeading, currentPitch, currentRoll); 
+			}
 		}
 
 	}, false);

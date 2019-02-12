@@ -113,7 +113,7 @@ BlocksList.prototype.getBlock = function(idx)
  */
 BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
-	if(this.xhr !== undefined)
+	if (this.xhr !== undefined)
 	{
 		this.xhr.abort();
 		this.xhr = undefined;

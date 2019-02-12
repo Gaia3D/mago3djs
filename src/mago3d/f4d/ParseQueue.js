@@ -182,19 +182,22 @@ ParseQueue.prototype.parseArrayOctreesPCloud = function(gl, octreesArray, magoMa
 		{
 			for (var key in this.octreesPCloudToParseMap)
 			{
-				lowestOctree = this.octreesPCloudToParseMap[key];
-				if (this.eraseOctreePCloudToParse(lowestOctree))
+				if (Object.prototype.hasOwnProperty.call(this.octreesPCloudToParseMap, key))
 				{
-					if (lowestOctree.lego === undefined)
-					{ continue; }
-					
-					lowestOctree.lego.parsePointsCloudData(lowestOctree.lego.dataArrayBuffer, gl, magoManager);
-					lowestOctree.lego.dataArrayBuffer = undefined;
-					
-					octreesParsedCount++;
+					lowestOctree = this.octreesPCloudToParseMap[key];
+					if (this.eraseOctreePCloudToParse(lowestOctree))
+					{
+						if (lowestOctree.lego === undefined)
+						{ continue; }
+						
+						lowestOctree.lego.parsePointsCloudData(lowestOctree.lego.dataArrayBuffer, gl, magoManager);
+						lowestOctree.lego.dataArrayBuffer = undefined;
+						
+						octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }	
 				
 			}
 		}
@@ -222,14 +225,14 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 			lowestOctree = octreesArray[i];
 			
 			// Check if has pCloudPartitions.***
-			if(lowestOctree.pCloudPartitionsArray === undefined)
-				continue;
+			if (lowestOctree.pCloudPartitionsArray === undefined)
+			{ continue; }
 			
 			var pCloudPartitionsCount = lowestOctree.pCloudPartitionsArray.length;
-			for(var j=0; j<pCloudPartitionsCount; j++)
+			for (var j=0; j<pCloudPartitionsCount; j++)
 			{
 				var pCloudPartition = lowestOctree.pCloudPartitionsArray[j];
-				if(this.eraseOctreePCloudPartitionToParse(pCloudPartition))
+				if (this.eraseOctreePCloudPartitionToParse(pCloudPartition))
 				{
 					pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
 					octreesParsedCount++;
@@ -238,13 +241,13 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 			
 			//if (this.eraseOctreePCloudPartitionToParse(lowestOctree))
 			//{
-				//if (lowestOctree.lego === undefined)
-				//{ continue; }
+			//if (lowestOctree.lego === undefined)
+			//{ continue; }
 				
-				//lowestOctree.lego.parsePointsCloudData(gl, lowestOctree.lego.dataArrayBuffer, magoManager);
-				//lowestOctree.lego.dataArrayBuffer = undefined;
+			//lowestOctree.lego.parsePointsCloudData(gl, lowestOctree.lego.dataArrayBuffer, magoManager);
+			//lowestOctree.lego.dataArrayBuffer = undefined;
 				
-				//octreesParsedCount++;
+			//octreesParsedCount++;
 			//}
 			if (octreesParsedCount > maxParsesCount)
 			{ break; }
@@ -254,20 +257,22 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 		{
 			for (var key in this.octreesPCloudPartitionToParseMap)
 			{
-				lowestOctree = this.octreesPCloudPartitionToParseMap[key];
-				if (this.eraseOctreePCloudPartitionToParse(lowestOctree))
+				if (Object.prototype.hasOwnProperty.call(this.octreesPCloudPartitionToParseMap, key))
 				{
-					//if (lowestOctree.lego === undefined)
-					//{ continue; }
-					
-					pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
-					octreesParsedCount++;
-					
-					//octreesParsedCount++;
+					lowestOctree = this.octreesPCloudPartitionToParseMap[key];
+					if (this.eraseOctreePCloudPartitionToParse(lowestOctree))
+					{
+						//if (lowestOctree.lego === undefined)
+						//{ continue; }
+						
+						pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
+						octreesParsedCount++;
+						
+						//octreesParsedCount++;
+					}
+					if (octreesParsedCount > maxParsesCount)
+					{ break; }	
 				}
-				if (octreesParsedCount > maxParsesCount)
-				{ break; }	
-				
 			}
 		}
 		

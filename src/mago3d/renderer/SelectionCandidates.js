@@ -21,7 +21,7 @@ var SelectionCandidateFamily = function()
  */
 SelectionCandidateFamily.prototype.setCandidate = function(idxKey, candidate)
 {
-	if(idxKey !== undefined && candidate)
+	if (idxKey !== undefined && candidate)
 	{
 		this.candidatesMap[idxKey] = candidate;
 	}
@@ -118,7 +118,7 @@ SelectionManager.prototype.getSelectionCandidatesFamily = function(familyName)
 SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, object)
 {
 	var selCandidatesFamily = this.getSelectionCandidatesFamily(familyName);
-	if(selCandidatesFamily)
+	if (selCandidatesFamily)
 	{
 		selCandidatesFamily.setCandidate(idxKey, object);
 	}
@@ -166,10 +166,14 @@ SelectionManager.prototype.clearCandidates = function()
 	this.buildingsMap = {};
 	this.nodesMap = {};
 	
-	for(var key in this.selCandidatesFamilyMap)
+	for (var key in this.selCandidatesFamilyMap)
 	{
-		var selCandidateFamily = this.selCandidatesFamilyMap[key];
-		selCandidateFamily.clearCandidate();
+		if (Object.prototype.hasOwnProperty.call(this.selCandidatesFamilyMap, key))
+		{
+			var selCandidateFamily = this.selCandidatesFamilyMap[key];
+			selCandidateFamily.clearCandidate();
+		}
+
 	}
 };
 
@@ -186,10 +190,13 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 	this.currentBuildingSelected = this.buildingsMap[idxKey];
 	this.currentNodeSelected = this.nodesMap[idxKey];
 	
-	for(var key in this.selCandidatesFamilyMap)
+	for (var key in this.selCandidatesFamilyMap)
 	{
-		var selCandidateFamily = this.selCandidatesFamilyMap[key];
-		selCandidateFamily.selectObject(idxKey);
+		if (Object.prototype.hasOwnProperty.call(this.selCandidatesFamilyMap, key))
+		{
+			var selCandidateFamily = this.selCandidatesFamilyMap[key];
+			selCandidateFamily.selectObject(idxKey);
+		}
 	}
 };
 
@@ -206,9 +213,12 @@ SelectionManager.prototype.clearCurrents = function(idxKey)
 	this.currentBuildingSelected = undefined;
 	this.currentNodeSelected = undefined;
 	
-	for(var key in this.selCandidatesFamilyMap)
+	for (var key in this.selCandidatesFamilyMap)
 	{
-		var selCandidateFamily = this.selCandidatesFamilyMap[key];
-		selCandidateFamily.clearCurrentSelected();
+		if (Object.prototype.hasOwnProperty.call(this.selCandidatesFamilyMap, key))
+		{
+			var selCandidateFamily = this.selCandidatesFamilyMap[key];
+			selCandidateFamily.clearCurrentSelected();
+		}
 	}
 };

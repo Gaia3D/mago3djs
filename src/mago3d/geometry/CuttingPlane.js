@@ -21,8 +21,8 @@ var CuttingPlane = function()
 CuttingPlane.prototype.getPlane = function()
 {
 	// Calculate plane.***
-	if(this.plane === undefined)
-		this.plane = new Plane();
+	if (this.plane === undefined)
+	{ this.plane = new Plane(); }
 	
 	// In the transformationMatrix there are the normal of the plane.***
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
@@ -36,8 +36,8 @@ CuttingPlane.prototype.getPlane = function()
 CuttingPlane.prototype.makeRectangle = function(width, height)
 {
 	// Provisional function.***
-	if(this.mesh === undefined)
-		this.mesh = new Mesh();
+	if (this.mesh === undefined)
+	{ this.mesh = new Mesh(); }
 	
 	var vertexList = this.mesh.getVertexList();
 	var semiWidth = width/2;
@@ -73,14 +73,14 @@ CuttingPlane.prototype.render = function(magoManager, shader, renderType)
 {
 	var gl = magoManager.sceneState.gl;
 	var glPrimitive;
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		// colorCoding selection.***
 		var selectionColor = magoManager.selectionColor;
 		var selFamilyName = "general";
 		var selManager = magoManager.selectionManager;
 		var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyName);
-		if(selCandidateNodes === undefined)
+		if (selCandidateNodes === undefined)
 		{
 			selCandidateNodes = selManager.newCandidatesFamily(selFamilyName);
 		}
@@ -91,7 +91,7 @@ CuttingPlane.prototype.render = function(magoManager, shader, renderType)
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		gl.uniform4fv(shader.oneColor4_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
 	}
-	else if(renderType === 1)
+	else if (renderType === 1)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.0, 1.0]);
@@ -99,7 +99,7 @@ CuttingPlane.prototype.render = function(magoManager, shader, renderType)
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		glPrimitive = gl.LINE_LOOP;
 	}
-	else if(renderType === 0)
+	else if (renderType === 0)
 	{
 		var refMatrixType = 0; // identity matrix.***
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);

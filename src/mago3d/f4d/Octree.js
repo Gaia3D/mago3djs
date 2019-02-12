@@ -191,11 +191,11 @@ Octree.prototype.deletePCloudObjects = function(gl, vboMemManager)
 	//this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
 	//this.pCloudPartitionsArray;
 	
-	if(this.pCloudPartitionsArray === undefined)
-		return;
+	if (this.pCloudPartitionsArray === undefined)
+	{ return; }
 	
 	var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
-	for(var i=0; i<pCloudPartitionsCount; i++)
+	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
 		var pCloudPartition = this.pCloudPartitionsArray[i];
 		// Note: provisionally "pCloudPartition" is a lego class object.***
@@ -206,7 +206,7 @@ Octree.prototype.deletePCloudObjects = function(gl, vboMemManager)
 	
 	// Now, delete child.***
 	var childsCount = this.subOctrees_array.length;
-	for(var i=0; i<childsCount; i++)
+	for (var i=0; i<childsCount; i++)
 	{
 		var subOctree = this.subOctrees_array[i];
 		subOctree.deletePCloudObjects(gl, vboMemManager);
@@ -560,36 +560,36 @@ Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, 
  */
 Octree.prototype.preparePCloudData = function(magoManager, neoBuilding) 
 {
-	if(this.pCloudPartitionsCount === undefined && this.pCloudPartitionsCount === 0)
-		return;
+	if (this.pCloudPartitionsCount === undefined && this.pCloudPartitionsCount === 0)
+	{ return; }
 	
-	if(this.pCloudPartitionsArray === undefined)
-		this.pCloudPartitionsArray = [];
+	if (this.pCloudPartitionsArray === undefined)
+	{ this.pCloudPartitionsArray = []; }
 	
 	var pCloudPartitionsCount = this.pCloudPartitionsCount;
 		
-	if(this.lod === 1)
-		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-	else if(this.lod > 1)
-		pCloudPartitionsCount = 1;
+	if (this.lod === 1)
+	{ pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2); }
+	else if (this.lod > 1)
+	{ pCloudPartitionsCount = 1; }
 	
-	for(var i=0; i<pCloudPartitionsCount; i++)
+	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
-		if( i < this.pCloudPartitionsArray.length )
+		if ( i < this.pCloudPartitionsArray.length )
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
-			if(pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				// Parse data.***
-				if(magoManager.parseQueue.pCloudPartitionsParsed < 2)
+				if (magoManager.parseQueue.pCloudPartitionsParsed < 2)
 				{
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
 					return true;
 				}
-				if(magoManager.parseQueue.pCloudPartitionsParsed >= 2)
-				return true;
+				if (magoManager.parseQueue.pCloudPartitionsParsed >= 2)
+				{ return true; }
 			}
 			
 		}
@@ -597,7 +597,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 		{
 			// Create the pCloudPartition.***
 			var readWriter = magoManager.readerWriter;
-			if(readWriter.pCloudPartitions_requested < 4)
+			if (readWriter.pCloudPartitions_requested < 4)
 			{
 				var pCloudPartitionLego = new Lego();
 				this.pCloudPartitionsArray.push(pCloudPartitionLego);
@@ -632,8 +632,8 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	// 1rst, check the number of partitions of data.***
 	var partitionsCount = this.pCloudPartitionsCount;
 	
-	if(partitionsCount === undefined || partitionsCount === 0)
-		return;
+	if (partitionsCount === undefined || partitionsCount === 0)
+	{ return; }
 	
 	// Determine the distance from camera.***
 	var magoPolicy = magoManager.magoPolicy;
@@ -657,9 +657,9 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	if (frustumCull !== Constant.INTERSECTION_OUTSIDE ) 
 	{
 		// Check if pCloud data is loaded.***
-		if(bPrepareData)
+		if (bPrepareData)
 		{
-			if(this.preparePCloudData(magoManager, neoBuilding))
+			if (this.preparePCloudData(magoManager, neoBuilding))
 			{
 				bPrepareData = false;
 			}
@@ -669,27 +669,27 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
 		var ssao_idx = 1;
-		if(this.pCloudPartitionsArray === undefined)
-			return;
+		if (this.pCloudPartitionsArray === undefined)
+		{ return; }
 		
 		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
 		
-		if(this.lod === 1)
+		if (this.lod === 1)
 		{
 			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-			if(pCloudPartitionsCount > 10)
-				pCloudPartitionsCount = 10;
+			if (pCloudPartitionsCount > 10)
+			{ pCloudPartitionsCount = 10; }
 		}
-		else if(this.lod > 1)
-			pCloudPartitionsCount = 1;
+		else if (this.lod > 1)
+		{ pCloudPartitionsCount = 1; }
 		
 		// Test.***
 		//pCloudPartitionsCount = 1;
 		
-		for(var i=0; i<pCloudPartitionsCount; i++)
+		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
-			if(pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
+			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
 			{
 				// render.***
 				var posCompressed = pCloudPartition.bPositionsCompressed;
@@ -712,13 +712,13 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	else
 	{
 		// Delete unnecessary objects if ditToCam is big.***
-		if(distToCamera > 50.0)
+		if (distToCamera > 50.0)
 		{
 			// Put octree to delete pCloud, but before, delete from the parseQueue.***
-			if(this.pCloudPartitionsArray !== undefined)
+			if (this.pCloudPartitionsArray !== undefined)
 			{
 				var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
-				for(var i=0; i<pCloudPartitionsCount; i++)
+				for (var i=0; i<pCloudPartitionsCount; i++)
 				{
 					var pCloudPartition = this.pCloudPartitionsArray[i];
 					magoManager.parseQueue.eraseOctreePCloudPartitionToParse(pCloudPartition);

@@ -339,7 +339,7 @@ MagoManager.prototype.testButtonOnClick = function()
 {
 	// Test to reorient a camera.***
 	if (this.cctvList === undefined)
-		return;
+	{ return; }
 	
 	var cam = this.cctvList.getCCTVByName("CCTV6");
 	var timeInSeconds = 0.5;
@@ -733,7 +733,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
-		if(this.modeler !== undefined)
+		if (this.modeler !== undefined)
 		{
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();

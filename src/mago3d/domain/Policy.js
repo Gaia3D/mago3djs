@@ -242,18 +242,18 @@ Policy.prototype.setImagePath = function(imagePath)
 Policy.prototype.getLod = function(distInMeters) 
 {
 	var lod = -1;
-	if(distInMeters < this.lod0DistInMeters)
-		lod = 0;
-	else if(distInMeters < this.lod1DistInMeters)
-		lod = 1;
-	else if(distInMeters < this.lod2DistInMeters)
-		lod = 2;
-	else if(distInMeters < this.lod3DistInMeters)
-		lod = 3;
-	else if(distInMeters < this.lod4DistInMeters)
-		lod = 4;
+	if (distInMeters < this.lod0DistInMeters)
+	{ lod = 0; }
+	else if (distInMeters < this.lod1DistInMeters)
+	{ lod = 1; }
+	else if (distInMeters < this.lod2DistInMeters)
+	{ lod = 2; }
+	else if (distInMeters < this.lod3DistInMeters)
+	{ lod = 3; }
+	else if (distInMeters < this.lod4DistInMeters)
+	{ lod = 4; }
 	else 
-		lod = 5;
+	{ lod = 5; }
 	
 	return lod;	
 };

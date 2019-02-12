@@ -148,7 +148,7 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 
 	// normals.***
 	this.hasNormals = stream.readInt8();
-	if(this.hasNormals)
+	if (this.hasNormals)
 	{
 		// todo:
 	}
@@ -163,14 +163,14 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	
 	// texCoords.***
 	this.hasTexCoords = stream.readInt8();
-	if(this.hasTexCoords)
+	if (this.hasTexCoords)
 	{
 		// todo:
 	}
 	
 	// indices.***
 	this.hasIndices = stream.readInt8();
-	if(this.hasIndices)
+	if (this.hasIndices)
 	{
 		// todo:
 	}
@@ -277,8 +277,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		shader.disableVertexAttribArray(shader.color4_loc);
 		
 		// 1) Position.*********************************************
-		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		rendered = true;
@@ -289,8 +289,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{
-			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
 		else 
 		{
@@ -298,11 +298,11 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 
-		if(!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
-		if(!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		// TODO:
 		//if (vbo_vicky.meshColorCacheKey !== undefined )
@@ -323,8 +323,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 			
 			shader.disableVertexAttribArray(shader.color4_loc); 
 			
-			if(!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+			{ return false; }
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);

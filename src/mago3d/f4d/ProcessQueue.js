@@ -350,7 +350,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			{ continue; }
 		
 			var deleteMetaData = true;
-			if (key == 1)
+			if (key === 1)
 			{ deleteMetaData = false; }
 			this.deleteNeoBuilding(gl, neoBuilding, magoManager);
 		}
@@ -392,79 +392,88 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	var deletedCount = 0;
 	for (var key in this.nodesToDeleteLessThanLod3Map)
 	{
-		node = this.nodesToDeleteLessThanLod3Map[key];
-		//node = nodesToDeleteLod2Lod4Lod5Array[i];
-		if (node.data === undefined)
-		{ continue; }
-	
-		if (this.eraseNodeToDeleteLessThanLod3(node))
+		if (Object.prototype.hasOwnProperty.call(this.nodesToDeleteLessThanLod3Map, key))
 		{
-			neoBuilding = node.data.neoBuilding;
-			if (neoBuilding === undefined)
+			node = this.nodesToDeleteLessThanLod3Map[key];
+			//node = nodesToDeleteLod2Lod4Lod5Array[i];
+			if (node.data === undefined)
 			{ continue; }
-			
-			if (neoBuilding.octree)
+		
+			if (this.eraseNodeToDeleteLessThanLod3(node))
 			{
-				neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
-			}
-			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
-			{
-				modelRefsDeletedCount ++;
-			}
+				neoBuilding = node.data.neoBuilding;
+				if (neoBuilding === undefined)
+				{ continue; }
 				
-			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
-			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
-			deletedCount++;
-			
-			if (deletedCount > 10)
-			{ break; }
+				if (neoBuilding.octree)
+				{
+					neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+				}
+				if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
+				{
+					modelRefsDeletedCount ++;
+				}
+					
+				neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+				neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+				deletedCount++;
+				
+				if (deletedCount > 10)
+				{ break; }
+			}
 		}
 	}
 	
 	deletedCount = 0;
 	for (var key in this.nodesToDeleteLessThanLod4Map)
 	{
-		node = this.nodesToDeleteLessThanLod4Map[key];
-		if (node.data === undefined)
-		{ continue; }
-	
-		if (this.eraseNodeToDeleteLessThanLod4(node))
+		if (Object.prototype.hasOwnProperty.call(this.nodesToDeleteLessThanLod4Map, key))
 		{
-			neoBuilding = node.data.neoBuilding;
-			if (neoBuilding === undefined)
+			node = this.nodesToDeleteLessThanLod4Map[key];
+			if (node.data === undefined)
 			{ continue; }
 		
-			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
-			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
-			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
-			deletedCount++;
+			if (this.eraseNodeToDeleteLessThanLod4(node))
+			{
+				neoBuilding = node.data.neoBuilding;
+				if (neoBuilding === undefined)
+				{ continue; }
 			
-			if (deletedCount > 10)
-			{ break; }
+				neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+				neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+				neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
+				deletedCount++;
+				
+				if (deletedCount > 10)
+				{ break; }
+			}
 		}
 	}
 	
 	deletedCount = 0;
 	for (var key in this.nodesToDeleteLessThanLod5Map)
 	{
-		node = this.nodesToDeleteLessThanLod5Map[key];
-		if (node.data === undefined)
-		{ continue; }
-	
-		if (this.eraseNodeToDeleteLessThanLod5(node))
+		if (Object.prototype.hasOwnProperty.call(this.nodesToDeleteLessThanLod5Map, key))
 		{
-			neoBuilding = node.data.neoBuilding;
-			if (neoBuilding === undefined)
+			node = this.nodesToDeleteLessThanLod5Map[key];
+			if (node.data === undefined)
 			{ continue; }
 		
-			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
-			neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
-			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
-			neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod4");
-			deletedCount++;
+			if (this.eraseNodeToDeleteLessThanLod5(node))
+			{
+				neoBuilding = node.data.neoBuilding;
+				if (neoBuilding === undefined)
+				{ continue; }
 			
-			if (deletedCount > 10)
-			{ break; }
+				neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+				neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
+				neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod3");
+				neoBuilding.deleteObjectsLodMesh(gl, magoManager.vboMemoryManager, "lod4");
+				deletedCount++;
+				
+				if (deletedCount > 10)
+				{ break; }
+			}
 		}
 	}
 	
@@ -474,80 +483,43 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	var deletedCount = 0;
 	for (var key in this.tinTerrainsToDeleteMap)
 	{
-		var tinTerrain = this.tinTerrainsToDeleteMap[key];
-		if (tinTerrain === undefined)
-		{ continue; }
-		
-		if (this.eraseTinTerrainToDelete(tinTerrain))
+		if (Object.prototype.hasOwnProperty.call(this.tinTerrainsToDeleteMap, key))
 		{
-			tinTerrain.deleteObjects(magoManager);
-			tinTerrain = undefined;
-			deletedCount++;
+			var tinTerrain = this.tinTerrainsToDeleteMap[key];
+			if (tinTerrain === undefined)
+			{ continue; }
+			
+			if (this.eraseTinTerrainToDelete(tinTerrain))
+			{
+				tinTerrain.deleteObjects(magoManager);
+				tinTerrain = undefined;
+				deletedCount++;
+			}
+			
+			if (deletedCount > 10)
+			{ break; }
 		}
-		
-		if (deletedCount > 10)
-		{ break; }
 	}
 	
 	// PointsCloud.***
 	var deletedCount = 0;
 	for (var key in this.octreeToDeletePCloudsMap)
 	{
-		var octree = this.octreeToDeletePCloudsMap[key];
-		if (octree === undefined)
-		{ continue; }
-		
-		if (this.eraseOctreeToDeletePCloud(octree))
+		if (Object.prototype.hasOwnProperty.call(this.octreeToDeletePCloudsMap, key))
 		{
-			octree.deletePCloudObjects(gl, magoManager.vboMemoryManager);
-			octree = undefined;
-			deletedCount++;
+			var octree = this.octreeToDeletePCloudsMap[key];
+			if (octree === undefined)
+			{ continue; }
+			
+			if (this.eraseOctreeToDeletePCloud(octree))
+			{
+				octree.deletePCloudObjects(gl, magoManager.vboMemoryManager);
+				octree = undefined;
+				deletedCount++;
+			}
+			
+			if (deletedCount > 5)
+			{ break; }
 		}
-		
-		if (deletedCount > 5)
-		{ break; }
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

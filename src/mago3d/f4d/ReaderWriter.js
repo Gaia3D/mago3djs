@@ -219,13 +219,13 @@ function loadWithXhr(fileName, xhr, timeOut)
 	// 1) 사용될 jQuery Deferred 객체를 생성한다.
 	var deferred = $.Deferred();
 	
-	if(xhr === undefined)
-		xhr = new XMLHttpRequest();
+	if (xhr === undefined)
+	{ xhr = new XMLHttpRequest(); }
 	
 	xhr.open("GET", fileName, true);
 	xhr.responseType = "arraybuffer";
-	if(timeOut !== undefined)
-		xhr.timeout = timeOut; // time in milliseconds
+	if (timeOut !== undefined)
+	{ xhr.timeout = timeOut; } // time in milliseconds
 	  
 	// 이벤트 핸들러를 등록한다.
 	xhr.onload = function() 
@@ -494,8 +494,8 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 	}).always(function() 
 	{
 		magoManager.readerWriter.pCloudPartitions_requested--;
-		if(magoManager.readerWriter.pCloudPartitions_requested < 0)
-			magoManager.readerWriter.pCloudPartitions_requested = 0;
+		if (magoManager.readerWriter.pCloudPartitions_requested < 0)
+		{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
 	});
 };
 
@@ -751,10 +751,10 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 			
 			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
-			if(metaData.projectDataType === 5)
-				bytesReaded = neoBuilding.octree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+			if (metaData.projectDataType === 5)
+			{ bytesReaded = neoBuilding.octree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding); }
 			else
-				bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding);
+			{ bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding); }
 
 			metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
 			metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
@@ -1172,24 +1172,24 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 			return;
 		}
 		
-		function createTexture(gl, filter, data, width, height) 
+		function createTexture(_gl, filter, data, width, height) 
 		{
-			var textureAux = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, textureAux);
+			var textureAux = _gl.createTexture();
+			_gl.bindTexture(_gl.TEXTURE_2D, textureAux);
 			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE);
+			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE);
+			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, filter);
+			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, filter);
 			if (data instanceof Uint8Array) 
 			{
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+				_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, data);
 			}
 			else 
 			{
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+				_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, data);
 			}
-			gl.bindTexture(gl.TEXTURE_2D, null);
+			_gl.bindTexture(_gl.TEXTURE_2D, null);
 			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 			return textureAux;
 		}
@@ -1247,7 +1247,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
 		
-		texture.fileLoadState == CODE.fileLoadState.READY;
+		texture.fileLoadState = CODE.fileLoadState.READY;
 		
 		magoManager.fileRequestControler.lowLodImagesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 0) { magoManager.fileRequestControler.lowLodImagesRequestedCount = 0; }

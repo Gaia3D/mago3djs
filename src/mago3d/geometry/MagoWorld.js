@@ -107,7 +107,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	mouseAction.strModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
 	// save the sphere pick.***
-	if(magoManager.globe !== undefined)
+	if (magoManager.globe !== undefined)
 	{
 		var camRay;
 		camRay = magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
@@ -151,7 +151,7 @@ MagoWorld.prototype.mouseup = function(event)
 
 MagoWorld.prototype.mouseclick = function(event)
 {
-	if(event.button === 0)
+	if (event.button === 0)
 	{
 		var mouseX = event.clientX;
 		var mouseY = event.clientY;
@@ -293,7 +293,7 @@ MagoWorld.prototype.mousemove = function(event)
 		var zRotAngRad = increX * 0.003;
 		var xRotAngRad = increY * 0.003;
 		
-		if (zRotAngRad === 0 && xRotAngRad == 0)
+		if (zRotAngRad === 0 && xRotAngRad === 0)
 		{ return; }
 		
 		if (this.rotMatX === undefined)

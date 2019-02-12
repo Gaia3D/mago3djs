@@ -31,21 +31,22 @@ var Color = function()
  */
 Color.grayToRGB_MagoStyle = function(gray, resultColor) 
 {
-	if(resultColor === undefined)
-		resultColor = new Color();
+	if (resultColor === undefined)
+	{ resultColor = new Color(); }
 	
-	if(gray > 1.0)gray = 1.0;
-	else if(gray<0.0)gray = 0.0;
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
 	
 	var r, g, b;
 	
 	r = -gray + 1.0;
 	
-	if(gray > 0.5)
+	if (gray > 0.5)
 	{
 		g = -gray*2.0 + 2.0; 
 	}
-	else{
+	else 
+	{
 		g = gray*2.0;
 	}
 	

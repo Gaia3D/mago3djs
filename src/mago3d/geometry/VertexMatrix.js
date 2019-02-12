@@ -294,11 +294,11 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
  */
 VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, texCoords2Array, colors4Array, numCols, numRows, resultVertexMatrix) 
 {
-	if(positions3Array === undefined)
-		return;
+	if (positions3Array === undefined)
+	{ return; }
 	
-	if(resultVertexMatrix === undefined)
-		resultVertexMatrix = new VertexMatrix();
+	if (resultVertexMatrix === undefined)
+	{ resultVertexMatrix = new VertexMatrix(); }
 	
 	var vertexList;
 	var vertex;
@@ -306,10 +306,10 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
 	var nx, ny, nz;
 	var tx, ty;
 	var r, g, b, a;
-	for(var r=0; r<numRows; r++)
+	for (var r=0; r<numRows; r++)
 	{
 		vertexList = resultVertexMatrix.newVertexList();
-		for(var c=0; c<numCols; c++)
+		for (var c=0; c<numCols; c++)
 		{
 			vertex = vertexList.newVertex();
 			px = positions3Array[c*3];
@@ -318,7 +318,7 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
 			
 			vertex.setPosition(px, py, pz);
 			
-			if(normals3Array)
+			if (normals3Array)
 			{
 				nx = normals3Array[c*3];
 				ny = normals3Array[c*3+1];
@@ -326,14 +326,14 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
 				vertex.setNormal(nx, ny, nz);
 			}
 			
-			if(texCoords2Array)
+			if (texCoords2Array)
 			{
 				tx = texCoords2Array[c*2];
 				ty = texCoords2Array[c*2+1];
 				vertex.setTexCoord(tx, ty);
 			}
 			
-			if(colors4Array)
+			if (colors4Array)
 			{
 				r = colors4Array[c*4];
 				g = colors4Array[c*4+1];
@@ -353,8 +353,8 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
  */
 VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop, bClockWise) 
 {
-	if(resultFacesArray === undefined)
-		resultFacesArray = [];
+	if (resultFacesArray === undefined)
+	{ resultFacesArray = []; }
 	
 	// condition: all the vertex lists must have the same number of vertex.***
 	
@@ -381,14 +381,14 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 	var faceLast_B;
 	var vertexCount = vertexListDown.vertexArray.length;
 	var vertex_0, vertex_1, vertex_2, vertex_3;
-	if(bClockWise === undefined)
-		bClockWise = false;
+	if (bClockWise === undefined)
+	{ bClockWise = false; }
 	
 	var resultHalfEdgesArray_A = [];
 	var resultHalfEdgesArray_B = [];
 	var vtx0_idx, vtx1_idx, vtx2_idx, vtx3_idx;
 	
-	if(bClockWise)
+	if (bClockWise)
 	{
 		for (var j = 0; j < vertexCount; j++) 
 		{
@@ -444,9 +444,10 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				}
 			}
 			
-			if(faceLast_B === undefined)
-				faceLast_B = face_B;
-			else{
+			if (faceLast_B === undefined)
+			{ faceLast_B = face_B; }
+			else 
+			{
 				//face_A.setTwinFace(faceLast_B);
 				faceLast_B = face_B;
 			}
@@ -514,9 +515,10 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				
 			}
 			
-			if(faceLast_B === undefined)
-				faceLast_B = face_B;
-			else{
+			if (faceLast_B === undefined)
+			{ faceLast_B = face_B; }
+			else 
+			{
 				//face_A.setTwinFace(faceLast_B);
 				faceLast_B = face_B;
 			}
@@ -534,8 +536,8 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
  */
 VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWise) 
 {
-	if(resultSurface === undefined)
-		resultSurface = new Surface();
+	if (resultSurface === undefined)
+	{ resultSurface = new Surface(); }
 	
 	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;

@@ -93,8 +93,8 @@ Face.prototype.calculatePlaneNormal = function()
 		startVec.unitary();
 		endVec.unitary();
 		
-		if(startVec.isNAN() || endVec.isNAN())
-			continue;
+		if (startVec.isNAN() || endVec.isNAN())
+		{ continue; }
 		
 		var crossProd = startVec.crossProduct(endVec, undefined); // Point3D.
 		var scalarProd = startVec.scalarProduct(endVec);
@@ -115,8 +115,8 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 	// Provisionally calculate the plane normal and assign to the vertices.***
 	var verticesCount = this.vertexArray.length;
 
-	if(bForceRecalculatePlaneNormal !== undefined && bForceRecalculatePlaneNormal)
-		this.calculatePlaneNormal();
+	if (bForceRecalculatePlaneNormal !== undefined && bForceRecalculatePlaneNormal)
+	{ this.calculatePlaneNormal(); }
 	
 	if (this.planeNormal === undefined)
 	{ this.calculatePlaneNormal(); }
@@ -184,7 +184,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	{ resultTrianglesArray = []; }
 
 	var verticesCount = this.getVerticesCount();
-	if(verticesCount <= 3)
+	if (verticesCount <= 3)
 	{
 		// This is a triangle, so no need to tessellate.***
 		resultTrianglesArray = this.getTrianglesConvex(resultTrianglesArray);

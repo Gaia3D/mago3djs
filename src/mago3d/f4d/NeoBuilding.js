@@ -884,7 +884,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord) 
 {
 	// Check metaData.projectDataType.***
-	if(this.metaData.projectDataType === 5)
+	if (this.metaData.projectDataType === 5)
 	{
 		// Render pointsCloud pyramidMode.***
 		return;
@@ -1011,7 +1011,8 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
 				gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 			}
-			else{
+			else 
+			{
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			}
 		}

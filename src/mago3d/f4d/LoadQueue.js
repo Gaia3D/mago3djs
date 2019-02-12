@@ -84,11 +84,14 @@ LoadQueue.prototype.resetQueue = function()
 {	
 	for (var key in this.lod2PCloudDataMap)
 	{
-		var loadData = this.lod2PCloudDataMap[key];
-		if (loadData.octree === undefined || loadData.octree.lego === undefined)
-		{ continue; }
-		
-		loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
+		if (Object.prototype.hasOwnProperty.call(this.lod2PCloudDataMap, key))
+		{
+			var loadData = this.lod2PCloudDataMap[key];
+			if (loadData.octree === undefined || loadData.octree.lego === undefined)
+			{ continue; }
+			
+			loadData.octree.lego.fileLoadState = CODE.fileLoadState.READY;
+		}
 	}
 	
 	this.lod2PCloudDataMap = {};
@@ -114,58 +117,30 @@ LoadQueue.prototype.manageQueue = function()
 	counter = 0;
 	for (var key in this.lod2PCloudDataMap)
 	{
-		var loadData = this.lod2PCloudDataMap[key];
-		var octree = loadData.octree;
-		var filePath = loadData.filePath;
-		
-		if (octree.lego !== undefined)
+		if (Object.prototype.hasOwnProperty.call(this.lod2PCloudDataMap, key))
 		{
-			readerWriter.getOctreePCloudArraybuffer(filePath, octree, this.magoManager);
-		}
-		else
-		{ var hola = 0; }
-		
-		delete this.lod2PCloudDataMap[key];
-		loadData.deleteObjects();
-		loadData = undefined;
-
-		counter++;
-		if (counter > 4)
-		{
-			//this.lod2PCloudDataMap = {};
-			remainLod2 = true;
-			break;
+			var loadData = this.lod2PCloudDataMap[key];
+			var octree = loadData.octree;
+			var filePath = loadData.filePath;
+			
+			if (octree.lego !== undefined)
+			{
+				readerWriter.getOctreePCloudArraybuffer(filePath, octree, this.magoManager);
+			}
+			
+			delete this.lod2PCloudDataMap[key];
+			loadData.deleteObjects();
+			loadData = undefined;
+	
+			counter++;
+			if (counter > 4)
+			{
+				//this.lod2PCloudDataMap = {};
+				remainLod2 = true;
+				break;
+			}
 		}
 	}
 	
 	this.resetQueue();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

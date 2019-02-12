@@ -159,19 +159,19 @@ Surface.prototype.getCopyIndependentSurface = function(resultSurface)
 Surface.setTwinsFacesBetweenFaceAndFacesArrays = function(face, facesArray, bIsRegularQuadGrid) 
 {
 	// if the faces pertains a regular-quad-grid, then there are only ONE twin between the "face" & the "facesArray".***
-	if(facesArray === undefined)
-		return false;
+	if (facesArray === undefined)
+	{ return false; }
 	
 	var twined = false;
 	var facesCount = facesArray.length;
 	var face_A;
-	for(var i=0; i<facesCount; i++)
+	for (var i=0; i<facesCount; i++)
 	{
 		face_A = facesArray[i];
-		if(face_A.setTwinFace(face))
+		if (face_A.setTwinFace(face))
 		{
 			twined = true;
-			if(bIsRegularQuadGrid)
+			if (bIsRegularQuadGrid)
 			{
 				// if faces are from a regular quad grid, there are only 1 twin possible.***
 				return true;
@@ -188,29 +188,29 @@ Surface.setTwinsFacesBetweenFaceAndFacesArrays = function(face, facesArray, bIsR
 Surface.setTwinsFacesBetweenFacesArrays_regularQuadGrid = function(facesArray_A, facesArray_B) 
 {
 	// Faces are rectangles in a rectangle grid.***
-	if(facesArray_A === undefined || facesArray_B === undefined)
-		return false;
+	if (facesArray_A === undefined || facesArray_B === undefined)
+	{ return false; }
 	
 	var bIsRegularQuadGrid = true;
 	var faces_A_count = facesArray_A.length;
 	var face_A, face_B;
-	for(var i=0; i<faces_A_count-1; i++)
+	for (var i=0; i<faces_A_count-1; i++)
 	{
 		face_A = facesArray_A[i];
 		face_B = facesArray_B[i+1];
-		if(!face_A.setTwinFace(face_B))
+		if (!face_A.setTwinFace(face_B))
 		{
 			face_A = facesArray_A[i+1];
 			face_B = facesArray_B[i];
-			if(!face_A.setTwinFace(face_B))
+			if (!face_A.setTwinFace(face_B))
 			{
 				face_A = facesArray_A[i];
 				face_B = facesArray_B[i];
-				if(!face_A.setTwinFace(face_B))
+				if (!face_A.setTwinFace(face_B))
 				{
 					face_A = facesArray_A[i+1];
 					face_B = facesArray_B[i+1];
-					if(!face_A.setTwinFace(face_B))
+					if (!face_A.setTwinFace(face_B))
 					{
 						// do nothing.***
 					}
@@ -292,8 +292,11 @@ Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	var vertex;
 	for (var key in verticesMap)
 	{
-		vertex = verticesMap[key];
-		resultVerticesArray.push(vertex);
+		if (Object.prototype.hasOwnProperty.call(verticesMap, key))
+		{
+			vertex = verticesMap[key];
+			resultVerticesArray.push(vertex);
+		}
 	}
 	
 	return resultVerticesArray;

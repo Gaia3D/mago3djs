@@ -349,12 +349,12 @@ MagoManager.prototype.init = function(gl)
 {
 	this.bInit = true;
 	
-	if(this.sceneState.gl === undefined)
-		this.sceneState.gl = gl;
-	if(this.vboMemoryManager.gl === undefined)
-		this.vboMemoryManager.gl = gl;
+	if (this.sceneState.gl === undefined)
+	{ this.sceneState.gl = gl; }
+	if (this.vboMemoryManager.gl === undefined)
+	{ this.vboMemoryManager.gl = gl; }
 	
-	if(this.invertedBox === undefined)
+	if (this.invertedBox === undefined)
 	{
 		this.invertedBox = new Box();
 		var mesh = this.invertedBox.makeMesh(1.5, 1.5, 1.5);
@@ -407,8 +407,8 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 			var gl = scene.context._gl;
 			gl.getExtension("EXT_frag_depth");
 			
-			if(!this.bInit)
-				this.init(gl);
+			if (!this.bInit)
+			{ this.init(gl); }
 		
 			if (gl.isContextLost())
 			{ return; }
@@ -1537,97 +1537,97 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 				}
 				
 
-					// Test flyTo by topology.******************************************************************************
-					var selCandidatesEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
-					var selCandidatesNodes = this.selectionManager.getSelectionCandidatesFamily("networkNodes");
-					var flyed = false;
-					if(selCandidatesEdges)
+				// Test flyTo by topology.******************************************************************************
+				var selCandidatesEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
+				var selCandidatesNodes = this.selectionManager.getSelectionCandidatesFamily("networkNodes");
+				var flyed = false;
+				if (selCandidatesEdges)
+				{
+					var edgeSelected = selCandidatesEdges.currentSelected;
+					if (edgeSelected && edgeSelected.vtxSegment)
 					{
-						var edgeSelected = selCandidatesEdges.currentSelected;
-						if(edgeSelected && edgeSelected.vtxSegment)
+						// calculate the 2 positions of the edge.***
+						var camPos = this.sceneState.camera.position;
+						var vtxSeg = edgeSelected.vtxSegment;
+						var pos1 = new Point3D();
+						var pos2 = new Point3D();
+						pos1.copyFrom(vtxSeg.startVertex.point3d);
+						pos2.copyFrom(vtxSeg.endVertex.point3d);
+						pos1.add(0.0, 0.0, 1.7); // add person height.***
+						pos2.add(0.0, 0.0, 1.7); // add person height.***
+							
+							
+						// calculate pos1 & pos2 to worldCoordinate.***
+						// Need the building tMatrix.***
+						var network = edgeSelected.networkOwner;
+						var node = network.nodeOwner;
+						var geoLocDataManager = node.data.geoLocDataManager;
+						var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+						var tMat = geoLoc.tMatrix;
+							
+						// To positions must add "pivotPointTraslation" if exist.***
+						// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
+						var pivotTranslation = geoLoc.pivotPointTraslation;
+						if (pivotTranslation)
 						{
-							// calculate the 2 positions of the edge.***
-							var camPos = this.sceneState.camera.position;
-							var vtxSeg = edgeSelected.vtxSegment;
-							var pos1 = new Point3D();
-							var pos2 = new Point3D();
-							pos1.copyFrom(vtxSeg.startVertex.point3d);
-							pos2.copyFrom(vtxSeg.endVertex.point3d);
-							pos1.add(0.0, 0.0, 1.7); // add person height.***
-							pos2.add(0.0, 0.0, 1.7); // add person height.***
-							
-							
-							// calculate pos1 & pos2 to worldCoordinate.***
-							// Need the building tMatrix.***
-							var network = edgeSelected.networkOwner;
-							var node = network.nodeOwner;
-							var geoLocDataManager = node.data.geoLocDataManager;
-							var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-							var tMat = geoLoc.tMatrix;
-							
-							// To positions must add "pivotPointTraslation" if exist.***
-							// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-							var pivotTranslation = geoLoc.pivotPointTraslation;
-							if(pivotTranslation)
-							{
-								pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-								pos2.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-							}
-
-							var worldPos1 = tMat.transformPoint3D(pos1, undefined);
-							var worldPos2 = tMat.transformPoint3D(pos2, undefined);
-
-							// select the farestPoint to camera.***
-							var dist1 = camPos.squareDistToPoint(worldPos1);
-							var dist2 = camPos.squareDistToPoint(worldPos2);
-							var pointSelected;
-							if(dist1<dist2)
-							{
-								pointSelected = worldPos2;
-							}
-							else
-								pointSelected = worldPos1;
-							
-							// now flyTo pointSelected.***
-							this.flyToTopology(pointSelected, 2);
-							flyed = true;
+							pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
+							pos2.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
 						}
+
+						var worldPos1 = tMat.transformPoint3D(pos1, undefined);
+						var worldPos2 = tMat.transformPoint3D(pos2, undefined);
+
+						// select the farestPoint to camera.***
+						var dist1 = camPos.squareDistToPoint(worldPos1);
+						var dist2 = camPos.squareDistToPoint(worldPos2);
+						var pointSelected;
+						if (dist1<dist2)
+						{
+							pointSelected = worldPos2;
+						}
+						else
+						{ pointSelected = worldPos1; }
+							
+						// now flyTo pointSelected.***
+						this.flyToTopology(pointSelected, 2);
+						flyed = true;
 					}
-					if(!flyed && selCandidatesNodes)
+				}
+				if (!flyed && selCandidatesNodes)
+				{
+					var nodeSelected = selCandidatesNodes.currentSelected;
+					if (nodeSelected)
 					{
-						var nodeSelected = selCandidatesNodes.currentSelected;
-						if(nodeSelected)
+						// calculate the 2 positions of the edge.***
+						var camPos = this.sceneState.camera.position;
+						var pos1 = new Point3D(nodeSelected.position.x, nodeSelected.position.y, nodeSelected.position.z);
+						pos1.add(0.0, 0.0, 1.7); // add person height.***
+							
+							
+						// calculate pos1 & pos2 to worldCoordinate.***
+						// Need the building tMatrix.***
+						var network = nodeSelected.networkOwner;
+						var node = network.nodeOwner;
+						var geoLocDataManager = node.data.geoLocDataManager;
+						var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+						var tMat = geoLoc.tMatrix;
+							
+						// To positions must add "pivotPointTraslation" if exist.***
+						// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
+						var pivotTranslation = geoLoc.pivotPointTraslation;
+						if (pivotTranslation)
 						{
-							// calculate the 2 positions of the edge.***
-							var camPos = this.sceneState.camera.position;
-							var pos1 = new Point3D(nodeSelected.position.x, nodeSelected.position.y, nodeSelected.position.z);
-							pos1.add(0.0, 0.0, 1.7); // add person height.***
-							
-							
-							// calculate pos1 & pos2 to worldCoordinate.***
-							// Need the building tMatrix.***
-							var network = nodeSelected.networkOwner;
-							var node = network.nodeOwner;
-							var geoLocDataManager = node.data.geoLocDataManager;
-							var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-							var tMat = geoLoc.tMatrix;
-							
-							// To positions must add "pivotPointTraslation" if exist.***
-							// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-							var pivotTranslation = geoLoc.pivotPointTraslation;
-							if(pivotTranslation)
-							{
-								pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-							}
-							
-							var worldPos1 = tMat.transformPoint3D(pos1, undefined);
-							
-							// now flyTo pointSelected.***
-							this.flyToTopology(worldPos1, 2);
-							flyed = true;
+							pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
 						}
+							
+						var worldPos1 = tMat.transformPoint3D(pos1, undefined);
+							
+						// now flyTo pointSelected.***
+						this.flyToTopology(worldPos1, 2);
+						flyed = true;
 					}
-					// End Test flyTo by topology.******************************************************************************
+				}
+				// End Test flyTo by topology.******************************************************************************
 				
 			}
 			
@@ -1644,7 +1644,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	var ssao_idx = 0; // 0= depth. 1= ssao.***
 	var renderTexture = false;
 	this.depthFboNeo.bind(); 
-	if(this.isFarestFrustum())
+	if (this.isFarestFrustum())
 	{
 		gl.clearColor(1, 1, 1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1669,7 +1669,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	ssao_idx = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	
-	if(this.weatherStation)
+	if (this.weatherStation)
 	{
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
@@ -1866,7 +1866,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 	}
 	
 	if (this.noiseTexture === undefined) 
-		return;
+	{ return; }
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -2123,8 +2123,8 @@ MagoManager.prototype.renderGeometryColorCoding = function(gl, visibleObjControl
 		gl.useProgram(null);
 		
 		// Render cuttingPlanes of temperaturalayers if exist.***
-		if(this.weatherStation)
-			this.weatherStation.test_renderCuttingPlanes(this, renderType);
+		if (this.weatherStation)
+		{ this.weatherStation.test_renderCuttingPlanes(this, renderType); }
 	}
 	
 	
@@ -2148,8 +2148,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
 	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
-	if(pixelX < 0)pixelX = 0;
-	if(pixelY < 0)pixelY = 0;
+	if (pixelX < 0){ pixelX = 0; }
+	if (pixelY < 0){ pixelY = 0; }
 	
 	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
@@ -2171,11 +2171,11 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	
 	// Aditionally check if selected an edge of topology.***
 	var selNetworkEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
-	if(selNetworkEdges)
+	if (selNetworkEdges)
 	{
 		var currEdgeSelected = selNetworkEdges.currentSelected;
 		var i = 0;
-		while(currEdgeSelected === undefined && i< totalPixelsCount)
+		while (currEdgeSelected === undefined && i< totalPixelsCount)
 		{
 			var idx = this.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
 			currEdgeSelected = selNetworkEdges.selectObject(idx);
@@ -2185,11 +2185,11 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	
 	// TEST: Check if selected a cuttingPlane.***
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-	if(selGeneralObjects)
+	if (selGeneralObjects)
 	{
 		var currObjectSelected = selGeneralObjects.currentSelected;
 		var i = 0;
-		while(currObjectSelected === undefined && i< totalPixelsCount)
+		while (currObjectSelected === undefined && i< totalPixelsCount)
 		{
 			var idx = this.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
 			currObjectSelected = selGeneralObjects.selectObject(idx);
@@ -2300,8 +2300,8 @@ MagoManager.prototype.calculatePixelLinearDepth = function(gl, pixelX, pixelY, d
 	gl.depthRange(0, 1);
 	gl.frontFace(gl.CCW);
 
-	if(depthFbo === undefined)
-		depthFbo = this.depthFboNeo;
+	if (depthFbo === undefined)
+	{ depthFbo = this.depthFboNeo; }
 	
 	if (depthFbo) 
 	{
@@ -2336,8 +2336,8 @@ MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixe
 	gl.depthRange(0, 1);
 	gl.frontFace(gl.CCW);
 
-	if(frustumFar === undefined)
-		frustumFar = this.sceneState.camera.frustum.far;
+	if (frustumFar === undefined)
+	{ frustumFar = this.sceneState.camera.frustum.far; }
 	
 	var linearDepth = this.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo);
 	var realZDepth = linearDepth*frustumFar; // original.***
@@ -2364,11 +2364,11 @@ MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pi
 {
 	var pixelPosCamCoord = new Point3D();
 	
-	if(frustumFar === undefined)
-		frustumFar = this.sceneState.camera.frustum.far;
+	if (frustumFar === undefined)
+	{ frustumFar = this.sceneState.camera.frustum.far; }
 	
-	if(depthFbo === undefined)
-		depthFbo = this.depthFboNeo;
+	if (depthFbo === undefined)
+	{ depthFbo = this.depthFboNeo; }
 	
 	pixelPosCamCoord = this.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumFar);
 
@@ -2502,27 +2502,28 @@ MagoManager.prototype.isDragging = function()
 		this.selectionFbo.bind();
 		var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 		var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-		if(selGeneralObjects)
+		if (selGeneralObjects)
 		{
 			var currObjectSelected = selGeneralObjects.currentSelected;
-			if(currObjectSelected)
+			if (currObjectSelected)
 			{
 				// check if is a cuttingPlane.***
-				if(currObjectSelected instanceof CuttingPlane)
+				if (currObjectSelected instanceof CuttingPlane)
 				{
 					bIsDragging = true;
 				}
 			}
-			else{
+			else 
+			{
 				
-				bIsDragging = false
+				bIsDragging = false;
 			}
 		}
 		else
-			bIsDragging = false;
+		{ bIsDragging = false; }
 	}
 	
-	if(!bIsDragging)
+	if (!bIsDragging)
 	{
 		this.selectionManager.clearCandidates();
 	}
@@ -2611,13 +2612,13 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	
 	// Test for drawing mode.******************************************************************
 	//this.magoMode = CODE.magoMode.DRAWING;
-	if(this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
+	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		// Test code.***
-		if(this.modeler === undefined)
-			this.modeler = new Modeler();
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(); }
 		
-		if(this.modeler.planeGrid === undefined)
+		if (this.modeler.planeGrid === undefined)
 		{
 			// Calculate the click position and create the planeGrid geoLocation.***
 			this.modeler.createPlaneGrid();
@@ -2633,14 +2634,15 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				var worldPosCesium = scene.globe.pick(ray, scene);
 				geoCoord = Globe.CartesianToGeographicWgs84(worldPosCesium.x, worldPosCesium.y, worldPosCesium.z, undefined);
 			}
-			else{
+			else 
+			{
 				var mouseAction = this.sceneState.mouseAction;
 				var strWorldPoint = mouseAction.strWorldPoint;
 				geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
 			}
 			
-			if(this.modeler.planeGrid.geoLocDataManager === undefined)
-				this.modeler.planeGrid.geoLocDataManager = new GeoLocationDataManager();
+			if (this.modeler.planeGrid.geoLocDataManager === undefined)
+			{ this.modeler.planeGrid.geoLocDataManager = new GeoLocationDataManager(); }
 			
 			var geoLocDataManager = this.modeler.planeGrid.geoLocDataManager;
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2675,13 +2677,13 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 
 	// Test.**********************************************************************************************************************
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-	if(selGeneralObjects)
+	if (selGeneralObjects)
 	{
 		var currObjectSelected = selGeneralObjects.currentSelected;
-		if(currObjectSelected)
+		if (currObjectSelected)
 		{
 			// check if is a cuttingPlane.***
-			if(currObjectSelected instanceof CuttingPlane)
+			if (currObjectSelected instanceof CuttingPlane)
 			{
 				var mouseAction = this.sceneState.mouseAction;
 				mouseAction.claculateStartPositionsAux(this);
@@ -2868,7 +2870,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			
 			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
 				nodeOwner.data.projectId,
-                nodeOwner.data.nodeId,
+				nodeOwner.data.nodeId,
 				null,
 				geographicCoords.latitude,
 				geographicCoords.longitude,
@@ -3082,13 +3084,13 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	{
 		// Test. Check if there are cuttingPlanes to move.***
 		var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-		if(selGeneralObjects)
+		if (selGeneralObjects)
 		{
 			var currObjectSelected = selGeneralObjects.currentSelected;
-			if(currObjectSelected)
+			if (currObjectSelected)
 			{
 				// check if is a cuttingPlane.***
-				if(currObjectSelected instanceof CuttingPlane)
+				if (currObjectSelected instanceof CuttingPlane)
 				{
 					// Move the cuttingPlane.***
 					var geoLocDataManager = currObjectSelected.geoLocDataManager;
@@ -3100,13 +3102,13 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 					var camRay = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, undefined);
 					var strWorldPoint = mouseAction.strWorldPointAux; // original.***
 					////var strWorldPoint = mouseAction.strWorldPoint;
-					if(strWorldPoint)
+					if (strWorldPoint)
 					{
 						var strEarthRadius = strWorldPoint.getModul();
 						
 						var curWorldPosAux;
 						curWorldPosAux = this.globe.intersectionLineWgs84(camRay, curWorldPosAux, strEarthRadius);
-						if(curWorldPosAux)
+						if (curWorldPosAux)
 						{
 							var curWorldPointAux = new Point3D(curWorldPosAux[0], curWorldPosAux[1], curWorldPosAux[2]);
 							var curLocation = ManagerUtils.pointToGeographicCoord(curWorldPointAux, undefined, this);
@@ -3134,7 +3136,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	// Test. Render depth only for the selected object.***************************
 	var gl = this.sceneState.gl;
 	
-	if(this.depthFboAux === undefined)
+	if (this.depthFboAux === undefined)
 	{
 		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	}
@@ -3146,7 +3148,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	}
 	this.depthFboAux.bind(); 
 	
-	if(this.isFarestFrustum())
+	if (this.isFarestFrustum())
 	{
 		gl.clearColor(1, 1, 1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -3158,27 +3160,27 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.CULL_FACE);
 	
-		// Now, renderDepth the selected object. Fix the frustumFar for adequate precision on depthPacking.***
-		var shader = this.postFxShadersManager.getShader("modelRefDepth"); 
-		shader.useProgram();
-		shader.bindUniformGenerals();
-		shader.enableVertexAttribArray(shader.position3_loc);
+	// Now, renderDepth the selected object. Fix the frustumFar for adequate precision on depthPacking.***
+	var shader = this.postFxShadersManager.getShader("modelRefDepth"); 
+	shader.useProgram();
+	shader.bindUniformGenerals();
+	shader.enableVertexAttribArray(shader.position3_loc);
 		
-		var geoLocDataManager = currObjectSelected.geoLocDataManager;
-		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+	var geoLocDataManager = currObjectSelected.geoLocDataManager;
+	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 		
-		// test: in depth, set frustumFar = 1000000000(100M).***
-		var frustumFarLoc = shader.uniformsMapGeneral["frustumFar"].uniformLocation;
-		gl.uniform1f(frustumFarLoc, new Float32Array([100000000.0]));
+	// test: in depth, set frustumFar = 1000000000(100M).***
+	var frustumFarLoc = shader.uniformsMapGeneral.frustumFar.uniformLocation;
+	gl.uniform1f(frustumFarLoc, new Float32Array([100000000.0]));
 			
-			var renderType = 0;
-			//this.weatherStation.test_renderCuttingPlanes(this, renderType);
+	var renderType = 0;
+	//this.weatherStation.test_renderCuttingPlanes(this, renderType);
 			
-			gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, geoLocationData.rotMatrix._floatArrays);
-			gl.uniform3fv(shader.buildingPosHIGH_loc, geoLocationData.positionHIGH);
-			gl.uniform3fv(shader.buildingPosLOW_loc, geoLocationData.positionLOW);
-			gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-			currObjectSelected.render(this, shader, renderType);
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, geoLocationData.rotMatrix._floatArrays);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, geoLocationData.positionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, geoLocationData.positionLOW);
+	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	currObjectSelected.render(this, shader, renderType);
 			
 	
 	this.depthFboAux.unbind(); 
@@ -3326,18 +3328,21 @@ MagoManager.prototype.manageQueue = function()
 	var parsedsCount = 0;
 	for (var key in this.parseQueue.tinTerrainsToParseMap)
 	{
-		var tinTerrain = this.parseQueue.tinTerrainsToParseMap[key];
-		if (tinTerrain !== undefined)
+		if (Object.prototype.hasOwnProperty.call(this.parseQueue.tinTerrainsToParseMap, key))
 		{
-			if (this.parseQueue.eraseTinTerrainToParse(tinTerrain)) // check if is inside of the queue to parse.***
+			var tinTerrain = this.parseQueue.tinTerrainsToParseMap[key];
+			if (tinTerrain !== undefined)
 			{
-				tinTerrain.parseData(tinTerrain.dataArrayBuffer);
-				parsedsCount++;
+				if (this.parseQueue.eraseTinTerrainToParse(tinTerrain)) // check if is inside of the queue to parse.***
+				{
+					tinTerrain.parseData(tinTerrain.dataArrayBuffer);
+					parsedsCount++;
+				}
 			}
+			
+			if (parsedsCount > 1)
+			{ break; }
 		}
-		
-		if (parsedsCount > 1)
-		{ break; }
 	}
 	/*
 	var visibleTilesArray = this.tinTerrainManager.visibleTilesArray;
@@ -3403,7 +3408,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistancePointsCloudType = fun
 	
 		var projectDataType = neoBuilding.metaData.projectDataType;
 		
-		if(projectDataType !== undefined && projectDataType === 4) // projectDataType = 4 (pointsCloudType building).***
+		if (projectDataType !== undefined && projectDataType === 4) // projectDataType = 4 (pointsCloudType building).***
 		{
 			projectFolderName = neoBuilding.projectFolderName;
 			buildingFolderName = neoBuilding.buildingFileName;
@@ -4271,7 +4276,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
-		if(this.modeler !== undefined)
+		if (this.modeler !== undefined)
 		{
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
@@ -4424,10 +4429,10 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
 
 MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color, bRenderLines) 
 {
-	if(nodesArray === undefined || nodesArray.length === 0)
-		return;
+	if (nodesArray === undefined || nodesArray.length === 0)
+	{ return; }
 	
-	if(this.unitaryBoxSC === undefined)
+	if (this.unitaryBoxSC === undefined)
 	{
 		this.unitaryBoxSC = new BoxAux();
 		this.unitaryBoxSC.makeAABB(1.0, 1.0, 1.0); // make a unitary box.***
@@ -4564,7 +4569,7 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 	}
 	
 	if (this.noiseTexture === undefined) 
-		return;
+	{ return; }
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -4692,8 +4697,8 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	}
 	
 	// Render cuttingPlanes of temperaturalayers if exist.***
-	if(this.weatherStation)
-		this.weatherStation.test_renderCuttingPlanes(this, renderType);
+	if (this.weatherStation)
+	{ this.weatherStation.test_renderCuttingPlanes(this, renderType); }
 	
 	// tin terrain.***
 	if (this.tinTerrainManager !== undefined)
@@ -4705,13 +4710,13 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	
 	// Test.***
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-	if(selGeneralObjects)
+	if (selGeneralObjects)
 	{
 		var currObjectSelected = selGeneralObjects.currentSelected;
-		if(currObjectSelected)
+		if (currObjectSelected)
 		{
 			// check if is a cuttingPlane.***
-			if(currObjectSelected instanceof CuttingPlane)
+			if (currObjectSelected instanceof CuttingPlane)
 			{
 				// Test. Render depth only for the selected object.***************************
 				this.test_renderDepth_objectSelected(currObjectSelected);
@@ -5350,10 +5355,10 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
 	{
 		this.scene.camera.flyTo({
-			destination: Cesium.Cartesian3.clone(worldPoint3d),
+			destination : Cesium.Cartesian3.clone(worldPoint3d),
 			orientation : {
 				direction : new Cesium.Cartesian3(this.scene.camera.direction.x, this.scene.camera.direction.y, this.scene.camera.direction.z),
-			up : new Cesium.Cartesian3(this.scene.camera.up.x, this.scene.camera.up.y, this.scene.camera.up.z)},
+				up        : new Cesium.Cartesian3(this.scene.camera.up.x, this.scene.camera.up.y, this.scene.camera.up.z)},
 			duration: parseInt(duration)
 		});
 	}

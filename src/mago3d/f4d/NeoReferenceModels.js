@@ -313,8 +313,8 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 	
 	// Test check.***
-	if(magoManager.objectSelected === this)
-		var hola = 0;
+	if (magoManager.objectSelected === this)
+	{ var hola = 0; }
 	
 	var vboKey;
 	for (var n=0; n<cacheKeys_count; n++) // Original.***
@@ -323,14 +323,14 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 		
 		// Positions.***
-		if(!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
 
 		if (renderType === 1)
 		{
 			// Normals.***
-			if(!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
-				return false;
+			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+			{ return false; }
 
 			// TexCoords.***
 			if (renderTexture && neoReference.hasTexture) 
@@ -338,8 +338,8 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 				if (block.vertexCount <= neoReference.vertexCount) 
 				{
 					var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-					if(!refVboData.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-						return false;
+					if (!refVboData.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+					{ return false; }
 				}
 				else 
 				{
@@ -381,8 +381,8 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 				indicesCount = vboKey.indicesCount;
 			}
 		}
-		if(!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
-			return false;
+		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+		{ return false; }
 		
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 		//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
@@ -565,7 +565,7 @@ NeoReferencesMotherAndIndices.prototype.getNeoReference = function(idx)
  */
 NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManager) 
 {
-	if(this.xhr !== undefined)
+	if (this.xhr !== undefined)
 	{
 		this.xhr.abort();
 		this.xhr = undefined;
@@ -574,7 +574,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
 	this.neoRefsIndices = undefined;
 	
-	if(this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== CODE.fileLoadState.READY)
+	if (this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== CODE.fileLoadState.READY)
 	{
 		this.blocksList.xhr.abort();
 		this.blocksList.xhr = undefined;
@@ -1428,12 +1428,12 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
 	}
-	if(renderType === 0)
+	if (renderType === 0)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
@@ -1488,8 +1488,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		}
 	}
 	
-	if((visibleIndices_count - noRenderedsCount)/visibleIndices_count < 0.4)
-		allRendered = false;
+	if ((visibleIndices_count - noRenderedsCount)/visibleIndices_count < 0.4)
+	{ allRendered = false; }
 	
 	return allRendered;
 };

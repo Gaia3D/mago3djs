@@ -14,8 +14,8 @@ var Network = function(owner)
 	}
 	
 	this.nodeOwner;
-	if(owner)
-		this.nodeOwner = owner;
+	if (owner)
+	{ this.nodeOwner = owner; }
 	
 	this.id; // network id.***
 	this.nodesArray;
@@ -257,7 +257,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 	var selFamilyNameNodes = "networkNodes";
 	var selManager = magoManager.selectionManager;
 	var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyNameNodes);
-	if(selCandidateNodes === undefined)
+	if (selCandidateNodes === undefined)
 	{
 		selCandidateNodes = selManager.newCandidatesFamily(selFamilyNameNodes);
 	}
@@ -265,7 +265,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 	var selFamilyNameEdges = "networkEdges";
 	var selManager = magoManager.selectionManager;
 	var selCandidateEdges = selManager.getSelectionCandidatesFamily(selFamilyNameEdges);
-	if(selCandidateEdges === undefined)
+	if (selCandidateEdges === undefined)
 	{
 		selCandidateEdges = selManager.newCandidatesFamily(selFamilyNameEdges);
 	}
@@ -335,7 +335,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 			}
 				
 			var edgesCount = this.edgesArray.length;
-			for(var i=0; i<edgesCount; i++)
+			for (var i=0; i<edgesCount; i++)
 			{
 				var edge = this.edgesArray[i];
 				var selColor4 = selectionColor.getAvailableColor(undefined); // new.
@@ -354,7 +354,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
  */
 Network.prototype.render = function(magoManager, shader, renderType)
 {
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		this.renderColorCoding(magoManager, shader, renderType);
 		return;
@@ -368,7 +368,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	var selFamilyNameNodes = "networkNodes";
 	var selManager = magoManager.selectionManager;
 	var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyNameNodes);
-	if(selCandidateNodes === undefined)
+	if (selCandidateNodes === undefined)
 	{
 		selCandidateNodes = selManager.newCandidatesFamily(selFamilyNameNodes);
 	}
@@ -376,7 +376,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	var selFamilyNameEdges = "networkEdges";
 	var selManager = magoManager.selectionManager;
 	var selCandidateEdges = selManager.getSelectionCandidatesFamily(selFamilyNameEdges);
-	if(selCandidateEdges === undefined)
+	if (selCandidateEdges === undefined)
 	{
 		selCandidateEdges = selManager.newCandidatesFamily(selFamilyNameEdges);
 	}
@@ -417,7 +417,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 			var node = this.nodesArray[i];
 			
 			// check if is selected.***
-			if(node === selCandidateNodes.currentSelected)
+			if (node === selCandidateNodes.currentSelected)
 			{
 				gl.uniform4fv(shader.oneColor4_loc, [0.9, 0.5, 0.1, 1.0]);
 			}
@@ -427,7 +427,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 			nodeMaster.box.render(magoManager, shader, renderType);
 			
 			// restore defaultColor.***
-			if(node === selCandidateNodes.currentSelected)
+			if (node === selCandidateNodes.currentSelected)
 			{
 				gl.uniform4fv(shader.oneColor4_loc, [0.3, 0.3, 0.9, 1.0]);
 			}
@@ -459,17 +459,17 @@ Network.prototype.render = function(magoManager, shader, renderType)
 			//gl.drawArrays(gl.LINES, 0, vboKey.segmentsCount*2);
 			
 			var edgesCount = this.edgesArray.length;
-			for(var i=0; i<edgesCount; i++)
+			for (var i=0; i<edgesCount; i++)
 			{
 				var edge = this.edgesArray[i];
-				if(edge === selCandidateEdges.currentSelected)
+				if (edge === selCandidateEdges.currentSelected)
 				{
 					gl.uniform4fv(shader.oneColor4_loc, [0.0, 1.0, 0.0, 1.0]);
 				}
 				gl.drawArrays(gl.LINES, i*2, 2);
 				
 				// restore default color.***
-				if(edge === selCandidateEdges.currentSelected)
+				if (edge === selCandidateEdges.currentSelected)
 				{
 					gl.uniform4fv(shader.oneColor4_loc, [0.1, 0.1, 0.6, 1.0]);
 				}
@@ -481,10 +481,10 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	this.renderSpaces = magoManager.tempSettings.renderSpaces;
 	this.spacesAlpha = magoManager.tempSettings.spacesAlpha;
 	
-	if(renderType === 1)
-		shader.enableVertexAttribArray(shader.normal3_loc); 
+	if (renderType === 1)
+	{ shader.enableVertexAttribArray(shader.normal3_loc); } 
 	
-	if(this.renderSpaces)
+	if (this.renderSpaces)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		refMatrixType = 0;

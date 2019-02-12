@@ -17,10 +17,10 @@ var VboBuffer = function(dataTarget)
 	this.key;
 	this.dataTarget; // gl.ARRAY_BUFFER, gl.ELEMENT_ARRAY_BUFFER. In WebGl2 added(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, gl.TRANSFORM_FEEDBACK_BUFFER, gl.UNIFORM_BUFFER, gl.PIXEL_PACK_BUFFER, gl.PIXEL_UNPACK_BUFFER).***
 
-	if(dataTarget !== undefined)
-		this.dataTarget = dataTarget;
+	if (dataTarget !== undefined)
+	{ this.dataTarget = dataTarget; }
 	else 
-		this.dataTarget = 34962; // 34962 = gl.ARRAY_BUFFER. Default value.***
+	{ this.dataTarget = 34962; } // 34962 = gl.ARRAY_BUFFER. Default value.***
 };
 
 /**
@@ -28,14 +28,14 @@ var VboBuffer = function(dataTarget)
  */
 VboBuffer.prototype.deleteGlObjects = function(vboMemManager) 
 {
-	if(this.key !== undefined)
+	if (this.key !== undefined)
 	{
 		var gl = vboMemManager.gl;
 		
-		if(this.dataTarget === gl.ARRAY_BUFFER)
-			vboMemManager.storeClassifiedBufferKey(gl, this.key, this.dataLength);
-		else if(this.dataTarget === gl.ELEMENT_ARRAY_BUFFER)
-			vboMemManager.storeClassifiedElementKey(gl, this.key, this.dataLength);
+		if (this.dataTarget === gl.ARRAY_BUFFER)
+		{ vboMemManager.storeClassifiedBufferKey(gl, this.key, this.dataLength); }
+		else if (this.dataTarget === gl.ELEMENT_ARRAY_BUFFER)
+		{ vboMemManager.storeClassifiedElementKey(gl, this.key, this.dataLength); }
 	}
 	
 	this.dataArray = undefined;
@@ -50,20 +50,21 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
  */
 VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager) 
 {
-	if(dataArray === undefined)
-		return;
+	if (dataArray === undefined)
+	{ return; }
 	
 	this.dataGlType = VboBuffer.getGlTypeOfArray(dataArray);
 	
 	var arrayElemsCount = dataArray.length;
 	var classifiedPosByteSize = arrayElemsCount; // Init value.***
-	if(vboMemManager.enableMemoryManagement)
+	if (vboMemManager.enableMemoryManagement)
 	{
 		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(arrayElemsCount);
 		this.dataArray = VboBuffer.newTypedArray(classifiedPosByteSize, this.dataGlType);
 		this.dataArray.set(dataArray);
 	}
-	else{
+	else 
+	{
 		this.dataArray = dataArray;
 	}
 	this.dataLength = arrayElemsCount;
@@ -98,7 +99,7 @@ VboBuffer.prototype.isReady = function(gl, vboMemManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
- /*
+/*
 VboBuffer.prototype.bindData = function(shader, vboMemManager) 
 {
 	if(shader === undefined)
@@ -131,16 +132,16 @@ VboBuffer.prototype.bindData = function(shader, vboMemManager)
 VboBuffer.getGlTypeOfArray = function(dataArray) 
 {
 	var glType = -1;
-	if(dataArray.constructor === Float32Array)
-		glType = 5126; // gl.FLOAT.***
-	else if(dataArray.constructor === Int16Array)
-		glType = 5122; // gl.SHORT.***
-	else if(dataArray.constructor === Uint16Array)
-		glType = 5123; // gl.UNSIGNED_SHORT.***
-	else if(dataArray.constructor === Int8Array)
-		glType = 5120; // gl.BYTE.***
-	else if(dataArray.constructor === Uint8Array)
-		glType = 5121; // gl.UNSIGNED_BYTE.***
+	if (dataArray.constructor === Float32Array)
+	{ glType = 5126; } // gl.FLOAT.***
+	else if (dataArray.constructor === Int16Array)
+	{ glType = 5122; } // gl.SHORT.***
+	else if (dataArray.constructor === Uint16Array)
+	{ glType = 5123; } // gl.UNSIGNED_SHORT.***
+	else if (dataArray.constructor === Int8Array)
+	{ glType = 5120; } // gl.BYTE.***
+	else if (dataArray.constructor === Uint8Array)
+	{ glType = 5121; } // gl.UNSIGNED_BYTE.***
 	
 	return glType;
 };
@@ -151,16 +152,16 @@ VboBuffer.getGlTypeOfArray = function(dataArray)
 VboBuffer.newTypedArray = function(arrayLength, glType) 
 {
 	var typedArray;
-	if(glType === 5126)// gl.FLOAT.***
-		typedArray = new Float32Array(arrayLength);
-	else if(glType === 5122)// gl.SHORT.***
-		typedArray = new Int16Array(arrayLength);
-	else if(glType === 5123)// gl.UNSIGNED_SHORT.***
-		typedArray = new Uint16Array(arrayLength);
-	else if(glType === 5120)// gl.BYTE.***
-		typedArray = new Int8Array(arrayLength);
-	else if(glType === 5121)// gl.UNSIGNED_BYTE.***
-		typedArray = new Uint8Array(arrayLength);
+	if (glType === 5126)// gl.FLOAT.***
+	{ typedArray = new Float32Array(arrayLength); }
+	else if (glType === 5122)// gl.SHORT.***
+	{ typedArray = new Int16Array(arrayLength); }
+	else if (glType === 5123)// gl.UNSIGNED_SHORT.***
+	{ typedArray = new Uint16Array(arrayLength); }
+	else if (glType === 5120)// gl.BYTE.***
+	{ typedArray = new Int8Array(arrayLength); }
+	else if (glType === 5121)// gl.UNSIGNED_BYTE.***
+	{ typedArray = new Uint8Array(arrayLength); }
 		
 	return typedArray;
 };
@@ -193,13 +194,13 @@ var VBOVertexIdxCacheKey = function()
  */
 VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager) 
 {
-	if(shader === undefined)
-		return false;
+	if (shader === undefined)
+	{ return false; }
 	
 	var gl = shader.gl;
 	var vboBufferPos = this.vboBufferPos;
-	if(!vboBufferPos.isReady(gl, vboMemManager))
-		return false;
+	if (!vboBufferPos.isReady(gl, vboMemManager))
+	{ return false; }
 	
 	if (shader.position3_loc !== undefined && shader.position3_loc !== -1) 
 	{
@@ -212,7 +213,7 @@ VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager
 		}
 		return true;
 	}
-	else shader.disableVertexAttribArray(shader.position3_loc);
+	else { shader.disableVertexAttribArray(shader.position3_loc); }
 	return false;
 };
 
@@ -221,19 +222,19 @@ VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager
  */
 VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager) 
 {
-	if(shader === undefined)
-		return false;
+	if (shader === undefined)
+	{ return false; }
 	
 	var vboBufferNor = this.vboBufferNor;
-	if(vboBufferNor === undefined)
+	if (vboBufferNor === undefined)
 	{
 		shader.disableVertexAttribArray(shader.normal3_loc);
 		return true; // Return "true" bcos there are no "normal" data, that is different that having "normal" data and not prepared yet.***
 	}
 	
 	var gl = shader.gl;
-	if(!vboBufferNor.isReady(gl, vboMemManager))
-		return false;
+	if (!vboBufferNor.isReady(gl, vboMemManager))
+	{ return false; }
 	
 	if (shader.normal3_loc !== undefined && shader.normal3_loc !== -1) 
 	{
@@ -246,7 +247,7 @@ VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager)
 		}
 		return true;
 	}
-	else shader.disableVertexAttribArray(shader.normal3_loc);
+	else { shader.disableVertexAttribArray(shader.normal3_loc); }
 	return false;
 };
 
@@ -255,19 +256,19 @@ VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager)
  */
 VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager) 
 {
-	if(shader === undefined)
-		return false;
+	if (shader === undefined)
+	{ return false; }
 	
 	var vboBufferTCoord = this.vboBufferTCoord;
-	if(vboBufferTCoord === undefined)
+	if (vboBufferTCoord === undefined)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		return true; // Return "true" bcos there are no "tCoord" data, that is different that having "tCoord" data and not prepared yet.***
 	}
 	
 	var gl = shader.gl;
-	if(!vboBufferTCoord.isReady(gl, vboMemManager))
-		return false;
+	if (!vboBufferTCoord.isReady(gl, vboMemManager))
+	{ return false; }
 	if (shader.texCoord2_loc !== undefined && shader.texCoord2_loc !== -1) 
 	{
 		shader.enableVertexAttribArray(shader.texCoord2_loc);
@@ -279,7 +280,7 @@ VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager
 		}
 		return true;
 	}
-	else shader.disableVertexAttribArray(shader.texCoord2_loc);
+	else { shader.disableVertexAttribArray(shader.texCoord2_loc); }
 };
 
 /**
@@ -287,19 +288,19 @@ VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager
  */
 VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager) 
 {
-	if(shader === undefined)
-		return false;
+	if (shader === undefined)
+	{ return false; }
 	
 	var vboBufferCol = this.vboBufferCol;
-	if(vboBufferCol === undefined)
+	if (vboBufferCol === undefined)
 	{
 		shader.disableVertexAttribArray(shader.color4_loc);
 		return true; // Return "true" bcos there are no "color" data, that is different that having "color" data and not prepared yet.***
 	}
 	
 	var gl = shader.gl;
-	if(!vboBufferCol.isReady(gl, vboMemManager))
-		return false;
+	if (!vboBufferCol.isReady(gl, vboMemManager))
+	{ return false; }
 
 	if (shader.color4_loc !== undefined && shader.color4_loc !== -1) 
 	{
@@ -312,7 +313,7 @@ VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager)
 		}
 		return true;
 	}
-	else shader.disableVertexAttribArray(shader.color4_loc);
+	else { shader.disableVertexAttribArray(shader.color4_loc); }
 	return false;
 };
 
@@ -321,14 +322,14 @@ VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager)
  */
 VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager) 
 {
-	if(shader === undefined)
-		return false;
+	if (shader === undefined)
+	{ return false; }
 	
 	var gl = shader.gl;
 	
 	var vboBufferIdx = this.vboBufferIdx;
-	if(!vboBufferIdx.isReady(gl, vboMemManager))
-		return false;
+	if (!vboBufferIdx.isReady(gl, vboMemManager))
+	{ return false; }
 	
 	if (vboBufferIdx.key !== shader.last_vboIdx_binded)
 	{
@@ -343,12 +344,12 @@ VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager)
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager) 
 {
-	if(posDataArray === undefined)
-		return;
+	if (posDataArray === undefined)
+	{ return; }
 	
 	var gl = vboMemManager.gl;
-	if(this.vboBufferPos === undefined)
-		this.vboBufferPos = new VboBuffer(gl.ARRAY_BUFFER);
+	if (this.vboBufferPos === undefined)
+	{ this.vboBufferPos = new VboBuffer(gl.ARRAY_BUFFER); }
 	
 	this.vboBufferPos.setDataArray(posDataArray, vboMemManager);
 	this.vertexCount = this.vboBufferPos.dataLength/3;
@@ -360,8 +361,8 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
 VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemManager) 
 {
 	var gl = vboMemManager.gl;
-	if(this.vboBufferNor === undefined)
-		this.vboBufferNor = new VboBuffer(gl.ARRAY_BUFFER);
+	if (this.vboBufferNor === undefined)
+	{ this.vboBufferNor = new VboBuffer(gl.ARRAY_BUFFER); }
 	
 	this.vboBufferNor.setDataArray(norDataArray, vboMemManager);
 };
@@ -372,8 +373,8 @@ VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemMa
 VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemManager) 
 {
 	var gl = vboMemManager.gl;
-	if(this.vboBufferIdx === undefined)
-		this.vboBufferIdx = new VboBuffer(gl.ELEMENT_ARRAY_BUFFER);
+	if (this.vboBufferIdx === undefined)
+	{ this.vboBufferIdx = new VboBuffer(gl.ELEMENT_ARRAY_BUFFER); }
 	
 	this.vboBufferIdx.setDataArray(idxDataArray, vboMemManager);
 	this.indicesCount = this.vboBufferIdx.dataLength;
@@ -386,8 +387,8 @@ VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemMa
 {
 	
 	var gl = vboMemManager.gl;
-	if(this.vboBufferCol === undefined)
-		this.vboBufferCol = new VboBuffer(gl.ARRAY_BUFFER);
+	if (this.vboBufferCol === undefined)
+	{ this.vboBufferCol = new VboBuffer(gl.ARRAY_BUFFER); }
 	
 	this.vboBufferCol.setDataArray(colDataArray, vboMemManager);
 };
@@ -399,8 +400,8 @@ VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray
 {
 	var gl = vboMemManager.gl;
 	
-	if(this.vboBufferTCoord === undefined)
-		this.vboBufferTCoord = new VboBuffer(gl.ARRAY_BUFFER);
+	if (this.vboBufferTCoord === undefined)
+	{ this.vboBufferTCoord = new VboBuffer(gl.ARRAY_BUFFER); }
 	
 	this.vboBufferTCoord.setDataArray(texCoordDataArray, vboMemManager);
 };
@@ -412,27 +413,27 @@ VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray
  */
 VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
-	if(this.vboBufferPos !== undefined)
+	if (this.vboBufferPos !== undefined)
 	{
 		this.vboBufferPos.deleteGlObjects(vboMemManager);	
 		this.vboBufferPos = undefined;
 	}
-	if(this.vboBufferNor !== undefined)
+	if (this.vboBufferNor !== undefined)
 	{
 		this.vboBufferNor.deleteGlObjects(vboMemManager);	
 		this.vboBufferNor = undefined;
 	}
-	if(this.vboBufferIdx !== undefined)
+	if (this.vboBufferIdx !== undefined)
 	{
 		this.vboBufferIdx.deleteGlObjects(vboMemManager);	
 		this.vboBufferIdx = undefined;
 	}
-	if(this.vboBufferCol !== undefined)
+	if (this.vboBufferCol !== undefined)
 	{
 		this.vboBufferCol.deleteGlObjects(vboMemManager);	
 		this.vboBufferCol = undefined;
 	}
-	if(this.vboBufferTCoord !== undefined)
+	if (this.vboBufferTCoord !== undefined)
 	{
 		this.vboBufferTCoord.deleteGlObjects(vboMemManager);	
 		this.vboBufferTCoord = undefined;
