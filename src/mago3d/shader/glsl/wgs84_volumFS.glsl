@@ -22,12 +22,17 @@ uniform float tanHalfFovy;
 uniform int texNumCols;
 uniform int texNumRows;
 uniform int texNumSlices;
+uniform int numSlicesPerStacks;
+uniform int slicesNumCols;
+uniform int slicesNumRows;
 uniform float maxLon;
 uniform float minLon;
 uniform float maxLat;
 uniform float minLat;
 uniform float maxAlt;
 uniform float minAlt;
+uniform vec4 cuttingPlanes[6];   
+uniform int cuttingPlanesCount;
 
 uniform float maxValue;
 uniform float minValue;
@@ -168,7 +173,7 @@ float atan2(float y, float x)
 void cartesianToGeographicWgs84(vec3 point, out vec3 result) 
 {
 	// From WebWorldWind.***
-	// According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
+	// According to H. Vermeille, \"An analytical method to transform geocentric into geodetic coordinates\"
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
 	
 	float firstEccentricitySquared = 6.69437999014E-3;
@@ -218,7 +223,7 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result)
 			rad1 = sqrt(evoluteBorderTest);
 			rad2 = sqrt(e4 * p * q);
 
-			// 10*e2 is my arbitrary decision of what Vermeille means by "near... the cusps of the evolute".
+			// 10*e2 is my arbitrary decision of what Vermeille means by \"near... the cusps of the evolute\".
 			if (evoluteBorderTest > 10.0 * e2) 
 			{
 				rad3 = pow((rad1 + rad2) * (rad1 + rad2), cbrtFac);
@@ -284,6 +289,37 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result)
 	result = vec3(factor * lambda, factor * phi, h); // (longitude, latitude, altitude).***
 }
 
+bool isPointRearCamera(vec3 point, vec3 camPos, vec3 camDir)
+{
+	bool isRear = false;
+	float lambdaX = 10.0;
+	float lambdaY = 10.0;
+	float lambdaZ = 10.0;
+	if(abs(camDir.x) > 0.0000001)
+	{
+		float lambdaX = (point.x - camPos.x)/camDir.x;
+	}
+	else if(abs(camDir.y) > 0.0000001)
+	{
+		float lambdaY = (point.y - camPos.y)/camDir.y;
+	}
+	else if(abs(camDir.z) > 0.0000001)
+	{
+		float lambdaZ = (point.z - camPos.z)/camDir.z;
+	}
+	
+	if(lambdaZ < 0.0 || lambdaY < 0.0 || lambdaX < 0.0)
+			isRear = true;
+		else
+			isRear = false;
+	return isRear;
+}
+
+float distPointToPlane(vec3 point, vec4 plane)
+{
+	return (point.x*plane.x + point.y*plane.y + point.z*plane.z + plane.w);
+}
+
 bool getValue(vec3 geoLoc, out vec4 value)
 {
 	// geoLoc = (longitude, latitude, altitude).***
@@ -292,6 +328,7 @@ bool getValue(vec3 geoLoc, out vec4 value)
 	float alt = geoLoc.z;
 	
 	// 1rst, check if geoLoc intersects the volume.***
+	// Note: minLon, maxLon, minLat, maxLat, minAlt & maxAlt are uniforms.***
 	if(lon < minLon || lon > maxLon)
 		return false;
 	else if(lat < minLat || lat > maxLat)
@@ -299,17 +336,40 @@ bool getValue(vec3 geoLoc, out vec4 value)
 	else if(alt < minAlt || alt > maxAlt)
 		return false;
 		
-	// provisionally filter = NEAREST.***
 	float lonRange = maxLon - minLon;
 	float latRange = maxLat - minLat;
 	float altRange = maxAlt - minAlt;
-	float col = (lon - minLon)/lonRange * float(texNumCols);
-	float row = (lat - minLat)/latRange * float(texNumRows);
-	float slice = (alt - minAlt)/altRange * float(texNumSlices);
+	float col = (lon - minLon)/lonRange * float(slicesNumCols); 
+	float row = (lat - minLat)/latRange * float(slicesNumRows); 
+	float slice = (alt - minAlt)/altRange * float(texNumSlices); // slice if texture has only one stack.***
+	float sliceDown = floor(slice);
+	float sliceUp = ceil(slice);
+	float sliceDownDist = slice - sliceDown;
+	//slice = 18.0; // test. force slice to nearest to ground.***
 	
-	slice = 0.0;
-	vec2 texCoord = vec2(col/float(texNumCols), (row+slice)/float(texNumRows*texNumSlices));
-	value = texture2D(volumeTex, texCoord);
+	float stackDown = floor(sliceDown/float(numSlicesPerStacks));
+	float realSliceDown = sliceDown - stackDown * float(numSlicesPerStacks);
+	float tx = stackDown * float(slicesNumCols) + col;
+	float ty = realSliceDown * float(slicesNumRows) + row;
+	vec2 texCoord = vec2(tx/float(texNumCols), ty/float(texNumRows));
+	vec4 valueDown = texture2D(volumeTex, texCoord);
+	
+	if(sliceDown < float(texNumSlices-1))
+	{
+		float stackUp = floor(sliceUp/float(numSlicesPerStacks));
+		float realSliceUp = sliceUp - stackUp * float(numSlicesPerStacks);
+		float tx2 = stackUp * float(slicesNumCols) + col;
+		float ty2 = realSliceUp * float(slicesNumRows) + row;
+		vec2 texCoord2 = vec2(tx2/float(texNumCols), ty2/float(texNumRows));
+		vec4 valueUp = texture2D(volumeTex, texCoord2);
+		value = valueDown*(1.0-sliceDownDist)+valueUp*(sliceDownDist);
+	}
+	else{
+		value = valueDown;
+	}
+	//if((value.r * (maxValue - minValue)) > maxValue * 0.3)
+	//	return true;
+	//else return false;
 	return true;
 }
 
@@ -336,34 +396,29 @@ void main() {
 	
 	if(intersectType == 0)
 	{
-		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);
-		//return;
 		discard;
 	}
 		
 	if(intersectType == 1)
 	{
 		// provisionally discard.***
-		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);
-		//return;
 		discard;	
 	}
 	
 	// check if nearP is rear of the camera.***
+	if(isPointRearCamera(nearP, camPosWorld.xyz, camDirWorld.xyz))
+	{
+		nearP = vec3(camPosWorld.xyz);
+	}
 	float dist = distance(nearP, farP);
 	float testDist = dist;
-	if(dist > 150000.0)
-		testDist = 150000.0;
-	vec3 endPoint = vec3(nearP.x + camDirWorld.x * testDist, nearP.y + camDirWorld.y * testDist, nearP.z + camDirWorld.z * testDist);
-	vec3 endGeoLoc;
-	cartesianToGeographicWgs84(endPoint, endGeoLoc);
-	vec3 strGeoLoc;
-	cartesianToGeographicWgs84(nearP, strGeoLoc);
+	if(dist > 1500000.0)
+		testDist = 1500000.0;
 	
 	// now calculate the geographicCoords of 2 points.***
 	// now, depending the dist(nearP, endPoint), determine numSmples.***
 	// provisionally take 16 samples.***
-	float numSamples = 64.0;
+	float numSamples = 512.0;
 	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
 	float alpha = 0.8/numSamples;
 	float tempRange = maxValue - minValue;
@@ -373,16 +428,41 @@ void main() {
 	int intAux = 0;
 	float increDist = testDist / numSamples;
 	int c = 0;
-	for(int i=0; i<128; i++)
+	bool isPointRearPlane = true;
+	for(int i=0; i<512; i++)
 	{
 		vec3 currGeoLoc;
 		vec3 currPosWorld = vec3(nearP.x + camDirWorld.x * increDist*float(c), nearP.y + camDirWorld.y * increDist*float(c), nearP.z + camDirWorld.z * increDist*float(c));
-		cartesianToGeographicWgs84(currPosWorld, currGeoLoc);
-		if(getValue(currGeoLoc, value))
+		// Check if the currPosWorld is in front or rear of planes (if exist planes).***
+		int planesCounter = 0;
+		for(int j=0; j<6; j++)
 		{
-			float realValue = value.r * tempRange + minValue*255.0;
-			totalValue += (value.r);
-			sampledsCount += 1;
+			if(planesCounter == cuttingPlanesCount)
+				break;
+			
+			vec4 plane = cuttingPlanes[j];
+			float dist = distPointToPlane(currPosWorld, plane);
+			if(dist > 0.0)
+			{
+				isPointRearPlane = false;
+				break;
+			}
+			else{
+				isPointRearPlane = true;
+			}
+			planesCounter++;
+		}
+		
+		
+		if(isPointRearPlane)
+		{
+			cartesianToGeographicWgs84(currPosWorld, currGeoLoc);
+			if(getValue(currGeoLoc, value))
+			{
+				float realValue = value.r * tempRange + minValue*255.0;
+				totalValue += (value.r);
+				sampledsCount += 1;
+			}
 		}
 		if(sampledsCount >= 1)
 		{
@@ -398,7 +478,7 @@ void main() {
 	fValue = totalValue;
 	if(fValue > 1.0)
 	{
-		gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		return;
 	}
 	float b = 1.0 - fValue;
@@ -414,21 +494,3 @@ void main() {
 	color += vec4(r,g,b,0.8);
 	gl_FragColor = color;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
