@@ -8,30 +8,19 @@ var gulp = require('gulp');
 var globby = require('globby');
 var rimraf = require('rimraf');
 var glslStripComments = require('glsl-strip-comments');
-var stripDebug = require('gulp-strip-debug');
 var concat = require('gulp-concat');
 var uglifyjs = require('uglify-es');	// for ES6 support 
 var composer = require('gulp-uglify/composer');
 var uglify = composer(uglifyjs, console);
 
-//var minify = require('gulp-minify');
-//var imagemin = require('gulp-imagemin');
-//var sourcemaps = require('gulp-sourcemaps');
-//var cleanCss = require('gulp-clean-css');
 var rename = require("gulp-rename");
-//var convertEncoding = require('gulp-convert-encoding');
-//var jasmine = require('gulp-jasmine');
-//var jasmineBrowser = require('gulp-jasmine-browser');
-//var mocha = require('gulp-mocha');
-//var watch = require('gulp-watch');
 var mkdirp = require('mkdirp');
 var del = require('del');
-//var fileInclude = require('gulp-file-include');
+
 var eslint = require('gulp-eslint');
 var gulpIf = require('gulp-if');
 var jsdoc = require('gulp-jsdoc3');
 var Server = require('karma').Server;
-//var yargs = require('yargs');
 
 var paths = {
 	data      : './data',
@@ -124,69 +113,38 @@ gulp.task('clean', function()
 	return del([ paths.build ]);
 });
 
-//gulp.task('minify-js', [ 'clean' ], function() {
-//	return gulp.src( paths.source_js )
-//			.pipe(minify({
-//				ext:{
-//					src:'.js',
-//					min:'.min.js'
-//			    },
-//			    exclude: ['tasks'],
-//			    ignoreFiles: ['.combo.js', '.min.js']
-//			}))
-//			.pipe(gulp.dest( paths.dest_js ))
-//});
-
-////Concatenate and Minify JS task
-//gulp.task('scripts', function() {
-//  return gulp.src('./public_html/assets/js/modules/*.js')
-//    .pipe(concat('webstoemp.js'))
-//    .pipe(gulp.dest('./public_html/assets/js/build'))
-//    .pipe(rename('webstoemp.min.js'))
-//    .pipe(stripdebug())
-//    .pipe(uglify())
-//    .pipe(gulp.dest('./public_html/assets/js/build'))
-//    .pipe(notify({ message: 'Scripts task complete' }));
-//});
-
-gulp.task('uglify:js', [ 'combine:js' ], function () 
+gulp.task('build', function(done) 
 {
-	return gulp.src(path.join(path.normalize(paths.dest_js), 'mago3d.js'))
-		.pipe(stripDebug())
-		.pipe(uglify())
-		.pipe(rename({extname: '.min.js'}))
-		.pipe(gulp.dest(paths.dest_js));
+	mkdirp.sync(paths.build);
+	mkdirp.sync(paths.dest_js);
+	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
+	done();
 });
 
-gulp.task('combine:js', [ 'clean', 'build' ], function() 
+gulp.task('combine:js', gulp.series( 'clean', 'build', function() 
 {
 	return gulp.src(paths.source_js)
 		.pipe(concat('mago3d.js'))
 		.pipe(gulp.dest(paths.dest_js));
-});
+}));
 
-//gulp.task('minify-css', [ 'clean' ], function() {
-//	return gulp.src(paths.source_css)
-//		.pipe(cleanCss({compatibility : 'ie8'}))
-//		.pipe(gulp.dest(paths.dest_css));
-//});
-
-// // Copy all static images
-//gulp.task('images', [ 'clean' ], function() {
-//	return gulp.src(paths.images)
-//		// Pass in options to the task
-//		.pipe(imagemin({ optimizationLevel : 5}))
-//		.pipe(gulp.dest('./public/dist/image'));
-//});
+gulp.task('uglify:js', gulp.series( 'combine:js', function () 
+{
+	return gulp.src(path.join(path.normalize(paths.dest_js), 'mago3d.js'))
+		//.pipe(stripDebug())
+		.pipe(uglify())
+		.pipe(rename({extname: '.min.js'}))
+		.pipe(gulp.dest('./'));
+}));
 
 function isFixed(file) 
 {
-	return file.eslint !== null && file.eslint.fixed;
+	return file.eslint !== null && file.eslint !== undefined && file.eslint.fixed;
 }
 
 gulp.task('watch', function() 
 {
-	gulp.watch('**/*.{js,jsx}', ['lint']);
+	gulp.watch('./src/mago3d/**/*.js', gulp.series('lint'));
 });
 
 gulp.task('karma', function (done) 
@@ -219,14 +177,7 @@ gulp.task('doc', function (cb)
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('build', function() 
-{
-	mkdirp.sync(paths.build);
-	mkdirp.sync(paths.dest_js);
-	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
-});
-
-gulp.task('default', [ 'clean', 'uglify:js',  'doc' ]);
+gulp.task('default', gulp.series('clean', 'lint', 'uglify:js',  'doc'));
 
 gulp.task('buildShader', function() 
 {
