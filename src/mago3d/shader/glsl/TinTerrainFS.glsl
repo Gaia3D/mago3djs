@@ -59,8 +59,8 @@ vec3 getViewRay(vec2 tc)
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
     return ray;                      
-}         
-            
+}
+
 //linear view space depth
 float getDepth(vec2 coord)
 {

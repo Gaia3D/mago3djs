@@ -40,7 +40,7 @@ void main()
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
     
     //linear depth in camera space (0..far)
-    depth = (modelViewMatrixRelToEye * pos4).z/far;
+    depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	gl_PointSize = 2.0;
