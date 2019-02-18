@@ -179,7 +179,9 @@ gulp.task('doc', function (cb)
 
 gulp.task('default', gulp.series('clean', 'lint', 'uglify:js',  'doc'));
 
-gulp.task('buildShader', function() 
+gulp.task('buildShader', function(done) 
 {
+	mkdirp.sync(paths.build);
 	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
+	done();
 });

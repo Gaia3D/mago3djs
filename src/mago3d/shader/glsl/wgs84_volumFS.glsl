@@ -173,7 +173,7 @@ float atan2(float y, float x)
 void cartesianToGeographicWgs84(vec3 point, out vec3 result) 
 {
 	// From WebWorldWind.***
-	// According to H. Vermeille, \"An analytical method to transform geocentric into geodetic coordinates\"
+	// According to H. Vermeille, An analytical method to transform geocentric into geodetic coordinates
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
 	
 	float firstEccentricitySquared = 6.69437999014E-3;
@@ -223,7 +223,7 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result)
 			rad1 = sqrt(evoluteBorderTest);
 			rad2 = sqrt(e4 * p * q);
 
-			// 10*e2 is my arbitrary decision of what Vermeille means by \"near... the cusps of the evolute\".
+			// 10*e2 is my arbitrary decision of what Vermeille means by near... the cusps of the evolute.
 			if (evoluteBorderTest > 10.0 * e2) 
 			{
 				rad3 = pow((rad1 + rad2) * (rad1 + rad2), cbrtFac);

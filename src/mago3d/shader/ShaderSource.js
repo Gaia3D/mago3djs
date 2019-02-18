@@ -399,6 +399,70 @@ void main() {\n\
     gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
 }\n\
 ";
+ShaderSource.draw_vert3D = "precision mediump float;\n\
+\n\
+	// This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
+attribute float a_index;\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform float u_particles_res;\n\
+uniform mat4 ModelViewProjectionMatrix;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+vec4 geographicToWorldCoord(float lonDeg, float latDeg, float alt)\n\
+{\n\
+	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)\n\
+	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum\n\
+	// a = semi-major axis.\n\
+	// e2 = firstEccentricitySquared.\n\
+	// v = a / sqrt(1 - e2 * sin2(lat)).\n\
+	// x = (v+h)*cos(lat)*cos(lon).\n\
+	// y = (v+h)*cos(lat)*sin(lon).\n\
+	// z = [v*(1-e2)+h]*sin(lat).\n\
+	float degToRadFactor = M_PI/180.0;\n\
+	float equatorialRadius = 6378137.0; // meters.\n\
+	float firstEccentricitySquared = 6.69437999014E-3;\n\
+	float lonRad = lonDeg * degToRadFactor;\n\
+	float latRad = latDeg * degToRadFactor;\n\
+	float cosLon = cos(lonRad);\n\
+	float cosLat = cos(latRad);\n\
+	float sinLon = sin(lonRad);\n\
+	float sinLat = sin(latRad);\n\
+	float a = equatorialRadius;\n\
+	float e2 = firstEccentricitySquared;\n\
+	float v = a/sqrt(1.0 - e2 * sinLat * sinLat);\n\
+	float h = alt;\n\
+	\n\
+	vec4 resultCartesian = vec4((v+h)*cosLat*cosLon, (v+h)*cosLat*sinLon, (v*(1.0-e2)+h)*sinLat, 1.0);\n\
+	return resultCartesian;\n\
+}\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_particles, vec2(\n\
+        fract(a_index / u_particles_res),\n\
+        floor(a_index / u_particles_res) / u_particles_res));\n\
+\n\
+    // decode current particle position from the pixel's RGBA value\n\
+    v_particle_pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a);\n\
+\n\
+    gl_PointSize = 1.0;\n\
+    vec4 pos2d = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
+	\n\
+	// Now, must calculate geographic coords of the pos2d.***\n\
+	float longitudeDeg = -180.0 + pos2d.x * 360.0;\n\
+	float latitudeDeg = 90.0 - pos2d.y * 180.0;\n\
+	float altitude = 0.0;\n\
+	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
+	vec4 worldPos = geographicToWorldCoord(longitudeDeg, latitudeDeg, altitude);\n\
+	\n\
+	// Now calculate the position on camCoord.***\n\
+	\n\
+	gl_Position = ModelViewProjectionMatrix * worldPos;\n\
+}";
 ShaderSource.filterSilhouetteFS = "precision mediump float;\n\
 \n\
 uniform sampler2D depthTex;\n\
@@ -932,8 +996,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		\n\
 		if(colorType == 1)\n\
 			aColor4 = color4;\n\
-	}\n\
-";
+	}";
 ShaderSource.PngImageFS = "precision mediump float;\n\
 varying vec2 v_texcoord;\n\
 uniform bool textureFlipYAxis;\n\
@@ -1025,9 +1088,12 @@ void main()\n\
     vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	gl_PointSize = 1.0 + 50.0/gl_Position.z;\n\
+	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
+	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
+	if(gl_PointSize < 3.0)\n\
+		gl_PointSize = 3.0;\n\
 }";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\
@@ -1060,8 +1126,7 @@ vec4 packDepth(const in float depth)\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = packDepth(-depth);\n\
-}\n\
-";
+}";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
 uniform mat4 buildingRotMatrix; \n\
@@ -1104,12 +1169,11 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
     \n\
     //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far;\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_PointSize = 2.0;\n\
-}\n\
-";
+}";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\
 uniform sampler2D u_screen;\n\
@@ -1430,8 +1494,8 @@ vec3 getViewRay(vec2 tc)\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
     return ray;                      \n\
-}         \n\
-            \n\
+}\n\
+\n\
 //linear view space depth\n\
 float getDepth(vec2 coord)\n\
 {\n\
@@ -1591,8 +1655,7 @@ void main() {\n\
     gl_FragColor = vec4(\n\
         fract(pos * 255.0),\n\
         floor(pos * 255.0) / 255.0);\n\
-}\n\
-";
+}";
 ShaderSource.vol_fs = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
@@ -1828,8 +1891,7 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
+}";
 ShaderSource.wgs84_volumFS = "precision mediump float;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
@@ -1854,12 +1916,17 @@ uniform float tanHalfFovy;\n\
 uniform int texNumCols;\n\
 uniform int texNumRows;\n\
 uniform int texNumSlices;\n\
+uniform int numSlicesPerStacks;\n\
+uniform int slicesNumCols;\n\
+uniform int slicesNumRows;\n\
 uniform float maxLon;\n\
 uniform float minLon;\n\
 uniform float maxLat;\n\
 uniform float minLat;\n\
 uniform float maxAlt;\n\
 uniform float minAlt;\n\
+uniform vec4 cuttingPlanes[6];   \n\
+uniform int cuttingPlanesCount;\n\
 \n\
 uniform float maxValue;\n\
 uniform float minValue;\n\
@@ -2000,7 +2067,7 @@ float atan2(float y, float x) \n\
 void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
 {\n\
 	// From WebWorldWind.***\n\
-	// According to H. Vermeille, \"An analytical method to transform geocentric into geodetic coordinates\"\n\
+	// According to H. Vermeille, An analytical method to transform geocentric into geodetic coordinates\n\
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf\n\
 	\n\
 	float firstEccentricitySquared = 6.69437999014E-3;\n\
@@ -2050,7 +2117,7 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
 			rad1 = sqrt(evoluteBorderTest);\n\
 			rad2 = sqrt(e4 * p * q);\n\
 \n\
-			// 10*e2 is my arbitrary decision of what Vermeille means by \"near... the cusps of the evolute\".\n\
+			// 10*e2 is my arbitrary decision of what Vermeille means by near... the cusps of the evolute.\n\
 			if (evoluteBorderTest > 10.0 * e2) \n\
 			{\n\
 				rad3 = pow((rad1 + rad2) * (rad1 + rad2), cbrtFac);\n\
@@ -2116,6 +2183,37 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
 	result = vec3(factor * lambda, factor * phi, h); // (longitude, latitude, altitude).***\n\
 }\n\
 \n\
+bool isPointRearCamera(vec3 point, vec3 camPos, vec3 camDir)\n\
+{\n\
+	bool isRear = false;\n\
+	float lambdaX = 10.0;\n\
+	float lambdaY = 10.0;\n\
+	float lambdaZ = 10.0;\n\
+	if(abs(camDir.x) > 0.0000001)\n\
+	{\n\
+		float lambdaX = (point.x - camPos.x)/camDir.x;\n\
+	}\n\
+	else if(abs(camDir.y) > 0.0000001)\n\
+	{\n\
+		float lambdaY = (point.y - camPos.y)/camDir.y;\n\
+	}\n\
+	else if(abs(camDir.z) > 0.0000001)\n\
+	{\n\
+		float lambdaZ = (point.z - camPos.z)/camDir.z;\n\
+	}\n\
+	\n\
+	if(lambdaZ < 0.0 || lambdaY < 0.0 || lambdaX < 0.0)\n\
+			isRear = true;\n\
+		else\n\
+			isRear = false;\n\
+	return isRear;\n\
+}\n\
+\n\
+float distPointToPlane(vec3 point, vec4 plane)\n\
+{\n\
+	return (point.x*plane.x + point.y*plane.y + point.z*plane.z + plane.w);\n\
+}\n\
+\n\
 bool getValue(vec3 geoLoc, out vec4 value)\n\
 {\n\
 	// geoLoc = (longitude, latitude, altitude).***\n\
@@ -2124,6 +2222,7 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 	float alt = geoLoc.z;\n\
 	\n\
 	// 1rst, check if geoLoc intersects the volume.***\n\
+	// Note: minLon, maxLon, minLat, maxLat, minAlt & maxAlt are uniforms.***\n\
 	if(lon < minLon || lon > maxLon)\n\
 		return false;\n\
 	else if(lat < minLat || lat > maxLat)\n\
@@ -2131,17 +2230,40 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 	else if(alt < minAlt || alt > maxAlt)\n\
 		return false;\n\
 		\n\
-	// provisionally filter = NEAREST.***\n\
 	float lonRange = maxLon - minLon;\n\
 	float latRange = maxLat - minLat;\n\
 	float altRange = maxAlt - minAlt;\n\
-	float col = (lon - minLon)/lonRange * float(texNumCols);\n\
-	float row = (lat - minLat)/latRange * float(texNumRows);\n\
-	float slice = (alt - minAlt)/altRange * float(texNumSlices);\n\
+	float col = (lon - minLon)/lonRange * float(slicesNumCols); \n\
+	float row = (lat - minLat)/latRange * float(slicesNumRows); \n\
+	float slice = (alt - minAlt)/altRange * float(texNumSlices); // slice if texture has only one stack.***\n\
+	float sliceDown = floor(slice);\n\
+	float sliceUp = ceil(slice);\n\
+	float sliceDownDist = slice - sliceDown;\n\
+	//slice = 18.0; // test. force slice to nearest to ground.***\n\
 	\n\
-	slice = 0.0;\n\
-	vec2 texCoord = vec2(col/float(texNumCols), (row+slice)/float(texNumRows*texNumSlices));\n\
-	value = texture2D(volumeTex, texCoord);\n\
+	float stackDown = floor(sliceDown/float(numSlicesPerStacks));\n\
+	float realSliceDown = sliceDown - stackDown * float(numSlicesPerStacks);\n\
+	float tx = stackDown * float(slicesNumCols) + col;\n\
+	float ty = realSliceDown * float(slicesNumRows) + row;\n\
+	vec2 texCoord = vec2(tx/float(texNumCols), ty/float(texNumRows));\n\
+	vec4 valueDown = texture2D(volumeTex, texCoord);\n\
+	\n\
+	if(sliceDown < float(texNumSlices-1))\n\
+	{\n\
+		float stackUp = floor(sliceUp/float(numSlicesPerStacks));\n\
+		float realSliceUp = sliceUp - stackUp * float(numSlicesPerStacks);\n\
+		float tx2 = stackUp * float(slicesNumCols) + col;\n\
+		float ty2 = realSliceUp * float(slicesNumRows) + row;\n\
+		vec2 texCoord2 = vec2(tx2/float(texNumCols), ty2/float(texNumRows));\n\
+		vec4 valueUp = texture2D(volumeTex, texCoord2);\n\
+		value = valueDown*(1.0-sliceDownDist)+valueUp*(sliceDownDist);\n\
+	}\n\
+	else{\n\
+		value = valueDown;\n\
+	}\n\
+	//if((value.r * (maxValue - minValue)) > maxValue * 0.3)\n\
+	//	return true;\n\
+	//else return false;\n\
 	return true;\n\
 }\n\
 \n\
@@ -2168,34 +2290,29 @@ void main() {\n\
 	\n\
 	if(intersectType == 0)\n\
 	{\n\
-		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);\n\
-		//return;\n\
 		discard;\n\
 	}\n\
 		\n\
 	if(intersectType == 1)\n\
 	{\n\
 		// provisionally discard.***\n\
-		//gl_FragColor = vec4(0.0, 1.0, 0.0, 0.8);\n\
-		//return;\n\
 		discard;	\n\
 	}\n\
 	\n\
 	// check if nearP is rear of the camera.***\n\
+	if(isPointRearCamera(nearP, camPosWorld.xyz, camDirWorld.xyz))\n\
+	{\n\
+		nearP = vec3(camPosWorld.xyz);\n\
+	}\n\
 	float dist = distance(nearP, farP);\n\
 	float testDist = dist;\n\
-	if(dist > 150000.0)\n\
-		testDist = 150000.0;\n\
-	vec3 endPoint = vec3(nearP.x + camDirWorld.x * testDist, nearP.y + camDirWorld.y * testDist, nearP.z + camDirWorld.z * testDist);\n\
-	vec3 endGeoLoc;\n\
-	cartesianToGeographicWgs84(endPoint, endGeoLoc);\n\
-	vec3 strGeoLoc;\n\
-	cartesianToGeographicWgs84(nearP, strGeoLoc);\n\
+	if(dist > 1500000.0)\n\
+		testDist = 1500000.0;\n\
 	\n\
 	// now calculate the geographicCoords of 2 points.***\n\
 	// now, depending the dist(nearP, endPoint), determine numSmples.***\n\
 	// provisionally take 16 samples.***\n\
-	float numSamples = 64.0;\n\
+	float numSamples = 512.0;\n\
 	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);\n\
 	float alpha = 0.8/numSamples;\n\
 	float tempRange = maxValue - minValue;\n\
@@ -2205,16 +2322,41 @@ void main() {\n\
 	int intAux = 0;\n\
 	float increDist = testDist / numSamples;\n\
 	int c = 0;\n\
-	for(int i=0; i<128; i++)\n\
+	bool isPointRearPlane = true;\n\
+	for(int i=0; i<512; i++)\n\
 	{\n\
 		vec3 currGeoLoc;\n\
 		vec3 currPosWorld = vec3(nearP.x + camDirWorld.x * increDist*float(c), nearP.y + camDirWorld.y * increDist*float(c), nearP.z + camDirWorld.z * increDist*float(c));\n\
-		cartesianToGeographicWgs84(currPosWorld, currGeoLoc);\n\
-		if(getValue(currGeoLoc, value))\n\
+		// Check if the currPosWorld is in front or rear of planes (if exist planes).***\n\
+		int planesCounter = 0;\n\
+		for(int j=0; j<6; j++)\n\
 		{\n\
-			float realValue = value.r * tempRange + minValue*255.0;\n\
-			totalValue += (value.r);\n\
-			sampledsCount += 1;\n\
+			if(planesCounter == cuttingPlanesCount)\n\
+				break;\n\
+			\n\
+			vec4 plane = cuttingPlanes[j];\n\
+			float dist = distPointToPlane(currPosWorld, plane);\n\
+			if(dist > 0.0)\n\
+			{\n\
+				isPointRearPlane = false;\n\
+				break;\n\
+			}\n\
+			else{\n\
+				isPointRearPlane = true;\n\
+			}\n\
+			planesCounter++;\n\
+		}\n\
+		\n\
+		\n\
+		if(isPointRearPlane)\n\
+		{\n\
+			cartesianToGeographicWgs84(currPosWorld, currGeoLoc);\n\
+			if(getValue(currGeoLoc, value))\n\
+			{\n\
+				float realValue = value.r * tempRange + minValue*255.0;\n\
+				totalValue += (value.r);\n\
+				sampledsCount += 1;\n\
+			}\n\
 		}\n\
 		if(sampledsCount >= 1)\n\
 		{\n\
@@ -2230,7 +2372,7 @@ void main() {\n\
 	fValue = totalValue;\n\
 	if(fValue > 1.0)\n\
 	{\n\
-		gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);\n\
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 		return;\n\
 	}\n\
 	float b = 1.0 - fValue;\n\
@@ -2245,26 +2387,7 @@ void main() {\n\
 	float r = fValue;\n\
 	color += vec4(r,g,b,0.8);\n\
 	gl_FragColor = color;\n\
-}\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-";
+}";
 ShaderSource.wgs84_volumVS = "precision mediump float;\n\
 \n\
 attribute vec3 position;\n\
