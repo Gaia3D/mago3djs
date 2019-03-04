@@ -762,6 +762,46 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		
 		return neoReference.texture.fileLoadState;
 	}
+	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '2' )
+	{
+		// Project_data_type (new in version 002).***************************************
+		// 1 = 3d model data type (normal 3d with interior & exterior data).***
+		// 2 = single building skin data type (as vWorld or googleEarth data).***
+		// 3 = multi building skin data type (as Shibuya & Odaiba data).***
+		// 4 = pointsCloud data type.***
+		// 5 = pointsCloud data type pyramidOctree test.***	
+		if(this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
+			return neoReference.texture.fileLoadState;
+	
+		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
+		{
+			// provisionally use materialId as textureId.
+			var textureId = neoReference.materialId;
+			texture = this.texturesLoaded[textureId];
+			neoReference.texture = texture;
+			
+			if (texture.texId === undefined && texture.textureImageFileName !== "")
+			{
+				if (magoManager.backGround_fileReadings_count > 10) 
+				{ return undefined; }
+	
+				if (texture.fileLoadState === CODE.fileLoadState.READY) 
+				{
+					var gl = magoManager.sceneState.gl;
+					texture.texId = gl.createTexture();
+					// Load the texture.***
+					var projectFolderName = this.projectFolderName;
+					var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
+					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + this.buildingFileName + "/Images_Resized/" + texture.textureImageFileName;
+
+					magoManager.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, texture, this, magoManager);
+					magoManager.backGround_fileReadings_count ++;
+				}
+			}
+		}
+		
+		return neoReference.texture.fileLoadState;
+	}
 	
 };
 
