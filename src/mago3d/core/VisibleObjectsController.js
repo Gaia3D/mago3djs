@@ -10,7 +10,7 @@ var VisibleObjectsController = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	// This object works with FrustumVolumeControl.***
 	this.currentVisibles0 = [];
 	this.currentVisibles1 = [];
 	this.currentVisibles2 = [];

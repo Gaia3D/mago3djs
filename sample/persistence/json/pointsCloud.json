@@ -480,6 +480,120 @@
 			"longitude": 127.932919,
 			"pitch": 0,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 1 - 180924_032318_Scanner_1",
+			"data_name": "SEN_C - Scanner 1 - 180924_032318_Scanner_1",
+			"heading": 0,
+			"height": 151.681747,
+			"latitude": 37.392484,
+			"longitude": 127.932919,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 1 - 180924_032600_Scanner_1",
+			"data_name": "SEN_C - Scanner 1 - 180924_032600_Scanner_1",
+			"heading": 0,
+			"height": 142.967499,
+			"latitude": 37.386288,
+			"longitude": 127.944844,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 1 - 180924_032856_Scanner_1",
+			"data_name": "SEN_C - Scanner 1 - 180924_032856_Scanner_1",
+			"heading": 0,
+			"height": 132.674499,
+			"latitude": 37.381537,
+			"longitude": 127.95658,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
+			"data_name": "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
+			"heading": 0,
+			"height": 148.527122,
+			"latitude": 37.392555,
+			"longitude": 127.932668,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 2 - 180924_032600_Scanner_2",
+			"data_name": "SEN_C - Scanner 2 - 180924_032600_Scanner_2",
+			"heading": 0,
+			"height": 139.914749,
+			"latitude": 37.386419,
+			"longitude": 127.944761,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_key": "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
+			"data_name": "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
+			"heading": 0,
+			"height": 130.874874,
+			"latitude": 37.381339,
+			"longitude": 127.956207,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,

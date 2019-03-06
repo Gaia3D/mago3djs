@@ -1403,26 +1403,26 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles0);
 		
 		// provisionally prepare pointsCloud datas.******************************************************
-		if (this.visibleObjControlerOctreesAux === undefined)
-		{ this.visibleObjControlerOctreesAux = new VisibleObjectsController(); }
-		
-		this.visibleObjControlerOctreesAux.initArrays(); // init.******
+		// Load the motherOctrees pCloudData.***
 		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		for (var i=0; i<nodesCount; i++) 
 		{
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
-				
-			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctreesAux, 0))
-			{
-				// any octree is visible.
-				this.visibleObjControlerNodes.currentVisiblesAux.splice(i, 1);
-				i--;
-				nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
-			}
+			var neoBuilding = node.data.neoBuilding;
+			
+			if(neoBuilding === undefined)
+				continue;
+			
+			var octree = neoBuilding.octree; // MotherOctree.***
+			
+			if(octree === undefined)
+				continue;
+			
+			octree.preparePCloudData(this, neoBuilding);
+			
+			if(this.readerWriter.pCloudPartitions_requested >= 4)
+				break;
 		}
-		var fileRequestExtraCount = 2;
-		this.prepareVisibleOctreesSortedByDistancePointsCloudType(gl, this.visibleObjControlerOctreesAux, fileRequestExtraCount);
-		
 		
 		// TinTerrain.***
 		// TinTerrain.*******************************************************************************************************************************

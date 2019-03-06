@@ -324,14 +324,12 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
-		if (neoBuilding.currentVisibleOctreesControler === undefined)
-		{ continue; }
-	
-		var allVisibles = neoBuilding.currentVisibleOctreesControler.getAllVisibles();
-		lowestOctreesCount = allVisibles.length;
-		if (lowestOctreesCount === 0)
-		{ continue; }
-	
+		if(neoBuilding === undefined)
+			continue;
+		
+		if(neoBuilding.octree === undefined)
+			continue;
+
 		var projectDataType = neoBuilding.metaData.projectDataType;
 		
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
@@ -341,6 +339,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		
 		if (projectDataType !== undefined && projectDataType === 4)
 		{
+			// Old.***
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
 				lowestOctree = allVisibles[j];
@@ -392,16 +391,8 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 			relativeCam.calculateFrustumsPlanes();
 			var renderType = 1;// testing.***
 			var bPrepareData = true;
+			
 			neoBuilding.octree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
-			/*
-			for (var j=0; j<lowestOctreesCount; j++) 
-			{
-				lowestOctree = allVisibles[j];
-				lowestOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam);
-				
-				////gl.bindBuffer(gl.ARRAY_BUFFER, null);
-			}
-			*/
 		}
 	}
 	
