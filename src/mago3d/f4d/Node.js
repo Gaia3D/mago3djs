@@ -84,6 +84,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var neoBuilding = this.data.neoBuilding;
 	if (neoBuilding === undefined)
 	{ return; }
+
+	// Check projectType.*************************
+	var metaData = neoBuilding.metaData;
+	var projectsType = metaData.projectDataType;
+	//--------------------------------------------
 	
 	var rootNode = this.getRoot();
 	var geoLocDataManager = rootNode.data.geoLocDataManager;
