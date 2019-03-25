@@ -1405,6 +1405,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		// provisionally prepare pointsCloud datas.******************************************************
 		// Load the motherOctrees pCloudData.***
 		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
+		
 		for (var i=0; i<nodesCount; i++) 
 		{
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
@@ -1418,11 +1419,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			if(octree === undefined)
 				continue;
 			
-			octree.preparePCloudData(this, neoBuilding);
+			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
 			
-			if(this.readerWriter.pCloudPartitions_requested >= 4)
+			if(this.readerWriter.pCloudPartitions_requested >= 1)
 				break;
 		}
+		this.readerWriter.pCloudPartitions_requested = 0;
 		
 		// TinTerrain.***
 		// TinTerrain.*******************************************************************************************************************************
@@ -3202,7 +3204,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var neoBuilding = node.data.neoBuilding;
 	
 	// chaek if the neoBuilding has availableLod_0.***
-	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return; }
+	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return false; }
+	
+	// Check if for the current lod, the building is modelRefType.***
+	var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
+	if(!lodBuildingData.isModelRef)
+		return true; // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
 
 	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
 	var rootGeoLoc = rootGeoLocDataManager.getCurrentGeoLocationData();
@@ -3321,6 +3328,8 @@ MagoManager.prototype.manageQueue = function()
 	this.parseQueue.parseArrayOctreesPCloudPartition(gl, this.visibleObjControlerOctrees.currentVisiblesAux, this);
 
 	// parse skin-lego.***
+	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles0, this);
+	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles2, this);
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles3, this);
 
 	// parse TinTerrain.***
@@ -5066,27 +5075,21 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
-				
+
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{
 					geoLoc = this.calculate_geoLocDataOfNode(node);
 					continue;
 				}
-				geoLocDataManager = nodeRoot.data.geoLocDataManager;
-				geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-				realBuildingPos = node.getBBoxCenterPositionWorldCoord(geoLoc);
 				neoBuilding = node.data.neoBuilding;
-		
-				this.radiusAprox_aux = neoBuilding.bbox.getRadiusAprox();
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
-				
-				this.boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-				this.boundingSphere_Aux.setRadius(this.radiusAprox_aux);
-					
-				distToCamera = cameraPosition.distToSphere(this.boundingSphere_Aux);
+			
+				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+
 				neoBuilding.distToCam = distToCamera;
+				
 				if (neoBuilding.distToCam < lod0Dist)
 				{ neoBuilding.currentLod = 0; }
 				else if (neoBuilding.distToCam < lod1Dist)
@@ -5174,7 +5177,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 							}
 							else
 							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
 							}
 						}
 						else if (distToCamera < lod1_minDist) 
@@ -5186,7 +5190,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 							}
 							else
 							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
 							}
 						}
 						else if (distToCamera < lod2_minDist) 

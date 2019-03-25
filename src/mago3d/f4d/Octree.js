@@ -23,6 +23,7 @@ var Octree = function(octreeOwner)
 	this.octree_level = 0;
 	this.octree_number_name = 0;
 	this.neoBuildingOwnerId;
+	this.neoBuildingOwner;
 	this.octreeKey; // ownerBuilding_ID + octreeNumberName, so is unique.***
 	this.lod; // lod can be 0, 1 or 2...***
 	this.distToCamera;
@@ -45,6 +46,10 @@ var Octree = function(octreeOwner)
 	// PointsCloud pyramidOctree data.***
 	this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
 	this.pCloudPartitionsArray;
+	
+	// v002.***
+	this.blocksListsPartitionsCount;
+	this.blocksListsPartitionsParsedCount;
 };
 
 /**
@@ -400,6 +405,14 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	if (this.octree_number_name === undefined)
 	{ return; }
 
+	// Check the version.***
+	var version = neoBuilding.getHeaderVersion();
+	if(version === "0.0.2")
+	{
+		this.prepareModelReferencesListData_v002(magoManager);
+		return;
+	}
+
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	var buildingFolderName = neoBuilding.buildingFileName;
 	var projectFolderName = neoBuilding.projectFolderName;
@@ -421,6 +434,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 		magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
 	}
 	
+	
 	// 4 = parsed.***
 	// now, check if the blocksList is loaded & parsed.***
 	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
@@ -434,6 +448,63 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 		magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, this, magoManager);
 	}
+
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager) 
+{
+	var neoBuilding = this.neoBuildingOwner;
+		
+	// 1rst check possibles errors.***
+	if (neoBuilding === undefined)
+	{ return; }
+	
+	if (this.triPolyhedronsCount === 0) 
+	{ return; }
+	
+	if (this.octree_number_name === undefined)
+	{ return; }
+
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+	var buildingFolderName = neoBuilding.buildingFileName;
+	var projectFolderName = neoBuilding.projectFolderName;
+	
+	if (this.neoReferencesMotherAndIndices === undefined)
+	{
+		this.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
+		this.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+	}
+	
+	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
+	{
+		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
+		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
+
+		var subOctreeNumberName = this.octree_number_name.toString();
+		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+		var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+		magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
+	}
+	
+	// BlocksList: must distinguish v001 to v002.***
+	// In v002, the blocksList is conformed by partitions.***
+	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
+	if (blocksList === undefined)
+	{ return; }
+	
+	// Load blocksListsPartition.***
+	var partitionIdx = this.blocksListsPartitionsParsedCount;
+	if(partitionIdx < this.blocksListsPartitionsCount)
+	{
+		var subOctreeNumberName = this.octree_number_name.toString();
+		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
+		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model_" + partitionIdx.toString();
+		magoManager.readerWriter.getNeoBlocksArraybuffer_partition(filePathInServer, this, magoManager);
+	}
+	
 };
 
 /**
@@ -597,7 +668,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 		{
 			// Create the pCloudPartition.***
 			var readWriter = magoManager.readerWriter;
-			if (readWriter.pCloudPartitions_requested < 4)
+			if (readWriter.pCloudPartitions_requested < 1)
 			{
 				var pCloudPartitionLego = new Lego();
 				this.pCloudPartitionsArray.push(pCloudPartitionLego);
@@ -659,9 +730,12 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		// Check if pCloud data is loaded.***
 		if (bPrepareData)
 		{
-			if (this.preparePCloudData(magoManager, neoBuilding))
+			if (!magoManager.isCameraMoving && !magoManager.mouseLeftDown && !magoManager.mouseMiddleDown)
 			{
-				bPrepareData = false;
+				if (this.preparePCloudData(magoManager, neoBuilding))
+				{
+					bPrepareData = false;
+				}
 			}
 		}
 		
@@ -1108,6 +1182,9 @@ Octree.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z)
  */
 Octree.prototype.getMinDistToCamera = function(cameraPosition)
 {
+	// Old function. dont use this function.***
+	// Old function. dont use this function.***
+	// Old function. dont use this function.***
 	// this function returns the minDistToCamera of the lowestOctrees.***
 	var minDistToCam = 1000000.0;
 	
@@ -1596,6 +1673,73 @@ Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytes
 	}
 
 	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
+{
+	boundingSphere_Aux.setCenterPoint(this.centerPos.x, this.centerPos.y, this.centerPos.z);
+	boundingSphere_Aux.setRadius(this.getRadiusAprox());
+	return cameraPosition.distToSphere(boundingSphere_Aux);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSphere_Aux, octreesMaxSize) 
+{
+	// If this octree size > octreesMaxSize -> down in tree.***
+	var octreeSize = this.getRadiusAprox();
+	var subOctreesCount = this.subOctrees_array.length;
+	var dist;
+	if(octreeSize > octreesMaxSize && subOctreesCount > 0)
+	{
+		// Calculate the nearest subOctree to camera.***
+		var currDist;
+		var distCandidate;
+		var subOctreeCandidate;
+		for(var i=0; i<subOctreesCount; i++)
+		{
+			// Check if subOctree has content.***
+			var hasContent = false;
+			var subOctree = this.subOctrees_array[i];
+			if(subOctree.pCloudPartitionsCount && subOctree.pCloudPartitionsCount > 0)
+				hasContent = true;
+			if(subOctree.triPolyhedronsCount && subOctree.triPolyhedronsCount > 0)
+				hasContent = true;
+			
+			if(!hasContent)
+				continue;
+			
+			//currDist = subOctree.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
+			currDist = subOctree.centerPos.squareDistToPoint(cameraPosition); // test.***
+			if(distCandidate === undefined) 
+			{
+				distCandidate = currDist;
+				subOctreeCandidate = subOctree;
+			}
+			else{
+				if(currDist < distCandidate)
+				{
+					distCandidate = currDist;
+					subOctreeCandidate = subOctree;
+				}
+			}
+		}
+		
+		if(subOctreeCandidate)
+		{
+			return subOctreeCandidate.getMinDistToCameraInTree(cameraPosition, boundingSphere_Aux, octreesMaxSize);
+		}
+	}
+	else{
+		//dist = this.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
+		dist = this.centerPos.distToPoint(cameraPosition); // test.***
+	}
+	
+	return dist;
 };
 
 

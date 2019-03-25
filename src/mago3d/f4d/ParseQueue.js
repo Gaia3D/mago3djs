@@ -375,13 +375,18 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				
 				if (headerVersion[0] === "v")
 				{
-					// parse the beta version.
+					// parse the beta version.***
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
-				else 
+				else if (headerVersion === "0.0.1")
 				{
-					// parse versioned.
+					// parse versioned.***
 					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
+				}
+				else if (headerVersion === "0.0.2")
+				{
+					// parse partitioned.***
+					//blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				blocksList.dataArraybuffer = undefined;
 				octreesParsedCount++;

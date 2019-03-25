@@ -581,6 +581,159 @@
 			"longitude": 127.17898509286478,
 			"pitch": 0,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "00 BunYangBeSuJang",
+			"data_name": "00 문양배수장_FG",
+			"mapping_type":"origin",
+			"longitude": 128.434193,
+			"latitude": 35.851684,
+			"height": 96.000420,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "01 BunYangBeSuJang_SinSeol",
+			"data_name": "01 문양배수장_신설",
+			"mapping_type":"origin",
+			"longitude": 128.434021,
+			"latitude": 35.851469,
+			"height": 92.602089,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "02 BunYangBeSuJang_GuiJon",
+			"data_name": "02 문양배수장_기존",
+			"mapping_type":"origin",
+			"longitude": 128.435202,
+			"latitude": 35.851264,
+			"height": 103.494987,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "03 BunYangBeSuJang_ToChul",
+			"data_name": "03 문양배수장_토출부",
+			"mapping_type":"origin",
+			"longitude": 128.434012,
+			"latitude": 35.851108,
+			"height": 94.477173,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "04 BunYangBeSuJang_YuIbBu_OngByok1GuGan",
+			"data_name": "04 문양배수장_유입부_옹벽1구간",
+			"mapping_type":"origin",
+			"longitude": 128.434162,
+			"latitude": 35.851924,
+			"height": 97.251984,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "05 BunYangBeSuJang_YuIbBu_OngByok2-3GuGan",
+			"data_name": "05 문양배수장_유입부_옹벽2-3구간",
+			"mapping_type":"origin",
+			"longitude": 128.434328,
+			"latitude": 35.851427,
+			"height": 97.248474,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "06 BunYangBeSuJang_GaSiSeol",
+			"data_name": "06 문양배수장_가시설",
+			"mapping_type":"origin",
+			"longitude": 128.434024,
+			"latitude": 35.851470,
+			"height": 92.493385,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "07 BunYangBeSuJang_JiHyong",
+			"data_name": "07 문양배수장_지형",
+			"mapping_type":"origin",
+			"longitude": 128.435029,
+			"latitude": 35.851910,
+			"height": 92.465355,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "08 02 BunYangBeSuJang_GuiJonAmGeo",
+			"data_name": "08 02 문양배수장_기존암거",
+			"mapping_type":"origin",
+			"longitude": 128.434578,
+			"latitude": 35.851054,
+			"height": 84.195183,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
 		}
 	],
 	"parent": 0,

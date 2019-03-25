@@ -280,6 +280,9 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
  */
 GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera) 
 {
+	if(resultCamera === undefined)
+		resultCamera = new Camera();
+	
 	var pointAux = new Point3D();
 	
 	pointAux.set(absoluteCamera.position.x - this.position.x, 
@@ -300,6 +303,28 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 	pointAux = undefined;
 	
 	return resultCamera;
+};
+
+/**
+ * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ * @param absoluteCamera instance of Camera. 
+ * @param resultCamera instance of Camera. This is the transformed camera.
+ * @returns resultCamera
+ */
+GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
+{
+	if(resultRelativePosition === undefined)
+		resultRelativePosition = new Point3D();
+	
+	var pointAux = new Point3D();
+	
+	pointAux.set(absolutePosition.x - this.position.x, 
+		absolutePosition.y - this.position.y, 
+		absolutePosition.z - this.position.z);
+	
+	resultRelativePosition = this.rotMatrixInv.transformPoint3D(pointAux, resultRelativePosition);
+	
+	return resultRelativePosition;
 };
 
 /**
