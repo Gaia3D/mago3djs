@@ -22,6 +22,7 @@ var ReaderWriter = function()
 	this.k_counter;
 	this.referencesList_requested = 0;
 	this.blocksList_requested = 0;
+	this.blocksListPartitioned_requested = 0;
 	this.octreesSkinLegos_requested = 0;
 	this.skinLegos_requested = 0;
 	this.pCloudPartitions_requested = 0;
@@ -272,7 +273,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var xhr;
 	//xhr = new XMLHttpRequest();
-	blocksList.xhr = xhr;
+	blocksList.xhr = xhr; // possibility to cancel.***
 	
 	this.blocksList_requested++;
 	
@@ -301,6 +302,47 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	}).always(function() 
 	{
 		magoManager.readerWriter.blocksList_requested--;
+		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
+	});
+};
+
+ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, magoManager) 
+{
+	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
+	//var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+	//blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	//var xhr;
+	////xhr = new XMLHttpRequest();
+	//blocksList.xhr = xhr; // possibility to cancel.***
+	
+	this.blocksListPartitioned_requested++;
+	
+	loadWithXhr(fileName, xhr).done(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			blocksList.dataArraybuffer = arrayBuffer;
+			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			arrayBuffer = null;
+			
+			
+			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
+		}
+		else 
+		{
+			blocksList.fileLoadState = 500;
+		}
+	}).fail(function(status) 
+	{
+		console.log("Invalid XMLHttpRequest status = " + status);
+		if (status === 0) { blocksList.fileLoadState = 500; }
+		else if (status === -1) { blocksList.fileLoadState = CODE.fileLoadState.READY; }
+		else { blocksList.fileLoadState = status; }
+	}).always(function() 
+	{
+		magoManager.readerWriter.blocksListPartitioned_requested--;
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
 	});

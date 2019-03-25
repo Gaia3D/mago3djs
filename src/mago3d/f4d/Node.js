@@ -278,6 +278,51 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {boolean} applyOcclusionCulling
+ */
+Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
+{
+	var neoBuilding = this.data.neoBuilding;
+	
+	var nodeRoot = this.getRoot();
+	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	var realBuildingPos = this.getBBoxCenterPositionWorldCoord(geoLoc);
+	
+	boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+	boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
+		
+	var metaData = neoBuilding.metaData;
+	var projectsType = metaData.projectDataType;
+	if (projectsType && (projectsType === 4 || projectsType === 5))
+	{
+		// This is pointsCloud projectType.***
+		// Calculate the distance to camera with lowestOctrees.***
+		var octree = neoBuilding.octree;
+		if(octree === undefined)
+			return undefined;
+		
+		var relativeCamPos;
+		relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
+		//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
+		var octreesMaxSize = 120;
+		neoBuilding.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
+		boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+		boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
+	}
+	else{
+		// This is mesh projectType.***
+		
+		neoBuilding.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
+	}
+	
+	
+		
+	return neoBuilding.distToCam;
+};
+
 
 
 

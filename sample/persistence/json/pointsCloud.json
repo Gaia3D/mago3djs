@@ -491,12 +491,12 @@
 			"data_group_id": 78,
 			"data_group_name": "PointsCloud",
 			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 1 - 180924_032318_Scanner_1",
 			"data_name": "SEN_C - Scanner 1 - 180924_032318_Scanner_1",
 			"heading": 0,
-			"height": 151.681747,
-			"latitude": 37.392484,
-			"longitude": 127.932919,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 1 - 180924_032318_Scanner_1",
+			"latitude" : 34.05901906738067,
+			"longitude" : 130.5864989563062,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -510,12 +510,12 @@
 			"data_group_id": 78,
 			"data_group_name": "PointsCloud",
 			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 1 - 180924_032600_Scanner_1",
 			"data_name": "SEN_C - Scanner 1 - 180924_032600_Scanner_1",
 			"heading": 0,
-			"height": 142.967499,
-			"latitude": 37.386288,
-			"longitude": 127.944844,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 1 - 180924_032600_Scanner_1",
+			"latitude" : 34.05282280062895,
+			"longitude" : 130.5984242771472,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -529,12 +529,31 @@
 			"data_group_id": 78,
 			"data_group_name": "PointsCloud",
 			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 1 - 180924_032856_Scanner_1",
+			"data_name": "SEN_C - Scanner 1 - 180924_032849_Scanner_1",
+			"heading": 0,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 1 - 180924_032849_Scanner_1",
+			  "latitude" : 34.05040938169189,
+			  "longitude" : 130.6030578121039,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
 			"data_name": "SEN_C - Scanner 1 - 180924_032856_Scanner_1",
 			"heading": 0,
-			"height": 132.674499,
-			"latitude": 37.381537,
-			"longitude": 127.95658,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 1 - 180924_032856_Scanner_1",
+			  "latitude" : 34.04807235090706,
+			  "longitude" : 130.6101601476922,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -548,31 +567,12 @@
 			"data_group_id": 78,
 			"data_group_name": "PointsCloud",
 			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
-			"data_name": "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
-			"heading": 0,
-			"height": 148.527122,
-			"latitude": 37.392555,
-			"longitude": 127.932668,
-			"pitch": 0,
-			"roll": 0
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "PointsCloud",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_group_id": 78,
-			"data_group_name": "PointsCloud",
-			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 2 - 180924_032600_Scanner_2",
 			"data_name": "SEN_C - Scanner 2 - 180924_032600_Scanner_2",
 			"heading": 0,
-			"height": 139.914749,
-			"latitude": 37.386419,
-			"longitude": 127.944761,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
+			  "latitude" : 34.05908970540646,
+			  "longitude" : 130.5862476700540,
 			"pitch": 0,
 			"roll": 0
 		},
@@ -586,15 +586,6155 @@
 			"data_group_id": 78,
 			"data_group_name": "PointsCloud",
 			"mapping_type": "origin",
-			"data_key": "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
-			"data_name": "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
+			"data_name": "SEN_C - Scanner 2 - 180924_032318_Scanner_2",
 			"heading": 0,
-			"height": 130.874874,
-			"latitude": 37.381339,
-			"longitude": 127.956207,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 2 - 180924_032600_Scanner_2",
+			  "latitude" : 34.05295351103896,
+			  "longitude" : 130.5983414238023,
 			"pitch": 0,
 			"roll": 0
-		}
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_name": "SEN_C - Scanner 2 - 180924_032849_Scanner_2",
+			"heading": 0,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 2 - 180924_032849_Scanner_2",
+			  "latitude" : 34.05070344454242,
+			  "longitude" : 130.6030685093733,
+			"pitch": 0,
+			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "PointsCloud",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_group_id": 78,
+			"data_group_name": "PointsCloud",
+			"mapping_type": "origin",
+			"data_name": "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
+			"heading": 0,
+			"height": 0,
+			"data_key" : "SEN_C - Scanner 2 - 180924_032856_Scanner_2",
+		  "latitude" : 34.04787442360744,
+		  "longitude" : 130.6097870906931,
+			"pitch": 0,
+			"roll": 0
+		},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_024845_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_024845_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.673972,
+    "latitude": 37.376245,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.638875,
+    "latitude": 37.366393,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.634033,
+    "latitude": 37.369917,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.661618,
+    "latitude": 37.362489,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)11",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.667369,
+    "latitude": 37.370256,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)12",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.621082,
+    "latitude": 37.385717,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)13",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.630983,
+    "latitude": 37.397840,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)14",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)14",
+    "mapping_type":"origin",
+    "longitude": 126.627609,
+    "latitude": 37.397261,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)15",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)15",
+    "mapping_type":"origin",
+    "longitude": 126.622016,
+    "latitude": 37.385720,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)16",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)16",
+    "mapping_type":"origin",
+    "longitude": 126.631144,
+    "latitude": 37.397682,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)17",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)17",
+    "mapping_type":"origin",
+    "longitude": 126.627584,
+    "latitude": 37.397538,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)18",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)18",
+    "mapping_type":"origin",
+    "longitude": 126.625665,
+    "latitude": 37.374706,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)19",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)19",
+    "mapping_type":"origin",
+    "longitude": 126.655778,
+    "latitude": 37.359367,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.622340,
+    "latitude": 37.376126,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)20",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)20",
+    "mapping_type":"origin",
+    "longitude": 126.629616,
+    "latitude": 37.399083,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.638874,
+    "latitude": 37.366046,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.633589,
+    "latitude": 37.370629,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.622494,
+    "latitude": 37.375566,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.649517,
+    "latitude": 37.360943,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.661617,
+    "latitude": 37.362771,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.668295,
+    "latitude": 37.369972,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_025120_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.649515,
+    "latitude": 37.361296,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_030808_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_030808_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.633118,
+    "latitude": 37.395010,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_030935_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_030935_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.636445,
+    "latitude": 37.390085,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031239_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_031239_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640524,
+    "latitude": 37.384358,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.650327,
+    "latitude": 37.370199,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.654991,
+    "latitude": 37.366037,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.646320,
+    "latitude": 37.377325,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.659762,
+    "latitude": 37.364717,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.654211,
+    "latitude": 37.369464,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.654894,
+    "latitude": 37.366715,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.659423,
+    "latitude": 37.365213,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.654052,
+    "latitude": 37.369445,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.645948,
+    "latitude": 37.377463,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.650903,
+    "latitude": 37.371621,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_031448_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.653416,
+    "latitude": 37.369145,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.643882,
+    "latitude": 37.378595,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.647329,
+    "latitude": 37.376431,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.645156,
+    "latitude": 37.380288,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.641795,
+    "latitude": 37.382573,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.647580,
+    "latitude": 37.376559,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_032318_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.642666,
+    "latitude": 37.383001,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032600_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_032600_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.637185,
+    "latitude": 37.389625,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032849_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_032849_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.634284,
+    "latitude": 37.393575,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.630717,
+    "latitude": 37.398389,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.633753,
+    "latitude": 37.396518,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.633189,
+    "latitude": 37.402094,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.629495,
+    "latitude": 37.402574,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.630443,
+    "latitude": 37.398697,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.633872,
+    "latitude": 37.396581,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_032856_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.629585,
+    "latitude": 37.402312,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_033330_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_033330_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.639528,
+    "latitude": 37.394583,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_033620_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_033620_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.646465,
+    "latitude": 37.390196,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_033802_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_033802_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.653166,
+    "latitude": 37.386769,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_033956_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_033956_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.662496,
+    "latitude": 37.382628,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.666444,
+    "latitude": 37.379694,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.670667,
+    "latitude": 37.377841,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.668020,
+    "latitude": 37.380871,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.662497,
+    "latitude": 37.382466,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.669023,
+    "latitude": 37.378489,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_034217_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.662523,
+    "latitude": 37.382696,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034725_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_034725_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.656529,
+    "latitude": 37.385441,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_034918_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_034918_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.647977,
+    "latitude": 37.389806,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.636374,
+    "latitude": 37.396542,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.641175,
+    "latitude": 37.394418,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.640648,
+    "latitude": 37.402875,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.636862,
+    "latitude": 37.400885,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.636397,
+    "latitude": 37.396648,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.640923,
+    "latitude": 37.394719,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.642659,
+    "latitude": 37.404538,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_035146_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.638074,
+    "latitude": 37.399551,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.645542,
+    "latitude": 37.391954,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.651435,
+    "latitude": 37.396108,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.652415,
+    "latitude": 37.403021,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.645312,
+    "latitude": 37.406429,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.646356,
+    "latitude": 37.392563,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.650651,
+    "latitude": 37.396131,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.652152,
+    "latitude": 37.401077,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_035543_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.645335,
+    "latitude": 37.406320,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.627855,
+    "latitude": 37.375344,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.630744,
+    "latitude": 37.376570,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.633728,
+    "latitude": 37.381923,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)11",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.633235,
+    "latitude": 37.380716,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)12",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.637738,
+    "latitude": 37.385305,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)13",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.633722,
+    "latitude": 37.381940,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.632159,
+    "latitude": 37.379401,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.629792,
+    "latitude": 37.377572,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.628128,
+    "latitude": 37.375588,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.630183,
+    "latitude": 37.377024,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.632097,
+    "latitude": 37.379451,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.629885,
+    "latitude": 37.377567,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.634979,
+    "latitude": 37.380931,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_040140_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.638617,
+    "latitude": 37.385487,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_040647_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_040647_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640927,
+    "latitude": 37.387075,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041004_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_041004_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.647582,
+    "latitude": 37.393418,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.643814,
+    "latitude": 37.369325,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.648889,
+    "latitude": 37.372641,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.657232,
+    "latitude": 37.398209,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)11",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.651967,
+    "latitude": 37.397938,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)12",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.647440,
+    "latitude": 37.372345,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)13",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.656099,
+    "latitude": 37.380582,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)14",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)14",
+    "mapping_type":"origin",
+    "longitude": 126.660539,
+    "latitude": 37.392669,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)15",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)15",
+    "mapping_type":"origin",
+    "longitude": 126.652052,
+    "latitude": 37.397818,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.650879,
+    "latitude": 37.377452,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.656605,
+    "latitude": 37.380796,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.663662,
+    "latitude": 37.388789,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.661947,
+    "latitude": 37.396203,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.654568,
+    "latitude": 37.398542,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.658821,
+    "latitude": 37.385444,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.664033,
+    "latitude": 37.388623,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_041213_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.664024,
+    "latitude": 37.394962,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042101_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_042101_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.646757,
+    "latitude": 37.371676,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042239_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_042239_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.653432,
+    "latitude": 37.378456,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.660580,
+    "latitude": 37.384986,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.681930,
+    "latitude": 37.384213,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.678381,
+    "latitude": 37.388815,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.666176,
+    "latitude": 37.390102,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.683868,
+    "latitude": 37.386171,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_042515_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.664933,
+    "latitude": 37.389369,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.663101,
+    "latitude": 37.374371,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.670906,
+    "latitude": 37.373654,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.676269,
+    "latitude": 37.379490,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.658610,
+    "latitude": 37.378465,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.670573,
+    "latitude": 37.374712,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_043012_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.658066,
+    "latitude": 37.378514,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043642_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_043642_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.650658,
+    "latitude": 37.382701,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_043905_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_043905_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.644340,
+    "latitude": 37.386712,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044039_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_044039_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.638550,
+    "latitude": 37.390536,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.626028,
+    "latitude": 37.383572,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.631182,
+    "latitude": 37.380897,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.632560,
+    "latitude": 37.391135,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.627358,
+    "latitude": 37.388524,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.630009,
+    "latitude": 37.381761,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_044431_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.632860,
+    "latitude": 37.392828,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_044822_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_044822_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.634601,
+    "latitude": 37.379495,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045058_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_045058_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.642662,
+    "latitude": 37.382321,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.645297,
+    "latitude": 37.385081,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.649142,
+    "latitude": 37.387934,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.647861,
+    "latitude": 37.389073,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)11",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.643421,
+    "latitude": 37.383502,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)12",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.651049,
+    "latitude": 37.391633,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)13",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.648390,
+    "latitude": 37.389624,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.650052,
+    "latitude": 37.389851,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.651965,
+    "latitude": 37.390794,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.653223,
+    "latitude": 37.393031,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.650890,
+    "latitude": 37.392212,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.649999,
+    "latitude": 37.389851,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.651995,
+    "latitude": 37.390932,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.653018,
+    "latitude": 37.393021,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_045348_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.650962,
+    "latitude": 37.392213,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_045830_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_045830_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640259,
+    "latitude": 37.379584,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050044_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_050044_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.641467,
+    "latitude": 37.373651,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)0",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.645241,
+    "latitude": 37.369397,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)1",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.652261,
+    "latitude": 37.364835,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)10",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.644851,
+    "latitude": 37.370120,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)11",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.648618,
+    "latitude": 37.367387,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)2",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.656914,
+    "latitude": 37.363145,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)3",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.654171,
+    "latitude": 37.366003,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)4",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.649750,
+    "latitude": 37.367827,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)5",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.651592,
+    "latitude": 37.365269,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)6",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.657820,
+    "latitude": 37.362704,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)7",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.649024,
+    "latitude": 37.367808,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)8",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.646669,
+    "latitude": 37.370485,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)9",
+    "data_name": "song - Scanner 1 - 180924_050332_Scanner_1 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.639002,
+    "latitude": 37.374848,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 1 - 180924_051039_Scanner_1 - originalpoints, (first)",
+    "data_name": "song - Scanner 1 - 180924_051039_Scanner_1 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.627328,
+    "latitude": 37.382552,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_024845_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_024845_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.674004,
+    "latitude": 37.376260,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.639032,
+    "latitude": 37.366002,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.633071,
+    "latitude": 37.370566,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.660823,
+    "latitude": 37.363331,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)11",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.667695,
+    "latitude": 37.369930,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)12",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.621904,
+    "latitude": 37.385717,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)13",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.630928,
+    "latitude": 37.397772,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)14",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)14",
+    "mapping_type":"origin",
+    "longitude": 126.627543,
+    "latitude": 37.397535,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)15",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)15",
+    "mapping_type":"origin",
+    "longitude": 126.619051,
+    "latitude": 37.383450,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)16",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)16",
+    "mapping_type":"origin",
+    "longitude": 126.630991,
+    "latitude": 37.398753,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)17",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)17",
+    "mapping_type":"origin",
+    "longitude": 126.627578,
+    "latitude": 37.397302,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)18",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)18",
+    "mapping_type":"origin",
+    "longitude": 126.628798,
+    "latitude": 37.372102,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)19",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)19",
+    "mapping_type":"origin",
+    "longitude": 126.657989,
+    "latitude": 37.361227,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.622517,
+    "latitude": 37.375549,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)20",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)20",
+    "mapping_type":"origin",
+    "longitude": 126.630013,
+    "latitude": 37.398857,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.641786,
+    "latitude": 37.365613,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.631480,
+    "latitude": 37.371436,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.622980,
+    "latitude": 37.375831,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.649657,
+    "latitude": 37.361243,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.662018,
+    "latitude": 37.362525,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.667577,
+    "latitude": 37.369903,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_025120_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.649677,
+    "latitude": 37.360509,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_030808_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_030808_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.633119,
+    "latitude": 37.395344,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_030935_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_030935_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.636442,
+    "latitude": 37.390303,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031239_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_031239_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640422,
+    "latitude": 37.384422,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.649855,
+    "latitude": 37.370263,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.654835,
+    "latitude": 37.366076,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.646326,
+    "latitude": 37.377624,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.659927,
+    "latitude": 37.364646,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.654254,
+    "latitude": 37.369282,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.655071,
+    "latitude": 37.367180,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.657738,
+    "latitude": 37.366365,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.653613,
+    "latitude": 37.369203,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.645983,
+    "latitude": 37.377992,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.650953,
+    "latitude": 37.371701,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_031448_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.653546,
+    "latitude": 37.368911,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032318_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_032318_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.644660,
+    "latitude": 37.379298,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032600_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_032600_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.637345,
+    "latitude": 37.389551,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032849_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_032849_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.634680,
+    "latitude": 37.393558,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.630742,
+    "latitude": 37.398249,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.633389,
+    "latitude": 37.396061,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.632962,
+    "latitude": 37.402173,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.629319,
+    "latitude": 37.402421,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.630517,
+    "latitude": 37.398454,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.633280,
+    "latitude": 37.396138,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_032856_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.629302,
+    "latitude": 37.402257,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_033330_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_033330_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.639576,
+    "latitude": 37.394622,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_033620_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_033620_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.646728,
+    "latitude": 37.390221,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_033802_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_033802_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.653189,
+    "latitude": 37.386827,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_033956_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_033956_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.662540,
+    "latitude": 37.382480,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.666170,
+    "latitude": 37.379775,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.670886,
+    "latitude": 37.377934,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.668113,
+    "latitude": 37.380831,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.663154,
+    "latitude": 37.382616,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.668984,
+    "latitude": 37.378572,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_034218_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.663024,
+    "latitude": 37.381615,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034725_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_034725_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.656362,
+    "latitude": 37.385440,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_034918_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_034918_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.647960,
+    "latitude": 37.389883,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.636304,
+    "latitude": 37.396235,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.640685,
+    "latitude": 37.394198,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.640921,
+    "latitude": 37.402356,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.636327,
+    "latitude": 37.400496,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.636342,
+    "latitude": 37.396842,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.640401,
+    "latitude": 37.394673,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_035146_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.635869,
+    "latitude": 37.398437,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.645051,
+    "latitude": 37.392018,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.651496,
+    "latitude": 37.396130,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.652268,
+    "latitude": 37.403120,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.644873,
+    "latitude": 37.406741,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.646213,
+    "latitude": 37.392143,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.650640,
+    "latitude": 37.396164,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.653414,
+    "latitude": 37.399399,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_035543_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.645758,
+    "latitude": 37.406305,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.628034,
+    "latitude": 37.375278,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.630927,
+    "latitude": 37.376656,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.633842,
+    "latitude": 37.381965,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)11",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.632621,
+    "latitude": 37.379879,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)12",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.637951,
+    "latitude": 37.385206,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)13",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.633652,
+    "latitude": 37.381786,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.632462,
+    "latitude": 37.379209,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.629426,
+    "latitude": 37.377651,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.628112,
+    "latitude": 37.375336,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.630564,
+    "latitude": 37.376917,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.632462,
+    "latitude": 37.379210,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.629435,
+    "latitude": 37.377662,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.634975,
+    "latitude": 37.380739,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_040140_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.639105,
+    "latitude": 37.385104,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_040647_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_040647_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640801,
+    "latitude": 37.387125,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041004_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_041004_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.647493,
+    "latitude": 37.393391,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.643814,
+    "latitude": 37.369095,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.648860,
+    "latitude": 37.372689,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.657240,
+    "latitude": 37.398200,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)11",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.658936,
+    "latitude": 37.385461,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)12",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.663892,
+    "latitude": 37.388787,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)13",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.663992,
+    "latitude": 37.394932,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)14",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)14",
+    "mapping_type":"origin",
+    "longitude": 126.657237,
+    "latitude": 37.398760,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)15",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)15",
+    "mapping_type":"origin",
+    "longitude": 126.651577,
+    "latitude": 37.397865,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)16",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)16",
+    "mapping_type":"origin",
+    "longitude": 126.649688,
+    "latitude": 37.374415,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)17",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)17",
+    "mapping_type":"origin",
+    "longitude": 126.655360,
+    "latitude": 37.380509,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)18",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)18",
+    "mapping_type":"origin",
+    "longitude": 126.662978,
+    "latitude": 37.388498,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)19",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)19",
+    "mapping_type":"origin",
+    "longitude": 126.651100,
+    "latitude": 37.397724,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.650861,
+    "latitude": 37.377554,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.643818,
+    "latitude": 37.369105,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.648847,
+    "latitude": 37.372764,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.650974,
+    "latitude": 37.377520,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.656606,
+    "latitude": 37.380770,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.658940,
+    "latitude": 37.385186,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.664030,
+    "latitude": 37.388728,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_041213_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.664036,
+    "latitude": 37.394940,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042101_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_042101_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.646947,
+    "latitude": 37.371697,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042239_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_042239_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.653447,
+    "latitude": 37.378449,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.660414,
+    "latitude": 37.385476,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.681464,
+    "latitude": 37.384604,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.678152,
+    "latitude": 37.389004,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.666098,
+    "latitude": 37.390234,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.660210,
+    "latitude": 37.385406,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.682549,
+    "latitude": 37.385193,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.681203,
+    "latitude": 37.387473,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_042515_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.665002,
+    "latitude": 37.390270,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.663787,
+    "latitude": 37.374051,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.671193,
+    "latitude": 37.373520,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.676582,
+    "latitude": 37.379085,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.659216,
+    "latitude": 37.378548,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.663835,
+    "latitude": 37.374171,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.670764,
+    "latitude": 37.373625,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.676140,
+    "latitude": 37.379098,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_043012_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.658232,
+    "latitude": 37.378347,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043642_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_043642_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.650692,
+    "latitude": 37.382776,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_043905_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_043905_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.644214,
+    "latitude": 37.386724,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044039_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_044039_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.638320,
+    "latitude": 37.390562,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.625970,
+    "latitude": 37.383516,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.630688,
+    "latitude": 37.380721,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.632397,
+    "latitude": 37.391104,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.627504,
+    "latitude": 37.388527,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.631242,
+    "latitude": 37.380879,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_044431_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.632877,
+    "latitude": 37.391822,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_044822_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_044822_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.634297,
+    "latitude": 37.379268,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.639692,
+    "latitude": 37.378720,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.643242,
+    "latitude": 37.381785,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.646346,
+    "latitude": 37.385347,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.641958,
+    "latitude": 37.382981,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.642298,
+    "latitude": 37.381330,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.643484,
+    "latitude": 37.383486,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_045058_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.642846,
+    "latitude": 37.383280,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.644954,
+    "latitude": 37.385407,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.649050,
+    "latitude": 37.387735,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.647652,
+    "latitude": 37.389020,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)11",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.644061,
+    "latitude": 37.383997,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)12",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.651106,
+    "latitude": 37.391396,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)13",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)13",
+    "mapping_type":"origin",
+    "longitude": 126.647446,
+    "latitude": 37.388739,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.649907,
+    "latitude": 37.389988,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.652189,
+    "latitude": 37.390904,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.653209,
+    "latitude": 37.393077,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.651108,
+    "latitude": 37.392144,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.649915,
+    "latitude": 37.389988,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.652061,
+    "latitude": 37.390915,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.653121,
+    "latitude": 37.393076,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_045348_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.650823,
+    "latitude": 37.392118,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_045830_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_045830_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.640267,
+    "latitude": 37.379559,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050044_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_050044_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.641074,
+    "latitude": 37.373534,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)0",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)0",
+    "mapping_type":"origin",
+    "longitude": 126.645444,
+    "latitude": 37.369397,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)1",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)1",
+    "mapping_type":"origin",
+    "longitude": 126.652244,
+    "latitude": 37.364875,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)10",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)10",
+    "mapping_type":"origin",
+    "longitude": 126.639569,
+    "latitude": 37.375339,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)11",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)11",
+    "mapping_type":"origin",
+    "longitude": 126.648869,
+    "latitude": 37.367304,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)12",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)12",
+    "mapping_type":"origin",
+    "longitude": 126.633114,
+    "latitude": 37.380026,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)2",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)2",
+    "mapping_type":"origin",
+    "longitude": 126.657009,
+    "latitude": 37.363228,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)3",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)3",
+    "mapping_type":"origin",
+    "longitude": 126.654138,
+    "latitude": 37.366040,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)4",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)4",
+    "mapping_type":"origin",
+    "longitude": 126.650033,
+    "latitude": 37.368072,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)5",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)5",
+    "mapping_type":"origin",
+    "longitude": 126.651467,
+    "latitude": 37.365351,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)6",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)6",
+    "mapping_type":"origin",
+    "longitude": 126.657819,
+    "latitude": 37.362583,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)7",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)7",
+    "mapping_type":"origin",
+    "longitude": 126.654077,
+    "latitude": 37.365788,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)8",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)8",
+    "mapping_type":"origin",
+    "longitude": 126.649134,
+    "latitude": 37.368061,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)9",
+    "data_name": "song - Scanner 2 - 180924_050332_Scanner_2 - originalpoints, (first)9",
+    "mapping_type":"origin",
+    "longitude": 126.646560,
+    "latitude": 37.370526,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "song - Scanner 2 - 180924_051039_Scanner_2 - originalpoints, (first)",
+    "data_name": "song - Scanner 2 - 180924_051039_Scanner_2 - originalpoints, (first)",
+    "mapping_type":"origin",
+    "longitude": 126.627426,
+    "latitude": 37.382590,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+
 	],
 	"parent": 0,
 	"depth": 1,

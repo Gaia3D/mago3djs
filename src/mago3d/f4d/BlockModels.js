@@ -64,6 +64,7 @@ Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToR
  */
 var BlocksList = function() 
 {
+	// This class is created in "Octree.prototype.prepareModelReferencesListData = function(magoManager) ".***
 	if (!(this instanceof BlocksList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -75,6 +76,9 @@ var BlocksList = function()
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 	this.xhr; // file request.***
+	
+	// v002.***
+	//this.
 };
 
 /**
@@ -515,52 +519,4 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	return succesfullyGpuDataBinded;
 };
 
-/**
- * 블록 컨테이너
- * @class BlocksListsContainer
- */
-var BlocksListsContainer = function() 
-{
-	if (!(this instanceof BlocksListsContainer)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.blocksListsArray = [];
-};
 
-/**
- * 새 블록 리스트를 생성
- * @param blocksListName 변수
- * @returns blocksList
- */
-BlocksListsContainer.prototype.newBlocksList = function(blocksListName) 
-{
-	var blocksList = new BlocksList();
-	blocksList.name = blocksListName;
-	this.blocksListsArray.push(blocksList);
-	return blocksList;
-};
-
-/**
- * 블록 리스트 획득
- * @param blockList_name 변수
- * @returns blocksList
- */
-BlocksListsContainer.prototype.getBlockList = function(blockList_name) 
-{
-	var blocksListsCount = this.blocksListsArray.length;
-	var found = false;
-	var i=0;
-	var blocksList = null;
-	while (!found && i<blocksListsCount) 
-	{
-		var currentBlocksList = this.blocksListsArray[i];
-		if (currentBlocksList.name === blockList_name) 
-		{
-			found = true;
-			blocksList = currentBlocksList;
-		}
-		i++;
-	}
-	return blocksList;
-};
