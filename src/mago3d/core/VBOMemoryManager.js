@@ -268,6 +268,8 @@ var VBOMemoryManager = function()
 	
 	this.buffersKeyWorld.bytesLimit = 800000000;
 	this.elementKeyWorld.bytesLimit = 300000000;
+	
+	this.currentMemoryUsage = 0.0;
 };
 
 /**
@@ -288,9 +290,17 @@ VBOMemoryManager.prototype.isGpuMemFull = function()
 VBOMemoryManager.prototype.getClassifiedBufferKey = function(gl, bufferSize) 
 {
 	if (this.enableMemoryManagement)
-	{ return this.buffersKeyWorld.getClassifiedBufferKey(gl, bufferSize); }
+	{ 
+		var bufferKey = this.buffersKeyWorld.getClassifiedBufferKey(gl, bufferSize);
+		if(bufferKey !== undefined)
+			this.currentMemoryUsage += bufferSize;
+		return bufferKey; 
+	}
 	else
-	{ return gl.createBuffer(); }
+	{ 
+		this.currentMemoryUsage += bufferSize;
+		return gl.createBuffer(); 
+	}
 };
 
 /**
@@ -303,6 +313,10 @@ VBOMemoryManager.prototype.storeClassifiedBufferKey = function(gl, bufferKey, bu
 	{ this.buffersKeyWorld.storeClassifiedBufferKey(bufferKey, bufferSize); }
 	else
 	{ gl.deleteBuffer(bufferKey); }
+
+	this.currentMemoryUsage -= bufferSize;
+	if(this.currentMemoryUsage < 0.0)
+		this.currentMemoryUsage = 0.0;
 };
 
 /**

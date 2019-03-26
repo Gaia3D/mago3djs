@@ -196,25 +196,29 @@ Octree.prototype.deletePCloudObjects = function(gl, vboMemManager)
 	//this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
 	//this.pCloudPartitionsArray;
 	
-	if (this.pCloudPartitionsArray === undefined)
-	{ return; }
+	if (this.pCloudPartitionsArray !== undefined)
+	{ 
 	
-	var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
-	for (var i=0; i<pCloudPartitionsCount; i++)
-	{
-		var pCloudPartition = this.pCloudPartitionsArray[i];
-		// Note: provisionally "pCloudPartition" is a lego class object.***
-		pCloudPartition.deleteObjects(gl, vboMemManager);
+		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
+		for (var i=0; i<pCloudPartitionsCount; i++)
+		{
+			var pCloudPartition = this.pCloudPartitionsArray[i];
+			// Note: provisionally "pCloudPartition" is a lego class object.***
+			pCloudPartition.deleteObjects(gl, vboMemManager);
+		}
+		
+		this.pCloudPartitionsArray = undefined;
 	}
 	
-	this.pCloudPartitionsArray = undefined;
-	
 	// Now, delete child.***
-	var childsCount = this.subOctrees_array.length;
-	for (var i=0; i<childsCount; i++)
+	if(this.subOctrees_array !== undefined)
 	{
-		var subOctree = this.subOctrees_array[i];
-		subOctree.deletePCloudObjects(gl, vboMemManager);
+		var childsCount = this.subOctrees_array.length;
+		for (var i=0; i<childsCount; i++)
+		{
+			var subOctree = this.subOctrees_array[i];
+			subOctree.deletePCloudObjects(gl, vboMemManager);
+		}
 	}
 };
 
@@ -640,7 +644,11 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	var pCloudPartitionsCount = this.pCloudPartitionsCount;
 		
 	if (this.lod === 1)
-	{ pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2); }
+	{ 
+		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
+		if(pCloudPartitionsCount > 10)
+			pCloudPartitionsCount = 10;
+	}
 	else if (this.lod > 1)
 	{ pCloudPartitionsCount = 1; }
 	
@@ -668,22 +676,24 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 		{
 			// Create the pCloudPartition.***
 			var readWriter = magoManager.readerWriter;
-			if (readWriter.pCloudPartitions_requested < 1)
-			{
-				var pCloudPartitionLego = new Lego();
-				this.pCloudPartitionsArray.push(pCloudPartitionLego);
-				pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
-				
-				var projectFolderName = neoBuilding.projectFolderName;
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-				var subOctreeNumberName = this.octree_number_name.toString();
-				var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-				var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
-				
-				readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
-				return true;
-			}
+
+				if (readWriter.pCloudPartitions_requested < 1 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+				{
+					var pCloudPartitionLego = new Lego();
+					this.pCloudPartitionsArray.push(pCloudPartitionLego);
+					pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
+					
+					var projectFolderName = neoBuilding.projectFolderName;
+					var buildingFolderName = neoBuilding.buildingFileName;
+					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+					var subOctreeNumberName = this.octree_number_name.toString();
+					var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+					var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
+					
+					readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+					return true;
+				}
+			
 		}
 	}
 	
@@ -777,7 +787,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 
 		}
 		
-
+		
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
 			var subOctree = this.subOctrees_array[i];

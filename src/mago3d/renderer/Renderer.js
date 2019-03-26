@@ -263,23 +263,23 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		}
 		else if (distToCam < 200)
 		{
-			vertices_count = Math.floor(vertices_count/2);
+			vertices_count = Math.floor(vertices_count/4);
 		}
 		else if (distToCam < 400)
 		{
-			vertices_count = Math.floor(vertices_count/4);
+			vertices_count = Math.floor(vertices_count/8);
 		}
 		else if (distToCam < 800)
 		{
-			vertices_count = Math.floor(vertices_count/8);
+			vertices_count = Math.floor(vertices_count/16);
 		}
 		else if (distToCam < 1600)
 		{
-			vertices_count = Math.floor(vertices_count/16);
+			vertices_count = Math.floor(vertices_count/32);
 		}
 		else
 		{
-			vertices_count = Math.floor(vertices_count/32);
+			vertices_count = Math.floor(vertices_count/64);
 		}
 		
 		

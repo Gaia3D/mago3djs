@@ -1409,6 +1409,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		for (var i=0; i<nodesCount; i++) 
 		{
+			if(this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
+				break;
+			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			var neoBuilding = node.data.neoBuilding;
 			
@@ -1422,8 +1425,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			
 			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
 			
-			if(this.readerWriter.pCloudPartitions_requested >= 1)
-				break;
+			
 		}
 		this.readerWriter.pCloudPartitions_requested = 0;
 		
