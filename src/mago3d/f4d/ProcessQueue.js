@@ -376,6 +376,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			if (neoBuilding.octree)
 			{
 				neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+				neoBuilding.octree.deletePCloudObjects(gl, magoManager.vboMemoryManager);
 			}
 			if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
 			{
@@ -408,6 +409,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 				if (neoBuilding.octree)
 				{
 					neoBuilding.octree.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
+					neoBuilding.octree.deletePCloudObjects(gl, magoManager.vboMemoryManager);
 				}
 				if (neoBuilding.motherBlocksArray.length > 0 || neoBuilding.motherNeoReferencesArray.length > 0)
 				{

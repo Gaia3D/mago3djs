@@ -755,10 +755,10 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 			{ pCloudPartitionsCount = 10; }
 		}
 		else if (this.lod > 1)
-		{ pCloudPartitionsCount = 1; }
-		
-		// Test.***
-		//pCloudPartitionsCount = 1;
+		{ 
+			pCloudPartitionsCount = 1; 
+		}
+
 		
 		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
@@ -777,11 +777,13 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 
 		}
 		
+
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
 			var subOctree = this.subOctrees_array[i];
 			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
 		}
+		
 	}
 	else
 	{
@@ -804,6 +806,8 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		}
 	}
 };
+
+
 
 /**
  * 어떤 일을 하고 있습니까?
