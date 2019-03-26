@@ -1155,7 +1155,8 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);	
+			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
+						
 		} else {
 			var defaultProjectArray = serverPolicy.geo_data_default_projects;
 			var projectIdArray = new Array(defaultProjectArray.length);
@@ -1185,10 +1186,17 @@
 				});
 			});
 		}
+		
+		
 	}
 	
 	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
 		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+		
+		// If want use gpu_memoryPool.******************************
+		//var magoManager = managerFactory.getMagoManager();
+		//magoManager.vboMemoryManager.enableMemoryManagement = true;
+		//----------------------------------------------------------
 	}
 	
 	function gotoProject(projectId, longitude, latitude, height, duration) {

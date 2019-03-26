@@ -86,7 +86,8 @@ var VBOKeysNation = function(bufferSizes, minSize)
 VBOKeysNation.prototype.getClassifiedBufferKey = function(gl, bufferSize, keyWorld, onlyReuse) 
 {
 	// 1rst find the vboKeyStore for this bufferSize.
-	var vboKeyStore = this.vboKeysStoreMap[bufferSize];
+	var closestBufferSize = this.getClosestBufferSize(bufferSize);
+	var vboKeyStore = this.vboKeysStoreMap[closestBufferSize];
 	
 	if (vboKeyStore)
 	{
