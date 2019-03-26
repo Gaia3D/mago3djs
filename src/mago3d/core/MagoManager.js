@@ -125,6 +125,7 @@ var MagoManager = function()
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
 	this.selectionColor = new SelectionColor();
 	this.vboMemoryManager = new VBOMemoryManager();
+	
 
 	this.fileRequestControler = new FileRequestControler();
 	this.visibleObjControlerOctrees = new VisibleObjectsController(); 
