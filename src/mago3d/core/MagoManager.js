@@ -3920,10 +3920,11 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 
 	renderTexture = false;
 	
-	if (ssao_idx === 0) 
+	if (ssao_idx === 0 ) 
 	{
 		gl.disable(gl.BLEND);
 		this.renderGeometryDepth(gl, ssao_idx, visibleObjControlerNodes);
+		
 		// Draw the axis.***
 		if (this.magoPolicy.getShowOrigin() && this.nodeSelected !== undefined)
 		{
@@ -3953,7 +3954,8 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		{
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
-			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
+			var bApplySsao = true;
+			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
 			if (this.noiseTexture === undefined) 
 			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
@@ -3981,6 +3983,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			var renderType = 1;
 			var refMatrixIdxKey =0; // provisionally set this var here.***
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			
+			bApplySsao = false;
+			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
+			
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
@@ -4701,8 +4707,8 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 		var minSize = 0.0;
 
 		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);

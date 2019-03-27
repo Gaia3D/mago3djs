@@ -310,9 +310,9 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, magoManager) 
 {
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
-	//var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-	//blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	//var xhr;
+	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	var xhr;
 	////xhr = new XMLHttpRequest();
 	//blocksList.xhr = xhr; // possibility to cancel.***
 	
@@ -792,6 +792,11 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
+			
+			//if(neoBuilding.buildingId == "KSJ_100")
+			//{
+			//	var hola = 0;
+			//}
 			
 			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
 			if (metaData.projectDataType === 5)
