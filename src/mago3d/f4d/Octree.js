@@ -500,6 +500,9 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 	{ return; }
 	
 	// Load blocksListsPartition.***
+	if(this.blocksListsPartitionsParsedCount === undefined)
+		this.blocksListsPartitionsParsedCount = 0;
+	
 	var partitionIdx = this.blocksListsPartitionsParsedCount;
 	if(partitionIdx < this.blocksListsPartitionsCount)
 	{
@@ -651,6 +654,10 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	}
 	else if (this.lod > 1)
 	{ pCloudPartitionsCount = 1; }
+
+	// Temporary total limiting:
+	//if(pCloudPartitionsCount > 15)
+	//	pCloudPartitionsCount = 15;
 	
 	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
@@ -1596,6 +1603,10 @@ Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
  */
 Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
 {
+	// Check the metaData version.***
+	var version = neoBuildingOwner.getHeaderVersion();
+	
+	
 	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 	if (octreeLevel === 0) 
@@ -1616,6 +1627,12 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
+
+	if(version === "0.0.2")
+	{
+		// Read ModelLists partitions count.***
+		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	}
 
 	// 1rst, create the 8 subOctrees.***
 	for (var i=0; i<subOctreesCount; i++) 

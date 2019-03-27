@@ -85,6 +85,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
+	if(neoBuilding.buildingId == "KSJ_100")
+	{
+		var hola = 0;
+	}
+
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
