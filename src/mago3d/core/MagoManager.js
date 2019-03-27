@@ -6495,6 +6495,10 @@ MagoManager.prototype.callAPI = function(api)
 			DrawAPI.drawInsertIssueImage(api, this);
 		}
 	}
+	else if (apiName === "gotoFly")
+	{
+		this.flyToPoint(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
+	}
 	else if (apiName === "getCoordinateRelativeToBuilding") 
 	{
 		var projectId = api.getProjectId();
