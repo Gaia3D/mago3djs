@@ -5391,6 +5391,30 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 	*/
 };
 
+MagoManager.prototype.flyToPoint = function(longitude, latitude, altitude, duration) 
+{
+	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
+	{
+		this.scene.camera.flyTo({
+			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
+				parseFloat(latitude),
+				parseFloat(altitude)),
+			duration: parseInt(duration)
+		});
+	}
+	else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND)
+	{
+		this.wwd.goToAnimator.travelTime = duration * 1000;
+		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
+	}
+	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
+	{
+		this.magoWorld.goto(parseFloat(longitude),
+			parseFloat(latitude),
+			parseFloat(altitude) + 10);
+	}
+};
+
 /**
  * dataKey 이용해서 data 검색
  * @param apiName api 이름
@@ -6498,6 +6522,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "gotoFly")
 	{
 		this.flyToPoint(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
+		//this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
 	}
 	else if (apiName === "getCoordinateRelativeToBuilding") 
 	{
