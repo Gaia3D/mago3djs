@@ -324,11 +324,11 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
 		
-		if(neoBuilding === undefined)
-			continue;
+		if (neoBuilding === undefined)
+		{ continue; }
 		
-		if(neoBuilding.octree === undefined)
-			continue;
+		if (neoBuilding.octree === undefined)
+		{ continue; }
 
 		var projectDataType = neoBuilding.metaData.projectDataType;
 		
