@@ -470,10 +470,10 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  */
 NeoBuilding.prototype.getHeaderVersion = function() 
 {
-	if(this.metaData)
-		return this.metaData.version;
+	if (this.metaData)
+	{ return this.metaData.version; }
 	else
-		return undefined;
+	{ return undefined; }
 };
 
 

@@ -1409,8 +1409,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		for (var i=0; i<nodesCount; i++) 
 		{
-			if(this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
-				break;
+			if (this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
+			{ break; }
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			var neoBuilding = node.data.neoBuilding;
@@ -3211,8 +3211,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	
 	// Check if for the current lod, the building is modelRefType.***
 	var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
-	if(!lodBuildingData.isModelRef)
-		return true; // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
+	if (!lodBuildingData.isModelRef)
+	{ return true; } // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
 
 	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
 	var rootGeoLoc = rootGeoLocDataManager.getCurrentGeoLocationData();

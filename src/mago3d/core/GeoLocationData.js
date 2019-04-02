@@ -280,8 +280,8 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
  */
 GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera, resultCamera) 
 {
-	if(resultCamera === undefined)
-		resultCamera = new Camera();
+	if (resultCamera === undefined)
+	{ resultCamera = new Camera(); }
 	
 	var pointAux = new Point3D();
 	
@@ -313,8 +313,8 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
  */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
-	if(resultRelativePosition === undefined)
-		resultRelativePosition = new Point3D();
+	if (resultRelativePosition === undefined)
+	{ resultRelativePosition = new Point3D(); }
 	
 	var pointAux = new Point3D();
 	

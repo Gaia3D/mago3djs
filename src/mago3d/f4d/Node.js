@@ -85,11 +85,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
-	if(neoBuilding.buildingId == "KSJ_100")
-	{
-		var hola = 0;
-	}
-
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
@@ -306,8 +301,8 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		// This is pointsCloud projectType.***
 		// Calculate the distance to camera with lowestOctrees.***
 		var octree = neoBuilding.octree;
-		if(octree === undefined)
-			return undefined;
+		if (octree === undefined)
+		{ return undefined; }
 		
 		var relativeCamPos;
 		relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
@@ -317,14 +312,13 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 		boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
 	}
-	else{
+	else 
+	{
 		// This is mesh projectType.***
 		
 		neoBuilding.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
 	}
-	
-	
-		
+
 	return neoBuilding.distToCam;
 };
 

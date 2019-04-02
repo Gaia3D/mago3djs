@@ -211,7 +211,7 @@ Octree.prototype.deletePCloudObjects = function(gl, vboMemManager)
 	}
 	
 	// Now, delete child.***
-	if(this.subOctrees_array !== undefined)
+	if (this.subOctrees_array !== undefined)
 	{
 		var childsCount = this.subOctrees_array.length;
 		for (var i=0; i<childsCount; i++)
@@ -411,7 +411,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 
 	// Check the version.***
 	var version = neoBuilding.getHeaderVersion();
-	if(version === "0.0.2")
+	if (version === "0.0.2")
 	{
 		this.prepareModelReferencesListData_v002(magoManager);
 		return;
@@ -500,11 +500,11 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 	{ return; }
 	
 	// Load blocksListsPartition.***
-	if(this.blocksListsPartitionsParsedCount === undefined)
-		this.blocksListsPartitionsParsedCount = 0;
+	if (this.blocksListsPartitionsParsedCount === undefined)
+	{ this.blocksListsPartitionsParsedCount = 0; }
 	
 	var partitionIdx = this.blocksListsPartitionsParsedCount;
-	if(partitionIdx < this.blocksListsPartitionsCount)
+	if (partitionIdx < this.blocksListsPartitionsCount)
 	{
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
@@ -649,8 +649,8 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	if (this.lod === 1)
 	{ 
 		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
-		if(pCloudPartitionsCount > 10)
-			pCloudPartitionsCount = 10;
+		if (pCloudPartitionsCount > 10)
+		{ pCloudPartitionsCount = 10; }
 	}
 	else if (this.lod > 1)
 	{ pCloudPartitionsCount = 1; }
@@ -684,22 +684,22 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 			// Create the pCloudPartition.***
 			var readWriter = magoManager.readerWriter;
 
-				if (readWriter.pCloudPartitions_requested < 1 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
-				{
-					var pCloudPartitionLego = new Lego();
-					this.pCloudPartitionsArray.push(pCloudPartitionLego);
-					pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
+			if (readWriter.pCloudPartitions_requested < 1 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+			{
+				var pCloudPartitionLego = new Lego();
+				this.pCloudPartitionsArray.push(pCloudPartitionLego);
+				pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
 					
-					var projectFolderName = neoBuilding.projectFolderName;
-					var buildingFolderName = neoBuilding.buildingFileName;
-					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-					var subOctreeNumberName = this.octree_number_name.toString();
-					var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-					var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
+				var projectFolderName = neoBuilding.projectFolderName;
+				var buildingFolderName = neoBuilding.buildingFileName;
+				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+				var subOctreeNumberName = this.octree_number_name.toString();
+				var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+				var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
 					
-					readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
-					return true;
-				}
+				readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+				return true;
+			}
 			
 		}
 	}
@@ -1628,7 +1628,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
-	if(version === "0.0.2")
+	if (version === "0.0.2")
 	{
 		// Read ModelLists partitions count.***
 		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1725,34 +1725,35 @@ Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSph
 	var octreeSize = this.getRadiusAprox();
 	var subOctreesCount = this.subOctrees_array.length;
 	var dist;
-	if(octreeSize > octreesMaxSize && subOctreesCount > 0)
+	if (octreeSize > octreesMaxSize && subOctreesCount > 0)
 	{
 		// Calculate the nearest subOctree to camera.***
 		var currDist;
 		var distCandidate;
 		var subOctreeCandidate;
-		for(var i=0; i<subOctreesCount; i++)
+		for (var i=0; i<subOctreesCount; i++)
 		{
 			// Check if subOctree has content.***
 			var hasContent = false;
 			var subOctree = this.subOctrees_array[i];
-			if(subOctree.pCloudPartitionsCount && subOctree.pCloudPartitionsCount > 0)
-				hasContent = true;
-			if(subOctree.triPolyhedronsCount && subOctree.triPolyhedronsCount > 0)
-				hasContent = true;
+			if (subOctree.pCloudPartitionsCount && subOctree.pCloudPartitionsCount > 0)
+			{ hasContent = true; }
+			if (subOctree.triPolyhedronsCount && subOctree.triPolyhedronsCount > 0)
+			{ hasContent = true; }
 			
-			if(!hasContent)
-				continue;
+			if (!hasContent)
+			{ continue; }
 			
 			//currDist = subOctree.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
 			currDist = subOctree.centerPos.squareDistToPoint(cameraPosition); // test.***
-			if(distCandidate === undefined) 
+			if (distCandidate === undefined) 
 			{
 				distCandidate = currDist;
 				subOctreeCandidate = subOctree;
 			}
-			else{
-				if(currDist < distCandidate)
+			else 
+			{
+				if (currDist < distCandidate)
 				{
 					distCandidate = currDist;
 					subOctreeCandidate = subOctree;
@@ -1760,12 +1761,13 @@ Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSph
 			}
 		}
 		
-		if(subOctreeCandidate)
+		if (subOctreeCandidate)
 		{
 			return subOctreeCandidate.getMinDistToCameraInTree(cameraPosition, boundingSphere_Aux, octreesMaxSize);
 		}
 	}
-	else{
+	else 
+	{
 		//dist = this.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
 		dist = this.centerPos.distToPoint(cameraPosition); // test.***
 	}
