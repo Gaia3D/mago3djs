@@ -205,7 +205,10 @@ Matrix4.prototype.setByFloat32Array = function(float32array)
  */
 Matrix4.prototype.getIndexOfArray = function(col, row) 
 {
-	return 4 * col + row;
+	var _col = col || 0;
+	var _row = row || 0;
+
+	return 4 * _col + _row;
 };
 
 /**

@@ -1415,13 +1415,13 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			var neoBuilding = node.data.neoBuilding;
 			
-			if(neoBuilding === undefined)
-				continue;
+			if (neoBuilding === undefined)
+			{ continue; }
 			
 			var octree = neoBuilding.octree; // MotherOctree.***
 			
-			if(octree === undefined)
-				continue;
+			if (octree === undefined)
+			{ continue; }
 			
 			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
 			

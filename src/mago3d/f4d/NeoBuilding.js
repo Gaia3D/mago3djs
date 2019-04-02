@@ -773,8 +773,8 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		// 3 = multi building skin data type (as Shibuya & Odaiba data).***
 		// 4 = pointsCloud data type.***
 		// 5 = pointsCloud data type pyramidOctree test.***	
-		if(this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
-			return neoReference.texture.fileLoadState;
+		if (this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
+		{ return neoReference.texture.fileLoadState; }
 	
 		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
