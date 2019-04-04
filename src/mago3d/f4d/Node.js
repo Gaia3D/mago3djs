@@ -85,7 +85,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
-
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
@@ -319,9 +318,7 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		
 		neoBuilding.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
 	}
-	
-	
-		
+
 	return neoBuilding.distToCam;
 };
 

@@ -514,14 +514,16 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 	// if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 	
 	// Load blocksListsPartition.***
+
 	//if(this.blocksListsPartitionsParsedCount === undefined)
 	//	this.blocksListsPartitionsParsedCount = 0;
+
 	
 	blocksList.prepareData(magoManager, this);
 	
 	/*
 	var partitionIdx = this.blocksListsPartitionsParsedCount;
-	if(partitionIdx < this.blocksListsPartitionsCount)
+	if (partitionIdx < this.blocksListsPartitionsCount)
 	{
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
