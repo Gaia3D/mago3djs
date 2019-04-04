@@ -355,8 +355,19 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 		{
 			lowestOctree = octreesArray[i];
 			
+			// Temp code.******************************************
+			neoBuilding = lowestOctree.neoBuildingOwner;
+			headerVersion = neoBuilding.getHeaderVersion();
+			
+			if (neoBuilding.buildingId === "KSJ_100")
+			{ var hola = 0; }
+			// End temp code.---------------------------------------
+			
 			if (this.eraseOctreeLod0ModelsToParse(lowestOctree))
 			{
+				if (neoBuilding.buildingId === "KSJ_100")
+				{ var hola = 0; }
+			
 				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 				{ continue; }
 				
@@ -364,29 +375,37 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				if (blocksList === undefined)
 				{ continue; }
 				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
+				
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
 				
 				if (headerVersion[0] === "v")
 				{
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
+				
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+				
 					// parse the beta version.***
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				else if (headerVersion === "0.0.1")
 				{
+					if (blocksList.dataArraybuffer === undefined)
+					{ continue; }
+				
+					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+					{ continue; }
+				
 					// parse versioned.***
-					blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
+					blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				else if (headerVersion === "0.0.2")
 				{
 					// parse partitioned.***
-					//blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
+					blocksList.parseBlocksListVersioned_v002(magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				blocksList.dataArraybuffer = undefined;
 				octreesParsedCount++;

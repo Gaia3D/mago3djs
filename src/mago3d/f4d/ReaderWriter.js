@@ -307,14 +307,11 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	});
 };
 
-ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, magoManager) 
+ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, blocksArrayPartition, magoManager) 
 {
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
-	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var xhr;
-	////xhr = new XMLHttpRequest();
-	//blocksList.xhr = xhr; // possibility to cancel.***
 	
 	this.blocksListPartitioned_requested++;
 	
@@ -323,8 +320,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			blocksList.dataArraybuffer = arrayBuffer;
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			blocksArrayPartition.dataArraybuffer = arrayBuffer;
+			blocksArrayPartition.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
 			
 			
@@ -332,19 +329,19 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 		}
 		else 
 		{
-			blocksList.fileLoadState = 500;
+			blocksArrayPartition.fileLoadState = 500;
 		}
 	}).fail(function(status) 
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else if (status === -1) { blocksList.fileLoadState = CODE.fileLoadState.READY; }
-		else { blocksList.fileLoadState = status; }
+		if (status === 0) { blocksArrayPartition.fileLoadState = 500; }
+		else if (status === -1) { blocksArrayPartition.fileLoadState = CODE.fileLoadState.READY; }
+		else { blocksArrayPartition.fileLoadState = status; }
 	}).always(function() 
 	{
 		magoManager.readerWriter.blocksListPartitioned_requested--;
-		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
+		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.blocksListPartitioned_requested < 0) { magoManager.fileRequestControler.blocksListPartitioned_requested = 0; }
 	});
 };
 

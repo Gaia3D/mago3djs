@@ -192,6 +192,126 @@ var VBOVertexIdxCacheKey = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWriter, vboMemManager, bytesReaded) 
+{
+	var startBuff, endBuff;
+	
+	// 1) Positions array.***
+	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	//this.vertexCount = vertexCount;
+	bytesReaded += 4;
+	var verticesFloatValuesCount = vertexCount * 3;
+	
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+	//var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+	//this.setDataArrayPos(posDataArray, vboMemManager);
+
+	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+	
+	// 2) Normals.***
+	vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	bytesReaded += 4;
+	var normalByteValuesCount = vertexCount * 3;
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 1 * normalByteValuesCount;
+	//var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+	//this.setDataArrayNor(norDataArray, vboMemManager);
+	
+	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+	
+	// 3) Indices.***
+	var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+
+	bytesReaded += 4;
+	var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+	bytesReaded +=1;
+	//var sizeThresholds = [];
+	for ( var k = 0; k < sizeLevels; k++ )
+	{
+		//sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
+		bytesReaded += 4;
+	}
+	//var indexMarkers = [];
+	for ( var k = 0; k < sizeLevels; k++ )
+	{
+		//indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+	}
+	//var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+	//this.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+	//var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
+	//this.setDataArrayIdx(idxDataArray, vboMemManager);
+
+	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter, vboMemManager, bytesReaded) 
+{
+	var startBuff, endBuff;
+	
+	// 1) Positions array.***
+	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	this.vertexCount = vertexCount;
+	bytesReaded += 4;
+	var verticesFloatValuesCount = vertexCount * 3;
+	
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 4 * verticesFloatValuesCount;
+	var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+	this.setDataArrayPos(posDataArray, vboMemManager);
+
+	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+	
+	// 2) Normals.***
+	vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	bytesReaded += 4;
+	var normalByteValuesCount = vertexCount * 3;
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 1 * normalByteValuesCount;
+	var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+	this.setDataArrayNor(norDataArray, vboMemManager);
+	
+	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+	
+	// 3) Indices.***
+	var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+
+	bytesReaded += 4;
+	var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
+	bytesReaded +=1;
+	var sizeThresholds = [];
+	for ( var k = 0; k < sizeLevels; k++ )
+	{
+		sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
+		bytesReaded += 4;
+	}
+	var indexMarkers = [];
+	for ( var k = 0; k < sizeLevels; k++ )
+	{
+		indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
+		bytesReaded += 4;
+	}
+	var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
+	this.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
+	startBuff = bytesReaded;
+	endBuff = bytesReaded + 2 * shortIndicesValuesCount;
+	var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
+	this.setDataArrayIdx(idxDataArray, vboMemManager);
+
+	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager) 
 {
 	if (shader === undefined)

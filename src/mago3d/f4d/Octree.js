@@ -319,6 +319,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 	if (this.lego === undefined) 
 	{
 		this.lego = new Lego();
+		this.lego.birthTime = magoManager.currTime;
 		this.lego.fileLoadState = CODE.fileLoadState.READY;
 		this.lego.legoKey = this.octreeKey + "_lego";
 	}
@@ -430,7 +431,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 	{
 		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
-		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
+		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList("0.0.1"); }
 
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
@@ -485,7 +486,18 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 	{
 		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
-		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList(); }
+		{ 
+			var blocksList = new BlocksList("0.0.2"); 
+			this.neoReferencesMotherAndIndices.blocksList = blocksList; 
+			
+			// Set blocksList partitionData.***
+			blocksList.blocksArrayPartitionsCount = this.blocksListsPartitionsCount;
+
+			var subOctreeNumberName = this.octree_number_name.toString();
+			var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
+			var masterPathName = blocks_folderPath + "/" + subOctreeNumberName + "_Model_";
+			blocksList.blocksArrayPartitionsMasterPathName = masterPathName;
+		}
 
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
@@ -498,11 +510,18 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
 	if (blocksList === undefined)
 	{ return; }
+
+	// if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 	
 	// Load blocksListsPartition.***
-	if (this.blocksListsPartitionsParsedCount === undefined)
-	{ this.blocksListsPartitionsParsedCount = 0; }
+
+	//if(this.blocksListsPartitionsParsedCount === undefined)
+	//	this.blocksListsPartitionsParsedCount = 0;
+
 	
+	blocksList.prepareData(magoManager, this);
+	
+	/*
 	var partitionIdx = this.blocksListsPartitionsParsedCount;
 	if (partitionIdx < this.blocksListsPartitionsCount)
 	{
@@ -511,7 +530,7 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model_" + partitionIdx.toString();
 		magoManager.readerWriter.getNeoBlocksArraybuffer_partition(filePathInServer, this, magoManager);
 	}
-	
+	*/
 };
 
 /**

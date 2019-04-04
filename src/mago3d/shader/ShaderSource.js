@@ -796,6 +796,7 @@ uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 varying float applySpecLighting;\n\
 uniform bool bApplySsao;\n\
+uniform float externalAlpha;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -908,7 +909,7 @@ void main()\n\
     }\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-	float alfa = textureColor.w;\n\
+	float alfa = textureColor.w * externalAlpha;\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\

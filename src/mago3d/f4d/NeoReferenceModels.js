@@ -45,17 +45,39 @@ var NeoReference = function()
 
 	// 8) check for render.***
 	this.renderingFase = false;
+	this.blendAlpha = 0.0;
+	this.birthTime;
+	this.isAdult = false;
 };
 
 /**
- * 카메라가 이동중인지를 확인
- * @param cameraPosition 변수
- * @param squareDistUmbral 변수
- * @returns camera_was_moved
  */
 NeoReference.prototype.swapRenderingFase = function() 
 {
 	this.renderingFase = !this.renderingFase;
+};
+
+/**
+ */
+NeoReference.prototype.getBlendAlpha = function(currTime) 
+{
+	if(!this.isAdult)
+	{
+		if(this.birthTime === undefined)
+			this.birthTime = currTime;
+		
+		var increAlpha = (currTime - this.birthTime)*0.0001;
+		this.blendAlpha += increAlpha;
+		
+		if(this.blendAlpha >= 1.0)
+		{
+			this.isAdult = true;
+		}
+	}
+	else
+		return 1.0;
+	
+	return this.blendAlpha;
 };
 
 /**
@@ -285,6 +307,11 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
+	// Test external alpha.***
+	var blendAlpha = neoReference.getBlendAlpha(magoManager.currTime);
+	gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+	// End test.---
+	
 	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 	// Must applicate the transformMatrix of the reference object.***
 
@@ -385,7 +412,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		{ return false; }
 		
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 		
 	}
 		
