@@ -183,7 +183,7 @@ var MagoManager = function()
 	this.arrayAuxSC = [];
 
 	this.currentTimeSC;
-	this.dateSC;
+	this.dateSC = new Date();
 	this.startTimeSC;
 	this.maxMilisecondsForRender = 10;
 
@@ -1277,6 +1277,9 @@ MagoManager.prototype.load_testTextures = function()
  */
 MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
 {
+	this.dateSC = new Date();
+	this.currTime = this.dateSC.getTime();
+	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 
@@ -1409,19 +1412,19 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		for (var i=0; i<nodesCount; i++) 
 		{
-			if(this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
-				break;
+			if (this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
+			{ break; }
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			var neoBuilding = node.data.neoBuilding;
 			
-			if(neoBuilding === undefined)
-				continue;
+			if (neoBuilding === undefined)
+			{ continue; }
 			
 			var octree = neoBuilding.octree; // MotherOctree.***
 			
-			if(octree === undefined)
-				continue;
+			if (octree === undefined)
+			{ continue; }
 			
 			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
 			
@@ -3209,10 +3212,12 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	// chaek if the neoBuilding has availableLod_0.***
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return false; }
 	
+	
+	
 	// Check if for the current lod, the building is modelRefType.***
 	var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
-	if(!lodBuildingData.isModelRef)
-		return true; // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
+	if (!lodBuildingData.isModelRef)
+	{ return true; } // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
 
 	var rootGeoLocDataManager = this.getNodeGeoLocDataManager(node);
 	var rootGeoLoc = rootGeoLocDataManager.getCurrentGeoLocationData();
@@ -3251,6 +3256,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	}
 	else 
 	{
+		if (neoBuilding.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
+		{ var hola = 0; }
+	
 		// Must calculate the frustum planes.
 		this.myCameraRelative.calculateFrustumsPlanes();
 		
@@ -3465,6 +3473,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
 	{
 		lowestOctree = currentVisibleOctrees[i];
+		var neoBuilding = lowestOctree.neoBuildingOwner;
+		var version = neoBuilding.getHeaderVersion();
+		
 		
 		// 1rst, check if lod2 is loaded. If lod2 is no loaded yet, then load first lod2.***
 		if (this.readerWriter.octreesSkinLegos_requested < 5)
@@ -3480,6 +3491,15 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 			if (lowestOctree.neoReferencesMotherAndIndices === undefined || !lowestOctree.neoReferencesMotherAndIndices.isReadyToRender())
 			{
 				lowestOctree.prepareModelReferencesListData(this);
+			}
+			else 
+			{
+				if (version === "0.0.2")
+				{
+					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList; 
+					if (blocksList)
+					{ blocksList.prepareData(this, lowestOctree); }
+				}
 			}
 		}
 
@@ -3952,6 +3972,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
 		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
 		{
+			gl.enable(gl.BLEND);
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
 			var bApplySsao = true;
@@ -3967,6 +3988,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
 			currentShader.bindUniformGenerals();
+			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
 
 			gl.activeTexture(gl.TEXTURE0);
@@ -3986,7 +4008,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			bApplySsao = false;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
-			
+
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
@@ -4354,7 +4376,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	currentShader.disableVertexAttribArrayAll();
 
 	
-	
+	gl.disable(gl.BLEND);
 	gl.depthRange(0.0, 1.0);	
 };
 
@@ -5095,6 +5117,9 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
 			
+				if (neoBuilding.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
+				{ var hola = 0; }
+			
 				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 
 				neoBuilding.distToCam = distToCamera;
@@ -5391,30 +5416,6 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 	*/
 };
 
-MagoManager.prototype.flyToPoint = function(longitude, latitude, altitude, duration) 
-{
-	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
-	{
-		this.scene.camera.flyTo({
-			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
-				parseFloat(latitude),
-				parseFloat(altitude)),
-			duration: parseInt(duration)
-		});
-	}
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND)
-	{
-		this.wwd.goToAnimator.travelTime = duration * 1000;
-		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
-	}
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
-	{
-		this.magoWorld.goto(parseFloat(longitude),
-			parseFloat(latitude),
-			parseFloat(altitude) + 10);
-	}
-};
-
 /**
  * dataKey 이용해서 data 검색
  * @param apiName api 이름
@@ -5428,20 +5429,20 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 		this.scene.camera.flyTo({
 			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
 				parseFloat(latitude),
-				parseFloat(altitude) + 10),
+				parseFloat(altitude)),
 			duration: parseInt(duration)
 		});
 	}
 	else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND)
 	{
 		this.wwd.goToAnimator.travelTime = duration * 1000;
-		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
+		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude)));
 	}
 	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
 	{
 		this.magoWorld.goto(parseFloat(longitude),
 			parseFloat(latitude),
-			parseFloat(altitude) + 10);
+			parseFloat(altitude));
 	}
 
 };
@@ -6521,8 +6522,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "gotoFly")
 	{
-		this.flyToPoint(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
-		//this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
+		this.flyTo(api.getLongitude(), api.getLatitude(), api.getElevation(), api.getDuration());
 	}
 	else if (apiName === "getCoordinateRelativeToBuilding") 
 	{

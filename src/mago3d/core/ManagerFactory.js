@@ -423,7 +423,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
 				DEFALUT_TERRAIN = "Cesium World Terrain";
 			}
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate : true}); }
+			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true}); }
 			// 기본 지도 설정
 			setDefaultDataset();
 		}

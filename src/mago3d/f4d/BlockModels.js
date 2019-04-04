@@ -55,6 +55,7 @@ Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToR
 
 	return true;
 };
+
 //****************************************************************************************************
 //****************************************************************************************************
 
@@ -62,7 +63,27 @@ Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToR
  * 블록 목록
  * @class BlocksList
  */
-var BlocksList = function() 
+var BlocksArrayPartition = function(version) 
+{
+	if (!(this instanceof BlocksArrayPartition)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+
+	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.fileLoadState = CODE.fileLoadState.READY;
+	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
+
+};
+
+//****************************************************************************************************
+//****************************************************************************************************
+
+/**
+ * 블록 목록
+ * @class BlocksList
+ */
+var BlocksList = function(version) 
 {
 	// This class is created in "Octree.prototype.prepareModelReferencesListData = function(magoManager) ".***
 	if (!(this instanceof BlocksList)) 
@@ -71,14 +92,20 @@ var BlocksList = function()
 	}
 
 	this.name = "";
+	this.version;
 	this.blocksArray;
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
 	this.xhr; // file request.***
 	
+	if (version !== undefined)
+	{ this.version = version; }
+	
 	// v002.***
-	//this.
+	this.blocksArrayPartitionsCount;
+	this.blocksArrayPartitionsArray;
+	this.blocksArrayPartitionsMasterPathName;
 };
 
 /**
@@ -218,57 +245,10 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
-		// 1) Positions array.
-		var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		
-		if (vertexCount > 200000)
-		{ var hola = 0; }
-		
 		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-		
-		var verticesFloatValuesCount = vertexCount * 3;
-		block.vertexCount = vertexCount;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-		var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-		vboViCacheKey.setDataArrayPos(posDataArray, vboMemManager);
+		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
+		block.vertexCount = vboViCacheKey.vertexCount;
 
-		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-		
-		// 2) Normals.
-		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var normalByteValuesCount = vertexCount * 3;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 1 * normalByteValuesCount;
-		var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-		vboViCacheKey.setDataArrayNor(norDataArray, vboMemManager);
-
-		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-		
-		// 3) Indices.
-		var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		idxByteSize = shortIndicesValuesCount;
-		classifiedIdxByteSize = vboMemManager.getClassifiedBufferSize(idxByteSize);
-
-		var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded +=1;
-		var sizeThresholds = [];
-		for ( var k = 0; k < sizeLevels; k++ )
-		{
-			sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))); bytesReaded += 4;
-		}
-		var indexMarkers = [];
-		for ( var k = 0; k < sizeLevels; k++ )
-		{
-			indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4)); bytesReaded += 4;
-		}
-		var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
-		vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + 2 * shortIndicesValuesCount;
-		var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
-		vboViCacheKey.setDataArrayIdx(idxDataArray, vboMemManager);
-
-		bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
 	}
 	
 	return bytesReaded;
@@ -282,7 +262,7 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
  * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
  * @param {Array} motherBlocksArray Global blocks array.
  */
-BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
+BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
@@ -362,6 +342,118 @@ BlocksList.prototype.parseBlocksListVersioned = function(arrayBuffer, readWriter
 
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	return succesfullyGpuDataBinded;
+};
+
+/**
+ * 블록리스트 버퍼를 파싱(비대칭적)
+ * This function parses the geometry data from binary arrayBuffer.
+ * 
+ * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array} motherBlocksArray Global blocks array.
+ */
+BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, motherBlocksArray, magoManager) 
+{
+	// 1rst, find the blocksArrayPartition to parse.***
+	var blocksArrayPartitionsCount = this.blocksArrayPartitionsArray.length;
+	var blocksArrayPartition = this.blocksArrayPartitionsArray[blocksArrayPartitionsCount-1];
+	if (blocksArrayPartition.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{ return; }
+	
+	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	var bytesReaded = 0;
+	var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
+	var gl = magoManager.sceneState.gl;
+	var succesfullyGpuDataBinded = true;
+	
+	// read the version.
+	//var versionLength = 5;
+	//var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
+	//bytesReaded += versionLength;
+	
+	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
+	for ( var i = 0; i< blocksCount; i++ ) 
+	{
+		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var block;
+		
+		// Check if block exist.
+		if (motherBlocksArray[blockIdx]) 
+		{
+			block = motherBlocksArray[blockIdx];
+		}
+		else 
+		{
+			// The block doesn't exist, so creates a new block and read data.
+			block = new Block();
+			block.idx = blockIdx;
+			motherBlocksArray[blockIdx] = block;
+		}
+		
+		// Now, read the blocks vbo's idx.***
+		var vboIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		
+		if (vboIdx === 0)
+		{
+			// Only if the vboIdx = 0 -> read the bbox.***
+			var bbox = new BoundingBox();
+			bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+			bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+			bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
+			bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+			bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+			bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+			var maxLength = bbox.getMaxLength();
+			if (maxLength < 0.5) { block.isSmallObj = true; }
+			else { block.isSmallObj = false; }
+
+			block.radius = maxLength/2.0;
+		}
+		
+		// check if the vbo exists.***
+		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[vboIdx];
+		if (vboViCacheKey === undefined)
+		{
+			// Now, read the vbo (Pos-Nor-Idx).***
+			vboViCacheKey = new VBOVertexIdxCacheKey();
+			block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[vboIdx] = vboViCacheKey;
+			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
+			block.vertexCount = vboViCacheKey.vertexCount;
+		}
+		else 
+		{
+			// step over.***
+			if (blocksCount > 1)
+			{ bytesReaded = vboViCacheKey.stepOverPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded); }
+		}
+
+		//bbox.deleteObjects();
+		//bbox = undefined;
+		
+		//bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
+		
+		// parse lego if exist.
+		//var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
+		//if (existLego)
+		//{
+		//	if (block.lego === undefined)
+		//	{ 
+		//		// TODO : this is no used. delete this.***
+		//		block.lego = new Lego(); 
+		//	}
+		//	
+		//	bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
+		//}
+
+	}
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; // test.***
 	return succesfullyGpuDataBinded;
 };
 
@@ -460,57 +552,9 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		bytesReaded += 4;
 		for ( var j = 0; j < vboDatasCount; j++ ) 
 		{
-			// 1) Positions array.
-			var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			var verticesFloatValuesCount = vertexCount * 3;
 			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			
-			block.vertexCount = vertexCount;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-			var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-			vboViCacheKey.setDataArrayPos(posDataArray, vboMemManager);
-
-			bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
-			
-			// 2) Normals.
-			vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-			bytesReaded += 4;
-			var normalByteValuesCount = vertexCount * 3;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 1 * normalByteValuesCount;
-			var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-			vboViCacheKey.setDataArrayNor(norDataArray, vboMemManager);
-			
-			bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
-			
-			// 3) Indices.
-			var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-
-			bytesReaded += 4;
-			var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
-			bytesReaded +=1;
-			var sizeThresholds = [];
-			for ( var k = 0; k < sizeLevels; k++ )
-			{
-				sizeThresholds.push(new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
-				bytesReaded += 4;
-			}
-			var indexMarkers = [];
-			for ( var k = 0; k < sizeLevels; k++ )
-			{
-				indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
-				bytesReaded += 4;
-			}
-			var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
-			vboViCacheKey.bigTrianglesIndicesCount = bigTrianglesShortIndicesValues_count;
-			startBuff = bytesReaded;
-			endBuff = bytesReaded + 2 * shortIndicesValuesCount;
-			var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
-			vboViCacheKey.setDataArrayIdx(idxDataArray, vboMemManager);
-
-			bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
+			block.vertexCount = vboViCacheKey.vertexCount;
 		}
 
 		// Pendent to load the block's lego.***
@@ -518,5 +562,96 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
 };
+
+/**
+ */
+BlocksList.prototype.prepareData = function(magoManager, octreeOwner) 
+{
+	
+	if (this.version === "0.0.1")
+	{
+		// Provisionally this function is into octree.prepareModelReferencesListData(...).***
+	}
+	else if (this.version === "0.0.2")
+	{
+		// Check the current loading state.***
+		if (this.blocksArrayPartitionsArray === undefined)
+		{ this.blocksArrayPartitionsArray = []; }
+		
+		var currPartitionsCount = this.blocksArrayPartitionsArray.length;
+		if (currPartitionsCount === 0)
+		{
+			// Proceed to load the 1rst partition.***
+			var partitionIdx = 0;
+			var filePathInServer = this.blocksArrayPartitionsMasterPathName + partitionIdx.toString();
+			var blocksArrayPartition = new BlocksArrayPartition();
+			this.blocksArrayPartitionsArray.push(blocksArrayPartition);
+			magoManager.readerWriter.getNeoBlocksArraybuffer_partition(filePathInServer, octreeOwner, blocksArrayPartition, magoManager);
+		}
+		else
+		{
+			// Check the last partition.***
+			var lastBlocksArrayPartition = this.blocksArrayPartitionsArray[currPartitionsCount-1];
+			if (lastBlocksArrayPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
+			{
+				if (currPartitionsCount < this.blocksArrayPartitionsCount)
+				{
+					// Proceed to load another partition.***
+					var partitionIdx = currPartitionsCount;
+					var filePathInServer = this.blocksArrayPartitionsMasterPathName + partitionIdx.toString();
+					var blocksArrayPartition = new BlocksArrayPartition();
+					this.blocksArrayPartitionsArray.push(blocksArrayPartition);
+					magoManager.readerWriter.getNeoBlocksArraybuffer_partition(filePathInServer, octreeOwner, blocksArrayPartition, magoManager);
+				}
+			}
+		}
+	
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

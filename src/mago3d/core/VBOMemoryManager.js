@@ -292,8 +292,8 @@ VBOMemoryManager.prototype.getClassifiedBufferKey = function(gl, bufferSize)
 	if (this.enableMemoryManagement)
 	{ 
 		var bufferKey = this.buffersKeyWorld.getClassifiedBufferKey(gl, bufferSize);
-		if(bufferKey !== undefined)
-			this.currentMemoryUsage += bufferSize;
+		if (bufferKey !== undefined)
+		{ this.currentMemoryUsage += bufferSize; }
 		return bufferKey; 
 	}
 	else
@@ -315,8 +315,8 @@ VBOMemoryManager.prototype.storeClassifiedBufferKey = function(gl, bufferKey, bu
 	{ gl.deleteBuffer(bufferKey); }
 
 	this.currentMemoryUsage -= bufferSize;
-	if(this.currentMemoryUsage < 0.0)
-		this.currentMemoryUsage = 0.0;
+	if (this.currentMemoryUsage < 0.0)
+	{ this.currentMemoryUsage = 0.0; }
 };
 
 /**

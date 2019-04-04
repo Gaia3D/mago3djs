@@ -470,10 +470,10 @@ NeoBuilding.prototype.getTransformedRelativeEyePositionToBuilding = function(abs
  */
 NeoBuilding.prototype.getHeaderVersion = function() 
 {
-	if(this.metaData)
-		return this.metaData.version;
+	if (this.metaData)
+	{ return this.metaData.version; }
 	else
-		return undefined;
+	{ return undefined; }
 };
 
 
@@ -773,8 +773,8 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		// 3 = multi building skin data type (as Shibuya & Odaiba data).***
 		// 4 = pointsCloud data type.***
 		// 5 = pointsCloud data type pyramidOctree test.***	
-		if(this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
-			return neoReference.texture.fileLoadState;
+		if (this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
+		{ return neoReference.texture.fileLoadState; }
 	
 		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -926,6 +926,9 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
  */
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord) 
 {
+	var gl = magoManager.sceneState.gl;
+	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	
 	// Check metaData.projectDataType.***
 	if (this.metaData.projectDataType === 5)
 	{
@@ -944,6 +947,9 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		}
 		else
 		{
+			if (this.buildingId === "KSJ_100")
+			{ var hola = 0; }
+			
 			// This building is octree divided type data.***
 			var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 			
@@ -1120,6 +1126,9 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 	var lowestOctree;
 	var refMatrixIdxKey = 0;
 	var isInterior = false; // old var.***
+	
+	if (this.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
+	{ var hola = 0; }
 	
 	// LOD0.***
 	var minSize = 0.0;
