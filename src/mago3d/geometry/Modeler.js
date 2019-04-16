@@ -18,6 +18,30 @@ var Modeler = function()
 	this.drawingElement = CODE.modelerDrawingElement.NOTHING; // test for the moment.***
 	this.planeGrid; // sketch plane.***
 	this.polyLine2d; // current polyline2D to sketch.***
+	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.***
+	this.excavation; // class : Excavation.***
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.getGeographicCoordsList = function() 
+{
+	if(this.geoCoordsList === undefined)
+		this.geoCoordsList = new GeographicCoordsList();
+	
+	return this.geoCoordsList;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.getExcavation = function() 
+{
+	if(this.excavation === undefined)
+		this.excavation = new Excavation();
+	
+	return this.excavation;
 };
 
 /**
@@ -35,7 +59,7 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Modeler.prototype.render = function(magoManager, shader) 
+Modeler.prototype.render = function(magoManager, shader, renderType) 
 {
 	// 1rst, render the planeGrid if exist.***
 	if (this.planeGrid !== undefined)
@@ -48,6 +72,17 @@ Modeler.prototype.render = function(magoManager, shader)
 		// Provisionally render the polyLine2d on the sketch plane here.***
 		var points2dCount = this.polyLine2d.getPointsCount();
 		
+	}
+	
+	if(this.geoCoordsList !== undefined)
+	{
+		// Provisionally render geographicPoints.***
+		this.geoCoordsList.renderPoints(magoManager, shader);
+	}
+	
+	if(this.excavation !== undefined)
+	{
+		this.excavation.renderPoints(magoManager, shader, renderType);
 	}
 };
 
@@ -76,3 +111,46 @@ Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows)
 	
 	
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

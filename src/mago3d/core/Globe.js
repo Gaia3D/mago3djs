@@ -282,7 +282,7 @@ Globe.atan2Test = function(y, x)
 	}
 };
 
-Globe.CartesianToGeographicWgs84 = function (x, y, z, result) 
+Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosition) 
 {
 	// From WebWorldWind.***
 	// According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
@@ -414,6 +414,15 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result)
 	result.latitude = factor * phi;
 	result.longitude = factor * lambda;
 	result.altitude = h;
+	
+	if(bStoreAbsolutePosition !== undefined && bStoreAbsolutePosition === true)
+	{
+		// In this case, store into result_geographicCoord the x, y, z values.***
+		if(result.absolutePoint === undefined)
+			result.absolutePoint = new Point3D(x, y, z);
+		else
+			result.absolutePoint.set(x, y, z);
+	}
 
 	return result;
 };

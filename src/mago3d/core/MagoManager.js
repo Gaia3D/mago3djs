@@ -1003,7 +1003,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 		sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
 		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
-
+		
 		var frustum0 = sceneState.camera.getFrustum(0);
 		frustum0.far[0] = scene.frustumCommandsList[0].far; 
 		frustum0.near[0] = scene.frustumCommandsList[0].near;
@@ -1012,6 +1012,20 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		frustum0.aspectRatio[0] = scene.camera.frustum._aspectRatio;
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad/2);
 		sceneState.camera.setCurrentFrustum(0);
+		
+		var frustumIdx = this.currentFrustumIdx;
+		var camera = this.sceneState.camera;
+		var frustum = camera.getFrustum(frustumIdx);
+		var aspectRatio = frustum.aspectRatio;
+		var fovy = frustum.fovyRad;
+		frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
+		frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
+		var currentFrustumFar = this.scene._frustumCommandsList[frustumIdx].far;
+		var currentFrustumNear = this.scene._frustumCommandsList[frustumIdx].near;
+		
+		this.sceneState.camera.frustum.near[0] = currentFrustumNear;
+		this.sceneState.camera.frustum.far[0] = currentFrustumFar;
+		
 
 		// now, determine if the camera was moved.***
 		// Find cam dir & up by modelViewMatrix.***
@@ -1280,6 +1294,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.dateSC = new Date();
 	this.currTime = this.dateSC.getTime();
 	
+	
+	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 
@@ -1427,8 +1443,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			{ continue; }
 			
 			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
-			
-			
 		}
 		this.readerWriter.pCloudPartitions_requested = 0;
 		
@@ -1649,7 +1663,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 			
 	// 1) The depth render.**********************************************************************************************************************
-	var ssao_idx = 0; // 0= depth. 1= ssao.***
+	var ssao_idx = 0; // 0= depth. 1= color.***
 	var renderTexture = false;
 	this.depthFboNeo.bind(); 
 	if (this.isFarestFrustum())
@@ -1664,7 +1678,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
-	// 2) ssao render.************************************************************************************************************
+	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
 		;//
@@ -1792,7 +1806,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function(ssao_idx) 
 {
 	// 1rst, make the test object if no exist.***
-	return;
+	//return;
 	
 	if (this.nativeProjectsArray === undefined)
 	{
@@ -1881,7 +1895,7 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 	gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao.***
 	gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
 	gl.uniform1i(currentShader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.uniform1i(currentShader.bApplySpecularLighting_loc, true); // turn off specular lighting.***
+	gl.uniform1i(currentShader.bApplySpecularLighting_loc, true); // turn on/off specular lighting & normals.***
 	
 	// -------------------------------------
 	
@@ -2288,7 +2302,8 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	
 	this.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2);
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-	this.pointSC = buildingGeoLocation.tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
+	var tMatrixInv = buildingGeoLocation.getTMatrixInv();
+	this.pointSC = tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
 
 	if (resultSelObjMovePlane === undefined)
 	{ resultSelObjMovePlane = new Plane(); }
@@ -2608,6 +2623,24 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  * @param gl 변수
  * @param scene 변수
  */
+MagoManager.prototype.keyDown = function(key) 
+{
+	if (key === 84) // 84 = 't'.***
+	{
+		// do test.***
+		var excavation = this.modeler.getExcavation();
+		if(excavation !== undefined)
+		{
+			excavation.makeExtrudeObject(this);
+		}
+	}
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
 MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
 {
 	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
@@ -2625,41 +2658,76 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Test code.***
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
+			//	CODE.modelerMode = {
+			//	"INACTIVE"                 : 0,
+			//	"DRAWING_POLYLINE"         : 1,
+			//	"DRAWING_GEOGRAPHICPOINTS" : 2,
+			//};
+			
+		
+		
+		// Calculate the geographicCoord of the click position.****
+		var geoCoord;
+		var strWorldPoint;
+		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.frameState.camera;
+			var scene = this.scene;
+			var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
+			strWorldPoint = scene.globe.pick(ray, scene);
+			geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
+		}
+		else 
+		{
+			var mouseAction = this.sceneState.mouseAction;
+			strWorldPoint = mouseAction.strWorldPoint;
+			geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
+		}
+			
+		var modelerMode = this.modeler.mode;
 		
 		if (this.modeler.planeGrid === undefined)
 		{
 			// Calculate the click position and create the planeGrid geoLocation.***
 			this.modeler.createPlaneGrid();
 			this.modeler.planeGrid.makeVbo(this.vboMemoryManager);
-		
-			// Check if this is MagoWorld or Cesium.***
-			var geoCoord;
-			if (this.configInformation.geo_view_library === Constant.CESIUM)
-			{
-				var camera = this.scene.frameState.camera;
-				var scene = this.scene;
-				var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
-				var worldPosCesium = scene.globe.pick(ray, scene);
-				geoCoord = Globe.CartesianToGeographicWgs84(worldPosCesium.x, worldPosCesium.y, worldPosCesium.z, undefined);
-			}
-			else 
-			{
-				var mouseAction = this.sceneState.mouseAction;
-				var strWorldPoint = mouseAction.strWorldPoint;
-				geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
-			}
 			
 			if (this.modeler.planeGrid.geoLocDataManager === undefined)
 			{ this.modeler.planeGrid.geoLocDataManager = new GeoLocationDataManager(); }
 			
 			var geoLocDataManager = this.modeler.planeGrid.geoLocDataManager;
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
 			return;
 		}
 		
+		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		
 		// For each "click" add point2d to the modeler's polyLine2d.***
 		
+		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
+		if(this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			
+			var geoCoordsList = this.modeler.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+		}
+		
+		// Excavation.***
+		if(this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			
+			var excavation = this.modeler.getExcavation();
+			var geoCoordsList = excavation.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+		}
 		
 		var hola = 0;
 	}
@@ -2682,7 +2750,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	//this.isCameraMoving = true;
 	
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
-
+	/*
 	// Test.**********************************************************************************************************************
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
 	if (selGeneralObjects)
@@ -2698,6 +2766,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 			}
 		}
 	}
+	*/
 	// End test.-------------------------------------------------------------------------------------------------------------------
 };
 
@@ -2966,7 +3035,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			// find the pixel position relative to building.
 			var pixelPosWorldCoord = new Point3D();
 			pixelPosWorldCoord = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord);
-			var pixelPosBuildingCoord = geoLocationData.tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
+			var tMatrixInv = geoLocationData.getTMatrixInv();
+			var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
 			
 			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
 		}
@@ -2979,9 +3049,10 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		// transform world_ray to building_ray.***
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
-
-		camPosBuilding = geoLocationData.geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-		this.pointSC = geoLocationData.geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
+		
+		var geoLocMatrixInv = geoLocationData.getGeoLocationMatrixInv();
+		camPosBuilding = geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
+		this.pointSC = geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
 		camDirBuilding.x = this.pointSC.x;
 		camDirBuilding.y = this.pointSC.y;
 		camDirBuilding.z = this.pointSC.z;
@@ -3049,8 +3120,9 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
-		camPosBuilding = buildingGeoLocation.tMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-		camDirBuilding = buildingGeoLocation.tMatrixInv.rotatePoint3D(this.lineSC.direction, camDirBuilding);
+		var tMatrixInv = buildingGeoLocation.getTMatrixInv();
+		camPosBuilding = tMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
+		camDirBuilding = tMatrixInv.rotatePoint3D(this.lineSC.direction, camDirBuilding);
 	
 		// now, intersect building_ray with the selObjMovePlane.***
 		var line = new Line();
@@ -3956,6 +4028,54 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	}
 	if (ssao_idx === 1) 
 	{
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		if (this.modeler !== undefined)
+		{
+			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.useProgram();
+			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
+			
+			if (this.noiseTexture === undefined) 
+			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
+			
+			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+			gl.enableVertexAttribArray(currentShader.position3_loc);
+			gl.enableVertexAttribArray(currentShader.normal3_loc);
+			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
+			
+			currentShader.bindUniformGenerals();
+			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
+
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.activeTexture(gl.TEXTURE2); 
+			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
+			currentShader.last_tex_id = this.textureAux_1x1;
+			
+			
+			var refTMatrixIdxKey = 0;
+			var minSizeToRender = 0.0;
+			var renderType = 1;
+			var refMatrixIdxKey =0; // provisionally set this var here.***
+			this.modeler.render(this, currentShader, renderType);
+			
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			
+			currentShader.disableVertexAttribArrayAll();
+			gl.useProgram(null);
+
+		}
+		
 		// check changesHistory.
 		this.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 		this.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
@@ -4313,56 +4433,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			this.tinTerrainManager.render(this, bDepthRender);
 		}
 		
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		if (this.modeler !== undefined)
-		{
-			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
-			currentShader.useProgram();
-			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
-			
-			if (this.noiseTexture === undefined) 
-			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-			
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.enableVertexAttribArray(currentShader.normal3_loc);
-			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-			
-			currentShader.bindUniformGenerals();
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			currentShader.last_tex_id = this.textureAux_1x1;
-			
-			
-			var refTMatrixIdxKey = 0;
-			var minSizeToRender = 0.0;
-			var renderType = 1;
-			var refMatrixIdxKey =0; // provisionally set this var here.***
-			this.modeler.render(this, currentShader);
-			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			//this.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			
-			currentShader.disableVertexAttribArrayAll();
-			gl.useProgram(null);
-
-		}
+		
 
 	}
 	
@@ -4707,6 +4778,35 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	var currentShader;
 	var shaderProgram;
 	var renderTexture = false;
+	
+	// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		if (this.modeler !== undefined)
+		{
+			currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
+			currentShader.resetLastBuffersBinded();
+			shaderProgram = currentShader.program;
+
+			currentShader.useProgram();
+			currentShader.enableVertexAttribArray(currentShader.position3_loc);
+			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+			currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+			currentShader.disableVertexAttribArray(currentShader.color4_loc);
+			currentShader.bindUniformGenerals();
+		
+			currentShader.bindUniformGenerals();
+
+			var refTMatrixIdxKey = 0;
+			var minSizeToRender = 0.0;
+			var renderType = 0;
+			var refMatrixIdxKey =0; // provisionally set this var here.***
+			this.modeler.render(this, currentShader, renderType);
+
+			currentShader.disableVertexAttribArrayAll();
+			gl.useProgram(null);
+
+		}
 	
 	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
@@ -5116,9 +5216,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				neoBuilding = node.data.neoBuilding;
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
-			
-				if (neoBuilding.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
-				{ var hola = 0; }
+
 			
 				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 

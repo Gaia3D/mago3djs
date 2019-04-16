@@ -52,6 +52,8 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 			this.data.bbox = undefined;
 		}
 		
+		// Delete geoLocationDataManager, etc. TODO.***
+		
 		this.data = undefined;
 	}
 	

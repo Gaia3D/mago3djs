@@ -226,7 +226,14 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	
 	// Caps (bottom and top).***
 	if (this.convexFacesIndicesData === undefined)
-	{ return resultMesh; }
+	{ 
+		// Calculate the convexFacesIndicesData.***
+		var vtxProfileFirst = this.getVtxProfile(0);
+		var profile2d = vtxProfileFirst.getProjectedProfile2D(profile2d);
+		this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(this.convexFacesIndicesData);
+		
+		//return resultMesh; 
+	}
 	
 	var resultSurface;
 	

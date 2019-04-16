@@ -413,6 +413,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
 		//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		//gl.drawElements(gl.POINTS, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
 		
 	}
 		

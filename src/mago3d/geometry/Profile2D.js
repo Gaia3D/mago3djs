@@ -50,6 +50,18 @@ Profile2D.prototype.newInnerRing = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
+Profile2D.prototype.getInnerRingsList = function() 
+{
+	if (this.innerRingsList === undefined)
+	{ this.innerRingsList = new Rings2DList(); }
+
+	return this.innerRingsList;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 Profile2D.prototype.deleteObjects = function() 
 {
 	if (this.outerRing)
@@ -352,7 +364,6 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	for (var i=0; i<outerPointsCount; i++)
 	{
 		point = outerPolygon.point2dList.getPoint(i);
-		//point.owner
 		computingPolygon.point2dList.addPoint(outerPolygon.point2dList.getPoint(i));
 	}
 	
@@ -718,6 +729,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setRadiusCount(7);
 	star.setInteriorRadius(0.7);
 	star.setExteriorRadius(2);
+	
 };
 
 
