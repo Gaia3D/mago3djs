@@ -1004,9 +1004,13 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
 		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 		
+		var frustumCommandsList = this.scene._frustumCommandsList;
+		if(frustumCommandsList === undefined)
+			frustumCommandsList = this.scene.frustumCommandsList;
+		
 		var frustum0 = sceneState.camera.getFrustum(0);
-		frustum0.far[0] = scene.frustumCommandsList[0].far; 
-		frustum0.near[0] = scene.frustumCommandsList[0].near;
+		frustum0.far[0] = frustumCommandsList[0].far; 
+		frustum0.near[0] = frustumCommandsList[0].near;
 		frustum0.fovRad[0] = scene.camera.frustum._fov;
 		frustum0.fovyRad[0]= scene.camera.frustum._fovy;
 		frustum0.aspectRatio[0] = scene.camera.frustum._aspectRatio;
@@ -1018,10 +1022,13 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var frustum = camera.getFrustum(frustumIdx);
 		var aspectRatio = frustum.aspectRatio;
 		var fovy = frustum.fovyRad;
-		frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
-		frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
-		var currentFrustumFar = this.scene._frustumCommandsList[frustumIdx].far;
-		var currentFrustumNear = this.scene._frustumCommandsList[frustumIdx].near;
+		
+		
+		
+		frustum.far[0] = frustumCommandsList[frustumIdx].far; 
+		frustum.near[0] = frustumCommandsList[frustumIdx].near;
+		var currentFrustumFar = frustumCommandsList[frustumIdx].far;
+		var currentFrustumNear = frustumCommandsList[frustumIdx].near;
 		
 		this.sceneState.camera.frustum.near[0] = currentFrustumNear;
 		this.sceneState.camera.frustum.far[0] = currentFrustumFar;
