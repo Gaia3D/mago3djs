@@ -719,6 +719,11 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");
 	shader.externalAlpha_loc = gl.getUniformLocation(shader.program, "externalAlpha");
 	
+	//uniform float fixPointSize;
+	//uniform bool bUseFixPointSize;
+	shader.fixPointSize_loc = gl.getUniformLocation(shader.program, "fixPointSize");
+	shader.bUseFixPointSize_loc = gl.getUniformLocation(shader.program, "bUseFixPointSize");
+	
 };
 
 //*********************************************************************************************************************

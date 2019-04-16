@@ -384,7 +384,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			}
 			neoBuilding.deleteObjectsModelReferences(gl, magoManager.vboMemoryManager);
 			
-			if (modelRefsDeletedCount > 100)
+			if (modelRefsDeletedCount > 10)
 			{ break; }
 		}
 	}
@@ -420,7 +420,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 				neoBuilding.deleteObjectsLod2(gl, magoManager.vboMemoryManager);
 				deletedCount++;
 				
-				if (deletedCount > 100)
+				if (deletedCount > 10)
 				{ break; }
 			}
 		}

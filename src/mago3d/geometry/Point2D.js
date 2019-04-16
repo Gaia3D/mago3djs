@@ -15,6 +15,8 @@ var Point2D = function(x, y)
 	if (y) { this.y = y; }
 	else { this.y = 0.0; }
 	
+	this.ownerVertex3d; // Aux var.***
+	
 	// aux test.***
 	this.associated;
 };

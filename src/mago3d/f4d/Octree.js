@@ -682,6 +682,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	{
 		if ( i < this.pCloudPartitionsArray.length )
 		{
+			// Note: "pCloudPartition" is a Lego class object provisionally.***
 			var pCloudPartition = this.pCloudPartitionsArray[i];
 			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{

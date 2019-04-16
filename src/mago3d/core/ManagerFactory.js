@@ -747,6 +747,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		// get current building selected
 		if (magoManager.magoPolicy.issueInsertEnable)	{ return; }
+		
+		magoManager.keyDown(event.keyCode);
 
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
@@ -816,6 +818,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				currentAlt -= increDist;
 				displayData = true;
 			}
+			
+			
 
 			if (displayData)
 			{

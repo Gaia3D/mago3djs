@@ -32,8 +32,10 @@ CODE.magoMode = {
 };
 
 CODE.modelerMode = {
-	"INACTIVE"         : 0,
-	"DRAWING_POLYLINE" : 1
+	"INACTIVE"                 : 0,
+	"DRAWING_POLYLINE"         : 1,
+	"DRAWING_GEOGRAPHICPOINTS" : 2,
+	"DRAWING_EXCAVATIONPOINTS" : 3,
 };
 
 CODE.modelerDrawingState = {
@@ -42,10 +44,11 @@ CODE.modelerDrawingState = {
 };
 
 CODE.modelerDrawingElement = {
-	"NOTHING"   : 0,
-	"POINTS"    : 1,
-	"LINES"     : 2,
-	"POLYLINES" : 3
+	"NOTHING"          : 0,
+	"POINTS"           : 1,
+	"LINES"            : 2,
+	"POLYLINES"        : 3,
+	"GEOGRAPHICPOINTS" : 4,
 };
 
 CODE.PROJECT_ID_PREFIX = "projectId_";

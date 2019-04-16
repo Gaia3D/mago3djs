@@ -334,6 +334,9 @@ Surface.prototype.getTriangles = function(resultTrianglesArray)
 	var facesCount = this.getFacesCount();
 	for (var i=0; i<facesCount; i++)
 	{
+		if( i == 11)
+			var hola = 0;
+		
 		face = this.getFace(i);
 		resultTrianglesArray = face.getTessellatedTriangles(resultTrianglesArray);
 	}
