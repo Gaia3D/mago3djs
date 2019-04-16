@@ -1005,11 +1005,11 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 
 		var frustum0 = sceneState.camera.getFrustum(0);
-		frustum0.far[0] = scene._frustumCommandsList[0].far; 
-		frustum0.near[0] = scene._frustumCommandsList[0].near;
-		frustum0.fovRad[0] = scene._camera.frustum._fov;
-		frustum0.fovyRad[0]= scene._camera.frustum._fovy;
-		frustum0.aspectRatio[0] = scene._camera.frustum._aspectRatio;
+		frustum0.far[0] = scene.frustumCommandsList[0].far; 
+		frustum0.near[0] = scene.frustumCommandsList[0].near;
+		frustum0.fovRad[0] = scene.camera.frustum._fov;
+		frustum0.fovyRad[0]= scene.camera.frustum._fovy;
+		frustum0.aspectRatio[0] = scene.camera.frustum._aspectRatio;
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad/2);
 		sceneState.camera.setCurrentFrustum(0);
 
@@ -1141,21 +1141,21 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var frustum = camera.getFrustum(frustumIdx);
 		var aspectRatio = frustum.aspectRatio;
 		var fovy = frustum.fovyRad;
-		frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
-		frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
-		var currentFrustumFar = this.scene._frustumCommandsList[frustumIdx].far;
-		var currentFrustumNear = this.scene._frustumCommandsList[frustumIdx].near;
+		frustum.far[0] = this.scene.frustumCommandsList[frustumIdx].far; 
+		frustum.near[0] = this.scene.frustumCommandsList[frustumIdx].near;
+		var currentFrustumFar = this.scene.frustumCommandsList[frustumIdx].far;
+		var currentFrustumNear = this.scene.frustumCommandsList[frustumIdx].near;
 		
 		this.sceneState.camera.frustum.near[0] = currentFrustumNear;
 		this.sceneState.camera.frustum.far[0] = currentFrustumFar;
 		
 		// take all frustums near-far distances.***
-		var numFrustums = this.scene._frustumCommandsList.length;
+		var numFrustums = this.scene.frustumCommandsList.length;
 		var distancesArray = [];
 		for (var i=0; i<numFrustums; i++)
 		{
-			distancesArray[i*2] = this.scene._frustumCommandsList[i].near;
-			distancesArray[i*2+1] = this.scene._frustumCommandsList[i].far;
+			distancesArray[i*2] = this.scene.frustumCommandsList[i].near;
+			distancesArray[i*2+1] = this.scene.frustumCommandsList[i].far;
 		}
 		
 		// Set cam dir & up by modelViewMatrix.***
@@ -6364,7 +6364,7 @@ MagoManager.prototype.callAPI = function(api)
 			{
 				var scratchLookAtMatrix4 = new Cesium.Matrix4();
 				var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
-				var camera = this.scene._camera;
+				var camera = this.scene.camera;
 
 				this.cameraFPV._camera = camera;
 				this.cameraFPV._cameraBAK = Cesium.Camera.clone(camera, this.cameraFPV._cameraBAK);
@@ -6400,7 +6400,7 @@ MagoManager.prototype.callAPI = function(api)
 			}
 			else if (this.configInformation.geo_view_library === Constant.CESIUM)
 			{
-				this.scene._camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene._camera);
+				this.scene.camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene.camera);
 			}
 			this.cameraFPV.release();
 		}
