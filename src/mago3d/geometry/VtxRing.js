@@ -92,10 +92,10 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
 {
 	// This function returns a ring2d made by polylines2d.***
 	if (this.vertexList === undefined)
-		return resultRing2d;
+	{ return resultRing2d; }
 	
-	if(resultRing2d === undefined)
-		resultRing2d = new Ring2D();
+	if (resultRing2d === undefined)
+	{ resultRing2d = new Ring2D(); }
 	
 	var points2dArray = [];
 	points2dArray = VertexList.getProjectedPoints2DArray(this.vertexList.vertexArray, normal, points2dArray);
@@ -108,8 +108,8 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
 
 VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 {
-	if(point3dArray === undefined)
-		return;
+	if (point3dArray === undefined)
+	{ return; }
 	
 	if (this.vertexList === undefined)
 	{ this.vertexList = new VertexList(); }

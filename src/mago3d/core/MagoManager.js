@@ -765,7 +765,7 @@ function handleTextureLoaded(gl, image, texture)
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // if need vertical mirror of the image.***
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
@@ -1005,8 +1005,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 		
 		var frustumCommandsList = this.scene._frustumCommandsList;
-		if(frustumCommandsList === undefined)
-			frustumCommandsList = this.scene.frustumCommandsList;
+		if (frustumCommandsList === undefined)
+		{ frustumCommandsList = this.scene.frustumCommandsList; }
 		
 		var frustum0 = sceneState.camera.getFrustum(0);
 		frustum0.far[0] = frustumCommandsList[0].far; 
@@ -2636,7 +2636,7 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		// do test.***
 		var excavation = this.modeler.getExcavation();
-		if(excavation !== undefined)
+		if (excavation !== undefined)
 		{
 			excavation.makeExtrudeObject(this);
 		}
@@ -2665,11 +2665,11 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Test code.***
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
-			//	CODE.modelerMode = {
-			//	"INACTIVE"                 : 0,
-			//	"DRAWING_POLYLINE"         : 1,
-			//	"DRAWING_GEOGRAPHICPOINTS" : 2,
-			//};
+		//	CODE.modelerMode = {
+		//	"INACTIVE"                 : 0,
+		//	"DRAWING_POLYLINE"         : 1,
+		//	"DRAWING_GEOGRAPHICPOINTS" : 2,
+		//};
 			
 		
 		
@@ -2714,7 +2714,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// For each "click" add point2d to the modeler's polyLine2d.***
 		
 		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
-		if(this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2725,7 +2725,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// Excavation.***
-		if(this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -4787,33 +4787,33 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	var renderTexture = false;
 	
 	// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		if (this.modeler !== undefined)
-		{
-			currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
-			currentShader.resetLastBuffersBinded();
-			shaderProgram = currentShader.program;
+	// Test Modeler Rendering.********************************************************************
+	// Test Modeler Rendering.********************************************************************
+	if (this.modeler !== undefined)
+	{
+		currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
+		currentShader.resetLastBuffersBinded();
+		shaderProgram = currentShader.program;
 
-			currentShader.useProgram();
-			currentShader.enableVertexAttribArray(currentShader.position3_loc);
-			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-			currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-			currentShader.disableVertexAttribArray(currentShader.color4_loc);
-			currentShader.bindUniformGenerals();
+		currentShader.useProgram();
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+		currentShader.disableVertexAttribArray(currentShader.color4_loc);
+		currentShader.bindUniformGenerals();
 		
-			currentShader.bindUniformGenerals();
+		currentShader.bindUniformGenerals();
 
-			var refTMatrixIdxKey = 0;
-			var minSizeToRender = 0.0;
-			var renderType = 0;
-			var refMatrixIdxKey =0; // provisionally set this var here.***
-			this.modeler.render(this, currentShader, renderType);
+		var refTMatrixIdxKey = 0;
+		var minSizeToRender = 0.0;
+		var renderType = 0;
+		var refMatrixIdxKey =0; // provisionally set this var here.***
+		this.modeler.render(this, currentShader, renderType);
 
-			currentShader.disableVertexAttribArrayAll();
-			gl.useProgram(null);
+		currentShader.disableVertexAttribArrayAll();
+		gl.useProgram(null);
 
-		}
+	}
 	
 	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;

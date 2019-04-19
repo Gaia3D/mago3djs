@@ -27,8 +27,8 @@ var Modeler = function()
  */
 Modeler.prototype.getGeographicCoordsList = function() 
 {
-	if(this.geoCoordsList === undefined)
-		this.geoCoordsList = new GeographicCoordsList();
+	if (this.geoCoordsList === undefined)
+	{ this.geoCoordsList = new GeographicCoordsList(); }
 	
 	return this.geoCoordsList;
 };
@@ -38,8 +38,8 @@ Modeler.prototype.getGeographicCoordsList = function()
  */
 Modeler.prototype.getExcavation = function() 
 {
-	if(this.excavation === undefined)
-		this.excavation = new Excavation();
+	if (this.excavation === undefined)
+	{ this.excavation = new Excavation(); }
 	
 	return this.excavation;
 };
@@ -74,13 +74,13 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
 		
 	}
 	
-	if(this.geoCoordsList !== undefined)
+	if (this.geoCoordsList !== undefined)
 	{
 		// Provisionally render geographicPoints.***
 		this.geoCoordsList.renderPoints(magoManager, shader);
 	}
 	
-	if(this.excavation !== undefined)
+	if (this.excavation !== undefined)
 	{
 		this.excavation.renderPoints(magoManager, shader, renderType);
 	}

@@ -192,8 +192,8 @@ Face.getBestFacePlaneToProject = function(normal)
 Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygon2d)
 {
 	// Create a temp polygon2d.***
-	if(resultProjectedPolygon2d === undefined)
-		resultProjectedPolygon2d = new Polygon2D();
+	if (resultProjectedPolygon2d === undefined)
+	{ resultProjectedPolygon2d = new Polygon2D(); }
 	
 	if (resultProjectedPolygon2d.point2dList === undefined)
 	{ resultProjectedPolygon2d.point2dList = new Point2DList(); }
@@ -246,8 +246,8 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 		var point2d_0, point2d_1, point2d_2;
 		var point2d_0 = convexPolygon.point2dList.getPoint(0);
 		
-		if(point2d_0 === undefined)
-			var hola = 0;
+		if (point2d_0 === undefined)
+		{ var hola = 0; }
 		
 		vertex0 = point2d_0.ownerVertex3d;
 		var point2dCount = convexPolygon.point2dList.getPointsCount();

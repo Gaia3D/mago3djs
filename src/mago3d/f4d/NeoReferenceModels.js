@@ -61,21 +61,21 @@ NeoReference.prototype.swapRenderingFase = function()
  */
 NeoReference.prototype.getBlendAlpha = function(currTime) 
 {
-	if(!this.isAdult)
+	if (!this.isAdult)
 	{
-		if(this.birthTime === undefined)
-			this.birthTime = currTime;
+		if (this.birthTime === undefined)
+		{ this.birthTime = currTime; }
 		
 		var increAlpha = (currTime - this.birthTime)*0.0001;
 		this.blendAlpha += increAlpha;
 		
-		if(this.blendAlpha >= 1.0)
+		if (this.blendAlpha >= 1.0)
 		{
 			this.isAdult = true;
 		}
 	}
 	else
-		return 1.0;
+	{ return 1.0; }
 	
 	return this.blendAlpha;
 };
