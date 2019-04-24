@@ -9,4 +9,4 @@ script: gulp
 
 branches : 
   only : 
-    - develop
+    - master
