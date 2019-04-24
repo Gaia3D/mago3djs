@@ -46,11 +46,11 @@ var GeoLocationData = function(geoLocationDataName)
  * @class GeoLocationData
  * @param geoLocData 변수
  */
-GeoLocationData.prototype.deleteObjects = function() 
+GeoLocationData.prototype.deleteObjects = function(vboMemManager) 
 {
 	this.name = undefined;
 	if (this.geographicCoord)
-	{ this.geographicCoord.deleteObjects(); }
+	{ this.geographicCoord.deleteObjects(vboMemManager); }
 	this.geographicCoord = undefined;
 	
 	this.heading = undefined;
@@ -262,14 +262,69 @@ GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWo
  */
 GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLocalCoord) 
 {
-	if (worldCoord === undefined || this.tMatrixInv === undefined)
+	var tMatrixInv = this.getTMatrixInv();
+	if (worldCoord === undefined || tMatrixInv === undefined)
 	{ return undefined; }
 	
 	if (resultLocalCoord === undefined)
 	{ resultLocalCoord = new Point3D(); }
 	
-	resultLocalCoord = this.tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
+	resultLocalCoord = tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
 	return resultLocalCoord;
+};
+
+/**
+ * 
+ * @returns this.rotMatrixInv.
+ */
+GeoLocationData.prototype.getRotMatrixInv = function() 
+{
+	if (this.rotMatrixInv === undefined)
+	{
+		var rotMatrixInv = mat4.create();
+		rotMatrixInv = mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
+		
+		this.rotMatrixInv = new Matrix4();
+		this.rotMatrixInv.setByFloat32Array(rotMatrixInv);
+	}
+	
+	return this.rotMatrixInv;
+};
+
+/**
+ * 
+ * @returns this.tMatrixInv.
+ */
+GeoLocationData.prototype.getTMatrixInv = function() 
+{
+	if (this.tMatrixInv === undefined)
+	{
+		var tMatrixInv = mat4.create();
+		tMatrixInv = mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
+		
+		this.tMatrixInv = new Matrix4();
+		this.tMatrixInv.setByFloat32Array(tMatrixInv);
+	}
+	
+	return this.tMatrixInv;
+};
+
+/**
+ * 
+ * @returns this.geoLocMatrixInv.
+ */
+GeoLocationData.prototype.getGeoLocationMatrixInv = function() 
+{
+	if (this.geoLocMatrixInv === undefined)
+	{
+		var geoLocMatrixInv = mat4.create();
+		geoLocMatrixInv = mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
+		
+		this.geoLocMatrixInv = new Matrix4();
+		this.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
+	}
+	
+	return this.geoLocMatrixInv;
 };
 
 /**
@@ -288,14 +343,16 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 	pointAux.set(absoluteCamera.position.x - this.position.x, 
 		absoluteCamera.position.y - this.position.y, 
 		absoluteCamera.position.z - this.position.z);
+		
+	var rotMatInv = this.getRotMatrixInv();
 	
-	resultCamera.position = this.rotMatrixInv.transformPoint3D(pointAux, resultCamera.position);
+	resultCamera.position = rotMatInv.transformPoint3D(pointAux, resultCamera.position);
 	
 	pointAux.set(absoluteCamera.direction.x, absoluteCamera.direction.y, absoluteCamera.direction.z);
-	resultCamera.direction = this.rotMatrixInv.transformPoint3D(pointAux, resultCamera.direction);
+	resultCamera.direction = rotMatInv.transformPoint3D(pointAux, resultCamera.direction);
 	
 	pointAux.set(absoluteCamera.up.x, absoluteCamera.up.y, absoluteCamera.up.z);
-	resultCamera.up = this.rotMatrixInv.transformPoint3D(pointAux, resultCamera.up);
+	resultCamera.up = rotMatInv.transformPoint3D(pointAux, resultCamera.up);
   
 	pointAux.x = undefined;
 	pointAux.y = undefined;
@@ -321,11 +378,15 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
 	pointAux.set(absolutePosition.x - this.position.x, 
 		absolutePosition.y - this.position.y, 
 		absolutePosition.z - this.position.z);
-	
-	resultRelativePosition = this.rotMatrixInv.transformPoint3D(pointAux, resultRelativePosition);
+	var rotMatInv = this.getRotMatrixInv();
+	resultRelativePosition = rotMatInv.transformPoint3D(pointAux, resultRelativePosition);
 	
 	return resultRelativePosition;
 };
+
+//**********************************************************************************************************************************************************
+//**********************************************************************************************************************************************************
+//**********************************************************************************************************************************************************
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -339,7 +400,6 @@ var GeoLocationDataManager = function()
 	}
 	
 	this.geoLocationDataArray = [];
-	//this.geoLocationDataCache = {}; // use this.***
 };
 
 /**

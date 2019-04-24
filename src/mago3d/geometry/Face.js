@@ -67,7 +67,7 @@ Face.prototype.setColor = function(r, g, b, a)
 
 Face.prototype.getPlaneNormal = function()
 {
-	if (this.planeNormal === undefined)
+	if (this.planeNormal === undefined || this.planeNormal.isNAN())
 	{ 
 		//this.calculateVerticesNormals(); 
 		this.calculatePlaneNormal();
@@ -76,19 +76,19 @@ Face.prototype.getPlaneNormal = function()
 	return this.planeNormal;
 };
 
-Face.prototype.calculatePlaneNormal = function()
+Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 {
-	// Note: face must be planar.***
-	if (this.planeNormal === undefined)
-	{ this.planeNormal = new Point3D(); }
+	// Note: the vertexArray must be planar.***
+	if (resultPlaneNormal === undefined)
+	{ resultPlaneNormal = new Point3D(); }
 
-	this.planeNormal.set(0, 0, 0);
-	var verticesCount = this.vertexArray.length;
+	resultPlaneNormal.set(0, 0, 0);
+	var verticesCount = vertexArray.length;
 	for (var i=0; i<verticesCount; i++)
 	{
-		var prevIdx = VertexList.getPrevIdx(i, this.vertexArray);
-		var startVec = VertexList.getVector(prevIdx, this.vertexArray, undefined);
-		var endVec = VertexList.getVector(i, this.vertexArray, undefined);
+		var prevIdx = VertexList.getPrevIdx(i, vertexArray);
+		var startVec = VertexList.getVector(prevIdx, vertexArray, undefined);
+		var endVec = VertexList.getVector(i, vertexArray, undefined);
 		
 		startVec.unitary();
 		endVec.unitary();
@@ -97,15 +97,26 @@ Face.prototype.calculatePlaneNormal = function()
 		{ continue; }
 		
 		var crossProd = startVec.crossProduct(endVec, undefined); // Point3D.
+		crossProd.unitary(); 
+		if (crossProd.isNAN())
+		{ continue; }
+	
 		var scalarProd = startVec.scalarProduct(endVec);
 		
-		var cosAlfa = scalarProd;
+		var cosAlfa = scalarProd; // Bcos startVec & endVec are unitaries.***
 		var alfa = Math.acos(cosAlfa);
 		
-		this.planeNormal.add(crossProd.x*alfa, crossProd.y*alfa, crossProd.z*alfa);
+		resultPlaneNormal.add(crossProd.x*alfa, crossProd.y*alfa, crossProd.z*alfa);
 	}
-	this.planeNormal.unitary();
+	resultPlaneNormal.unitary();
 	
+	return resultPlaneNormal;
+};
+
+Face.prototype.calculatePlaneNormal = function()
+{
+	// Note: face must be planar.***
+	this.planeNormal = Face.calculatePlaneNormal(this.vertexArray, this.planeNormal);
 	return this.planeNormal;
 };
 
@@ -178,6 +189,21 @@ Face.getBestFacePlaneToProject = function(normal)
 	return best_plane;
 };
 
+Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygon2d)
+{
+	// Create a temp polygon2d.***
+	if (resultProjectedPolygon2d === undefined)
+	{ resultProjectedPolygon2d = new Polygon2D(); }
+	
+	if (resultProjectedPolygon2d.point2dList === undefined)
+	{ resultProjectedPolygon2d.point2dList = new Point2DList(); }
+
+	var point2dList = resultProjectedPolygon2d.point2dList;
+	point2dList.pointsArray =  VertexList.getProjectedPoints2DArray(vertexArray, normal, point2dList.pointsArray);
+
+	return resultProjectedPolygon2d;
+};
+
 Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 {
 	if (resultTrianglesArray === undefined)
@@ -197,60 +223,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 	
 	// Create a temp polygon2d.***
-	var polygon2d = new Polygon2D();
-	if (polygon2d.point2dList === undefined)
-	{ polygon2d.point2dList = new Point2DList(); }
-	var point2dList = polygon2d.point2dList;
-	var point2d;
-	// Project this face into the bestPlane.***
-	if (bestPlaneToProject === 0) // plane-xy.***
-	{
-		// project this face into a xy plane.***
-		for (var i=0; i<verticesCount; i++)
-		{
-			var vertex = this.getVertex(i);
-			var point3d = vertex.point3d;
-			if (normal.z > 0)
-			{ point2d = point2dList.newPoint(point3d.x, point3d.y); }
-			else
-			{ point2d = point2dList.newPoint(point3d.x, -point3d.y); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
-		}
-	}
-	else if (bestPlaneToProject === 1) // plane-yz.***
-	{
-		// project this face into a yz plane.***
-		for (var i=0; i<verticesCount; i++)
-		{
-			var vertex = this.getVertex(i);
-			var point3d = vertex.point3d;
-			if (normal.x > 0)
-			{ point2d = point2dList.newPoint(point3d.y, point3d.z); }
-			else
-			{ point2d = point2dList.newPoint(-point3d.y, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
-		}
-	}
-	else if (bestPlaneToProject === 2) // plane-xz.***
-	{
-		// project this face into a xz plane.***
-		for (var i=0; i<verticesCount; i++)
-		{
-			var vertex = this.getVertex(i);
-			var point3d = vertex.point3d;
-			if (normal.y > 0)
-			{ point2d = point2dList.newPoint(-point3d.x, point3d.z); }
-			else
-			{ point2d = point2dList.newPoint(point3d.x, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
-		}
-	}
-	else
-	{
-		// some times normal = (nan, nan, nan).
-		return resultTrianglesArray;
-	}
-	
+	var polygon2d = Face.getProjectedPolygon2D(this.vertexArray, normal, undefined);
 	
 	// Now, tessellate the polygon2D.***
 	// Before tessellate, we must know if there are concavePoints.***
@@ -272,6 +245,10 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 		var triangle;
 		var point2d_0, point2d_1, point2d_2;
 		var point2d_0 = convexPolygon.point2dList.getPoint(0);
+		
+		if (point2d_0 === undefined)
+		{ var hola = 0; }
+		
 		vertex0 = point2d_0.ownerVertex3d;
 		var point2dCount = convexPolygon.point2dList.getPointsCount();
 		for (var j=1; j<point2dCount-1; j++)

@@ -88,6 +88,36 @@ VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
 	}
 };
 
+VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, normal)
+{
+	// This function returns a ring2d made by polylines2d.***
+	if (this.vertexList === undefined)
+	{ return resultRing2d; }
+	
+	if (resultRing2d === undefined)
+	{ resultRing2d = new Ring2D(); }
+	
+	var points2dArray = [];
+	points2dArray = VertexList.getProjectedPoints2DArray(this.vertexList.vertexArray, normal, points2dArray);
+	
+	var polyLine2d = resultRing2d.newElement("POLYLINE");
+	polyLine2d.point2dArray = points2dArray;
+	
+	return resultRing2d;
+};
+
+VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
+{
+	if (point3dArray === undefined)
+	{ return; }
+	
+	if (this.vertexList === undefined)
+	{ this.vertexList = new VertexList(); }
+	
+	this.vertexList.copyFromPoint3DArray(point3dArray);
+	this.calculateElementsIndicesRange();
+};
+
 VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 {
 	if (point2dList === undefined)
@@ -101,6 +131,13 @@ VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 	
 	this.vertexList.copyFromPoint2DList(point2dList, z);
 	this.calculateElementsIndicesRange();
+};
+
+VtxRing.prototype.calculatePlaneNormal = function(resultPlaneNormal)
+{
+	// Note: this ring must be planar (or almost planar).***
+	var planeNormal = Face.calculatePlaneNormal(this.vertexList.vertexArray, undefined);
+	return planeNormal;
 };
 
 VtxRing.prototype.calculateElementsIndicesRange = function()

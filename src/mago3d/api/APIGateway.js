@@ -451,6 +451,20 @@ function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDat
 	managerFactoryInstance.callAPI(api);
 }
 
+/**
+ * 고려 소프트웨어: 바로가기
+ */
+function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duration)
+{
+	if (managerFactoryInstance === null) { return; } 
+	
+	var api = new API("gotoFly");
+	api.setLongitude(longitude);
+	api.setLatitude(latitude);
+	api.setElevation(height);
+	api.setDuration(duration);
+	managerFactoryInstance.callAPI(api);
+}
 
 /**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체

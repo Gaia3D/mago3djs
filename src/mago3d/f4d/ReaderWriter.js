@@ -307,14 +307,11 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	});
 };
 
-ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, magoManager) 
+ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lowestOctree, blocksArrayPartition, magoManager) 
 {
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
-	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var xhr;
-	////xhr = new XMLHttpRequest();
-	//blocksList.xhr = xhr; // possibility to cancel.***
 	
 	this.blocksListPartitioned_requested++;
 	
@@ -323,8 +320,8 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			blocksList.dataArraybuffer = arrayBuffer;
-			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			blocksArrayPartition.dataArraybuffer = arrayBuffer;
+			blocksArrayPartition.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
 			
 			
@@ -332,19 +329,19 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 		}
 		else 
 		{
-			blocksList.fileLoadState = 500;
+			blocksArrayPartition.fileLoadState = 500;
 		}
 	}).fail(function(status) 
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
-		if (status === 0) { blocksList.fileLoadState = 500; }
-		else if (status === -1) { blocksList.fileLoadState = CODE.fileLoadState.READY; }
-		else { blocksList.fileLoadState = status; }
+		if (status === 0) { blocksArrayPartition.fileLoadState = 500; }
+		else if (status === -1) { blocksArrayPartition.fileLoadState = CODE.fileLoadState.READY; }
+		else { blocksArrayPartition.fileLoadState = status; }
 	}).always(function() 
 	{
 		magoManager.readerWriter.blocksListPartitioned_requested--;
-		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
-		if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
+		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
+		if (magoManager.fileRequestControler.blocksListPartitioned_requested < 0) { magoManager.fileRequestControler.blocksListPartitioned_requested = 0; }
 	});
 };
 
@@ -1224,7 +1221,7 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 		{
 			var textureAux = _gl.createTexture();
 			_gl.bindTexture(_gl.TEXTURE_2D, textureAux);
-			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			_gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, filter);
@@ -1454,8 +1451,8 @@ ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture)
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 	//var gl = viewer.scene.context._gl;
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // if need vertical mirror of the image.***
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); // if need vertical mirror of the image.***
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);

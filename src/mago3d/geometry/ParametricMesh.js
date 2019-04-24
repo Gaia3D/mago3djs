@@ -73,11 +73,11 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
 	
 	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
 	this.vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
-	
+	//profile2d.checkNormals();
 	// create vtxProfiles.***
 	// make the base-vtxProfile.***
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByProfile(profile2d);
+	baseVtxProfile.makeByProfile2D(profile2d);
 	
 	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
 	
@@ -126,7 +126,7 @@ ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSeg
 	// create vtxProfiles.***
 	// make the base-vtxProfile.***
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByProfile(profile2d);
+	baseVtxProfile.makeByProfile2D(profile2d);
 	
 	if (extrusionVector === undefined)
 	{ extrusionVector = new Point3D(0, 0, 1); }

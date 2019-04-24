@@ -544,6 +544,9 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 
 Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 {
+	if (resultVboContainer === undefined)
+	{ return; }
+	
 	// provisionally make edges by this.***
 	var frontierHedgesArray = this.getFrontierHalfEdges(undefined);
 	var hedgesCount = frontierHedgesArray.length;

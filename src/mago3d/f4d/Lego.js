@@ -27,7 +27,9 @@ var Lego = function()
 	// extra vars.***
 	this.renderableType; // triangles, lines, points, etc.***
 	this.hasColors;
-	
+	this.blendAlpha = 0.0;
+	this.birthTime;
+	this.isAdult = false;
 };
 
 /**
@@ -41,6 +43,31 @@ var Lego = function()
 Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 {
 	this.parseLegoData(dataArraybuffer, gl, magoManager);
+};
+
+/**
+ */
+Lego.prototype.getBlendAlpha = function(currTime) 
+{
+	return 1.0;
+	/*
+	if(!this.isAdult)
+	{
+		if(this.birthTime === undefined)
+			this.birthTime = currTime;
+		var increAlpha = (currTime - this.birthTime)*0.0001;
+		this.blendAlpha += increAlpha;
+		
+		if(this.blendAlpha >= 1.0)
+		{
+			this.isAdult = true;
+		}
+	}
+	else
+		return 1.0;
+	
+	return this.blendAlpha;
+	*/
 };
 
 /**
@@ -286,6 +313,11 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 	}
 	else if (renderType === 1) // color.***
 	{
+		// Test external alpha.***
+		var blendAlpha = this.getBlendAlpha(magoManager.currTime);
+		gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+		// End test.---
+	
 		// 4) Texcoord.*********************************************
 		if (renderTexture)
 		{

@@ -670,6 +670,8 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.uniformLocation = uniformLocation;
 		uniformDataPair.vec3fv = sceneState.ssaoKernel16;
 	}
+	
+	
 };
 
 /**
@@ -715,6 +717,13 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	
 	shader.bApplySpecularLighting_loc = gl.getUniformLocation(shader.program, "bApplySpecularLighting");
 	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");
+	shader.externalAlpha_loc = gl.getUniformLocation(shader.program, "externalAlpha");
+	
+	//uniform float fixPointSize;
+	//uniform bool bUseFixPointSize;
+	shader.fixPointSize_loc = gl.getUniformLocation(shader.program, "fixPointSize");
+	shader.bUseFixPointSize_loc = gl.getUniformLocation(shader.program, "bUseFixPointSize");
+	
 };
 
 //*********************************************************************************************************************

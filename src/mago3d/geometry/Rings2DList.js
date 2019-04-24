@@ -33,6 +33,18 @@ Rings2DList.prototype.newRing = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
+Rings2DList.prototype.addRing = function(ring) 
+{
+	if (this.ringsArray === undefined)
+	{ this.ringsArray = []; }
+	
+	this.ringsArray.push(ring);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertexList
+ */
 Rings2DList.prototype.deleteObjects = function() 
 {
 	if (this.ringsArray)

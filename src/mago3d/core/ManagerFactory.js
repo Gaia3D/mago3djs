@@ -207,7 +207,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		scene = viewer.scene;
 		//scene.copyGlobeDepth = true;
 		viewer.scene.globe.depthTestAgainstTerrain = true;
-
+		viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
+		viewer.scene.highDynamicRange = false; //do not use high dynamic range
 		// object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
 		//viewer.scene.magoManager.getObjectIndexFile();
 		if (projectIdArray !== null && projectIdArray.length > 0) 
@@ -747,6 +748,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		// get current building selected
 		if (magoManager.magoPolicy.issueInsertEnable)	{ return; }
+		
+		magoManager.keyDown(event.keyCode);
 
 		var selectedBuilding = magoManager.buildingSelected;	
 		if (selectedBuilding === undefined) 	{ return; }
@@ -816,6 +819,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				currentAlt -= increDist;
 				displayData = true;
 			}
+			
+			
 
 			if (displayData)
 			{

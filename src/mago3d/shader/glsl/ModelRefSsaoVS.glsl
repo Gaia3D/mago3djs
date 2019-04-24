@@ -54,7 +54,7 @@
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 
-		vertexPos = vec3(modelViewMatrixRelToEye * pos4);
+		//vertexPos = vec3(modelViewMatrixRelToEye * pos4);
 		vec3 rotatedNormal = currentTMat * normal;
 		vLightWeighting = vec3(1.0, 1.0, 1.0);
 		uAmbientColor = vec3(0.8);

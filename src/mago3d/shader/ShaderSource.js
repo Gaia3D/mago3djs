@@ -796,6 +796,7 @@ uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 varying float applySpecLighting;\n\
 uniform bool bApplySsao;\n\
+uniform float externalAlpha;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -908,7 +909,7 @@ void main()\n\
     }\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-	float alfa = textureColor.w;\n\
+	float alfa = textureColor.w * externalAlpha;\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
@@ -976,7 +977,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 \n\
-		vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
+		//vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
 		uAmbientColor = vec3(0.8);\n\
@@ -1063,6 +1064,10 @@ uniform bool bPositionCompressed;\n\
 uniform vec3 minPosition;\n\
 uniform vec3 bboxSize;\n\
 attribute vec4 color4;\n\
+uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
+uniform float fixPointSize;\n\
+uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 \n\
 void main()\n\
@@ -1084,8 +1089,13 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vColor=color4;\n\
+	\n\
+    if(bUse1Color)\n\
+	{\n\
+		vColor=oneColor4;\n\
+	}\n\
+	else\n\
+		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\

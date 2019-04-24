@@ -131,7 +131,8 @@ Ring2D.prototype.getPoints = function(resultPointsArray)
 	if (totalPointsCount > 1)
 	{
 		// mark the last as pointType = 0
-		resultPointsArray[totalPointsCount-1].pointType = 0; // delete this.***
+		//resultPointsArray[totalPointsCount-1].pointType = 0; // delete this.***original
+		resultPointsArray[totalPointsCount-1].pointType = 1; 
 		
 		var errorDist = 10E-8;
 		var firstPoint = resultPointsArray[0];

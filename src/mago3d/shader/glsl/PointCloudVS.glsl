@@ -9,6 +9,10 @@ uniform bool bPositionCompressed;
 uniform vec3 minPosition;
 uniform vec3 bboxSize;
 attribute vec4 color4;
+uniform bool bUse1Color;
+uniform vec4 oneColor4;
+uniform float fixPointSize;
+uniform bool bUseFixPointSize;
 varying vec4 vColor;
 
 void main()
@@ -30,8 +34,13 @@ void main()
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
-
-    vColor=color4;
+	
+    if(bUse1Color)
+	{
+		vColor=oneColor4;
+	}
+	else
+		vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
 	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***

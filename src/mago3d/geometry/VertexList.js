@@ -101,6 +101,69 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 	return resultCrossProduct;
 };
 
+VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
+{
+	// This function projects the vertices on to planes xy, yz or xz.***
+	if (vertexArray === undefined)
+	{ return resultPoints2dArray; }
+	
+	if (resultPoints2dArray === undefined)
+	{ resultPoints2dArray = []; }
+	
+	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
+	
+	var point2d;
+	var verticesCount = vertexArray.length;
+	// Project this face into the bestPlane.***
+	if (bestPlaneToProject === 0) // plane-xy.***
+	{
+		// project this face into a xy plane.***
+		for (var i=0; i<verticesCount; i++)
+		{
+			var vertex = vertexArray[i];
+			var point3d = vertex.point3d;
+			if (normal.z > 0)
+			{ point2d = new Point2D(point3d.x, point3d.y); }
+			else
+			{ point2d = new Point2D(point3d.x, -point3d.y); }
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			resultPoints2dArray.push(point2d);
+		}
+	}
+	else if (bestPlaneToProject === 1) // plane-yz.***
+	{
+		// project this face into a yz plane.***
+		for (var i=0; i<verticesCount; i++)
+		{
+			var vertex = vertexArray[i];
+			var point3d = vertex.point3d;
+			if (normal.x > 0)
+			{ point2d = new Point2D(point3d.y, point3d.z); }
+			else
+			{ point2d = new Point2D(-point3d.y, point3d.z); }
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			resultPoints2dArray.push(point2d);
+		}
+	}
+	else if (bestPlaneToProject === 2) // plane-xz.***
+	{
+		// project this face into a xz plane.***
+		for (var i=0; i<verticesCount; i++)
+		{
+			var vertex = vertexArray[i];
+			var point3d = vertex.point3d;
+			if (normal.y > 0)
+			{ point2d = new Point2D(-point3d.x, point3d.z); }
+			else
+			{ point2d = new Point2D(point3d.x, point3d.z); }
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			resultPoints2dArray.push(point2d);
+		}
+	}
+	
+	return resultPoints2dArray;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @returns vertex
@@ -133,6 +196,33 @@ VertexList.prototype.copyFrom = function(vertexList)
 		vertex = vertexList.getVertex(i);
 		myVertex = this.newVertex();
 		myVertex.copyFrom(vertex);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns vertex
+ */
+VertexList.prototype.copyFromPoint3DArray = function(point3dArray) 
+{
+	if (point3dArray === undefined)
+	{ return; }
+	
+	// first reset vertexArray.
+	this.deleteObjects();
+	this.vertexArray = [];
+	
+	var point3d;
+	var vertex;
+
+	var pointsCount = point3dArray.length;
+	for (var i=0; i<pointsCount; i++)
+	{
+		point3d = point3dArray[i];
+		vertex = this.newVertex();
+		vertex.point3d = new Point3D();
+		vertex.point3d.set(point3d.x, point3d.y, point3d.z);
+		vertex.vertexType = point3d.pointType;
 	}
 };
 

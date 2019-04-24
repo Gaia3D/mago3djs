@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "10"
+os : windows
+before_script:
+  - npm install
+  - npm install -g gulp-cli
+script: gulp
+
+branches : 
+  only : 
+    - develop
