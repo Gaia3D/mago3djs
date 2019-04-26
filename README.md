@@ -1,7 +1,9 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Gaia3D/mago3djs.svg)](https://greenkeeper.io/)
+
 [![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](#korean)
 [![Englsh](https://img.shields.io/badge/language-English-orange.svg)](#english)
-[![Japan](https://img.shields.io/badge/language-Japan-red.svg)](#japan) [![Greenkeeper badge](https://badges.greenkeeper.io/Gaia3D/mago3djs.svg)](https://greenkeeper.io/)
+[![Japan](https://img.shields.io/badge/language-Japan-red.svg)](#japan) 
 
 <a name="korean"></a>
 
