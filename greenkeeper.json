@@ -1,0 +1,10 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "externlib/jquery-toast/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
