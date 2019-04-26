@@ -10,3 +10,4 @@ script: gulp
 branches : 
   only : 
     - master
+    - /^greenkeeper/.*$/
