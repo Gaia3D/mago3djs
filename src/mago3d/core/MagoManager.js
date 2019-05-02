@@ -2695,7 +2695,8 @@ MagoManager.prototype.keyDown = function(key)
 		var heading;
 		var pitch;
 		var roll;
-		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll);
+		var durationTimeInSeconds = 30;
+		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -5950,7 +5951,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll) 
+MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 {
 	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
 	if (nodesMap)
@@ -5958,20 +5959,26 @@ MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, l
 		var node = nodesMap[dataKey];
 		if (node === undefined)
 		{ return; }
-		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll);
+		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 };
 
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll) 
+MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 {
 	if (node === undefined)
 	{ return; }
 
-	//node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
-	node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, 30);
+	if(durationTimeInSeconds !== undefined)
+	{
+		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
+	}
+	else{
+		node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
+	}
+	
 	var neoBuilding = node.data.neoBuilding;
 	
 	this.selectedObjectNotice(neoBuilding);
