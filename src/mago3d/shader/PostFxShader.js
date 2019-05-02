@@ -276,8 +276,8 @@ PostFxShader.prototype.disableVertexAttribArrayAll = function()
 {
 	var gl = this.gl;
 	var vertexAttribsCount = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
-	for(var i = 0; i<vertexAttribsCount; i++)
-		gl.disableVertexAttribArray(i);
+	for (var i = 0; i<vertexAttribsCount; i++)
+	{ gl.disableVertexAttribArray(i); }
 };
 
 /**

@@ -1402,8 +1402,8 @@ ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, tex
 
 	imageFromArray.onload = function () 
 	{
-		if(flip_y_texCoords === undefined)
-			flip_y_texCoords = false;
+		if (flip_y_texCoords === undefined)
+		{ flip_y_texCoords = false; }
 		
 		if (texture.texId === undefined)
 		{ texture.texId = gl.createTexture(); }
@@ -1436,8 +1436,8 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			if(flip_y_texCoords === undefined)
-			flip_y_texCoords = false;
+			if (flip_y_texCoords === undefined)
+			{ flip_y_texCoords = false; }
 		
 			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager, flip_y_texCoords);
 			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -1452,5 +1452,24 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
 	});
 		
+};
+
+
+ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
+{
+	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+	//var gl = viewer.scene.context._gl;
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // if need vertical mirror of the image.***
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.generateMipmap(gl.TEXTURE_2D);
+	gl.bindTexture(gl.TEXTURE_2D, null);
 };
 

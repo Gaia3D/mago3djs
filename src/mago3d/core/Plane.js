@@ -66,8 +66,8 @@ Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist)
  */
 Plane.prototype.getNormal = function(resultNormal) 
 {
-	if(resultNormal === undefined)
-		resultNormal = new Point3D();
+	if (resultNormal === undefined)
+	{ resultNormal = new Point3D(); }
 	
 	resultNormal.set(this.a, this.b, this.c);
 	
@@ -91,19 +91,19 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 	// relativeOrientation = 1 -> // there are parallels & opposite sense.***
 	// relativeOrientation = 2 -> // there are NO parallels.***
 	var matrixAux = mat4.create(); // creates as identityMatrix.***
-	if(relativeOrientation === 0)
+	if (relativeOrientation === 0)
 	{
 		// there are parallels & the same sense.***
 		// In this case, the resultMatrix is a identityMatrix, so do nothing.***
 	}
-	else if(relativeOrientation === 1)
+	else if (relativeOrientation === 1)
 	{
 		// there are parallels & opposite sense.***
 		// Rotate 180 degree in xAxis.***
 		var identityMat = mat4.create();
 		matrixAux = mat4.rotateX(matrixAux, identityMat, Math.PI);
 	}
-	else if(relativeOrientation === 2)
+	else if (relativeOrientation === 2)
 	{
 		// there are NO parallels.***
 		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
@@ -119,8 +119,8 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 		matrixAux = mat4.fromQuat(identityMat, quaternion);
 	}
 	
-	if(resultTMatrix === undefined)
-		resultTMatrix = new Matrix4();
+	if (resultTMatrix === undefined)
+	{ resultTMatrix = new Matrix4(); }
 	
 	resultTMatrix._floatArrays = matrixAux;
 	

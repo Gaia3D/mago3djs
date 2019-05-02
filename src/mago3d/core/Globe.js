@@ -417,13 +417,13 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 	result.longitude = factor * lambda;
 	result.altitude = h;
 	
-	if(bStoreAbsolutePosition !== undefined && bStoreAbsolutePosition === true)
+	if (bStoreAbsolutePosition !== undefined && bStoreAbsolutePosition === true)
 	{
 		// In this case, store into result_geographicCoord the x, y, z values.***
-		if(result.absolutePoint === undefined)
-			result.absolutePoint = new Point3D(x, y, z);
+		if (result.absolutePoint === undefined)
+		{ result.absolutePoint = new Point3D(x, y, z); }
 		else
-			result.absolutePoint.set(x, y, z);
+		{ result.absolutePoint.set(x, y, z); }
 	}
 
 	return result;

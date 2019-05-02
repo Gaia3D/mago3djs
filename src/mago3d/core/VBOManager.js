@@ -583,8 +583,8 @@ var VBOVertexIdxCacheKeysContainer = function()
  */
 VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() 
 {
-	if(this.vboCacheKeysArray === undefined)
-		this.vboCacheKeysArray = [];
+	if (this.vboCacheKeysArray === undefined)
+	{ this.vboCacheKeysArray = []; }
 	
 	var vboViCacheKey = new VBOVertexIdxCacheKey();
 	this.vboCacheKeysArray.push(vboViCacheKey);
@@ -627,8 +627,8 @@ VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function()
  */
 VBOVertexIdxCacheKeysContainer.prototype.getVboKey = function(idx) 
 {
-	if(this.vboCacheKeysArray === undefined)
-		return undefined;
+	if (this.vboCacheKeysArray === undefined)
+	{ return undefined; }
 	
 	var vbo = this.vboCacheKeysArray[idx];
 	return vbo;

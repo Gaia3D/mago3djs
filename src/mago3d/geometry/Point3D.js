@@ -155,12 +155,12 @@ Point3D.prototype.getSphericalCoords = function(resultGeographicCoords)
 Point3D.prototype.getRelativeOrientationToVector = function(vector, radError) 
 {
 	var angRad = this.angleRadToVector(vector);
-	if(angRad < radError)
-		return 0; // there are parallel & the same sense.***
-	else if(Math.abs(Math.PI - angRad) < radError)
-		return 1; // there are parallel & opposite sense.***
+	if (angRad < radError)
+	{ return 0; } // there are parallel & the same sense.***
+	else if (Math.abs(Math.PI - angRad) < radError)
+	{ return 1; } // there are parallel & opposite sense.***
 	else
-		return 2; // there are NO parallels.***
+	{ return 2; } // there are NO parallels.***
 };
 
 /**
@@ -446,8 +446,8 @@ var Point3DList = function()
  */
 Point3DList.prototype.newPoint3D = function(x, y, z) 
 {
-	if(this.points3dArray === undefined)
-		this.points3dArray = [];
+	if (this.points3dArray === undefined)
+	{ this.points3dArray = []; }
 	
 	var point3d = new Point3D(x, y, z);
 	this.points3dArray.push(point3d);
@@ -459,8 +459,8 @@ Point3DList.prototype.newPoint3D = function(x, y, z)
  */
 Point3DList.prototype.addPoint3D = function(point3d) 
 {
-	if(this.points3dArray === undefined)
-		this.points3dArray = [];
+	if (this.points3dArray === undefined)
+	{ this.points3dArray = []; }
 	
 	this.points3dArray.push(point3d);
 };
@@ -470,18 +470,18 @@ Point3DList.prototype.addPoint3D = function(point3d)
  */
 Point3DList.calculateBBox = function(points3DArray, resultBBox) 
 {
-	if(points3DArray === undefined)
-		return undefined;
+	if (points3DArray === undefined)
+	{ return undefined; }
 
 	var pointCount = points3DArray.length;
-	if(pointCount === 0)
-		return undefined;
+	if (pointCount === 0)
+	{ return undefined; }
 	
-	if(resultBBox === undefined)
-		resultBBox = new BoundingBox();
+	if (resultBBox === undefined)
+	{ resultBBox = new BoundingBox(); }
 	
 	resultBBox.init(points3DArray[0]); // init the box.***
-	for(var i=1; i<pointCount; i++)
+	for (var i=1; i<pointCount; i++)
 	{
 		resultBBox.addPoint(points3DArray[i]);
 	}

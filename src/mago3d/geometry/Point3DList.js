@@ -11,8 +11,8 @@ var Point3DList = function(points3dArray)
 	}
 
 	this.pointsArray;
-	if(points3dArray !== undefined)
-		this.pointsArray = points3dArray;
+	if (points3dArray !== undefined)
+	{ this.pointsArray = points3dArray; }
 	
 	this.bLoop;
 	
@@ -25,7 +25,7 @@ Point3DList.prototype.deleteObjects = function(magoManager)
 	this.deletePoints3d();
 	this.deleteVboKeysContainer(magoManager);
 	
-	if(this.geoLocDataManager !== undefined)
+	if (this.geoLocDataManager !== undefined)
 	{
 		this.geoLocDataManager.deleteObjects();
 		this.geoLocDataManager = undefined;
@@ -34,7 +34,7 @@ Point3DList.prototype.deleteObjects = function(magoManager)
 
 Point3DList.prototype.deleteVboKeysContainer = function(magoManager)
 {
-	if(this.vboKeysContainer !== undefined)
+	if (this.vboKeysContainer !== undefined)
 	{
 		var gl = magoManager.sceneState.gl;
 		this.vboKeysContainer.deleteGlObjects(gl, magoManager.vboMemoryManager);
@@ -69,11 +69,11 @@ Point3DList.prototype.addPoint = function(point3d)
 
 Point3DList.prototype.getGeographicLocation = function()
 {
-	if(this.geoLocDataManager === undefined)
-		this.geoLocDataManager = new GeoLocationDataManager();
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
-	if(geoLoc === undefined)
+	if (geoLoc === undefined)
 	{
 		geoLoc = this.geoLocDataManager.newGeoLocationData("default");
 	}
@@ -144,13 +144,13 @@ Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)
 {
 	// If "bLoop" = true, then this points3dList is a loop.***
 	// If "bLoop" = false, then this points3dList is a string.***
-	if(bLoop === undefined)
-		bLoop = false;
+	if (bLoop === undefined)
+	{ bLoop = false; }
 	
 	var pointsCount = this.getPointsCount();
 	
-	if(!bLoop && idx === pointsCount-1)
-		return undefined;
+	if (!bLoop && idx === pointsCount-1)
+	{ return undefined; }
 	
 	var currPoint = this.getPoint(idx);
 	var nextIdx = this.getNextIdx(idx);
@@ -171,24 +171,24 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	// This function returns a plane that has the same angle with the 2 segments of a point(idx).***
 	// If "bLoop" = true, then this points3dList is a loop.***
 	// If "bLoop" = false, then this points3dList is a string.***
-	if(bLoop === undefined)
-		bLoop = false;
+	if (bLoop === undefined)
+	{ bLoop = false; }
 	
 	var pointsCount = this.getPointsCount();
 	
-	if(pointsCount < 1)
-		return resultBisectionPlane;
+	if (pointsCount < 1)
+	{ return resultBisectionPlane; }
 	
-	if(resultBisectionPlane === undefined)
-		resultBisectionPlane = new Plane();
+	if (resultBisectionPlane === undefined)
+	{ resultBisectionPlane = new Plane(); }
 	
 	var point3d = this.getPoint(idx);
 	var segment3d;
 	var dir;
 	
-	if(!bLoop)
+	if (!bLoop)
 	{
-		if(idx === pointsCount-1)
+		if (idx === pointsCount-1)
 		{
 			// The last point is an exception in string mode.***
 			// Take the previous segment.***
@@ -200,7 +200,8 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 			segment3d = this.getSegment3D(idx, undefined, bLoop);	
 		}
 	}
-	else{
+	else 
+	{
 		segment3d = this.getSegment3D(idx, undefined, bLoop);
 	}
 	
@@ -213,14 +214,14 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 
 Point3DList.prototype.makeVbo = function(magoManager)
 {
-	if(this.vboKeysContainer === undefined)
-		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+	if (this.vboKeysContainer === undefined)
+	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
 	var pointsCount = this.pointsArray.length;
 	var posByteSize = pointsCount * 3;
 	var posVboDataArray = new Float32Array(posByteSize);
 	var point3d;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point3d = this.pointsArray[i];
 		posVboDataArray[i*3] = point3d.x;
@@ -234,12 +235,12 @@ Point3DList.prototype.makeVbo = function(magoManager)
 
 Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
-	if(this.pointsArray === undefined)
-		return false;
+	if (this.pointsArray === undefined)
+	{ return false; }
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if(this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
 	{
 		this.makeVbo(magoManager);
 		return;
@@ -253,19 +254,19 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
-	if(bEnableDepth === undefined)
-		bEnableDepth = true;
+	if (bEnableDepth === undefined)
+	{ bEnableDepth = true; }
 	
-	if(bEnableDepth)
-		gl.enable(gl.DEPTH_TEST);
+	if (bEnableDepth)
+	{ gl.enable(gl.DEPTH_TEST); }
 	else
-		gl.disable(gl.DEPTH_TEST);
+	{ gl.disable(gl.DEPTH_TEST); }
 
 	// Render the line.***
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		var selectionManager = magoManager.selectionManager;
 		var selectionColor = magoManager.selectionColor;

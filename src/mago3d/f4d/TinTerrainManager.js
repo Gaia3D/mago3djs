@@ -147,7 +147,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// For the visible tinTerrains prepare its.***
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.***
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	if(this.terrainType === 0) // PlainTerrain.***
+	if (this.terrainType === 0) // PlainTerrain.***
 	{
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
@@ -155,7 +155,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			tinTerrain.prepareTinTerrainPlain(magoManager, this);
 		}
 	}
-	else if(this.terrainType === 1)// ElevationTerrain.***
+	else if (this.terrainType === 1)// ElevationTerrain.***
 	{
 		for (var i=0; i<visiblesTilesCount; i++)
 		{

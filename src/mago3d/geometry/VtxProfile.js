@@ -85,32 +85,32 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	// Note: this makes a projected profile2d ONLY conformed by polyLines2D.***
 	// This function is used when necessary to tessellate this vtxProfile.***
 	
-	if(this.outerVtxRing === undefined)
-		return resultProfile2d;
+	if (this.outerVtxRing === undefined)
+	{ return resultProfile2d; }
 	
 	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.***
 	var normal = this.outerVtxRing.calculatePlaneNormal(undefined);
 	
-	if(normal === undefined)
-		return resultProfile2d;
+	if (normal === undefined)
+	{ return resultProfile2d; }
 	
-	if(resultProfile2d === undefined)
-		resultProfile2d = new Profile2D();
+	if (resultProfile2d === undefined)
+	{ resultProfile2d = new Profile2D(); }
 	
 	// OuterVtxRing.***
 	resultProfile2d.outerRing = this.outerVtxRing.getProjectedPolyLineBasedRing2D(resultProfile2d.outerRing, normal);
 	
 	// InnerVtxRings.***
-	if(this.innerVtxRingsList !== undefined)
+	if (this.innerVtxRingsList !== undefined)
 	{
 		var innerVtxRingsCount = this.innerVtxRingsList.getVtxRingsCount();
 		var innerRingsList;
-		if(innerVtxRingsCount > 0)
+		if (innerVtxRingsCount > 0)
 		{
 			innerRingsList = resultProfile2d.getInnerRingsList();
 		}
 		
-		for(var i=0; i<innerVtxRingsCount; i++)
+		for (var i=0; i<innerVtxRingsCount; i++)
 		{
 			var innerVtxRing = this.innerVtxRingsList.getVtxRing(i);
 			var innerRing = innerVtxRing.getProjectedPolyLineBasedRing2D(undefined, normal);
@@ -123,8 +123,8 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 
 VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoints3dArrayArray)
 {
-	if(outerPoints3dArray === undefined)
-		return;
+	if (outerPoints3dArray === undefined)
+	{ return; }
 	
 	// outer.***************************************
 	if (this.outerVtxRing === undefined)
@@ -138,12 +138,12 @@ VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoi
 
 VtxProfile.prototype.updateByPoints3DArray = function(outerPoints3dArray, innerPoints3dArrayArray)
 {
-	if(outerPoints3dArray === undefined)
-		return;
+	if (outerPoints3dArray === undefined)
+	{ return; }
 	
 	// outer.***************************************
 	if (this.outerVtxRing === undefined)
-		return;
+	{ return; }
 
 	this.outerVtxRing.updateByPoints3DArray(outerPoints3dArray);
 	

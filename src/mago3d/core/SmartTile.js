@@ -123,7 +123,7 @@ SmartTile.prototype.clearNodesArray = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
- /*
+/*
 SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId) 
 {
 	var resultNode;
@@ -324,8 +324,8 @@ SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeo
  */
 SmartTile.prototype.putNode = function(targetDepth, node, magoManager) 
 {
-	if(this.sphereExtent === undefined)
-		this.makeSphereExtent(magoManager);
+	if (this.sphereExtent === undefined)
+	{ this.makeSphereExtent(magoManager); }
 	
 	// now, if the current depth < targetDepth, then descend.
 	if (this.depth < targetDepth)
@@ -344,10 +344,10 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 		var subSmartTile;
 		var finish = false;
 		var i=0;
-		while(!finish && i<4)
+		while (!finish && i<4)
 		{
 			subSmartTile = this.subTiles[i];
-			if(subSmartTile.intersectsNode(node))
+			if (subSmartTile.intersectsNode(node))
 			{
 				subSmartTile.putNode(targetDepth, node, magoManager);
 				finish = true;
@@ -356,13 +356,13 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 			i++;
 		}
 	}
-	else if(this.depth === targetDepth)
+	else if (this.depth === targetDepth)
 	{
-		if(this.nodeSeedsArray === undefined)
-			this.nodeSeedsArray = [];
+		if (this.nodeSeedsArray === undefined)
+		{ this.nodeSeedsArray = []; }
 		
-		if(this.nodesArray === undefined)
-			this.nodesArray = [];
+		if (this.nodesArray === undefined)
+		{ this.nodesArray = []; }
 		
 		node.data.smartTileOwner = this;
 		
@@ -504,7 +504,7 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 	{
 		node = nodeSeedsArray[i];
 		
-		if(this.intersectsNode(node))
+		if (this.intersectsNode(node))
 		{
 			nodeSeedsArray.splice(i, 1);
 			i--;
@@ -591,14 +591,14 @@ SmartTile.prototype.eraseNode = function(node)
 	//this.nodesArray;
 	
 	// Erase from this.nodeSeedsArray & this.nodesArray.***
-	if(this.nodeSeedsArray !== undefined)
+	if (this.nodeSeedsArray !== undefined)
 	{
 		var nodeSeedsCount = this.nodeSeedsArray.length;
 		var finished = false;
 		var i = 0;
-		while(!finished && i<nodeSeedsCount)
+		while (!finished && i<nodeSeedsCount)
 		{
-			if(this.nodeSeedsArray[i] === node)
+			if (this.nodeSeedsArray[i] === node)
 			{
 				this.nodeSeedsArray.splice(i, 1);
 				finished = true;
@@ -607,14 +607,14 @@ SmartTile.prototype.eraseNode = function(node)
 		}
 	}
 	
-	if(this.nodesArray !== undefined)
+	if (this.nodesArray !== undefined)
 	{
 		var nodesCount = this.nodesArray.length;
 		finished = false;
 		i = 0;
-		while(!finished && i<nodesCount)
+		while (!finished && i<nodesCount)
 		{
-			if(this.nodesArray[i] === node)
+			if (this.nodesArray[i] === node)
 			{
 				this.nodesArray.splice(i, 1);
 				finished = true;

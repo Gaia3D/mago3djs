@@ -997,25 +997,6 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		\n\
 		if(colorType == 1)\n\
 			aColor4 = color4;\n\
-		//test.***\n\
-		//float zclip = gl_Position.z / gl_Position.w;\n\
-        //bool clipped = (zclip < -1.0 || zclip > 1.0);\n\
-        //if (clipped)\n\
-        //{\n\
-        //    // Position z on the near plane.\n\
-		//	if(zclip > 1.0)\n\
-		//	{\n\
-		//		gl_Position.z *= 0.5;\n\
-		//		//gl_Position.w *= 1.4;\n\
-		//		//gl_Position *= 0.5;\n\
-		//	}\n\
-		//	if(zclip < -1.0)\n\
-		//	{\n\
-		//		gl_Position.z *= 2.0;\n\
-		//		//gl_Position.w *= 0.7;\n\
-		//		//gl_Position *= 10.0;\n\
-		//	}\n\
-        //}\n\
 	}";
 ShaderSource.PngImageFS = "precision mediump float;\n\
 varying vec2 v_texcoord;\n\
@@ -1083,8 +1064,8 @@ uniform bool bPositionCompressed;\n\
 uniform vec3 minPosition;\n\
 uniform vec3 bboxSize;\n\
 attribute vec4 color4;\n\
-uniform vec4 oneColor4;\n\
 uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
@@ -1108,26 +1089,21 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-	if(bUse1Color)\n\
+	\n\
+    if(bUse1Color)\n\
 	{\n\
 		vColor=oneColor4;\n\
 	}\n\
 	else\n\
 		vColor=color4;\n\
 	\n\
-	gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	if(bUseFixPointSize)\n\
-		gl_PointSize = fixPointSize;\n\
-	else\n\
-	{\n\
-		//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
-		gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
-		if(gl_PointSize > 10.0)\n\
-			gl_PointSize = 10.0;\n\
-		if(gl_PointSize < 3.0)\n\
-			gl_PointSize = 3.0;\n\
-	}\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
+	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
+	if(gl_PointSize > 10.0)\n\
+		gl_PointSize = 10.0;\n\
+	if(gl_PointSize < 3.0)\n\
+		gl_PointSize = 3.0;\n\
 }";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\

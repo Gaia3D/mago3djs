@@ -46,14 +46,14 @@ var GeoLocationData = function(geoLocationDataName)
  */
 GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch, roll) 
 {
-	if(heading !== undefined)
-		this.heading = heading;
+	if (heading !== undefined)
+	{ this.heading = heading; }
 	
-	if(pitch !== undefined)
-		this.pitch = pitch;
+	if (pitch !== undefined)
+	{ this.pitch = pitch; }
 
-	if(roll !== undefined)
-		this.roll = roll;
+	if (roll !== undefined)
+	{ this.roll = roll; }
 };
 
 /**
@@ -61,8 +61,8 @@ GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch,
  */
 GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, latitude, altitude) 
 {
-	if(this.geographicCoord === undefined)
-		this.geographicCoord = new GeographicCoord();
+	if (this.geographicCoord === undefined)
+	{ this.geographicCoord = new GeographicCoord(); }
 	
 	this.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
 };
@@ -305,7 +305,7 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
  */
 GeoLocationData.prototype.getRotMatrixInv = function() 
 {
-	if(this.rotMatrixInv === undefined)
+	if (this.rotMatrixInv === undefined)
 	{
 		var rotMatrixInv = mat4.create();
 		rotMatrixInv = mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
@@ -323,7 +323,7 @@ GeoLocationData.prototype.getRotMatrixInv = function()
  */
 GeoLocationData.prototype.getTMatrixInv = function() 
 {
-	if(this.tMatrixInv === undefined)
+	if (this.tMatrixInv === undefined)
 	{
 		var tMatrixInv = mat4.create();
 		tMatrixInv = mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
@@ -341,7 +341,7 @@ GeoLocationData.prototype.getTMatrixInv = function()
  */
 GeoLocationData.prototype.getGeoLocationMatrixInv = function() 
 {
-	if(this.geoLocMatrixInv === undefined)
+	if (this.geoLocMatrixInv === undefined)
 	{
 		var geoLocMatrixInv = mat4.create();
 		geoLocMatrixInv = mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
@@ -412,14 +412,14 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
  */
 GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolutePositionsArray, resultRelativePositionsArray) 
 {
-	if(absolutePositionsArray === undefined)
-		return resultRelativePositionsArray;
+	if (absolutePositionsArray === undefined)
+	{ return resultRelativePositionsArray; }
 	
-	if(resultRelativePositionsArray === undefined)
-		resultRelativePositionsArray = [];
+	if (resultRelativePositionsArray === undefined)
+	{ resultRelativePositionsArray = []; }
 	
 	var absolutePoints3dCount = absolutePositionsArray.length;
-	for(var i=0; i<absolutePoints3dCount; i++)
+	for (var i=0; i<absolutePoints3dCount; i++)
 	{
 		var relPoint3d = this.getTransformedRelativePosition(absolutePositionsArray[i], undefined);
 		resultRelativePositionsArray.push(relPoint3d);

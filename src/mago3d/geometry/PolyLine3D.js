@@ -35,8 +35,8 @@ PolyLine3D.prototype.newPoint3d = function(x, y, z)
  */
 PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 {
-	if(points3dArray === undefined)
-		return;
+	if (points3dArray === undefined)
+	{ return; }
 	
 	if (this.point3dArray === undefined)
 	{ this.point3dArray = []; }
@@ -49,11 +49,11 @@ PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
  */
 PolyLine3D.prototype.getGeographicLocation = function()
 {
-	if(this.geoLocDataManager === undefined)
-		this.geoLocDataManager = new GeoLocationDataManager();
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
-	if(geoLoc === undefined)
+	if (geoLoc === undefined)
 	{
 		geoLoc = this.geoLocDataManager.newGeoLocationData("default");
 	}
@@ -66,14 +66,14 @@ PolyLine3D.prototype.getGeographicLocation = function()
  */
 PolyLine3D.prototype.makeVbo = function(magoManager)
 {
-	if(this.vboKeysContainer === undefined)
-		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+	if (this.vboKeysContainer === undefined)
+	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
 	var pointsCount = this.point3dArray.length;
 	var posByteSize = pointsCount * 3;
 	var posVboDataArray = new Float32Array(posByteSize);
 	var point3d;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		point3d = this.point3dArray[i];
 		posVboDataArray[i*3] = point3d.x;
@@ -90,13 +90,13 @@ PolyLine3D.prototype.makeVbo = function(magoManager)
  */
 PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
-	if(this.point3dArray === undefined)
-		return false;
+	if (this.point3dArray === undefined)
+	{ return false; }
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if(this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
-		this.makeVbo(magoManager);
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	{ this.makeVbo(magoManager); }
 
 	shader.enableVertexAttribArray(shader.position3_loc);
 	
@@ -106,19 +106,19 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
-	if(bEnableDepth === undefined)
-		bEnableDepth = true;
+	if (bEnableDepth === undefined)
+	{ bEnableDepth = true; }
 	
-	if(bEnableDepth)
-		gl.enable(gl.DEPTH_TEST);
+	if (bEnableDepth)
+	{ gl.enable(gl.DEPTH_TEST); }
 	else
-		gl.disable(gl.DEPTH_TEST);
+	{ gl.disable(gl.DEPTH_TEST); }
 
 	// Render the line.***
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		var selectionManager = magoManager.selectionManager;
 		var selectionColor = magoManager.selectionColor;

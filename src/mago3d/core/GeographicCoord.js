@@ -42,18 +42,18 @@ GeographicCoord.prototype.deleteObjects = function(vboMemManager)
 	this.latitude = undefined;
 	this.altitude = undefined;
 	
-	if(this.absolutePoint !== undefined)
+	if (this.absolutePoint !== undefined)
 	{
 		this.absolutePoint.deleteObjects();
 		this.absolutePoint = undefined;
 	}
 	
-	if(this.vboKeysContainer !== undefined)
+	if (this.vboKeysContainer !== undefined)
 	{
 		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
 	}
 	
-	if(this.geoLocDataManager !== undefined)
+	if (this.geoLocDataManager !== undefined)
 	{
 		this.geoLocDataManager.deleteObjects();
 	}
@@ -68,8 +68,8 @@ GeographicCoord.prototype.getWgs84Point3D = function(resultPoint3d)
 {
 	var cartesianAux = Globe.geographicToCartesianWgs84(this.longitude, this.latitude, this.altitude, undefined);
 	
-	if(resultPoint3d === undefined)
-		resultPoint3d = new Point3D();
+	if (resultPoint3d === undefined)
+	{ resultPoint3d = new Point3D(); }
 	
 	resultPoint3d.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
 	return resultPoint3d;
@@ -88,8 +88,8 @@ GeographicCoord.prototype.getMercatorProjection = function(resultPoint2d)
  */
 GeographicCoord.prototype.getGeoLocationDataManager = function() 
 {
-	if(this.geoLocDataManager === undefined)
-		this.geoLocDataManager = new GeoLocationDataManager();
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	
 	return this.geoLocDataManager ;
 };
@@ -112,12 +112,12 @@ GeographicCoord.prototype.copyFrom = function(geographicCoord)
  */
 GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude) 
 {
-	if(longitude !== undefined)
-		this.longitude = longitude;
-	if(latitude !== undefined)
-		this.latitude = latitude;
-	if(altitude !== undefined)
-		this.altitude = altitude;
+	if (longitude !== undefined)
+	{ this.longitude = longitude; }
+	if (latitude !== undefined)
+	{ this.latitude = latitude; }
+	if (altitude !== undefined)
+	{ this.altitude = altitude; }
 };
 
 /**
@@ -145,10 +145,10 @@ GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resul
  
 GeographicCoord.prototype.prepareData = function(vboMemManager) 
 {
-	if(this.vboKeysContainer === undefined)
-		this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+	if (this.vboKeysContainer === undefined)
+	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
-	if(this.vboKeysContainer.getVbosCount() === 0)
+	if (this.vboKeysContainer.getVbosCount() === 0)
 	{
 		var vboKey = this.vboKeysContainer.newVBOVertexIdxCacheKey();
 		
@@ -165,13 +165,13 @@ GeographicCoord.prototype.prepareData = function(vboMemManager)
  */
 GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, renderType) 
 {
-	if(!this.prepareData(magoManager.vboMemoryManager))
-		return false;
+	if (!this.prepareData(magoManager.vboMemoryManager))
+	{ return false; }
 	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		var selectionManager = magoManager.selectionManager;
 		var selectionColor = magoManager.selectionColor;
@@ -227,8 +227,8 @@ GeographicCoordsList.prototype.addGeoCoord = function(geographicPoint)
  */
 GeographicCoordsList.prototype.getGeoCoord = function(idx) 
 {
-	if(this.geographicCoordsArray === undefined)
-		return undefined;
+	if (this.geographicCoordsArray === undefined)
+	{ return undefined; }
 	
 	return this.geographicCoordsArray[idx];
 };
@@ -238,8 +238,8 @@ GeographicCoordsList.prototype.getGeoCoord = function(idx)
  */
 GeographicCoordsList.prototype.getGeoCoordsCount = function() 
 {
-	if(this.geographicCoordsArray === undefined)
-		return 0;
+	if (this.geographicCoordsArray === undefined)
+	{ return 0; }
 	
 	return this.geographicCoordsArray.length;
 };
@@ -250,12 +250,12 @@ GeographicCoordsList.prototype.getGeoCoordsCount = function()
 GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocIn, resultPoints3dArray) 
 {
 	// This function returns points3dArray relative to the geoLocIn.***
-	if(resultPoints3dArray === undefined)
-		resultPoints3dArray = [];
+	if (resultPoints3dArray === undefined)
+	{ resultPoints3dArray = []; }
 	
 	var geoPointsCount = this.getGeoCoordsCount();
 	
-	for(var i=0; i<geoPointsCount; i++)
+	for (var i=0; i<geoPointsCount; i++)
 	{
 		var geoCoord = this.getGeoCoord(i);
 		var geoLoc = geoCoord.geoLocDataManager.getCurrentGeoLocationData();
@@ -272,11 +272,11 @@ GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocI
  */
 GeographicCoordsList.prototype.deleteObjects = function(vboMemManager) 
 {
-	if(this.geographicCoordsArray !== undefined)
+	if (this.geographicCoordsArray !== undefined)
 	{
 		var geoPointsCount = this.getGeoCoordsCount();
 		
-		for(var i=0; i<geoPointsCount; i++)
+		for (var i=0; i<geoPointsCount; i++)
 		{
 			this.geographicCoordsArray[i].deleteGlObjects(vboMemManager);
 			this.geographicCoordsArray[i] = undefined;
@@ -284,7 +284,7 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
 		this.geographicCoordsArray = undefined;
 	}
 	
-	if(this.vboKeysContainer !== undefined)
+	if (this.vboKeysContainer !== undefined)
 	{
 		this.vboKeysContainer.deleteGlObjects(vboMemManager);
 		this.vboKeysContainer = undefined;
@@ -298,12 +298,12 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
  */
 GeographicCoordsList.prototype.makeLines = function(magoManager) 
 {
-	if(this.geographicCoordsArray === undefined || this.geographicCoordsArray.length === 0)
-		return false;
+	if (this.geographicCoordsArray === undefined || this.geographicCoordsArray.length === 0)
+	{ return false; }
 	
 	// To render lines, use Point3DList class object.***
-	if(this.points3dList === undefined)
-		this.points3dList = new Point3DList();
+	if (this.points3dList === undefined)
+	{ this.points3dList = new Point3DList(); }
 	
 	var geoLoc = this.points3dList.getGeographicLocation();
 	
@@ -325,11 +325,11 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
  */
 GeographicCoordsList.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth) 
 {
-	if(this.geographicCoordsArray === undefined)
-		return false;
+	if (this.geographicCoordsArray === undefined)
+	{ return false; }
 	
-	if(this.points3dList === undefined)
-		return false;
+	if (this.points3dList === undefined)
+	{ return false; }
 	
 	var shader = magoManager.postFxShadersManager.getShader("pointsCloud");
 	shader.useProgram();
@@ -348,8 +348,8 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
  */
 GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, renderType, bEnableDepth) 
 {
-	if(this.geographicCoordsArray === undefined)
-		return false;
+	if (this.geographicCoordsArray === undefined)
+	{ return false; }
 	
 	var gl = magoManager.sceneState.gl;
 	
@@ -373,18 +373,18 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
-	if(bEnableDepth === undefined)
-		bEnableDepth = true;
+	if (bEnableDepth === undefined)
+	{ bEnableDepth = true; }
 	
-	if(bEnableDepth)
-		gl.enable(gl.DEPTH_TEST);
+	if (bEnableDepth)
+	{ gl.enable(gl.DEPTH_TEST); }
 	else
-		gl.disable(gl.DEPTH_TEST);
+	{ gl.disable(gl.DEPTH_TEST); }
 
 	// Render pClouds.***
 	var geoCoord;
 	var geoCoordsCount = this.geographicCoordsArray.length;
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		geoCoord = this.geographicCoordsArray[i];
 		geoCoord.renderPoint(magoManager, shader, gl, renderType);
@@ -392,7 +392,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	
 	// Check if exist selectedGeoCoord.***
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
-	if(currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
+	if (currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
 		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
 		gl.uniform1f(shader.fixPointSize_loc, 10.0);
@@ -408,12 +408,12 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
  */
 GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray) 
 {
-	if(resultPoint3DArray === undefined)
-		resultPoint3DArray = [];
+	if (resultPoint3DArray === undefined)
+	{ resultPoint3DArray = []; }
 	
 	var geoCoord;
 	var geoCoordsCount = this.geographicCoordsArray.length;
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		geoCoord = this.geographicCoordsArray[i];
 		var wgs84Point3d = geoCoord.getWgs84Point3D(undefined);

@@ -19,15 +19,15 @@ var Mesh = function()
 
 Mesh.prototype.deleteObjects = function(vboMemManager)
 {
-	if(this.vertexList !== undefined)
+	if (this.vertexList !== undefined)
 	{
 		this.vertexList.deleteObjects();
 	}
 	
-	if(this.surfacesArray !== undefined)
+	if (this.surfacesArray !== undefined)
 	{
 		var surfacesCount = this.surfacesArray.length;
-		for(var i=0; i<surfacesCount; i++)
+		for (var i=0; i<surfacesCount; i++)
 		{
 			this.surfacesArray[i].deleteObjects();
 			this.surfacesArray[i] = undefined;
@@ -35,13 +35,13 @@ Mesh.prototype.deleteObjects = function(vboMemManager)
 		this.surfacesArray = undefined;
 	}
 	
-	if(this.hedgesList !== undefined)
+	if (this.hedgesList !== undefined)
 	{
 		this.hedgesList.deleteGlObjects();
 		this.hedgesList = undefined;
 	}
 	
-	if(this.vboKeysContainer !== undefined)
+	if (this.vboKeysContainer !== undefined)
 	{
 		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
 		this.vboKeysContainer = undefined;
@@ -50,7 +50,7 @@ Mesh.prototype.deleteObjects = function(vboMemManager)
 
 Mesh.prototype.deleteVbos = function(vboMemManager)
 {
-	if(this.vboKeysContainer !== undefined)
+	if (this.vboKeysContainer !== undefined)
 	{
 		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
 		this.vboKeysContainer = undefined;
@@ -584,8 +584,8 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 
 Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 {
-	if(resultVboContainer === undefined)
-		return;
+	if (resultVboContainer === undefined)
+	{ return; }
 	
 	// provisionally make edges by this.***
 	var frontierHedgesArray = this.getFrontierHalfEdges(undefined);

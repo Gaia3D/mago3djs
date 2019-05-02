@@ -104,11 +104,11 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
 	// This function projects the vertices on to planes xy, yz or xz.***
-	if(vertexArray === undefined)
-		return resultPoints2dArray;
+	if (vertexArray === undefined)
+	{ return resultPoints2dArray; }
 	
-	if(resultPoints2dArray === undefined)
-		resultPoints2dArray = [];
+	if (resultPoints2dArray === undefined)
+	{ resultPoints2dArray = []; }
 	
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 	
@@ -205,8 +205,8 @@ VertexList.prototype.copyFrom = function(vertexList)
  */
 VertexList.prototype.copyFromPoint3DArray = function(point3dArray) 
 {
-	if(point3dArray === undefined)
-		return;
+	if (point3dArray === undefined)
+	{ return; }
 	
 	// first reset vertexArray.
 	this.deleteObjects();

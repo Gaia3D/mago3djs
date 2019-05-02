@@ -27,7 +27,7 @@ var Excavation = function()
  */
 Excavation.prototype.getGeographicCoordsList = function() 
 {
-	if(this.geoCoordsList === undefined)
+	if (this.geoCoordsList === undefined)
 	{
 		this.geoCoordsList = new GeographicCoordsList();
 		this.geoCoordsList.owner = this;
@@ -41,10 +41,10 @@ Excavation.prototype.getGeographicCoordsList = function()
  */
 Excavation.prototype.renderPoints = function(magoManager, shader, renderType) 
 {
-	if(this.geoCoordsList === undefined)
-		return false;
+	if (this.geoCoordsList === undefined)
+	{ return false; }
 	
-	if(this.meshPositive !== undefined)
+	if (this.meshPositive !== undefined)
 	{
 		this.renderExcavation(magoManager, shader, renderType);
 	}
@@ -58,8 +58,8 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
  */
 Excavation.prototype.renderExcavation = function(magoManager, shader, renderType) 
 {
-	if(this.meshPositive === undefined)
-		return;
+	if (this.meshPositive === undefined)
+	{ return; }
 	
 	//if(magoManager.currentFrustumIdx !== 0)
 	//	return;
@@ -240,7 +240,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	// Render the hole.*********************************************************************************************
 	//shader.bindUniformGenerals();
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.uniform4fv(shader.oneColor4_loc, [222/255,184/255,135/255, 1.0]); //.***
+	gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.***
 	
 	//gl.disable(gl.POLYGON_OFFSET_FILL);
 	//gl.disable(gl.CULL_FACE);
@@ -264,17 +264,17 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	//gl.disable(gl.DEPTH_TEST);
 	//gl.disable(gl.STENCIL_TEST);
 	
-	if(magoManager.currentFrustumIdx === 0)
-	{
-		
-	}
+	//if (magoManager.currentFrustumIdx === 0)
+	//{
+	//	
+	//}
 	
 	this.meshNegative.render(magoManager, shader, renderType, glPrimitive);
 
 	
-			//gl.disable(gl.STENCIL_TEST);
-			//gl.depthFunc(gl.LEQUAL);
-			//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.***
+	//gl.disable(gl.STENCIL_TEST);
+	//gl.depthFunc(gl.LEQUAL);
+	//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.***
 
 
 	gl.enable(gl.DEPTH_TEST);
@@ -295,11 +295,11 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
  */
 Excavation.prototype.getGeoLocationData = function() 
 {
-	if(this.geoLocDataManager === undefined)
-		this.geoLocDataManager = new GeoLocationDataManager();
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
-	if(geoLoc === undefined)
+	if (geoLoc === undefined)
 	{
 		geoLoc = this.geoLocDataManager.newGeoLocationData("default");
 	}
@@ -312,8 +312,8 @@ Excavation.prototype.getGeoLocationData = function()
  */
 Excavation.prototype.makeExtrudeObject = function(magoManager) 
 {
-	if(this.geoCoordsList === undefined)
-		return false;
+	if (this.geoCoordsList === undefined)
+	{ return false; }
 	
 	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
 	// Another possibility is calculate the average point of geoCoords.***
@@ -327,21 +327,21 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 	
 	
 	// Now, make the down & up profiles.***
-	if(this.vtxProfilesList === undefined)
-		this.vtxProfilesList = new VtxProfilesList();
+	if (this.vtxProfilesList === undefined)
+	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
 	// Project the geoCoordList into a plane. Remember that the local coordinate is the 1rst geoCoord.***
 	// Calculate down & up points of the extrude object.***
 	var points3dArrayDown = [];
 	var points3dArrayUp = [];
 	
-	if(this.excavationDepthInMeters === undefined)
-		this.excavationDepthInMeters = 80.0;
+	if (this.excavationDepthInMeters === undefined)
+	{ this.excavationDepthInMeters = 80.0; }
 	
 	var cartesianAux;
 	var geoCoord;
 	var geoCoordsCount = this.geoCoordsList.getGeoCoordsCount();
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		// Current geoCoord.***
 		geoCoord = this.geoCoordsList.getGeoCoord(i);
@@ -376,7 +376,7 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 	vertexProfileUp.makeByPoints3DArray(points3dArrayUp, undefined);
 	
 	// Now, make the mesh.***
-	if(this.meshPositive === undefined)
+	if (this.meshPositive === undefined)
 	{
 		//this.meshTest = 
 		var bIncludeBottomCap = true;
@@ -409,8 +409,8 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
  */
 Excavation.prototype.remakeExtrudeObject = function(magoManager) 
 {
-	if(this.vtxProfilesList === undefined)
-		return false;
+	if (this.vtxProfilesList === undefined)
+	{ return false; }
 	
 	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
 	// Another possibility is calculate the average point of geoCoords.***
@@ -428,13 +428,13 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 	var points3dArrayDown = [];
 	var points3dArrayUp = [];
 	
-	if(this.excavationDepthInMeters === undefined)
-		this.excavationDepthInMeters = 80.0;
+	if (this.excavationDepthInMeters === undefined)
+	{ this.excavationDepthInMeters = 80.0; }
 	
 	var cartesianAux;
 	var geoCoord;
 	var geoCoordsCount = this.geoCoordsList.getGeoCoordsCount();
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		// Current geoCoord.***
 		geoCoord = this.geoCoordsList.getGeoCoord(i);
@@ -480,7 +480,7 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 	
 	// Now, make the mesh.***
 	
-	if(this.meshPositive === undefined)
+	if (this.meshPositive === undefined)
 	{
 		//this.meshTest = 
 		var bIncludeBottomCap = true;

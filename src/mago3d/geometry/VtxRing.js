@@ -18,10 +18,10 @@ var VtxRing = function()
 VtxRing.prototype.deleteElementIndexRanges = function()
 {
 	if (this.elemsIndexRangesArray === undefined)
-		return;
+	{ return; }
 	
 	var indexRangesCount = this.elemsIndexRangesArray.length;
-	for(var i=0; i<indexRangesCount; i++)
+	for (var i=0; i<indexRangesCount; i++)
 	{
 		this.elemsIndexRangesArray[i].deleteObjects();
 		this.elemsIndexRangesArray[i] = undefined;
@@ -107,10 +107,10 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
 {
 	// This function returns a ring2d made by polylines2d.***
 	if (this.vertexList === undefined)
-		return resultRing2d;
+	{ return resultRing2d; }
 	
-	if(resultRing2d === undefined)
-		resultRing2d = new Ring2D();
+	if (resultRing2d === undefined)
+	{ resultRing2d = new Ring2D(); }
 	
 	var points2dArray = [];
 	points2dArray = VertexList.getProjectedPoints2DArray(this.vertexList.vertexArray, normal, points2dArray);
@@ -123,8 +123,8 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
 
 VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 {
-	if(point3dArray === undefined)
-		return;
+	if (point3dArray === undefined)
+	{ return; }
 	
 	if (this.vertexList === undefined)
 	{ this.vertexList = new VertexList(); }
@@ -136,8 +136,8 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 {
 	// Note: point3dCount must be equal to this.verticesCount.***
-	if(point3dArray === undefined)
-		return;
+	if (point3dArray === undefined)
+	{ return; }
 	
 	if (this.vertexList === undefined)
 	{ this.vertexList = new VertexList(); }
@@ -146,15 +146,15 @@ VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 	var point3d;
 	var position;
 	var points3dCount = point3dArray.length;
-	for(var i=0; i<points3dCount; i++)
+	for (var i=0; i<points3dCount; i++)
 	{
 		point3d = point3dArray[i]; // the original point3d.***
 		vertex = this.vertexList.getVertex(i);
-		if(vertex === undefined)
-			vertex = this.vertexList.newVertex();
+		if (vertex === undefined)
+		{ vertex = this.vertexList.newVertex(); }
 		
-		if(vertex.point3d === undefined)
-			vertex.point3d = new Point3D();
+		if (vertex.point3d === undefined)
+		{ vertex.point3d = new Point3D(); }
 		
 		vertex.point3d.set(point3d.x, point3d.y, point3d.z);
 	}

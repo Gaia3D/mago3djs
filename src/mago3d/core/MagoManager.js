@@ -764,8 +764,8 @@ MagoManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullingV
 function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
-	if(flip_y_texCoords === undefined)
-		flip_y_texCoords = true;
+	if (flip_y_texCoords === undefined)
+	{ flip_y_texCoords = true; }
 	
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.***
@@ -1008,8 +1008,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
 		
 		var frustumCommandsList = this.scene._frustumCommandsList;
-		if(frustumCommandsList === undefined)
-			frustumCommandsList = this.scene.frustumCommandsList;
+		if (frustumCommandsList === undefined)
+		{ frustumCommandsList = this.scene.frustumCommandsList; }
 		
 		var frustum0 = sceneState.camera.getFrustum(0);
 		frustum0.far[0] = frustumCommandsList[0].far; 
@@ -1470,8 +1470,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		// TinTerrain.*******************************************************************************************************************************
 		if (this.isFarestFrustum())
 		{
-			if(this.tinTerrainManager !== undefined)
-				this.tinTerrainManager.prepareVisibleTinTerrains(this);
+			if (this.tinTerrainManager !== undefined)
+			{ this.tinTerrainManager.prepareVisibleTinTerrains(this); }
 		}
 		//if(this.isFarestFrustum())
 		this.manageQueue();
@@ -2160,7 +2160,7 @@ MagoManager.prototype.renderGeometryColorCoding = function(gl, visibleObjControl
 		{ this.weatherStation.test_renderCuttingPlanes(this, renderType); }
 	}
 	
-	if(this.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS)
+	if (this.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS)
 	{
 		// render geographicCoords of the modeler.***
 		if (this.modeler !== undefined)
@@ -2554,21 +2554,22 @@ MagoManager.prototype.isDragging = function()
 		this.selectionFbo.bind();
 		this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 		var nowSelected = this.selectionManager.getSelectedGeneral();
-		if(nowSelected !== undefined && nowSelected === currSelected)
+		if (nowSelected !== undefined && nowSelected === currSelected)
 		{
 			var className = nowSelected.constructor.name;
-			if(className === "GeographicCoord")
+			if (className === "GeographicCoord")
 			{
 				bIsDragging = true;
 			}
-			else{
+			else 
+			{
 				bIsDragging = false;
 			}
 		}
 	}
 	else
 	{
-		if(this.weatherStation)
+		if (this.weatherStation)
 		{
 			// check if there are cuttingPlanes to move.***
 			this.selectionFbo.bind();
@@ -2697,7 +2698,7 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		// do test.***
 		var excavation = this.modeler.getExcavation();
-		if(excavation !== undefined)
+		if (excavation !== undefined)
 		{
 			excavation.makeExtrudeObject(this);
 		}
@@ -2749,15 +2750,15 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Test code.***
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
-			//	CODE.modelerMode = {
-			//	"INACTIVE"                 : 0,
-			//	"DRAWING_POLYLINE"         : 1,
-			//	"DRAWING_GEOGRAPHICPOINTS" : 2,
-			//};
+		//	CODE.modelerMode = {
+		//	"INACTIVE"                 : 0,
+		//	"DRAWING_POLYLINE"         : 1,
+		//	"DRAWING_GEOGRAPHICPOINTS" : 2,
+		//};
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS
+		this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -2793,7 +2794,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
-		if(this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2804,7 +2805,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// Excavation.***
-		if(this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2817,7 +2818,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// Tunnel.***
-		if(this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -3084,10 +3085,10 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS) 
 	{
 		var currSelected = this.selectionManager.getSelectedGeneral();
-		if(currSelected)
+		if (currSelected)
 		{
 			var className = currSelected.constructor.name;
-			if(className === "GeographicCoord")
+			if (className === "GeographicCoord")
 			{
 				// 1rst, check if there are objects to move.***
 				if (this.mustCheckIfDragging) 
@@ -3276,10 +3277,10 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	{
 		// Move the current geographic point selected.***
 		var currSelected = this.selectionManager.getSelectedGeneral();
-		if(currSelected)
+		if (currSelected)
 		{
 			var className = currSelected.constructor.name;
-			if(className === "GeographicCoord")
+			if (className === "GeographicCoord")
 			{
 				var geoLocDataManager = currSelected.getGeoLocationDataManager();
 				var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
@@ -3309,22 +3310,22 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 				
 				// Now, must check the moved object's owner.***
 				var owner = currSelected.owner;
-				if(owner)
+				if (owner)
 				{
 					// 1rst, check if is a geoCoordsList.***
-					if(owner.constructor.name === "GeographicCoordsList")
+					if (owner.constructor.name === "GeographicCoordsList")
 					{
 						owner.makeLines(this);
 					}
 					
 					var owner2 = owner.owner;
-					if(owner2)
+					if (owner2)
 					{
-						if(owner2.constructor.name === "Excavation")
+						if (owner2.constructor.name === "Excavation")
 						{
 							owner2.remakeExtrudeObject(this);
 						}
-						else if(owner2.constructor.name === "Tunnel")
+						else if (owner2.constructor.name === "Tunnel")
 						{
 							//owner2.remakeExtrudeObject(this);
 						}
@@ -3336,7 +3337,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	}
 	else
 	{
-		if(this.weatherStation)
+		if (this.weatherStation)
 		{
 			// Test. Check if there are cuttingPlanes to move.***
 			var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
@@ -3463,8 +3464,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	
 	// Check if for the current lod, the building is modelRefType.***
 	var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
-	if(lodBuildingData === undefined)
-		return false;
+	if (lodBuildingData === undefined)
+	{ return false; }
 	
 	if (!lodBuildingData.isModelRef)
 	{ return true; } // return true, bcos the caller pops the building from the "visibleObjControlerNodes" if return false.***
@@ -4944,33 +4945,33 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	var renderTexture = false;
 	
 	// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		if (this.modeler !== undefined)
-		{
-			currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
-			currentShader.resetLastBuffersBinded();
-			shaderProgram = currentShader.program;
+	// Test Modeler Rendering.********************************************************************
+	// Test Modeler Rendering.********************************************************************
+	if (this.modeler !== undefined)
+	{
+		currentShader = this.postFxShadersManager.getShader("modelRefDepth"); 
+		currentShader.resetLastBuffersBinded();
+		shaderProgram = currentShader.program;
 
-			currentShader.useProgram();
-			currentShader.enableVertexAttribArray(currentShader.position3_loc);
-			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-			currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-			currentShader.disableVertexAttribArray(currentShader.color4_loc);
-			currentShader.bindUniformGenerals();
+		currentShader.useProgram();
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+		currentShader.disableVertexAttribArray(currentShader.color4_loc);
+		currentShader.bindUniformGenerals();
 		
-			currentShader.bindUniformGenerals();
+		currentShader.bindUniformGenerals();
 
-			var refTMatrixIdxKey = 0;
-			var minSizeToRender = 0.0;
-			var renderType = 0;
-			var refMatrixIdxKey =0; // provisionally set this var here.***
-			this.modeler.render(this, currentShader, renderType);
+		var refTMatrixIdxKey = 0;
+		var minSizeToRender = 0.0;
+		var renderType = 0;
+		var refMatrixIdxKey =0; // provisionally set this var here.***
+		this.modeler.render(this, currentShader, renderType);
 
-			currentShader.disableVertexAttribArrayAll();
-			gl.useProgram(null);
+		currentShader.disableVertexAttribArrayAll();
+		gl.useProgram(null);
 
-		}
+	}
 	
 	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
@@ -5306,8 +5307,8 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	
 	// TinTerranTiles.*************************************************************************
 	// Provisionally:
-	if(this.tinTerrainManager !== undefined)
-		this.tinTerrainManager.doFrustumCulling(frustumVolume, camera.position, this);
+	if (this.tinTerrainManager !== undefined)
+	{ this.tinTerrainManager.doFrustumCulling(frustumVolume, camera.position, this); }
 };
 
 /**

@@ -28,8 +28,8 @@ var Modeler = function()
  */
 Modeler.prototype.getGeographicCoordsList = function() 
 {
-	if(this.geoCoordsList === undefined)
-		this.geoCoordsList = new GeographicCoordsList();
+	if (this.geoCoordsList === undefined)
+	{ this.geoCoordsList = new GeographicCoordsList(); }
 	
 	return this.geoCoordsList;
 };
@@ -39,8 +39,8 @@ Modeler.prototype.getGeographicCoordsList = function()
  */
 Modeler.prototype.getExcavation = function() 
 {
-	if(this.excavation === undefined)
-		this.excavation = new Excavation();
+	if (this.excavation === undefined)
+	{ this.excavation = new Excavation(); }
 	
 	return this.excavation;
 };
@@ -50,8 +50,8 @@ Modeler.prototype.getExcavation = function()
  */
 Modeler.prototype.getTunnel = function() 
 {
-	if(this.tunnel === undefined)
-		this.tunnel = new Tunnel();
+	if (this.tunnel === undefined)
+	{ this.tunnel = new Tunnel(); }
 	
 	return this.tunnel;
 };
@@ -86,18 +86,18 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
 		
 	}
 	
-	if(this.geoCoordsList !== undefined)
+	if (this.geoCoordsList !== undefined)
 	{
 		// Provisionally render geographicPoints.***
 		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
 	}
 	
-	if(this.excavation !== undefined)
+	if (this.excavation !== undefined)
 	{
 		this.excavation.renderPoints(magoManager, shader, renderType);
 	}
 	
-	if(this.tunnel !== undefined)
+	if (this.tunnel !== undefined)
 	{
 		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}

@@ -345,13 +345,13 @@ Node.prototype.checkAnimation = function(magoManager)
 {
 	var animData = this.data.animationData;
 	
-	if(animData === undefined)
-		return;
+	if (animData === undefined)
+	{ return; }
 	
 	// calculate the currentLocation and currentRotation.***
 	var currTime = magoManager.getCurrentTime();
-	if(animData.lastTime === undefined)
-		animData.lastTime = animData.birthTime;
+	if (animData.lastTime === undefined)
+	{ animData.lastTime = animData.birthTime; }
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
 	//var remainTime = animData.durationInSeconds
@@ -383,8 +383,8 @@ Node.prototype.checkAnimation = function(magoManager)
 Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager) 
 {
 	// Provisionally set a geoLocationData target.************************************
-	if(this.data.animationData === undefined)
-		this.data.animationData = new AnimationData();
+	if (this.data.animationData === undefined)
+	{ this.data.animationData = new AnimationData(); }
 	
 	var animData = this.data.animationData;
 	
@@ -430,9 +430,9 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	var nodesArray = [];
 	nodeRoot.extractNodesByDataName(nodesArray, "neoBuilding");
 	
-			nodeRoot.data.geographicCoord.longitude = longitude; 
-			nodeRoot.data.geographicCoord.latitude = latitude; 
-			nodeRoot.data.geographicCoord.altitude = elevation;
+	nodeRoot.data.geographicCoord.longitude = longitude; 
+	nodeRoot.data.geographicCoord.latitude = latitude; 
+	nodeRoot.data.geographicCoord.altitude = elevation;
 	
 	var aNode;
 	var buildingSelected;
@@ -446,10 +446,10 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		if (geoLocationData === undefined)
 		{ continue; }
 	
-				// Change the geoCoords of the buildingSeed.***
-				var buildingSeed = aNode.data.buildingSeed;
-				buildingSeed.geographicCoordOfBBox.longitude = longitude;
-				buildingSeed.geographicCoordOfBBox.latitude = latitude;
+		// Change the geoCoords of the buildingSeed.***
+		var buildingSeed = aNode.data.buildingSeed;
+		buildingSeed.geographicCoordOfBBox.longitude = longitude;
+		buildingSeed.geographicCoordOfBBox.latitude = latitude;
 
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
 		var neoBuilding = aNode.data.neoBuilding;
@@ -464,17 +464,17 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.***
 		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
 		
-				// aNode was moved, so, check if is out of the smartTileOwner.***
-				// If aNode is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.***
-				var smartTileOwner = aNode.data.smartTileOwner;
-				if(!smartTileOwner.intersectsNode(aNode))
-				{
-					smartTileOwner.eraseNode(aNode);
+		// aNode was moved, so, check if is out of the smartTileOwner.***
+		// If aNode is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.***
+		var smartTileOwner = aNode.data.smartTileOwner;
+		if (!smartTileOwner.intersectsNode(aNode))
+		{
+			smartTileOwner.eraseNode(aNode);
 					
-					// Now, put the node in the corresponent smartTile.***
-					var targetDepth = smartTileOwner.targetDepth;
-					magoManager.smartTileManager.putNode(targetDepth, aNode, magoManager);
-				}
+			// Now, put the node in the corresponent smartTile.***
+			var targetDepth = smartTileOwner.targetDepth;
+			magoManager.smartTileManager.putNode(targetDepth, aNode, magoManager);
+		}
 	}
 };
 

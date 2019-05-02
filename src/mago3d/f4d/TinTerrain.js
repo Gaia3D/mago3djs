@@ -539,8 +539,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				this.childMap.LU = subTile_LU;
 				
 				// Test imagery textures extent.***********************************************
-				if(subTile_LU.imageryGeoExtent === undefined)
-					subTile_LU.imageryGeoExtent = new GeographicExtent();
+				if (subTile_LU.imageryGeoExtent === undefined)
+				{ subTile_LU.imageryGeoExtent = new GeographicExtent(); }
 				subTile_LU.imageryGeoExtent.setExtent(imageryMercatorMinX, imageryMercatorMidY, 0.0, imageryMercatorMidX, imageryMercatorMaxY, 0.0);
 				// End test.-------------------------------------------------------------------
 			}
@@ -558,8 +558,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				this.childMap.LD = subTile_LD;
 				
 				// Test imagery textures extent.***********************************************
-				if(subTile_LD.imageryGeoExtent === undefined)
-					subTile_LD.imageryGeoExtent = new GeographicExtent();
+				if (subTile_LD.imageryGeoExtent === undefined)
+				{ subTile_LD.imageryGeoExtent = new GeographicExtent(); }
 				subTile_LD.imageryGeoExtent.setExtent(imageryMercatorMinX, imageryMercatorMinY, 0.0, imageryMercatorMidX, imageryMercatorMidY, 0.0);
 				// End test.-------------------------------------------------------------------
 			}
@@ -576,8 +576,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				this.childMap.RU = subTile_RU;
 				
 				// Test imagery textures extent.***********************************************
-				if(subTile_RU.imageryGeoExtent === undefined)
-					subTile_RU.imageryGeoExtent = new GeographicExtent();
+				if (subTile_RU.imageryGeoExtent === undefined)
+				{ subTile_RU.imageryGeoExtent = new GeographicExtent(); }
 				subTile_RU.imageryGeoExtent.setExtent(imageryMercatorMidX, imageryMercatorMidY, 0.0, imageryMercatorMaxX, imageryMercatorMaxY, 0.0);
 				// End test.-------------------------------------------------------------------
 			}
@@ -594,8 +594,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 				this.childMap.RD = subTile_RD;
 				
 				// Test imagery textures extent.***********************************************
-				if(subTile_RD.imageryGeoExtent === undefined)
-					subTile_RD.imageryGeoExtent = new GeographicExtent();
+				if (subTile_RD.imageryGeoExtent === undefined)
+				{ subTile_RD.imageryGeoExtent = new GeographicExtent(); }
 				subTile_RD.imageryGeoExtent.setExtent(imageryMercatorMidX, imageryMercatorMinY, 0.0, imageryMercatorMaxX, imageryMercatorMidY, 0.0);
 				// End test.-------------------------------------------------------------------
 			}
@@ -871,7 +871,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		var tanRange = maxTan - minTan;
 		
 		var texCoordsCount = this.texCoordsArray.length/2;
-		for(var i=0; i<texCoordsCount; i++)
+		for (var i=0; i<texCoordsCount; i++)
 		{
 			// scale.***
 			this.texCoordsArray[i*2] *= this.textureTranslateAndScale.z;
