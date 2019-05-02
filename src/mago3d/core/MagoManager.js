@@ -2676,7 +2676,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	
+	/*
 	if (key === 80) // 80 = 'p'.***
 	{
 		// Do a test.***
@@ -2728,7 +2728,7 @@ MagoManager.prototype.keyDown = function(key)
 			this.modeler.mode = CODE.modelerMode.INACTIVE;
 		}
 	}
-	
+	*/
 	
 };
 
@@ -5386,7 +5386,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				neoBuilding = node.data.neoBuilding;
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
-
 			
 				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 

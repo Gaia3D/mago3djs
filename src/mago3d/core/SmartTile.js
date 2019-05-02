@@ -100,6 +100,7 @@ SmartTile.prototype.newSubTile = function(parentTile)
 	
 	var subTile = new SmartTile();
 	subTile.depth = parentTile.depth + 1;
+	subTile.targetDepth = parentTile.targetDepth;
 	this.subTiles.push(subTile);
 	return subTile;
 };
