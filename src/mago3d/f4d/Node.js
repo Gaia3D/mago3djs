@@ -343,6 +343,7 @@ Node.prototype.getNodeGeoLocDataManager = function()
  */
 Node.prototype.checkAnimation = function(magoManager) 
 {
+	var finished = false;
 	var animData = this.data.animationData;
 	
 	if (animData === undefined)
@@ -355,10 +356,11 @@ Node.prototype.checkAnimation = function(magoManager)
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
 	var remainTime = animData.durationInSeconds - (currTime - animData.birthTime)/1000.0; // in seconds.***
-	/*
+	
 	if (Math.abs(remainTime) < 0.1)
 	{
-		
+		// finish the process.***
+		finished = true;
 	}
 	else
 	{
@@ -384,8 +386,10 @@ Node.prototype.checkAnimation = function(magoManager)
 		
 		// finally update "lastTime".***
 		animData.lastTime = currTime;
+		finished = false;
 	}
-	*/
+	
+	return finished;
 };
 
 /**
