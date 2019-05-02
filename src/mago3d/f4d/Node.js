@@ -87,6 +87,12 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
+	// Test animation.***
+	if(this.checkAnimation(magoManager))
+	{
+		this.data.animationData = undefined;
+	}
+
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
@@ -343,6 +349,7 @@ Node.prototype.getNodeGeoLocDataManager = function()
  */
 Node.prototype.checkAnimation = function(magoManager) 
 {
+	var finished = false;
 	var animData = this.data.animationData;
 	
 	if (animData === undefined)
@@ -354,33 +361,57 @@ Node.prototype.checkAnimation = function(magoManager)
 	{ animData.lastTime = animData.birthTime; }
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
-	//var remainTime = animData.durationInSeconds
+	var remainTime = animData.durationInSeconds - (currTime - animData.birthTime)/1000.0; // in seconds.***
 	
-	// calculate by durationInSeconds.***
-	var geoLocDatamanager = this.getNodeGeoLocDataManager();
-	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+	var nextLongitude;
+	var nextLatitude;
+	var nextAltitude;
+	
+	if (remainTime < 0.1)
+	{
+		nextLongitude = animData.targetLongitude;
+		nextLatitude = animData.targetLatitude;
+		nextAltitude = animData.targetAltitude;
 		
-	var currLongitude = geoLocationData.longitude;
-	var currLatitude = geoLocationData.latitude;
-	var currAltitude = geoLocationData.altitude;
+		// finish the process.***
+		finished = true;
+	}
+	else
+	{
+		// calculate by durationInSeconds.***
+		var geoLocDatamanager = this.getNodeGeoLocDataManager();
+		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+			
+		var currLongitude = geoLocationData.geographicCoord.longitude;
+		var currLatitude = geoLocationData.geographicCoord.latitude;
+		var currAltitude = geoLocationData.geographicCoord.altitude;
+		
+		var targetLongitude = animData.targetLongitude;
+		var targetLatitude = animData.targetLatitude;
+		var targetAltitude = animData.targetAltitude;
+		
+		var dir = new Point3D(); // use point3d with geographic coordinates.***
+		dir.set(targetLongitude - currLongitude, targetLatitude - currLatitude, targetAltitude - currAltitude);
+		dir.unitary();
+		
+		nextLongitude = currLongitude + dir.x * deltaTime/remainTime;
+		nextLatitude = currLatitude + dir.y * deltaTime/remainTime;
+		nextAltitude = currAltitude + dir.z * deltaTime/remainTime;
+		
+		// finally update "lastTime".***
+		animData.lastTime = currTime;
+		finished = false;
+	}
 	
-	var targetLongitude = animData.targetLongitude;
-	var targetLatitude = animData.targetLatitude;
-	var targetAltitude = animData.targetAltitude;
+	this.changeLocationAndRotation(nextLongitude, nextLatitude, nextAltitude, undefined, undefined, undefined, magoManager);
 	
-	
-	
-	//var nextLongitude = 
-	
-	
-	// finally update "lastTime".***
-	animData.lastTime = currTime;
+	return finished;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager) 
+Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager, durationInSeconds) 
 {
 	// Provisionally set a geoLocationData target.************************************
 	if (this.data.animationData === undefined)
@@ -389,7 +420,11 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var animData = this.data.animationData;
 	
 	animData.birthTime = magoManager.getCurrentTime();
-	animData.durationInSeconds = 3.0;
+	
+	if(durationInSeconds === undefined)
+		durationInSeconds = 3.0;
+	
+	animData.durationInSeconds = durationInSeconds;
 	
 	// target location.***
 	animData.targetLongitude = longitude;

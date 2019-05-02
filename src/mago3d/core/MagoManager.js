@@ -2676,23 +2676,27 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	/*
+	
 	if (key === 80) // 80 = 'p'.***
 	{
 		// Do a test.***
 		var projectId = "3ds.json";
 		var dataKey = "GyeomjaeJeongSeon_del";
+		
+		// Jeju island.***
 		var latitude = 33.519674269678504;
 		var longitude = 126.53339849002569;
 		
-		latitude = 33.519674269678504;
-		longitude = 126.53339849002569;
+		// Near the original position.***
+		latitude = 37.58639062251842;
+		longitude = 126.61172849731089;
 		
 		var elevation = 30.0;
 		var heading;
 		var pitch;
 		var roll;
-		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll);
+		var durationTimeInSeconds = 30;
+		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -2704,7 +2708,7 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		
 		var tunnel = this.modeler.getTunnel();
-		if(tunnel !== undefined)
+		if (tunnel !== undefined)
 		{
 			tunnel.getProfileGeographicCoordsList(); // executed this only to create the profile.*** TEST.***
 			tunnel.makeMesh(this);
@@ -2713,18 +2717,18 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
-		if(this.magoMode === undefined)
-			this.magoMode = CODE.magoMode.NORMAL;
+		if (this.magoMode === undefined)
+		{ this.magoMode = CODE.magoMode.NORMAL; }
 		
-		if(this.magoMode === CODE.magoMode.NORMAL)
-			this.magoMode = CODE.magoMode.DRAWING;
-		else if(this.magoMode === CODE.magoMode.DRAWING)
+		if (this.magoMode === CODE.magoMode.NORMAL)
+		{ this.magoMode = CODE.magoMode.DRAWING; }
+		else if (this.magoMode === CODE.magoMode.DRAWING)
 		{
 			this.magoMode = CODE.magoMode.NORMAL;
 			this.modeler.mode = CODE.modelerMode.INACTIVE;
 		}
 	}
-	*/
+	
 	
 };
 
@@ -5894,6 +5898,9 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
  */
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
+	if (neoBuilding === undefined)
+	{ return; }
+	
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = node.getNodeGeoLocDataManager();
 	if (geoLocDatamanager === undefined)
@@ -5944,7 +5951,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll) 
+MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 {
 	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
 	if (nodesMap)
@@ -5952,19 +5959,26 @@ MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, l
 		var node = nodesMap[dataKey];
 		if (node === undefined)
 		{ return; }
-		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll);
+		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 };
 
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll) 
+MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 {
 	if (node === undefined)
 	{ return; }
 
-	node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
+	if(durationTimeInSeconds !== undefined)
+	{
+		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
+	}
+	else{
+		node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
+	}
+	
 	var neoBuilding = node.data.neoBuilding;
 	
 	this.selectedObjectNotice(neoBuilding);
