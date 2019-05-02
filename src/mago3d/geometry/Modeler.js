@@ -20,6 +20,7 @@ var Modeler = function()
 	this.polyLine2d; // current polyline2D to sketch.***
 	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.***
 	this.excavation; // class : Excavation.***
+	this.tunnel; // class : Tunnel.***
 };
 
 /**
@@ -42,6 +43,17 @@ Modeler.prototype.getExcavation = function()
 		this.excavation = new Excavation();
 	
 	return this.excavation;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.getTunnel = function() 
+{
+	if(this.tunnel === undefined)
+		this.tunnel = new Tunnel();
+	
+	return this.tunnel;
 };
 
 /**
@@ -77,12 +89,17 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
 	if(this.geoCoordsList !== undefined)
 	{
 		// Provisionally render geographicPoints.***
-		this.geoCoordsList.renderPoints(magoManager, shader);
+		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
 	}
 	
 	if(this.excavation !== undefined)
 	{
 		this.excavation.renderPoints(magoManager, shader, renderType);
+	}
+	
+	if(this.tunnel !== undefined)
+	{
+		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}
 };
 

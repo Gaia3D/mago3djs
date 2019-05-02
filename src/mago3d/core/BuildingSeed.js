@@ -18,6 +18,7 @@ var BuildingSeed = function()
 	this.rotationsDegree; // class : Point3D. (heading, pitch, roll).
 	this.bBox;            // class : BoundingBox.
 	this.geographicCoordOfBBox; // class : GeographicCoord.
+	this.smartTileOwner;
 };
 
 /**

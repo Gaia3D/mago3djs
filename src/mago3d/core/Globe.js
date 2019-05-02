@@ -247,6 +247,8 @@ Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 	return resultNormal;
 };
 
+
+
 Globe.atan2Test = function(y, x) 
 {
 	var M_PI = Math.PI;
@@ -426,40 +428,30 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 
 	return result;
 };
-/*
-Globe.CartesianToGeographicWgs84 = function(x, y, z, resultGeographic)
+
+Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint2d) 
 {
-	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
-	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
-	var a = 6378137.0;
-	var f = 1.0 / 298.257223563;
-	var f2 = f*f;
-	var e2 = 2*f - f2;
-	var p = Math.sqrt(x*x + y*y);
-	var r = Math.sqrt(p*p + z*z);
+	// longitude = [-180, 180].***
+	// latitude = [-90, 90].***
+	var degToRadFactor = Math.PI/180.0;
+	var lonRad = longitude * degToRadFactor;
+	var latRad = latitude * degToRadFactor;
 	
-	var nu = Math.atan(z/2 *((1-f) + (e2*a/r)));
-	var lambda = Math.atan(y/x);
-	
-	var sin_nu = Math.sin(nu);
-	var cos_nu = Math.cos(nu);
-	var sin3_nu = sin_nu * sin_nu * sin_nu;
-	var cos3_nu = cos_nu * cos_nu * cos_nu;
-	
-	var numerator = z*(1-f)+e2*a*sin3_nu;
-	var denominator = (1-f)*(p-e2*a*cos3_nu);
-	var fita = Math.atan(numerator/denominator);
-	var sin_fita = Math.sin(fita);
-	var h = p*Math.cos(fita) + z*sin_fita - a*Math.sqrt(1-e2*sin_fita*sin_fita);
-	
-	var radToDegFactor = 180.0/Math.PI;
-	if (resultGeographic === undefined)
-	{ resultGeographic = new GeographicCoord(); }
-	
-	resultGeographic.setLonLatAlt(lambda * radToDegFactor, fita * radToDegFactor, h);
-	return resultGeographic;
+	return Globe.geographicRadianToMercatorProjection(lonRad, latRad, resultPoint2d);
 };
-*/
+
+Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoint2d) 
+{
+	// longitude = [-pi, pi].***
+	// latitude = [-pi/2, pi/2].***
+	var equatorialRadius = Globe.equatorialRadius();
+	if (resultPoint2d === undefined)
+	{ resultPoint2d = new Point2D(); }
+
+	resultPoint2d.set(equatorialRadius * lonRad, equatorialRadius * latRad);
+	
+	return resultPoint2d;
+};
 
 Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resultCartesian)
 {
@@ -472,7 +464,7 @@ Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resul
 	// y = (v+h)*cos(lat)*sin(lon).
 	// z = [v*(1-e2)+h]*sin(lat).
 	var degToRadFactor = Math.PI/180.0;
-	var equatorialRadius = 6378137.0; // meters.
+	var equatorialRadius = Globe.equatorialRadius();
 	var firstEccentricitySquared = 6.69437999014E-3;
 	var lonRad = longitude * degToRadFactor;
 	var latRad = latitude * degToRadFactor;
@@ -486,7 +478,7 @@ Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resul
 	var h = altitude;
 	
 	if (resultCartesian === undefined)
-	{ resultCartesian = new Float32Array(3); }
+	{ resultCartesian = []; }
 	
 	resultCartesian[0]=(v+h)*cosLat*cosLon;
 	resultCartesian[1]=(v+h)*cosLat*sinLon;

@@ -222,6 +222,7 @@ VertexList.prototype.copyFromPoint3DArray = function(point3dArray)
 		vertex = this.newVertex();
 		vertex.point3d = new Point3D();
 		vertex.point3d.set(point3d.x, point3d.y, point3d.z);
+		vertex.point3d.pointType = point3d.pointType;
 		vertex.vertexType = point3d.pointType;
 	}
 };
@@ -248,6 +249,7 @@ VertexList.prototype.copyFromPoint2DList = function(point2dList, z)
 		vertex = this.newVertex();
 		vertex.point3d = new Point3D();
 		vertex.point3d.set(point2d.x, point2d.y, z);
+		vertex.point3d.pointType = point2d.pointType;
 		vertex.vertexType = point2d.pointType;
 	}
 };

@@ -23,6 +23,11 @@ var TinTerrainManager = function()
 	
 	this.geoServURL = "http://192.168.10.57:9090/geoserver/gwc/service/wmts";
 	
+	// Elevation model or plain ellipsoid.***
+	// terrainType = 0 -> terrainPlainModel.***
+	// terrainType = 1 -> terrainElevationModel.***
+	this.terrainType = 0; 
+	
 	this.init();
 };
 
@@ -30,7 +35,8 @@ TinTerrainManager.prototype.init = function()
 {
 	this.tinTerrainsQuadTreeAsia = new TinTerrain(undefined); // Main object.***
 	this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.***
-	
+	//1.4844222297453322
+	//var latDeg = 1.4844222297453322 *180/Math.PI;
 	// Asia side.***
 	var minLon = 0;
 	var minLat = -90;
@@ -52,6 +58,72 @@ TinTerrainManager.prototype.init = function()
 	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
+	
+	// do imagery test.***
+	// set imagery initial geoExtent (in mercator coords).***
+	/*
+	// https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer
+	Initial Extent:
+	XMin: -2.7680880158351306E7
+	YMin: -195164.8424795773 // error.***
+	XMax: 2.7680880158351306E7
+	YMax: 1.9971868880408563E7
+	Spatial Reference: 102100 
+
+	Full Extent:
+	XMin: -2.003750722959434E7
+	YMin: -1.997186888040859E7
+	XMax: 2.003750722959434E7
+	YMax: 1.9971868880408563E7
+	Spatial Reference: 102100 
+	
+	//https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/0
+	Level 0 Extent:
+	XMin: -2.0028669624423463E7
+	YMin: -7679113.797548824
+	XMax: 2.001627433615794E7
+	YMax: 1.7924177384518914E7
+	Spatial Reference: 102100  (3857) 
+
+	*/
+	
+	
+	// Full extent.***
+	var initImageryMercatorMinX = -2.003750722959434E7;
+	var initImageryMercatorMinY = -1.997186888040859E7;
+	var initImageryMercatorMaxX = 2.003750722959434E7;
+	var initImageryMercatorMaxY = 1.9971868880408563E7;
+	
+	//north: 1.4844222297453322
+	var eqRadius = Globe.equatorialRadius();
+	var north = eqRadius*1.48352986419518;
+	var north2 = eqRadius*Math.PI/2;
+	
+	// Initial extent.***
+	//var initImageryMercatorMinX = -2.7680880158351306E7;
+	//var initImageryMercatorMinY = -195164.8424795773;
+	//var initImageryMercatorMaxX = 2.7680880158351306E7;
+	//var initImageryMercatorMaxY = 1.9971868880408563E7;
+	
+	// Level 0 extent.***
+	//var initImageryMercatorMinX = -2.0028669624423463E7;
+	//var initImageryMercatorMinY = -7679113.797548824;
+	//var initImageryMercatorMaxX = 2.001627433615794E7;
+	//var initImageryMercatorMaxY = 1.7924177384518914E7;
+	
+	// my extent.***
+	
+	var initImageryMercatorMinX = -2.003750722959434E7;
+	var initImageryMercatorMinY = -north2;
+	var initImageryMercatorMaxX = 2.003750722959434E7;
+	var initImageryMercatorMaxY = north2;
+	
+	
+	this.tinTerrainsQuadTreeAsia.imageryGeoExtent = new GeographicExtent();
+	this.tinTerrainsQuadTreeAsia.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
+	
+	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent = new GeographicExtent();
+	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -75,10 +147,21 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// For the visible tinTerrains prepare its.***
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.***
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	for (var i=0; i<visiblesTilesCount; i++)
+	if(this.terrainType === 0) // PlainTerrain.***
 	{
-		tinTerrain = this.visibleTilesArray[i];
-		tinTerrain.prepareTinTerrain(magoManager, this);
+		for (var i=0; i<visiblesTilesCount; i++)
+		{
+			tinTerrain = this.visibleTilesArray[i];
+			tinTerrain.prepareTinTerrainPlain(magoManager, this);
+		}
+	}
+	else if(this.terrainType === 1)// ElevationTerrain.***
+	{
+		for (var i=0; i<visiblesTilesCount; i++)
+		{
+			tinTerrain = this.visibleTilesArray[i];
+			tinTerrain.prepareTinTerrain(magoManager, this);
+		}
 	}
 	
 	// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.***

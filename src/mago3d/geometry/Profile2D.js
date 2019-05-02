@@ -152,7 +152,7 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
 			indexData.idxInList = point.idxInList;
 			if (currRing === this.outerRing)
 			{
-				ringIdxInList = -1;
+				ringIdxInList = -1; // Set idx of outerRing as -1.***
 			}
 			else 
 			{

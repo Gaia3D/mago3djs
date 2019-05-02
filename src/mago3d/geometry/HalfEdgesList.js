@@ -15,6 +15,20 @@ var HalfEdgesList = function()
 	this.hEdgesArray;
 };
 
+HalfEdgesList.prototype.deleteObjects = function()
+{
+	if(this.hEdgesArray !== undefined)
+	{
+		var hedgesCount = this.hEdgesArray.length;
+		for(var i=0; i<hedgesCount; i++)
+		{
+			this.hEdgesArray[i].deleteObjects();
+			this.hEdgesArray[i] = undefined;
+		}
+		this.hEdgesArray = undefined;
+	}
+};
+
 HalfEdgesList.prototype.newHalfEdge = function()
 {
 	if (this.hEdgesArray === undefined)

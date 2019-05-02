@@ -82,6 +82,10 @@ var SelectionManager = function()
 	// Custom candidates.***
 	this.selCandidatesFamilyMap = {};
 	
+	// General candidates.***
+	this.selCandidatesMap = {};
+	this.currentGeneralObjectSelected;
+	
 };
 
 /**
@@ -122,6 +126,39 @@ SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, obj
 	{
 		selCandidatesFamily.setCandidate(idxKey, object);
 	}
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.setCandidateGeneral = function(idxKey, candidateObject)
+{
+	this.selCandidatesMap[idxKey] = candidateObject;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.getCandidateGeneral = function(idxKey)
+{
+	return this.selCandidatesMap[idxKey];
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.getSelectedGeneral = function()
+{
+	return this.currentGeneralObjectSelected;
 };
 
 /**
@@ -175,6 +212,9 @@ SelectionManager.prototype.clearCandidates = function()
 		}
 
 	}
+	
+	// General selection candidates map.***
+	this.selCandidatesMap = {};
 };
 
 /**
@@ -198,6 +238,8 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 			selCandidateFamily.selectObject(idxKey);
 		}
 	}
+	
+	this.currentGeneralObjectSelected = this.selCandidatesMap[idxKey];
 };
 
 /**
@@ -221,4 +263,48 @@ SelectionManager.prototype.clearCurrents = function(idxKey)
 			selCandidateFamily.clearCurrentSelected();
 		}
 	}
+	
+	this.currentGeneralObjectSelected = undefined;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -16,6 +16,26 @@ var Surface = function()
 	this.localHedgesList;
 };
 
+Surface.prototype.deleteObjects = function()
+{
+	if(this.facesArray !== undefined)
+	{
+		var facesCount = this.facesArray.length;
+		for(var i=0; i<facesCount; i++)
+		{
+			this.facesArray[i].deleteObjects();
+			this.facesArray[i] = undefined;
+		}
+		this.facesArray = undefined;
+	}
+	
+	// Note: "Surface" is NO-Owner of vertices of "localVertexList", so, don't delete "localVertexList". Only set as "undefined".***
+	this.localVertexList = undefined;
+	
+	// Note: "Surface" is NO-Owner of hedges of "localHedgesList", so, don't delete "localHedgesList". Only set as "undefined".***
+	this.localHedgesList = undefined;
+};
+
 Surface.prototype.newFace = function()
 {
 	if (this.facesArray === undefined)

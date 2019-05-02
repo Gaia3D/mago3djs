@@ -82,7 +82,7 @@ VtxProfile.prototype.transformPointsByMatrix4 = function(tMat4)
 
 VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 {
-	// Note: this makes a projected profile2d conformed by polyLines2D.***
+	// Note: this makes a projected profile2d ONLY conformed by polyLines2D.***
 	// This function is used when necessary to tessellate this vtxProfile.***
 	
 	if(this.outerVtxRing === undefined)
@@ -131,6 +131,21 @@ VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoi
 	{ this.outerVtxRing = new VtxRing(); }
 
 	this.outerVtxRing.makeByPoints3DArray(outerPoints3dArray);
+	
+	// inners.***************************************
+	// todo:
+};
+
+VtxProfile.prototype.updateByPoints3DArray = function(outerPoints3dArray, innerPoints3dArrayArray)
+{
+	if(outerPoints3dArray === undefined)
+		return;
+	
+	// outer.***************************************
+	if (this.outerVtxRing === undefined)
+		return;
+
+	this.outerVtxRing.updateByPoints3DArray(outerPoints3dArray);
 	
 	// inners.***************************************
 	// todo:

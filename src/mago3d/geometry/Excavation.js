@@ -28,7 +28,10 @@ var Excavation = function()
 Excavation.prototype.getGeographicCoordsList = function() 
 {
 	if(this.geoCoordsList === undefined)
+	{
 		this.geoCoordsList = new GeographicCoordsList();
+		this.geoCoordsList.owner = this;
+	}
 	
 	return this.geoCoordsList;
 };
@@ -41,39 +44,13 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
 	if(this.geoCoordsList === undefined)
 		return false;
 	
-	this.geoCoordsList.renderPoints(magoManager, shader);
-	
 	if(this.meshPositive !== undefined)
 	{
-		/*
-		var gl = magoManager.sceneState.gl;
-		shader.useProgram();
-		shader.resetLastBuffersBinded();
-
-		shader.enableVertexAttribArray(shader.position3_loc);
-		shader.disableVertexAttribArray(shader.color4_loc);
-		shader.enableVertexAttribArray(shader.normal3_loc); 
-		shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.***
-		
-		shader.bindUniformGenerals();
-		
-		gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.0, 0.8, 1.0]);
-		
-		gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
-		gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
-		gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
-		gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.***
-	
-		var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
-	
-		var glPrimitive = undefined;
-		this.meshPositive.render(magoManager, shader, renderType, glPrimitive);
-		*/
 		this.renderExcavation(magoManager, shader, renderType);
 	}
+	
+	this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
+	this.geoCoordsList.renderLines(magoManager, shader, renderType, false, false);
 };
 
 /**
@@ -98,7 +75,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.***
 	
 	shader.bindUniformGenerals();
-	
+	/*
 	// Note: in this case, we must modify the modelViewProjectionRelToEyeMatrix, to change the farClip of the frustums.*********************************************
 	var scene = magoManager.scene;
 	var uniformState = scene._context.uniformState;
@@ -138,8 +115,8 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	
 	
 	// calculate nearTop.***
-	if(magoManager.currentFrustumIdx !== 0)
-	near *= 0.99;
+	//if(magoManager.currentFrustumIdx !== 0)
+	//near *= 0.99;
 	var nearTop = near * tangentOfHalfFovy;
 	var nearRight = nearTop * aspectRatio;
 	var nearBottom = -nearTop;
@@ -207,7 +184,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	gl.uniformMatrix4fv(mvpRelToEyeMat_loc, false, modelViewProjectionRelToEyeMat._floatArrays);
 	
 	// End modify the modelViewProjectionRelToEyeMatrix, to change the farClip of the frustums.--------------------------------------------------------------------
-	
+	*/
 	
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.***
@@ -222,12 +199,8 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	gl.depthRange(0, 1);
 	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, buildingGeoLocation.rotMatrix._floatArrays);
-		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
-		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
+	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.***
 		
-		//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.***
-		//return;
 	
 	// STENCIL SETTINGS.**********************************************************************************
 	gl.colorMask(false, false, false, false);
@@ -276,8 +249,8 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	gl.depthMask(true);
 	gl.stencilMask(0x00);
 
-	gl.stencilFunc(gl.NOTEQUAL, 0, 0xff);
-	//gl.stencilFunc(gl.LEQUAL, 1, 0xff);
+	//gl.stencilFunc(gl.NOTEQUAL, 0, 0xff);
+	gl.stencilFunc(gl.LEQUAL, 1, 0xff);
 	//gl.stencilFunc(gl.LESS, 0, 0xff);
 	//gl.stencilFunc(gl.EQUAL, 1, 0xff);
 	gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE); // stencilOp(fail, zfail, zpass)
@@ -288,7 +261,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 
 	gl.depthFunc(gl.ALWAYS);
 
-	gl.disable(gl.DEPTH_TEST);
+	//gl.disable(gl.DEPTH_TEST);
 	//gl.disable(gl.STENCIL_TEST);
 	
 	if(magoManager.currentFrustumIdx === 0)
@@ -320,33 +293,44 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 /**
  * 어떤 일을 하고 있습니까?
  */
-Excavation.prototype.makeExtrudeObject = function(magoManager) 
+Excavation.prototype.getGeoLocationData = function() 
 {
-	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
-	// Another possibility is calculate the average point of geoCoords.***
 	if(this.geoLocDataManager === undefined)
 		this.geoLocDataManager = new GeoLocationDataManager();
 	
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
 	if(geoLoc === undefined)
 	{
-		geoLoc = this.geoLocDataManager.newGeoLocationData("noName");
-		
-		// Take the 1rst geographicCoord's geoLocation.***
-		var geoCoord = this.geoCoordsList.getGeoCoord(0);
-		var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
-		var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
-		
-		geoLoc.copyFrom(geoLocFirst);
+		geoLoc = this.geoLocDataManager.newGeoLocationData("default");
 	}
+	
+	return geoLoc;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Excavation.prototype.makeExtrudeObject = function(magoManager) 
+{
+	if(this.geoCoordsList === undefined)
+		return false;
+	
+	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
+	// Another possibility is calculate the average point of geoCoords.***
+	var geoLoc = this.getGeoLocationData();
+
+	// Take the 1rst geographicCoord's geoLocation.***
+	var geoCoord = this.geoCoordsList.getGeoCoord(0);
+	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
+	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
+	geoLoc.copyFrom(geoLocFirst);
+	
 	
 	// Now, make the down & up profiles.***
 	if(this.vtxProfilesList === undefined)
 		this.vtxProfilesList = new VtxProfilesList();
 	
 	// Project the geoCoordList into a plane. Remember that the local coordinate is the 1rst geoCoord.***
-	
-	
 	// Calculate down & up points of the extrude object.***
 	var points3dArrayDown = [];
 	var points3dArrayUp = [];
@@ -418,6 +402,111 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
 		
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Excavation.prototype.remakeExtrudeObject = function(magoManager) 
+{
+	if(this.vtxProfilesList === undefined)
+		return false;
+	
+	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
+	// Another possibility is calculate the average point of geoCoords.***
+	var geoLoc = this.getGeoLocationData();
+
+	// Take the 1rst geographicCoord's geoLocation.***
+	var geoCoord = this.geoCoordsList.getGeoCoord(0);
+	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
+	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
+	geoLoc.copyFrom(geoLocFirst);
+	
+
+	// Project the geoCoordList into a plane. Remember that the local coordinate is the 1rst geoCoord.***
+	// Calculate down & up points of the extrude object.***
+	var points3dArrayDown = [];
+	var points3dArrayUp = [];
+	
+	if(this.excavationDepthInMeters === undefined)
+		this.excavationDepthInMeters = 80.0;
+	
+	var cartesianAux;
+	var geoCoord;
+	var geoCoordsCount = this.geoCoordsList.getGeoCoordsCount();
+	for(var i=0; i<geoCoordsCount; i++)
+	{
+		// Current geoCoord.***
+		geoCoord = this.geoCoordsList.getGeoCoord(i);
+		
+		// Down & Up absolute points.***
+		var point3DDown = new Point3D();
+		var point3DUp = new Point3D();
+		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude - this.excavationDepthInMeters, cartesianAux);
+		point3DDown.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
+		
+		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude + 100.0, cartesianAux);
+		point3DUp.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
+		
+		// Down & Up relative points.***
+		var point3DDownRel = new Point3D();
+		var point3DUpRel = new Point3D();
+		point3DDownRel = geoLoc.getTransformedRelativePosition(point3DDown, point3DDownRel);
+		point3DUpRel = geoLoc.getTransformedRelativePosition(point3DUp, point3DUpRel);
+		
+		point3DDownRel.pointType = 1;
+		point3DUpRel.pointType = 1;
+		
+		points3dArrayDown[i] = point3DDownRel;
+		points3dArrayUp[i] = point3DUpRel;
+	}
+	
+	// Now, update vertexProfiles (down_vtxProfile & up_vtxProfile).***
+	var vertexProfileDown = this.vtxProfilesList.getVtxProfile(0);
+	var vertexProfileUp = this.vtxProfilesList.getVtxProfile(1);
+	
+	vertexProfileDown.updateByPoints3DArray(points3dArrayDown, undefined);
+	vertexProfileUp.updateByPoints3DArray(points3dArrayUp, undefined);
+	
+	var vboMemManager = magoManager.vboMemoryManager;
+	//this.meshPositive.deleteVbos(vboMemManager);
+	//this.meshNegative.deleteVbos(vboMemManager);
+	
+	this.meshPositive.deleteObjects(vboMemManager);
+	this.meshNegative.deleteObjects(vboMemManager);
+	
+	this.meshPositive = undefined;
+	this.meshNegative = undefined;
+	
+	// Now, make the mesh.***
+	
+	if(this.meshPositive === undefined)
+	{
+		//this.meshTest = 
+		var bIncludeBottomCap = true;
+		var bIncludeTopCap = true;
+		this.mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+		
+		// positive mesh.***
+		this.meshPositive = this.mesh.getCopySurfaceIndependentMesh(this.meshPositive);
+		this.meshPositive.calculateVerticesNormals();
+	
+		this.meshPositive.setColor(0.1, 0.5, 0.5, 1.0);
+
+		this.meshPositive.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
+		this.meshPositive.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
+		
+		// negative mesh.***
+		this.meshNegative = this.mesh.getCopySurfaceIndependentMesh(this.meshNegative);
+		this.meshNegative.reverseSense(); // here calculates vertices normals.***
+	
+		this.meshNegative.setColor(0.1, 0.5, 0.5, 1.0);
+
+		this.meshNegative.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
+		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
+		
+	}
+	
 };
 
 

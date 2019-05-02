@@ -65,6 +65,7 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
  */
 ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
+	// Note: move this function into "VtxProfilesList" class.***
 	if (profile2d === undefined)
 	{ return undefined; }
 	
@@ -113,6 +114,7 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
  */
 ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {
+	// Note: move this function into "VtxProfilesList" class.***
 	if (profile2d === undefined || extrusionDist === undefined)
 	{ return undefined; }
 	

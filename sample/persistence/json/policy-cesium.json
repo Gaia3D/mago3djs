@@ -21,7 +21,7 @@
   "password_create_char": "!@#",
   "password_exception_char": "\u003c\u003e\u0026\u0027\"",
   "geo_view_library": "cesium",
-  "geo_cesium_ion_token": "",
+  "geo_cesium_ion_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmYTMzMTJjYy0yNDc2LTRjYjgtOGMzYS0zYjZlNzY3MzZhYjciLCJpZCI6Mzk5Miwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0MTA2Njg3MX0.KuYmyBpN-h8Mr832CqNRe9_7yaD7ONVVnEXPDLvFhA8",
   "geo_data_path": "/f4d",
   "geo_data_default_projects": [
     "3ds.json"

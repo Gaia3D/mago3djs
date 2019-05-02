@@ -63,12 +63,77 @@ Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+Plane.prototype.getNormal = function(resultNormal) 
+{
+	if(resultNormal === undefined)
+		resultNormal = new Point3D();
+	
+	resultNormal.set(this.a, this.b, this.c);
+	
+	return resultNormal;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Plane.prototype.getRotationMatrix = function(resultTMatrix) 
+{
+	// The initial normal is (0, 0, 1), & the planeNormal is the transformed normal, so, calculate the rotationMatrix.***
+	var initialNormal = new Point3D(0.0, 0.0, 1.0);
+	var transformedNormal = this.getNormal(undefined);
+	
+	// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
+	// Check if the "initialNormal & the transformedNormal are parallels.***
+	var radError = 10E-10;
+	var relativeOrientation = initialNormal.getRelativeOrientationToVector(transformedNormal, radError);
+	// relativeOrientation = 0 -> // there are parallels & the same sense.***
+	// relativeOrientation = 1 -> // there are parallels & opposite sense.***
+	// relativeOrientation = 2 -> // there are NO parallels.***
+	var matrixAux = mat4.create(); // creates as identityMatrix.***
+	if(relativeOrientation === 0)
+	{
+		// there are parallels & the same sense.***
+		// In this case, the resultMatrix is a identityMatrix, so do nothing.***
+	}
+	else if(relativeOrientation === 1)
+	{
+		// there are parallels & opposite sense.***
+		// Rotate 180 degree in xAxis.***
+		var identityMat = mat4.create();
+		matrixAux = mat4.rotateX(matrixAux, identityMat, Math.PI);
+	}
+	else if(relativeOrientation === 2)
+	{
+		// there are NO parallels.***
+		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
+		var rotAxis = initialNormal.crossProduct(transformedNormal, undefined);
+		rotAxis.unitary();
+		var angRad = initialNormal.angleRadToVector(transformedNormal);
+		var axis = vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
+		var quaternion = quat.create();
+		quaternion = quat.setAxisAngle(quaternion, axis, angRad);
+		
+		// Now, make matrix4 from quaternion.***
+		var identityMat = mat4.create();
+		matrixAux = mat4.fromQuat(identityMat, quaternion);
+	}
+	
+	if(resultTMatrix === undefined)
+		resultTMatrix = new Matrix4();
+	
+	resultTMatrix._floatArrays = matrixAux;
+	
+	return resultTMatrix;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param line 변수
  * @param intersectionPoint 변수
  */
 Plane.prototype.intersectionLine = function(line, intersectionPoint) 
 {
-	
 	var r = line.point.x;
 	var s = line.point.y;
 	var t = line.point.z;

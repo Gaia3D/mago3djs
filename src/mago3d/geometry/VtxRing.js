@@ -15,6 +15,21 @@ var VtxRing = function()
 	this.elemsIndexRangesArray; // [] array.***
 };
 
+VtxRing.prototype.deleteElementIndexRanges = function()
+{
+	if (this.elemsIndexRangesArray === undefined)
+		return;
+	
+	var indexRangesCount = this.elemsIndexRangesArray.length;
+	for(var i=0; i<indexRangesCount; i++)
+	{
+		this.elemsIndexRangesArray[i].deleteObjects();
+		this.elemsIndexRangesArray[i] = undefined;
+	}
+	
+	this.elemsIndexRangesArray = undefined;
+};
+
 VtxRing.prototype.newElementIndexRange = function()
 {
 	if (this.elemsIndexRangesArray === undefined)
@@ -118,6 +133,38 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 	this.calculateElementsIndicesRange();
 };
 
+VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
+{
+	// Note: point3dCount must be equal to this.verticesCount.***
+	if(point3dArray === undefined)
+		return;
+	
+	if (this.vertexList === undefined)
+	{ this.vertexList = new VertexList(); }
+
+	var vertex;
+	var point3d;
+	var position;
+	var points3dCount = point3dArray.length;
+	for(var i=0; i<points3dCount; i++)
+	{
+		point3d = point3dArray[i]; // the original point3d.***
+		vertex = this.vertexList.getVertex(i);
+		if(vertex === undefined)
+			vertex = this.vertexList.newVertex();
+		
+		if(vertex.point3d === undefined)
+			vertex.point3d = new Point3D();
+		
+		vertex.point3d.set(point3d.x, point3d.y, point3d.z);
+	}
+	
+	this.vertexList.copyFromPoint3DArray(point3dArray);
+	
+	// Do no modify elementsIndexRanges.***
+	//this.calculateElementsIndicesRange();
+};
+
 VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 {
 	if (point2dList === undefined)
@@ -144,6 +191,10 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 {
 	if (this.vertexList === undefined)
 	{ return false; }
+
+	// 1rst, delete all existent indexRanges.***
+	this.deleteElementIndexRanges();
+	this.elemsIndexRangesArray = [];
 	
 	var vertex;
 	var idxRange = undefined;

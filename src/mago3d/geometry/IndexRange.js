@@ -22,3 +22,9 @@ IndexRange.prototype.copyFrom = function(indexRange)
 	this.strIdx = indexRange.strIdx;
 	this.endIdx = indexRange.endIdx;
 };
+
+IndexRange.prototype.deleteObjects = function()
+{
+	this.strIdx = undefined;
+	this.endIdx = undefined;
+};
