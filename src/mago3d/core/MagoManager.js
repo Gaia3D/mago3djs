@@ -2682,11 +2682,14 @@ MagoManager.prototype.keyDown = function(key)
 		// Do a test.***
 		var projectId = "3ds.json";
 		var dataKey = "GyeomjaeJeongSeon_del";
+		
+		// Jeju island.***
 		var latitude = 33.519674269678504;
 		var longitude = 126.53339849002569;
 		
-		latitude = 33.519674269678504;
-		longitude = 126.53339849002569;
+		// Near the original position.***
+		latitude = 37.58639062251842;
+		longitude = 126.61172849731089;
 		
 		var elevation = 30.0;
 		var heading;
@@ -5967,7 +5970,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	if (node === undefined)
 	{ return; }
 
-	node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
+	//node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
+	node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, 30);
 	var neoBuilding = node.data.neoBuilding;
 	
 	this.selectedObjectNotice(neoBuilding);
