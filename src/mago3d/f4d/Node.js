@@ -354,27 +354,38 @@ Node.prototype.checkAnimation = function(magoManager)
 	{ animData.lastTime = animData.birthTime; }
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
-	//var remainTime = animData.durationInSeconds
-	
-	// calculate by durationInSeconds.***
-	var geoLocDatamanager = this.getNodeGeoLocDataManager();
-	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+	var remainTime = animData.durationInSeconds - (currTime - animData.birthTime)/1000.0; // in seconds.***
+	/*
+	if (Math.abs(remainTime) < 0.1)
+	{
 		
-	var currLongitude = geoLocationData.longitude;
-	var currLatitude = geoLocationData.latitude;
-	var currAltitude = geoLocationData.altitude;
-	
-	var targetLongitude = animData.targetLongitude;
-	var targetLatitude = animData.targetLatitude;
-	var targetAltitude = animData.targetAltitude;
-	
-	
-	
-	//var nextLongitude = 
-	
-	
-	// finally update "lastTime".***
-	animData.lastTime = currTime;
+	}
+	else
+	{
+		// calculate by durationInSeconds.***
+		var geoLocDatamanager = this.getNodeGeoLocDataManager();
+		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+			
+		var currLongitude = geoLocationData.longitude;
+		var currLatitude = geoLocationData.latitude;
+		var currAltitude = geoLocationData.altitude;
+		
+		var targetLongitude = animData.targetLongitude;
+		var targetLatitude = animData.targetLatitude;
+		var targetAltitude = animData.targetAltitude;
+		
+		var dir = new Point3D(); // use point3d with geographic coordinates.***
+		dir.set(targetLongitude - currLongitude, targetLatitude - currLatitude, targetAltitude - currAltitude);
+		dir.unitary();
+		
+		var nextLongitude = currLongitude + dir.x * deltaTime/remainTime;
+		var nextLatitude = currLatitude + dir.y * deltaTime/remainTime;
+		var nextAltitude = currAltitude + dir.z * deltaTime/remainTime;
+		
+		// finally update "lastTime".***
+		animData.lastTime = currTime;
+	}
+	*/
 };
 
 /**

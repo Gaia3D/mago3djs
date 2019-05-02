@@ -2676,7 +2676,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	/*
+	
 	if (key === 80) // 80 = 'p'.***
 	{
 		// Do a test.***
@@ -2704,7 +2704,7 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		
 		var tunnel = this.modeler.getTunnel();
-		if(tunnel !== undefined)
+		if (tunnel !== undefined)
 		{
 			tunnel.getProfileGeographicCoordsList(); // executed this only to create the profile.*** TEST.***
 			tunnel.makeMesh(this);
@@ -2713,18 +2713,18 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
-		if(this.magoMode === undefined)
-			this.magoMode = CODE.magoMode.NORMAL;
+		if (this.magoMode === undefined)
+		{ this.magoMode = CODE.magoMode.NORMAL; }
 		
-		if(this.magoMode === CODE.magoMode.NORMAL)
-			this.magoMode = CODE.magoMode.DRAWING;
-		else if(this.magoMode === CODE.magoMode.DRAWING)
+		if (this.magoMode === CODE.magoMode.NORMAL)
+		{ this.magoMode = CODE.magoMode.DRAWING; }
+		else if (this.magoMode === CODE.magoMode.DRAWING)
 		{
 			this.magoMode = CODE.magoMode.NORMAL;
 			this.modeler.mode = CODE.modelerMode.INACTIVE;
 		}
 	}
-	*/
+	
 	
 };
 
@@ -5894,6 +5894,9 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
  */
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
+	if (neoBuilding === undefined)
+	{ return; }
+	
 	var node = neoBuilding.nodeOwner;
 	var geoLocDatamanager = node.getNodeGeoLocDataManager();
 	if (geoLocDatamanager === undefined)
