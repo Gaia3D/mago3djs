@@ -94,10 +94,6 @@ Point3D.prototype.isNAN = function()
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
  */
 Point3D.prototype.crossProduct = function(point, resultPoint) 
 {
@@ -111,10 +107,6 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
  */
 Point3D.prototype.scalarProduct = function(point) 
 {
@@ -123,9 +115,6 @@ Point3D.prototype.scalarProduct = function(point)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @returns resultPoint
  */
 Point3D.prototype.getSphericalCoords = function(resultGeographicCoords) 
 {
@@ -162,10 +151,19 @@ Point3D.prototype.getSphericalCoords = function(resultGeographicCoords)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ */
+Point3D.prototype.getRelativeOrientationToVector = function(vector, radError) 
+{
+	var angRad = this.angleRadToVector(vector);
+	if (angRad < radError)
+	{ return 0; } // there are parallel & the same sense.***
+	else if (Math.abs(Math.PI - angRad) < radError)
+	{ return 1; } // there are parallel & opposite sense.***
+	else
+	{ return 2; } // there are NO parallels.***
+};
+
+/**
  */
 Point3D.prototype.angleRadToVector = function(vector) 
 {
@@ -177,7 +175,7 @@ Point3D.prototype.angleRadToVector = function(vector)
 	var myModul = this.getModul();
 	var vecModul = vector.getModul();
 	
-	// calcule by cos.***
+	// calculate by cos.***
 	//var cosAlfa = scalarProd / (myModul * vecModul); 
 	//var angRad = Math.acos(cosAlfa);
 	//var angDeg = alfa * 180.0/Math.PI;

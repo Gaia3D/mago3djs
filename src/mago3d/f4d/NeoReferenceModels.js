@@ -261,14 +261,14 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	{ var hola = 0; }
 	
 	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
-	var selCandidates;
+	var selectionManager;
 	var selectionColor;
 	var currentNode;
 	var currentOctree;
 	
 	if (renderType === 2)
 	{
-		selCandidates = magoManager.selectionManager;
+		selectionManager = magoManager.selectionManager;
 		selectionColor = magoManager.selectionColor;
 		renderTexture = false; // reassign value for this var.***
 		currentNode = currentObjectsRendering.curNode;
@@ -299,7 +299,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); 
 		var idxKey = selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
 
-		selCandidates.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
+		selectionManager.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
 		if (neoReference.selColor4) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);

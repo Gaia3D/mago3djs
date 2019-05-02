@@ -49,6 +49,14 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 	this.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+GeographicExtent.prototype.getMidPoint = function(resultGeographicCoord) 
+{
+	return GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
+};
+
 
 
 

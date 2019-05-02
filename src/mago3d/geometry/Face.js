@@ -17,6 +17,23 @@ var Face = function()
 	this.surfaceOwner;
 };
 
+Face.prototype.deleteObjects = function()
+{
+	// Note: "Face" is NO-Owner of vertices, so, don't delete vertices. Only set as "undefined".***
+	this.vertexArray = undefined;
+
+	// Note: "Face" is NO-Owner of hEdge, so, don't delete hEdge. Only set as "undefined".***
+	this.hEdge = undefined;
+	
+	if (this.planeNormal !== undefined)
+	{
+		this.planeNormal.deleteObjects();
+		this.planeNormal = undefined;
+	}
+	
+	this.surfaceOwner = undefined;
+};
+
 Face.prototype.getVerticesCount = function()
 {
 	if (this.vertexArray === undefined)

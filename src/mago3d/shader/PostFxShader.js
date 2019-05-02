@@ -128,7 +128,7 @@ var Uniform1fDataPair = function(gl, uniformName)
  */
 Uniform1fDataPair.prototype.bindUniform = function() 
 {
-	this.gl.uniform1f(this.uniformLocation, this.floatValue);
+	this.gl.uniform1f(this.uniformLocation, this.floatValue[0]);
 };
 
 
@@ -274,12 +274,10 @@ PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
  */
 PostFxShader.prototype.disableVertexAttribArrayAll = function()
 {
-	// Provisional function.***
 	var gl = this.gl;
-	if (this.texCoord2_loc !== -1){ gl.disableVertexAttribArray(this.texCoord2_loc); }
-	if (this.position3_loc !== -1){ gl.disableVertexAttribArray(this.position3_loc); }
-	if (this.normal3_loc !== -1){ gl.disableVertexAttribArray(this.normal3_loc); }
-	if (this.color4_loc !== -1){ gl.disableVertexAttribArray(this.color4_loc); }
+	var vertexAttribsCount = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+	for (var i = 0; i<vertexAttribsCount; i++)
+	{ gl.disableVertexAttribArray(i); }
 };
 
 /**

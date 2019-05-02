@@ -229,6 +229,18 @@ Matrix4.prototype.get = function(col, row)
  * @param col 변수
  * @param row 변수
  */
+Matrix4.prototype.setTranslation = function(x, y, z) 
+{
+	this.set(3, 0, x);
+	this.set(3, 1, y);
+	this.set(3, 2, z);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param col 변수
+ * @param row 변수
+ */
 Matrix4.prototype.set = function(col, row, value) 
 {
 	this._floatArrays[this.getIndexOfArray(col, row)] = value;

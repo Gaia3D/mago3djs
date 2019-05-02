@@ -18,6 +18,15 @@ var HalfEdge = function()
 	this.face;
 };
 
+HalfEdge.prototype.deleteObjects = function()
+{
+	// Note: "HalfEdge" is NO-Owner of the contents, so, don't delete contents. Only set as "undefined".***
+	this.startVertex = undefined;
+	this.next = undefined;
+	this.twin = undefined;
+	this.face = undefined;
+};
+
 HalfEdge.prototype.setStartVertex = function(vertex)
 {
 	this.startVertex = vertex;

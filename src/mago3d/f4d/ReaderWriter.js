@@ -826,7 +826,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 					var texture_type_nameLegth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 					for (var j=0; j<texture_type_nameLegth; j++) 
 					{
-						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; // for example "diffuse".***
+						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; // for example "diffuse".***
 					}
 
 					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -868,7 +868,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 							lodBuildingData.textureFileName = "";
 							for (var j=0; j<nameLength; j++) 
 							{
-								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
 							}
 						}
 						
@@ -878,14 +878,14 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 							lodBuildingData.geometryFileName = "";
 							for (var j=0; j<nameLength; j++) 
 							{
-								lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+								lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
 							}
 							
 							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 							lodBuildingData.textureFileName = "";
 							for (var j=0; j<nameLength; j++) 
 							{
-								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)));bytesReaded += 1; 
+								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
 							}
 						}
 						neoBuilding.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
@@ -1392,7 +1392,7 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
  * @param imageArrayBuffer 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, texture, magoManager) 
+ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, texture, magoManager, flip_y_texCoords) 
 {
 	// example: allowedFileTypes = ["image/png", "image/jpeg", "image/gif"];
 	var blob = new Blob( [ imageArrayBuffer ], { type: "image/png" } );
@@ -1402,9 +1402,12 @@ ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, tex
 
 	imageFromArray.onload = function () 
 	{
+		if (flip_y_texCoords === undefined)
+		{ flip_y_texCoords = false; }
+		
 		if (texture.texId === undefined)
 		{ texture.texId = gl.createTexture(); }
-		handleTextureLoaded(gl, imageFromArray, texture.texId);
+		handleTextureLoaded(gl, imageFromArray, texture.texId, flip_y_texCoords);
 		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		imageArrayBuffer = null;
 	};
@@ -1424,7 +1427,7 @@ ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, tex
  * @param texture 변수
  * @param magoManager 변수
  */
-ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, magoManager) 
+ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, magoManager, flip_y_texCoords) 
 {
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
@@ -1433,7 +1436,11 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager);
+			if (flip_y_texCoords === undefined)
+			{ flip_y_texCoords = false; }
+		
+			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager, flip_y_texCoords);
+			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 	}).fail(function(status) 
 	{
@@ -1446,6 +1453,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	});
 		
 };
+
 
 ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture) 
 {
@@ -1464,3 +1472,4 @@ ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture)
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
+

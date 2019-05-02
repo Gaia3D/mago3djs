@@ -947,9 +947,6 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		}
 		else
 		{
-			if (this.buildingId === "KSJ_100")
-			{ var hola = 0; }
-			
 			// This building is octree divided type data.***
 			var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 			

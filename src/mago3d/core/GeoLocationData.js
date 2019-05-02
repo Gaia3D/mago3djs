@@ -43,6 +43,32 @@ var GeoLocationData = function(geoLocationDataName)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch, roll) 
+{
+	if (heading !== undefined)
+	{ this.heading = heading; }
+	
+	if (pitch !== undefined)
+	{ this.pitch = pitch; }
+
+	if (roll !== undefined)
+	{ this.roll = roll; }
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, latitude, altitude) 
+{
+	if (this.geographicCoord === undefined)
+	{ this.geographicCoord = new GeographicCoord(); }
+	
+	this.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  * @param geoLocData 변수
  */
@@ -364,9 +390,6 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 
 /**
  * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
- * @param absoluteCamera instance of Camera. 
- * @param resultCamera instance of Camera. This is the transformed camera.
- * @returns resultCamera
  */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
@@ -382,6 +405,36 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
 	resultRelativePosition = rotMatInv.transformPoint3D(pointAux, resultRelativePosition);
 	
 	return resultRelativePosition;
+};
+
+/**
+ * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ */
+GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolutePositionsArray, resultRelativePositionsArray) 
+{
+	if (absolutePositionsArray === undefined)
+	{ return resultRelativePositionsArray; }
+	
+	if (resultRelativePositionsArray === undefined)
+	{ resultRelativePositionsArray = []; }
+	
+	var absolutePoints3dCount = absolutePositionsArray.length;
+	for (var i=0; i<absolutePoints3dCount; i++)
+	{
+		var relPoint3d = this.getTransformedRelativePosition(absolutePositionsArray[i], undefined);
+		resultRelativePositionsArray.push(relPoint3d);
+	}
+	
+	return resultRelativePositionsArray;
+};
+
+/**
+ */
+GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader) 
+{
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.rotMatrix._floatArrays);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, [this.positionHIGH[0], this.positionHIGH[1], this.positionHIGH[2]]);
+	gl.uniform3fv(shader.buildingPosLOW_loc, [this.positionLOW[0], this.positionLOW[1], this.positionLOW[2]]);
 };
 
 //**********************************************************************************************************************************************************

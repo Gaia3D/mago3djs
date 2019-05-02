@@ -231,8 +231,6 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		var vtxProfileFirst = this.getVtxProfile(0);
 		var profile2d = vtxProfileFirst.getProjectedProfile2D(profile2d);
 		this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(this.convexFacesIndicesData);
-		
-		//return resultMesh; 
 	}
 	
 	var resultSurface;
@@ -304,6 +302,40 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 	
 	return resultSurface;
 };
+
+VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList)
+{
+	// 1rst, make the base vtxProfile.***
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
+	this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.***
+	// make the base-vtxProfile.***
+	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile2D(profile2d);
+	
+	// Now, transform the baseVtxProfile to coplanar into the 1rstPlane.***
+	var bLoop = false; // Is important to set as bLoop = false to obtain a perpendicular plane respect to the segment.***
+	var bisectionPlane1rst = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
+	var point3d1rst = pathPoints3dList.getPoint(0);
+	var tMatrix = bisectionPlane1rst.getRotationMatrix(undefined);
+	tMatrix.setTranslation();
+	
+	/*
+	if (extrusionVector === undefined)
+	{ extrusionVector = new Point3D(0, 0, 1); }
+	
+	var increDist = extrusionDist/extrudeSegmentsCount;
+	for (var i=0; i<extrudeSegmentsCount; i++)
+	{
+		// test with a 1 segment extrusion.***
+		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(0, 0, increDist*(i+1));
+	}
+	*/
+};
+
 
 
 

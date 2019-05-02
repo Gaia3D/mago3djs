@@ -28,8 +28,6 @@ var SmartTile = function(smartTileName)
 	this.nodeSeedsArray;
 	this.nodesArray; // nodes with geometry data only (lowest nodes).
 	
-	this.renderablesArray; // todo.***
-	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 };
 
@@ -324,10 +322,70 @@ SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeo
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+SmartTile.prototype.putNode = function(targetDepth, node, magoManager) 
+{
+	if (this.sphereExtent === undefined)
+	{ this.makeSphereExtent(magoManager); }
+	
+	// now, if the current depth < targetDepth, then descend.
+	if (this.depth < targetDepth)
+	{
+		// create 4 child smartTiles.
+		if (this.subTiles === undefined || this.subTiles.length === 0)
+		{
+			for (var i=0; i<4; i++)
+			{ this.newSubTile(this); }
+		}
+		
+		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
+		this.setSizesToSubTiles();
+
+		// intercept buildingSeeds for each subTiles.
+		var subSmartTile;
+		var finish = false;
+		var i=0;
+		while (!finish && i<4)
+		{
+			subSmartTile = this.subTiles[i];
+			if (subSmartTile.intersectsNode(node))
+			{
+				subSmartTile.putNode(targetDepth, node, magoManager);
+				finish = true;
+			}
+			
+			i++;
+		}
+	}
+	else if (this.depth === targetDepth)
+	{
+		if (this.nodeSeedsArray === undefined)
+		{ this.nodeSeedsArray = []; }
+		
+		if (this.nodesArray === undefined)
+		{ this.nodesArray = []; }
+		
+		node.data.smartTileOwner = this;
+		
+		this.nodeSeedsArray.push(node);
+		this.nodesArray.push(node);
+		
+		// todo: Must recalculate the smartTile sphereExtent.***
+		//this.makeSphereExtent(magoManager);
+		
+		return true;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
 SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager) 
 {
 	if (this.nodeSeedsArray === undefined || this.nodeSeedsArray.length === 0)
 	{ return; }
+
+	this.targetDepth = targetDepth;
 	
 	// if this has "nodeSeedsArray" then make sphereExtent.
 	this.makeSphereExtent(magoManager);
@@ -404,6 +462,37 @@ SmartTile.prototype.getLowestTileWithNodeInside = function(node)
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+SmartTile.prototype.intersectsNode = function(node) 
+{
+	var intersects = false;
+	var buildingSeed = node.data.buildingSeed;
+	var rootNode = node.getRoot();
+	
+	var longitude, latitude;
+	if (rootNode.data.bbox.geographicCoord === undefined)
+	{
+		// in this case take the data from buildingSeed.***
+		longitude = buildingSeed.geographicCoordOfBBox.longitude;
+		latitude = buildingSeed.geographicCoordOfBBox.latitude;
+	}
+	else 
+	{
+		longitude = rootNode.data.bbox.geographicCoord.longitude;
+		latitude = rootNode.data.bbox.geographicCoord.latitude;
+	}
+	
+	if (this.intersectPoint(longitude, latitude))
+	{
+		intersects = true;
+	}
+	
+	return intersects;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
 SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray) 
 {
 	// this function intersects the buildingSeeds with this tile.
@@ -414,24 +503,8 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
 		node = nodeSeedsArray[i];
-		buildingSeed = node.data.buildingSeed;
 		
-		rootNode = node.getRoot();
-		
-		var longitude, latitude;
-		if (rootNode.data.bbox.geographicCoord === undefined)
-		{
-			// in this case take the data from buildingSeed.***
-			longitude = buildingSeed.geographicCoordOfBBox.longitude;
-			latitude = buildingSeed.geographicCoordOfBBox.latitude;
-		}
-		else 
-		{
-			longitude = rootNode.data.bbox.geographicCoord.longitude;
-			latitude = rootNode.data.bbox.geographicCoord.latitude;
-		}
-		
-		if (this.intersectPoint(longitude, latitude))
+		if (this.intersectsNode(node))
 		{
 			nodeSeedsArray.splice(i, 1);
 			i--;
@@ -439,10 +512,14 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 			
 			if (this.nodeSeedsArray === undefined)
 			{ this.nodeSeedsArray = []; }
+		
+			// Set the smartTileOwner, for fast move of the node between smartTiles.***
+			node.data.smartTileOwner = this;
 			
 			this.nodeSeedsArray.push(node);
 			
 			// now, redefine the altitude limits of this tile.
+			var buildingSeed = node.data.buildingSeed;
 			var altitude = buildingSeed.geographicCoordOfBBox.altitude;
 			var bboxRadius = buildingSeed.bBox.getRadiusAprox();
 			if (altitude-bboxRadius < this.minGeographicCoord.altitude)
@@ -502,6 +579,49 @@ SmartTile.prototype.intersectPoint = function(longitude, latitude)
 	{ return false; }
 	
 	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.prototype.eraseNode = function(node) 
+{
+	//this.nodeSeedsArray;
+	//this.nodesArray;
+	
+	// Erase from this.nodeSeedsArray & this.nodesArray.***
+	if (this.nodeSeedsArray !== undefined)
+	{
+		var nodeSeedsCount = this.nodeSeedsArray.length;
+		var finished = false;
+		var i = 0;
+		while (!finished && i<nodeSeedsCount)
+		{
+			if (this.nodeSeedsArray[i] === node)
+			{
+				this.nodeSeedsArray.splice(i, 1);
+				finished = true;
+			}
+			i++;
+		}
+	}
+	
+	if (this.nodesArray !== undefined)
+	{
+		var nodesCount = this.nodesArray.length;
+		finished = false;
+		i = 0;
+		while (!finished && i<nodesCount)
+		{
+			if (this.nodesArray[i] === node)
+			{
+				this.nodesArray.splice(i, 1);
+				finished = true;
+			}
+			i++;
+		}
+	}
 };
 
 /**
@@ -881,6 +1001,21 @@ SmartTileManager.prototype.createMainTiles = function()
 	tile2.depth = 0; // mother tile.
 	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
+{
+	if (this.tilesArray !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			this.tilesArray[i].putNode(targetDepth, node, magoManager);
+		}
+	}
 };
 
 /**

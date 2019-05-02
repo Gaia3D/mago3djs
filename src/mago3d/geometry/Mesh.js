@@ -17,6 +17,46 @@ var Mesh = function()
 	this.vboKeysContainer;
 };
 
+Mesh.prototype.deleteObjects = function(vboMemManager)
+{
+	if (this.vertexList !== undefined)
+	{
+		this.vertexList.deleteObjects();
+	}
+	
+	if (this.surfacesArray !== undefined)
+	{
+		var surfacesCount = this.surfacesArray.length;
+		for (var i=0; i<surfacesCount; i++)
+		{
+			this.surfacesArray[i].deleteObjects();
+			this.surfacesArray[i] = undefined;
+		}
+		this.surfacesArray = undefined;
+	}
+	
+	if (this.hedgesList !== undefined)
+	{
+		this.hedgesList.deleteGlObjects();
+		this.hedgesList = undefined;
+	}
+	
+	if (this.vboKeysContainer !== undefined)
+	{
+		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this.vboKeysContainer = undefined;
+	}
+};
+
+Mesh.prototype.deleteVbos = function(vboMemManager)
+{
+	if (this.vboKeysContainer !== undefined)
+	{
+		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this.vboKeysContainer = undefined;
+	}
+};
+
 Mesh.prototype.newSurface = function()
 {
 	if (this.surfacesArray === undefined)

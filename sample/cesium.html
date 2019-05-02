@@ -19,6 +19,8 @@
 	<script type="text/javascript" src="../externlib/jqplot/plugins/jqplot.pieRenderer.js"></script>
 	<script type="text/javascript" src="../externlib/jqplot/plugins/jqplot.barRenderer.js"></script>
 	<script type="text/javascript" src="../externlib/jqplot/plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
 </head>
 
 <body>
@@ -949,6 +951,7 @@
 
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../src/mago3d/message/Message.js"></script>
+<script type="text/javascript" src="../src/mago3d/core/AnimationManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Atmosphere.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/AuxiliarSegment.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/BoundingBox.js"></script>
@@ -1045,6 +1048,8 @@
 <script type="text/javascript" src="../src/mago3d/geometry/Point2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Point3D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Point3DList.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Point4D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Polygon2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/PolyLine2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Profile2D.js"></script>
@@ -1055,12 +1060,14 @@
 <script type="text/javascript" src="../src/mago3d/geometry/Ring2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Rings2DList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Segment2D.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Segment3D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Star2D.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Surface.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Tessellator.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Triangle.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/TrianglesList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/TrianglesMatrix.js"></script>
+<script type="text/javascript" src="../src/mago3d/geometry/Tunnel.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/Vertex.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VertexList.js"></script>
 <script type="text/javascript" src="../src/mago3d/geometry/VertexMatrix.js"></script>
@@ -1096,9 +1103,9 @@
 <script type="text/javascript" src="../src/mago3d/topology/NetworkSpace.js"></script>
 <script>
 	var agent = navigator.userAgent.toLowerCase();
-	if(agent.indexOf('chrome') < 0) { 
-		alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
-	}
+	//if(agent.indexOf('chrome') < 0) { 
+		//alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");
+	//}
 
    	var managerFactory = null;
 	var menuObject = { homeMenu : false, myIssueMenu : false, searchMenu : false, apiMenu : false, insertIssueMenu : false, treeMenu : false, chartMenu : false, logMenu : false, attributeMenu : false, configMenu : false };
@@ -2191,6 +2198,12 @@ function TestButtonFunction()
 	// Do the test.***
 	magoManager.testButtonOnClick();
 };
+if (!Math.cbrt) {
+	Math.cbrt = function(x) {
+		var y = Math.pow(Math.abs(x), 1/3);
+		return x < 0 ? -y : y;
+	};
+}
 </script>
 </body>
 </html>

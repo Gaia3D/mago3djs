@@ -21,9 +21,10 @@ CODE.fileLoadState = {
 };
 
 CODE.moveMode = {
-	"ALL"    : "0",
-	"OBJECT" : "1",
-	"NONE"   : "2"
+	"ALL"              : "0",
+	"OBJECT"           : "1",
+	"GEOGRAPHICPOINTS" : "2",
+	"NONE"             : "3"
 };
 
 CODE.magoMode = {
@@ -34,8 +35,10 @@ CODE.magoMode = {
 CODE.modelerMode = {
 	"INACTIVE"                 : 0,
 	"DRAWING_POLYLINE"         : 1,
-	"DRAWING_GEOGRAPHICPOINTS" : 2,
-	"DRAWING_EXCAVATIONPOINTS" : 3,
+	"DRAWING_PLANEGRID"        : 2,
+	"DRAWING_GEOGRAPHICPOINTS" : 3,
+	"DRAWING_EXCAVATIONPOINTS" : 4,
+	"DRAWING_TUNNELPOINTS"     : 5
 };
 
 CODE.modelerDrawingState = {

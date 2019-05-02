@@ -3,7 +3,7 @@
 * 어떤 일을 하고 있습니까?
 * @class Point2DList
 */
-var Point2DList = function(x, y) 
+var Point2DList = function() 
 {
 	if (!(this instanceof Point2DList)) 
 	{
@@ -63,6 +63,7 @@ Point2DList.prototype.getPointsCount = function()
 
 Point2DList.prototype.getPrevIdx = function(idx)
 {
+	// Note: This function is used when this is a point2dRing.***
 	var pointsCount = this.pointsArray.length;
 	var prevIdx;
 	
@@ -76,6 +77,7 @@ Point2DList.prototype.getPrevIdx = function(idx)
 
 Point2DList.prototype.getNextIdx = function(idx)
 {
+	// Note: This function is used when this is a point2dRing.***
 	var pointsCount = this.pointsArray.length;
 	var nextIdx;
 	
