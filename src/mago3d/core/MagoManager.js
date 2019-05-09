@@ -5970,11 +5970,12 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	if (node === undefined)
 	{ return; }
 
-	if(durationTimeInSeconds !== undefined)
+	if (durationTimeInSeconds !== undefined)
 	{
 		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
 	}
-	else{
+	else
+	{
 		node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
 	}
 	
@@ -6824,6 +6825,70 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeMagoMode") 
 	{
 		var hola = 0;
+	}
+	else if (apiName === "getCurrentPosition")
+	{
+		var unit = api.getUnit();
+		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		{
+			var position = this.scene.camera.position;
+		
+			switch (unit)
+			{
+			case CODE.units.METRE : return position;
+			case CODE.units.RADIAN : return Cesium.Cartographic.fromCartesian(position);
+			case CODE.units.DEGREE : {
+				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+				return {
+					lat : Cesium.Math.toDegrees(cartographicPosition.latitude),
+					lon : Cesium.Math.toDegrees(cartographicPosition.longitude),
+					alt : cartographicPosition.height
+				};
+			}
+			}
+		}
+	}
+	else if (apiName === "getCurrentOrientaion")
+	{
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.camera;
+			if (!camera)
+			{
+				throw new Error('Camera is broken.');
+			}
+			return {
+				heading : Cesium.Math.toDegrees(camera.heading),
+				pitch   : Cesium.Math.toDegrees(camera.pitch),
+				roll    : Cesium.Math.toDegrees(camera.roll)
+			};
+		}
+	}
+	else if (apiName === "changeCameraOrientation")
+	{	
+		var heading = defaultValue(api.getHeading(), Cesium.Math.toDegrees(camera.heading));
+		var pitch = defaultValue(api.getPitch(), Cesium.Math.toDegrees(camera.pitch));
+		var roll = defaultValue(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
+		var duration = defaultValue(api.getDuration(), 0);
+
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.camera;
+			if (!camera)
+			{
+				throw new Error('Camera is broken.');
+			}
+
+			camera.flyTo({
+				destination : camera.position,
+				orientation : {
+					heading : Cesium.Math.toRadians(heading),
+					pitch   : Cesium.Math.toRadians(pitch),
+					roll    : Cesium.Math.toRadians(roll)
+				},
+				duration: parseInt(duration)
+			});
+		}
 	}
 };
 

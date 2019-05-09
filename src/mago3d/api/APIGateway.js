@@ -63,6 +63,7 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
 
 /**
  * 속성값에 의한 가시화 유무설정
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} isShow true = 표시, false = 비표시
  */
@@ -269,6 +270,7 @@ function changeMagoModeAPI(managerFactoryInstance, flag)
 
 /**
  * 현재 위치 근처 issue list. false인 경우 clear
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} flag true = 활성화, false = 비활성화
  */
@@ -284,6 +286,7 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
 /**
  * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
  * issue 등록 geo 정보 관련 상태 변경
+ * 확인 필요
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} insertIssueState 이슈 등록 좌표 상태
  */
@@ -357,7 +360,7 @@ function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
 }
 
 /**
- * 화면에 있는 모든 데이터를 삭제, 비표시
+ * 모든 f4d 데이터를 삭제, 비표시
  * @param {ManagerFactory} managerFactoryInstance
  */
 function clearAllDataAPI(managerFactoryInstance)
@@ -468,6 +471,7 @@ function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duratio
 
 /**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} eventType 어떤 마우스 동작을 원하는지를 구분
  */
@@ -601,4 +605,53 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
 	api.setResultPoint(resultPoint);
 
 	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * get current camera position
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {number} unit position unit. if not define, default value is CODE.units.DEGREE. 0 : CODE.units.METRE, 1 : CODE.units.DEGREE, 2 : CODE.units.RADIAN
+ * @return {Object|Cartesian3|Cartographic}
+ */
+function getCurrentPositionAPI(managerFactoryInstance, unit)
+{
+	var api = new API("getCurrentPosition");
+	
+	api.setReturnable(true);
+	api.setUnit(unit);
+	
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * get current camera orientaion
+ * @param {ManagerFactory} managerFactoryInstance
+ * @return {Object}
+ */
+function getCurrentOrientaionAPI(managerFactoryInstance)
+{
+	var api = new API("getCurrentOrientaion");
+	
+	api.setReturnable(true);
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * change camera orientation
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string|undefined|null} heading 좌, 우. needs degree. default value is current camera's heading value.
+ * @param {string|undefined|null} pitch 위, 아래. needs degree. default value is current camera's pitch value.
+ * @param {string|undefined|null} roll 좌, 우 기울기. needs degree. default value is current camera's roll value.
+ * @param {string|undefined|null} duration 이동하는 시간. default value is 0.
+ */
+function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll, duration)
+{
+	var api = new API("changeCameraOrientation");
+
+	api.setHeading(heading);
+	api.setPitch(pitch);
+	api.setRoll(roll);
+	api.setDuration(duration);
+
+	managerFactoryInstance.callAPI(api);
 }

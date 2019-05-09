@@ -109,6 +109,8 @@ function API(apiName)
 	
 	// General magoMode.***
 	this.magoMode = CODE.magoMode.NORMAL;
+
+	this.unit = CODE.units.DEGREE;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -521,4 +523,20 @@ API.prototype.getResultPoint = function()
 API.prototype.setResultPoint = function(resultPoint)
 {
 	this.resultPoint = resultPoint;
+};
+
+API.prototype.getUnit = function()
+{
+	return this.unit;
+};
+API.prototype.setUnit = function(unit)
+{
+	if (unit !== undefined)
+	{
+		if (isNaN(unit) || unit > CODE.units.RADIAN)
+		{
+			throw new Error('unit parameter needs CODE.units');
+		}
+		this.unit = unit;
+	}
 };
