@@ -16,19 +16,15 @@ var HierarchyManager = function()
 	// lowest nodes array. initial array to create tiles global distribution.
 	this.nodesArray = [];
 	this.projectsMap = {};
+	
+	this.staticModelsManager;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
-	//for (var value of this.projectsMap.values()) 
-	//{
-	//	value.clear();
-	//}
 	this.projectsMap = {};
 	
 	var nodesCount = this.nodesArray.length;
@@ -45,8 +41,17 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ */
+HierarchyManager.prototype.getStaticModelsManager = function() 
+{
+	if(this.staticModelsManager === undefined)
+		this.staticModelsManager = new StaticModelsManager();
+	
+	return this.staticModelsManager;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
@@ -77,8 +82,6 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey) 
 {
@@ -94,8 +97,6 @@ HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray) 
 {
@@ -119,8 +120,6 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.existProject = function(projectId) 
 {
@@ -129,8 +128,6 @@ HierarchyManager.prototype.existProject = function(projectId)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.getNodesMap = function(projectId, attributes) 
 {
@@ -154,8 +151,6 @@ HierarchyManager.prototype.getNodesMap = function(projectId, attributes)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
  */
 HierarchyManager.prototype.newNode = function(id, projectId, attributes) 
 {

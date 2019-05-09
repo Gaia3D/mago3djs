@@ -131,6 +131,17 @@ Vertex.prototype.copyFrom = function(vertex)
  * @param y 변수
  * @param z 변수
  */
+Vertex.prototype.getPosition = function() 
+{
+	return this.point3d;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
 Vertex.prototype.setPosition = function(x, y, z) 
 {
 	if (this.point3d === undefined)
@@ -211,6 +222,30 @@ Vertex.prototype.getOutingHEdges = function(resultHedgesArray)
 	// todo:
 	
 	return resultHedgesArray;
+};
+
+Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resultVertex)
+{
+	// Note: projectionDirection must be unitary.***
+	if(vertex === undefined)
+		return resultVertex;
+	
+	var position = vertex.getPosition();
+	var line = new Line(position, projectionDirection);
+
+	var intersectionPoint;
+	intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	
+	if(resultVertex === undefined)
+		resultVertex = new Vertex();
+	
+	// 1rst, copy from the original vertex.***
+	resultVertex.copyFrom(vertex);
+	
+	// Now, change only the position.***
+	resultVertex.setPosition(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+	
+	return resultVertex;
 };
 
 

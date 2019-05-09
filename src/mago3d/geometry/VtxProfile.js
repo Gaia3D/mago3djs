@@ -14,6 +14,21 @@ var VtxProfile = function()
 	this.innerVtxRingsList;
 };
 
+VtxProfile.prototype.deleteObjects = function()
+{
+	if(this.outerVtxRing !== undefined)
+	{
+		this.outerVtxRing.deleteObjects();
+		this.outerVtxRing = undefined;
+	}
+	
+	if(this.innerVtxRingsList !== undefined)
+	{
+		this.innerVtxRingsList.deleteObjects();
+		this.innerVtxRingsList = undefined;
+	}
+};
+
 VtxProfile.prototype.getInnerVtxRingsCount = function()
 {
 	if (this.innerVtxRingsList === undefined || this.innerVtxRingsList.getRingsCount === 0)
@@ -89,8 +104,9 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	{ return resultProfile2d; }
 	
 	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.***
+	// The normal is used co calculate the bestFace to project.***
 	var normal = this.outerVtxRing.calculatePlaneNormal(undefined);
-	
+
 	if (normal === undefined)
 	{ return resultProfile2d; }
 	
@@ -208,6 +224,26 @@ VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
 	{ this.innerVtxRingsList.getAllVertices(resultVerticesArray); }
 	
 	return resultVerticesArray;
+};
+
+VtxProfile.getProjectedOntoPlane = function(vtxProfile, plane, projectionDirection, resultvtxProfile)
+{
+	if (vtxProfile.outerVtxRing === undefined)
+	{ return resultvtxProfile; }
+	
+	if (resultvtxProfile === undefined)
+	{ resultvtxProfile = new VtxProfile(); }
+	
+	// OuterVtxRing.***
+	resultvtxProfile.outerVtxRing = VtxRing.getProjectedOntoPlane(vtxProfile.outerVtxRing, plane, projectionDirection, resultvtxProfile.outerVtxRing);
+				
+	// InnerVtxRings.***
+	if (vtxProfile.innerVtxRingsList !== undefined)
+	{
+		resultvtxProfile.innerVtxRingsList = VtxRingsList.getProjectedOntoPlane(vtxProfile.innerVtxRingsList, plane, projectionDirection, resultvtxProfile.innerVtxRingsList);
+	}
+	
+	return resultvtxProfile;
 };
 
 

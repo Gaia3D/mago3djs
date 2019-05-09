@@ -4,7 +4,7 @@
  * 선
  * @class Line
  */
-var Line = function() 
+var Line = function(point, direction) 
 {
 	if (!(this instanceof Line)) 
 	{
@@ -12,8 +12,15 @@ var Line = function()
 	}
 	
 	// (x,y,z) = (x0,y0,z0) + lambda * (u, v, w);
-	this.point = new Point3D();
-	this.direction = new Point3D();
+	if(point !== undefined)
+		this.point = point;
+	else
+		this.point = new Point3D();
+	
+	if(direction !== undefined)
+		this.direction = direction;
+	else
+		this.direction = new Point3D();
 };
 
 /**
@@ -27,9 +34,9 @@ var Line = function()
  */
 Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz) 
 {
+	// Note: dx, dy, dz must be unitary.***
 	this.point.set(px, py, pz);
 	this.direction.set(dx, dy, dz);
-	this.direction.unitary();
 };
 
 /**

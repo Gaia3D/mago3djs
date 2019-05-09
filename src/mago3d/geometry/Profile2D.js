@@ -455,7 +455,6 @@ Profile2D.prototype.checkNormals = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns vertexList
  */
 Profile2D.prototype.TEST__setFigure_1 = function() 
 {
@@ -491,7 +490,47 @@ Profile2D.prototype.TEST__setFigure_1 = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ */
+Profile2D.prototype.TEST__setFigure_2holes = function() 
+{
+	// complicated polygon with multiple holes.***
+	var polyLine;
+	var arc;
+	var circle;
+	var rect;
+	var point3d;
+	var star;
+	
+	// Outer ring.**************************************
+	var outerRing = this.newOuterRing();
+	polyLine = outerRing.newElement("POLYLINE");
+	point3d = polyLine.newPoint2d(7, 7); // 0
+	point3d = polyLine.newPoint2d(0, 7); // 1
+	point3d = polyLine.newPoint2d(0, 0); // 2
+	point3d = polyLine.newPoint2d(7, 0); // 3
+	
+	arc = outerRing.newElement("ARC");
+	arc.setCenterPosition(7, 3.5);
+	arc.setRadius(3.5);
+	arc.setStartAngleDegree(-90.0);
+	arc.setSweepAngleDegree(180.0);
+	arc.numPointsFor360Deg = 24;
+	
+	// hole 1.***
+	var innerRing = this.newInnerRing();
+	rect = innerRing.newElement("RECTANGLE");
+	rect.setCenterPosition(3, 3);
+	rect.setDimensions(2, 2);
+	
+	// hole 2.***
+	innerRing = this.newInnerRing();
+	circle = innerRing.newElement("CIRCLE");
+	circle.setCenterPosition(7, 3);
+	circle.setRadius(1);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  */
 Profile2D.prototype.TEST__setFigureHole_2 = function() 
 {

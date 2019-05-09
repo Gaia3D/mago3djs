@@ -20,6 +20,7 @@ var MagoManager = function()
 	this.postFxShadersManager = new PostFxShadersManager();
 	this.readerWriter = new ReaderWriter();
 	this.magoPolicy = new Policy();
+	this.animationManager;
 	
 	var serverPolicy = MagoConfig.getPolicy();
 	if (serverPolicy !== undefined)
@@ -788,7 +789,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	var projectFolderName;
 	
 	//var geometryDataPath = this.readerWriter.getCurrentDataPath();
-	var geometryDataPath = this.readerWriter.geometryDataPath;
+	var geometryDataPath = this.readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
@@ -796,8 +797,89 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
 		node = currentVisibleNodes[i];
-		projectFolderName = node.data.projectFolderName;
-		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
+		
+		// Check if the node is a referenceNode.***
+		var attributes = node.data.attributes;
+		if(attributes.isReference !== undefined && attributes.isReference === true)
+		{
+			// check if has neoBuilding.***
+			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
+			if(neoBuilding === undefined)
+			{
+				/*
+				attributes = {
+				"isPhysical": true,
+				"nodeType": "TEST",
+				"isReference": true,
+				"projectFolderName": "staticModels",
+				"buildingFolderName": "F4D_AutonomousBus",
+				"heading": 0,
+				"height": 41,
+				"latitude": 37.58197511583916,
+				"longitude": 126.60868083665515,
+				"pitch": 0,
+				"roll": 0};
+				*/
+				var neoBuildingFolderName = attributes.buildingFolderName;
+				projectFolderName = attributes.projectFolderName;
+				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
+				
+				// demand to staticModelsManager the neoBuilding.***
+				var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
+				neoBuilding = staticModelsManager.getStaticModel(staticModelDataPath);
+				
+				// make a buildingSeed.***
+				var buildingSeed = new BuildingSeed();
+				buildingSeed.fisrtName = neoBuildingFolderName;
+				buildingSeed.name = neoBuildingFolderName;
+				buildingSeed.buildingId = neoBuildingFolderName;
+				buildingSeed.buildingFileName = neoBuildingFolderName;
+				buildingSeed.geographicCoord = new GeographicCoord(attributes.longitude, attributes.latitude, attributes.height); // class : GeographicCoord.
+				buildingSeed.rotationsDegree = new Point3D(attributes.heading, attributes.pitch, attributes.roll); // class : Point3D. (heading, pitch, roll).
+				buildingSeed.bBox = new BoundingBox();           // class : BoundingBox.
+				buildingSeed.bBox.init();
+				buildingSeed.bBox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+				buildingSeed.geographicCoordOfBBox = new GeographicCoord(attributes.longitude, attributes.latitude, attributes.height);  // class : GeographicCoord.
+				buildingSeed.smartTileOwner;
+				
+				// Now, set neoBuildings parameters.***
+				neoBuilding.buildingFileName = neoBuildingFolderName;
+				neoBuilding.nodeOwner = node;
+				node.data.neoBuilding = neoBuilding;
+				node.data.buildingSeed = buildingSeed;
+				var nodeBbox = new BoundingBox();
+				node.data.bbox = nodeBbox;
+				node.data.projectFolderName = projectFolderName;
+				
+				if (neoBuilding.metaData === undefined) 
+				{ neoBuilding.metaData = new MetaData(); }
+
+				if (neoBuilding.metaData.geographicCoord === undefined)
+				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+				if (neoBuilding.metaData.bbox === undefined) 
+				{ neoBuilding.metaData.bbox = new BoundingBox(); }
+				
+				neoBuilding.name = "test_" + neoBuildingFolderName;
+				neoBuilding.buildingId = neoBuildingFolderName;
+			
+				neoBuilding.buildingType = "basicBuilding";
+				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+				if (neoBuilding.bbox === undefined)
+				{ neoBuilding.bbox = new BoundingBox(); }
+				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+				neoBuilding.projectFolderName = node.data.projectFolderName;
+			}
+		}
+		else{
+			projectFolderName = node.data.projectFolderName;
+			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
+		}
 		
 		// Check if this node has topologyData.***
 		/*
@@ -832,20 +914,19 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	
 		}
 		*/
-		
-		
+
 		// check if this building is ready to render.***
-		//if (!neoBuilding.allFilesLoaded) // no used yet.
+		// 1) MetaData
+		var metaData = neoBuilding.metaData;
+		if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 		{
-			// 1) MetaData
-			var metaData = neoBuilding.metaData;
-			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
-			{
-				if (this.fileRequestControler.isFullHeaders())	{ return; }
-				var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
-				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
-			}
+			projectFolderName = neoBuilding.projectFolderName;
+			if (this.fileRequestControler.isFullHeaders())	{ return; }
+			var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+			
+			this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 		}
+		
 	}
 	currentVisibleNodes.length = 0;
 };
@@ -1314,8 +1395,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.dateSC = new Date();
 	this.currTime = this.dateSC.getTime();
 	
-	
-	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 
@@ -1360,6 +1439,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
+		
+		if(this.animationManager !== undefined)
+			this.animationManager.checkAnimation(this);
 	}
 
 	var cameraPosition = this.sceneState.camera.position;
@@ -1452,6 +1534,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			{ break; }
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
+			
+			if(node.isReferenceNode())
+				continue;
+			
 			var neoBuilding = node.data.neoBuilding;
 			
 			if (neoBuilding === undefined)
@@ -1695,7 +1781,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
@@ -1767,7 +1853,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderMagoGeometries(ssao_idx); //TEST
+	//this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -1814,6 +1900,11 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	for (var i=0; i<lowLodNodesCount; i++) 
 	{
 		node = lowLodNodesArray[i];
+		
+		// debug.***
+		if(node.data.attributes.isReference !== undefined)
+			var hola = 0;
+		
 		neoBuilding = node.data.neoBuilding;
 		
 		neoBuilding.prepareSkin(this);
@@ -2003,40 +2094,9 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
  */
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes) 
 {
-	var canvas = document.getElementById("objectLabel");
-	if (canvas === undefined)
-	{ return; }
-
-	var magoDiv = document.getElementById('magoContainer');
-	var offsetLeft = magoDiv.offsetLeft;
-	var offsetTop = magoDiv.offsetTop;
-	var offsetWidth = magoDiv.offsetWidth;
-	var offsetHeight = magoDiv.offsetHeight;
-	
-	canvas.style.opacity = 1.0;
-	canvas.width = this.sceneState.drawingBufferWidth;
-	canvas.height = this.sceneState.drawingBufferHeight;
-	var canvasStyleLeft = offsetLeft.toString()+"px";
-	var canvasStyleTop = offsetTop.toString()+"px";
-	canvas.style.left = canvasStyleLeft;
-	canvas.style.top = canvasStyleTop;
-	canvas.style.position = "absolute";
-	
+	var canvas = this.getObjectLabel();
 	var ctx = canvas.getContext("2d");
-	//ctx.strokeStyle = 'SlateGrey';
-	//ctx.strokeStyle = 'MidnightBlue';
-	ctx.strokeStyle = 'DarkSlateGray'; 
-	//ctx.fillStyle= "white";
-	ctx.fillStyle= "PapayaWhip";
-	ctx.lineWidth = 4;
-	ctx.font = "20px Arial";
-	ctx.textAlign = 'center';
-	//ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.save();
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-	var lineHeight = ctx.measureText("M").width * 1.1;
 
 	// lod2.
 	var gl = this.sceneState.gl;
@@ -2676,13 +2736,19 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	/*
+	
 	if (key === 80) // 80 = 'p'.***
 	{
+		if(this.animationManager === undefined)
+			this.animationManager = new AnimationManager();
+
 		// Do a test.***
 		var projectId = "3ds.json";
 		var dataKey = "GyeomjaeJeongSeon_del";
 		
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		this.animationManager.putNode(node);
+
 		// Jeju island.***
 		var latitude = 33.519674269678504;
 		var longitude = 126.53339849002569;
@@ -2691,11 +2757,12 @@ MagoManager.prototype.keyDown = function(key)
 		latitude = 37.58639062251842;
 		longitude = 126.61172849731089;
 		
-		var elevation = 30.0;
+		var elevation = 2.0;
 		var heading;
 		var pitch;
 		var roll;
 		var durationTimeInSeconds = 30;
+		//durationTimeInSeconds = undefined;
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
@@ -2728,7 +2795,7 @@ MagoManager.prototype.keyDown = function(key)
 			this.modeler.mode = CODE.modelerMode.INACTIVE;
 		}
 	}
-	*/
+	
 	
 };
 
@@ -2762,7 +2829,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -2780,7 +2848,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			strWorldPoint = mouseAction.strWorldPoint;
 		}
 		geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
-			
+		geoCoord.absolutePoint = strWorldPoint;
+		
 		var modelerMode = this.modeler.mode;
 		if (this.modeler.mode === CODE.modelerMode.DRAWING_PLANEGRID && this.modeler.planeGrid === undefined)
 		{
@@ -2798,7 +2867,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
-		if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2809,7 +2878,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// Excavation.***
-		if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2822,7 +2891,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// Tunnel.***
-		if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -2834,7 +2903,52 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			geoCoordsList.makeLines(this);
 		}
 		
-		var hola = 0;
+		// StaticGeometries.***
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			
+			// test to insert an staticGeometry AutonomousBus.***
+			var staticGeometryFilePath = "";
+			
+			// create a "node" & insert into smartTile.***
+			var projectId = "AutonomousVehicle";
+			var attributes = {
+				"isPhysical": true,
+				"nodeType": "TEST",
+				"isReference": true,
+				"projectFolderName": "staticModels",
+				"buildingFolderName": "F4D_AutonomousBus",
+				"heading": 0,
+				"height": 41,
+				"latitude": 37.58197511583916,
+				"longitude": 126.60868083665515,
+				"pitch": 0,
+				"roll": 0};
+				
+			var nodesMap = this.hierarchyManager.getNodesMap(projectId, attributes);
+			var existentNodesCount = Object.keys(nodesMap).length;
+			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
+			
+			var node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
+			
+			// Now, create the geoLocdataManager of node.***
+			node.data.attributes = attributes;
+			node.data.geographicCoord = geoCoord;
+			node.data.rotationsDegree = new Point3D(0,0,0);
+			node.data.geoLocDataManager = geoLocDataManager;
+			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
+			node.data.bbox.init();
+			node.data.bbox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+			
+			
+			// Now, insert node into smartTile.***
+			var targetDepth = this.smartTileManager.targetDepth;
+			this.smartTileManager.putNode(targetDepth, node, this);
+		}
+		
 	}
 	
 };
@@ -3331,7 +3445,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 						}
 						else if (owner2.constructor.name === "Tunnel")
 						{
-							//owner2.remakeExtrudeObject(this);
+							owner2.remakeMesh(this);
 						}
 					}
 				}
@@ -3461,13 +3575,15 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
  */
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, node, visibleObjControlerOctrees, lod) 
 {
-	var neoBuilding = node.data.neoBuilding;
+	var data = node.data;
+	var neoBuilding = data.neoBuilding;
+	var currentLod = data.currentLod;
 	
 	// chaek if the neoBuilding has availableLod_0.***
 	if (neoBuilding === undefined || neoBuilding.octree === undefined) { return false; }
 	
 	// Check if for the current lod, the building is modelRefType.***
-	var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
+	var lodBuildingData = neoBuilding.getLodBuildingData(data.currentLod);
 	if (lodBuildingData === undefined)
 	{ return false; }
 	
@@ -3511,9 +3627,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	}
 	else 
 	{
-		if (neoBuilding.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
-		{ var hola = 0; }
-	
 		// Must calculate the frustum planes.
 		this.myCameraRelative.calculateFrustumsPlanes();
 		
@@ -3526,7 +3639,7 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (!find) 
 	{
 		// If the building is far to camera, then delete it.
-		if (neoBuilding.distToCam > 100) // default: 60.***
+		if (data.distToCam > 100) // default: 60.***
 		{ this.processQueue.putNodeToDeleteModelReferences(node, 1); }
 		
 		// TODO: must check if some part of the building is in parseQueue.***
@@ -4633,45 +4746,60 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 /**
  * Draw building names on scene.
  */
+MagoManager.prototype.getObjectLabel = function() 
+{
+	if(this.canvasObjectLabel === undefined)
+	{
+		this.canvasObjectLabel = document.getElementById("objectLabel");
+		if (this.canvasObjectLabel === undefined)
+		{ return; }
+
+		var magoDiv = document.getElementById('magoContainer');
+		var offsetLeft = magoDiv.offsetLeft;
+		var offsetTop = magoDiv.offsetTop;
+		var offsetWidth = magoDiv.offsetWidth;
+		var offsetHeight = magoDiv.offsetHeight;
+		
+		this.canvasObjectLabel.style.opacity = 1.0;
+		this.canvasObjectLabel.width = this.sceneState.drawingBufferWidth;
+		this.canvasObjectLabel.height = this.sceneState.drawingBufferHeight;
+		var canvasStyleLeft = offsetLeft.toString()+"px";
+		var canvasStyleTop = offsetTop.toString()+"px";
+		this.canvasObjectLabel.style.left = canvasStyleLeft;
+		this.canvasObjectLabel.style.top = canvasStyleTop;
+		this.canvasObjectLabel.style.position = "absolute";
+		
+		this.canvasObjectLabel.style.opacity = 1.0;
+		this.canvasObjectLabel.width = this.sceneState.drawingBufferWidth;
+		this.canvasObjectLabel.height = this.sceneState.drawingBufferHeight;
+		var ctx = this.canvasObjectLabel.getContext("2d");
+		//ctx.strokeStyle = 'SlateGrey';
+		//ctx.strokeStyle = 'MidnightBlue';
+		ctx.strokeStyle = 'DarkSlateGray'; 
+		//ctx.fillStyle= "white";
+		ctx.fillStyle= "PapayaWhip";
+		ctx.lineWidth = 4;
+		ctx.font = "20px Arial";
+		ctx.textAlign = 'center';
+		//ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		ctx.save();
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+		var lineHeight = ctx.measureText("M").width * 1.1;
+	}
+	
+	return this.canvasObjectLabel;
+};
+
+/**
+ * Draw building names on scene.
+ */
 MagoManager.prototype.drawCCTVNames = function(cctvArray) 
 {
-	var canvas = document.getElementById("objectLabel");
-	if (canvas === undefined)
-	{ return; }
-
-	var magoDiv = document.getElementById('magoContainer');
-	var offsetLeft = magoDiv.offsetLeft;
-	var offsetTop = magoDiv.offsetTop;
-	var offsetWidth = magoDiv.offsetWidth;
-	var offsetHeight = magoDiv.offsetHeight;
-	
-	canvas.style.opacity = 1.0;
-	canvas.width = this.sceneState.drawingBufferWidth;
-	canvas.height = this.sceneState.drawingBufferHeight;
-	var canvasStyleLeft = offsetLeft.toString()+"px";
-	var canvasStyleTop = offsetTop.toString()+"px";
-	canvas.style.left = canvasStyleLeft;
-	canvas.style.top = canvasStyleTop;
-	canvas.style.position = "absolute";
-	
-	canvas.style.opacity = 1.0;
-	canvas.width = this.sceneState.drawingBufferWidth;
-	canvas.height = this.sceneState.drawingBufferHeight;
+	var canvas = this.getObjectLabel();
 	var ctx = canvas.getContext("2d");
-	//ctx.strokeStyle = 'SlateGrey';
-	//ctx.strokeStyle = 'MidnightBlue';
-	ctx.strokeStyle = 'DarkSlateGray'; 
-	//ctx.fillStyle= "white";
-	ctx.fillStyle= "PapayaWhip";
-	ctx.lineWidth = 4;
-	ctx.font = "20px Arial";
-	ctx.textAlign = 'center';
-	//ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	ctx.save();
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-	var lineHeight = ctx.measureText("M").width * 1.1;
 
 	// lod2.
 	var gl = this.sceneState.gl;
@@ -5384,25 +5512,36 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				neoBuilding = node.data.neoBuilding;
+				if(neoBuilding === undefined)
+				{
+					// This node is a reference node.***
+					visibleNodes.currentVisiblesAux.push(node);
+					continue;
+				}
+				
 				if (this.boundingSphere_Aux === undefined)
 				{ this.boundingSphere_Aux = new Sphere(); }
 			
 				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
-
-				neoBuilding.distToCam = distToCamera;
 				
-				if (neoBuilding.distToCam < lod0Dist)
-				{ neoBuilding.currentLod = 0; }
-				else if (neoBuilding.distToCam < lod1Dist)
-				{ neoBuilding.currentLod = 1; }
-				else if (neoBuilding.distToCam < lod2Dist)
-				{ neoBuilding.currentLod = 2; }
-				else if (neoBuilding.distToCam < lod3Dist)
-				{ neoBuilding.currentLod = 3; }
-				else if (neoBuilding.distToCam < lod4Dist)
-				{ neoBuilding.currentLod = 4; }
-				else if (neoBuilding.distToCam < lod5Dist)
-				{ neoBuilding.currentLod = 5; }
+				var data = node.data;
+				data.currentLod;
+				data.distToCam = distToCamera;
+
+				//neoBuilding.distToCam = distToCamera;
+				
+				if (data.distToCam < lod0Dist)
+				{ data.currentLod = 0; }
+				else if (data.distToCam < lod1Dist)
+				{ data.currentLod = 1; }
+				else if (data.distToCam < lod2Dist)
+				{ data.currentLod = 2; }
+				else if (data.distToCam < lod3Dist)
+				{ data.currentLod = 3; }
+				else if (data.distToCam < lod4Dist)
+				{ data.currentLod = 4; }
+				else if (data.distToCam < lod5Dist)
+				{ data.currentLod = 5; }
 				
 				var frustumFar = this.magoPolicy.getFrustumFarDistance();
 				if (distToCamera > frustumFar)
@@ -5531,8 +5670,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 
 
 /**
- * dataKey 이용해서 data 검색
- * @param dataKey
  */
 MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowestTile) 
 {
@@ -5552,6 +5689,7 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		neoBuilding = new NeoBuilding();
+		
 		neoBuilding.nodeOwner = node;
 		node.data.neoBuilding = neoBuilding;
 		nodeBbox = new BoundingBox();
@@ -5588,16 +5726,15 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 		neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 		neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
 		neoBuilding.projectFolderName = node.data.projectFolderName;
+		
 	}
 };
 
 /**
- * dataKey 이용해서 data 검색
- * @param dataKey
  */
 MagoManager.prototype.calculate_geoLocDataOfNode = function(node) 
 {
-	// this function creates the geoLocationData of "node".***
+	// This function creates the geoLocationData of "node".***
 	var nodeRoot = node.getRoot();
 
 	if (nodeRoot.data.geoLocDataManager === undefined)
@@ -5651,10 +5788,6 @@ MagoManager.prototype.calculate_geoLocDataOfNode = function(node)
 };
 
 /**
- * dataKey 이용해서 data 검색
- * @param apiName api 이름
- * @param projectId project id
- * @param dataKey
  */
 MagoManager.prototype.flyToTopology = function(worldPoint3d, duration) 
 {
@@ -5952,14 +6085,10 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
  */
 MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 {
-	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-	if (nodesMap)
-	{
-		var node = nodesMap[dataKey];
-		if (node === undefined)
-		{ return; }
-		this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
-	}
+	var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+	if (node === undefined)
+	{ return; }
+	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 };
 
 /**
@@ -6146,7 +6275,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
 		}
 
-		bbox = node.data.bbox;
+		//bbox = node.data.bbox;
 
 		if (children !== undefined)
 		{
@@ -6327,16 +6456,9 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
-	var smartTilesCount = this.smartTileManager.tilesArray.length; // In this point, "smartTilesCount" = 2 always.
-	for (var a=0; a<smartTilesCount; a++)
-	{
-		var smartTile = this.smartTileManager.tilesArray[a];
-		if (smartTile.nodeSeedsArray === undefined)
-		{ smartTile.nodeSeedsArray = []; }
-		
-		smartTile.nodeSeedsArray = physicalNodesArray;
-		smartTile.makeTreeByDepth(17, this); // depth = 17.
-	}
+	var targetDepth = 17;
+	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
+
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 
 };
