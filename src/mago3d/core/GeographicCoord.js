@@ -188,6 +188,8 @@ GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, render
 	{ return false; }
 
 	gl.drawArrays(gl.POINTS, 0, vbo_vicky.vertexCount);
+	
+	
 };
 
 
@@ -370,7 +372,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	gl.uniform1i(shader.bPositionCompressed_loc, false);
 	gl.uniform1i(shader.bUse1Color_loc, true);
 	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.***
-	gl.uniform1f(shader.fixPointSize_loc, 5.0);
+	gl.uniform1f(shader.fixPointSize_loc, 15.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
 	if (bEnableDepth === undefined)
@@ -401,6 +403,35 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	
 	shader.disableVertexAttribArrayAll();
 	gl.enable(gl.DEPTH_TEST);
+	
+	// Write coords.***
+	var canvas = magoManager.getObjectLabel();
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	ctx.font = "13px Arial";
+
+	var gl = magoManager.sceneState.gl;
+	var worldPosition;
+	var screenCoord;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = this.geographicCoordsArray[i];
+		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		worldPosition = geoLoc.position;
+		screenCoord = magoManager.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+		screenCoord.x += 15;
+		screenCoord.y -= 15;
+		//var geoCoords = geoLoc.geographicCoord;
+		if (screenCoord.x >= 0 && screenCoord.y >= 0)
+		{
+			var word = "lon: " + geoCoord.longitude.toFixed(5) + ", lat: " + geoCoord.latitude.toFixed(5);
+			ctx.strokeText(word, screenCoord.x, screenCoord.y);
+			ctx.fillText(word, screenCoord.x, screenCoord.y);
+		}
+	}
+	ctx.restore();
+	
 };
 
 /**

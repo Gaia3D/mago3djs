@@ -472,8 +472,11 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 	//this.meshPositive.deleteVbos(vboMemManager);
 	//this.meshNegative.deleteVbos(vboMemManager);
 	
-	this.meshPositive.deleteObjects(vboMemManager);
-	this.meshNegative.deleteObjects(vboMemManager);
+	if(this.meshPositive !== undefined)
+		this.meshPositive.deleteObjects(vboMemManager);
+	
+	if(this.meshNegative !== undefined)
+		this.meshNegative.deleteObjects(vboMemManager);
 	
 	this.meshPositive = undefined;
 	this.meshNegative = undefined;
@@ -490,18 +493,14 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 		// positive mesh.***
 		this.meshPositive = this.mesh.getCopySurfaceIndependentMesh(this.meshPositive);
 		this.meshPositive.calculateVerticesNormals();
-	
 		this.meshPositive.setColor(0.1, 0.5, 0.5, 1.0);
-
 		this.meshPositive.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
 		this.meshPositive.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
 		
 		// negative mesh.***
 		this.meshNegative = this.mesh.getCopySurfaceIndependentMesh(this.meshNegative);
 		this.meshNegative.reverseSense(); // here calculates vertices normals.***
-	
 		this.meshNegative.setColor(0.1, 0.5, 0.5, 1.0);
-
 		this.meshNegative.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
 		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
 		

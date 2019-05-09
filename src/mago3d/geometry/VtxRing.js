@@ -15,6 +15,20 @@ var VtxRing = function()
 	this.elemsIndexRangesArray; // [] array.***
 };
 
+VtxRing.prototype.deleteObjects = function()
+{
+	if(this.vertexList !== undefined)
+	{
+		this.vertexList.deleteObjects();
+		this.vertexList = undefined;
+	}
+	
+	if(this.elemsIndexRangesArray !== undefined)
+	{
+		this.deleteElementIndexRanges();
+	}
+};
+
 VtxRing.prototype.deleteElementIndexRanges = function()
 {
 	if (this.elemsIndexRangesArray === undefined)
@@ -230,7 +244,18 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 	{ idxRange.endIdx = 0; }
 };
 
+VtxRing.getProjectedOntoPlane = function(vtxRing, plane, projectionDirection, resultVtxRing)
+{
+	if (vtxRing.vertexList === undefined)
+	{ return resultRing2d; }
+	
+	if (resultVtxRing === undefined)
+	{ resultVtxRing = new VtxRing(); }
 
+	resultVtxRing.vertexList = VertexList.getProjectedOntoPlane(vtxRing.vertexList, plane, projectionDirection, resultVtxRing.vertexList);
+	resultVtxRing.calculateElementsIndicesRange();
+	return resultVtxRing;
+};
 
 
 

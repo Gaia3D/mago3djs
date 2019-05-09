@@ -101,6 +101,26 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 	return resultCrossProduct;
 };
 
+VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirection, resultVertexList)
+{
+	if(vertexList === undefined)
+		return resultVertexList;
+	
+	if(resultVertexList === undefined)
+		resultVertexList = new VertexList();
+	
+	var vertex, projectedVertex;
+	var vertexCount = vertexList.getVertexCount();
+	for(var i=0; i<vertexCount; i++)
+	{
+		vertex = vertexList.getVertex(i);
+		projectedVertex = resultVertexList.newVertex();
+		projectedVertex = Vertex.getProjectedOntoPlane(vertex, plane, projectionDirection, projectedVertex)
+	}
+	
+	return resultVertexList;
+};
+
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
 	// This function projects the vertices on to planes xy, yz or xz.***
@@ -160,6 +180,9 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			resultPoints2dArray.push(point2d);
 		}
 	}
+	
+	if(resultPoints2dArray.length === 0)
+		var hola = 0;
 	
 	return resultPoints2dArray;
 };

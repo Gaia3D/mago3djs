@@ -30,18 +30,6 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
 		var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
 		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.altitude);
 	}
-	/*
-	//else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-	//{
-	//	var cartographic = Cesium.Cartographic.fromCartesian(new Cesium.Cartesian3(point.x, point.y, point.z));
-	//	resultGeographicCoord.setLonLatAlt(cartographic.longitude * (180.0/Math.PI), cartographic.latitude * (180.0/Math.PI), cartographic.height);
-	//}
-	//else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-	//{
-	//	var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
-	//	resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.height);
-	//}
-	*/
 	
 	return resultGeographicCoord;
 };

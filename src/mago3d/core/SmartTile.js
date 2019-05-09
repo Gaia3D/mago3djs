@@ -469,17 +469,23 @@ SmartTile.prototype.intersectsNode = function(node)
 	var buildingSeed = node.data.buildingSeed;
 	var rootNode = node.getRoot();
 	
+	// Find geographicCoords as is possible.***
 	var longitude, latitude;
-	if (rootNode.data.bbox.geographicCoord === undefined)
+	if(rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
+	{
+		longitude = rootNode.data.bbox.geographicCoord.longitude;
+		latitude = rootNode.data.bbox.geographicCoord.latitude;
+	}
+	else if(buildingSeed !== undefined)
 	{
 		// in this case take the data from buildingSeed.***
 		longitude = buildingSeed.geographicCoordOfBBox.longitude;
 		latitude = buildingSeed.geographicCoordOfBBox.latitude;
 	}
-	else 
+	else
 	{
-		longitude = rootNode.data.bbox.geographicCoord.longitude;
-		latitude = rootNode.data.bbox.geographicCoord.latitude;
+		longitude = node.data.geographicCoord.longitude;
+		latitude = node.data.geographicCoord.latitude;
 	}
 	
 	if (this.intersectPoint(longitude, latitude))
@@ -1002,6 +1008,28 @@ SmartTileManager.prototype.createMainTiles = function()
 	tile2.depth = 0; // mother tile.
 	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodesArray, magoManager) 
+{
+	if(targetDepth === undefined)
+		targetDepth = 17;
+	
+	this.targetDepth = targetDepth;
+	
+	var smartTilesCount = this.tilesArray.length; // In this point, "smartTilesCount" = 2 always.
+	for (var a=0; a<smartTilesCount; a++)
+	{
+		var smartTile = this.tilesArray[a];
+		if (smartTile.nodeSeedsArray === undefined)
+		{ smartTile.nodeSeedsArray = []; }
+		
+		smartTile.nodeSeedsArray = physicalNodesArray;
+		smartTile.makeTreeByDepth(targetDepth, magoManager); // default depth = 17.
+	}
 };
 
 /**

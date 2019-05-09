@@ -13,3 +13,13 @@ var IndexData = function()
 	this.owner;
 	this.idx;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+IndexData.prototype.deleteObjects = function() 
+{
+	// Don't delete objects. Only assign as undefined.***
+	this.owner = undefined;
+	this.idx = undefined;
+};

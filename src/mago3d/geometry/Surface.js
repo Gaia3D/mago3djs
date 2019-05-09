@@ -288,8 +288,6 @@ Surface.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 		for (var j=0; j<verticesCount; j++)
 		{
 			vtx = face.getVertex(j);
-			if (vtx === undefined)
-			{ var hola = 0; }
 			vtx.setIdxInList(idxAux);
 			idxAux++;
 		}
@@ -354,9 +352,6 @@ Surface.prototype.getTriangles = function(resultTrianglesArray)
 	var facesCount = this.getFacesCount();
 	for (var i=0; i<facesCount; i++)
 	{
-		if ( i === 11)
-		{ var hola = 0; }
-
 		face = this.getFace(i);
 		resultTrianglesArray = face.getTessellatedTriangles(resultTrianglesArray);
 	}
@@ -386,3 +381,43 @@ Surface.prototype.reverseSense = function()
 		face.reverseSense();
 	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

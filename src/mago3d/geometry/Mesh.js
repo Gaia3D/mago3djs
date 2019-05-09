@@ -204,8 +204,6 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 			for (var k=0; k<verticesCount; k++)
 			{
 				vtx = face.getVertex(k);
-				if (vtx === undefined)
-				{ var hola = 0; }
 				vtx.setIdxInList(idxAux);
 				idxAux++;
 			}

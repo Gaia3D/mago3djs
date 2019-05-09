@@ -121,6 +121,10 @@ Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 		var scalarProd = startVec.scalarProduct(endVec);
 		
 		var cosAlfa = scalarProd; // Bcos startVec & endVec are unitaries.***
+		if(cosAlfa > 1.0)
+			cosAlfa = 1.0;
+		else if(cosAlfa < -1.0)
+			cosAlfa = -1.0;
 		var alfa = Math.acos(cosAlfa);
 		
 		resultPlaneNormal.add(crossProd.x*alfa, crossProd.y*alfa, crossProd.z*alfa);
@@ -237,6 +241,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 
 	// 1rst, must project the face to a plane and process to tessellate in 2d.***
 	var normal = this.getPlaneNormal();
+	
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 	
 	// Create a temp polygon2d.***
@@ -258,13 +263,13 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	{
 		var convexPolygon = convexPolygonsArray[i];
 		
+		if(convexPolygon.point2dList.getPointsCount() === 0)
+			continue;
+		
 		var vertex0, vertex1, vertex2;
 		var triangle;
 		var point2d_0, point2d_1, point2d_2;
 		var point2d_0 = convexPolygon.point2dList.getPoint(0);
-		
-		if (point2d_0 === undefined)
-		{ var hola = 0; }
 		
 		vertex0 = point2d_0.ownerVertex3d;
 		var point2dCount = convexPolygon.point2dList.getPointsCount();
@@ -285,7 +290,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 
 Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
-	// To call this method, the face must be convex.***
+	// To call this method, the face MUST be convex.***
 	if (this.vertexArray === undefined || this.vertexArray.length === 0)
 	{ return resultTrianglesArray; }
 	

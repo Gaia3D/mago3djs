@@ -13,6 +13,20 @@ var VtxRingsList = function()
 	this.vtxRingsArray;
 };
 
+VtxRingsList.prototype.deleteObjects = function()
+{
+	if(this.vtxRingsArray !== undefined)
+	{
+		var vtxRingsCount = this.vtxRingsArray.length;
+		for(var i=0; i<vtxRingsCount; i++)
+		{
+			this.vtxRingsArray[i].deleteObjects();
+			this.vtxRingsArray[i] = undefined;
+		}
+		this.vtxRingsArray = undefined;
+	}
+};
+
 VtxRingsList.prototype.getVtxRingsCount = function()
 {
 	if (this.vtxRingsArray === undefined)
@@ -98,6 +112,26 @@ VtxRingsList.prototype.setVerticesIdxInList = function()
 	{
 		this.vtxRingsArray[i].setVerticesIdxInList();
 	}
+};
+
+VtxRingsList.getProjectedOntoPlane = function(vtxRingList, plane, projectionDirection, resultVtxRingList)
+{
+	if(vtxRingList === undefined)
+		return resultVtxRingList;
+	
+	if(resultVtxRingList === undefined)
+		resultVtxRingList = new VtxRingsList();
+	
+	var vtxRing, projectedVtxRing;;
+	var vtxRingsCount = vtxRingList.getVtxRingsCount();
+	for(var i=0; i<vtxRingsCount; i++)
+	{
+		vtxRing = vtxRingList.getVtxRing(i);
+		projectedVtxRing = resultVtxRingList.newVtxRing();
+		projectedVtxRing = VtxRing.getProjectedOntoPlane(vtxRing, plane, projectionDirection, projectedVtxRing);
+	}
+	
+	return resultVtxRingList;
 };
 
 

@@ -55,6 +55,9 @@ ProcessQueue.prototype.eraseOctreeToDeletePCloud = function(octree)
 
 ProcessQueue.prototype.putNodeToDeleteLodMesh = function(node, aValue)
 {
+	if(node.isReferenceNode())
+		return;
+	
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
@@ -114,6 +117,9 @@ ProcessQueue.prototype.eraseTinTerrainToDelete = function(tinTerrain)
 
 ProcessQueue.prototype.putNodeToDeleteLessThanLod3 = function(node, aValue)
 {
+	if(node.isReferenceNode())
+		return;
+	
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
@@ -142,6 +148,9 @@ ProcessQueue.prototype.eraseNodeToDeleteLessThanLod3 = function(node)
 
 ProcessQueue.prototype.putNodeToDeleteLessThanLod4 = function(node, aValue)
 {
+	if(node.isReferenceNode())
+		return;
+	
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
@@ -170,6 +179,9 @@ ProcessQueue.prototype.eraseNodeToDeleteLessThanLod4 = function(node)
 
 ProcessQueue.prototype.putNodeToDeleteLessThanLod5 = function(node, aValue)
 {
+	if(node.isReferenceNode())
+		return;
+	
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
 	{ aValue = 0; }
@@ -198,6 +210,10 @@ ProcessQueue.prototype.eraseNodeToDeleteLessThanLod5 = function(node)
 
 ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 {
+	// In this case check if the node is reference node type.***
+	if(node.isReferenceNode())
+		return;
+	
 	// this puts the node to the "nodesToDeleteModelReferencesMap".
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)
