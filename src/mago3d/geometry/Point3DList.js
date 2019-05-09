@@ -183,8 +183,7 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	{ resultBisectionPlane = new Plane(); }
 	
 	var point3d = this.getPoint(idx);
-	var segment3d;
-	var dir;
+	var segment3d_A, segment3d_B;
 	
 	if (!bLoop)
 	{
@@ -193,21 +192,35 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 			// The last point is an exception in string mode.***
 			// Take the previous segment.***
 			var idxPrev = idx-1;
-			segment3d = this.getSegment3D(idxPrev, undefined, bLoop);	
+			segment3d_A = this.getSegment3D(idxPrev, undefined, bLoop);	
+			segment3d_B = this.getSegment3D(idxPrev, undefined, bLoop);	
+		}
+		else if(idx === 0)
+		{
+			segment3d_A = this.getSegment3D(idx, undefined, bLoop);	
+			segment3d_B = this.getSegment3D(idx, undefined, bLoop);
 		}
 		else
 		{
-			segment3d = this.getSegment3D(idx, undefined, bLoop);	
+			var idxPrev = idx-1;
+			segment3d_A = this.getSegment3D(idx, undefined, bLoop);	
+			segment3d_B = this.getSegment3D(idxPrev, undefined, bLoop);	
 		}
 	}
 	else 
 	{
-		segment3d = this.getSegment3D(idx, undefined, bLoop);
+		var idxPrev = this.getPrevIdx(idx);
+		segment3d_A = this.getSegment3D(idx, undefined, bLoop);
+		segment3d_B = this.getSegment3D(idxPrev, undefined, bLoop);	
 	}
 	
+	var dirA = segment3d_A.getDirection();
+	var dirB = segment3d_B.getDirection();
+	dirA.addPoint(dirB);
+	dirA.unitary;
+	
 	// Now, with "point3d" & "dir" make the plane.***
-	dir = segment3d.getDirection(undefined);
-	resultBisectionPlane.setPointAndNormal(point3d.x, point3d.y, point3d.z, dir.x, dir.y, dir.z);
+	resultBisectionPlane.setPointAndNormal(point3d.x, point3d.y, point3d.z, dirA.x, dirA.y, dirA.z);
 	
 	return resultBisectionPlane;
 };

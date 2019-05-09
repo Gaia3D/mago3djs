@@ -23,33 +23,60 @@ var Node = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+Node.prototype.isReferenceNode = function() 
+{
+	var isReference = false;
+	if(this.data !== undefined)
+	{
+		var attributes = this.data.attributes;
+		if(attributes !== undefined)
+		{
+			if(attributes.isReference !== undefined)
+				isReference = attributes.isReference;
+		}
+	}
+	
+	return isReference;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
 {
 	this.parent = undefined;
-	if (this.data)
+	var data = this.data;
+	if (data !== undefined)
 	{
-		if (this.data.neoBuilding)
+		// Check if this is a reference node.***
+		var isReference = this.isReferenceNode();
+		
+		// No delete neoBuilding if this node is a reference node.***
+		if(isReference)
+			return;
+
+		if (data.neoBuilding)
 		{
-			this.data.neoBuilding.deleteObjects(gl, vboMemoryManager);
-			this.data.neoBuilding = undefined;
+			data.neoBuilding.deleteObjects(gl, vboMemoryManager);
+			data.neoBuilding = undefined;
 		}
 		
-		if (this.data.geographicCoord)
+		if (data.geographicCoord)
 		{
-			this.data.geographicCoord.deleteObjects();
-			this.data.geographicCoord = undefined;
+			data.geographicCoord.deleteObjects();
+			data.geographicCoord = undefined;
 		}
 		
-		if (this.data.rotationsDegree)
+		if (data.rotationsDegree)
 		{
-			this.data.rotationsDegree.deleteObjects();
-			this.data.rotationsDegree = undefined;
+			data.rotationsDegree.deleteObjects();
+			data.rotationsDegree = undefined;
 		}
 		
-		if (this.data.bbox)
+		if (data.bbox)
 		{
-			this.data.bbox.deleteObjects();
-			this.data.bbox = undefined;
+			data.bbox.deleteObjects();
+			data.bbox = undefined;
 		}
 		
 		// Delete geoLocationDataManager, etc. TODO.***
@@ -79,19 +106,13 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// renderType = 1 -> normal render.***
 	// renderType = 2 -> colorSelection render.***
 	//--------------------------------------------
-	
-	if (this.data === undefined)
+	var data = this.data;
+	if (data === undefined)
 	{ return; }
 	
 	var neoBuilding = this.data.neoBuilding;
 	if (neoBuilding === undefined)
 	{ return; }
-
-	// Test animation.***
-	if(this.checkAnimation(magoManager))
-	{
-		this.data.animationData = undefined;
-	}
 
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
@@ -105,7 +126,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var gl = magoManager.sceneState.gl;
 	
 	// check attributes of the project.************************************************
-	var project = magoManager.hierarchyManager.getNodesMap(this.data.projectId);
+	var project = magoManager.hierarchyManager.getNodesMap(data.projectId);
 	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
 	{
 		var applySpecLighting = project.attributes.specularLighting;
@@ -120,8 +141,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	magoManager.renderer.currentObjectsRendering.curNode = this;
 	
 	var flipYTexCoord = false;
-	if (this.data.attributes.flipYTexCoords !== undefined)
-	{ flipYTexCoord = this.data.attributes.flipYTexCoords; }
+	if (data.attributes.flipYTexCoords !== undefined)
+	{ flipYTexCoord = data.attributes.flipYTexCoords; }
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
@@ -131,9 +152,16 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// magoManager.tempSettings.renderWithTopology === 0 -> render only Building.***
 	// magoManager.tempSettings.renderWithTopology === 1 -> render only Topology.***
 	// magoManager.tempSettings.renderWithTopology === 2 -> render both.***
+
+	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
+	var currRenderingFase = magoManager.renderingFase;
+	if(this.isReferenceNode())
+		magoManager.renderingFase = -10; // set a strange value to skip avoiding rendering fase of references objects.***
 	
-	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+	neoBuilding.currentLod = data.currentLod; // update currentLod.***
+	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 	
+	magoManager.renderingFase = currRenderingFase;
 	// Test.***
 	/*
 	if (neoBuilding.network)
@@ -290,15 +318,21 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
  */
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {
-	var neoBuilding = this.data.neoBuilding;
+	var data = this.data;
+	var neoBuilding = data.neoBuilding;
 	
 	var nodeRoot = this.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = this.getBBoxCenterPositionWorldCoord(geoLoc);
+	var radiusAprox;
+	if(neoBuilding !== undefined)
+		radiusAprox = neoBuilding.bbox.getRadiusAprox();
+	else
+		radiusAprox = data.bbox.getRadiusAprox();
 	
 	boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-	boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
+	boundingSphere_Aux.setRadius(radiusAprox);
 		
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
@@ -314,18 +348,17 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
 		//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
 		var octreesMaxSize = 120;
-		neoBuilding.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
+		data.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
 		boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 		boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
 	}
 	else 
 	{
 		// This is mesh projectType.***
-		
-		neoBuilding.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
+		data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
 	}
 
-	return neoBuilding.distToCam;
+	return data.distToCam;
 };
 
 /**
@@ -347,13 +380,13 @@ Node.prototype.getNodeGeoLocDataManager = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.checkAnimation = function(magoManager) 
+Node.prototype.finishedAnimation = function(magoManager) 
 {
 	var finished = false;
 	var animData = this.data.animationData;
 	
 	if (animData === undefined)
-	{ return; }
+	{ return true; }
 	
 	// calculate the currentLocation and currentRotation.***
 	var currTime = magoManager.getCurrentTime();
@@ -361,13 +394,18 @@ Node.prototype.checkAnimation = function(magoManager)
 	{ animData.lastTime = animData.birthTime; }
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
-	var remainTime = animData.durationInSeconds - (currTime - animData.birthTime)/1000.0; // in seconds.***
+	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.***
+	var factor = deltaTime/animData.durationInSeconds;
+	factor *= 100.0;
 	
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
 	
-	if (remainTime < 0.1)
+	var geoLocDatamanager = this.getNodeGeoLocDataManager();
+	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+	
+	if (totalDeltaTime > animData.durationInSeconds)
 	{
 		nextLongitude = animData.targetLongitude;
 		nextLatitude = animData.targetLatitude;
@@ -379,9 +417,6 @@ Node.prototype.checkAnimation = function(magoManager)
 	else
 	{
 		// calculate by durationInSeconds.***
-		var geoLocDatamanager = this.getNodeGeoLocDataManager();
-		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
-			
 		var currLongitude = geoLocationData.geographicCoord.longitude;
 		var currLatitude = geoLocationData.geographicCoord.latitude;
 		var currAltitude = geoLocationData.geographicCoord.altitude;
@@ -394,16 +429,16 @@ Node.prototype.checkAnimation = function(magoManager)
 		dir.set(targetLongitude - currLongitude, targetLatitude - currLatitude, targetAltitude - currAltitude);
 		dir.unitary();
 		
-		nextLongitude = currLongitude + dir.x * deltaTime/remainTime;
-		nextLatitude = currLatitude + dir.y * deltaTime/remainTime;
-		nextAltitude = currAltitude + dir.z * deltaTime/remainTime;
+		nextLongitude = currLongitude + dir.x * factor;
+		nextLatitude = currLatitude + dir.y * factor;
+		nextAltitude = currAltitude + dir.z * factor;
 		
 		// finally update "lastTime".***
 		animData.lastTime = currTime;
 		finished = false;
 	}
 	
-	this.changeLocationAndRotation(nextLongitude, nextLatitude, nextAltitude, undefined, undefined, undefined, magoManager);
+	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, magoManager);
 	
 	return finished;
 };

@@ -16,6 +16,8 @@ var NeoBuilding = function()
 	this.buildingId;
 	this.buildingType; // use this for classify a building.***
 	this.buildingFileName = "";
+	
+	// Bounding box.***
 	this.bbox;
 	this.bboxAbsoluteCenterPos;
 	
@@ -39,8 +41,7 @@ var NeoBuilding = function()
 	this.octree; // f4d_octree. ***
 
 	// auxiliar vars.
-	this.distToCam; // used to sort neoBuildings by distance to cam, and other things.***
-	this.currentLod;
+	this.currentLod; // must be updated before call render.***
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture; // old version.***
@@ -924,10 +925,13 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord) 
+NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
 {
 	var gl = magoManager.sceneState.gl;
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	
+	if(currentLod !== undefined)
+		this.currentLod = currentLod;
 	
 	// Check metaData.projectDataType.***
 	if (this.metaData.projectDataType === 5)
@@ -1123,9 +1127,6 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 	var lowestOctree;
 	var refMatrixIdxKey = 0;
 	var isInterior = false; // old var.***
-	
-	if (this.buildingId === "03_GukDo47HoSeonHoengDanGyoRyang(GyongSaAChi)_BS")
-	{ var hola = 0; }
 	
 	// LOD0.***
 	var minSize = 0.0;

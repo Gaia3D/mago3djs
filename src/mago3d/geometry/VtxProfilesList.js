@@ -14,6 +14,38 @@ var VtxProfilesList = function(x, y)
 	this.convexFacesIndicesData;
 };
 
+VtxProfilesList.prototype.deleteObjects = function()
+{
+	if(this.vtxProfilesArray !== undefined)
+	{
+		var vtxProfilesCount = this.vtxProfilesArray.length;
+		for(var i=0; i<vtxProfilesCount; i++)
+		{
+			this.vtxProfilesArray[i].deleteObjects();
+			this.vtxProfilesArray[i] = undefined;
+		}
+		this.vtxProfilesArray = undefined;
+	}
+	
+	if(this.convexFacesIndicesData !== undefined)
+	{
+		/*
+		var idxDatasCount = this.convexFacesIndicesData.length;
+		for(var i=0; i<idxDatasCount; i++)
+		{
+			for(var key in this.convexFacesIndicesData[i])
+			{
+				var value = this.convexFacesIndicesData[i][key];
+				value.deleteObjects();
+				value = undefined;
+			}
+			this.convexFacesIndicesData[i] = undefined;
+		}
+		*/
+		this.convexFacesIndicesData = undefined;
+	}
+};
+
 VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFacesArray, resultMesh, elemIndexRange)
 {
 	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".***
@@ -59,6 +91,14 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	return resultFacesArray;
 };
 
+VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
+{
+	if (this.vtxProfilesArray === undefined)
+	{ this.vtxProfilesArray = []; }
+	
+	this.vtxProfilesArray.push(vtxProfile);
+};
+
 VtxProfilesList.prototype.newVtxProfile = function()
 {
 	if (this.vtxProfilesArray === undefined)
@@ -102,7 +142,7 @@ VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 	return resultVerticesArray;
 };
 
-VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
+VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap, bLoop)
 {
 	// face's vertex order.***
 	// 3-------2
@@ -113,6 +153,16 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	
 	if (this.vtxProfilesArray === undefined)
 	{ return resultTriangleMatrix; }
+
+	if(bLoop === undefined)
+		bLoop = false;
+	
+	if(bLoop === true)
+	{
+		// To make a safe mesh, if loop, then there are no caps in the extrems.***
+		bIncludeBottomCap = false;
+		bIncludeTopCap = false;
+	}
 	
 	// outerLateral.***************************************************
 	var vtxProfilesCount = this.getVtxProfilesCount();
@@ -149,10 +199,21 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		surface = resultMesh.newSurface();
 		prevFacesArray = undefined;
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
-		for (var j=0; j<vtxProfilesCount-1; j++)
+		for (var j=0; j<vtxProfilesCount; j++)
 		{
-			bottomVtxProfile = this.getVtxProfile(j);
-			topVtxProfile = this.getVtxProfile(j+1);
+			if(j === vtxProfilesCount-1 )
+			{
+				if(bLoop)
+				{
+					bottomVtxProfile = this.getVtxProfile(j);
+					topVtxProfile = this.getVtxProfile(0);
+				}
+				else break;
+			}
+			else{
+				bottomVtxProfile = this.getVtxProfile(j);
+				topVtxProfile = this.getVtxProfile(j+1);
+			}
 			
 			bottomVtxRing = bottomVtxProfile.outerVtxRing;
 			topVtxRing = topVtxProfile.outerVtxRing;
@@ -176,7 +237,6 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			
 			prevFacesArray = [];
 			Array.prototype.push.apply(prevFacesArray, facesArray);
-			
 		}
 	}
 	
@@ -192,11 +252,22 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			surface = resultMesh.newSurface();
 			prevFacesArray = undefined;
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
-			for (var j=0; j<vtxProfilesCount-1; j++)
+			for (var j=0; j<vtxProfilesCount; j++)
 			{
-				bottomVtxProfile = this.getVtxProfile(j);
-				topVtxProfile = this.getVtxProfile(j+1);
-				
+				if(j === vtxProfilesCount-1 )
+				{
+					if(bLoop)
+					{
+						bottomVtxProfile = this.getVtxProfile(j);
+						topVtxProfile = this.getVtxProfile(0);
+					}
+					else break;
+				}
+				else{
+					bottomVtxProfile = this.getVtxProfile(j);
+					topVtxProfile = this.getVtxProfile(j+1);
+				}
+
 				bottomVtxRing = bottomVtxProfile.getInnerVtxRing(k);
 				topVtxRing = topVtxProfile.getInnerVtxRing(k);
 				
@@ -303,7 +374,19 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 	return resultSurface;
 };
 
-VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList)
+/**
+ * @method VtxProfilesList.makeLoft
+ * @param {Profile2D} profile2d
+ * @param {Points3DList} pathPoints3dList
+ * @param {boolean} bLoop
+ * @returns none
+ * @description 설명
+ * @example
+ * ` ``js
+ * 
+ * ` ``
+ */
+VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList, bLoop)
 {
 	// 1rst, make the base vtxProfile.***
 	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
@@ -311,29 +394,43 @@ VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList)
 	
 	// create vtxProfiles.***
 	// make the base-vtxProfile.***
-	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
+	var baseVtxProfile = new VtxProfile();
 	baseVtxProfile.makeByProfile2D(profile2d);
 	
 	// Now, transform the baseVtxProfile to coplanar into the 1rstPlane.***
-	var bLoop = false; // Is important to set as bLoop = false to obtain a perpendicular plane respect to the segment.***
+	if(bLoop === undefined) bLoop = false; // Is important to set "bLoop" = false to obtain a perpendicular plane respect to the segment.***
 	var bisectionPlane1rst = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
 	var point3d1rst = pathPoints3dList.getPoint(0);
 	var tMatrix = bisectionPlane1rst.getRotationMatrix(undefined);
-	tMatrix.setTranslation();
+	tMatrix.setTranslation(point3d1rst.x, point3d1rst.y, point3d1rst.z);
 	
-	/*
-	if (extrusionVector === undefined)
-	{ extrusionVector = new Point3D(0, 0, 1); }
+	// Now rotate&translate vtxProfile onto the bisectionPlane1rst.***
+	baseVtxProfile.transformPointsByMatrix4(tMatrix);
 	
-	var increDist = extrusionDist/extrudeSegmentsCount;
-	for (var i=0; i<extrudeSegmentsCount; i++)
+	// Now, project the vtxProfile onto the bisectionPlanes of each vertex.***
+	var pathPoint3d;
+	var bisectionPlane;
+	var segment3d;
+	var projectionDirection;
+	var pathPointsCount = pathPoints3dList.getPointsCount();
+	for(var i=0; i<pathPointsCount; i++)
 	{
-		// test with a 1 segment extrusion.***
-		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
-		nextVtxProfile.copyFrom(baseVtxProfile);
-		nextVtxProfile.translate(0, 0, increDist*(i+1));
+		pathPoint3d = pathPoints3dList.getPoint(i);
+		bisectionPlane = pathPoints3dList.getBisectionPlane(i, undefined, bLoop);
+		if(i === 0)
+		{
+			segment3d = pathPoints3dList.getSegment3D(i, undefined, bLoop);
+		}
+		else
+			segment3d = pathPoints3dList.getSegment3D(i-1, undefined, bLoop);
+		
+		projectionDirection = segment3d.getDirection(undefined);
+		
+		var projectedVtxProfile = VtxProfile.getProjectedOntoPlane(baseVtxProfile, bisectionPlane, projectionDirection, undefined);
+		this.addVtxProfile(projectedVtxProfile);
+		// finally update the baseVtxProfile.***
+		baseVtxProfile = projectedVtxProfile;
 	}
-	*/
 };
 
 
