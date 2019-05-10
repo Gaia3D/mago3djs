@@ -471,12 +471,12 @@ SmartTile.prototype.intersectsNode = function(node)
 	
 	// Find geographicCoords as is possible.***
 	var longitude, latitude;
-	if(rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
+	if (rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
 	{
 		longitude = rootNode.data.bbox.geographicCoord.longitude;
 		latitude = rootNode.data.bbox.geographicCoord.latitude;
 	}
-	else if(buildingSeed !== undefined)
+	else if (buildingSeed !== undefined)
 	{
 		// in this case take the data from buildingSeed.***
 		longitude = buildingSeed.geographicCoordOfBBox.longitude;
@@ -1015,8 +1015,8 @@ SmartTileManager.prototype.createMainTiles = function()
  */
 SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodesArray, magoManager) 
 {
-	if(targetDepth === undefined)
-		targetDepth = 17;
+	if (targetDepth === undefined)
+	{ targetDepth = 17; }
 	
 	this.targetDepth = targetDepth;
 	

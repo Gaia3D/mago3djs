@@ -55,8 +55,8 @@ var AnimationManager = function()
  */
 AnimationManager.prototype.putNode = function(node) 
 {
-	if(this.nodesMap === undefined)
-		this.nodesMap = {};
+	if (this.nodesMap === undefined)
+	{ this.nodesMap = {}; }
 	
 	var nodeId = node.data.nodeId;
 	this.nodesMap[nodeId] = node;
@@ -67,16 +67,19 @@ AnimationManager.prototype.putNode = function(node)
  */
 AnimationManager.prototype.checkAnimation = function(magoManager) 
 {
-	if(this.nodesMap === undefined)
-		return;
+	if (this.nodesMap === undefined)
+	{ return; }
 	
 	var node;
 	for (var key in this.nodesMap)
 	{
-		node = this.nodesMap[key];
-		if(node.finishedAnimation(magoManager))
+		if (Object.prototype.hasOwnProperty.call(this.nodesMap, key))
 		{
-			delete this.nodesMap[key];
+			node = this.nodesMap[key];
+			if (node.finishedAnimation(magoManager))
+			{
+				delete this.nodesMap[key];
+			}
 		}
 	}
 };

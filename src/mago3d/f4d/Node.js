@@ -26,13 +26,13 @@ var Node = function()
 Node.prototype.isReferenceNode = function() 
 {
 	var isReference = false;
-	if(this.data !== undefined)
+	if (this.data !== undefined)
 	{
 		var attributes = this.data.attributes;
-		if(attributes !== undefined)
+		if (attributes !== undefined)
 		{
-			if(attributes.isReference !== undefined)
-				isReference = attributes.isReference;
+			if (attributes.isReference !== undefined)
+			{ isReference = attributes.isReference; }
 		}
 	}
 	
@@ -52,8 +52,8 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 		var isReference = this.isReferenceNode();
 		
 		// No delete neoBuilding if this node is a reference node.***
-		if(isReference)
-			return;
+		if (isReference)
+		{ return; }
 
 		if (data.neoBuilding)
 		{
@@ -114,6 +114,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
+	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.***
+	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).***
+	neoBuilding.currentVisibleOctreesControler = data.currentVisibleOctreesControler;
+	neoBuilding.myCameraRelative = data.myCameraRelative;
+
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
@@ -155,8 +160,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
 	var currRenderingFase = magoManager.renderingFase;
-	if(this.isReferenceNode())
-		magoManager.renderingFase = -10; // set a strange value to skip avoiding rendering fase of references objects.***
+	if (this.isReferenceNode())
+	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.***
 	
 	neoBuilding.currentLod = data.currentLod; // update currentLod.***
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
@@ -326,10 +331,10 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	var realBuildingPos = this.getBBoxCenterPositionWorldCoord(geoLoc);
 	var radiusAprox;
-	if(neoBuilding !== undefined)
-		radiusAprox = neoBuilding.bbox.getRadiusAprox();
+	if (neoBuilding !== undefined)
+	{ radiusAprox = neoBuilding.bbox.getRadiusAprox(); }
 	else
-		radiusAprox = data.bbox.getRadiusAprox();
+	{ radiusAprox = data.bbox.getRadiusAprox(); }
 	
 	boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 	boundingSphere_Aux.setRadius(radiusAprox);
@@ -456,8 +461,8 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	
 	animData.birthTime = magoManager.getCurrentTime();
 	
-	if(durationInSeconds === undefined)
-		durationInSeconds = 3.0;
+	if (durationInSeconds === undefined)
+	{ durationInSeconds = 3.0; }
 	
 	animData.durationInSeconds = durationInSeconds;
 	
@@ -548,6 +553,35 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	}
 };
 
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+/*
+Node.prototype.test__octreeModelRefAndIndices_changed = function() 
+{
+	var data = this.data;
+	
+	if(data === undefined)
+		return false;
+	
+	var neoBuilding = data.neoBuilding;
+	if(neoBuilding === undefined)
+		return false;
+	
+	var octree = neoBuilding.octree;
+	if(octree === undefined)
+		return true;
+	
+	var modelRefMotherAndIndices = octree.neoReferencesMotherAndIndices;
+	if(modelRefMotherAndIndices === undefined)
+		return true;
+	
+	if(modelRefMotherAndIndices.neoRefsIndices.length === 0 || modelRefMotherAndIndices.motherNeoRefsList.length === 0)
+		return true;
+	
+	return false;
+};
+*/
 
 
 

@@ -44,8 +44,8 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
  */
 HierarchyManager.prototype.getStaticModelsManager = function() 
 {
-	if(this.staticModelsManager === undefined)
-		this.staticModelsManager = new StaticModelsManager();
+	if (this.staticModelsManager === undefined)
+	{ this.staticModelsManager = new StaticModelsManager(); }
 	
 	return this.staticModelsManager;
 };

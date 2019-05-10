@@ -33,13 +33,13 @@ CODE.magoMode = {
 };
 
 CODE.modelerMode = {
-	"INACTIVE"                   : 0,
-	"DRAWING_POLYLINE"           : 1,
-	"DRAWING_PLANEGRID"          : 2,
-	"DRAWING_GEOGRAPHICPOINTS"   : 3,
-	"DRAWING_EXCAVATIONPOINTS"   : 4,
-	"DRAWING_TUNNELPOINTS"       : 5,
-	"DRAWING_STATICGEOMETRY"     : 6
+	"INACTIVE"                 : 0,
+	"DRAWING_POLYLINE"         : 1,
+	"DRAWING_PLANEGRID"        : 2,
+	"DRAWING_GEOGRAPHICPOINTS" : 3,
+	"DRAWING_EXCAVATIONPOINTS" : 4,
+	"DRAWING_TUNNELPOINTS"     : 5,
+	"DRAWING_STATICGEOMETRY"   : 6
 };
 
 CODE.modelerDrawingState = {
