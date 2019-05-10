@@ -16,13 +16,13 @@ var VtxProfile = function()
 
 VtxProfile.prototype.deleteObjects = function()
 {
-	if(this.outerVtxRing !== undefined)
+	if (this.outerVtxRing !== undefined)
 	{
 		this.outerVtxRing.deleteObjects();
 		this.outerVtxRing = undefined;
 	}
 	
-	if(this.innerVtxRingsList !== undefined)
+	if (this.innerVtxRingsList !== undefined)
 	{
 		this.innerVtxRingsList.deleteObjects();
 		this.innerVtxRingsList = undefined;

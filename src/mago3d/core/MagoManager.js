@@ -800,11 +800,11 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
-		if(attributes.isReference !== undefined && attributes.isReference === true)
+		if (attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
-			if(neoBuilding === undefined)
+			if (neoBuilding === undefined)
 			{
 				/*
 				attributes = {
@@ -820,8 +820,16 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				"pitch": 0,
 				"roll": 0};
 				*/
+				
+				//SD_COUNCIL_del
 				var neoBuildingFolderName = attributes.buildingFolderName;
 				projectFolderName = attributes.projectFolderName;
+				
+				// test.***
+				//neoBuildingFolderName = "F4D_SD_COUNCIL_del";
+				//projectFolderName = "3ds";
+				//attributes.pitch = 90;
+				
 				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
 				
 				// demand to staticModelsManager the neoBuilding.***
@@ -876,7 +884,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
 		}
-		else{
+		else 
+		{
 			projectFolderName = node.data.projectFolderName;
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 		}
@@ -1384,6 +1393,26 @@ MagoManager.prototype.getCurrentTime = function()
 {
 	return this.currTime;
 };
+/*
+MagoManager.prototype.test__octreeModelRefAndIndices_changed = function() 
+{
+	if(this.hierarchyManager.existProject("AutonomousVehicle"))
+	{
+		var nodesMap = this.hierarchyManager.getNodesMap("AutonomousVehicle");
+		for(var key in nodesMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(nodesMap, key))
+			{
+				var node = nodesMap[key];
+				if(node.test__octreeModelRefAndIndices_changed())
+					var hola = 0;
+			}
+		}
+	
+		var hola = 0 ;
+	}
+};
+*/
 
 /**
  * start rendering.
@@ -1397,6 +1426,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
+	
 
 	var gl = this.sceneState.gl;
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -1440,10 +1470,10 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
 		
-		if(this.animationManager !== undefined)
-			this.animationManager.checkAnimation(this);
+		if (this.animationManager !== undefined)
+		{ this.animationManager.checkAnimation(this); }
 	}
-
+	
 	var cameraPosition = this.sceneState.camera.position;
 	
 	// Take the current frustumVolumenObject.***
@@ -1461,10 +1491,15 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		doFrustumCullingToBuildings = true;
+		
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
+		
+		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
 		
+		
 	}
+	
 	
 	var currentShader = undefined;
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
@@ -1493,12 +1528,13 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 				nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
 			}
 		}
-
+		
+		
 		this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles0); 
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles1); 
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
-		
+
 		
 		// lod 2.
 		if (this.readerWriter.referencesList_requested < 5)
@@ -1519,10 +1555,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
 		}
 		
+		
 		// lod3, lod4, lod5.***
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles2);
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles0);
+		
 		
 		// provisionally prepare pointsCloud datas.******************************************************
 		// Load the motherOctrees pCloudData.***
@@ -1535,8 +1573,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			
-			if(node.isReferenceNode())
-				continue;
+			if (node.isReferenceNode())
+			{ continue; }
 			
 			var neoBuilding = node.data.neoBuilding;
 			
@@ -1552,6 +1590,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		}
 		this.readerWriter.pCloudPartitions_requested = 0;
 		
+		
+		
 		// TinTerrain.***
 		// TinTerrain.*******************************************************************************************************************************
 		if (this.isFarestFrustum())
@@ -1561,12 +1601,16 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		}
 		//if(this.isFarestFrustum())
 		this.manageQueue();
+	
+		
 		
 		if (this.currentFrustumIdx === 0)
 		{
 			this.loadQueue.manageQueue();
 			//this.loadQueue.resetQueue();
 		}
+		
+		
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
@@ -1767,7 +1811,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	}
 	
 	// lightDepthRender: TODO.***
-	
+
 			
 	// 1) The depth render.**********************************************************************************************************************
 	var ssao_idx = 0; // 0= depth. 1= color.***
@@ -1785,6 +1829,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 	
+
+	
 	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
@@ -1794,6 +1840,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	{
 		scene._context._currentFramebuffer._bind();
 	}
+	
+
 
 	ssao_idx = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
@@ -1847,7 +1895,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		*/
 	}
 	
-	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
@@ -1870,6 +1917,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		gl.activeTexture(gl.TEXTURE0);
 		this.wwd.drawContext.redrawRequested = true;
 	}
+	
 };
 
 /**
@@ -1902,8 +1950,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		node = lowLodNodesArray[i];
 		
 		// debug.***
-		if(node.data.attributes.isReference !== undefined)
-			var hola = 0;
+		if (node.data.attributes.isReference !== undefined)
+		{ var hola = 0; }
 		
 		neoBuilding = node.data.neoBuilding;
 		
@@ -2739,8 +2787,8 @@ MagoManager.prototype.keyDown = function(key)
 	
 	if (key === 80) // 80 = 'p'.***
 	{
-		if(this.animationManager === undefined)
-			this.animationManager = new AnimationManager();
+		if (this.animationManager === undefined)
+		{ this.animationManager = new AnimationManager(); }
 
 		// Do a test.***
 		var projectId = "3ds.json";
@@ -2916,28 +2964,28 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			// create a "node" & insert into smartTile.***
 			var projectId = "AutonomousVehicle";
 			var attributes = {
-				"isPhysical": true,
-				"nodeType": "TEST",
-				"isReference": true,
-				"projectFolderName": "staticModels",
-				"buildingFolderName": "F4D_AutonomousBus",
-				"heading": 0,
-				"height": 41,
-				"latitude": 37.58197511583916,
-				"longitude": 126.60868083665515,
-				"pitch": 0,
-				"roll": 0};
+				"isPhysical"         : true,
+				"nodeType"           : "TEST",
+				"isReference"        : true,
+				"projectFolderName"  : "staticModels",
+				"buildingFolderName" : "F4D_AutonomousBus",
+				"heading"            : 0,
+				"height"             : 41,
+				"latitude"           : 37.58197511583916,
+				"longitude"          : 126.60868083665515,
+				"pitch"              : 0,
+				"roll"               : 0};
 				
-			var nodesMap = this.hierarchyManager.getNodesMap(projectId, attributes);
+			var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
 			var existentNodesCount = Object.keys(nodesMap).length;
 			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
 			
-			var node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
+			var node = this.hierarchyManager.newNode(buildingId, projectId, undefined);
 			
 			// Now, create the geoLocdataManager of node.***
 			node.data.attributes = attributes;
 			node.data.geographicCoord = geoCoord;
-			node.data.rotationsDegree = new Point3D(0,0,0);
+			node.data.rotationsDegree = new Point3D(attributes.pitch, attributes.roll, attributes.heading);
 			node.data.geoLocDataManager = geoLocDataManager;
 			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
 			node.data.bbox.init();
@@ -3573,7 +3621,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
  * @param {VisibleObjectsController} visibleObjControlerOctrees 
  * @param {any} lod 
  */
-MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, node, visibleObjControlerOctrees, lod) 
+MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, node, globalVisibleObjControlerOctrees, lod) 
 {
 	var data = node.data;
 	var neoBuilding = data.neoBuilding;
@@ -3598,8 +3646,9 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	if (nodeGeoLocation === undefined)
 	{ return false; }
 
-	if (neoBuilding.currentVisibleOctreesControler === undefined)
-	{ neoBuilding.currentVisibleOctreesControler = new VisibleObjectsController(); }	
+	// Create if necessary, the visibleObjectsControler of the node.***
+	if (data.currentVisibleOctreesControler === undefined)
+	{ data.currentVisibleOctreesControler = new VisibleObjectsController(); }	
 
 	var distLod0 = this.magoPolicy.getLod0DistInMeters();
 	var distLod1 = this.magoPolicy.getLod1DistInMeters();
@@ -3609,31 +3658,31 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 	var distLod5 = this.magoPolicy.getLod5DistInMeters();
 
 	var find = false;
-	if (this.myCameraRelative === undefined)
-	{ this.myCameraRelative = new Camera(); }
+	if (data.myCameraRelative === undefined)
+	{ data.myCameraRelative = new Camera(); }
 	
-	this.myCameraRelative.frustum.copyParametersFrom(this.myCameraSCX.bigFrustum);
-	this.myCameraRelative = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, this.myCameraRelative);
-	//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(this.myCameraRelative.position.x, this.myCameraRelative.position.y, this.myCameraRelative.position.z); // old.***
+	data.myCameraRelative.frustum.copyParametersFrom(this.myCameraSCX.bigFrustum);
+	data.myCameraRelative = nodeGeoLocation.getTransformedRelativeCamera(this.sceneState.camera, data.myCameraRelative);
+	//var isCameraInsideOfBuilding = neoBuilding.isCameraInsideOfBuilding(data.myCameraRelative.position.x, data.myCameraRelative.position.y, data.myCameraRelative.position.z); // old.***
 	
-	neoBuilding.currentVisibleOctreesControler.clear();
+	data.currentVisibleOctreesControler.clear();
 	
 	if (lod === 2)
 	{
 		// In this case is not necessary calculate the frustum planes.
-		neoBuilding.octree.extractLowestOctreesByLOD(neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-			this.myCameraRelative.position, distLod0, distLod1, distLod5);
+		neoBuilding.octree.extractLowestOctreesByLOD(data.currentVisibleOctreesControler, globalVisibleObjControlerOctrees, this.boundingSphere_Aux,
+			data.myCameraRelative.position, distLod0, distLod1, distLod5);
 		find = true;
 	}
 	else 
 	{
 		// Must calculate the frustum planes.
-		this.myCameraRelative.calculateFrustumsPlanes();
+		data.myCameraRelative.calculateFrustumsPlanes();
 		
 		// 1rst, check if there are octrees very close.
-		var frustum0 = this.myCameraRelative.bigFrustum;
-		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustum0, neoBuilding.currentVisibleOctreesControler, visibleObjControlerOctrees, this.boundingSphere_Aux,
-			this.myCameraRelative.position, distLod0, distLod1, distLod2*100);
+		var frustum0 = data.myCameraRelative.bigFrustum;
+		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustum0, data.currentVisibleOctreesControler, globalVisibleObjControlerOctrees, this.boundingSphere_Aux,
+			data.myCameraRelative.position, distLod0, distLod1, distLod2*100);
 	}
 
 	if (!find) 
@@ -3650,22 +3699,6 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		this.processQueue.eraseNodeToDeleteModelReferences(node);
 	}
 	
-	// LOD0 & LOD1
-	// Check if the lod0lowestOctrees, lod1lowestOctrees must load and parse data
-	var lowestOctree;
-	var currentVisibleOctrees = [].concat(neoBuilding.currentVisibleOctreesControler.currentVisibles0, neoBuilding.currentVisibleOctreesControler.currentVisibles1);
-	var applyOcclusionCulling = neoBuilding.getRenderSettingApplyOcclusionCulling();
-	
-	for (var i=0, length = currentVisibleOctrees.length; i<length; i++) 
-	{
-		lowestOctree = currentVisibleOctrees[i];
-		if (lowestOctree.triPolyhedronsCount === 0) 
-		{ continue; }
-	
-		if (lowestOctree.neoReferencesMotherAndIndices  && lowestOctree.neoReferencesMotherAndIndices.isReadyToRender())
-		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(this.myCameraRelative.position.x, this.myCameraRelative.position.y, this.myCameraRelative.position.z, applyOcclusionCulling); }
-	}
-		
 	return true;
 };
 
@@ -3682,9 +3715,12 @@ MagoManager.prototype.manageQueue = function()
 	var gl = this.sceneState.gl;
 	
 	
-
+	
+	
 	// 1rst, manage deleting queue.***************
 	this.processQueue.manageDeleteQueue(this);
+	
+	
 	
 	// 2nd, parse pendent data.**********************************************************************************
 	// is desirable to parse octrees references ordered by the current eye distance.
@@ -3694,10 +3730,14 @@ MagoManager.prototype.manageQueue = function()
 	// parse octrees lod0 & lod1 references.***
 	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
 	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
+	
+	
 
 	// parse octrees lod0 & lod1 models.***
 	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
 	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
+	
+	
 	
 	// parse octrees lod2 (lego).***
 	this.parseQueue.parseArrayOctreesLod2Legos(gl, this.visibleObjControlerOctrees.currentVisibles2, this);
@@ -3710,6 +3750,8 @@ MagoManager.prototype.manageQueue = function()
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles0, this);
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles2, this);
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles3, this);
+	
+	
 
 	// parse TinTerrain.***
 	var tinTerrain;
@@ -3747,6 +3789,8 @@ MagoManager.prototype.manageQueue = function()
 		}
 	}
 	*/
+	
+	
 };
 
 /**
@@ -3870,6 +3914,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 				}
 			}
 		}
+		
 
 		if (this.readerWriter.referencesList_requested > 5)
 		{ return; }
@@ -3877,6 +3922,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		if (filesLoadCounter > maxFilesLoad)
 		{ return; }
 	}
+	
+	
 };
 
 /**
@@ -4748,7 +4795,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
  */
 MagoManager.prototype.getObjectLabel = function() 
 {
-	if(this.canvasObjectLabel === undefined)
+	if (this.canvasObjectLabel === undefined)
 	{
 		this.canvasObjectLabel = document.getElementById("objectLabel");
 		if (this.canvasObjectLabel === undefined)
@@ -5512,7 +5559,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				neoBuilding = node.data.neoBuilding;
-				if(neoBuilding === undefined)
+				if (neoBuilding === undefined)
 				{
 					// This node is a reference node.***
 					visibleNodes.currentVisiblesAux.push(node);
@@ -5565,6 +5612,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					}
 				}
 				//-------------------------------------------------------------------------------------------
+				
+				
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
@@ -5658,13 +5707,19 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 			{
 				// create the buildings by buildingSeeds.
 				this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
+				
 			}
+			
+			
 		}
 		else
 		{
 			// create the buildings by buildingSeeds.
 			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
+			
 		}
+		
+		
 	}
 };
 
@@ -5688,6 +5743,19 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	for (var j=startIndex; j<nodeSeedsCount; j++)
 	{
 		node = lowestTile.nodeSeedsArray[j];
+		
+		if (node.isReferenceNode())
+		{ var hola = 0; }
+		
+		if (node.data.neoBuilding !== undefined)
+		{
+			if (lowestTile.nodesArray === undefined)
+			{ lowestTile.nodesArray = []; }
+	
+			lowestTile.nodesArray.push(node);
+			continue;
+		}
+		
 		neoBuilding = new NeoBuilding();
 		
 		neoBuilding.nodeOwner = node;
@@ -6099,11 +6167,12 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	if (node === undefined)
 	{ return; }
 
-	if(durationTimeInSeconds !== undefined)
+	if (durationTimeInSeconds !== undefined)
 	{
 		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
 	}
-	else{
+	else 
+	{
 		node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
 	}
 	

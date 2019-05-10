@@ -12,15 +12,15 @@ var Line = function(point, direction)
 	}
 	
 	// (x,y,z) = (x0,y0,z0) + lambda * (u, v, w);
-	if(point !== undefined)
-		this.point = point;
+	if (point !== undefined)
+	{ this.point = point; }
 	else
-		this.point = new Point3D();
+	{ this.point = new Point3D(); }
 	
-	if(direction !== undefined)
-		this.direction = direction;
+	if (direction !== undefined)
+	{ this.direction = direction; }
 	else
-		this.direction = new Point3D();
+	{ this.direction = new Point3D(); }
 };
 
 /**

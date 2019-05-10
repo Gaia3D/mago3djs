@@ -472,11 +472,11 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 	//this.meshPositive.deleteVbos(vboMemManager);
 	//this.meshNegative.deleteVbos(vboMemManager);
 	
-	if(this.meshPositive !== undefined)
-		this.meshPositive.deleteObjects(vboMemManager);
+	if (this.meshPositive !== undefined)
+	{ this.meshPositive.deleteObjects(vboMemManager); }
 	
-	if(this.meshNegative !== undefined)
-		this.meshNegative.deleteObjects(vboMemManager);
+	if (this.meshNegative !== undefined)
+	{ this.meshNegative.deleteObjects(vboMemManager); }
 	
 	this.meshPositive = undefined;
 	this.meshNegative = undefined;
