@@ -17,13 +17,13 @@ var VtxRing = function()
 
 VtxRing.prototype.deleteObjects = function()
 {
-	if(this.vertexList !== undefined)
+	if (this.vertexList !== undefined)
 	{
 		this.vertexList.deleteObjects();
 		this.vertexList = undefined;
 	}
 	
-	if(this.elemsIndexRangesArray !== undefined)
+	if (this.elemsIndexRangesArray !== undefined)
 	{
 		this.deleteElementIndexRanges();
 	}

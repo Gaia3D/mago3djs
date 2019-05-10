@@ -16,10 +16,10 @@ var VtxProfilesList = function(x, y)
 
 VtxProfilesList.prototype.deleteObjects = function()
 {
-	if(this.vtxProfilesArray !== undefined)
+	if (this.vtxProfilesArray !== undefined)
 	{
 		var vtxProfilesCount = this.vtxProfilesArray.length;
-		for(var i=0; i<vtxProfilesCount; i++)
+		for (var i=0; i<vtxProfilesCount; i++)
 		{
 			this.vtxProfilesArray[i].deleteObjects();
 			this.vtxProfilesArray[i] = undefined;
@@ -27,7 +27,7 @@ VtxProfilesList.prototype.deleteObjects = function()
 		this.vtxProfilesArray = undefined;
 	}
 	
-	if(this.convexFacesIndicesData !== undefined)
+	if (this.convexFacesIndicesData !== undefined)
 	{
 		/*
 		var idxDatasCount = this.convexFacesIndicesData.length;
@@ -154,10 +154,10 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	if (this.vtxProfilesArray === undefined)
 	{ return resultTriangleMatrix; }
 
-	if(bLoop === undefined)
-		bLoop = false;
+	if (bLoop === undefined)
+	{ bLoop = false; }
 	
-	if(bLoop === true)
+	if (bLoop === true)
 	{
 		// To make a safe mesh, if loop, then there are no caps in the extrems.***
 		bIncludeBottomCap = false;
@@ -201,16 +201,17 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
 		for (var j=0; j<vtxProfilesCount; j++)
 		{
-			if(j === vtxProfilesCount-1 )
+			if (j === vtxProfilesCount-1 )
 			{
-				if(bLoop)
+				if (bLoop)
 				{
 					bottomVtxProfile = this.getVtxProfile(j);
 					topVtxProfile = this.getVtxProfile(0);
 				}
-				else break;
+				else { break; }
 			}
-			else{
+			else 
+			{
 				bottomVtxProfile = this.getVtxProfile(j);
 				topVtxProfile = this.getVtxProfile(j+1);
 			}
@@ -254,16 +255,17 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
 			for (var j=0; j<vtxProfilesCount; j++)
 			{
-				if(j === vtxProfilesCount-1 )
+				if (j === vtxProfilesCount-1 )
 				{
-					if(bLoop)
+					if (bLoop)
 					{
 						bottomVtxProfile = this.getVtxProfile(j);
 						topVtxProfile = this.getVtxProfile(0);
 					}
-					else break;
+					else { break; }
 				}
-				else{
+				else 
+				{
 					bottomVtxProfile = this.getVtxProfile(j);
 					topVtxProfile = this.getVtxProfile(j+1);
 				}
@@ -398,7 +400,7 @@ VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList, bLoop
 	baseVtxProfile.makeByProfile2D(profile2d);
 	
 	// Now, transform the baseVtxProfile to coplanar into the 1rstPlane.***
-	if(bLoop === undefined) bLoop = false; // Is important to set "bLoop" = false to obtain a perpendicular plane respect to the segment.***
+	if (bLoop === undefined) { bLoop = false; } // Is important to set "bLoop" = false to obtain a perpendicular plane respect to the segment.***
 	var bisectionPlane1rst = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
 	var point3d1rst = pathPoints3dList.getPoint(0);
 	var tMatrix = bisectionPlane1rst.getRotationMatrix(undefined);
@@ -413,16 +415,16 @@ VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList, bLoop
 	var segment3d;
 	var projectionDirection;
 	var pathPointsCount = pathPoints3dList.getPointsCount();
-	for(var i=0; i<pathPointsCount; i++)
+	for (var i=0; i<pathPointsCount; i++)
 	{
 		pathPoint3d = pathPoints3dList.getPoint(i);
 		bisectionPlane = pathPoints3dList.getBisectionPlane(i, undefined, bLoop);
-		if(i === 0)
+		if (i === 0)
 		{
 			segment3d = pathPoints3dList.getSegment3D(i, undefined, bLoop);
 		}
 		else
-			segment3d = pathPoints3dList.getSegment3D(i-1, undefined, bLoop);
+		{ segment3d = pathPoints3dList.getSegment3D(i-1, undefined, bLoop); }
 		
 		projectionDirection = segment3d.getDirection(undefined);
 		

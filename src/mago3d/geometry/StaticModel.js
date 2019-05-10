@@ -33,7 +33,7 @@ var StaticModelsManager = function()
 /**
  * @class StaticModelsManager
  */
- /*
+/*
 StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
 {
 	if(this.staticModelsMap === undefined)
@@ -50,11 +50,11 @@ StaticModelsManager.prototype.getStaticModel = function(modelFullPath)
 {
 	var neoBuilding;
 	
-	if(this.staticModelsMap === undefined)
-		this.staticModelsMap = {};
+	if (this.staticModelsMap === undefined)
+	{ this.staticModelsMap = {}; }
 	
 	neoBuilding = this.staticModelsMap[modelFullPath];
-	if(neoBuilding === undefined)
+	if (neoBuilding === undefined)
 	{
 		// Create the neoBuilding.***
 		neoBuilding = new NeoBuilding();

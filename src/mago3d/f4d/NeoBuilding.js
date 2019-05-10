@@ -26,9 +26,6 @@ var NeoBuilding = function()
 	this.motherNeoReferencesMap; 
 	this.motherBlocksArray = []; 
 	
-	// Current visible objects.*******************************************
-	this.currentVisibleOctreesControler; //  class VisibleObjectsControler;
-	
 	// Aditional Color.***************************************************
 	this.isHighLighted;
 	this.isColorChanged;
@@ -40,8 +37,10 @@ var NeoBuilding = function()
 	// The octree.********************************************************
 	this.octree; // f4d_octree. ***
 
-	// auxiliar vars.
-	this.currentLod; // must be updated before call render.***
+	// Auxiliar vars. This vars must be updated before to call render.***
+	this.currentLod; // Must be updated before to call render.***
+	this.currentVisibleOctreesControler; // Must be updated before to call render.***
+	this.myCameraRelative; // Must be updated before to call render.***
 
 	// The simple building.***********************************************
 	this.simpleBuilding3x3Texture; // old version.***
@@ -930,8 +929,8 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	var gl = magoManager.sceneState.gl;
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	
-	if(currentLod !== undefined)
-		this.currentLod = currentLod;
+	if (currentLod !== undefined)
+	{ this.currentLod = currentLod; }
 	
 	// Check metaData.projectDataType.***
 	if (this.metaData.projectDataType === 5)
@@ -1128,6 +1127,18 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 	var refMatrixIdxKey = 0;
 	var isInterior = false; // old var.***
 	
+	var applyOcclusionCulling = this.getRenderSettingApplyOcclusionCulling();
+	if (applyOcclusionCulling === undefined)
+	{ applyOcclusionCulling = true; }
+	
+	var relCamPosX, relCamPosY, relCamPosZ; 
+	if (applyOcclusionCulling)
+	{
+		relCamPosX = this.myCameraRelative.position.x;
+		relCamPosY = this.myCameraRelative.position.y;
+		relCamPosZ = this.myCameraRelative.position.z;
+	}
+	
 	// LOD0.***
 	var minSize = 0.0;
 	var lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;
@@ -1136,7 +1147,10 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		lowestOctree = this.currentVisibleOctreesControler.currentVisibles0[j];
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
-
+		
+		if (applyOcclusionCulling)
+		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
+		
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
 	}
@@ -1149,6 +1163,9 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		lowestOctree = this.currentVisibleOctreesControler.currentVisibles1[j];
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
+	
+		if (applyOcclusionCulling)
+		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
 
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
@@ -1163,7 +1180,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		lowestOctree = this.currentVisibleOctreesControler.currentVisibles2[j];
 		if (lowestOctree.lego === undefined) 
 		{ continue; }
-
+		
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
 	}

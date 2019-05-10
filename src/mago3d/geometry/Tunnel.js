@@ -93,8 +93,8 @@ Tunnel.prototype.renderPoints = function(magoManager, shader, renderType)
  */
 Tunnel.prototype.renderMesh = function(magoManager, shader, renderType) 
 {
-	if(this.meshPositive === undefined)
-		return;
+	if (this.meshPositive === undefined)
+	{ return; }
 	
 	var gl = magoManager.sceneState.gl;
 	var buildingGeoLocation = this.getGeoLocationData();
@@ -284,7 +284,7 @@ Tunnel.prototype.makeMesh = function(magoManager)
 	// Make the loft vtxProfilesList.***
 	//bLoop = true;
 	
-	if(this.meshPositive === undefined)
+	if (this.meshPositive === undefined)
 	{
 		this.vtxProfilesList.makeLoft(profile2d, pathPoints3dList, bLoop);
 		
@@ -363,7 +363,7 @@ Tunnel.prototype.remakeMesh = function(magoManager)
 	this.vtxProfilesList.deleteObjects();
 	this.vtxProfilesList = new VtxProfilesList();
 	
-	if(this.meshPositive === undefined)
+	if (this.meshPositive === undefined)
 	{
 		this.vtxProfilesList.makeLoft(profile2d, pathPoints3dList, bLoop);
 		

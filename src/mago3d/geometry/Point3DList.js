@@ -195,7 +195,7 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 			segment3d_A = this.getSegment3D(idxPrev, undefined, bLoop);	
 			segment3d_B = this.getSegment3D(idxPrev, undefined, bLoop);	
 		}
-		else if(idx === 0)
+		else if (idx === 0)
 		{
 			segment3d_A = this.getSegment3D(idx, undefined, bLoop);	
 			segment3d_B = this.getSegment3D(idx, undefined, bLoop);

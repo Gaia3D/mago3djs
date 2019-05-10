@@ -170,6 +170,7 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
 {
 	// This function calculates all data and matrices for the location(longitude, latitude, altitude) and rotation(heading, pitch, roll).
+	// Note: Heading, pitch & roll are angles in degree.***
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 

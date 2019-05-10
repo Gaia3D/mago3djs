@@ -227,8 +227,8 @@ Vertex.prototype.getOutingHEdges = function(resultHedgesArray)
 Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resultVertex)
 {
 	// Note: projectionDirection must be unitary.***
-	if(vertex === undefined)
-		return resultVertex;
+	if (vertex === undefined)
+	{ return resultVertex; }
 	
 	var position = vertex.getPosition();
 	var line = new Line(position, projectionDirection);
@@ -236,8 +236,8 @@ Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resu
 	var intersectionPoint;
 	intersectionPoint = plane.intersectionLine(line, intersectionPoint);
 	
-	if(resultVertex === undefined)
-		resultVertex = new Vertex();
+	if (resultVertex === undefined)
+	{ resultVertex = new Vertex(); }
 	
 	// 1rst, copy from the original vertex.***
 	resultVertex.copyFrom(vertex);
