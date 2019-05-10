@@ -613,9 +613,9 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
  * @param {number} unit position unit. if not define, default value is CODE.units.DEGREE. 0 : CODE.units.METRE, 1 : CODE.units.DEGREE, 2 : CODE.units.RADIAN
  * @return {Object|Cartesian3|Cartographic}
  */
-function getCurrentPositionAPI(managerFactoryInstance, unit)
+function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
 {
-	var api = new API("getCurrentPosition");
+	var api = new API("getCameraCurrentPosition");
 	
 	api.setReturnable(true);
 	api.setUnit(unit);
@@ -628,9 +628,9 @@ function getCurrentPositionAPI(managerFactoryInstance, unit)
  * @param {ManagerFactory} managerFactoryInstance
  * @return {Object}
  */
-function getCurrentOrientaionAPI(managerFactoryInstance)
+function getCameraCurrentOrientaionAPI(managerFactoryInstance)
 {
-	var api = new API("getCurrentOrientaion");
+	var api = new API("getCameraCurrentOrientaion");
 	
 	api.setReturnable(true);
 	return managerFactoryInstance.callAPI(api);
@@ -654,4 +654,34 @@ function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll
 	api.setDuration(duration);
 
 	managerFactoryInstance.callAPI(api);
+}
+
+
+/**
+ * Object literal with config options for instantiate static model.
+ * @typedef {Object} instantiateOption
+ * @property {string} instanceId Required. instance Id.  projectFolderName
+ * @property {string} projectFolderName Required. project Folder Name.
+ * @property {string} buildingFolderName Required. Static Model data Folder Name.
+ * @property {number} longitude Required. initial longitude.
+ * @property {number} latitude Required. initial latitude.
+ * @property {number} height Optional. Default value is 0.
+ * @property {number} heading Optional. Default value is 0.
+ * @property {number} pitch Optional. Default value is 0.
+ * @property {number} roll Optional. Default value is 0.
+ */
+
+/**
+ * instantiate static model
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId 
+ * @param {instantiateOption} attributes
+ */
+function instantiateStaticModelAPI(managerFactoryInstance, projectId, attributes)
+{
+	var api = new API("instantiateStaticModel");
+	
+	api.setProjectId(projectId);
+	api.setInstantiateObj(attributes);
+	return managerFactoryInstance.callAPI(api);
 }

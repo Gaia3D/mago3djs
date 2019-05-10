@@ -110,7 +110,11 @@ function API(apiName)
 	// General magoMode.***
 	this.magoMode = CODE.magoMode.NORMAL;
 
+	//position unit
 	this.unit = CODE.units.DEGREE;
+
+	//for staticModel instantiate
+	this.instantiateObj = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -540,3 +544,13 @@ API.prototype.setUnit = function(unit)
 		this.unit = unit;
 	}
 };
+
+API.prototype.getInstantiateObj = function()
+{
+	return this.instantiateObj;
+};
+API.prototype.setInstantiateObj = function(instantiateObj)
+{
+	this.instantiateObj = instantiateObj;
+};
+

@@ -800,11 +800,11 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
-		if(attributes.isReference !== undefined && attributes.isReference === true)
+		if (attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
-			if(neoBuilding === undefined)
+			if (neoBuilding === undefined)
 			{
 				/*
 				attributes = {
@@ -876,7 +876,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
 		}
-		else{
+		else
+		{
 			projectFolderName = node.data.projectFolderName;
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 		}
@@ -1440,8 +1441,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
 		
-		if(this.animationManager !== undefined)
-			this.animationManager.checkAnimation(this);
+		if (this.animationManager !== undefined)
+		{ this.animationManager.checkAnimation(this); }
 	}
 
 	var cameraPosition = this.sceneState.camera.position;
@@ -1535,8 +1536,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
 			
-			if(node.isReferenceNode())
-				continue;
+			if (node.isReferenceNode())
+			{ continue; }
 			
 			var neoBuilding = node.data.neoBuilding;
 			
@@ -1902,8 +1903,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		node = lowLodNodesArray[i];
 		
 		// debug.***
-		if(node.data.attributes.isReference !== undefined)
-			var hola = 0;
+		if (node.data.attributes.isReference !== undefined)
+		{ var hola = 0; }
 		
 		neoBuilding = node.data.neoBuilding;
 		
@@ -2739,8 +2740,8 @@ MagoManager.prototype.keyDown = function(key)
 	
 	if (key === 80) // 80 = 'p'.***
 	{
-		if(this.animationManager === undefined)
-			this.animationManager = new AnimationManager();
+		if (this.animationManager === undefined)
+		{ this.animationManager = new AnimationManager(); }
 
 		// Do a test.***
 		var projectId = "3ds.json";
@@ -2916,17 +2917,17 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			// create a "node" & insert into smartTile.***
 			var projectId = "AutonomousVehicle";
 			var attributes = {
-				"isPhysical": true,
-				"nodeType": "TEST",
-				"isReference": true,
-				"projectFolderName": "staticModels",
-				"buildingFolderName": "F4D_AutonomousBus",
-				"heading": 0,
-				"height": 41,
-				"latitude": 37.58197511583916,
-				"longitude": 126.60868083665515,
-				"pitch": 0,
-				"roll": 0};
+				"isPhysical"         : true,
+				"nodeType"           : "TEST",
+				"isReference"        : true,
+				"projectFolderName"  : "staticModels",
+				"buildingFolderName" : "F4D_AutonomousBus",
+				"heading"            : 0,
+				"height"             : 41,
+				"latitude"           : 37.58197511583916,
+				"longitude"          : 126.60868083665515,
+				"pitch"              : 0,
+				"roll"               : 0};
 				
 			var nodesMap = this.hierarchyManager.getNodesMap(projectId, attributes);
 			var existentNodesCount = Object.keys(nodesMap).length;
@@ -2937,7 +2938,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			// Now, create the geoLocdataManager of node.***
 			node.data.attributes = attributes;
 			node.data.geographicCoord = geoCoord;
-			node.data.rotationsDegree = new Point3D(0,0,0);
+			node.data.rotationsDegree = new Point3D(0, 0, 0);
 			node.data.geoLocDataManager = geoLocDataManager;
 			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
 			node.data.bbox.init();
@@ -4748,7 +4749,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
  */
 MagoManager.prototype.getObjectLabel = function() 
 {
-	if(this.canvasObjectLabel === undefined)
+	if (this.canvasObjectLabel === undefined)
 	{
 		this.canvasObjectLabel = document.getElementById("objectLabel");
 		if (this.canvasObjectLabel === undefined)
@@ -5512,7 +5513,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				neoBuilding = node.data.neoBuilding;
-				if(neoBuilding === undefined)
+				if (neoBuilding === undefined)
 				{
 					// This node is a reference node.***
 					visibleNodes.currentVisiblesAux.push(node);
@@ -6948,7 +6949,7 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		var hola = 0;
 	}
-	else if (apiName === "getCurrentPosition")
+	else if (apiName === "getCameraCurrentPosition")
 	{
 		var unit = api.getUnit();
 		if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -6970,7 +6971,7 @@ MagoManager.prototype.callAPI = function(api)
 			}
 		}
 	}
-	else if (apiName === "getCurrentOrientaion")
+	else if (apiName === "getCameraCurrentOrientaion")
 	{
 		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
 		{
@@ -7010,6 +7011,90 @@ MagoManager.prototype.callAPI = function(api)
 				},
 				duration: parseInt(duration)
 			});
+		}
+	}
+	else if (apiName === "instantiateStaticModel")
+	{
+		var projectId = api.getProjectId();
+		var attributes = api.getInstantiateObj();
+
+		if (!defined(attributes.instanceId))
+		{
+			throw new Error('instanceId is required.');
+		}
+		if (!defined(attributes.projectFolderName))
+		{
+			throw new Error('projectFolderName is required.');
+		}
+		if (!defined(attributes.buildingFolderName))
+		{
+			throw new Error('buildingFolderName is required.');
+		}
+		if (!defined(attributes.longitude))
+		{
+			throw new Error('longitude is required.');
+		}
+		if (!defined(attributes.latitude))
+		{
+			throw new Error('latitude is required.');
+		}
+
+		if (!attributes.isReference)
+		{
+			attributes.isReference = true;
+		}
+
+		if (!attributes.isPhysical)
+		{
+			attributes.isPhysical = true;
+		}
+
+		if (!attributes.nodeType)
+		{
+			attributes.nodeType = "TEST";
+		}
+
+		var nodesMap = this.hierarchyManager.getNodesMap(projectId, attributes);
+		var existentNodesCount = Object.keys(nodesMap).length;
+		var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
+		
+		var longitude = attributes.longitude;
+		var latitude = attributes.latitude;
+		var altitude = defaultValue(attributes.height, 0);
+		var heading = defaultValue(attributes.heading, 0);
+		var pitch = defaultValue(attributes.pitch, 0);
+		var roll = defaultValue(attributes.roll, 0);
+		
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
+		if (node === undefined)
+		{
+			node = this.hierarchyManager.newNode(instanceId, projectId, attributes);
+
+			var geoCoord = new GeographicCoord();
+			geoCoord.latitude = latitude;
+			geoCoord.longitude = longitude;
+			geoCoord.altitude = altitude;
+
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
+
+			// Now, create the geoLocdataManager of node.***
+			node.data.attributes = attributes;
+			node.data.geographicCoord = geoCoord;
+			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
+			node.data.geoLocDataManager = geoLocDataManager;
+			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
+			node.data.bbox.init();
+			node.data.bbox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+
+			// Now, insert node into smartTile.***
+			var targetDepth = defaultValue(17, this.smartTileManager.targetDepth);
+			this.smartTileManager.putNode(targetDepth, node, this);
+		}
+		else 
+		{
+			this.changeLocationAndRotation(projectId, instanceId, latitude, longitude, altitude, heading, pitch, roll);
 		}
 	}
 };
