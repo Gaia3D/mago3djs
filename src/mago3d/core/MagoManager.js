@@ -7082,21 +7082,25 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "instantiateStaticModel")
 	{
-		var projectId = api.getProjectId();
 		var attributes = api.getInstantiateObj();
+
+		if (!defined(attributes.projectId))
+		{
+			throw new Error('instanceId is required.');
+		}
 
 		if (!defined(attributes.instanceId))
 		{
 			throw new Error('instanceId is required.');
 		}
-		if (!defined(attributes.projectFolderName))
+		/*if (!defined(attributes.projectFolderName))
 		{
 			throw new Error('projectFolderName is required.');
 		}
 		if (!defined(attributes.buildingFolderName))
 		{
 			throw new Error('buildingFolderName is required.');
-		}
+		}*/
 		if (!defined(attributes.longitude))
 		{
 			throw new Error('longitude is required.');
@@ -7121,9 +7125,11 @@ MagoManager.prototype.callAPI = function(api)
 			attributes.nodeType = "TEST";
 		}
 
-		var nodesMap = this.hierarchyManager.getNodesMap(projectId, attributes);
-		var existentNodesCount = Object.keys(nodesMap).length;
-		var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
+		//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
+		//var existentNodesCount = Object.keys(nodesMap).length;
+		//var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
+		var projectId = attributes.projectId;
+		var instanceId = attributes.instanceId;
 		
 		var longitude = attributes.longitude;
 		var latitude = attributes.latitude;
@@ -7135,7 +7141,7 @@ MagoManager.prototype.callAPI = function(api)
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
 		if (node === undefined)
 		{
-			node = this.hierarchyManager.newNode(instanceId, projectId, attributes);
+			node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
 
 			var geoCoord = new GeographicCoord();
 			geoCoord.latitude = latitude;
@@ -7156,7 +7162,7 @@ MagoManager.prototype.callAPI = function(api)
 			node.data.bbox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
 
 			// Now, insert node into smartTile.***
-			var targetDepth = defaultValue(17, this.smartTileManager.targetDepth);
+			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
 			this.smartTileManager.putNode(targetDepth, node, this);
 		}
 		else 

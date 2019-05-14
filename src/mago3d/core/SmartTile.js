@@ -1037,6 +1037,7 @@ SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodes
  */
 SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
 {
+	targetDepth = defaultValue(targetDepth, 17);
 	if (this.tilesArray !== undefined)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
