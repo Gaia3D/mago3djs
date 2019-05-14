@@ -785,7 +785,13 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		
 		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
 		
-		if (this.lod === 1)
+		if (this.lod === 0)
+		{
+			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
+			if (pCloudPartitionsCount > 20)
+			{ pCloudPartitionsCount = 20; }
+		}
+		else if (this.lod === 1)
 		{
 			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
 			if (pCloudPartitionsCount > 10)
