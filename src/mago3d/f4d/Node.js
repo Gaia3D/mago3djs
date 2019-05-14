@@ -118,6 +118,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).***
 	neoBuilding.currentVisibleOctreesControler = data.currentVisibleOctreesControler;
 	neoBuilding.myCameraRelative = data.myCameraRelative;
+	neoBuilding.isColorChanged = data.isColorChanged;
+	neoBuilding.aditionalColor = data.aditionalColor;
 
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
