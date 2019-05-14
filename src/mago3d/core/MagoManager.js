@@ -4717,7 +4717,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		var nodesPCloudCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
-			currentShader = this.postFxShadersManager.getShader("pointsCloud");
+			currentShader = this.postFxShadersManager.getShader("pointsCloudSsao");
 			currentShader.useProgram();
 			
 			currentShader.resetLastBuffersBinded();
@@ -4727,7 +4727,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			currentShader.bindUniformGenerals();
 			
-			var bApplySsao = false;
+			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
 			gl.activeTexture(gl.TEXTURE0);
