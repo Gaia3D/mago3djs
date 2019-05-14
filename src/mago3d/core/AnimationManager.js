@@ -15,6 +15,11 @@ var AnimationData = function()
 	this.lastTime; // the last update time.***
 	this.durationInSeconds;
 	
+	// start location.***
+	this.startLongitude;
+	this.startLatitude;
+	this.startAltitude;
+	
 	// target location.***
 	this.targetLongitude;
 	this.targetLatitude;

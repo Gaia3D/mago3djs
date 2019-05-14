@@ -927,7 +927,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
 {
 	var gl = magoManager.sceneState.gl;
-	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	//gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	
 	if (currentLod !== undefined)
 	{ this.currentLod = currentLod; }
@@ -1151,6 +1151,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (applyOcclusionCulling)
 		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
 		
+		lowestOctree.lod = 0; // set current lod to octree.***
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
 	}
@@ -1166,7 +1167,8 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 	
 		if (applyOcclusionCulling)
 		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
-
+		
+		lowestOctree.lod = 1; // set current lod to octree.***
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
 	}
@@ -1181,6 +1183,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (lowestOctree.lego === undefined) 
 		{ continue; }
 		
+		lowestOctree.lod = 2; // set current lod to octree.***
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
 	}
