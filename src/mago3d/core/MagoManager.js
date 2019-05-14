@@ -98,26 +98,16 @@ var MagoManager = function()
 		0.0, -0.5, 0.55,
 		0.33, 0.3, 0.35];
 
-	// Original for hemisphere.***
-	/*
-	for(var i=0; i<kernelSize; i++) {
-		var x = 2.0 * (Math.random() - 0.5);
-		var y = 2.0 * (Math.random() - 0.5);
-		var z = Math.random();
-		if(z<0.15)z = 0.15;
-		this.kernel.push(x);
-		this.kernel.push(y);
-		this.kernel.push(z);
+	// Test for sphere.***
+	this.sphereKernel = [];
+	var kernelSize = 16;
+	for (var i=0; i<kernelSize; i++) 
+	{
+		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
+		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
+		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
 	}
-	*/
-
-	/* Test for sphere.***
-	for(var i=0; i<kernelSize; i++) {
-		this.kernel.push(2.0 * (Math.random() - 0.5));
-		this.kernel.push(2.0 * (Math.random() - 0.5));
-		this.kernel.push(2.0 * (Math.random() - 0.5));
-	}
-	*/
+	
 	// End ssao.------------------------------------------------
 
 	this.atmosphere = new Atmosphere();
@@ -5174,6 +5164,30 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 		
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);
+	}
+	
+	// PointsCloud.****************************************************************************************
+	// PointsCloud.****************************************************************************************
+	var nodesPCloudCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
+	if (nodesPCloudCount > 0)
+	{
+		currentShader = this.postFxShadersManager.getShader("pointsCloud");
+		currentShader.useProgram();
+		
+		currentShader.resetLastBuffersBinded();
+
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.enableVertexAttribArray(currentShader.color4_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc); // provisionally has no normals.***
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
+		
+		currentShader.bindUniformGenerals();
+
+		this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, renderType); 
+		currentShader.disableVertexAttribArrayAll();
+		
+		gl.useProgram(null);
+
 	}
 	
 	// Render cuttingPlanes of temperaturalayers if exist.***

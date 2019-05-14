@@ -643,8 +643,15 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	{
 		aNode = nodesArray[i];
 		var geoLocDatamanager = aNode.getNodeGeoLocDataManager();
-		//var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
-		var geoLocationData = geoLocDatamanager.newGeoLocationData();
+		var geoLocationData;
+		if (this.data.animationData !== undefined)
+		{
+			var geoLocationData = geoLocDatamanager.newGeoLocationData();
+		}
+		else 
+		{
+			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
+		}
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		if (geoLocationData === undefined)
 		{ continue; }
