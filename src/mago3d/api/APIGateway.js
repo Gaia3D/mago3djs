@@ -682,5 +682,5 @@ function instantiateStaticModelAPI(managerFactoryInstance, attributes)
 	var api = new API("instantiateStaticModel");
 	
 	api.setInstantiateObj(attributes);
-	return managerFactoryInstance.callAPI(api);
+	managerFactoryInstance.callAPI(api);
 }

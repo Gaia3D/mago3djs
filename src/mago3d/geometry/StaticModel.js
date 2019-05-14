@@ -12,7 +12,9 @@ var StaticModel = function()
 	}
 	
 	this.guid;
-	this.modelFullPath;
+	//this.modelFullPath;
+	this.buildingFolderName;
+	this.projectFolderName;
 	this.neoBuilding; // F4D type data.***
 };
 
@@ -31,9 +33,10 @@ var StaticModelsManager = function()
 };
 
 /**
- * @class StaticModelsManager
+ * Add StaticModel.
+ * @param {String} guid.
+ * @param {Object} staticModel.
  */
-/*
 StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
 {
 	if(this.staticModelsMap === undefined)
@@ -41,17 +44,21 @@ StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
 	
 	this.staticModelsMap[guid] = staticModel;
 };
-*/
 
 /**
- * @class StaticModelsManager
+ * Get StaticModel.
+ * @param {String} projectId.
+ * @return {Object|undefined} StaticModel.
  */
-StaticModelsManager.prototype.getStaticModel = function(modelFullPath)
+StaticModelsManager.prototype.getStaticModel = function(projectId)
 {
-	var neoBuilding;
+	//var staticModel;
+	//var neoBuilding;
 	
-	if (this.staticModelsMap === undefined)
+	/*if (this.staticModelsMap === undefined)
 	{ this.staticModelsMap = {}; }
+
+
 	
 	neoBuilding = this.staticModelsMap[modelFullPath];
 	if (neoBuilding === undefined)
@@ -59,9 +66,19 @@ StaticModelsManager.prototype.getStaticModel = function(modelFullPath)
 		// Create the neoBuilding.***
 		neoBuilding = new NeoBuilding();
 		this.staticModelsMap[modelFullPath] = neoBuilding;
+	}*/
+
+	if (this.staticModelsMap === undefined)
+	{ 
+		throw new Error('StaticModel is not exist.');
 	}
-	
-	return neoBuilding;
+
+	var staticModel = this.staticModelsMap[projectId];
+	if (staticModel === undefined)
+	{
+		throw new Error('StaticModel is not exist.');
+	}
+	return staticModel;
 };
 
 

@@ -787,7 +787,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	var neoBuilding;
 	var node, rootNode;
 	var projectFolderName;
-	
+	var neoBuildingFolderName;
 	//var geometryDataPath = this.readerWriter.getCurrentDataPath();
 	var geometryDataPath = this.readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
 	if (this.headersRequestedCounter === undefined)
@@ -800,25 +800,26 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
-		if (attributes.isReference !== undefined && attributes.isReference === true)
+		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 			if (neoBuilding === undefined)
 			{
-				var neoBuildingFolderName = attributes.buildingFolderName;
-				projectFolderName = attributes.projectFolderName;
-				
 				// test.****************************************
 				//neoBuildingFolderName = "F4D_Seongdong_del";
 				//projectFolderName = "3ds";
 				//----------------------------------------------
-				
-				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
-				
+
 				// demand to staticModelsManager the neoBuilding.***
+				var projectId = attributes.projectId;
 				var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
-				neoBuilding = staticModelsManager.getStaticModel(staticModelDataPath);
+				var staticModel = staticModelsManager.getStaticModel(projectId);
+				neoBuilding = new NeoBuilding();//staticModel.neoBuilding;
+				neoBuildingFolderName = staticModel.buildingFolderName;
+				projectFolderName = staticModel.projectFolderName;
+				
+				//neoBuilding = staticModelsManager.getStaticModel(staticModelDataPath);
 				
 				// make a buildingSeed.***
 				var buildingSeed = new BuildingSeed();
@@ -840,7 +841,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				node.data.neoBuilding = neoBuilding;
 				node.data.buildingSeed = buildingSeed;
 				node.data.projectFolderName = projectFolderName;
-				
 
 				if (neoBuilding.metaData === undefined) 
 				{ 
@@ -7072,7 +7072,7 @@ MagoManager.prototype.callAPI = function(api)
 
 		if (!defined(attributes.projectId))
 		{
-			throw new Error('instanceId is required.');
+			throw new Error('projectId is required.');
 		}
 
 		if (!defined(attributes.instanceId))
