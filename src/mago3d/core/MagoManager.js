@@ -4111,7 +4111,8 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		colorChangedHistoryMap = MagoConfig.getColorHistorys(projectId, dataKey);
 		if (colorChangedHistoryMap)
 		{
-			neoBuilding = node.data.neoBuilding;
+			var data = node.data;
+			//neoBuilding = node.data.neoBuilding;
 			for (var key in colorChangedHistoryMap)
 			{
 				if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
@@ -4122,11 +4123,11 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
 						{
 							// change color for all node.
-							neoBuilding.isColorChanged = true;
-							if (neoBuilding.aditionalColor === undefined)
-							{ neoBuilding.aditionalColor = new Color(); }
+							data.isColorChanged = true;
+							if (data.aditionalColor === undefined)
+							{ data.aditionalColor = new Color(); }
 							
-							neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 						}
 						else 
 						{
@@ -4143,11 +4144,11 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 								// 1rst, check if this has the same "key" and same "value".
 								if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
 								{
-									neoBuilding.isColorChanged = true;
-									if (neoBuilding.aditionalColor === undefined)
-									{ neoBuilding.aditionalColor = new Color(); }
+									data.isColorChanged = true;
+									if (data.aditionalColor === undefined)
+									{ data.aditionalColor = new Color(); }
 									
-									neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+									data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 								}
 							}
 						}
@@ -4155,6 +4156,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 					else 
 					{
 						// change color for an object.
+						neoBuilding = node.data.neoBuilding;
 						var objectId = changeHistory.objectId;
 						var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
 						if (objectsArray)
@@ -4215,14 +4217,15 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 										for (var i=0; i<nodesCount; i++)
 										{
 											var aNode2 = nodesArray[i];
-											neoBuilding = aNode2.data.neoBuilding;
-											if (neoBuilding)
+											var data = aNode2.data;
+											//neoBuilding = aNode2.data.neoBuilding;
+											if (data)
 											{
-												neoBuilding.isColorChanged = true;
-												if (neoBuilding.aditionalColor === undefined)
-												{ neoBuilding.aditionalColor = new Color(); }
+												data.isColorChanged = true;
+												if (data.aditionalColor === undefined)
+												{ data.aditionalColor = new Color(); }
 												
-												neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+												data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 											}
 										}
 									}
@@ -4238,16 +4241,17 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 										for (var i=0; i<nodesCount; i++)
 										{
 											var aNode2 = nodesArray[i];
-											neoBuilding = aNode2.data.neoBuilding;
-											if (neoBuilding)
+											var data = aNode2.data;
+											//neoBuilding = aNode2.data.neoBuilding;
+											if (data)
 											{
 												if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
 												{
-													neoBuilding.isColorChanged = true;
-													if (neoBuilding.aditionalColor === undefined)
-													{ neoBuilding.aditionalColor = new Color(); }
+													data.isColorChanged = true;
+													if (data.aditionalColor === undefined)
+													{ data.aditionalColor = new Color(); }
 													
-													neoBuilding.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+													data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
 												}
 											}
 										}
