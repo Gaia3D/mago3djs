@@ -314,8 +314,11 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 	else if (renderType === 1) // color.***
 	{
 		// Test external alpha.***
-		var blendAlpha = this.getBlendAlpha(magoManager.currTime);
-		gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+		if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.***
+		{
+			var blendAlpha = this.getBlendAlpha(magoManager.currTime);
+			gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+		}
 		// End test.---
 	
 		// 4) Texcoord.*********************************************

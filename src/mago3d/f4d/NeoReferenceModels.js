@@ -308,8 +308,12 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
 	// Test external alpha.***
-	var blendAlpha = neoReference.getBlendAlpha(magoManager.currTime);
-	gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+	if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.***
+	{
+		var blendAlpha = neoReference.getBlendAlpha(magoManager.currTime);
+		gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
+	}
+	
 	// End test.---
 	
 	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;

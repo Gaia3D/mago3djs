@@ -806,29 +806,13 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 			if (neoBuilding === undefined)
 			{
-				/*
-				attributes = {
-				"isPhysical": true,
-				"nodeType": "TEST",
-				"isReference": true,
-				"projectFolderName": "staticModels",
-				"buildingFolderName": "F4D_AutonomousBus",
-				"heading": 0,
-				"height": 41,
-				"latitude": 37.58197511583916,
-				"longitude": 126.60868083665515,
-				"pitch": 0,
-				"roll": 0};
-				*/
-				
-				//SD_COUNCIL_del
 				var neoBuildingFolderName = attributes.buildingFolderName;
 				projectFolderName = attributes.projectFolderName;
 				
-				// test.***
-				//neoBuildingFolderName = "F4D_SD_COUNCIL_del";
+				// test.****************************************
+				//neoBuildingFolderName = "F4D_Seongdong_del";
 				//projectFolderName = "3ds";
-				//attributes.pitch = 90;
+				//----------------------------------------------
 				
 				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
 				
@@ -843,10 +827,10 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				buildingSeed.buildingId = neoBuildingFolderName;
 				buildingSeed.buildingFileName = neoBuildingFolderName;
 				buildingSeed.geographicCoord = new GeographicCoord(attributes.longitude, attributes.latitude, attributes.height); // class : GeographicCoord.
-				buildingSeed.rotationsDegree = new Point3D(attributes.heading, attributes.pitch, attributes.roll); // class : Point3D. (heading, pitch, roll).
+				buildingSeed.rotationsDegree = new Point3D(attributes.pitch, attributes.roll, attributes.heading); // class : Point3D. (heading, pitch, roll).
 				buildingSeed.bBox = new BoundingBox();           // class : BoundingBox.
 				buildingSeed.bBox.init();
-				buildingSeed.bBox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+				buildingSeed.bBox.expand(10.0); // we dont know the bbox size, provisionally set as 10,10,10.***
 				buildingSeed.geographicCoordOfBBox = new GeographicCoord(attributes.longitude, attributes.latitude, attributes.height);  // class : GeographicCoord.
 				buildingSeed.smartTileOwner;
 				
@@ -855,32 +839,34 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.nodeOwner = node;
 				node.data.neoBuilding = neoBuilding;
 				node.data.buildingSeed = buildingSeed;
-				var nodeBbox = new BoundingBox();
-				node.data.bbox = nodeBbox;
 				node.data.projectFolderName = projectFolderName;
 				
+
 				if (neoBuilding.metaData === undefined) 
-				{ neoBuilding.metaData = new MetaData(); }
+				{ 
+					neoBuilding.metaData = new MetaData(); 
+					
+					if (neoBuilding.metaData.geographicCoord === undefined)
+					{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
 
-				if (neoBuilding.metaData.geographicCoord === undefined)
-				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-				if (neoBuilding.metaData.bbox === undefined) 
-				{ neoBuilding.metaData.bbox = new BoundingBox(); }
+					if (neoBuilding.metaData.bbox === undefined) 
+					{ neoBuilding.metaData.bbox = new BoundingBox(); }
 				
+					neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+					neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+					neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+					neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+					neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+				}
+
 				neoBuilding.name = "test_" + neoBuildingFolderName;
 				neoBuilding.buildingId = neoBuildingFolderName;
 			
 				neoBuilding.buildingType = "basicBuilding";
-				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
-				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+				//nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
 				if (neoBuilding.bbox === undefined)
 				{ neoBuilding.bbox = new BoundingBox(); }
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
 		}
@@ -2784,33 +2770,39 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	
 	if (key === 80) // 80 = 'p'.***
 	{
 		if (this.animationManager === undefined)
 		{ this.animationManager = new AnimationManager(); }
-
+	
+		var projectId = "AutonomousVehicle";
+		var dataKey = "AutonomousBus_0";
+			
 		// Do a test.***
-		var projectId = "3ds.json";
-		var dataKey = "GyeomjaeJeongSeon_del";
+		//var projectId = "3ds.json";
+		//var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		this.animationManager.putNode(node);
+		
+		var geoLocDataManager = node.getNodeGeoLocDataManager();
+		var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+		var geoCoords = geoLocData.getGeographicCoords();
+		var currLon = geoCoords.longitude;
+		var currLat = geoCoords.latitude;
+		var currAlt = geoCoords.altitude;
+		
 
-		// Jeju island.***
-		var latitude = 33.519674269678504;
-		var longitude = 126.53339849002569;
+		// Move a little.***
+		var latitude = currLat + 0.0002;
+		var longitude = currLon;// + 0.0002;
+		var elevation = currAlt;
 		
-		// Near the original position.***
-		latitude = 37.58639062251842;
-		longitude = 126.61172849731089;
 		
-		var elevation = 2.0;
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 30;
-		//durationTimeInSeconds = undefined;
+		var durationTimeInSeconds = 1;
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
@@ -2954,13 +2946,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// StaticGeometries.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
 		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			// test to insert an staticGeometry AutonomousBus.***
-			var staticGeometryFilePath = "";
-			
 			// create a "node" & insert into smartTile.***
 			var projectId = "AutonomousVehicle";
 			var attributes = {
@@ -2970,12 +2955,17 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				"projectFolderName"  : "staticModels",
 				"buildingFolderName" : "F4D_AutonomousBus",
 				"heading"            : 0,
-				"height"             : 41,
-				"latitude"           : 37.58197511583916,
-				"longitude"          : 126.60868083665515,
 				"pitch"              : 0,
 				"roll"               : 0};
 				
+			//attributes.pitch = 90.0;
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, attributes.heading, attributes.pitch, attributes.roll, geoLocData, this);
+			
+			// test to insert an staticGeometry AutonomousBus.***
+			var staticGeometryFilePath = "";
+
 			var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
 			var existentNodesCount = Object.keys(nodesMap).length;
 			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
@@ -2987,10 +2977,11 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			node.data.geographicCoord = geoCoord;
 			node.data.rotationsDegree = new Point3D(attributes.pitch, attributes.roll, attributes.heading);
 			node.data.geoLocDataManager = geoLocDataManager;
-			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
-			node.data.bbox.init();
-			node.data.bbox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+			node.data.rotationsDegree.set(attributes.pitch, attributes.roll, attributes.heading);
+			var geoLocDataManager = node.data.geoLocDataManager;
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 			
+			geoLocData.setRotationHeadingPitchRoll(attributes.heading, attributes.pitch, attributes.roll);
 			
 			// Now, insert node into smartTile.***
 			var targetDepth = this.smartTileManager.targetDepth;
@@ -4121,7 +4112,6 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		if (colorChangedHistoryMap)
 		{
 			neoBuilding = node.data.neoBuilding;
-			//for (var changeHistory of colorChangedHistoryMap.values()) 
 			for (var key in colorChangedHistoryMap)
 			{
 				if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
@@ -4958,6 +4948,7 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
 
 	var neoBuilding;
+	var bbox;
 	var ssao_idx = 1;
 	var nodesCount = nodesArray.length;
 	for (var b=0; b<nodesCount; b++)
@@ -4966,13 +4957,14 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 		
 		node = nodesArray[b];
 		neoBuilding = node.data.neoBuilding;
+		bbox = node.getBBox();
 
-		gl.uniform3fv(currentShader.scale_loc, [neoBuilding.bbox.getXLength(), neoBuilding.bbox.getYLength(), neoBuilding.bbox.getZLength()]); //.***
+		gl.uniform3fv(currentShader.scale_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
 		var buildingGeoLocation = node.getNodeGeoLocDataManager().getCurrentGeoLocationData();
 		
 		buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
 
-		this.pointSC = neoBuilding.bbox.getCenterPoint(this.pointSC);
+		this.pointSC = bbox.getCenterPoint(this.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [this.pointSC.x, this.pointSC.y, this.pointSC.z]); //.***
 		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		this.renderer.renderObject(gl, this.unitaryBoxSC, this, currentShader, ssao_idx, bRenderLines);
@@ -5738,20 +5730,17 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
 	if (lowestTile.nodesArray)
 	{ startIndex = lowestTile.nodesArray.length; }
+
+	if (lowestTile.nodesArray === undefined)
+	{ lowestTile.nodesArray = []; }
 	
 	var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
 	for (var j=startIndex; j<nodeSeedsCount; j++)
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		
-		if (node.isReferenceNode())
-		{ var hola = 0; }
-		
 		if (node.data.neoBuilding !== undefined)
 		{
-			if (lowestTile.nodesArray === undefined)
-			{ lowestTile.nodesArray = []; }
-	
 			lowestTile.nodesArray.push(node);
 			continue;
 		}
@@ -5763,9 +5752,6 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 		nodeBbox = new BoundingBox();
 		node.data.bbox = nodeBbox;
 		buildingSeed = node.data.buildingSeed;
-	
-		if (lowestTile.nodesArray === undefined)
-		{ lowestTile.nodesArray = []; }
 		
 		lowestTile.nodesArray.push(node);
 		

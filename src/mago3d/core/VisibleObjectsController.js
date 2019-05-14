@@ -69,8 +69,8 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 
 		while (!finished && i<=endIdx)
 		{
-			var aNeoBuilding = nodesArray[i].data.neoBuilding;
-			if (neoBuilding.distToCam < aNeoBuilding.distToCam)
+			var aNode = nodesArray[i];
+			if (aNode.data.distToCam < aNode.data.distToCam)
 			{
 				idx = i;
 				finished = true;
@@ -89,8 +89,8 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 		var middleIdx = startIdx + Math.floor(range/2);
 		var newStartIdx;
 		var newEndIdx;
-		var middleNeoBuilding = nodesArray[middleIdx].data.neoBuilding;
-		if (middleNeoBuilding.distToCam > neoBuilding.distToCam)
+		var middleNode = nodesArray[middleIdx];
+		if (middleNode.data.distToCam > middleNode.data.distToCam)
 		{
 			newStartIdx = startIdx;
 			newEndIdx = middleIdx;

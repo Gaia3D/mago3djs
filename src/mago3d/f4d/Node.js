@@ -151,6 +151,38 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
+	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).***
+	var currRenderingFase = magoManager.renderingFase;
+	if (this.isReferenceNode())
+	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.***
+	
+	// test.*************************************************************************************************************
+	this.data.isTrailRender = true; // test.***
+	var isTrailRender = this.data.isTrailRender;
+	if (isTrailRender !== undefined && isTrailRender === true)
+	{
+		magoManager.isTrailRender = true;
+		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.***
+		var geoLocDatasCount = geoLocDataManager.getGeoLocationDatasCount();
+		//for(var i=geoLocDatasCount - 1; i>0; i--)
+		for (var i=1; i<geoLocDatasCount; i++ )
+		{
+			var buildingGeoLocation = geoLocDataManager.getGeoLocationData(i);
+			buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
+						
+			var externalAlpha = (geoLocDatasCount - i)/(geoLocDatasCount*7);
+			gl.uniform1f(shader.externalAlpha_loc, externalAlpha);
+
+			// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
+			neoBuilding.currentLod = data.currentLod; // update currentLod.***
+			neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
+
+		}
+		gl.depthRange(0, 1);
+		magoManager.isTrailRender = false;
+	}
+	//--------------------------------------------------------------------------------------------------------------------
+	
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 
@@ -159,14 +191,21 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// magoManager.tempSettings.renderWithTopology === 2 -> render both.***
 
 	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
-	var currRenderingFase = magoManager.renderingFase;
-	if (this.isReferenceNode())
-	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.***
-	
+	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	neoBuilding.currentLod = data.currentLod; // update currentLod.***
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 	
-	magoManager.renderingFase = currRenderingFase;
+	magoManager.renderingFase = currRenderingFase; // Return to current renderingFase.***
+	
+	// Finally, if there are no animationData, then delete the trailEfect.***
+	if (this.data.animationData !== undefined && this.data.animationData.finished === true)
+	{
+		if (geoLocDataManager.getGeoLocationDatasCount() > 1)
+		{ geoLocDataManager.popGeoLocationData(); }
+		else
+		{ this.data.animationData = undefined; }
+	}
+	
 	// Test.***
 	/*
 	if (neoBuilding.network)
@@ -287,14 +326,52 @@ Node.prototype.extractNodes = function(nodesArray)
  * @param texture 변수
  * @returns texId
  */
-Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
+Node.prototype.getBBox = function() 
 {
-	if (this.bboxAbsoluteCenterPos === undefined)
+	var bbox;
+	var data = this.data;
+	if (data.bbox === undefined)
 	{
-		this.calculateBBoxCenterPositionWorldCoord(geoLoc);
+		// 1rst, check if exist neoBuilding's metaData.***
+		var neoBuilding = data.neoBuilding;
+		if (neoBuilding !== undefined && neoBuilding.metaData !== undefined)
+		{
+			var metaData = neoBuilding.metaData;
+			data.bbox = new BoundingBox(); // Only create a node's bbox when exist neoBuilding's metaData.***
+			data.bbox.copyFrom(metaData.bbox);
+		}
+		else if (data.buildingSeed !== undefined)
+		{
+			var buildingSeed = data.buildingSeed;
+			bbox = buildingSeed.bbox;
+		}
+	}
+	else 
+	{
+		bbox = data.bbox;
 	}
 	
-	return this.bboxAbsoluteCenterPos;
+	return data.bbox;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
+{
+	var bboxAbsoluteCenterPos;
+	if (this.bboxAbsoluteCenterPos === undefined)
+	{
+		bboxAbsoluteCenterPos = this.calculateBBoxCenterPositionWorldCoord(geoLoc);
+	}
+	else 
+	{
+		bboxAbsoluteCenterPos = this.bboxAbsoluteCenterPos;
+	}
+	
+	return bboxAbsoluteCenterPos;
 };
 
 /**
@@ -305,16 +382,32 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var bboxCenterPoint;
-	bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-	this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
+	var bboxAbsoluteCenterPosAux;
+	if (this.data.bbox !== undefined)
+	{
+		// this.data.bbox is the most important bbox.***
+		bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+	}
+	else if (this.data.neoBuilding !== undefined)
+	{
+		bboxCenterPoint = this.data.neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+	}
+	else 
+	{
+		bboxCenterPoint = new Point3D();
+	}
+
+	bboxAbsoluteCenterPosAux = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, bboxAbsoluteCenterPosAux);
 	
 	// Now, must applicate the aditional translation vector. Aditional translation is made when we translate the pivot point.
 	if (geoLoc.pivotPointTraslation)
 	{
 		var traslationVector;
 		traslationVector = geoLoc.tMatrix.rotatePoint3D(geoLoc.pivotPointTraslation, traslationVector );
-		this.bboxAbsoluteCenterPos.add(traslationVector.x, traslationVector.y, traslationVector.z);
+		bboxAbsoluteCenterPosAux.add(traslationVector.x, traslationVector.y, traslationVector.z);
 	}
+	
+	return bboxAbsoluteCenterPosAux;
 };
 
 /**
@@ -329,12 +422,23 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	var nodeRoot = this.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	
+	// To calculate realBuildingPosition, we need this.data.bbox.***
+	// If this.data.bbox no exist, then calculate a provisional value.***
+	if (this.bboxAbsoluteCenterPos === undefined) 
+	{
+		if (this.data.bbox !== undefined)
+		{
+			// this.data.bbox is the most important bbox.***
+			var bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+			this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
+		}
+	}
+	
 	var realBuildingPos = this.getBBoxCenterPositionWorldCoord(geoLoc);
 	var radiusAprox;
-	if (neoBuilding !== undefined)
-	{ radiusAprox = neoBuilding.bbox.getRadiusAprox(); }
-	else
-	{ radiusAprox = data.bbox.getRadiusAprox(); }
+	var bbox = this.getBBox();
+	radiusAprox = bbox.getRadiusAprox(); 
 	
 	boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 	boundingSphere_Aux.setRadius(radiusAprox);
@@ -400,12 +504,19 @@ Node.prototype.finishedAnimation = function(magoManager)
 	
 	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
 	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.***
-	var factor = deltaTime/animData.durationInSeconds;
-	factor *= 100.0;
+
 	
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
+	
+	// calculate velocity.***
+	var velocityLon = (animData.targetLongitude - animData.startLongitude)/animData.durationInSeconds;
+	var velocityLat = (animData.targetLatitude - animData.startLatitude)/animData.durationInSeconds;
+	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/animData.durationInSeconds;
+	
+	// calculate rotation velocity.***
+	// todo:
 	
 	var geoLocDatamanager = this.getNodeGeoLocDataManager();
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
@@ -418,6 +529,8 @@ Node.prototype.finishedAnimation = function(magoManager)
 		
 		// finish the process.***
 		finished = true;
+		this.data.animationData.finished = true;
+		//this.data.animationData = undefined;
 	}
 	else
 	{
@@ -430,13 +543,13 @@ Node.prototype.finishedAnimation = function(magoManager)
 		var targetLatitude = animData.targetLatitude;
 		var targetAltitude = animData.targetAltitude;
 		
-		var dir = new Point3D(); // use point3d with geographic coordinates.***
-		dir.set(targetLongitude - currLongitude, targetLatitude - currLatitude, targetAltitude - currAltitude);
-		dir.unitary();
+		nextLongitude = animData.startLongitude + velocityLon * totalDeltaTime;
+		nextLatitude = animData.startLatitude + velocityLat * totalDeltaTime;
+		nextAltitude = animData.startAltitude + velocityAlt * totalDeltaTime;
 		
-		nextLongitude = currLongitude + dir.x * factor;
-		nextLatitude = currLatitude + dir.y * factor;
-		nextAltitude = currAltitude + dir.z * factor;
+		//nextLongitude = currLongitude + velocityLon * deltaTime;
+		//nextLatitude = currLatitude + velocityLat * deltaTime;
+		//nextAltitude = currAltitude + velocityAlt * deltaTime;
 		
 		// finally update "lastTime".***
 		animData.lastTime = currTime;
@@ -451,6 +564,7 @@ Node.prototype.finishedAnimation = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
+ 
 Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager, durationInSeconds) 
 {
 	// Provisionally set a geoLocationData target.************************************
@@ -458,6 +572,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	{ this.data.animationData = new AnimationData(); }
 	
 	var animData = this.data.animationData;
+	animData.finished = false;
 	
 	animData.birthTime = magoManager.getCurrentTime();
 	
@@ -465,6 +580,15 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	{ durationInSeconds = 3.0; }
 	
 	animData.durationInSeconds = durationInSeconds;
+	
+	var geoLocDataManager = this.getNodeGeoLocDataManager();
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var geoCoords = geoLocData.getGeographicCoords();
+	
+	// start location.***
+	animData.startLongitude = geoCoords.longitude;
+	animData.startLatitude = geoCoords.latitude;
+	animData.startAltitude = geoCoords.altitude;
 	
 	// target location.***
 	animData.targetLongitude = longitude;
@@ -477,16 +601,17 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	animData.targetRoll = roll;
 	
 	// linear velocity in m/s.***
-	animData.linearVelocityInMetersSecond = 40.0;
-	
+	//animData.linearVelocityInMetersSecond = 40.0;
+				
 	// angular velocity deg/s.***
-	animData.headingAngDegSecondVelocity = 10.0;
-	animData.pitchAngDegSecondVelocity = 0.0;
-	animData.rollAngDegSecondVelocity = 0.0;
+	//animData.headingAngDegSecondVelocity = 10.0;
+	//animData.pitchAngDegSecondVelocity = 0.0;
+	//animData.rollAngDegSecondVelocity = 0.0;
 	// end setting geoLocDataTarget.--------------------------------------------------
 	
 	
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -516,7 +641,8 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	{
 		aNode = nodesArray[i];
 		var geoLocDatamanager = aNode.getNodeGeoLocDataManager();
-		var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+		//var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
+		var geoLocationData = geoLocDatamanager.newGeoLocationData();
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		if (geoLocationData === undefined)
 		{ continue; }

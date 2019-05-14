@@ -59,6 +59,14 @@ GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch,
 /**
  * 어떤 일을 하고 있습니까?
  */
+GeoLocationData.prototype.getGeographicCoords = function() 
+{
+	return this.geographicCoord;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, latitude, altitude) 
 {
 	if (this.geographicCoord === undefined)
@@ -453,6 +461,7 @@ var GeoLocationDataManager = function()
 	}
 	
 	this.geoLocationDataArray = [];
+	this.geoLocationDataArrayMaxLengthAllowed = 15;
 };
 
 /**
@@ -476,6 +485,14 @@ GeoLocationDataManager.prototype.deleteObjects = function()
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+GeoLocationDataManager.prototype.popGeoLocationData = function() 
+{
+	this.geoLocationDataArray.pop();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  * @param geoLocationName 변수
  * @returns geoLocationData
@@ -485,9 +502,24 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
 	if (geoLocationName === undefined)
 	{ geoLocationName = "noName" + this.geoLocationDataArray.length.toString(); }
 	var geoLocationData = new GeoLocationData(geoLocationName);
-	this.geoLocationDataArray.push(geoLocationData);
-	//this.geoLocationDataCache[geoLocationName] = geoLocationData;
+	this.geoLocationDataArray.unshift(geoLocationData);
+	
+	if (this.geoLocationDataArray.length > this.geoLocationDataArrayMaxLengthAllowed)
+	{
+		this.geoLocationDataArray.pop();
+		// delete extracted geoLocdata. TODO:
+	}
+
 	return geoLocationData;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns this.geoLoactionDataArray[idx]
+ */
+GeoLocationDataManager.prototype.getGeoLocationDatasCount = function() 
+{
+	return this.geoLocationDataArray.length;
 };
 
 /**
