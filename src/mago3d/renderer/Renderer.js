@@ -345,6 +345,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		if (projectDataType !== undefined && projectDataType === 4)
 		{
 			// Old.***
+			/*
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
 				lowestOctree = allVisibles[j];
@@ -384,6 +385,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 
 				gl.bindBuffer(gl.ARRAY_BUFFER, null);
 			}
+			*/
 		}
 		else if (projectDataType !== undefined && projectDataType === 5)
 		{
