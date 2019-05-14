@@ -1,4 +1,4 @@
-"#ifdef GL_ES
+#ifdef GL_ES
     precision highp float;
 #endif
 
@@ -77,4 +77,4 @@ void main()
     vec4 finalColor;
 	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);
     gl_FragColor = finalColor; 
-}";
+}

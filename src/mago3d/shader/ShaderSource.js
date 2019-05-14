@@ -1053,7 +1053,7 @@ ShaderSource.PointCloudFS = "	precision lowp float;\n\
     {\n\
 		gl_FragColor = vColor;\n\
 	}";
-ShaderSource.PointCloudSsaoFS = "\"#ifdef GL_ES\n\
+ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
@@ -1132,7 +1132,7 @@ void main()\n\
     vec4 finalColor;\n\
 	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
     gl_FragColor = finalColor; \n\
-}\";";
+}";
 ShaderSource.PointCloudVS = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
