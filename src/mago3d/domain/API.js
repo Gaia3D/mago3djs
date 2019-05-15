@@ -115,6 +115,9 @@ function API(apiName)
 
 	//for staticModel instantiate
 	this.instantiateObj = null;
+
+	//for staticModel add
+	this.staticModelAttributeObj = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -552,5 +555,14 @@ API.prototype.getInstantiateObj = function()
 API.prototype.setInstantiateObj = function(instantiateObj)
 {
 	this.instantiateObj = instantiateObj;
+};
+
+API.prototype.getStaticModelAttributeObj = function()
+{
+	return this.staticModelAttributeObj;
+};
+API.prototype.setStaticModelAttributeObj = function(staticModelAttributeObj)
+{
+	this.staticModelAttributeObj = staticModelAttributeObj;
 };
 

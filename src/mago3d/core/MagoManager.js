@@ -805,7 +805,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var projectId = attributes.projectId;
 				var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
 				var staticModel = staticModelsManager.getStaticModel(projectId);
-				neoBuilding = new NeoBuilding();//staticModel.neoBuilding;
+				neoBuilding = staticModel.neoBuilding;
 				neoBuildingFolderName = staticModel.buildingFolderName;
 				projectFolderName = staticModel.projectFolderName;
 				
@@ -6266,102 +6266,123 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var childrenCount;
 	if (attributes !== undefined)
 	{
-		buildingId = data_key;
-		node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
-		// set main data of the node.
-		node.data.projectFolderName = projectFolderName;
-		node.data.projectId = projectId;
-		node.data.data_name = data_name;
-		node.data.attributes = attributes;
-		node.data.mapping_type = mapping_type;
-		var tMatrix;
-		
-		if (attributes.isPhysical)
+		if (!attributes.isReference)
 		{
-			// find the buildingSeed.
-			buildingSeed = buildingSeedMap[buildingId];
-			if (buildingSeed)
+			buildingId = data_key;
+			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
+			// set main data of the node.
+			node.data.projectFolderName = projectFolderName;
+			node.data.projectId = projectId;
+			node.data.data_name = data_name;
+			node.data.attributes = attributes;
+			node.data.mapping_type = mapping_type;
+			var tMatrix;
+			
+			if (attributes.isPhysical)
 			{
-				node.data.buildingSeed = buildingSeed;
-				resultPhysicalNodesArray.push(node);
-			}
-		}
-
-		if (longitude && latitude)
-		{
-			// this is root node.
-			if (height === undefined)
-			{ height = 0; }
-			
-			node.data.geographicCoord = new GeographicCoord();
-			node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
-			
-			if (node.data.rotationsDegree === undefined)
-			{ node.data.rotationsDegree = new Point3D(); }
-			node.data.rotationsDegree.set(pitch, roll, heading);
-			
-			
-			if (buildingSeed !== undefined)
-			{
-				if (buildingSeed.geographicCoord === undefined)
-				{ buildingSeed.geographicCoord = new GeographicCoord(); }
-			
-				if (buildingSeed.rotationsDegree === undefined)
-				{ buildingSeed.rotationsDegree = new Point3D(); }
-		
-				buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
-				buildingSeed.rotationsDegree.set(pitch, roll, heading);
-				
-				// now calculate the geographic coord of the center of the bbox.
-				if (buildingSeed.geographicCoordOfBBox === undefined) 
-				{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
-			
-				// calculate the transformation matrix at (longitude, latitude, height).
-				var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
-				tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
-				
-				// now calculate the geographicCoord of the center of the bBox.
-				var bboxCenterPoint;
-
-				bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-				buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
-			}
-		}
-
-		// now, calculate the bbox.***
-		node.data.bbox = new BoundingBox();
-		
-		if (node.data.buildingSeed && node.data.buildingSeed.bBox)
-		{ node.data.bbox.copyFrom(buildingSeed.bBox); }
-		
-		if (node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
-		{
-			node.data.bbox.translateToOrigin();
-		}
-		
-		// calculate the geographicCoordOfTheBBox.***
-		if (tMatrix !== undefined)
-		{
-			bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
-			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
-		}
-
-		//bbox = node.data.bbox;
-
-		if (children !== undefined)
-		{
-			childrenCount = children.length;
-			for (var i=0; i<childrenCount; i++)
-			{
-				childJason = children[i];
-				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId);
-				
-				// if childNode has "geographicCoord" then the childNode is in reality a root.
-				if (childNode.data.geographicCoord === undefined)
+				// find the buildingSeed.
+				buildingSeed = buildingSeedMap[buildingId];
+				if (buildingSeed)
 				{
-					node.addChildren(childNode);
+					node.data.buildingSeed = buildingSeed;
+					resultPhysicalNodesArray.push(node);
+				}
+			}
+
+			if (longitude && latitude)
+			{
+				// this is root node.
+				if (height === undefined)
+				{ height = 0; }
+				
+				node.data.geographicCoord = new GeographicCoord();
+				node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				
+				if (node.data.rotationsDegree === undefined)
+				{ node.data.rotationsDegree = new Point3D(); }
+				node.data.rotationsDegree.set(pitch, roll, heading);
+				
+				
+				if (buildingSeed !== undefined)
+				{
+					if (buildingSeed.geographicCoord === undefined)
+					{ buildingSeed.geographicCoord = new GeographicCoord(); }
+				
+					if (buildingSeed.rotationsDegree === undefined)
+					{ buildingSeed.rotationsDegree = new Point3D(); }
+			
+					buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
+					buildingSeed.rotationsDegree.set(pitch, roll, heading);
+					
+					// now calculate the geographic coord of the center of the bbox.
+					if (buildingSeed.geographicCoordOfBBox === undefined) 
+					{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+				
+					// calculate the transformation matrix at (longitude, latitude, height).
+					var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
+					tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+					
+					// now calculate the geographicCoord of the center of the bBox.
+					var bboxCenterPoint;
+
+					bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+					var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+					buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+				}
+			}
+
+			// now, calculate the bbox.***
+			node.data.bbox = new BoundingBox();
+			
+			if (node.data.buildingSeed && node.data.buildingSeed.bBox)
+			{ node.data.bbox.copyFrom(buildingSeed.bBox); }
+			
+			if (node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
+			{
+				node.data.bbox.translateToOrigin();
+			}
+			
+			// calculate the geographicCoordOfTheBBox.***
+			if (tMatrix !== undefined)
+			{
+				bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
+				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+				node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
+			}
+
+			//bbox = node.data.bbox;
+
+			if (children !== undefined)
+			{
+				childrenCount = children.length;
+				for (var i=0; i<childrenCount; i++)
+				{
+					childJason = children[i];
+					childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+					
+					// if childNode has "geographicCoord" then the childNode is in reality a root.
+					if (childNode.data.geographicCoord === undefined)
+					{
+						node.addChildren(childNode);
+					}
+				}
+			}
+		}
+		else 
+		{
+			attributes.projectId = projectId;
+			this.addStaticModel(attributes);
+			if (children !== undefined)
+			{
+				childrenCount = children.length;
+				for (var i=0; i<childrenCount; i++)
+				{
+					var childrenObj = children[i];
+					if (!defined(childrenObj.projectId))
+					{
+						childrenObj.projectId = projectId;
+					}
+					this.instantiateStaticModel(childrenObj);
 				}
 			}
 		}
@@ -6541,6 +6562,123 @@ MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId
 	return this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
 };
 
+/**
+ * instantiate static model
+ * @param {instantiateOption} attributes
+ */
+MagoManager.prototype.instantiateStaticModel = function(attributes)
+{
+	if (!defined(attributes.projectId))
+	{
+		throw new Error('projectId is required.');
+	}
+
+	if (!defined(attributes.instanceId))
+	{
+		throw new Error('instanceId is required.');
+	}
+
+	if (!defined(attributes.longitude))
+	{
+		throw new Error('longitude is required.');
+	}
+	if (!defined(attributes.latitude))
+	{
+		throw new Error('latitude is required.');
+	}
+
+	if (!attributes.isReference)
+	{
+		attributes.isReference = true;
+	}
+
+	if (!attributes.isPhysical)
+	{
+		attributes.isPhysical = true;
+	}
+
+	if (!attributes.nodeType)
+	{
+		attributes.nodeType = "TEST";
+	}
+
+	//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
+	//var existentNodesCount = Object.keys(nodesMap).length;
+	//var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
+	var projectId = attributes.projectId;
+	var instanceId = attributes.instanceId;
+	
+	var longitude = attributes.longitude;
+	var latitude = attributes.latitude;
+	var altitude = defaultValue(attributes.height, 0);
+	var heading = defaultValue(attributes.heading, 0);
+	var pitch = defaultValue(attributes.pitch, 0);
+	var roll = defaultValue(attributes.roll, 0);
+	
+	var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
+	if (node === undefined)
+	{
+		node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
+
+		var geoCoord = new GeographicCoord();
+		geoCoord.latitude = latitude;
+		geoCoord.longitude = longitude;
+		geoCoord.altitude = altitude;
+
+		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
+
+		// Now, create the geoLocdataManager of node.***
+		node.data.projectId = projectId;
+		node.data.attributes = attributes;
+		node.data.geographicCoord = geoCoord;
+		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
+		node.data.geoLocDataManager = geoLocDataManager;
+		/*node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
+		node.data.bbox.init();
+		node.data.bbox.expand(10.0);*/ // we dont know the bbox size, so set as 10,10,10.***
+
+		// Now, insert node into smartTile.***
+		var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
+		this.smartTileManager.putNode(targetDepth, node, this);
+	}
+	else 
+	{
+		this.changeLocationAndRotation(projectId, instanceId, latitude, longitude, altitude, heading, pitch, roll);
+	}
+};
+/**
+ * add static model
+ * @param {staticModelOption} attributes
+ */
+MagoManager.prototype.addStaticModel = function(attribute)
+{
+	if (!defined(attribute.projectId))
+	{
+		throw new Error('projectId is required.');
+	}
+
+	if (!defined(attribute.projectFolderName))
+	{
+		throw new Error('projectFolderName is required.');
+	}
+
+	if (!defined(attribute.buildingFolderName))
+	{
+		throw new Error('buildingFolderName is required.');
+	}
+	var projectId = attribute.projectId;
+	var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
+
+	var staticModel = new StaticModel();
+	staticModel.guid = projectId;
+	staticModel.projectFolderName = attribute.projectFolderName;
+	staticModel.buildingFolderName = attribute.buildingFolderName;
+	staticModel.neoBuilding = new NeoBuilding();
+	
+	staticModelsManager.addStaticModel(projectId, staticModel);
+};
 /**
  * api gateway
  */
@@ -7097,14 +7235,7 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			throw new Error('instanceId is required.');
 		}
-		/*if (!defined(attributes.projectFolderName))
-		{
-			throw new Error('projectFolderName is required.');
-		}
-		if (!defined(attributes.buildingFolderName))
-		{
-			throw new Error('buildingFolderName is required.');
-		}*/
+
 		if (!defined(attributes.longitude))
 		{
 			throw new Error('longitude is required.');
@@ -7157,13 +7288,14 @@ MagoManager.prototype.callAPI = function(api)
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
 
 			// Now, create the geoLocdataManager of node.***
+			node.data.projectId = projectId;
 			node.data.attributes = attributes;
 			node.data.geographicCoord = geoCoord;
 			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 			node.data.geoLocDataManager = geoLocDataManager;
-			node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
+			/*node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
 			node.data.bbox.init();
-			node.data.bbox.expand(10.0); // we dont know the bbox size, so set as 10,10,10.***
+			node.data.bbox.expand(10.0);*/ // we dont know the bbox size, so set as 10,10,10.***
 
 			// Now, insert node into smartTile.***
 			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
@@ -7173,6 +7305,11 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			this.changeLocationAndRotation(projectId, instanceId, latitude, longitude, altitude, heading, pitch, roll);
 		}
+	}
+	else if (apiName === "addStaticModel")
+	{
+		var attribute = api.getStaticModelAttributeObj();
+		this.addStaticModel(attribute);
 	}
 };
 

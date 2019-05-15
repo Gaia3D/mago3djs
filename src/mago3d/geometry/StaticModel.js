@@ -39,8 +39,8 @@ var StaticModelsManager = function()
  */
 StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
 {
-	if(this.staticModelsMap === undefined)
-		this.staticModelsMap = {};
+	if (this.staticModelsMap === undefined)
+	{ this.staticModelsMap = {}; }
 	
 	this.staticModelsMap[guid] = staticModel;
 };

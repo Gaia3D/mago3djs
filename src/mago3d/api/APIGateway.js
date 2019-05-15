@@ -660,10 +660,8 @@ function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll
 /**
  * Object literal with config options for instantiate static model.
  * @typedef {Object} instantiateOption
- * @property {string} projectId Required. projectId.
+ * @property {string} projectId Required. projectId. static model key.
  * @property {string} instanceId Required. instance Id.
- * @property {string} projectFolderName Required. project Folder Name.
- * @property {string} buildingFolderName Required. Static Model data Folder Name.
  * @property {number} longitude Required. initial longitude.
  * @property {number} latitude Required. initial latitude.
  * @property {number} height Optional. Default value is 0.
@@ -682,5 +680,26 @@ function instantiateStaticModelAPI(managerFactoryInstance, attributes)
 	var api = new API("instantiateStaticModel");
 	
 	api.setInstantiateObj(attributes);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * Object literal with config options for add static model.
+ * @typedef {Object} staticModelOption
+ * @property {string} projectId Required. projectId. Static model key.
+ * @property {string} projectFolderName Required. Static Model Folder Name.
+ * @property {string} buildingFolderName Required. Static Model data Folder Name.
+ */
+
+/**
+ * add static model
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {staticModelOption} attributes
+ */
+function addStaticModelAPI(managerFactoryInstance, attributes)
+{
+	var api = new API("addStaticModel");
+	
+	api.setStaticModelAttributeObj(attributes);
 	managerFactoryInstance.callAPI(api);
 }
