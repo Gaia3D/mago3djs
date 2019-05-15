@@ -1058,40 +1058,21 @@ ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
 #endif\n\
 \n\
 uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool textureFlipYAxis;\n\
-varying vec3 vNormal;\n\
 uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
 uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;    \n\
-uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 oneColor4;\n\
 varying vec4 aColor4; // color from attributes\n\
-uniform bool bApplyScpecularLighting;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-\n\
-varying vec3 diffuseColor;\n\
-uniform vec3 specularColor;\n\
-varying vec3 vertexPos;\n\
+varying vec4 vColor;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
 \n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-varying float applySpecLighting;\n\
 uniform bool bApplySsao;\n\
 uniform float externalAlpha;\n\
 \n\
@@ -1119,21 +1100,15 @@ float getDepth(vec2 coord)\n\
 void main()\n\
 {\n\
 	float occlusion = 0.0;\n\
-	vec3 normal2 = vNormal;\n\
 	if(bApplySsao)\n\
 	{          \n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
 		float linearDepth = getDepth(screenPos);          \n\
 		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
 \n\
-		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-		vec3 bitangent = cross(normal2, tangent);\n\
-		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-		\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
-			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
+			vec3 sample = origin + (kernel[i]) * radius;\n\
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;        \n\
@@ -1154,68 +1129,8 @@ void main()\n\
 		occlusion = 1.0;\n\
 	}\n\
 \n\
-    // Do specular lighting.***\n\
-	float lambertian;\n\
-	float specular;\n\
-		\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
-		vec3 L = normalize(lightPos - vertexPos);\n\
-		lambertian = max(dot(normal2, L), 0.0);\n\
-		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
-		{\n\
-			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-			\n\
-			// Compute the specular term\n\
-			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessValue);\n\
-		}\n\
-		\n\
-		if(lambertian < 0.5)\n\
-		{\n\
-			lambertian = 0.5;\n\
-		}\n\
-	}\n\
-\n\
-    vec4 textureColor;\n\
-    if(colorType == 2)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-		\n\
-        if(textureColor.w == 0.0)\n\
-        {\n\
-            discard;\n\
-        }\n\
-    }\n\
-    else if(colorType == 0)\n\
-	{\n\
-        textureColor = oneColor4;\n\
-    }\n\
-	else if(colorType == 1)\n\
-	{\n\
-        textureColor = aColor4;\n\
-    }\n\
-	\n\
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-	float alfa = textureColor.w * externalAlpha;\n\
-\n\
     vec4 finalColor;\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, alfa); \n\
-	}\n\
-	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion, alfa);\n\
-	}\n\
+	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
     gl_FragColor = finalColor; \n\
 }";
 ShaderSource.PointCloudVS = "attribute vec3 position;\n\

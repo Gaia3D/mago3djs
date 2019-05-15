@@ -4717,17 +4717,21 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		var nodesPCloudCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
-			currentShader = this.postFxShadersManager.getShader("pointsCloud");
+			currentShader = this.postFxShadersManager.getShader("pointsCloudSsao");
 			currentShader.useProgram();
 			
 			currentShader.resetLastBuffersBinded();
 
 			currentShader.enableVertexAttribArray(currentShader.position3_loc);
 			currentShader.enableVertexAttribArray(currentShader.color4_loc);
-			currentShader.disableVertexAttribArray(currentShader.normal3_loc); // provisionally has no normals.***
-			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 			
 			currentShader.bindUniformGenerals();
+			
+			var bApplySsao = true;
+			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+			
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);
 
 			this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, ssao_idx); // lod0.***
 			currentShader.disableVertexAttribArrayAll();
@@ -5349,6 +5353,28 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// 7) PointsCloud shader.****************************************************************************************
+	shaderName = "pointsCloudSsao";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.PointCloudVS;
+	ssao_fs_source = ShaderSource.PointCloudSsaoFS;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// pointsCloud shader locals.***
+	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
+	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
+	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
 };
 
 /**
@@ -6843,13 +6869,13 @@ MagoManager.prototype.callAPI = function(api)
 								var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 								if (node === undefined || node.data === undefined)
 								{ continue; }
+							
+								node.isColorChanged = false;
 								
 								var neoBuilding = node.data.neoBuilding;
 								if (neoBuilding === undefined)
 								{ continue; }
 							
-								neoBuilding.isColorChanged = false;
-								
 								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
 								if (refObjectArray === undefined)
 								{ continue; }
