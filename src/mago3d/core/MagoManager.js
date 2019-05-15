@@ -5783,6 +5783,10 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		
+		//if node is instantiated,  buildingSeed will be make when prepareNeoBuildingsAsimetricVersion triggered.
+		if(node.data.attributes.isReference){
+			continue;
+		}
 		if (node.data.neoBuilding !== undefined)
 		{
 			lowestTile.nodesArray.push(node);
@@ -6199,6 +6203,9 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 
 	if (durationTimeInSeconds !== undefined)
 	{
+		if (this.animationManager === undefined)
+		{ this.animationManager = new AnimationManager(); }
+		this.animationManager.putNode(node);
 		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
 	}
 	else 
@@ -6661,9 +6668,6 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.geographicCoord = geoCoord;
 		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 		node.data.geoLocDataManager = geoLocDataManager;
-		/*node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
-		node.data.bbox.init();
-		node.data.bbox.expand(10.0);*/ // we dont know the bbox size, so set as 10,10,10.***
 
 		// Now, insert node into smartTile.***
 		var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
