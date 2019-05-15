@@ -54,8 +54,78 @@ VisibleObjectsController.prototype.get01Visibles = function()
 
 /**
  */
+VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsArray, startIdx, endIdx, object) 
+{
+	// this do a dicotomic search of idx in a ordered table.
+	// 1rst, check the range.
+	var range = endIdx - startIdx;
+	if (range < 6)
+	{
+		// in this case do a lineal search.
+		var finished = false;
+		var i = startIdx;
+		var idx;
+
+		while (!finished && i<=endIdx)
+		{
+			var anObject = objectsArray[i];
+			if (object.distToCamera < anObject.distToCamera)
+			{
+				idx = i;
+				finished = true;
+			}
+			i++;
+		}
+		
+		if (finished)
+		{ return idx; }
+		else 
+		{ return endIdx+1; }
+	}
+	else 
+	{
+		// in this case do the dicotomic search.
+		var middleIdx = startIdx + Math.floor(range/2);
+		var newStartIdx;
+		var newEndIdx;
+		var middleObject = objectsArray[middleIdx];
+		if (middleObject.distToCamera > object.distToCamera)
+		{
+			newStartIdx = startIdx;
+			newEndIdx = middleIdx;
+		}
+		else 
+		{
+			newStartIdx = middleIdx;
+			newEndIdx = endIdx;
+		}
+		return this.getObjectIdxSortedByDist(objectsArray, newStartIdx, newEndIdx, node);
+	}
+};
+
+/**
+ */
+VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(objectsArray, object) 
+{
+	if (objectsArray.length > 0)
+	{
+		var startIdx = 0;
+		var endIdx = objectsArray.length - 1;
+		var idx = this.getObjecIdxSortedByDist(objectsArray, startIdx, endIdx, object);
+		
+		objectsArray.splice(idx, 0, object);
+	}
+	else 
+	{
+		objectsArray.push(object);
+	}
+};
+
+/**
+ */
 VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
 {
+	// Note: Function exclusive to use with Node class objects.***
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.
 	var neoBuilding = node.data.neoBuilding;
@@ -70,7 +140,7 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 		while (!finished && i<=endIdx)
 		{
 			var aNode = nodesArray[i];
-			if (aNode.data.distToCam < aNode.data.distToCam)
+			if (node.data.distToCam < aNode.data.distToCam)
 			{
 				idx = i;
 				finished = true;
@@ -90,7 +160,7 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 		var newStartIdx;
 		var newEndIdx;
 		var middleNode = nodesArray[middleIdx];
-		if (middleNode.data.distToCam > middleNode.data.distToCam)
+		if (middleNode.data.distToCam > node.data.distToCam)
 		{
 			newStartIdx = startIdx;
 			newEndIdx = middleIdx;
@@ -108,6 +178,7 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
  */
 VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesArray, node) 
 {
+	// Note: Function exclusive to use with Node class objects.***
 	if (nodesArray.length > 0)
 	{
 		var startIdx = 0;
