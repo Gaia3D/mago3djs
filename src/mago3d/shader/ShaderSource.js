@@ -1046,6 +1046,67 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
+ShaderSource.PointCloudDepthVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bPositionCompressed;\n\
+uniform vec3 minPosition;\n\
+uniform vec3 bboxSize;\n\
+attribute vec4 color4;\n\
+uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
+uniform float fixPointSize;\n\
+uniform bool bUseFixPointSize;\n\
+varying vec4 vColor;\n\
+//varying float glPointSize;\n\
+varying float depth;  \n\
+\n\
+void main()\n\
+{\n\
+	vec3 realPos;\n\
+	vec4 rotatedPos;\n\
+	if(bPositionCompressed)\n\
+	{\n\
+		float maxShort = 65535.0;\n\
+		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+	}\n\
+	else\n\
+	{\n\
+		realPos = position;\n\
+	}\n\
+	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    if(bUse1Color)\n\
+	{\n\
+		vColor=oneColor4;\n\
+	}\n\
+	else\n\
+		vColor=color4;\n\
+	\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
+	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
+	if(gl_PointSize > 10.0)\n\
+		gl_PointSize = 10.0;\n\
+	if(gl_PointSize < 4.0)\n\
+		gl_PointSize = 4.0;\n\
+		\n\
+		//gl_PointSize = 4.0;\n\
+		//glPointSize = gl_PointSize;\n\
+	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+}";
 ShaderSource.PointCloudFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
@@ -1069,6 +1130,7 @@ uniform vec3 kernel[16];   \n\
 uniform vec4 oneColor4;\n\
 varying vec4 aColor4; // color from attributes\n\
 varying vec4 vColor;\n\
+varying float glPointSize;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
@@ -1102,28 +1164,48 @@ void main()\n\
 	float occlusion = 0.0;\n\
 	if(bApplySsao)\n\
 	{          \n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-		float linearDepth = getDepth(screenPos);          \n\
-		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-\n\
-		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			vec3 sample = origin + (kernel[i]) * radius;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;        \n\
-			float sampleDepth = -sample.z/far;\n\
-			if(sampleDepth > 0.49)\n\
-				continue;\n\
-			float depthBufferValue = getDepth(offset.xy);				              \n\
-			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
-			{\n\
-				occlusion +=  1.0;\n\
-			}\n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+		float linearDepth = getDepth(screenPos);\n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;\n\
+		float radiusAux = glPointSize/1.9;\n\
+		radiusAux = 1.5;\n\
+		vec2 screenPosAdjacent;\n\
+		\n\
+		for(int j = 0; j < 3; ++j)\n\
+		{\n\
+			radiusAux = 1.5 *(float(j)+1.0);\n\
+			for(int i = 0; i < 8; ++i)\n\
+			{    	 \n\
+				if(i == 0)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 1)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 2)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 3)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+				else if(i == 4)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 5)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 6)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 7)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+				float depthBufferValue = getDepth(screenPosAdjacent);\n\
+				float range_check = abs(linearDepth - depthBufferValue)*far;\n\
+				if (range_check > 1.5 && depthBufferValue > linearDepth)\n\
+				{\n\
+					if (range_check < 20.0)\n\
+						occlusion +=  1.0;\n\
+				}\n\
+			}   \n\
 		}   \n\
 			\n\
-		occlusion = 1.0 - occlusion / float(kernelSize);\n\
+		//if(occlusion > 1.0)\n\
+		//	occlusion = 8.0;\n\
+		//else occlusion = 0.0;\n\
+		occlusion = 1.0 - occlusion / 24.0;\n\
 	}\n\
 	else{\n\
 		occlusion = 1.0;\n\
@@ -1131,6 +1213,7 @@ void main()\n\
 \n\
     vec4 finalColor;\n\
 	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
+	//finalColor = vec4(vec3(0.8, 0.8, 0.8) * occlusion, externalAlpha);\n\
     gl_FragColor = finalColor; \n\
 }";
 ShaderSource.PointCloudVS = "attribute vec3 position;\n\
@@ -1149,6 +1232,7 @@ uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
+varying float glPointSize;\n\
 \n\
 void main()\n\
 {\n\
@@ -1184,6 +1268,8 @@ void main()\n\
 		gl_PointSize = 10.0;\n\
 	if(gl_PointSize < 3.0)\n\
 		gl_PointSize = 3.0;\n\
+		\n\
+	glPointSize = gl_PointSize;\n\
 }";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\

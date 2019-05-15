@@ -107,7 +107,7 @@ var MagoManager = function()
 		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
 		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
 	}
-	
+	this.kernel = this.sphereKernel;
 	// End ssao.------------------------------------------------
 
 	this.atmosphere = new Atmosphere();
@@ -2762,8 +2762,7 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 80) // 80 = 'p'.***
 	{
-		if (this.animationManager === undefined)
-		{ this.animationManager = new AnimationManager(); }
+		
 	
 		var projectId = "AutonomousVehicle";
 		var dataKey = "AutonomousBus_0";
@@ -2773,7 +2772,7 @@ MagoManager.prototype.keyDown = function(key)
 		//var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-		this.animationManager.putNode(node);
+
 		
 		var geoLocDataManager = node.getNodeGeoLocDataManager();
 		var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
@@ -4727,11 +4726,18 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			
 			currentShader.bindUniformGenerals();
 			
+			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);
+			
+			// Test to load pCloud.***
+			if (this.visibleObjControlerPCloudOctrees === undefined)
+			{ this.visibleObjControlerPCloudOctrees = new VisibleObjectsController(); }
+			
+			this.visibleObjControlerPCloudOctrees.clear();
 
 			this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, ssao_idx); // lod0.***
 			currentShader.disableVertexAttribArrayAll();
@@ -5175,7 +5181,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 	var nodesPCloudCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 	if (nodesPCloudCount > 0)
 	{
-		currentShader = this.postFxShadersManager.getShader("pointsCloud");
+		currentShader = this.postFxShadersManager.getShader("pointsCloudDepth");
 		currentShader.useProgram();
 		
 		currentShader.resetLastBuffersBinded();
@@ -5354,7 +5360,29 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
 	
-	// 7) PointsCloud shader.****************************************************************************************
+	// 7) PointsCloud Depth shader.****************************************************************************************
+	shaderName = "pointsCloudDepth";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.PointCloudDepthVS;
+	ssao_fs_source = ShaderSource.RenderShowDepthFS;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// pointsCloud shader locals.***
+	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
+	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
+	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	
+	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.PointCloudVS;
@@ -6199,6 +6227,9 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 
 	if (durationTimeInSeconds !== undefined)
 	{
+		if (this.animationManager === undefined)
+		{ this.animationManager = new AnimationManager(); }
+		this.animationManager.putNode(node);
 		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
 	}
 	else 

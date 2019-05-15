@@ -665,6 +665,12 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	
 	var pCloudPartitionsCount = this.pCloudPartitionsCount;
 		
+	if (this.lod === 0)
+	{ 
+		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
+		if (pCloudPartitionsCount > 25)
+		{ pCloudPartitionsCount = 25; }
+	}
 	if (this.lod === 1)
 	{ 
 		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
@@ -751,6 +757,10 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	// To calculate distToCamera use the relativeCamera.***
 	var cameraPosition = relativeCam.position;
 	var distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
+	this.distToCamera = distToCamera; // distCenterToCamera.***
+	
+	// Put this octree into magoManager.visibleObjControlerPCloudOctrees, to load after.***
+	
 	
 	// Provisionally, determine the LOD level by "distToCam".***
 	this.lod = magoPolicy.getLod(distToCamera);
@@ -788,8 +798,8 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		if (this.lod === 0)
 		{
 			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-			if (pCloudPartitionsCount > 20)
-			{ pCloudPartitionsCount = 20; }
+			if (pCloudPartitionsCount > 25)
+			{ pCloudPartitionsCount = 25; }
 		}
 		else if (this.lod === 1)
 		{
