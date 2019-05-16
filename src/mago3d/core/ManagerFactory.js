@@ -186,7 +186,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			for (var i=0; i<projectIdArray.length; i++) 
 			{
-				manager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
+				var projectDataFolder = projectDataFolderArray[i];
+				var projectData = projectDataArray[i];
+				if(!(projectData.data_key == projectDataFolder && projectData.attributes.isReference))
+				{
+					manager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
+				}
 			}
 		}
 	}
@@ -215,7 +220,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			for (var i=0; i<projectIdArray.length; i++) 
 			{
-				viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
+				var projectDataFolder = projectDataFolderArray[i];
+				var projectData = projectDataArray[i];
+				if(!(projectData.data_key == projectDataFolder && projectData.attributes.isReference))
+				{
+					viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
+				}
 			}
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);

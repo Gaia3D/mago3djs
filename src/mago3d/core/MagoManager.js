@@ -1397,8 +1397,7 @@ MagoManager.prototype.test__octreeModelRefAndIndices_changed = function()
  */
 MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
 {
-	this.dateSC = new Date();
-	this.currTime = this.dateSC.getTime();
+	
 	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
@@ -1409,6 +1408,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	
 	if (this.isFarestFrustum())
 	{
+		this.dateSC = new Date();
+		this.currTime = this.dateSC.getTime();
+
 		if (this.textureAux_1x1 === undefined) 
 		{
 			this.textureAux_1x1 = gl.createTexture();
@@ -5811,10 +5813,6 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 	{
 		node = lowestTile.nodeSeedsArray[j];
 		
-		//if node is instantiated,  buildingSeed will be make when prepareNeoBuildingsAsimetricVersion triggered.
-		if(node.data.attributes.isReference){
-			continue;
-		}
 		if (node.data.neoBuilding !== undefined)
 		{
 			lowestTile.nodesArray.push(node);
@@ -6431,6 +6429,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		}
 		else 
 		{
+			/* static model 사용은 API를 통해서만... 
 			attributes.projectId = projectId;
 			this.addStaticModel(attributes);
 			if (children !== undefined)
@@ -6446,6 +6445,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					this.instantiateStaticModel(childrenObj);
 				}
 			}
+			*/
 		}
 	}
 	return node;
