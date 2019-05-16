@@ -158,8 +158,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (this.isReferenceNode())
 	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.***
 	
-	// test.*************************************************************************************************************
-	this.data.isTrailRender = true; // test.***
+	// Check if is trail-render.*************************************************************************************************************
 	var isTrailRender = this.data.isTrailRender;
 	if (isTrailRender !== undefined && isTrailRender === true)
 	{
@@ -167,6 +166,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.***
 		var geoLocDatasCount = geoLocDataManager.getGeoLocationDatasCount();
 		//for(var i=geoLocDatasCount - 1; i>0; i--)
+		if (geoLocDatasCount >= geoLocDataManager.geoLocationDataArrayMaxLengthAllowed - 1)
+		{ var hola = 0; }
 		for (var i=1; i<geoLocDatasCount; i++ )
 		{
 			var buildingGeoLocation = geoLocDataManager.getGeoLocationData(i);
@@ -184,8 +185,12 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		magoManager.isTrailRender = false;
 	}
 	//--------------------------------------------------------------------------------------------------------------------
-	
-	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+	var geoLocDataIdx;
+	if (geoLocDataManager.getGeoLocationDatasCount() > 1)
+	{ geoLocDataIdx = 1; }
+	else
+	{ geoLocDataIdx = 0; }
+	var buildingGeoLocation = geoLocDataManager.getGeoLocationData(geoLocDataIdx);
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 
 	// magoManager.tempSettings.renderWithTopology === 0 -> render only Building.***
@@ -504,25 +509,21 @@ Node.prototype.finishedAnimation = function(magoManager)
 	if (animData.lastTime === undefined)
 	{ animData.lastTime = animData.birthTime; }
 	
-	var deltaTime = (currTime - animData.lastTime)/1000.0; // in seconds.***
 	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.***
 
-	
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
 	
 	// calculate velocity.***
-	var velocityLon = (animData.targetLongitude - animData.startLongitude)/animData.durationInSeconds;
-	var velocityLat = (animData.targetLatitude - animData.startLatitude)/animData.durationInSeconds;
-	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/animData.durationInSeconds;
-	
-	// calculate rotation velocity.***
-	// todo:
-	
+	var velocityLon = (animData.targetLongitude - animData.startLongitude)/(animData.durationInSeconds);
+	var velocityLat = (animData.targetLatitude - animData.startLatitude)/(animData.durationInSeconds);
+	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/(animData.durationInSeconds);
+
 	var geoLocDatamanager = this.getNodeGeoLocDataManager();
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
-	
+	var geographicCoord = geoLocationData.geographicCoord;
+
 	if (totalDeltaTime > animData.durationInSeconds)
 	{
 		nextLongitude = animData.targetLongitude;
@@ -532,15 +533,10 @@ Node.prototype.finishedAnimation = function(magoManager)
 		// finish the process.***
 		finished = true;
 		this.data.animationData.finished = true;
-		//this.data.animationData = undefined;
 	}
 	else
 	{
 		// calculate by durationInSeconds.***
-		var currLongitude = geoLocationData.geographicCoord.longitude;
-		var currLatitude = geoLocationData.geographicCoord.latitude;
-		var currAltitude = geoLocationData.geographicCoord.altitude;
-		
 		var targetLongitude = animData.targetLongitude;
 		var targetLatitude = animData.targetLatitude;
 		var targetAltitude = animData.targetAltitude;
@@ -549,17 +545,31 @@ Node.prototype.finishedAnimation = function(magoManager)
 		nextLatitude = animData.startLatitude + velocityLat * totalDeltaTime;
 		nextAltitude = animData.startAltitude + velocityAlt * totalDeltaTime;
 		
-		//nextLongitude = currLongitude + velocityLon * deltaTime;
-		//nextLatitude = currLatitude + velocityLat * deltaTime;
-		//nextAltitude = currAltitude + velocityAlt * deltaTime;
-		
 		// finally update "lastTime".***
 		animData.lastTime = currTime;
 		finished = false;
 	}
-	
+
 	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, magoManager);
 	
+	// Set camera position.****************************************
+	var camera = magoManager.scene.camera;
+	var position = camera.position;
+	var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+
+	var nextPosCamera = Globe.geographicToCartesianWgs84(nextLongitude, nextLatitude, cartographicPosition.height, undefined);
+	
+	magoManager.scene.camera.setView({
+		destination : new Cesium.Cartesian3(nextPosCamera[0], nextPosCamera[1], nextPosCamera[2]),
+		orientation : {
+			heading : camera.heading,
+			pitch   : camera.pitch,
+			roll    : camera.roll
+		},
+		duration: 0.0
+	});
+	
+	//--------------------------------------------------
 	return finished;
 };
 
@@ -602,6 +612,22 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	animData.targetPitch = pitch;
 	animData.targetRoll = roll;
 	
+	// calculate rotation (heading & pitch).***
+	var currLongitude = geoCoords.longitude;
+	var currLatitude = geoCoords.latitude;
+	var currAltitude = geoCoords.altitude;
+	var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);
+	var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);
+	var relativeNextPos;
+	relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
+	
+	// calculate heading (initially yAxis to north).***
+	var nextHeading = Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
+	var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
+	var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
+	
+	geoLocData.heading = nextHeading;
+	geoLocData.pitch = nextPitch;
 	// linear velocity in m/s.***
 	//animData.linearVelocityInMetersSecond = 40.0;
 				
@@ -646,11 +672,11 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		var geoLocationData;
 		if (this.data.animationData !== undefined)
 		{
-			var geoLocationData = geoLocDatamanager.newGeoLocationData();
+			geoLocationData = geoLocDatamanager.newGeoLocationData();
 		}
 		else 
 		{
-			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
+			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
 		}
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		if (geoLocationData === undefined)
@@ -661,6 +687,7 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		buildingSeed.geographicCoordOfBBox.longitude = longitude;
 		buildingSeed.geographicCoordOfBBox.latitude = latitude;
 
+		
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
 		var neoBuilding = aNode.data.neoBuilding;
 		if (neoBuilding.octree)

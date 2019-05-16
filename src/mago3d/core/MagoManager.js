@@ -1397,11 +1397,8 @@ MagoManager.prototype.test__octreeModelRefAndIndices_changed = function()
  */
 MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
 {
-	
-	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
-	
 
 	var gl = this.sceneState.gl;
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -1410,7 +1407,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	{
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
-
 		if (this.textureAux_1x1 === undefined) 
 		{
 			this.textureAux_1x1 = gl.createTexture();
@@ -1451,6 +1447,8 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
 	}
+	
+	
 	
 	var cameraPosition = this.sceneState.camera.position;
 	
@@ -2762,10 +2760,18 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	if (key === 80) // 80 = 'p'.***
+	if (key === 32) // 32 = 'space'.***
 	{
+		if (this.pointsCloudSsao === undefined)
+		{ this.pointsCloudSsao = true; }
 		
-	
+		if (this.pointsCloudSsao)
+		{ this.pointsCloudSsao = false; }
+		else
+		{ this.pointsCloudSsao = true; }
+	}
+	else if (key === 80) // 80 = 'p'.***
+	{
 		var projectId = "AutonomousVehicle";
 		var dataKey = "AutonomousBus_0";
 			
@@ -2774,7 +2780,7 @@ MagoManager.prototype.keyDown = function(key)
 		//var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-
+		node.data.isTrailRender = true; // test.***
 		
 		var geoLocDataManager = node.getNodeGeoLocDataManager();
 		var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
@@ -2782,18 +2788,17 @@ MagoManager.prototype.keyDown = function(key)
 		var currLon = geoCoords.longitude;
 		var currLat = geoCoords.latitude;
 		var currAlt = geoCoords.altitude;
-		
 
 		// Move a little.***
-		var latitude = currLat + 0.0002;
-		var longitude = currLon;// + 0.0002;
-		var elevation = currAlt;
+		var latitude = currLat + 0.0002 * 10*(Math.random()*2-1);
+		var longitude = currLon + 0.0002 * 10*(Math.random()*2-1);
+		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
 		
 		
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 1;
+		var durationTimeInSeconds = 10;
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
@@ -2948,8 +2953,19 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				"heading"            : 0,
 				"pitch"              : 0,
 				"roll"               : 0};
+				/*
+			var attributes = {
+				"isPhysical"         : true,
+				"nodeType"           : "TEST",
+				"isReference"        : true,
+				"projectFolderName"  : "3ds",
+				"buildingFolderName" : "F4D_GyeomjaeJeongSeon_del",
+				"heading"            : 0,
+				"pitch"              : 0,
+				"roll"               : 0};
 				
-			//attributes.pitch = 90.0;
+			attributes.pitch = 90.0;
+			*/
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, attributes.heading, attributes.pitch, attributes.roll, geoLocData, this);
@@ -2961,6 +2977,10 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var existentNodesCount = Object.keys(nodesMap).length;
 			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
 			
+			// Do a test.***
+			//var projectId = "3ds.json";
+			//buildingId = "GyeomjaeJeongSeon_del";
+		
 			var node = this.hierarchyManager.newNode(buildingId, projectId, undefined);
 			
 			// Now, create the geoLocdataManager of node.***
@@ -4718,7 +4738,13 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 		var nodesPCloudCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
-			currentShader = this.postFxShadersManager.getShader("pointsCloudSsao");
+			if (this.pointsCloudSsao === undefined)
+			{ this.pointsCloudSsao = true; }
+			
+			if (this.pointsCloudSsao)
+			{ currentShader = this.postFxShadersManager.getShader("pointsCloudSsao"); }
+			else
+			{ currentShader = this.postFxShadersManager.getShader("pointsCloud"); }
 			currentShader.useProgram();
 			
 			currentShader.resetLastBuffersBinded();
