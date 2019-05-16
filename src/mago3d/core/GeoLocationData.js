@@ -309,6 +309,24 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 
 /**
  * 
+ * @returns this.locMatrixInv.
+ */
+GeoLocationData.prototype.getLocMatrixInv = function() 
+{
+	if (this.geoLocMatrixInv === undefined)
+	{
+		var locMatrixInv = mat4.create();
+		locMatrixInv = mat4.invert(locMatrixInv, this.geoLocMatrix._floatArrays );
+		
+		this.geoLocMatrixInv = new Matrix4();
+		this.geoLocMatrixInv.setByFloat32Array(locMatrixInv);
+	}
+	
+	return this.geoLocMatrixInv;
+};
+
+/**
+ * 
  * @returns this.rotMatrixInv.
  */
 GeoLocationData.prototype.getRotMatrixInv = function() 
@@ -399,6 +417,25 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 /**
  * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
  */
+GeoLocationData.prototype.getTransformedRelativePositionNoApplyHeadingPitchRoll = function(absolutePosition, resultRelativePosition) 
+{
+	if (resultRelativePosition === undefined)
+	{ resultRelativePosition = new Point3D(); }
+	
+	var pointAux = new Point3D();
+	
+	pointAux.set(absolutePosition.x, 
+		absolutePosition.y, 
+		absolutePosition.z);
+	var locMatInv = this.getLocMatrixInv();
+	resultRelativePosition = locMatInv.transformPoint3D(pointAux, resultRelativePosition);
+	
+	return resultRelativePosition;
+};
+
+/**
+ * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
 	if (resultRelativePosition === undefined)
@@ -479,7 +516,7 @@ GeoLocationDataManager.prototype.deleteObjects = function()
 			this.geoLocationDataArray[i].deleteObjects();
 			this.geoLocationDataArray[i] = undefined;
 		}
-		this.geoLocationDataArray = undefined;
+		this.geoLocationDataArray = [];
 	}
 };
 
