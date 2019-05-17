@@ -524,6 +524,9 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var geographicCoord = geoLocationData.geographicCoord;
 
+	var camera = magoManager.scene.camera;
+	var position = camera.positionWC;
+
 	if (totalDeltaTime > animData.durationInSeconds)
 	{
 		nextLongitude = animData.targetLongitude;
@@ -552,15 +555,18 @@ Node.prototype.finishedAnimation = function(magoManager)
 
 	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, magoManager);
 	
+
 	// Set camera position.****************************************
-	var camera = magoManager.scene.camera;
-	var position = camera.positionWC;
+	// we must change this logic, not use cesium.
+	if(animData.tracked)
+	{
+		var target = Cesium.Cartesian3.fromDegrees(nextLongitude, nextLatitude, nextAltitude);
+		var range = Cesium.Cartesian3.distance(position, target);
+		var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
 
-	var target = Cesium.Cartesian3.fromDegrees(nextLongitude, nextLatitude, nextAltitude);
-	var range = Cesium.Cartesian3.distance(position, target);
-	var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
-
-	camera.lookAt(target, hpr);
+		camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+	}
+	
 	return finished;
 };
 
@@ -576,29 +582,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	
 	var animData = this.data.animationData;
 	animData.finished = false;
-	
 	animData.birthTime = magoManager.getCurrentTime();
-	
-
-	//Duration For compatibility with lower versions, lower version parameter is just duratiuon(number).
-	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
-	var durationInSeconds = 3.0;
-	if(isAnimOption)
-	{
-		if(animationOption.duration)
-		{
-			durationInSeconds = animationOption.duration;
-		}
-	}
-	else
-	{
-		durationInSeconds = animationOption;
-	}
-
-	//if (durationInSeconds === undefined)
-	//{ durationInSeconds = 3.0; }
-	
-	animData.durationInSeconds = durationInSeconds;
 	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
@@ -628,22 +612,45 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	geoLocData.pitch = animData.targetPitch;
 	geoLocData.roll = animData.targetRoll;
 
-	if(isAnimOption && animationOption.autoChangeRotation)
+	//Duration For compatibility with lower versions, lower version parameter is just duratiuon(number).
+	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
+	var durationInSeconds = 3.0;
+	if(isAnimOption)
 	{
-		var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);
-		var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);
-		var relativeNextPos;
-		relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
-		
-		// calculate heading (initially yAxis to north).***
-		var nextHeading = Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
-		var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
-		var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
-		
-		geoLocData.heading = nextHeading;
-		geoLocData.pitch = nextPitch;
-		geoLocData.roll = animData.targetRoll;
+		if(animationOption.duration)
+		{
+			durationInSeconds = animationOption.duration;
+		}
+
+		if(animationOption.tracked)
+		{
+			animData.tracked = animationOption.tracked;
+		}
+		if(animationOption.autoChangeRotation)
+		{
+			var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);
+			var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);
+			var relativeNextPos;
+			relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
+			
+			// calculate heading (initially yAxis to north).***
+			var nextHeading = Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
+			var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
+			var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
+			
+			geoLocData.heading = nextHeading;
+			geoLocData.pitch = nextPitch;
+			geoLocData.roll = animData.targetRoll;
+		}
 	}
+	else
+	{
+		durationInSeconds = animationOption;
+	}
+
+	//if (durationInSeconds === undefined)
+	//{ durationInSeconds = 3.0; }
+	animData.durationInSeconds = durationInSeconds;
 	// linear velocity in m/s.***
 	//animData.linearVelocityInMetersSecond = 40.0;
 				

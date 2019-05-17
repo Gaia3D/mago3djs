@@ -148,7 +148,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
-	api.setAnimationOption(roll);
+	api.setAnimationOption(animationOption);
 	managerFactoryInstance.callAPI(api);
 }
 
