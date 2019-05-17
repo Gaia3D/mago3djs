@@ -48,14 +48,14 @@ void main()
 		vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***
-	gl_PointSize = 1.0 + gl_Position.z/300.0;
+	float z_b = gl_Position.z/gl_Position.w;
+	float z_n = 2.0 * z_b - 1.0;
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***
 	if(gl_PointSize > 10.0)
 		gl_PointSize = 10.0;
-	if(gl_PointSize < 4.0)
-		gl_PointSize = 4.0;
+	if(gl_PointSize < 2.0)
+		gl_PointSize = 2.0;
 		
-		//gl_PointSize = 4.0;
-		//glPointSize = gl_PointSize;
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***
 }

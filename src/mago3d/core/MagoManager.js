@@ -1533,11 +1533,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// provisionally prepare pointsCloud datas.******************************************************
 		// Load the motherOctrees pCloudData.***
-		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		
+		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
+		var pCloudOcreesLoadedsCount = 0;
 		for (var i=0; i<nodesCount; i++) 
 		{
-			if (this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
+			if (this.readerWriter.pCloudPartitionsMother_requested >= 1)
 			{ break; }
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
@@ -1555,9 +1556,15 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			if (octree === undefined)
 			{ continue; }
 			
-			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
+			if (this.processQueue.existOctreeToDeletePCloud(octree))
+			{ continue; }
+			if (octree.preparePCloudData(this, neoBuilding)) // Here only loads the motherOctrees-pCloud.***
+			{ pCloudOcreesLoadedsCount++; }
+				
+			if (pCloudOcreesLoadedsCount >5)
+			{ break; }
 		}
-		this.readerWriter.pCloudPartitions_requested = 0;
+		this.readerWriter.pCloudPartitionsMother_requested = 0;
 		
 		
 		
@@ -2771,6 +2778,8 @@ MagoManager.prototype.keyDown = function(key)
 		{ this.pointsCloudSsao = false; }
 		else
 		{ this.pointsCloudSsao = true; }
+	
+	
 	}
 	else if (key === 80) // 80 = 'p'.***
 	{
@@ -4748,18 +4757,18 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			else
 			{ currentShader = this.postFxShadersManager.getShader("pointsCloud"); }
 			currentShader.useProgram();
-			
 			currentShader.resetLastBuffersBinded();
-
 			currentShader.enableVertexAttribArray(currentShader.position3_loc);
 			currentShader.enableVertexAttribArray(currentShader.color4_loc);
-			
 			currentShader.bindUniformGenerals();
 			
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
+			gl.uniform1i(currentShader.bUse1Color_loc, false);
+			//gl.uniform4fv(currentShader.oneColor4_loc, [0.99, 0.99, 0.99, 1.0]); //.***
+	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);
 			
