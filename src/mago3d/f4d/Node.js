@@ -554,22 +554,13 @@ Node.prototype.finishedAnimation = function(magoManager)
 	
 	// Set camera position.****************************************
 	var camera = magoManager.scene.camera;
-	var position = camera.position;
-	var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+	var position = camera.positionWC;
 
-	var nextPosCamera = Globe.geographicToCartesianWgs84(nextLongitude, nextLatitude, cartographicPosition.height, undefined);
-	
-	magoManager.scene.camera.setView({
-		destination : new Cesium.Cartesian3(nextPosCamera[0], nextPosCamera[1], nextPosCamera[2]),
-		orientation : {
-			heading : camera.heading,
-			pitch   : camera.pitch,
-			roll    : camera.roll
-		},
-		duration: 0.0
-	});
-	
-	//--------------------------------------------------
+	var target = Cesium.Cartesian3.fromDegrees(nextLongitude, nextLatitude, nextAltitude);
+	var range = Cesium.Cartesian3.distance(position, target);
+	var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
+
+	camera.lookAt(target, hpr);
 	return finished;
 };
 

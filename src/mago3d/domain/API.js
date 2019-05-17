@@ -118,6 +118,9 @@ function API(apiName)
 
 	//for staticModel add
 	this.staticModelAttributeObj = null;
+
+	//animation option. 
+	this.animationOption = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -566,3 +569,11 @@ API.prototype.setStaticModelAttributeObj = function(staticModelAttributeObj)
 	this.staticModelAttributeObj = staticModelAttributeObj;
 };
 
+API.prototype.getAnimationOption = function()
+{
+	return this.animationOption;
+};
+API.prototype.setAnimationOption = function(animationOption)
+{
+	this.animationOption = animationOption;
+};

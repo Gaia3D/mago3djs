@@ -6237,28 +6237,37 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+//MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds)
+MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 	if (node === undefined)
 	{ return; }
-	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
+	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 };
 
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+//MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	if (node === undefined)
 	{ return; }
 
-	if (durationTimeInSeconds !== undefined)
+	if (animationOption !== undefined)
 	{
 		if (this.animationManager === undefined)
 		{ this.animationManager = new AnimationManager(); }
 		this.animationManager.putNode(node);
-		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
+
+		if(typeof animationOption === 'object' && animationOption.tracked)
+		{
+			this.animationManager.clearTracked();
+		}
+		
+		//For compatibility with lower versions, lower version parameter is duratiuon(number).
+		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, animationOption);
 	}
 	else 
 	{
@@ -7309,86 +7318,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "instantiateStaticModel")
 	{
 		var attributes = api.getInstantiateObj();
-
-		if (!defined(attributes.projectId))
-		{
-			throw new Error('projectId is required.');
-		}
-
-		if (!defined(attributes.instanceId))
-		{
-			throw new Error('instanceId is required.');
-		}
-
-		if (!defined(attributes.longitude))
-		{
-			throw new Error('longitude is required.');
-		}
-		if (!defined(attributes.latitude))
-		{
-			throw new Error('latitude is required.');
-		}
-
-		if (!attributes.isReference)
-		{
-			attributes.isReference = true;
-		}
-
-		if (!attributes.isPhysical)
-		{
-			attributes.isPhysical = true;
-		}
-
-		if (!attributes.nodeType)
-		{
-			attributes.nodeType = "TEST";
-		}
-
-		//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
-		//var existentNodesCount = Object.keys(nodesMap).length;
-		//var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
-		var projectId = attributes.projectId;
-		var instanceId = attributes.instanceId;
-		
-		var longitude = attributes.longitude;
-		var latitude = attributes.latitude;
-		var altitude = defaultValue(attributes.height, 0);
-		var heading = defaultValue(attributes.heading, 0);
-		var pitch = defaultValue(attributes.pitch, 0);
-		var roll = defaultValue(attributes.roll, 0);
-		
-		var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
-		if (node === undefined)
-		{
-			node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
-
-			var geoCoord = new GeographicCoord();
-			geoCoord.latitude = latitude;
-			geoCoord.longitude = longitude;
-			geoCoord.altitude = altitude;
-
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
-
-			// Now, create the geoLocdataManager of node.***
-			node.data.projectId = projectId;
-			node.data.attributes = attributes;
-			node.data.geographicCoord = geoCoord;
-			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
-			node.data.geoLocDataManager = geoLocDataManager;
-			/*node.data.bbox = new BoundingBox(); // Make a provisional bbox. We dont know size.***
-			node.data.bbox.init();
-			node.data.bbox.expand(10.0);*/ // we dont know the bbox size, so set as 10,10,10.***
-
-			// Now, insert node into smartTile.***
-			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
-			this.smartTileManager.putNode(targetDepth, node, this);
-		}
-		else 
-		{
-			this.changeLocationAndRotation(projectId, instanceId, latitude, longitude, altitude, heading, pitch, roll);
-		}
+		this.instantiateStaticModel(attributes);
 	}
 	else if (apiName === "addStaticModel")
 	{

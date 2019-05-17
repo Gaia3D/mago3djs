@@ -115,6 +115,14 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
 }
 
 /**
+ * Object literal with change Location And Rotation animation option.
+ * @typedef {Object} animationOption
+ * @property {string} dutaion optional. 
+ * @property {boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
+ * @property {boolean} tracked optional. camera track this node. only one node track.
+ */
+
+/**
  * location and rotation 변경
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId
@@ -125,8 +133,9 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * @param {string} heading 좌, 우
  * @param {string} pitch 위, 아래
  * @param {string} roll 좌, 우 기울기
+ * @param {animationOption} animationOption animation option
  */
-function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll) 
+function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll, animationOption) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -139,6 +148,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
+	api.setAnimationOption(roll);
 	managerFactoryInstance.callAPI(api);
 }
 
