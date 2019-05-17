@@ -662,6 +662,9 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 
 	if (neoBuilding === undefined)
 	{ return; }
+
+	if (magoManager.processQueue.existOctreeToDeletePCloud(this))
+	{ return; }
 	
 	if (this.pCloudPartitionsArray === undefined)
 	{ this.pCloudPartitionsArray = []; }
@@ -689,10 +692,10 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	
 	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
-		if ( i < this.pCloudPartitionsArray.length )
+		var pCloudPartition = this.pCloudPartitionsArray[i];
+		if ( i < this.pCloudPartitionsArray.length)
 		{
 			// Note: "pCloudPartition" is a Lego class object provisionally.***
-			var pCloudPartition = this.pCloudPartitionsArray[i];
 			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				// Parse data.***
@@ -701,33 +704,45 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
-					return true;
+					return false;
 				}
 				if (magoManager.parseQueue.pCloudPartitionsParsed >= 2)
-				{ return true; }
+				{ return false; }
 			}
 			
 		}
 		else
 		{
-			// Create the pCloudPartition.***
-			var readWriter = magoManager.readerWriter;
-
-			if (readWriter.pCloudPartitions_requested < 1 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+			if (pCloudPartition === undefined )//&& pCloudPartition.fileLoadState === CODE.fileLoadState.READY)
 			{
-				var pCloudPartitionLego = new Lego();
-				this.pCloudPartitionsArray.push(pCloudPartitionLego);
-				pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
-					
-				var projectFolderName = neoBuilding.projectFolderName;
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-				var subOctreeNumberName = this.octree_number_name.toString();
-				var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-				var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
-					
-				readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
-				return true;
+				// Create the pCloudPartition.***
+				var readWriter = magoManager.readerWriter;
+				var pCloudPartitions_requested = 0;
+				if (this.octree_level === 0)
+				{
+					pCloudPartitions_requested = readWriter.pCloudPartitionsMother_requested;
+				}
+				else 
+				{
+					pCloudPartitions_requested = readWriter.pCloudPartitions_requested;
+				}
+				if (pCloudPartitions_requested < 5 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+				{
+					//var pCloudPartition = this.pCloudPartitionsArray[i];
+					var pCloudPartitionLego = new Lego();
+					this.pCloudPartitionsArray.push(pCloudPartitionLego);
+					pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
+						
+					var projectFolderName = neoBuilding.projectFolderName;
+					var buildingFolderName = neoBuilding.buildingFileName;
+					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+					var subOctreeNumberName = this.octree_number_name.toString();
+					var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+					var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
+						
+					readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+					return true;
+				}
 			}
 			
 		}
@@ -825,12 +840,13 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 			}
 		}
 		
-		
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
 			var subOctree = this.subOctrees_array[i];
 			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
 		}
+		
+		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
 	}
 	else

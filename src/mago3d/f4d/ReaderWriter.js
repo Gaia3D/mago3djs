@@ -25,6 +25,7 @@ var ReaderWriter = function()
 	this.blocksListPartitioned_requested = 0;
 	this.octreesSkinLegos_requested = 0;
 	this.skinLegos_requested = 0;
+	this.pCloudPartitionsMother_requested = 0;
 	this.pCloudPartitions_requested = 0;
 
 	this.gl;
@@ -506,7 +507,11 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
 ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, lowestOctree, pCloudPartitionLego, magoManager) 
 {
 	pCloudPartitionLego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	magoManager.readerWriter.pCloudPartitions_requested++;
+	var octreeDepth = lowestOctree.octree_level;
+	if (octreeDepth === 0)
+	{ magoManager.readerWriter.pCloudPartitionsMother_requested++; }
+	else
+	{ magoManager.readerWriter.pCloudPartitions_requested ++; }
 	
 	loadWithXhr(fileName).done(function(response) 
 	{
@@ -532,9 +537,23 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 		else { pCloudPartitionLego.fileLoadState = status; }
 	}).always(function() 
 	{
-		magoManager.readerWriter.pCloudPartitions_requested--;
-		if (magoManager.readerWriter.pCloudPartitions_requested < 0)
-		{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
+		if (octreeDepth === 0)
+		{
+			magoManager.readerWriter.pCloudPartitionsMother_requested --;
+			if (magoManager.readerWriter.pCloudPartitionsMother_requested < 0)
+			{ magoManager.readerWriter.pCloudPartitionsMother_requested = 0; }
+		}
+		else
+		{
+			
+			magoManager.readerWriter.pCloudPartitions_requested--;
+			if (magoManager.readerWriter.pCloudPartitions_requested < 0)
+			{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
+		}
+	
+		//magoManager.readerWriter.pCloudPartitions_requested--;
+		//if (magoManager.readerWriter.pCloudPartitions_requested < 0)
+		//{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
 	});
 };
 

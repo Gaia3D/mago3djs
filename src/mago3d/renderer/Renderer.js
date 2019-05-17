@@ -316,7 +316,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 	var lastExtureId;
 	
 	// Do some gl settings.***
-	gl.uniform1i(shader.bUse1Color_loc, false);
+	//gl.uniform1i(shader.bUse1Color_loc, false);
 	gl.uniform1f(shader.fixPointSize_loc, 1.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, false);
 	
