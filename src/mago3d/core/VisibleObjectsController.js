@@ -99,19 +99,20 @@ VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsAr
 			newStartIdx = middleIdx;
 			newEndIdx = endIdx;
 		}
-		return this.getObjectIdxSortedByDist(objectsArray, newStartIdx, newEndIdx, node);
+		return this.getObjectIdxSortedByDist(objectsArray, newStartIdx, newEndIdx, object);
 	}
 };
 
 /**
  */
-VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(objectsArray, object) 
+VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objectsArray, object) 
 {
 	if (objectsArray.length > 0)
 	{
 		var startIdx = 0;
 		var endIdx = objectsArray.length - 1;
-		var idx = this.getObjecIdxSortedByDist(objectsArray, startIdx, endIdx, object);
+		var idx = this.getObjectIdxSortedByDist(objectsArray, startIdx, endIdx, object);
+		               
 		
 		objectsArray.splice(idx, 0, object);
 	}
