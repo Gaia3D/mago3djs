@@ -756,11 +756,16 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	
 	// To calculate distToCamera use the relativeCamera.***
 	var cameraPosition = relativeCam.position;
-	var distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
-	this.distToCamera = distToCamera; // distCenterToCamera.***
+	var distCenterToCamera = this.centerPos.distToPoint(cameraPosition);
+	var distToCamera = distCenterToCamera - this.getRadiusAprox();
+	this.distToCamera = distCenterToCamera; // distCenterToCamera.***
 	
-	// Put this octree into magoManager.visibleObjControlerPCloudOctrees, to load after.***
-	
+	// Put this octree into magoManager.visibleObjControlerPCloudOctrees, to load after.*** 
+	if (renderType === 0) // Note: It can be "renderType === 0" or "renderType === 1". The important is do this only once a frame.***
+	{
+		var vocPCloudOctrees = magoManager.visibleObjControlerPCloudOctrees;
+		vocPCloudOctrees.putObjectToArraySortedByDist(vocPCloudOctrees.currentVisibles0, this);
+	}
 	
 	// Provisionally, determine the LOD level by "distToCam".***
 	this.lod = magoPolicy.getLod(distToCamera);
@@ -779,10 +784,10 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		{
 			if (!magoManager.isCameraMoving && !magoManager.mouseLeftDown && !magoManager.mouseMiddleDown)
 			{
-				if (this.preparePCloudData(magoManager, neoBuilding))
-				{
-					bPrepareData = false;
-				}
+				//if (this.preparePCloudData(magoManager, neoBuilding))
+				//{
+				//	bPrepareData = false;
+				//}
 			}
 		}
 		
@@ -827,7 +832,6 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				
 				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, ssao_idx, distToCamera, this.lod);
 			}
-
 		}
 		
 		
