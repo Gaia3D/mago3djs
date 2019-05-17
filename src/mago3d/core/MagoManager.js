@@ -1425,16 +1425,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// provisional pin textures loading.
 		this.load_testTextures();
-	
-		if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-		if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
-		{
-			// move this to onResize.***
-			this.depthFboNeo.deleteObjects(gl);
-			this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-			this.sceneState.camera.frustum.dirty = true;
-		}
-	
+
 		if (this.myCameraSCX === undefined) 
 		{ this.myCameraSCX = new Camera(); }
 		
@@ -1451,8 +1442,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
 	}
-	
-	
 	
 	var cameraPosition = this.sceneState.camera.position;
 	
@@ -1544,11 +1533,12 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// provisionally prepare pointsCloud datas.******************************************************
 		// Load the motherOctrees pCloudData.***
-		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		
+		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
+		var pCloudOcreesLoadedsCount = 0;
 		for (var i=0; i<nodesCount; i++) 
 		{
-			if (this.readerWriter.pCloudPartitionsMotherOctree_requested >= 1)
+			if (this.readerWriter.pCloudPartitionsMother_requested >= 1)
 			{ break; }
 			
 			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
@@ -1566,9 +1556,15 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			if (octree === undefined)
 			{ continue; }
 			
-			octree.preparePCloudData(this, neoBuilding); // Here only loads the motherOctrees-pCloud.***
+			if (this.processQueue.existOctreeToDeletePCloud(octree))
+			{ continue; }
+			if (octree.preparePCloudData(this, neoBuilding)) // Here only loads the motherOctrees-pCloud.***
+			{ pCloudOcreesLoadedsCount++; }
+				
+			if (pCloudOcreesLoadedsCount >5)
+			{ break; }
 		}
-		this.readerWriter.pCloudPartitions_requested = 0;
+		this.readerWriter.pCloudPartitionsMother_requested = 0;
 		
 		
 		
@@ -1797,21 +1793,30 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	var ssao_idx = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var renderTexture = false;
-	this.depthFboNeo.bind(); 
-	if (this.isFarestFrustum())
+	
+	// Take the depFrameBufferObject of the current frustumVolume.***
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
-		gl.clearColor(1, 1, 1, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// move this to onResize.***
+		frustumVolumenObject.depthFbo.deleteObjects(gl);
+		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
 	}
+	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	
+	this.depthFboNeo.bind(); 
+
+	gl.clearColor(1, 1, 1, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
 	//this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
-	
 
-	
 	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
@@ -1822,8 +1827,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		scene._context._currentFramebuffer._bind();
 	}
 	
-
-
 	ssao_idx = 1;
 	this.renderType = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
@@ -2775,6 +2778,8 @@ MagoManager.prototype.keyDown = function(key)
 		{ this.pointsCloudSsao = false; }
 		else
 		{ this.pointsCloudSsao = true; }
+	
+	
 	}
 	else if (key === 80) // 80 = 'p'.***
 	{
@@ -4752,18 +4757,18 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			else
 			{ currentShader = this.postFxShadersManager.getShader("pointsCloud"); }
 			currentShader.useProgram();
-			
 			currentShader.resetLastBuffersBinded();
-
 			currentShader.enableVertexAttribArray(currentShader.position3_loc);
 			currentShader.enableVertexAttribArray(currentShader.color4_loc);
-			
 			currentShader.bindUniformGenerals();
 			
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
+			gl.uniform1i(currentShader.bUse1Color_loc, false);
+			//gl.uniform4fv(currentShader.oneColor4_loc, [0.99, 0.99, 0.99, 1.0]); //.***
+	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);
 			

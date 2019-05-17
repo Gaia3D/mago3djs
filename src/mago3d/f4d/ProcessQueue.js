@@ -38,6 +38,19 @@ ProcessQueue.prototype.putOctreeToDeletePCloud = function(octree, aValue)
 	this.octreeToDeletePCloudsMap[key] = octree;
 };
 
+ProcessQueue.prototype.existOctreeToDeletePCloud = function(octree)
+{
+	if (octree === undefined)
+	{ return false; }
+	
+	var key = octree.octreeKey;
+	if (this.octreeToDeletePCloudsMap.hasOwnProperty(key)) 
+	{
+		return true;
+	}
+	return false;
+};
+
 ProcessQueue.prototype.eraseOctreeToDeletePCloud = function(octree)
 {
 	// this erases the octree from the "octreeToDeletePCloudsMap".

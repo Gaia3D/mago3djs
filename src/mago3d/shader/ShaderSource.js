@@ -1096,15 +1096,15 @@ void main()\n\
 		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
-	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
+	float z_b = gl_Position.z/gl_Position.w;\n\
+	float z_n = 2.0 * z_b - 1.0;\n\
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
-	if(gl_PointSize < 4.0)\n\
-		gl_PointSize = 4.0;\n\
+	if(gl_PointSize < 2.0)\n\
+		gl_PointSize = 2.0;\n\
 		\n\
-		//gl_PointSize = 4.0;\n\
-		//glPointSize = gl_PointSize;\n\
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
 }";
 ShaderSource.PointCloudFS = "	precision lowp float;\n\
@@ -1223,6 +1223,8 @@ uniform vec3 buildingPosLOW;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
 uniform bool bPositionCompressed;\n\
 uniform vec3 minPosition;\n\
 uniform vec3 bboxSize;\n\
@@ -1262,12 +1264,14 @@ void main()\n\
 		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***\n\
-	gl_PointSize = 1.0 + gl_Position.z/300.0;\n\
+	float z_b = gl_Position.z/gl_Position.w;\n\
+	float z_n = 2.0 * z_b - 1.0;\n\
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
-	if(gl_PointSize < 3.0)\n\
-		gl_PointSize = 3.0;\n\
+	if(gl_PointSize < 2.0)\n\
+		gl_PointSize = 2.0;\n\
 		\n\
 	glPointSize = gl_PointSize;\n\
 }";
