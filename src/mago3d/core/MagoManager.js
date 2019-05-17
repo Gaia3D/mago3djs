@@ -1106,9 +1106,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// now, determine if the camera was moved.***
 		// Find cam dir & up by modelViewMatrix.***
 		var modelViewMatInv = sceneState.modelViewMatrixInv;
-		var camPosX = modelViewMatInv._floatArrays[12];
-		var camPosY = modelViewMatInv._floatArrays[13];
-		var camPosZ = modelViewMatInv._floatArrays[14];
+		var camPosX = this.scene.camera.positionWC.x;
+		var camPosY = this.scene.camera.positionWC.y;
+		var camPosZ = this.scene.camera.positionWC.z;
 		
 		var camDirX = -modelViewMatInv._floatArrays[8];
 		var camDirY = -modelViewMatInv._floatArrays[9];
@@ -1251,9 +1251,13 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		// Set cam dir & up by modelViewMatrix.***
 		var sceneState = this.sceneState;
 		var modelViewMatInv = sceneState.modelViewMatrixInv;
-		var camPosX = modelViewMatInv._floatArrays[12];
-		var camPosY = modelViewMatInv._floatArrays[13];
+		//var camPosX = modelViewMatInv._floatArrays[12];
+		////var camPosY = modelViewMatInv._floatArrays[13];
 		var camPosZ = modelViewMatInv._floatArrays[14];
+		
+		var camPosX = this.scene.camera.positionWC.x;
+		var camPosY = this.scene.camera.positionWC.y;
+		var camPosZ = this.scene.camera.positionWC.z;
 		
 		var camDirX = -modelViewMatInv._floatArrays[8];
 		var camDirY = -modelViewMatInv._floatArrays[9];
