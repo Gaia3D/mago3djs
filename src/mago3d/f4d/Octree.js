@@ -659,6 +659,9 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 {
 	if (this.pCloudPartitionsCount === undefined && this.pCloudPartitionsCount === 0)
 	{ return; }
+
+	if (neoBuilding === undefined)
+	{ return; }
 	
 	if (this.pCloudPartitionsArray === undefined)
 	{ this.pCloudPartitionsArray = []; }
@@ -779,18 +782,6 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	var frustumCull = this.intersectionFrustum(cullingVolume, magoManager.boundingSphere_Aux);
 	if (frustumCull !== Constant.INTERSECTION_OUTSIDE ) 
 	{
-		// Check if pCloud data is loaded.***
-		if (bPrepareData)
-		{
-			if (!magoManager.isCameraMoving && !magoManager.mouseLeftDown && !magoManager.mouseMiddleDown)
-			{
-				//if (this.preparePCloudData(magoManager, neoBuilding))
-				//{
-				//	bPrepareData = false;
-				//}
-			}
-		}
-		
 		// Erase from deleting queue.***
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
@@ -830,7 +821,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
 				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
 				
-				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, ssao_idx, distToCamera, this.lod);
+				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, renderType, distToCamera, this.lod);
 			}
 		}
 		
