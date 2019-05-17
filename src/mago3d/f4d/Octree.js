@@ -758,7 +758,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	var cameraPosition = relativeCam.position;
 	var distCenterToCamera = this.centerPos.distToPoint(cameraPosition);
 	var distToCamera = distCenterToCamera - this.getRadiusAprox();
-	this.distToCamera = distCenterToCamera; // distCenterToCamera.***
+	this.distToCamera = distToCamera; // distCenterToCamera.***
 	
 	// Put this octree into magoManager.visibleObjControlerPCloudOctrees, to load after.*** 
 	if (renderType === 0) // Note: It can be "renderType === 0" or "renderType === 1". The important is do this only once a frame.***
