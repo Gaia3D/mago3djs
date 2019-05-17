@@ -1425,16 +1425,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// provisional pin textures loading.
 		this.load_testTextures();
-	
-		if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-		if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
-		{
-			// move this to onResize.***
-			this.depthFboNeo.deleteObjects(gl);
-			this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-			this.sceneState.camera.frustum.dirty = true;
-		}
-	
+
 		if (this.myCameraSCX === undefined) 
 		{ this.myCameraSCX = new Camera(); }
 		
@@ -1451,8 +1442,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
 	}
-	
-	
 	
 	var cameraPosition = this.sceneState.camera.position;
 	
@@ -1797,21 +1786,30 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	var ssao_idx = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var renderTexture = false;
-	this.depthFboNeo.bind(); 
-	if (this.isFarestFrustum())
+	
+	// Take the depFrameBufferObject of the current frustumVolume.***
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
-		gl.clearColor(1, 1, 1, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// move this to onResize.***
+		frustumVolumenObject.depthFbo.deleteObjects(gl);
+		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
 	}
+	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	
+	this.depthFboNeo.bind(); 
+
+	gl.clearColor(1, 1, 1, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
 	//this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
-	
 
-	
 	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
 	{
@@ -1822,8 +1820,6 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		scene._context._currentFramebuffer._bind();
 	}
 	
-
-
 	ssao_idx = 1;
 	this.renderType = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
