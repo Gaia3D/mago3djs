@@ -1795,6 +1795,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			
 	// 1) The depth render.**********************************************************************************************************************
 	var ssao_idx = 0; // 0= depth. 1= color.***
+	this.renderType = 0;
 	var renderTexture = false;
 	this.depthFboNeo.bind(); 
 	if (this.isFarestFrustum())
@@ -1824,6 +1825,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 
 
 	ssao_idx = 1;
+	this.renderType = 1;
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	
 	if (this.weatherStation)
@@ -5224,11 +5226,36 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 		
 		currentShader.bindUniformGenerals();
+		
+		// Test to load pCloud.***
+		if (this.visibleObjControlerPCloudOctrees === undefined)
+		{ this.visibleObjControlerPCloudOctrees = new VisibleObjectsController(); }
+		this.visibleObjControlerPCloudOctrees.clear();
 
 		this.renderer.renderNeoBuildingsPCloud(gl, this.visibleObjControlerNodes.currentVisiblesAux, this, currentShader, renderTexture, renderType); 
 		currentShader.disableVertexAttribArrayAll();
 		
 		gl.useProgram(null);
+		
+		// Load pCloud data.***
+		var visiblesSortedOctreesArray = this.visibleObjControlerPCloudOctrees.currentVisibles0;
+		var octreesCount = visiblesSortedOctreesArray.length;
+
+		var loadCount = 0;
+		if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+		{
+			for (var i=0; i<octreesCount; i++)
+			{
+				var octree = visiblesSortedOctreesArray[i];
+				if (octree.preparePCloudData(this, octree.neoBuildingOwner))
+				{
+					loadCount++;
+				}
+				
+				if (loadCount > 1)
+				{ break; }
+			}
+		}
 
 	}
 	
