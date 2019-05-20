@@ -6845,7 +6845,7 @@ MagoManager.prototype.callAPI = function(api)
 								if (node === undefined || node.data === undefined)
 								{ continue; }
 							
-								node.isColorChanged = false;
+								node.data.isColorChanged = false;
 								
 								var neoBuilding = node.data.neoBuilding;
 								if (neoBuilding === undefined)
