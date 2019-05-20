@@ -5647,20 +5647,21 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	{ return; }
 	
 	var distToCamera;
+	var magoPolicy = this.magoPolicy;
 	
-	var lod0_minDist = this.magoPolicy.getLod1DistInMeters();
+	var lod0_minDist = magoPolicy.getLod1DistInMeters();
 	var lod1_minDist = 1;
-	var lod2_minDist = this.magoPolicy.getLod2DistInMeters();
-	var lod5_minDist = this.magoPolicy.getLod5DistInMeters();
+	var lod2_minDist = magoPolicy.getLod2DistInMeters();
+	var lod5_minDist = magoPolicy.getLod5DistInMeters();
 	var lod3_minDist;
 	
 	// get lodDistances for determine the real lod of the building.***
-	var lod0Dist = this.magoPolicy.getLod0DistInMeters();
-	var lod1Dist = this.magoPolicy.getLod1DistInMeters();
-	var lod2Dist = this.magoPolicy.getLod2DistInMeters();
-	var lod3Dist = this.magoPolicy.getLod3DistInMeters();
-	var lod4Dist = this.magoPolicy.getLod4DistInMeters();
-	var lod5Dist = this.magoPolicy.getLod5DistInMeters();
+	var lod0Dist = magoPolicy.getLod0DistInMeters();
+	var lod1Dist = magoPolicy.getLod1DistInMeters();
+	var lod2Dist = magoPolicy.getLod2DistInMeters();
+	var lod3Dist = magoPolicy.getLod3DistInMeters();
+	var lod4Dist = magoPolicy.getLod4DistInMeters();
+	var lod5Dist = magoPolicy.getLod5DistInMeters();
 
 	var maxNumberOfCalculatingPositions = 100;
 	var currentCalculatingPositionsCount = 0;
@@ -5735,7 +5736,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				else if (data.distToCam < lod5Dist)
 				{ data.currentLod = 5; }
 				
-				var frustumFar = this.magoPolicy.getFrustumFarDistance();
+				var frustumFar = magoPolicy.getFrustumFarDistance();
 				if (distToCamera > frustumFar)
 				{ 
 					// put this node to delete into queue.***

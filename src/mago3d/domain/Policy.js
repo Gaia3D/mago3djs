@@ -75,7 +75,7 @@ var Policy = function()
 	
 	// PointsCloud.***
 	this.pointsCloudSettings = {};
-	this.pointsCloudSettings.maxPartitionsLod0 = 10;
+	this.pointsCloudSettings.maxPartitionsLod0 = 8;
 	this.pointsCloudSettings.maxPartitionsLod1 = 4;
 	this.pointsCloudSettings.maxPartitionsLod2orLess = 1;
 	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam0m = 1.0;
