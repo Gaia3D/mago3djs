@@ -181,6 +181,42 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	}
 };
 
+Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCount, magoManager) 
+{
+	var vertices_count = realPointsCount;
+	var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		
+	if (distToCam <= 10)
+	{
+		// Render all points.***
+	}
+	else if (distToCam < 100)
+	{
+		vertices_count =  Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam100m * realPointsCount);
+	}
+	else if (distToCam < 200)
+	{
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam200m * realPointsCount);
+	}
+	else if (distToCam < 400)
+	{
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam400m * realPointsCount);
+	}
+	else if (distToCam < 800)
+	{
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam800m * realPointsCount);
+	}
+	else if (distToCam < 1600)
+	{
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam1600m * realPointsCount);
+	}
+	else
+	{
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m * realPointsCount);
+	}
+	
+	return vertices_count;
+};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -208,9 +244,15 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 	if (vertices_count === 0) 
 	{ return; }
 	
-	shader.disableVertexAttribArray(shader.color4_loc);
-	shader.disableVertexAttribArray(shader.normal3_loc); // provisionally has no normals.***
-	shader.disableVertexAttribArray(shader.texCoord2_loc);
+	var pointsCountToDraw = this.getPointsCountForDistance(distToCam, vertices_count, magoManager);
+	
+	if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
+	{
+		pointsCountToDraw = Math.floor(pointsCountToDraw/5);
+	}
+
+	if (pointsCountToDraw <= 0)
+	{ return; }
 
 	if (ssao_idx === 0) // depth.***
 	{
@@ -218,83 +260,17 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
-		gl.drawArrays(gl.POINTS, 0, vertices_count);
+		gl.drawArrays(gl.POINTS, 0, pointsCountToDraw);
 	}
-	else if (ssao_idx === 1) // ssao.***
+	else if (ssao_idx === 1) // color.***
 	{
-		if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
-		{
-			vertices_count = Math.floor(vertices_count/5);
-			if (vertices_count === 0)
-			{ return; } 
-		}
-		/*
-		if (distToCam < 80)
-		{
-			// Render all points.***
-		}
-		else if (distToCam < 200)
-		{
-			vertices_count = Math.floor(vertices_count/8);
-		}
-		else if (distToCam < 400)
-		{
-			vertices_count = Math.floor(vertices_count/16);
-		}
-		else if (distToCam < 800)
-		{
-			vertices_count = Math.floor(vertices_count/32);
-		}
-		else if (distToCam < 1600)
-		{
-			vertices_count = Math.floor(vertices_count/64);
-		}
-		else
-		{
-			vertices_count = Math.floor(vertices_count/128);
-		}
-		*/
-		
-		
-		
-		if (distToCam < 100)
-		{
-			// Render all points.***
-		}
-		else if (distToCam < 200)
-		{
-			vertices_count = Math.floor(vertices_count/4);
-		}
-		else if (distToCam < 400)
-		{
-			vertices_count = Math.floor(vertices_count/8);
-		}
-		else if (distToCam < 800)
-		{
-			vertices_count = Math.floor(vertices_count/16);
-		}
-		else if (distToCam < 1600)
-		{
-			vertices_count = Math.floor(vertices_count/32);
-		}
-		else
-		{
-			vertices_count = Math.floor(vertices_count/64);
-		}
-		
-		
-		if (vertices_count <= 0)
-		{ 
-			return; 
-		}
-
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
 		if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
-		gl.drawArrays(gl.POINTS, 0, vertices_count);
+		gl.drawArrays(gl.POINTS, 0, pointsCountToDraw);
 		
 	}
 	

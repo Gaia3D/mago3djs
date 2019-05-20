@@ -651,6 +651,36 @@ Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, 
 };
 
 /**
+ * Returns the pointsCloud-PartitionsData count to consider for the "lod".
+ * @param {Number} lod Level of Detail.
+ * @param {Number} realPartitionsCount The real pointsCloud-PartitionsData count.
+ * @param {MagoManager} magoManager The main class manager.
+ * @returns {Number} pCloudPartitionsCount The pointsCloud-PartitionsData count to consider for the "lod".
+ */
+Octree.prototype.getPartitionsCountsForLod = function(lod, realPartitionsCount, magoManager) 
+{
+	var pCloudPartitionsCount =1;
+	if (lod === 0)
+	{ 
+		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		pCloudPartitionsCount = realPartitionsCount; 
+		if (pCloudPartitionsCount > pCloudSettings.maxPartitionsLod0)
+		{ pCloudPartitionsCount = pCloudSettings.maxPartitionsLod0; }
+	}
+	else if (lod === 1)
+	{ 
+		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		pCloudPartitionsCount = Math.ceil(realPartitionsCount/4); 
+		if (pCloudPartitionsCount > pCloudSettings.maxPartitionsLod1)
+		{ pCloudPartitionsCount = pCloudSettings.maxPartitionsLod1; }
+	}
+	else if (lod > 1)
+	{ pCloudPartitionsCount = 1; }
+
+	return pCloudPartitionsCount;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  * @param intNumber 변수
  * @returns numDigits
@@ -669,26 +699,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 	if (this.pCloudPartitionsArray === undefined)
 	{ this.pCloudPartitionsArray = []; }
 	
-	var pCloudPartitionsCount = this.pCloudPartitionsCount;
-		
-	if (this.lod === 0)
-	{ 
-		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
-		if (pCloudPartitionsCount > 25)
-		{ pCloudPartitionsCount = 25; }
-	}
-	if (this.lod === 1)
-	{ 
-		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
-		if (pCloudPartitionsCount > 10)
-		{ pCloudPartitionsCount = 10; }
-	}
-	else if (this.lod > 1)
-	{ pCloudPartitionsCount = 1; }
-
-	// Temporary total limiting:
-	//if(pCloudPartitionsCount > 15)
-	//	pCloudPartitionsCount = 15;
+	var pCloudPartitionsCount = this.getPartitionsCountsForLod(this.lod, this.pCloudPartitionsCount, magoManager);
 	
 	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
@@ -789,8 +800,6 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 	this.lod = magoPolicy.getLod(distToCamera);
 	
 	// Provisionally compare "this.lod" with "this.octreeLevel".***
-	
-	
 	var gl = magoManager.sceneState.gl;
 	var ssao_idx = 1;
 	
@@ -804,26 +813,8 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		if (this.pCloudPartitionsArray === undefined)
 		{ return; }
 		
-		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
-		
-		if (this.lod === 0)
-		{
-			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-			if (pCloudPartitionsCount > 25)
-			{ pCloudPartitionsCount = 25; }
-		}
-		else if (this.lod === 1)
-		{
-			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-			if (pCloudPartitionsCount > 10)
-			{ pCloudPartitionsCount = 10; }
-		}
-		else if (this.lod > 1)
-		{ 
-			pCloudPartitionsCount = 1; 
-		}
+		var pCloudPartitionsCount = this.getPartitionsCountsForLod(this.lod, this.pCloudPartitionsCount, magoManager);
 
-		
 		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];

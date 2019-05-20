@@ -1,9 +1,10 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * GeoLocationData is a class object that contains many information located on "geographicCoord".
+ * 
  * @class GeoLocationData
- * @param geoLocationDataName 변수
+ * @param {string} geoLocationDataName 
  */
 var GeoLocationData = function(geoLocationDataName) 
 {
