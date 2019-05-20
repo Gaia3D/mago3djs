@@ -2781,6 +2781,16 @@ MagoManager.prototype.keyDown = function(key)
 	
 	
 	}
+	else if (key === 49) // 49 = '1'.***
+	{
+		if (this.pointsCloudWhite === undefined)
+		{ this.pointsCloudWhite = true; }
+		
+		if (this.pointsCloudWhite)
+		{ this.pointsCloudWhite = false; }
+		else
+		{ this.pointsCloudWhite = true; }
+	}
 	else if (key === 80) // 80 = 'p'.***
 	{
 		var projectId = "AutonomousVehicle";
@@ -4766,8 +4776,15 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
-			gl.uniform1i(currentShader.bUse1Color_loc, false);
-			//gl.uniform4fv(currentShader.oneColor4_loc, [0.99, 0.99, 0.99, 1.0]); //.***
+			if (this.pointsCloudWhite !== undefined && this.pointsCloudWhite)
+			{
+				gl.uniform1i(currentShader.bUse1Color_loc, true);
+				gl.uniform4fv(currentShader.oneColor4_loc, [0.99, 0.99, 0.99, 1.0]); //.***
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bUse1Color_loc, false);
+			}
 	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);
@@ -5226,7 +5243,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 		currentShader.resetLastBuffersBinded();
 
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.enableVertexAttribArray(currentShader.color4_loc);
+		currentShader.disableVertexAttribArray(currentShader.color4_loc);
 		currentShader.disableVertexAttribArray(currentShader.normal3_loc); // provisionally has no normals.***
 		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 		
