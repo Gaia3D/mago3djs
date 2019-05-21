@@ -1,10 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Octree class object. The octree contains detailed geometry data (meshes, points cloud, etc.).
  * @class Octree
- *
- * @param octreeOwner 변수
+ * @param {Octree} octreeOwner If octreeOwner is undefined, then this octree is the mother octree.
  */
 var Octree = function(octreeOwner) 
 {
@@ -13,48 +12,167 @@ var Octree = function(octreeOwner)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// Note: an octree is a cube, not a box.***
+	/**
+	 * The center position in local coordinates of the octree.
+	 * @type {Point3D}
+	 * @default (0,0,0)
+	 */
 	this.centerPos = new Point3D();
-	this.half_dx = 0.0; // half width.***
-	this.half_dy = 0.0; // half length.***
-	this.half_dz = 0.0; // half height.***
+	
+	/**
+	 * The half width of the octree in x-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dx = 0.0; 
+	
+	/**
+	 * The half width of the octree in y-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dy = 0.0; 
+	
+	/**
+	 * The half width of the octree in z-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dz = 0.0; 
 
+	/**
+	 * The octree's owner. If octree_owner is undefined, then this octree is the mother octree.
+	 * @type {Octree}
+	 * @default undefined
+	 */
 	this.octree_owner;
-	this.octree_level = 0;
-	this.octree_number_name = 0;
-	this.neoBuildingOwnerId;
-	this.neoBuildingOwner;
-	this.octreeKey; // ownerBuilding_ID + octreeNumberName, so is unique.***
-	this.lod; // lod can be 0, 1 or 2...***
-	this.distToCamera;
-	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
-	this.fileLoadState = CODE.fileLoadState.READY;
-
 	if (octreeOwner) 
 	{
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
+	
+	/**
+	 * The octree's depth level. Mother octree's depth level is zero.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.octree_level = 0;
+	
+	// Octree number name.********************************
+	// Bottom           Top              Y
+	// +-----+-----+   +-----+-----+     ^
+	// |  4  |  3  |   |  8  |  7  |     |
+	// +-----+-----+   +-----+-----+     |
+	// |  1  |  2  |   |  5  |  6  |     |------> X
+	// +-----+-----+   +-----+-----+
+	
+	/**
+	 * The octree's identifier. Accumulative number, starting from mother octree.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.octree_number_name = 0;
+	
+	/**
+	 * The octree's neoBuildingOwner identifier.
+	 * @type {String}
+	 * @default undefined
+	 */
+	this.neoBuildingOwnerId;
+	
+	/**
+	 * The octree's neoBuildingOwner.
+	 * @type {NeoBuilding}
+	 * @default undefined
+	 */
+	this.neoBuildingOwner;
+	
+	/**
+	 * The octree's global unique identifier. It is compost by neoBuildingOwnerId + octree_number_name.
+	 * @type {String}
+	 * @default undefined
+	 */
+	this.octreeKey; 
+	
+	/**
+	 * The octree's current LOD. Assigned by distance to camera when frustumCulling.
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.lod; 
+	
+	/**
+	 * The octree's current distance to camera.
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.distToCamera;
+	
+	/**
+	 * The octree's meshes count. Readed when parsing.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.triPolyhedronsCount = 0; 
+	
+	/**
+	 * The octree's current fileLoadState.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.fileLoadState = CODE.fileLoadState.READY;
 
+	/**
+	 * The octree's children array. Array length must be 8.
+	 * @type {Array}
+	 * @default 0
+	 */
 	this.subOctrees_array = [];
-	this.neoReferencesMotherAndIndices; // Asimetric mode.***
+	
+	/**
+	 * The octree's meshes. The meshes of the octree are referenced by an indice.
+	 * @type {NeoReferencesMotherAndIndices}
+	 * @default undefined
+	 */
+	this.neoReferencesMotherAndIndices; 
+	
+	/**
+	 * Pre-extracted leaf octrees, to speedUp.
+	 * @type {Array}
+	 * @default undefined
+	 */
 	this.lowestOctrees_array; // pre extract lowestOctrees for speedUp, if this is motherOctree.***
 
-	// now, for legoStructure.***
-	this.lego; // NetSurfaceMesh or pCloud.***
+	/**
+	 * Can be a mesh or poitsCloudPartition. Generally used to contain LOD2 meshes.
+	 * @type {Lego}
+	 * @default undefined
+	 */
+	this.lego; 
 	
-	// PointsCloud pyramidOctree data.***
+	/**
+	 * PointsCloudPartitions count.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
+	
+	/**
+	 * PointsCloudPartitions.
+	 * @type {Array}
+	 * @default undefined
+	 */
 	this.pCloudPartitionsArray;
 	
 	// v002.***
-	this.blocksListsPartitionsCount;
-	this.blocksListsPartitionsParsedCount;
+	//this.blocksListsPartitionsCount;
+	//this.blocksListsPartitionsParsedCount;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns subOctree 변수
+ * Creates a child octree.
+ * @returns {Octree} subOctree Returns the created child octree.
  */
 Octree.prototype.new_subOctree = function() 
 {
@@ -74,20 +192,6 @@ Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager)
 	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	this.neoReferencesMotherAndIndices = undefined;
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
 
 	if (this.subOctrees_array !== undefined) 
 	{
@@ -155,20 +259,6 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	this.neoReferencesMotherAndIndices = undefined;
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
 	
 	// before deleteting child:
 	this.deletePCloudObjects(gl, vboMemManager);
@@ -711,17 +801,13 @@ Octree.prototype.preparePCloudData = function(magoManager)
 			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
 				// Parse data.***
-				if (magoManager.parseQueue.pCloudPartitionsParsed < 2)
+				if (magoManager.parseQueue.pCloudPartitionsParsed < 4)
 				{
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
-					return false;
 				}
-				if (magoManager.parseQueue.pCloudPartitionsParsed >= 2)
-				{ return false; }
 			}
-			
 		}
 		else
 		{
@@ -738,7 +824,7 @@ Octree.prototype.preparePCloudData = function(magoManager)
 				{
 					pCloudPartitions_requested = readWriter.pCloudPartitions_requested;
 				}
-				if (pCloudPartitions_requested < 8 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+				if (pCloudPartitions_requested < 3 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
 				{
 					//var pCloudPartition = this.pCloudPartitionsArray[i];
 					var pCloudPartitionLego = new Lego();
@@ -1024,32 +1110,6 @@ Octree.prototype.getCenterPos = function()
 Octree.prototype.getRadiusAprox = function() 
 {
 	return this.half_dx*1.7;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_NeoRefListsArray 변수
- */
-Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) 
-{
-	if (result_NeoRefListsArray === undefined) { result_NeoRefListsArray = []; }
-
-	var subOctreesArrayLength = this.subOctrees_array.length;
-	if (subOctreesArrayLength > 0) 
-	{
-		for (var i=0; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getNeoRefListArray(result_NeoRefListsArray);
-		}
-	}
-	else 
-	{
-		if (this.neoRefsList_Array.length>0) // original.***
-		//if(this.triPolyhedronsCount>0)
-		{
-			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
-		}
-	}
 };
 
 /**
@@ -1564,7 +1624,6 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray)
 	}
 	else 
 	{
-		//if(this.neoRefsList_Array.length > 0)
 		if (this.triPolyhedronsCount > 0) { result_octreesArray.push(this); } // there are only 1.***
 	}
 };
