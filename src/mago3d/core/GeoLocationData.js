@@ -587,8 +587,10 @@ GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader)
 //**********************************************************************************************************************************************************
 
 /**
- * 어떤 일을 하고 있습니까?
+ * GeoLocationDataManager is a class object that contains GeoLocationData objects in an array.
+ * 
  * @class GeoLocationDataManager
+ * @constructor 
  */
 var GeoLocationDataManager = function() 
 {
@@ -603,9 +605,6 @@ var GeoLocationDataManager = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocationName 변수
- * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.deleteObjects = function() 
 {
@@ -630,9 +629,7 @@ GeoLocationDataManager.prototype.popGeoLocationData = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
  * @param geoLocationName 변수
- * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 {

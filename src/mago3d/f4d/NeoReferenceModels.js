@@ -1,8 +1,10 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Geometry object. The real geometry data is a model, and this referenceObject has the model's index.
+ * 
  * @class NeoReference
+ * @constructor 
  */
 var NeoReference = function() 
 {
@@ -11,46 +13,149 @@ var NeoReference = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// 1) Object IDX.***
+	/**
+	 * The object's index on motherReferenceArray.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this._id = 0;
 
+	/**
+	 * The object's identifier.
+	 * @type {String}
+	 * @default ""
+	 */
 	this.objectId = "";
 
-	// 2) Block Idx.***
+	/**
+	 * The model's index.
+	 * @type {Number}
+	 * @default -1
+	 */
 	this._block_idx = -1;
+	
+	/**
+	 * The model-reference transformation matrix.(do not modify).
+	 * @type {Matrix4}
+	 * @default Identity matrix
+	 */
+	this._originalMatrix4 = new Matrix4(); 
 
-	// 3) Transformation Matrix.***
-	this._matrix4 = new Matrix4(); // initial and necessary matrix.***
-	this._originalMatrix4 = new Matrix4(); // original matrix, for use with block-reference (do not modify).***
-	this.tMatrixAuxArray; // use for deploying mode, cronological transformations for example.***
-	this.refMatrixType = 2; // 0 = identity matrix, 1 = translate matrix, 2 = transformation matrix.
-	this.refTranslationVec; // use this if "refMatrixType" === 1.
-	// 4) VBO datas container.***
-	this.vBOVertexIdxCacheKeysContainer; // initially undefined.***
+	/**
+	 * The final transformation matrix. Is calculated by multiplication between model-reference-matrix and building-matrix.
+	 * @type {Matrix4}
+	 * @default Identity matrix
+	 */
+	this._matrix4 = new Matrix4(); 
+	
+	/**
+	 * Array used to store finalTransformationMatrices, chronological transformations, or two positions mode for example.
+	 * @type {Array}
+	 * @default undefined
+	 */
+	this.tMatrixAuxArray; 
+	
+	/**
+	 * Parameter that specifies the type of the transformation matrix. 0 = identity matrix, 1 = translation matrix, 2 = transformation matrix.
+	 * @type {Number}
+	 * @default 2
+	 */
+	this.refMatrixType = 2; 
+	
+	/**
+	 * Position vector of the translation matrix. Use this if "refMatrixType" = 1.
+	 * @type {Float32Array(3)}
+	 * @default undefined
+	 */
+	this.refTranslationVec; 
+	
+	/**
+	 * VBOs container.
+	 * @type {VBOVertexIdxCacheKeysContainer}
+	 * @default undefined
+	 */
+	this.vBOVertexIdxCacheKeysContainer; 
 
-	// 5) The texture image.***
+	/**
+	 * Material index.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this.materialId;
+	
+	/**
+	 * Parameter that indicates if this object has texture.
+	 * @type {Boolean}
+	 * @default false
+	 */
 	this.hasTexture = false;
-	this.texture; // Texture
+	
+	/**
+	 * Texture object.
+	 * @type {Texture}
+	 * @default undefined
+	 */
+	this.texture; 
 
-	// 6) 1 color.***
-	this.color4; //new Color();
-	this.aditionalColor; // used when object color was changed.***
+	/**
+	 * Object's color if has not texture.
+	 * @type {Color}
+	 * @default undefined
+	 */
+	this.color4; 
+	
+	/**
+	 * Object's aditional color. Used when object color was changed.
+	 * @type {Color}
+	 * @default undefined
+	 */
+	this.aditionalColor; 
 
-	this.vertexCount = 0;// provisional. for checking vertexCount of the block.*** delete this.****
+	/**
+	 * Object's movement vector in local coordinates.
+	 * @type {Point3D}
+	 * @default undefined
+	 */
+	this.moveVectorRelToBuilding; 
+	
+	/**
+	 * Object's movement vector in world coordinates.
+	 * @type {Point3D}
+	 * @default undefined
+	 */
+	this.moveVector; 
 
-	// 7) movement of the object.***
-	this.moveVectorRelToBuilding; // Point3D.***
-	this.moveVector; // Point3D.***
-
-	// 8) check for render.***
+	/**
+	 * Object's current rendering phase. Parameter to avoid duplicated render on scene.
+	 * @type {boolean}
+	 * @default false
+	 */
 	this.renderingFase = false;
+	
+	/**
+	 * Object's translucent alpha. Used when born the reference object until adult.
+	 * @type {Number}
+	 * @default false
+	 */
 	this.blendAlpha = 0.0;
+	
+	/**
+	 * Object's born date.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this.birthTime;
+	
+	/**
+	 * Parameter that indicates if the object is adult. If is adult, then do no apply blendAlpha.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this.isAdult = false;
 };
 
 /**
+ * Commutate the renderingFase value: true - false.
  */
 NeoReference.prototype.swapRenderingFase = function() 
 {
@@ -58,6 +163,8 @@ NeoReference.prototype.swapRenderingFase = function()
 };
 
 /**
+ * Returns the blending alpha value in current time.
+ * @param {Number} currTime The current time.
  */
 NeoReference.prototype.getBlendAlpha = function(currTime) 
 {
@@ -455,8 +562,6 @@ NeoReference.prototype.deleteObjects = function(gl, vboMemManager)
 	if (this.selColor4)
 	{ this.selColor4.deleteObjects(); }
 	this.selColor4 = undefined; //new Color(); // use for selection only.***
-
-	this.vertexCount = undefined;// provisional. for checking vertexCount of the block.*** delete this.****
 
 	// 8) movement of the object.***
 	if (this.moveVector)

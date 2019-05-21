@@ -2742,6 +2742,24 @@ MagoManager.prototype.keyDown = function(key)
 	
 	
 	}
+	/*
+	else if (key === 37) // 37 = 'left'.***
+	{
+		
+	}
+	else if (key === 38) // 38 = 'up'.***
+	{
+		
+	}
+	else if (key === 39) // 39 = 'right'.***
+	{
+		
+	}
+	else if (key === 40) // 40 = 'down'.***
+	{
+		
+	}
+	*/
 	else if (key === 49) // 49 = '1'.***
 	{
 		if (this.pointsCloudWhite === undefined)

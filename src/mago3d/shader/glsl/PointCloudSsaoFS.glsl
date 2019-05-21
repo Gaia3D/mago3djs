@@ -55,7 +55,7 @@ void main()
 		radiusAux = 1.5;
 		vec2 screenPosAdjacent;
 		
-		for(int j = 0; j < 3; ++j)
+		for(int j = 0; j < 1; ++j)
 		{
 			radiusAux = 1.5 *(float(j)+1.0);
 			for(int i = 0; i < 8; ++i)
@@ -86,10 +86,10 @@ void main()
 			}   
 		}   
 			
-		//if(occlusion > 1.0)
-		//	occlusion = 8.0;
+		if(occlusion > 6.0)
+			occlusion = 8.0;
 		//else occlusion = 0.0;
-		occlusion = 1.0 - occlusion / 24.0;
+		occlusion = 1.0 - occlusion / 8.0;
 	}
 	else{
 		occlusion = 1.0;
