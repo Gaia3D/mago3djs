@@ -682,19 +682,20 @@ Octree.prototype.getPartitionsCountsForLod = function(lod, realPartitionsCount, 
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param intNumber 변수
- * @returns numDigits
+ * @param {MagoManager} magoManager Main mago3d manager.
+ * @returns {boolean} Returns if requested the points cloud data.
  */
-Octree.prototype.preparePCloudData = function(magoManager, neoBuilding) 
+Octree.prototype.preparePCloudData = function(magoManager) 
 {
 	if (this.pCloudPartitionsCount === undefined && this.pCloudPartitionsCount === 0)
-	{ return; }
+	{ return false; }
 
+	var neoBuilding = this.neoBuildingOwner;
 	if (neoBuilding === undefined)
-	{ return; }
+	{ return false; }
 
 	if (magoManager.processQueue.existOctreeToDeletePCloud(this))
-	{ return; }
+	{ return false; }
 	
 	if (this.pCloudPartitionsArray === undefined)
 	{ this.pCloudPartitionsArray = []; }
@@ -737,7 +738,7 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
 				{
 					pCloudPartitions_requested = readWriter.pCloudPartitions_requested;
 				}
-				if (pCloudPartitions_requested < 5 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+				if (pCloudPartitions_requested < 8 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
 				{
 					//var pCloudPartition = this.pCloudPartitionsArray[i];
 					var pCloudPartitionLego = new Lego();

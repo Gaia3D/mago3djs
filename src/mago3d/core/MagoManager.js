@@ -408,7 +408,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 			
 		}
 
-		this.startRender(scene, isLastFrustum, this.currentFrustumIdx, numFrustums);
+		this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
 			
 	}
 };
@@ -447,7 +447,7 @@ MagoManager.prototype.renderOrdered = function(dc)
 	this.sceneState.gl = dc.currentGlContext;
 	var scene;
 	
-	this.startRender(scene, isLastFrustum, frustumIdx, numFrustums);
+	this.startRender(isLastFrustum, frustumIdx, numFrustums);
 };
 
 
@@ -1395,11 +1395,12 @@ MagoManager.prototype.test__octreeModelRefAndIndices_changed = function()
 */
 
 /**
- * start rendering.
- * @param scene 변수
- * @param isLastFrustum 변수
+ * Main loop function.
+ * @param {boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
+ * @param {Number} frustumIdx Current frustum indice.
+ * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
  */
-MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, numFrustums) 
+MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
 {
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
@@ -1462,11 +1463,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		doFrustumCullingToBuildings = true;
 		
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
-		
-		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
-		
-		
 	}
 	
 	
@@ -1533,7 +1530,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		// provisionally prepare pointsCloud datas.******************************************************
 		// Load the motherOctrees pCloudData.***
-		
+		/*
 		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
 		var pCloudOcreesLoadedsCount = 0;
 		for (var i=0; i<nodesCount; i++) 
@@ -1558,12 +1555,13 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 			
 			if (this.processQueue.existOctreeToDeletePCloud(octree))
 			{ continue; }
-			if (octree.preparePCloudData(this, neoBuilding)) // Here only loads the motherOctrees-pCloud.***
+			if (octree.preparePCloudData(this)) // Here only loads the motherOctrees-pCloud.***
 			{ pCloudOcreesLoadedsCount++; }
 				
 			if (pCloudOcreesLoadedsCount >5)
 			{ break; }
 		}
+		*/
 		this.readerWriter.pCloudPartitionsMother_requested = 0;
 		
 		
@@ -1716,7 +1714,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 							
 						// To positions must add "pivotPointTraslation" if exist.***
 						// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-						var pivotTranslation = geoLoc.pivotPointTraslation;
+						var pivotTranslation = geoLoc.pivotPointTraslationLC;
 						if (pivotTranslation)
 						{
 							pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
@@ -1763,7 +1761,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 							
 						// To positions must add "pivotPointTraslation" if exist.***
 						// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-						var pivotTranslation = geoLoc.pivotPointTraslation;
+						var pivotTranslation = geoLoc.pivotPointTraslationLC;
 						if (pivotTranslation)
 						{
 							pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
@@ -1824,6 +1822,7 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 	}
 	else if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
+		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
 	}
 	
@@ -5269,7 +5268,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 			for (var i=0; i<octreesCount; i++)
 			{
 				var octree = visiblesSortedOctreesArray[i];
-				if (octree.preparePCloudData(this, octree.neoBuildingOwner))
+				if (octree.preparePCloudData(this))
 				{
 					loadCount++;
 				}
