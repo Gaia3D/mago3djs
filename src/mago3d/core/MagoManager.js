@@ -799,11 +799,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var neoBuildingFolderName = attributes.buildingFolderName;
 				projectFolderName = attributes.projectFolderName;
 				
-				// test.****************************************
-				//neoBuildingFolderName = "F4D_Seongdong_del";
-				//projectFolderName = "3ds";
-				//----------------------------------------------
-				
 				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
 				
 				// demand to staticModelsManager the neoBuilding.***
@@ -1528,40 +1523,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles0);
 		
 		
-		// provisionally prepare pointsCloud datas.******************************************************
-		// Load the motherOctrees pCloudData.***
-		/*
-		var nodesCount = this.visibleObjControlerNodes.currentVisiblesAux.length;
-		var pCloudOcreesLoadedsCount = 0;
-		for (var i=0; i<nodesCount; i++) 
-		{
-			if (this.readerWriter.pCloudPartitionsMother_requested >= 1)
-			{ break; }
-			
-			node = this.visibleObjControlerNodes.currentVisiblesAux[i];
-			
-			if (node.isReferenceNode())
-			{ continue; }
-			
-			var neoBuilding = node.data.neoBuilding;
-			
-			if (neoBuilding === undefined)
-			{ continue; }
-			
-			var octree = neoBuilding.octree; // MotherOctree.***
-			
-			if (octree === undefined)
-			{ continue; }
-			
-			if (this.processQueue.existOctreeToDeletePCloud(octree))
-			{ continue; }
-			if (octree.preparePCloudData(this)) // Here only loads the motherOctrees-pCloud.***
-			{ pCloudOcreesLoadedsCount++; }
-				
-			if (pCloudOcreesLoadedsCount >5)
-			{ break; }
-		}
-		*/
+		// Init the pCloudPartitionsMother_requested.***
 		this.readerWriter.pCloudPartitionsMother_requested = 0;
 		
 		
