@@ -1,8 +1,10 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class Buffer
+ * VBO.
+ * 
+ * @class VboBuffer
+ * @constructor 
  */
 var VboBuffer = function(dataTarget) 
 {
@@ -11,11 +13,40 @@ var VboBuffer = function(dataTarget)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * VBO data array.
+	 * @type {TypedArray}
+	 * @default undefined
+	 */
 	this.dataArray;
+	
+	/**
+	 * VBO data array length.
+	 * @type {Number}
+	 * @default undefined
+	 */
 	this.dataLength; 
-	this.dataGlType; // (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).***
-	this.key;
-	this.dataTarget; // gl.ARRAY_BUFFER, gl.ELEMENT_ARRAY_BUFFER. In WebGl2 added(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, gl.TRANSFORM_FEEDBACK_BUFFER, gl.UNIFORM_BUFFER, gl.PIXEL_PACK_BUFFER, gl.PIXEL_UNPACK_BUFFER).***
+	
+	/**
+	 * VBO data array type. (5120 : signed byte), (5121 : unsigned byte), (5122 : signed short), (5123 : unsigned short), (5126 : float).
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.dataGlType; 
+	
+	/**
+	 * Webgl vbo identifier.
+	 * @type {WebGLBuffer}
+	 * @default undefined
+	 */
+	this.key; 
+	
+	/**
+	 * Webgl data target. It can be gl.ARRAY_BUFFER or gl.ELEMENT_ARRAY_BUFFER. In WebGl2 added(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, gl.TRANSFORM_FEEDBACK_BUFFER, gl.UNIFORM_BUFFER, gl.PIXEL_PACK_BUFFER, gl.PIXEL_UNPACK_BUFFER).
+	 * @type {Number}
+	 * @default 34962 gl.ARRAY_BUFFER
+	 */
+	this.dataTarget; 
 
 	if (dataTarget !== undefined)
 	{ this.dataTarget = dataTarget; }
@@ -24,7 +55,8 @@ var VboBuffer = function(dataTarget)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Deletes all objects.
+ * @param {VboMemoryManager} vboMemManager.
  */
 VboBuffer.prototype.deleteGlObjects = function(vboMemManager) 
 {
@@ -46,7 +78,9 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Sets the data array.
+ * @param {TypedArray} dataArray The heading value in degrees.
+ * @param {VboMemoryManager} vboMemManager.
  */
 VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager) 
 {
@@ -198,15 +232,10 @@ VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWri
 	
 	// 1) Positions array.***
 	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-	//this.vertexCount = vertexCount;
 	bytesReaded += 4;
 	var verticesFloatValuesCount = vertexCount * 3;
-	
 	startBuff = bytesReaded;
 	endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-	//var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-	//this.setDataArrayPos(posDataArray, vboMemManager);
-
 	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 	
 	// 2) Normals.***
@@ -215,9 +244,6 @@ VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWri
 	var normalByteValuesCount = vertexCount * 3;
 	startBuff = bytesReaded;
 	endBuff = bytesReaded + 1 * normalByteValuesCount;
-	//var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
-	//this.setDataArrayNor(norDataArray, vboMemManager);
-	
 	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 	
 	// 3) Indices.***
