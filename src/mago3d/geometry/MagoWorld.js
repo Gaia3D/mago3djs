@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Top class on Mago3D.
  * @class MagoWorld
  */
 var MagoWorld = function(magoManager) 
@@ -73,20 +73,26 @@ MagoWorld.prototype.mousedown = function(event)
 	
 };
 
+MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
+{
+	var mouseAction = magoManager.sceneState.mouseAction;
+	mouseAction.curX = mouseX;
+	mouseAction.curY = mouseY;
+};
+
 MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 {
 	var gl = magoManager.sceneState.gl;
 	var mouseAction = magoManager.sceneState.mouseAction;
+	
+	MagoWorld.updateMouseClick(mouseX, mouseY, magoManager);
 	
 	// if button = 1 (middleButton), then rotate camera.***
 	mouseAction.strX = mouseX;
 	mouseAction.strY = mouseY;
 	if (magoManager.sceneState.mouseButton === 0)
 	{
-		// determine worldPosition of the mouse.***
 		magoManager.bPicking = true;
-		//magoManager.mouse_x = mouseX;
-		//magoManager.mouse_y = mouseY;
 	}
 	
 	// determine world position of the X,Y.***

@@ -112,16 +112,15 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
 };
 
 /**
- * 텍스처를 읽어서 그래픽 카드에 올림
- * Loading Texture
+ * Handles the loaded image.
  * 
- * @param {any} gl 
- * @param {any} image 
- * @param {any} texture 
+ * @param {WebGLRenderingContext} gl WebGL rendering context.
+ * @param {image} image 
+ * @param {WebGLTexture} texture 
+ * @param {Boolean} flip_y_texCoords 
  */
 function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
 {
-	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
 	if (flip_y_texCoords === undefined)
 	{ flip_y_texCoords = true; }
 	

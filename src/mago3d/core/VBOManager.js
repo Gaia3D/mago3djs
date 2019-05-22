@@ -129,37 +129,6 @@ VboBuffer.prototype.isReady = function(gl, vboMemManager)
 	return true;
 };
 
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-/*
-VboBuffer.prototype.bindData = function(shader, vboMemManager) 
-{
-	if(shader === undefined)
-		return false;
-	
-	var gl = shader.gl;
-	if(!this.isReady(gl, vboMemManager))
-		return false;
-	
-	if (shader.position3_loc !== undefined && shader.position3_loc !== -1) 
-	{
-		if (this.meshVertexCacheKey !== shader.last_vboPos_binded)
-		{
-			shader.enableVertexAttribArray(shader.position3_loc);
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.meshVertexCacheKey);
-			gl.vertexAttribPointer(shader.position3_loc, 3, this.posGlType, false, 0, 0);
-			shader.last_vboPos_binded = this.meshVertexCacheKey;
-		}
-		return true;
-	}
-	else shader.disableVertexAttribArray(shader.position3_loc);
-	
-	return false;
-};
-*/
-
 /**
  * 어떤 일을 하고 있습니까?
  */
