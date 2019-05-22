@@ -21,6 +21,7 @@ var MagoManager = function()
 	this.readerWriter = new ReaderWriter();
 	this.magoPolicy = new Policy();
 	this.animationManager;
+	this.texturesManager = new TexturesManager(this);
 	
 	var serverPolicy = MagoConfig.getPolicy();
 	if (serverPolicy !== undefined)
@@ -41,7 +42,6 @@ var MagoManager = function()
 	this.inspectorBox = new InspectorBox();
 
 	// SSAO.***************************************************
-	this.noiseTexture;
 	this.depthFbo;
 	this.normalFbo; // Only for test disply normals. No use this in release.***
 	this.ssaoFbo;
@@ -180,7 +180,6 @@ var MagoManager = function()
 
 	this.terranTileSC;
 
-	this.textureAux_1x1;
 	this.resultRaySC = new Float32Array(3);
 	this.matrix4SC = new Matrix4();
 
@@ -204,137 +203,6 @@ var MagoManager = function()
 };
 
 /**
- * noise texture를 생성
- * @param gl 변수
- * @param w 변수
- * @param h 변수
- * @param pixels 변수
- * @returns texture
- */
-function genNoiseTextureRGBA(gl, w, h, pixels) 
-{
-	var texture = gl.createTexture();
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	//	var b = new ArrayBuffer(w*h*4);
-	//var pixels = new Uint8Array(b);
-
-	if (w === 4 && h === 4) 
-	{
-		/*
-	  	pixels[0] = 149; pixels[1] = 16; pixels[2] = 2; pixels[3] = 197;
-	  	pixels[4] = 79; pixels[5] = 76; pixels[6] = 11; pixels[7] = 53;
-	  	pixels[8] = 83; pixels[9] = 74; pixels[10] = 155; pixels[11] = 159;
-	  	pixels[12] = 19; pixels[13] = 232; pixels[14] = 183; pixels[15] = 27;
-
-	  	pixels[16] = 200; pixels[17] = 248; pixels[18] = 98; pixels[19] = 10;
-	  	pixels[20] = 63; pixels[21] = 75; pixels[22] = 229; pixels[23] = 231;
-	  	pixels[24] = 162; pixels[25] = 85; pixels[26] = 114; pixels[27] = 243;
-	  	pixels[28] = 149; pixels[29] = 136; pixels[30] = 210; pixels[31] = 59;
-
-	  	pixels[32] = 210; pixels[33] = 233; pixels[34] = 117; pixels[35] = 103;
-	  	pixels[36] = 83; pixels[37] = 214; pixels[38] = 42; pixels[39] = 175;
-	  	pixels[40] = 117; pixels[41] = 223; pixels[42] = 87; pixels[43] = 197;
-	  	pixels[44] = 99; pixels[45] = 254; pixels[46] = 128; pixels[47] = 9;
-
-	  	pixels[48] = 137; pixels[49] = 99; pixels[50] = 146; pixels[51] = 38;
-	  	pixels[52] = 145; pixels[53] = 76; pixels[54] = 178; pixels[55] = 133;
-	  	pixels[56] = 202; pixels[57] = 11; pixels[58] = 220; pixels[59] = 34;
-	  	pixels[60] = 61; pixels[61] = 216; pixels[62] = 95; pixels[63] = 249;
-		 */
-		var i = 0;
-		pixels[i] = 50; i++;
-		pixels[i] = 58; i++;
-		pixels[i] = 229; i++;
-		pixels[i] = 120; i++;
-		pixels[i] = 212; i++;
-		pixels[i] = 236; i++;
-		pixels[i] = 251; i++;
-		pixels[i] = 148; i++;
-		pixels[i] = 75; i++;
-		pixels[i] = 92; i++;
-		pixels[i] = 246; i++;
-		pixels[i] = 59; i++;
-		pixels[i] = 197; i++;
-		pixels[i] = 95; i++;
-		pixels[i] = 235; i++;
-		pixels[i] = 216; i++;
-		pixels[i] = 130; i++;
-		pixels[i] = 124; i++;
-		pixels[i] = 215; i++;
-		pixels[i] = 154; i++;
-		pixels[i] = 25; i++;
-		pixels[i] = 41; i++;
-		pixels[i] = 221; i++;
-		pixels[i] = 146; i++;
-		pixels[i] = 187; i++;
-		pixels[i] = 217; i++;
-		pixels[i] = 130; i++;
-		pixels[i] = 199; i++;
-		pixels[i] = 142; i++;
-		pixels[i] = 112; i++;
-		pixels[i] = 61; i++;
-		pixels[i] = 135; i++;
-		pixels[i] = 67; i++;
-		pixels[i] = 125; i++;
-		pixels[i] = 159; i++;
-		pixels[i] = 153; i++;
-		pixels[i] = 215; i++;
-		pixels[i] = 49; i++;
-		pixels[i] = 49; i++;
-		pixels[i] = 69; i++;
-		pixels[i] = 126; i++;
-		pixels[i] = 168; i++;
-		pixels[i] = 61; i++;
-		pixels[i] = 215; i++;
-		pixels[i] = 21; i++;
-		pixels[i] = 93; i++;
-		pixels[i] = 183; i++;
-		pixels[i] = 1; i++;
-		pixels[i] = 125; i++;
-		pixels[i] = 44; i++;
-		pixels[i] = 22; i++;
-		pixels[i] = 130; i++;
-		pixels[i] = 197; i++;
-		pixels[i] = 118; i++;
-		pixels[i] = 109; i++;
-		pixels[i] = 23; i++;
-		pixels[i] = 195; i++;
-		pixels[i] = 4; i++;
-		pixels[i] = 148; i++;
-		pixels[i] = 245; i++;
-		pixels[i] = 124; i++;
-		pixels[i] = 125; i++;
-		pixels[i] = 185; i++;
-		pixels[i] = 28; i++;
-	}
-	else 
-	{
-		for (var y=0; y<h; y++) 
-		{
-			for (var x=0; x<w; x++) 
-			{
-				pixels[(y*w + x)*4+0] = Math.floor(255 * Math.random());
-				pixels[(y*w + x)*4+1] = Math.floor(255 * Math.random());
-				pixels[(y*w + x)*4+2] = Math.floor(255 * Math.random());
-				pixels[(y*w + x)*4+3] = Math.floor(255 * Math.random());
-			}
-		}
-	}
-
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-
-	texture.width = w;
-	texture.height = h;
-	return texture;
-};
-
-/**
  * object 를 그리는 두가지 종류의 function을 호출
  */
 MagoManager.prototype.init = function(gl) 
@@ -345,16 +213,6 @@ MagoManager.prototype.init = function(gl)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
 	{ this.vboMemoryManager.gl = gl; }
-	
-	if (this.invertedBox === undefined)
-	{
-		this.invertedBox = new Box();
-		var mesh = this.invertedBox.makeMesh(1.5, 1.5, 1.5);
-		mesh.reverseSense();
-		//mesh.setColor(0.5, 0.5, 0.5, 0.5);
-		mesh.getVbo(this.invertedBox.vbo_vicks_container, this.vboMemoryManager);
-		mesh.getVboEdges(this.invertedBox.vbo_vicks_containerEdges, this.vboMemoryManager);
-	}
 };
 
 /**
@@ -452,10 +310,7 @@ MagoManager.prototype.renderOrdered = function(dc)
 
 
 /**
- * 카메라가 이동중인지를 확인
- * @param cameraPosition 변수
- * @param squareDistUmbral 변수
- * @returns camera_was_moved
+ * Swaps the current rendering Phase.
  */
 MagoManager.prototype.swapRenderingFase = function() 
 {
@@ -742,29 +597,6 @@ MagoManager.prototype.renderCloudShadows = function(gl, cameraPosition, cullingV
 	gl.enable(gl.DEPTH_TEST);
 	gl.disable(gl.BLEND);
 	gl.disable(gl.STENCIL_TEST);
-};
-
-/**
- * 텍스처를 읽어서 그래픽 카드에 올림
- * Loading Texture
- * 
- * @param {any} gl 
- * @param {any} image 
- * @param {any} texture 
- */
-function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
-{
-	// https://developer.mozilla.org/en-US/docs/Web/API/Webgl_API/Tutorial/Using_textures_in_Webgl
-	if (flip_y_texCoords === undefined)
-	{ flip_y_texCoords = true; }
-	
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.***
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-	gl.generateMipmap(gl.TEXTURE_2D);
-	gl.bindTexture(gl.TEXTURE_2D, null);
 };
 
 /**
@@ -1177,8 +1009,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	
 	if (this.depthFboNeo !== undefined)
 	{
-		sceneState.ssaoNoiseScale2[0] = this.depthFboNeo.width[0]/this.noiseTexture.width;
-		sceneState.ssaoNoiseScale2[1] = this.depthFboNeo.height[0]/this.noiseTexture.height;
+		var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+		sceneState.ssaoNoiseScale2[0] = this.depthFboNeo.width[0]/noiseTexture.width;
+		sceneState.ssaoNoiseScale2[1] = this.depthFboNeo.height[0]/noiseTexture.height;
 	}
 	
 	// set the auxiliar camera.
@@ -1368,26 +1201,17 @@ MagoManager.prototype.getCurrentTime = function()
 {
 	return this.currTime;
 };
-/*
-MagoManager.prototype.test__octreeModelRefAndIndices_changed = function() 
+
+/**
+ * Returns WebGL Rendering Context.
+ */
+MagoManager.prototype.getGl = function() 
 {
-	if(this.hierarchyManager.existProject("AutonomousVehicle"))
-	{
-		var nodesMap = this.hierarchyManager.getNodesMap("AutonomousVehicle");
-		for(var key in nodesMap)
-		{
-			if (Object.prototype.hasOwnProperty.call(nodesMap, key))
-			{
-				var node = nodesMap[key];
-				if(node.test__octreeModelRefAndIndices_changed())
-					var hola = 0;
-			}
-		}
+	if (this.sceneState === undefined)
+	{ return undefined; }
 	
-		var hola = 0 ;
-	}
+	return this.sceneState.gl;
 };
-*/
 
 /**
  * Main loop function.
@@ -1407,19 +1231,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
-		if (this.textureAux_1x1 === undefined) 
-		{
-			this.textureAux_1x1 = gl.createTexture();
-			// Test wait for texture to load.********************************************
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([150, 150, 150, 255])); // clear grey
-			gl.bindTexture(gl.TEXTURE_2D, null);
-		}
 		
-		if (this.noiseTexture === undefined) 
-		{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-		
-		// provisional pin textures loading.
 		this.load_testTextures();
 
 		if (this.myCameraSCX === undefined) 
@@ -1805,8 +1617,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 			gl.enable(gl.BLEND);
 			
-			if (this.noiseTexture === undefined) 
-			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
+			var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+			var textureAux_1x1 = this.texturesManager.getTextureAux1x1();
 			
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -1829,10 +1641,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			currentShader.last_tex_id = this.textureAux_1x1;
+			gl.bindTexture(gl.TEXTURE_2D, textureAux_1x1);
+			currentShader.last_tex_id = textureAux_1x1;
 		//this.weatherStation.test_renderTemperatureMesh(this, currentShader, renderType);
 		this.weatherStation.test_renderPrecipitationMesh(this, currentShader, renderType);
 		gl.disable(gl.BLEND);
@@ -1995,8 +1807,6 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		gl.enable(gl.BLEND);
 	}
 	
-	if (this.noiseTexture === undefined) 
-	{ return; }
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -2015,6 +1825,9 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		
 	if (ssao_idx === 1)
 	{
+		var textureAux1x1 = this.texturesManager.getTextureAux1x1();
+		var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);
 		gl.enableVertexAttribArray(currentShader.color4_loc);
@@ -2030,13 +1843,12 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		}
 		
 		gl.uniform1i(currentShader.bUseNormal_loc, true);
-
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+		gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 		gl.activeTexture(gl.TEXTURE2); 
-		gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
+		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 	}
 	
 	var neoBuilding;
@@ -4306,9 +4118,8 @@ MagoManager.prototype.renderFilter = function()
 	var currentShader = this.postFxShadersManager.getShader(shaderName); 
 	currentShader.useProgram();
 	gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
-
-	if (this.noiseTexture === undefined) 
-	{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
+	
+	var noiseTexture = this.texturesManager.getNoiseTexture4x4();
 	
 	gl.enable(gl.BLEND);
 	gl.disable(gl.DEPTH_TEST);
@@ -4320,7 +4131,7 @@ MagoManager.prototype.renderFilter = function()
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 	gl.activeTexture(gl.TEXTURE2); 
 	//gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
 	//currentShader.last_tex_id = this.textureAux_1x1;
@@ -4376,17 +4187,18 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 	}
 	if (ssao_idx === 1) 
 	{
+		var textureAux1x1 = this.texturesManager.getTextureAux1x1();
+		var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+		
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		if (this.modeler !== undefined)
 		{
+
 			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
-			
-			if (this.noiseTexture === undefined) 
-			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
 			
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -4400,10 +4212,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			currentShader.last_tex_id = this.textureAux_1x1;
+			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			currentShader.last_tex_id = textureAux1x1;
 			
 			
 			var refTMatrixIdxKey = 0;
@@ -4446,9 +4258,6 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			var bApplySsao = true;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			
-			if (this.noiseTexture === undefined) 
-			{ this.noiseTexture = genNoiseTextureRGBA(gl, 4, 4, this.pixels); }
-			
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
@@ -4462,10 +4271,10 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
-			currentShader.last_tex_id = this.textureAux_1x1;
+			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			currentShader.last_tex_id = textureAux1x1;
 			
 			
 			var refTMatrixIdxKey = 0;
@@ -4978,13 +4787,13 @@ MagoManager.prototype.renderBoundingBoxesNodes = function(gl, nodesArray, color,
 	gl.uniform1f(currentShader.screenWidth_loc, this.sceneState.drawingBufferWidth);	
 	gl.uniform1f(currentShader.screenHeight_loc, this.sceneState.drawingBufferHeight);
 
-
-	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/this.noiseTexture.width, this.depthFboNeo.height/this.noiseTexture.height]);
+	var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+	gl.uniform2fv(currentShader.noiseScale2_loc, [this.depthFboNeo.width/noiseTexture.width, this.depthFboNeo.height/noiseTexture.height]);
 	gl.uniform3fv(currentShader.kernel16_loc, this.kernel);
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 
 	var neoBuilding;
 	var bbox;
@@ -5057,8 +4866,7 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 		gl.enable(gl.BLEND);
 	}
 	
-	if (this.noiseTexture === undefined) 
-	{ return; }
+	var noiseTexture = this.texturesManager.getNoiseTexture4x4();
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -5076,6 +4884,8 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 		
 	if (ssao_idx === 1)
 	{
+		var textureAux1x1 = this.texturesManager.getTextureAux1x1();
+		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);
 		gl.enableVertexAttribArray(currentShader.color4_loc);
@@ -5095,9 +4905,9 @@ MagoManager.prototype.renderAxisNodes = function(gl, nodesArray, bRenderLines, s
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
 		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
+		gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 		gl.activeTexture(gl.TEXTURE2); 
-		gl.bindTexture(gl.TEXTURE_2D, this.textureAux_1x1);
+		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 	}
 	
 	var neoBuilding;

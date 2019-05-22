@@ -21,8 +21,7 @@ var Camera = function()
 	this.frustumsArray = [];
 	this.frustumsArray.push(this.frustum);
 	
-	// auxiliar vars.
-	// points.
+	// frustum points.***
 	this.nearCenterPoint = new Point3D();
 	this.farCenterPoint = new Point3D();
 	
