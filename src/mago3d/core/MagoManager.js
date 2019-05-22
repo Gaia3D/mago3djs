@@ -406,8 +406,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var neoBuildingFolderName = attributes.buildingFolderName;
 				projectFolderName = attributes.projectFolderName;
 				
-				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
-				
 				// demand to staticModelsManager the neoBuilding.***
 				var projectId = attributes.projectId;
 				var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
