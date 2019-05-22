@@ -38,6 +38,7 @@ var Camera = function()
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+	this.tracked;
 };
 
 /**
@@ -405,25 +406,85 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	}
 };
 
+/**
+ * if track node exist, do track.
+ * @param {Object} magoManager
+ */
+Camera.prototype.doTrack = function(magoManager)
+{
+	if (this.tracked)
+	{
+		// Set camera position.****************************************
+		var trackNode = this.tracked;
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = magoManager.scene.camera;
+			var position = camera.positionWC;
+			var movedCamPos;
 
+			var geoLocDatamanager = trackNode.getNodeGeoLocDataManager();
+			//var geoLocationData = geoLocDatamanager.getTrackGeoLocationData();
+			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+			var prevGeoLocationData = geoLocDatamanager.getGeoLocationData(1);
+			if (defined(prevGeoLocationData))
+			{
+				var currentPos = geoLocationData.position;
+				var prevPos =  prevGeoLocationData.position;
 
+				var dx = currentPos.x - prevPos.x;
+				var dy = currentPos.y - prevPos.y;
+				var dz  = currentPos.z - prevPos.z;
+				movedCamPos = new Cesium.Cartesian3();
+				movedCamPos.x = position.x + dx;
+				movedCamPos.y = position.y + dy;
+				movedCamPos.z = position.z + dz;
+			}
+			
 
+			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 
+			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
+			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
+			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
 
+			camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+			
+			/*var sphere = new Sphere();
+			var radiusAprox_aux = trackNode.data.bbox.getRadiusAprox();
+			sphere.radius = radiusAprox_aux;
+			sphere.center = target;
 
+			camera.viewBoundingSphere(sphere, hpr);*/
+		}
+		else
+		{
+			//this.lookAt() -> we must develope lookAt function in magoworld.
+		}
+	}
+};
 
+/**
+ * stop track.
+ * @param {Object} magoManager
+ */
+Camera.prototype.stopTrack = function(magoManager)
+{
+	this.tracked = undefined;
+	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+	{
+		magoManager.scene.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+	}
+	else
+	{
+		//this.lookAtStop() -> we must develope lookAtStop function in magoworld.
+	}
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * set track node.
+ * @param {Object} node
+ */
+Camera.prototype.setTrack = function(node)
+{
+	this.tracked = node;
+};

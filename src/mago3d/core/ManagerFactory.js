@@ -188,7 +188,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			{
 				var projectDataFolder = projectDataFolderArray[i];
 				var projectData = projectDataArray[i];
-				if(!(projectData.data_key == projectDataFolder && projectData.attributes.isReference))
+				if (!(projectData.data_key === projectDataFolder && projectData.attributes.isReference))
 				{
 					manager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
 				}
@@ -222,7 +222,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			{
 				var projectDataFolder = projectDataFolderArray[i];
 				var projectData = projectDataArray[i];
-				if(!(projectData.data_key == projectDataFolder && projectData.attributes.isReference))
+				if (!(projectData.data_key === projectDataFolder && projectData.attributes.isReference))
 				{
 					viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
 				}
@@ -409,34 +409,45 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		  console.log(e); 
 		}, false);
 		//-------------------------------------------------------------
-
-		if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
+		if(serverPolicy.only_user_data_mode === "false")
 		{
-			var imageryProvider = new Cesium.WebMapServiceImageryProvider({
-				url        : serverPolicy.geo_server_url,
-				layers     : serverPolicy.geo_server_layers,
-				parameters : {
-					service     : serverPolicy.geo_server_parameters_service,
-					version     : serverPolicy.geo_server_parameters_version,
-					request     : serverPolicy.geo_server_parameters_request,
-					transparent : serverPolicy.geo_server_parameters_transparent,
-					format      : serverPolicy.geo_server_parameters_format
-				}//,
-				//proxy: new Cesium.DefaultProxy('/proxy/')
-			});
-			var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, options); }
-		}
-		else 
-		{
-			if (serverPolicy.geo_cesium_ion_token !== null && serverPolicy.geo_cesium_ion_token !== "") 
+			if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
 			{
-				Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
-				DEFALUT_TERRAIN = "Cesium World Terrain";
+				var imageryProvider = new Cesium.WebMapServiceImageryProvider({
+					url        : serverPolicy.geo_server_url,
+					layers     : serverPolicy.geo_server_layers,
+					parameters : {
+						service     : serverPolicy.geo_server_parameters_service,
+						version     : serverPolicy.geo_server_parameters_version,
+						request     : serverPolicy.geo_server_parameters_request,
+						transparent : serverPolicy.geo_server_parameters_transparent,
+						format      : serverPolicy.geo_server_parameters_format
+					}//,
+					//proxy: new Cesium.DefaultProxy('/proxy/')
+				});
+				var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
+				if (viewer === null) { viewer = new Cesium.Viewer(containerId, options); }
 			}
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true}); }
-			// 기본 지도 설정
-			setDefaultDataset();
+			else 
+			{
+				if (serverPolicy.geo_cesium_ion_token !== null && serverPolicy.geo_cesium_ion_token !== "") 
+				{
+					Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
+					DEFALUT_TERRAIN = "Cesium World Terrain";
+				}
+				if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true}); }
+				// 기본 지도 설정
+				setDefaultDataset();
+			}
+		}
+		else
+		{
+			var options = {baseLayerPicker: false};
+			if (viewer === null) 
+			{ 
+				viewer = new Cesium.Viewer(containerId, options); 
+				viewer.imageryLayers._layers = [];
+			}
 		}
 			
 		viewer.scene.magoManager = new MagoManager();

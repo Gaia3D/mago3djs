@@ -210,7 +210,18 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		if (geoLocDataManager.getGeoLocationDatasCount() > 1)
 		{ geoLocDataManager.popGeoLocationData(); }
 		else
-		{ this.data.animationData = undefined; }
+		{ 
+			this.data.animationData = undefined;
+			/*var camera = magoManager.sceneState.camera;
+			if(camera.tracked)
+			{
+				var tracknode = camera.tracked;
+				if(this.data.nodeId === tracknode.data.nodeId && this.data.projectId === tracknode.data.projectId)
+				{
+					camera.stopTrack(magoManager);
+				}
+			}*/
+		}
 	}
 	
 	// Test.***
@@ -524,9 +535,6 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 	var geographicCoord = geoLocationData.geographicCoord;
 
-	var camera = magoManager.scene.camera;
-	var position = camera.positionWC;
-
 	if (totalDeltaTime > animData.durationInSeconds)
 	{
 		nextLongitude = animData.targetLongitude;
@@ -554,18 +562,6 @@ Node.prototype.finishedAnimation = function(magoManager)
 	}
 
 	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, magoManager);
-	
-
-	// Set camera position.****************************************
-	// we must change this logic, not use cesium.
-	if(animData.tracked)
-	{
-		var target = Cesium.Cartesian3.fromDegrees(nextLongitude, nextLatitude, nextAltitude);
-		var range = Cesium.Cartesian3.distance(position, target);
-		var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
-
-		camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-	}
 	
 	return finished;
 };
@@ -615,18 +611,20 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	//Duration For compatibility with lower versions, lower version parameter is just duratiuon(number).
 	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
 	var durationInSeconds = 3.0;
-	if(isAnimOption)
+	if (isAnimOption)
 	{
-		if(animationOption.duration)
+		if (animationOption.duration)
 		{
 			durationInSeconds = animationOption.duration;
 		}
 
-		if(animationOption.tracked)
+		/*
+		if (animationOption.tracked)
 		{
 			animData.tracked = animationOption.tracked;
 		}
-		if(animationOption.autoChangeRotation)
+		*/
+		if (animationOption.autoChangeRotation)
 		{
 			var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);
 			var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);

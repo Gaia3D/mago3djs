@@ -1441,6 +1441,9 @@ MagoManager.prototype.startRender = function(scene, isLastFrustum, frustumIdx, n
 		
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
+
+		//if mago camera have track node, camera look track node.
+		this.sceneState.camera.doTrack(this);
 	}
 	
 	var cameraPosition = this.sceneState.camera.position;
@@ -6297,9 +6300,10 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 		{ this.animationManager = new AnimationManager(); }
 		this.animationManager.putNode(node);
 
-		if(typeof animationOption === 'object' && animationOption.tracked)
+		if (typeof animationOption === 'object' && animationOption.tracked)
 		{
-			this.animationManager.clearTracked();
+			this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
+			this.sceneState.camera.setTrack(node);
 		}
 		
 		//For compatibility with lower versions, lower version parameter is duratiuon(number).
@@ -6705,6 +6709,10 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		throw new Error('projectId is required.');
 	}
 
+	if(!this.isExistStaticModel(attributes.projectId))
+	{
+		throw new Error('static model is not exist.');
+	}
 	if (!defined(attributes.instanceId))
 	{
 		throw new Error('instanceId is required.');
@@ -6742,10 +6750,10 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 	
 	var longitude = attributes.longitude;
 	var latitude = attributes.latitude;
-	var altitude = defaultValue(attributes.height, 0);
-	var heading = defaultValue(attributes.heading, 0);
-	var pitch = defaultValue(attributes.pitch, 0);
-	var roll = defaultValue(attributes.roll, 0);
+	var altitude = parseFloat(defaultValue(attributes.height, 0));
+	var heading = parseFloat(defaultValue(attributes.heading, 0));
+	var pitch = parseFloat(defaultValue(attributes.pitch, 0));
+	var roll = parseFloat(defaultValue(attributes.roll, 0));
 	
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
 	if (node === undefined)
@@ -6753,9 +6761,9 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
 
 		var geoCoord = new GeographicCoord();
-		geoCoord.latitude = latitude;
-		geoCoord.longitude = longitude;
-		geoCoord.altitude = altitude;
+		geoCoord.latitude = parseFloat(latitude);
+		geoCoord.longitude = parseFloat(longitude);
+		geoCoord.altitude = parseFloat(altitude);
 
 		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -6808,6 +6816,26 @@ MagoManager.prototype.addStaticModel = function(attribute)
 	
 	staticModelsManager.addStaticModel(projectId, staticModel);
 };
+/**
+ * check static model is exist
+ * @param {string} projectId
+ * @return {Boolean} isExist
+ */
+MagoManager.prototype.isExistStaticModel = function(projectId)
+{
+	var isExist = false;
+
+	if(!this.hierarchyManager.staticModelsManager || !this.hierarchyManager.staticModelsManager.staticModelsMap)
+	{
+		return isExist;
+	}
+
+	if(this.hierarchyManager.staticModelsManager.staticModelsMap.hasOwnProperty(projectId))
+	{
+		isExist = true;
+	}
+	return isExist;
+}
 /**
  * api gateway
  */
@@ -7327,6 +7355,8 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeCameraOrientation")
 	{	
+		//수정필요, 카메라가 세슘카메라
+		var camera = this.scene.camera;
 		var heading = defaultValue(api.getHeading(), Cesium.Math.toDegrees(camera.heading));
 		var pitch = defaultValue(api.getPitch(), Cesium.Math.toDegrees(camera.pitch));
 		var roll = defaultValue(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
@@ -7341,7 +7371,7 @@ MagoManager.prototype.callAPI = function(api)
 			}
 
 			camera.flyTo({
-				destination : camera.position,
+				destination : camera.positionWC,
 				orientation : {
 					heading : Cesium.Math.toRadians(heading),
 					pitch   : Cesium.Math.toRadians(pitch),
@@ -7360,6 +7390,46 @@ MagoManager.prototype.callAPI = function(api)
 	{
 		var attribute = api.getStaticModelAttributeObj();
 		this.addStaticModel(attribute);
+	}
+	else if (apiName === "setTrackNode")
+	{
+		var node = this.hierarchyManager.getNodeByDataKey(api.getProjectId(), api.getDataKey());
+		if(!defined(node))
+		{
+			throw new Error("This node is not exist.");
+		}
+
+		this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
+		this.sceneState.camera.setTrack(node);
+	}
+	else if (apiName === "stopTrack")
+	{
+		this.sceneState.camera.stopTrack(this);
+	}
+	else if (apiName === "isExistStaticModel")
+	{
+		return this.isExistStaticModel(api.getProjectId());
+	}else if(apiName === "isExistData")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if(!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if(!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		if(node !== undefined)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 };
 

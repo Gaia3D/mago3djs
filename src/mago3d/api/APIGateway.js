@@ -713,3 +713,59 @@ function addStaticModelAPI(managerFactoryInstance, attributes)
 	api.setStaticModelAttributeObj(attributes);
 	managerFactoryInstance.callAPI(api);
 }
+
+/**
+ * set track target node.
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ */
+function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new API("setTrackNode");
+	
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * set track target node.
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function stopTrackAPI(managerFactoryInstance)
+{
+	var api = new API("stopTrack");
+	
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check static model is exist
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId
+ * @return {Boolean} isExist
+ */
+function isExistStaticModelAPI(managerFactoryInstance, projectId)
+{
+	var api = new API("isExistStaticModel");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check data is exist
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @return {Boolean} isExist
+ */
+function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new API("isExistData");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	return managerFactoryInstance.callAPI(api);
+}
