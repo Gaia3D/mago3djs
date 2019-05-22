@@ -72,7 +72,27 @@ var Policy = function()
 	this.specularColor = new Float32Array([0.6, 0.6, 0.6]);
 	
 	this.ssaoRadius = 0.15;
+	
+	// PointsCloud.***
+	this.pointsCloudSettings = {};
+	this.pointsCloudSettings.maxPartitionsLod0 = 8;
+	this.pointsCloudSettings.maxPartitionsLod1 = 4;
+	this.pointsCloudSettings.maxPartitionsLod2orLess = 1;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam0m = 1.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam100m = 1.0/6.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam200m = 1.0/12.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam400m = 1.0/24.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam800m = 1.0/48.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam1600m = 1.0/128.0;
+	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m = 1.0/256.0;
+	
 };
+
+Policy.prototype.getPointsCloudSettings = function() 
+{
+	return this.pointsCloudSettings;
+};
+
 Policy.prototype.getShowOrigin = function() 
 {
 	return this.showOrigin;

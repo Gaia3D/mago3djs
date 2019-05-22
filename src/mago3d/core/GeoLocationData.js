@@ -1,9 +1,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * GeoLocationData is a class object that contains axis information about the location on "geographicCoord".
+ * 
  * @class GeoLocationData
- * @param geoLocationDataName 변수
+ * @constructor 
+ * @param {string} geoLocationDataName The name of the geoLocationData.
  */
 var GeoLocationData = function(geoLocationDataName) 
 {
@@ -11,41 +13,138 @@ var GeoLocationData = function(geoLocationDataName)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	/**
+	 * The name of this geographicLocationData.
+	 * @type {String}
+	 * @default "noName"
+	 */
 	this.name;
 	
 	if (geoLocationDataName === undefined) { this.name = "noName"; }
 	else { this.name = geoLocationDataName; }
 	
-	this.geographicCoord; // longitude, latitude, altitude.***
+	/**
+	 * The geographic location (Longitude, Latitude, Altitude). This is the main data of this class.
+	 * @type {GeographicCoord}
+	 * @default undefined
+	 */
+	this.geographicCoord; 
 	
+	/**
+	 * The z-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.heading;
+	
+	/**
+	 * The x-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.pitch;
+	
+	/**
+	 * The y-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.roll;
 	
+	/**
+	 * The date relationed with this geoLocationData.
+	 * @type {Date}
+	 * @default undefined
+	 */
 	this.date; // year - month - day - hour - min - seg - miliseg.***
 	
-	this.position;   // Point3D().***
-	this.positionHIGH; // Float32Array[3].***
-	this.positionLOW; // Float32Array[3].***
-	this.pivotPoint; // Point3D().*** // Actual position = pivotPoint.
+	/**
+	 * The position in world coordinates (x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default (0,0,0).
+	 */
+	this.position;   
 	
-	// F4D Matrix4.****
-	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
-	this.geoLocMatrixInv; // this is just the cartographic transformation matrixInv determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
-	this.tMatrix;      // this contains translation & rotations (heading-pitch-roll).***
-	this.tMatrixInv;   // this contains translation & rotations (heading-pitch-roll).***
-	this.rotMatrix;    // this contains only rotation.***
-	this.rotMatrixInv; // this contains only rotation.***
+	/**
+	 * The high part of the splitted position.
+	 * @type {Float32Array(3)}
+	 * @default [0,0,0]
+	 */
+	this.positionHIGH; 
 	
-	// Aditional.***
-	this.pivotPointTraslation; // made when translate the pivot point.***
+	/**
+	 * The low part of the splitted position.
+	 * @type {Float32Array(3)}
+	 * @default [0,0,0]
+	 */
+	this.positionLOW; 
+	
+	/**
+	 * The effective absoluteCoord (x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default (0,0,0).
+	 */
+	this.pivotPoint; // Actual position = pivotPoint.
+	
+	/**
+	 * The transformation matrix of the geographicCoord. This matrix no includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.geoLocMatrix; 
+	
+	/**
+	 * The inverse of the transformation matrix of the geographicCoord. This matrix no includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.geoLocMatrixInv; 
+	
+	/**
+	 * The transformation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.tMatrix;      
+	
+	/**
+	 * The inverse of the transformation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.tMatrixInv;   
+	
+	/**
+	 * The rotation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.rotMatrix;    
+	
+	/**
+	 * The inverse of the rotation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.rotMatrixInv; 
+	
+	/**
+	 * The translation in local coordinates(x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default undefined
+	 */
+	this.pivotPointTraslationLC; 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Sets the parameters Heading, pitch and Roll.
+ * @param {Number} heading The heading value in degrees.
+ * @param {Number} pitch The pitch value in degrees.
+ * @param {Number} roll The roll value in degrees.
  */
 GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch, roll) 
 {
+	// Note: Sets the parameters if exist argument.
 	if (heading !== undefined)
 	{ this.heading = heading; }
 	
@@ -57,7 +156,8 @@ GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch,
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Returns the geographic coordinates.
+ * @Returns {GeographicCoord} this.geographicCoord
  */
 GeoLocationData.prototype.getGeographicCoords = function() 
 {
@@ -65,7 +165,10 @@ GeoLocationData.prototype.getGeographicCoords = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Sets the parameters Longitude, Latitude and Altitude of the geographic coordinates.
+ * @param {Number} longitude The longitude in degrees.
+ * @param {Number} latitude The latitude in degrees.
+ * @param {Number} altitude The altitude in meters.
  */
 GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, latitude, altitude) 
 {
@@ -76,9 +179,8 @@ GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, lat
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Deletes all objects of this class.
+ @param {VboMemoryManager} vboMemManager The manager and controller of the gpu memory.
  */
 GeoLocationData.prototype.deleteObjects = function(vboMemManager) 
 {
@@ -124,25 +226,24 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	this.rotMatrixInv = undefined; 
 	
 	// Aditional.***
-	if (this.pivotPointTraslation)
-	{ this.pivotPointTraslation.deleteObjects(); }
-	this.pivotPointTraslation = undefined;
+	if (this.pivotPointTraslationLC)
+	{ this.pivotPointTraslationLC.deleteObjects(); }
+	this.pivotPointTraslationLC = undefined;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Adds the translation vector into position.
  */
 GeoLocationData.prototype.doEffectivePivotPointTranslation = function() 
 {
 	// this function adds the "pivotPointTraslation" to the positions.
 	// this function is not for move the building on the globe. This function is only for translate the pivot point of the building.
-	if (this.pivotPointTraslation === undefined)
+	// Note: the translation vector only must be added into "this.pivotPoint". TODO:
+	if (this.pivotPointTraslationLC === undefined)
 	{ return; }
 	
 	var traslationVector;
-	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslation, traslationVector );
+	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslationLC, traslationVector );
 	
 	this.position.x += traslationVector.x;
 	this.position.y += traslationVector.y;
@@ -160,9 +261,8 @@ GeoLocationData.prototype.doEffectivePivotPointTranslation = function()
 
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Copies all data of this class into the return geoLoctationData.
+ *@param {GeoLocationData} 
  */
 GeoLocationData.prototype.copyFrom = function(geoLocData) 
 {
@@ -487,8 +587,10 @@ GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader)
 //**********************************************************************************************************************************************************
 
 /**
- * 어떤 일을 하고 있습니까?
+ * GeoLocationDataManager is a class object that contains GeoLocationData objects in an array.
+ * 
  * @class GeoLocationDataManager
+ * @constructor 
  */
 var GeoLocationDataManager = function() 
 {
@@ -503,9 +605,6 @@ var GeoLocationDataManager = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocationName 변수
- * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.deleteObjects = function() 
 {
@@ -530,9 +629,7 @@ GeoLocationDataManager.prototype.popGeoLocationData = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
  * @param geoLocationName 변수
- * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 {

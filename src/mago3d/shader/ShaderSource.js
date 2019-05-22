@@ -863,7 +863,7 @@ void main()\n\
 		\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		vec3 lightPos = vec3(20.0, 60.0, 20.0);\n\
+		vec3 lightPos = vec3(20.0, 60.0, 200.0);\n\
 		vec3 L = normalize(lightPos - vertexPos);\n\
 		lambertian = max(dot(normal2, L), 0.0);\n\
 		specular = 0.0;\n\
@@ -1171,7 +1171,7 @@ void main()\n\
 		radiusAux = 1.5;\n\
 		vec2 screenPosAdjacent;\n\
 		\n\
-		for(int j = 0; j < 3; ++j)\n\
+		for(int j = 0; j < 1; ++j)\n\
 		{\n\
 			radiusAux = 1.5 *(float(j)+1.0);\n\
 			for(int i = 0; i < 8; ++i)\n\
@@ -1202,10 +1202,10 @@ void main()\n\
 			}   \n\
 		}   \n\
 			\n\
-		//if(occlusion > 1.0)\n\
-		//	occlusion = 8.0;\n\
+		if(occlusion > 6.0)\n\
+			occlusion = 8.0;\n\
 		//else occlusion = 0.0;\n\
-		occlusion = 1.0 - occlusion / 24.0;\n\
+		occlusion = 1.0 - occlusion / 8.0;\n\
 	}\n\
 	else{\n\
 		occlusion = 1.0;\n\
