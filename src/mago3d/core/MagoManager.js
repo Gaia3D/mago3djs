@@ -5410,45 +5410,6 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	}
 };
 
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-MagoManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
-{
-	var resultNeoBuilding = this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
-	return resultNeoBuilding;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-MagoManager.prototype.getBuildingSeedById = function(buildingType, buildingId) 
-{
-	var resultNeoBuildingSeed = this.smartTileManager.getBuildingSeedById(buildingType, buildingId);
-	return resultNeoBuildingSeed;
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
-MagoManager.prototype.renderModeChanged = function()
-{
-	if (this.renderModeTemp === 0)
-	{
-		;//
-	}
-	else if (this.renderModeTemp === 1)
-	{
-		;//
-	}
-	else if (this.renderModeTemp === 2)
-	{
-		;//
-	}
-
-};
-
 MagoManager.prototype.displayLocationAndRotation = function(neoBuilding) 
 {
 	//var node = this.hierarchyManager.getNodeByDataName(projectId, dataName, dataNameValue); // original.***
@@ -5932,11 +5893,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 
-};
-
-MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId)
-{
-	return this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
 };
 
 /**
