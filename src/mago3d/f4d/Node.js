@@ -1,6 +1,7 @@
 'use strict';
 
 /**
+ * This is the geometry container. Is the minimum independent project.
  * @class Node
  */
 var Node = function() 
@@ -10,18 +11,31 @@ var Node = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// parent.
+	/**
+	 * Parent (owner) of this node object. If undefined, this node is the root node.
+	 * @type {Node}
+	 * @default undefined
+	 */
 	this.parent;
 	
-	// children array.
+	/**
+	 * Children array. This array contains Node objects.
+	 * @type {Array}
+	 * @default Default length = 0.
+	 */
 	this.children = []; 
 	
-	// data.
-	this.data; // {}.
+	/**
+	 * An object that contains all referent data, geometry data, location data, etc.
+	 * @type {Object}
+	 * @default undefined.
+	 */
+	this.data; 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Returns true if this node is a "reference" type node. "Reference" type nodes uses StaticModels geometry.
+ * @return {Boolean} true if this node is a "reference" type node.
  */
 Node.prototype.isReferenceNode = function() 
 {
@@ -40,7 +54,7 @@ Node.prototype.isReferenceNode = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Deletes all datas and all datas of children.
  */
 Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
 {
@@ -94,6 +108,67 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 		}
 		this.children = undefined;
 	}
+};
+
+/**
+ * Calculates the geographicLocationData of the node.
+ * @param {MagoManager} magoManager Main class object of Mago3D.
+ * @return {GeoLocationData} geoLoc The calculated geoLocationData of this node.
+ */
+Node.prototype.calculateGeoLocData = function(magoManager) 
+{
+	// This function creates the geoLocationData of "node".***
+	// Called from magomanager.tilesMultiFrustumCullingFinished(...), flyToBuilding(...)
+	var nodeRoot = this.getRoot();
+
+	if (nodeRoot.data.geoLocDataManager === undefined)
+	{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
+	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		
+	if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
+	{ 
+		geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
+		var geographicCoord;
+		var rotationsDegree;
+		
+		if (this.data.geographicCoord === undefined)
+		{
+			var buildingSeed = this.data.buildingSeed;
+			geographicCoord = buildingSeed.geographicCoord;
+			rotationsDegree = buildingSeed.rotationsDegree;
+		}
+		else 
+		{
+			geographicCoord = this.data.geographicCoord;
+			rotationsDegree = this.data.rotationsDegree;
+		}
+		
+		var longitude = geographicCoord.longitude;
+		var latitude = geographicCoord.latitude;
+		var altitude = geographicCoord.altitude;
+		var heading = rotationsDegree.z;
+		var pitch = rotationsDegree.x;
+		var roll = rotationsDegree.y;
+		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
+		this.pointSC = this.data.bbox.getCenterPoint(this.pointSC);
+
+		// check if use "centerOfBoundingBoxAsOrigin".***
+		if (this.data.mapping_type !== undefined && this.data.mapping_type.toLowerCase() === "boundingboxcenter")
+		{
+			var rootNode = this.getRoot();
+			if (rootNode)
+			{
+				// now, calculate the root center of bbox.
+				var buildingSeed = this.data.buildingSeed;
+				var buildingSeedBBox = buildingSeed.bBox;
+				this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
+				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+			}
+		}
+	}
+	
+	return geoLoc;
 };
 
 /**

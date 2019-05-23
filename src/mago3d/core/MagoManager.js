@@ -88,24 +88,42 @@ var MagoManager = function()
 	 */
 	this.hierarchyManager = new HierarchyManager();
 
-	// SSAO & others.***************************************************
-	this.depthFbo;
-	this.normalFbo; // Only for test disply normals. No use this in release.***
-
+	/**
+	 * Depth framebuffer object.
+	 * @type {FBO}
+	 * @default undefined.
+	 */
 	this.depthFboNeo;
+	
+	/**
+	 * Depth framebuffer object for auxiliary and test use.
+	 * @type {FBO}
+	 * @default undefined.
+	 */
 	this.depthFboAux;
-	this.selectionFbo; // framebuffer for selection.***
 	
-	// var to delete.*********************************************
-	this.shadersManager = new ShadersManager(); // Old. delete.***
-	// var to delete.*********************************************
-	this.loadQueue = new LoadQueue(this); // Old. delete.***
+	/**
+	 * Framebuffer object used for color coding selection.
+	 * @type {FBO}
+	 * @default undefined.
+	 */
+	this.selectionFbo; 
 	
-
-	// Mouse handler.***********************************************************************
-	this.handler; // mouse handlers. mouse_DOWN, mouse_MOVE, mouse_UP.***
+	/**
+	 * Current x position of the mouse in screen coordinates.
+	 * @type {Number}
+	 * @default 0.
+	 */
 	this.mouse_x = 0;
+	
+	/**
+	 * Current y position of the mouse in screen coordinates.
+	 * @type {Number}
+	 * @default 0.
+	 */
 	this.mouse_y = 0;
+	
+	
 	this.mouseLeftDown = false;
 	this.mouseMiddleDown = false;
 	this.mouseDragging = false;
@@ -120,14 +138,9 @@ var MagoManager = function()
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
-	this.TEST_maxWheelZoomAmount = 0;
-	this.TEST_maxZoomAmount = 0;
-	
 	this.configInformation;
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
-	this.lightCam;
-	this.magoGeometryTest;
 	
 	var serverPolicy = MagoConfig.getPolicy();
 	if (serverPolicy !== undefined)
@@ -167,8 +180,11 @@ var MagoManager = function()
 		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
 	}
 	// End ssao.------------------------------------------------
-
-	this.atmosphere = new Atmosphere();
+	
+	// var to delete.*********************************************
+	this.shadersManager = new ShadersManager(); // Old. delete.***
+	// var to delete.*********************************************
+	this.loadQueue = new LoadQueue(this); // Old. delete.***
 
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
@@ -1749,20 +1765,6 @@ MagoManager.prototype.cameraMoved = function()
 };
 
 /**
- * @param {Object} node
- * @returns {Object}
- */
- 
-MagoManager.prototype.getNodeGeoLocDataManager = function(node) 
-{
-	if (node === undefined)
-	{ return undefined; }
-	
-	return node.getNodeGeoLocDataManager();
-};
-
-
-/**
  * Renders the current frustumVolumen with colorCoding for selection.
  * @param {GL} gl.
  * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
@@ -1986,39 +1988,6 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
  * @param {GL} gl 변수
  * @param {int} pixelX Screen x position of the pixel.
  * @param {int} pixelY Screen y position of the pixel.
- */
-MagoManager.prototype.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo) 
-{
-	gl.depthRange(0, 1);
-	gl.frontFace(gl.CCW);
-
-	if (depthFbo === undefined)
-	{ depthFbo = this.depthFboNeo; }
-	
-	if (depthFbo) 
-	{
-		depthFbo.bind(); // bind the existent last depthFramebuffer.
-	}
-	else 
-	{
-		// never enter here.
-		return;
-	}
-
-	// Now, read the pixel and find the pixel position.
-	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
-	gl.readPixels(pixelX, this.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	
-	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
-	var linearDepth = zDepth /= 256.0; // LinearDepth. Convert 0 to 1.0 range depth.***
-	return linearDepth;
-};
-
-/**
- * Calculates the pixel position in camera coordinates.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
  * @param {Point3D} resultPixelPos The result of the calculation.
  * @return {Point3D} resultPixelPos The result of the calculation.
  */
@@ -2031,7 +2000,7 @@ MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixe
 	if (frustumFar === undefined)
 	{ frustumFar = this.sceneState.camera.frustum.far; }
 	
-	var linearDepth = this.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo);
+	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, this);
 	var realZDepth = linearDepth*frustumFar; // original.***
 
 	// now, find the 3d position of the pixel in camCoord.****
@@ -5266,7 +5235,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
 				{
-					geoLoc = this.calculate_geoLocDataOfNode(node);
+					geoLoc = node.calculateGeoLocData(this);
 					continue;
 				}
 				neoBuilding = node.data.neoBuilding;
@@ -5505,63 +5474,6 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 
 /**
  */
-MagoManager.prototype.calculate_geoLocDataOfNode = function(node) 
-{
-	// This function creates the geoLocationData of "node".***
-	var nodeRoot = node.getRoot();
-
-	if (nodeRoot.data.geoLocDataManager === undefined)
-	{ nodeRoot.data.geoLocDataManager = new GeoLocationDataManager(); }
-	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
-	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		
-	if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
-	{ 
-		geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
-		var geographicCoord;
-		var rotationsDegree;
-		
-		if (node.data.geographicCoord === undefined)
-		{
-			var buildingSeed = node.data.buildingSeed;
-			geographicCoord = buildingSeed.geographicCoord;
-			rotationsDegree = buildingSeed.rotationsDegree;
-		}
-		else 
-		{
-			geographicCoord = node.data.geographicCoord;
-			rotationsDegree = node.data.rotationsDegree;
-		}
-		
-		var longitude = geographicCoord.longitude;
-		var latitude = geographicCoord.latitude;
-		var altitude = geographicCoord.altitude;
-		var heading = rotationsDegree.z;
-		var pitch = rotationsDegree.x;
-		var roll = rotationsDegree.y;
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, this);
-		this.pointSC = node.data.bbox.getCenterPoint(this.pointSC);
-
-		// check if use "centerOfBoundingBoxAsOrigin".***
-		if (node.data.mapping_type !== undefined && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
-		{
-			var rootNode = node.getRoot();
-			if (rootNode)
-			{
-				// now, calculate the root center of bbox.
-				var buildingSeed = node.data.buildingSeed;
-				var buildingSeedBBox = buildingSeed.bBox;
-				this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
-				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-			}
-		}
-	}
-	
-	return geoLoc;
-};
-
-/**
- */
 MagoManager.prototype.flyToTopology = function(worldPoint3d, duration) 
 {
 	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
@@ -5640,7 +5552,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	var geoLoc;
 	if (geoLocDataManager === undefined)
 	{ 
-		geoLoc = this.calculate_geoLocDataOfNode(node);
+		geoLoc = node.calculateGeoLocData(this);
 		if (geoLoc === undefined)
 		{
 			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
@@ -5692,73 +5604,6 @@ MagoManager.prototype.getBuildingSeedById = function(buildingType, buildingId)
 {
 	var resultNeoBuildingSeed = this.smartTileManager.getBuildingSeedById(buildingType, buildingId);
 	return resultNeoBuildingSeed;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param frustumVolume 변수
- * @param visibleBuildings_array 변수
- * @param cameraPosition 변수
- * @returns visibleBuildings_array
- */
-MagoManager.prototype.doFrustumCullingClouds = function(frustumVolume, visibleBuildings_array)
-{
-	// This makes the visible buildings array.***
-	// This has Cesium dependency because uses the frustumVolume and the boundingSphere of cesium.***
-	//---------------------------------------------------------------------------------------------------------
-	// Note: in this function, we do frustum culling and determine the detailedBuilding in same time.***
-
-	// Init the visible buildings array.***
-
-	this.currentVisibleClouds_array.length = 0; // Init.***
-
-	//	var min_squaredDist_to_see_detailed = 40000; // 200m.***
-	//	var min_squaredDist_to_see_LOD0 = 250000; // 600m.***
-	//	var min_squaredDist_to_see = 10000000;
-	//	var min_squaredDist_to_see_smallBuildings = 700000;
-	//
-	//	var squaredDistToCamera;
-	//	var last_squared_dist;
-
-	var clouds_count = this.atmosphere.cloudsManager.circularCloudsArray.length;
-	for (var p_counter = 0; p_counter<clouds_count; p_counter++) 
-	{
-		var cloud = this.atmosphere.cloudsManager.circularCloudsArray[p_counter];
-
-		if (cloud.cullingPosition === undefined) 
-		{
-			continue;
-		}
-
-		/*
-		squaredDistToCamera = Cesium.Cartesian3.distanceSquared(cameraPosition, cloud.cullingPosition);
-		if(squaredDistToCamera > min_squaredDist_to_see)
-			continue;
-
-		if(BR_Project._header.isSmall && squaredDistToCamera>min_squaredDist_to_see_smallBuildings)
-			continue;
-		*/
-
-		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(cloud.cullingPosition);
-		this.radiusAprox_aux = cloud.cullingRadius;
-
-		if (this.radiusAprox_aux) 
-		{
-			this.boundingSphere_Aux.radius = this.radiusAprox_aux;
-		}
-		else 
-		{
-			this.boundingSphere_Aux.radius = 50.0; // 50m. Provisional.***
-		}
-
-		var frustumCull = frustumVolume.computeVisibility(this.boundingSphere_Aux);
-		if (frustumCull !== Cesium.Intersect.OUTSIDE) 
-		{
-			this.currentVisibleClouds_array.push(cloud);
-		}
-	}
-
-	return visibleBuildings_array;
 };
 
 /**
@@ -6103,7 +5948,6 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			pitch = nodeRoot.data.rotationsDegree.x;
 			roll = nodeRoot.data.rotationsDegree.y;
 			
-			//node.data.geographicCoord = nodeRoot.data.geographicCoord;
 			if (buildingSeed.geographicCoord === undefined)
 			{ buildingSeed.geographicCoord = new GeographicCoord(); }
 		

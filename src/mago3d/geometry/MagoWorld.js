@@ -17,7 +17,7 @@ var MagoWorld = function(magoManager)
 MagoWorld.prototype.prepareVisibles = function()
 {
 	// 1rst, do terrain frustum culling.***
-	
+	// TODO:
 };
 
 MagoWorld.prototype.renderScene = function()
@@ -96,7 +96,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	}
 	
 	// determine world position of the X,Y.***
-	mouseAction.strLinealDepth = magoManager.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux);
+	mouseAction.strLinealDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux, magoManager);
 	mouseAction.strCamCoordPoint = magoManager.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint);
 	mouseAction.strWorldPoint = magoManager.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint);
 	
