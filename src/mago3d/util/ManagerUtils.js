@@ -470,7 +470,36 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
 };
 
+/**
+ * Calculates the pixel linear depth value.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {FBO} depthFbo Depth frameBuffer object.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @return {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
+ */
+ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, magoManager) 
+{
+	//gl.depthRange(0, 1);
+	//gl.frontFace(gl.CCW);
 
+	if (depthFbo === undefined)
+	{ depthFbo = magoManager.depthFboNeo; }
+	
+	if (depthFbo) 
+	{
+		depthFbo.bind(); // bind the existent last depthFramebuffer.
+	}
+
+	// Now, read the pixel and find the pixel position.
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	
+	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
+	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.***
+	return linearDepth;
+};
 
 
 

@@ -2415,9 +2415,10 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	
 	// Test for drawing mode.******************************************************************
 	//this.magoMode = CODE.magoMode.DRAWING;
-	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
+	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***// Test code.***// Test code.***
 	{
 		// Test code.***
+		// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
 		//	CODE.modelerMode = {
