@@ -97,8 +97,8 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	
 	// determine world position of the X,Y.***
 	mouseAction.strLinealDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux, magoManager);
-	mouseAction.strCamCoordPoint = magoManager.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint);
-	mouseAction.strWorldPoint = magoManager.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint);
+	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, magoManager.depthFboAux, undefined, magoManager);
+	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.***
 	var camera = magoManager.sceneState.camera;
@@ -116,7 +116,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	if (magoManager.globe !== undefined)
 	{
 		var camRay;
-		camRay = magoManager.getRayWorldSpace(gl, mouseX, mouseY, camRay);
+		camRay = ManagerUtils.getRayWorldSpace(gl, mouseX, mouseY, camRay, magoManager); // rayWorldSpace.***
 		mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
 	}
 };

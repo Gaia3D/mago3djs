@@ -291,7 +291,7 @@ MagoManager.prototype.init = function(gl)
 
 /**
  * object 를 그리는 두가지 종류의 function을 호출
- * @param scene 변수
+ * @param scene 변수 Cesium Scene.
  * @param pass 변수
  * @param frustumIdx 변수
  * @param numFrustums 변수
@@ -1444,7 +1444,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			{ this.objMarkerSC = new ObjectMarker(); }
 			
 			pixelPos = new Point3D();
-			pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
+			pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, this);
 			var objMarker = this.objMarkerManager.newObjectMarker();
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		}
@@ -1457,7 +1457,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			if (pixelPos === undefined)
 			{
 				pixelPos = new Point3D();
-				pixelPos = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos);
+				pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, this);
 			}
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -1739,7 +1739,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 			//neoBuilding = node.data.neoBuilding;
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-			screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 			
 			if (screenCoord.x >= 0 && screenCoord.y >= 0)
 			{
@@ -1899,67 +1899,6 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	return selectedObject;
 };
 
-
-/**
- * Calculates the direction vector of a ray that starts in the camera position and
- * continues to the pixel position in world space.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
- * @returns {Line} resultRay
- */
-MagoManager.prototype.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay) 
-{
-	// in this function the "ray" is a line.***
-	if (resultRay === undefined) 
-	{ resultRay = new Line(); }
-	
-	// world ray = camPos + lambda*camDir.
-	var camPos = this.sceneState.camera.position;
-	var rayCamSpace = new Float32Array(3);
-	rayCamSpace = this.getRayCamSpace(pixelX, pixelY, rayCamSpace);
-	
-	if (this.pointSC === undefined)
-	{ this.pointSC = new Point3D(); }
-	
-	this.pointSC.set(rayCamSpace[0], rayCamSpace[1], rayCamSpace[2]);
-
-	// now, must transform this posCamCoord to world coord.***
-	this.pointSC2 = this.sceneState.modelViewMatrixInv.rotatePoint3D(this.pointSC, this.pointSC2); // rayWorldSpace.***
-	this.pointSC2.unitary(); // rayWorldSpace.***
-	resultRay.setPointAndDir(camPos.x, camPos.y, camPos.z,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.***
-
-	return resultRay;
-};
-
-/**
- * Calculates the direction vector of a ray that starts in the camera position and
- * continues to the pixel position in camera space.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
- * @returns {Float32Array(3)} resultRay Result of the calculation.
- */
-MagoManager.prototype.getRayCamSpace = function(pixelX, pixelY, resultRay) 
-{
-	// in this function "ray" is a vector.***
-	var frustum_far = 1.0; // unitary frustum far.***
-	var frustum = this.sceneState.camera.frustum;
-	var aspectRatio = frustum.aspectRatio;
-	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
-	
-	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
-	var wfar = hfar * aspectRatio;
-	var mouseX = pixelX;
-	var mouseY = this.sceneState.drawingBufferHeight - pixelY;
-	if (resultRay === undefined) 
-	{ resultRay = new Float32Array(3); }
-	resultRay[0] = wfar*((mouseX/this.sceneState.drawingBufferWidth) - 0.5);
-	resultRay[1] = hfar*((mouseY/this.sceneState.drawingBufferHeight) - 0.5);
-	resultRay[2] = - frustum_far;
-	return resultRay;
-};
-
 /**
  * Calculates the plane on move an object.
  * @param {GL} gl 변수
@@ -1977,7 +1916,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	
 	var geoLocDataManager = this.nodeSelected.getNodeGeoLocDataManager();
 	
-	this.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2, undefined, undefined, this);
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 	var tMatrixInv = buildingGeoLocation.getTMatrixInv();
 	this.pointSC = tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
@@ -1987,130 +1926,6 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	// the plane is in world coord.***
 	resultSelObjMovePlane.setPointAndNormal(this.pointSC.x, this.pointSC.y, this.pointSC.z, 0.0, 0.0, 1.0);
 	return resultSelObjMovePlane;
-};
-
-/**
- * Calculates the pixel position in camera coordinates.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
- * @param {Point3D} resultPixelPos The result of the calculation.
- * @return {Point3D} resultPixelPos The result of the calculation.
- */
-MagoManager.prototype.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar) 
-{
-	// depth render.
-	gl.depthRange(0, 1);
-	gl.frontFace(gl.CCW);
-
-	if (frustumFar === undefined)
-	{ frustumFar = this.sceneState.camera.frustum.far; }
-	
-	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, this);
-	var realZDepth = linearDepth*frustumFar; // original.***
-
-	// now, find the 3d position of the pixel in camCoord.****
-	this.resultRaySC = this.getRayCamSpace(pixelX, pixelY, this.resultRaySC);
-	if (resultPixelPos === undefined)
-	{ resultPixelPos = new Point3D(); }
-	
-	resultPixelPos.set(this.resultRaySC[0] * realZDepth, this.resultRaySC[1] * realZDepth, this.resultRaySC[2] * realZDepth);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	return resultPixelPos;
-};
-
-/**
- * Calculates the pixel position in world coordinates.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
- * @param {Point3D} resultPixelPos The result of the calculation.
- * @return {Point3D} resultPixelPos The result of the calculation.
- */
-MagoManager.prototype.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar) 
-{
-	var pixelPosCamCoord = new Point3D();
-	
-	if (frustumFar === undefined)
-	{ frustumFar = this.sceneState.camera.frustum.far; }
-	
-	if (depthFbo === undefined)
-	{ depthFbo = this.depthFboNeo; }
-	
-	pixelPosCamCoord = this.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumFar);
-
-	if (resultPixelPos === undefined)
-	{ var resultPixelPos = new Point3D(); }
-
-	resultPixelPos = this.cameraCoordPositionToWorldCoord(pixelPosCamCoord, resultPixelPos);
-	return resultPixelPos;
-};
-
-/**
- * Calculates the cameraCoord position in world coordinates.
- * @param {Point3D} cameraCoord position.
- * @return {Point3D} resultPixelPos The result of the calculation.
- */
-MagoManager.prototype.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorldPos) 
-{
-	// now, must transform this pixelCamCoord to world coord.***
-	var mv_inv = this.sceneState.modelViewMatrixInv;
-	if (resultWorldPos === undefined)
-	{ var resultWorldPos = new Point3D(); }
-	resultWorldPos = mv_inv.transformPoint3D(camCoordPos, resultWorldPos);
-	return resultWorldPos;
-};
-
-/**
- * Calculates the pixel position in world coordinates.
- * @param {GL} gl 변수
- * @param {int} pixelX Screen x position of the pixel.
- * @param {int} pixelY Screen y position of the pixel.
- * @param {Point3D} resultPixelPos The result of the calculation.
- * @return {Point3D} resultPixelPos The result of the calculation.
- */
-MagoManager.prototype.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord)
-{
-	if (resultScreenCoord === undefined)
-	{ resultScreenCoord = new Point3D(); }
-	
-	if (this.pointSC === undefined)
-	{ this.pointSC = new Point3D(); }
-	
-	if (this.pointSC2 === undefined)
-	{ this.pointSC2 = new Point3D(); }
-	
-	this.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
-	
-	// calculate the position in camera coords.
-	this.pointSC2 = this.sceneState.modelViewMatrix.transformPoint3D(this.pointSC, this.pointSC2);
-	
-	// now calculate the position in screen coords.
-	var zDist = this.pointSC2.z;
-	if (zDist > 0)
-	{
-		// the worldPoint is rear the camera.
-		resultScreenCoord.set(-1, -1, 0);
-		return resultScreenCoord;
-	}
-	
-	// now calculate the width and height of the plane in zDist.
-	//var fovyRad = this.sceneState.camera.frustum.fovyRad;
-	
-	var planeHeight = this.sceneState.camera.frustum.tangentOfHalfFovy*zDist*2;
-	var planeWidth = planeHeight * this.sceneState.camera.frustum.aspectRatio; // aspectRatio(w/h).
-	
-	var pixelX = -this.pointSC2.x * this.sceneState.drawingBufferWidth / planeWidth;
-	var pixelY = -(this.pointSC2.y) * this.sceneState.drawingBufferHeight / planeHeight;
-
-	pixelX += this.sceneState.drawingBufferWidth / 2;
-	pixelY += this.sceneState.drawingBufferHeight / 2;
-	
-	pixelY = this.sceneState.drawingBufferHeight - pixelY;
-	
-	resultScreenCoord.set(pixelX, pixelY, 0);
-	
-	return resultScreenCoord;
 };
 
 /**
@@ -2879,7 +2694,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			// create a local XY plane.
 			// find the pixel position relative to building.
 			var pixelPosWorldCoord = new Point3D();
-			pixelPosWorldCoord = this.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord);
+			pixelPosWorldCoord = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord, undefined, undefined, this);
 			var tMatrixInv = geoLocationData.getTMatrixInv();
 			var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
 			
@@ -2889,7 +2704,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (this.lineSC === undefined)
 		{ this.lineSC = new Line(); }
 		
-		this.lineSC = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+		this.lineSC = ManagerUtils.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC, this); // rayWorldSpace.***
 
 		// transform world_ray to building_ray.***
 		var camPosBuilding = new Point3D();
@@ -2961,7 +2776,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (this.lineSC === undefined)
 		{ this.lineSC = new Line(); }
 		
-		this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC); // rayWorldSpace.***
+		this.lineSC = ManagerUtils.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC, this); // rayWorldSpace.***
 		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 		var camPosBuilding = new Point3D();
 		var camDirBuilding = new Point3D();
@@ -3088,7 +2903,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 						var mouseAction = this.sceneState.mouseAction;
 						
 						// New Test.*******************************************************
-						var camRay = this.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, undefined);
+						var camRay = ManagerUtils.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, undefined, this); // rayWorldSpace.***
 						var strWorldPoint = mouseAction.strWorldPointAux; // original.***
 						////var strWorldPoint = mouseAction.strWorldPoint;
 						if (strWorldPoint)
@@ -4455,7 +4270,8 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
 		cctv = cctvArray[i];
 		geoLoc = cctv.geoLocationData;
 		worldPosition = geoLoc.position;
-		screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+		//screenCoord = this.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord);
+		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 		//screenCoord.x += 250;
 		//screenCoord.y += 150;
 		
@@ -6905,9 +6721,9 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	var collisionPosition = new Point3D();
 	var bottomPosition = new Point3D();
 
-	this.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition, undefined, undefined, this);
 	this.swapRenderingFase();
-	this.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, bottomPosition);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, undefined, undefined, this);
 
 	this.buildingSelected = current_building;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);

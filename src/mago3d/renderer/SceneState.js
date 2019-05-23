@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * ??
+ * This class contains the camera transformation matrices and other parameters that affects the scene.
  * @class SceneState
  */
 var SceneState = function() 
@@ -105,6 +105,15 @@ var SceneState = function()
 	// mouse.***
 	this.mouseButton = -1;
 	
+};
+
+/**
+ * Returns the modelViewMatrixInverse.
+ * @return {Matrix4} modelViewMatrixInv.
+ */
+SceneState.prototype.getModelViewMatrixInv = function() 
+{
+	return this.modelViewMatrixInv;
 };
 
 
