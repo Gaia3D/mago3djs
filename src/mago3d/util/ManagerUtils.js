@@ -1,24 +1,15 @@
 'use strict';
+
 /**
- * world coordinate or geographic coordinate transform and calculate util.
+ * ManagerUtils does some calculations about coordinates system of different earth coords.
+ * 
  * @class ManagerUtils
- * @classdesc This is util class. Every function provide static.
+ * @constructor 
  */
 var ManagerUtils = function() 
 {
-
-	/**
-	 * @deprecated not use.
-	 */
-	// sqrtTable.
-	this.sqrtTable = [];
-	// make 100 values.
-	var increValue = 0.01;
-	for (var i=0; i<101; i++)
-	{
-		this.sqrtTable[i] = Math.sqrt(1+(increValue*i)*(increValue*i));
-	}
-
+	
+	
 };
 
 /**
@@ -479,108 +470,9 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
 };
 
-/**
- * @deprecated not use
- * @param {Array.<number>} pointA.
- * @param {Array.<number>} pointB.
- * @param {Array.<number>} sqrtTable Optional. result split high value array. if undefined, set new Float32Array(3).
- * @return {number} aproxDist.
- */
-ManagerUtils.calculateAproxDist2D = function(pointA, pointB, sqrtTable)
-{
-	// test function.
-	var difX = Math.abs(pointA.x - pointB.x);
-	var difY = Math.abs(pointA.y - pointB.y);
-	
-	// find the big value.
-	var maxValue, value1;
-	
-	if (difX > difY)
-	{
-		maxValue = difX;
-		value1 = difY/maxValue;
-	}
-	else 
-	{
-		maxValue = difY;
-		value1 = difX/maxValue;
-	}
-	
-	var value1Idx = Math.floor(value1*100);
-	var aproxDist = maxValue * sqrtTable[value1Idx];
-	return aproxDist;
-};
 
-/**
- * @deprecated not use
- * @param {Array.<number>} pointA.
- * @param {Array.<number>} pointB.
- * @param {Array.<number>} sqrtTable Optional. result split high value array. if undefined, set new Float32Array(3).
- * @return {number} aproxDist.
- */
-ManagerUtils.calculateAproxDist3D = function(pointA, pointB)
-{
-	var sqrtTable = new Float32Array(11);
-	// make 10 values.
-	var increValue = 0.1;
-	for (var i=0; i<11; i++)
-	{
-		sqrtTable[i] = Math.sqrt(1+(increValue*i)*(increValue*i));
-	}
 
-	var difX = Math.abs(pointA.x - pointB.x);
-	var difY = Math.abs(pointA.y - pointB.y);
-	var difZ = Math.abs(pointA.z - pointB.z);
-	
-	// find the big value.
-	var maxValue, value1, value2;
-	var value1Idx, value2Idx;
-	
-	if (difX > difY)
-	{
-		if (difX > difZ)
-		{
-			maxValue = difX;
-			value1 = difY/maxValue;
-			value1Idx = Math.floor(value1*100);
-			var middleDist = maxValue * sqrtTable[value1Idx];
-			value2 = difZ/middleDist;
-			value2Idx = Math.floor(value2*100);
-			return (middleDist * sqrtTable[value2Idx]);
-		}
-		else 
-		{
-			maxValue = difZ;
-			value1 = difX/maxValue;
-			value1Idx = Math.floor(value1*100);
-			var middleDist = maxValue * sqrtTable[value1Idx];
-			value2 = difY/middleDist;
-			value2Idx = Math.floor(value2*100);
-			return (middleDist * sqrtTable[value2Idx]);
-		}
-	}
-	else 
-	{
-		if (difY > difZ)
-		{
-			maxValue = difY;
-			value1 = difX/maxValue;
-			value1Idx = Math.floor(value1*100);
-			var middleDist = maxValue * sqrtTable[value1Idx];
-			value2 = difZ/middleDist;
-			value2Idx = Math.floor(value2*100);
-			return (middleDist * sqrtTable[value2Idx]);
-		}
-		else 
-		{
-			maxValue = difZ;
-			value1 = difX/maxValue;
-			value1Idx = Math.floor(value1*100);
-			var middleDist = maxValue * sqrtTable[value1Idx];
-			value2 = difY/middleDist;
-			value2Idx = Math.floor(value2*100);
-			return (middleDist * sqrtTable[value2Idx]);
-		}
-	}
-	
-};
+
+
+
+
