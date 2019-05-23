@@ -17,7 +17,7 @@
  */
 function defaultValue(a, b) 
 {
-	if (a !== undefined) 
+	if (a !== undefined && a !== null) 
 	{
 		return a;
 	}

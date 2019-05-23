@@ -384,7 +384,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	var neoBuilding;
 	var node, rootNode;
 	var projectFolderName;
-	
+	var neoBuildingFolderName;
 	//var geometryDataPath = this.readerWriter.getCurrentDataPath();
 	var geometryDataPath = this.readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
 	if (this.headersRequestedCounter === undefined)
@@ -397,7 +397,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
-		if (attributes.isReference !== undefined && attributes.isReference === true)
+		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
 			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
@@ -406,11 +406,15 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var neoBuildingFolderName = attributes.buildingFolderName;
 				projectFolderName = attributes.projectFolderName;
 				
-				var staticModelDataPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuildingFolderName;
-				
 				// demand to staticModelsManager the neoBuilding.***
+				var projectId = attributes.projectId;
 				var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
-				neoBuilding = staticModelsManager.getStaticModel(staticModelDataPath);
+				var staticModel = staticModelsManager.getStaticModel(projectId);
+				neoBuilding = staticModel.neoBuilding;
+				neoBuildingFolderName = staticModel.buildingFolderName;
+				projectFolderName = staticModel.projectFolderName;
+				
+				//neoBuilding = staticModelsManager.getStaticModel(staticModelDataPath);
 				
 				// make a buildingSeed.***
 				var buildingSeed = new BuildingSeed();
@@ -432,7 +436,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				node.data.neoBuilding = neoBuilding;
 				node.data.buildingSeed = buildingSeed;
 				node.data.projectFolderName = projectFolderName;
-				
 
 				if (neoBuilding.metaData === undefined) 
 				{ 
@@ -1378,6 +1381,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
+
+		//if mago camera have track node, camera look track node.
+		this.sceneState.camera.doTrack(this);
 	}
 	
 	var cameraPosition = this.sceneState.camera.position;
@@ -5856,28 +5862,32 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+//MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds)
+MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 	if (node === undefined)
 	{ return; }
-	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
+	this.changeLocationAndRotationNode(node, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 };
 
 /**
  * 변환 행렬
  */
-MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+//MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
+MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	if (node === undefined)
 	{ return; }
 
-	if (durationTimeInSeconds !== undefined)
+	if (animationOption !== undefined)
 	{
 		if (this.animationManager === undefined)
 		{ this.animationManager = new AnimationManager(); }
 		this.animationManager.putNode(node);
-		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, durationTimeInSeconds);
+		
+		//For compatibility with lower versions, lower version parameter is duratiuon(number).
+		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, animationOption);
 	}
 	else 
 	{
@@ -5970,104 +5980,127 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var childrenCount;
 	if (attributes !== undefined)
 	{
-		buildingId = data_key;
-		node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
-		// set main data of the node.
-		node.data.projectFolderName = projectFolderName;
-		node.data.projectId = projectId;
-		node.data.data_name = data_name;
-		node.data.attributes = attributes;
-		node.data.mapping_type = mapping_type;
-		var tMatrix;
-		
-		if (attributes.isPhysical)
+		if (!attributes.isReference)
 		{
-			// find the buildingSeed.
-			buildingSeed = buildingSeedMap[buildingId];
-			if (buildingSeed)
+			buildingId = data_key;
+			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
+			// set main data of the node.
+			node.data.projectFolderName = projectFolderName;
+			node.data.projectId = projectId;
+			node.data.data_name = data_name;
+			node.data.attributes = attributes;
+			node.data.mapping_type = mapping_type;
+			var tMatrix;
+			
+			if (attributes.isPhysical)
 			{
-				node.data.buildingSeed = buildingSeed;
-				resultPhysicalNodesArray.push(node);
-			}
-		}
-
-		if (longitude && latitude)
-		{
-			// this is root node.
-			if (height === undefined)
-			{ height = 0; }
-			
-			node.data.geographicCoord = new GeographicCoord();
-			node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
-			
-			if (node.data.rotationsDegree === undefined)
-			{ node.data.rotationsDegree = new Point3D(); }
-			node.data.rotationsDegree.set(pitch, roll, heading);
-			
-			
-			if (buildingSeed !== undefined)
-			{
-				if (buildingSeed.geographicCoord === undefined)
-				{ buildingSeed.geographicCoord = new GeographicCoord(); }
-			
-				if (buildingSeed.rotationsDegree === undefined)
-				{ buildingSeed.rotationsDegree = new Point3D(); }
-		
-				buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
-				buildingSeed.rotationsDegree.set(pitch, roll, heading);
-				
-				// now calculate the geographic coord of the center of the bbox.
-				if (buildingSeed.geographicCoordOfBBox === undefined) 
-				{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
-			
-				// calculate the transformation matrix at (longitude, latitude, height).
-				var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
-				tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
-				
-				// now calculate the geographicCoord of the center of the bBox.
-				var bboxCenterPoint;
-
-				bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-				buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
-			}
-		}
-
-		// now, calculate the bbox.***
-		node.data.bbox = new BoundingBox();
-		
-		if (node.data.buildingSeed && node.data.buildingSeed.bBox)
-		{ node.data.bbox.copyFrom(buildingSeed.bBox); }
-		
-		if (node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
-		{
-			node.data.bbox.translateToOrigin();
-		}
-		
-		// calculate the geographicCoordOfTheBBox.***
-		if (tMatrix !== undefined)
-		{
-			bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
-			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-			node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
-		}
-
-		//bbox = node.data.bbox;
-
-		if (children !== undefined)
-		{
-			childrenCount = children.length;
-			for (var i=0; i<childrenCount; i++)
-			{
-				childJason = children[i];
-				childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId);
-				
-				// if childNode has "geographicCoord" then the childNode is in reality a root.
-				if (childNode.data.geographicCoord === undefined)
+				// find the buildingSeed.
+				buildingSeed = buildingSeedMap[buildingId];
+				if (buildingSeed)
 				{
-					node.addChildren(childNode);
+					node.data.buildingSeed = buildingSeed;
+					resultPhysicalNodesArray.push(node);
 				}
 			}
+
+			if (longitude && latitude)
+			{
+				// this is root node.
+				if (height === undefined)
+				{ height = 0; }
+				
+				node.data.geographicCoord = new GeographicCoord();
+				node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				
+				if (node.data.rotationsDegree === undefined)
+				{ node.data.rotationsDegree = new Point3D(); }
+				node.data.rotationsDegree.set(pitch, roll, heading);
+				
+				
+				if (buildingSeed !== undefined)
+				{
+					if (buildingSeed.geographicCoord === undefined)
+					{ buildingSeed.geographicCoord = new GeographicCoord(); }
+				
+					if (buildingSeed.rotationsDegree === undefined)
+					{ buildingSeed.rotationsDegree = new Point3D(); }
+			
+					buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
+					buildingSeed.rotationsDegree.set(pitch, roll, heading);
+					
+					// now calculate the geographic coord of the center of the bbox.
+					if (buildingSeed.geographicCoordOfBBox === undefined) 
+					{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+				
+					// calculate the transformation matrix at (longitude, latitude, height).
+					var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
+					tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+					
+					// now calculate the geographicCoord of the center of the bBox.
+					var bboxCenterPoint;
+
+					bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+					var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+					buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+				}
+			}
+
+			// now, calculate the bbox.***
+			node.data.bbox = new BoundingBox();
+			
+			if (node.data.buildingSeed && node.data.buildingSeed.bBox)
+			{ node.data.bbox.copyFrom(buildingSeed.bBox); }
+			
+			if (node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
+			{
+				node.data.bbox.translateToOrigin();
+			}
+			
+			// calculate the geographicCoordOfTheBBox.***
+			if (tMatrix !== undefined)
+			{
+				bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
+				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+				node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
+			}
+
+			//bbox = node.data.bbox;
+
+			if (children !== undefined)
+			{
+				childrenCount = children.length;
+				for (var i=0; i<childrenCount; i++)
+				{
+					childJason = children[i];
+					childNode = this.makeNode(childJason, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+					
+					// if childNode has "geographicCoord" then the childNode is in reality a root.
+					if (childNode.data.geographicCoord === undefined)
+					{
+						node.addChildren(childNode);
+					}
+				}
+			}
+		}
+		else 
+		{
+			/* static model 사용은 API를 통해서만... 
+			attributes.projectId = projectId;
+			this.addStaticModel(attributes);
+			if (children !== undefined)
+			{
+				childrenCount = children.length;
+				for (var i=0; i<childrenCount; i++)
+				{
+					var childrenObj = children[i];
+					if (!defined(childrenObj.projectId))
+					{
+						childrenObj.projectId = projectId;
+					}
+					this.instantiateStaticModel(childrenObj);
+				}
+			}
+			*/
 		}
 	}
 	return node;
@@ -6245,6 +6278,144 @@ MagoManager.prototype.getNeoBuildingByTypeId = function(buildingType, buildingId
 	return this.smartTileManager.getNeoBuildingById(buildingType, buildingId);
 };
 
+/**
+ * instantiate static model
+ * @param {instantiateOption} attributes
+ */
+MagoManager.prototype.instantiateStaticModel = function(attributes)
+{
+	if (!defined(attributes.projectId))
+	{
+		throw new Error('projectId is required.');
+	}
+
+	if (!this.isExistStaticModel(attributes.projectId))
+	{
+		throw new Error('static model is not exist.');
+	}
+	if (!defined(attributes.instanceId))
+	{
+		throw new Error('instanceId is required.');
+	}
+
+	if (!defined(attributes.longitude))
+	{
+		throw new Error('longitude is required.');
+	}
+	if (!defined(attributes.latitude))
+	{
+		throw new Error('latitude is required.');
+	}
+
+	if (!attributes.isReference)
+	{
+		attributes.isReference = true;
+	}
+
+	if (!attributes.isPhysical)
+	{
+		attributes.isPhysical = true;
+	}
+
+	if (!attributes.nodeType)
+	{
+		attributes.nodeType = "TEST";
+	}
+
+	//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
+	//var existentNodesCount = Object.keys(nodesMap).length;
+	//var instanceId = defaultValue(attributes.instanceId, projectId + "_" + existentNodesCount.toString());
+	var projectId = attributes.projectId;
+	var instanceId = attributes.instanceId;
+	
+	var longitude = attributes.longitude;
+	var latitude = attributes.latitude;
+	var altitude = parseFloat(defaultValue(attributes.height, 0));
+	var heading = parseFloat(defaultValue(attributes.heading, 0));
+	var pitch = parseFloat(defaultValue(attributes.pitch, 0));
+	var roll = parseFloat(defaultValue(attributes.roll, 0));
+	
+	var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
+	if (node === undefined)
+	{
+		node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
+
+		var geoCoord = new GeographicCoord();
+		geoCoord.latitude = parseFloat(latitude);
+		geoCoord.longitude = parseFloat(longitude);
+		geoCoord.altitude = parseFloat(altitude);
+
+		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
+
+		// Now, create the geoLocdataManager of node.***
+		node.data.projectId = projectId;
+		node.data.attributes = attributes;
+		node.data.geographicCoord = geoCoord;
+		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
+		node.data.geoLocDataManager = geoLocDataManager;
+
+		// Now, insert node into smartTile.***
+		var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
+		this.smartTileManager.putNode(targetDepth, node, this);
+	}
+	else 
+	{
+		this.changeLocationAndRotation(projectId, instanceId, latitude, longitude, altitude, heading, pitch, roll);
+	}
+};
+/**
+ * add static model
+ * @param {staticModelOption} attributes
+ */
+MagoManager.prototype.addStaticModel = function(attribute)
+{
+	if (!defined(attribute.projectId))
+	{
+		throw new Error('projectId is required.');
+	}
+
+	if (!defined(attribute.projectFolderName))
+	{
+		throw new Error('projectFolderName is required.');
+	}
+
+	if (!defined(attribute.buildingFolderName))
+	{
+		throw new Error('buildingFolderName is required.');
+	}
+	var projectId = attribute.projectId;
+	var staticModelsManager = this.hierarchyManager.getStaticModelsManager();
+
+	var staticModel = new StaticModel();
+	staticModel.guid = projectId;
+	staticModel.projectFolderName = attribute.projectFolderName;
+	staticModel.buildingFolderName = attribute.buildingFolderName;
+	staticModel.neoBuilding = new NeoBuilding();
+	
+	staticModelsManager.addStaticModel(projectId, staticModel);
+};
+/**
+ * check static model is exist
+ * @param {string} projectId
+ * @return {Boolean} isExist
+ */
+MagoManager.prototype.isExistStaticModel = function(projectId)
+{
+	var isExist = false;
+
+	if (!this.hierarchyManager.staticModelsManager || !this.hierarchyManager.staticModelsManager.staticModelsMap)
+	{
+		return isExist;
+	}
+
+	if (this.hierarchyManager.staticModelsManager.staticModelsMap.hasOwnProperty(projectId))
+	{
+		isExist = true;
+	}
+	return isExist;
+};
 /**
  * api gateway
  */
@@ -6723,6 +6894,123 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "changeMagoMode") 
 	{
 		var hola = 0;
+	}
+	else if (apiName === "getCameraCurrentPosition")
+	{
+		var unit = api.getUnit();
+		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		{
+			var position = this.scene.camera.position;
+		
+			switch (unit)
+			{
+			case CODE.units.METRE : return position;
+			case CODE.units.RADIAN : return Cesium.Cartographic.fromCartesian(position);
+			case CODE.units.DEGREE : {
+				var cartographicPosition = Cesium.Cartographic.fromCartesian(position);
+				return {
+					lat : Cesium.Math.toDegrees(cartographicPosition.latitude),
+					lon : Cesium.Math.toDegrees(cartographicPosition.longitude),
+					alt : cartographicPosition.height
+				};
+			}
+			}
+		}
+	}
+	else if (apiName === "getCameraCurrentOrientaion")
+	{
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.camera;
+			if (!camera)
+			{
+				throw new Error('Camera is broken.');
+			}
+			return {
+				heading : Cesium.Math.toDegrees(camera.heading),
+				pitch   : Cesium.Math.toDegrees(camera.pitch),
+				roll    : Cesium.Math.toDegrees(camera.roll)
+			};
+		}
+	}
+	else if (apiName === "changeCameraOrientation")
+	{	
+		//수정필요, 카메라가 세슘카메라
+		var camera = this.scene.camera;
+		var heading = defaultValue(api.getHeading(), Cesium.Math.toDegrees(camera.heading));
+		var pitch = defaultValue(api.getPitch(), Cesium.Math.toDegrees(camera.pitch));
+		var roll = defaultValue(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
+		var duration = defaultValue(api.getDuration(), 0);
+
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.camera;
+			if (!camera)
+			{
+				throw new Error('Camera is broken.');
+			}
+
+			camera.flyTo({
+				destination : camera.positionWC,
+				orientation : {
+					heading : Cesium.Math.toRadians(heading),
+					pitch   : Cesium.Math.toRadians(pitch),
+					roll    : Cesium.Math.toRadians(roll)
+				},
+				duration: parseInt(duration)
+			});
+		}
+	}
+	else if (apiName === "instantiateStaticModel")
+	{
+		var attributes = api.getInstantiateObj();
+		this.instantiateStaticModel(attributes);
+	}
+	else if (apiName === "addStaticModel")
+	{
+		var attribute = api.getStaticModelAttributeObj();
+		this.addStaticModel(attribute);
+	}
+	else if (apiName === "setTrackNode")
+	{
+		var node = this.hierarchyManager.getNodeByDataKey(api.getProjectId(), api.getDataKey());
+		if (!defined(node))
+		{
+			throw new Error("This node is not exist.");
+		}
+
+		this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
+		this.sceneState.camera.setTrack(node);
+	}
+	else if (apiName === "stopTrack")
+	{
+		this.sceneState.camera.stopTrack(this);
+	}
+	else if (apiName === "isExistStaticModel")
+	{
+		return this.isExistStaticModel(api.getProjectId());
+	}
+	else if (apiName === "isExistData")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if (!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		if (node !== undefined)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 };
 
