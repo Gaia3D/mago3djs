@@ -409,7 +409,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		  console.log(e); 
 		}, false);
 		//-------------------------------------------------------------
-		if(serverPolicy.only_user_data_mode === "false")
+		if (serverPolicy.only_user_data_mode === "false")
 		{
 			if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
 			{

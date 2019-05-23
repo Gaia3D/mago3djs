@@ -212,15 +212,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		else
 		{ 
 			this.data.animationData = undefined;
-			/*var camera = magoManager.sceneState.camera;
-			if(camera.tracked)
-			{
-				var tracknode = camera.tracked;
-				if(this.data.nodeId === tracknode.data.nodeId && this.data.projectId === tracknode.data.projectId)
-				{
-					camera.stopTrack(magoManager);
-				}
-			}*/
 		}
 	}
 	
@@ -617,13 +608,6 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 		{
 			durationInSeconds = animationOption.duration;
 		}
-
-		/*
-		if (animationOption.tracked)
-		{
-			animData.tracked = animationOption.tracked;
-		}
-		*/
 		if (animationOption.autoChangeRotation)
 		{
 			var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);

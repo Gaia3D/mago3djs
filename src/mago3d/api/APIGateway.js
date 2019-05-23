@@ -119,7 +119,6 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * @typedef {Object} animationOption
  * @property {string} dutaion optional. 
  * @property {boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
- * @property {boolean} tracked optional. camera track this node. only one node track.
  */
 
 /**

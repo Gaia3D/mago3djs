@@ -5885,12 +5885,6 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 		if (this.animationManager === undefined)
 		{ this.animationManager = new AnimationManager(); }
 		this.animationManager.putNode(node);
-
-		if (typeof animationOption === 'object' && animationOption.tracked)
-		{
-			this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
-			this.sceneState.camera.setTrack(node);
-		}
 		
 		//For compatibility with lower versions, lower version parameter is duratiuon(number).
 		node.changeLocationAndRotationAnimated(latitude, longitude, elevation, heading, pitch, roll, this, animationOption);
@@ -6295,7 +6289,7 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		throw new Error('projectId is required.');
 	}
 
-	if(!this.isExistStaticModel(attributes.projectId))
+	if (!this.isExistStaticModel(attributes.projectId))
 	{
 		throw new Error('static model is not exist.');
 	}
@@ -6411,17 +6405,17 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
 {
 	var isExist = false;
 
-	if(!this.hierarchyManager.staticModelsManager || !this.hierarchyManager.staticModelsManager.staticModelsMap)
+	if (!this.hierarchyManager.staticModelsManager || !this.hierarchyManager.staticModelsManager.staticModelsMap)
 	{
 		return isExist;
 	}
 
-	if(this.hierarchyManager.staticModelsManager.staticModelsMap.hasOwnProperty(projectId))
+	if (this.hierarchyManager.staticModelsManager.staticModelsMap.hasOwnProperty(projectId))
 	{
 		isExist = true;
 	}
 	return isExist;
-}
+};
 /**
  * api gateway
  */
@@ -6980,7 +6974,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "setTrackNode")
 	{
 		var node = this.hierarchyManager.getNodeByDataKey(api.getProjectId(), api.getDataKey());
-		if(!defined(node))
+		if (!defined(node))
 		{
 			throw new Error("This node is not exist.");
 		}
@@ -6995,20 +6989,21 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "isExistStaticModel")
 	{
 		return this.isExistStaticModel(api.getProjectId());
-	}else if(apiName === "isExistData")
+	}
+	else if (apiName === "isExistData")
 	{
 		var projectId = api.getProjectId();
 		var dataKey = api.getDataKey();
-		if(!defined(projectId))
+		if (!defined(projectId))
 		{
 			throw new Error("projectId is required.");
 		}
-		if(!defined(dataKey))
+		if (!defined(dataKey))
 		{
 			throw new Error("dataKey is required.");
 		}
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-		if(node !== undefined)
+		if (node !== undefined)
 		{
 			return true;
 		}
