@@ -1929,7 +1929,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 };
 
 /**
- * 드래그 여부 판단
+ * Returns true if is dragging.
  * 
  * @returns {Boolean} 드래그 여부
  */
