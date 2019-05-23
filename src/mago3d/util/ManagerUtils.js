@@ -481,15 +481,12 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
  */
 ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, magoManager) 
 {
-	//gl.depthRange(0, 1);
-	//gl.frontFace(gl.CCW);
-
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 	
 	if (depthFbo) 
 	{
-		depthFbo.bind(); // bind the existent last depthFramebuffer.
+		depthFbo.bind(); 
 	}
 
 	// Now, read the pixel and find the pixel position.
@@ -500,6 +497,250 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.***
 	return linearDepth;
 };
+
+/**
+ * Calculates the pixel position in camera coordinates.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+{
+	if (frustumFar === undefined)
+	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+	
+	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
+	var realZDepth = linearDepth*frustumFar; // original.***
+
+	// now, find the 3d position of the pixel in camCoord.****
+	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
+	if (resultPixelPos === undefined)
+	{ resultPixelPos = new Point3D(); }
+	
+	resultPixelPos.set(magoManager.resultRaySC[0] * realZDepth, magoManager.resultRaySC[1] * realZDepth, magoManager.resultRaySC[2] * realZDepth);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	return resultPixelPos;
+};
+
+/**
+ * Calculates the cameraCoord position in world coordinates.
+ * @param {Point3D} cameraCoord Camera coordinate position.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorldPos, magoManager) 
+{
+	// now, must transform this pixelCamCoord to world coord.***
+	var mv_inv = magoManager.sceneState.getModelViewMatrixInv();
+	if (resultWorldPos === undefined)
+	{ var resultWorldPos = new Point3D(); }
+	resultWorldPos = mv_inv.transformPoint3D(camCoordPos, resultWorldPos);
+	return resultWorldPos;
+};
+
+/**
+ * Calculates the pixel position in world coordinates.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+{
+	var pixelPosCamCoord = new Point3D();
+	
+	if (frustumFar === undefined)
+	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+	
+	if (depthFbo === undefined)
+	{ depthFbo = magoManager.depthFboNeo; }
+	
+	pixelPosCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumFar, magoManager);
+
+	if (resultPixelPos === undefined)
+	{ var resultPixelPos = new Point3D(); }
+
+	resultPixelPos = ManagerUtils.cameraCoordPositionToWorldCoord(pixelPosCamCoord, resultPixelPos, magoManager);
+	return resultPixelPos;
+};
+
+/**
+ * Calculates a world coordinate point to screen coordinate.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} worldCoordX x value of the point in world coordinate.
+ * @param {Number} worldCoordY y value of the point in world coordinate.
+ * @param {Number} worldCoordZ z value of the point in world coordinate.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @return {Point3D} resultPixelPos The result of the calculation.
+ */
+ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord, magoManager)
+{
+	if (resultScreenCoord === undefined)
+	{ resultScreenCoord = new Point3D(); }
+	
+	if (magoManager.pointSC === undefined)
+	{ magoManager.pointSC = new Point3D(); }
+	
+	if (magoManager.pointSC2 === undefined)
+	{ magoManager.pointSC2 = new Point3D(); }
+	
+	magoManager.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
+	
+	// calculate the position in camera coords.
+	var pointSC2 = magoManager.pointSC2;
+	var sceneState = magoManager.sceneState;
+	pointSC2 = sceneState.modelViewMatrix.transformPoint3D(magoManager.pointSC, pointSC2);
+	
+	// now calculate the position in screen coords.
+	var zDist = pointSC2.z;
+	if (zDist > 0)
+	{
+		// the worldPoint is rear the camera.
+		resultScreenCoord.set(-1, -1, 0);
+		return resultScreenCoord;
+	}
+	
+	// now calculate the width and height of the plane in zDist.
+	//var fovyRad = sceneState.camera.frustum.fovyRad;
+	
+	var planeHeight = sceneState.camera.frustum.tangentOfHalfFovy*zDist*2;
+	var planeWidth = planeHeight * sceneState.camera.frustum.aspectRatio; 
+	var pixelX = -pointSC2.x * sceneState.drawingBufferWidth / planeWidth;
+	var pixelY = -(pointSC2.y) * sceneState.drawingBufferHeight / planeHeight;
+
+	pixelX += sceneState.drawingBufferWidth / 2;
+	pixelY += sceneState.drawingBufferHeight / 2;
+	pixelY = sceneState.drawingBufferHeight - pixelY;
+	resultScreenCoord.set(pixelX, pixelY, 0);
+	
+	return resultScreenCoord;
+};
+
+/**
+ * Calculates the direction vector of a ray that starts in the camera position and
+ * continues to the pixel position in camera space.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {Float32Array(3)} resultRay Result of the calculation.
+ * @returns {Float32Array(3)} resultRay Result of the calculation.
+ */
+ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager) 
+{
+	// in this function "ray" is a vector.***
+	var sceneState = magoManager.sceneState;
+	var frustum_far = 1.0; // unitary frustum far.***
+	var frustum = sceneState.camera.frustum;
+	var aspectRatio = frustum.aspectRatio;
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
+	
+	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
+	var wfar = hfar * aspectRatio;
+	var mouseX = pixelX;
+	var mouseY = sceneState.drawingBufferHeight - pixelY;
+	if (resultRay === undefined) 
+	{ resultRay = new Float32Array(3); }
+	resultRay[0] = wfar*((mouseX/sceneState.drawingBufferWidth) - 0.5);
+	resultRay[1] = hfar*((mouseY/sceneState.drawingBufferHeight) - 0.5);
+	resultRay[2] = - frustum_far;
+	return resultRay;
+};
+
+/**
+ * Calculates the direction vector of a ray that starts in the camera position and
+ * continues to the pixel position in world space.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @returns {Line} resultRay
+ */
+ManagerUtils.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay, magoManager) 
+{
+	// in this function the "ray" is a line.***
+	if (resultRay === undefined) 
+	{ resultRay = new Line(); }
+	
+	// world ray = camPos + lambda*camDir.
+	var camPos = magoManager.sceneState.camera.position;
+	var rayCamSpace = new Float32Array(3);
+	rayCamSpace = ManagerUtils.getRayCamSpace(pixelX, pixelY, rayCamSpace, magoManager);
+	
+	if (magoManager.pointSC === undefined)
+	{ magoManager.pointSC = new Point3D(); }
+	
+	var pointSC = magoManager.pointSC;
+	var pointSC2 = magoManager.pointSC2;
+	
+	pointSC.set(rayCamSpace[0], rayCamSpace[1], rayCamSpace[2]);
+
+	// now, must transform this posCamCoord to world coord.***
+	pointSC2 = magoManager.sceneState.modelViewMatrixInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.***
+	pointSC2.unitary(); // rayWorldSpace.***
+	resultRay.setPointAndDir(camPos.x, camPos.y, camPos.z,       pointSC2.x, pointSC2.y, pointSC2.z);// original.***
+
+	return resultRay;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
