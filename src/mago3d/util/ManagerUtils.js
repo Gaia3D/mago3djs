@@ -1,6 +1,5 @@
 'use strict';
 
-
 /**
  * ManagerUtils does some calculations about coordinates system of different earth coords.
  * 
@@ -13,51 +12,55 @@ var ManagerUtils = function()
 	
 };
 
+/**
+ * world coordinate to geographic coordinate.
+ * @param {Point3D} point world coordinate.
+ * @param {GeographicCoord|undefined} resultGeographicCoord Optional. result geographicCoord. if undefined, create GeographicCoord instance.
+ * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
+ * @return {GeographicCoord} geographic coordinate object.
+ */
 ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) 
 {
 	if (resultGeographicCoord === undefined)
 	{ resultGeographicCoord = new GeographicCoord(); }
 	
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		var globe = magoManager.wwd.globe;
-		var origin = new WorldWind.Position();
-		origin = globe.computePositionFromPoint(point.x, point.y, point.z, origin);
-		resultGeographicCoord.setLonLatAlt(origin.longitude, origin.latitude, origin.altitude);
-	}
-	else 
-	{
-		var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
-		resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.altitude);
-	}
+	var cartographic = Globe.CartesianToGeographicWgs84(point.x, point.y, point.z, cartographic);
+	resultGeographicCoord.setLonLatAlt(cartographic.longitude, cartographic.latitude, cartographic.altitude);
 	
 	return resultGeographicCoord;
 };
 
+/**
+ * geographic coordinate to world coordinate.
+ * @param {number} longitude longitude.
+ * @param {number} latitude latitude.
+ * @param {number} altitude altitude.
+ * @param {Point3D|undefined} resultWorldPoint Optional. result worldCoord. if undefined, create Point3D instance.
+ * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
+ * @return {Point3D} world coordinate object.
+ */
 ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitude, resultWorldPoint, magoManager) 
 {
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
 
-	if (magoManager.configInformation !== undefined && magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
-		resultWorldPoint.set(cartesian[1], cartesian[2], cartesian[0]);
-		return resultWorldPoint;
-	}
-	
 	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
 	resultWorldPoint.set(cartesian[0], cartesian[1], cartesian[2]);
 	
 	return resultWorldPoint;
 };
 
+/**
+ * when node mapping type is boundingboxcenter, set pivotPointTraslation and create pivotPoint at geoLocationData
+ * this function NO modifies the geographic coords.
+ * "newPivotPoint" is in buildingCoords.
+ * "newPivotPoint" is the desired position of the new origen of coords, for example:
+ * in a building you can desire the center of the bbox as the origin of the coords.
+ * @param {GeoLocationData} geoLocationData. Required.
+ * @param {Point3D} newPivotPoint newPivotPoint.
+ */
 ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newPivotPoint) 
 {
-	// this function NO modifies the geographic coords.***
-	// "newPivotPoint" is in buildingCoords.***
-	// "newPivotPoint" is the desired position of the new origen of coords, for example:
-	// in a building you can desire the center of the bbox as the origin of the coords.***
 	if (geoLocationData === undefined)
 	{ return; }
 
@@ -68,33 +71,16 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	geoLocationData.doEffectivePivotPointTranslation();
 };
 
+/**
+ * this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
+ * @param {Point3D} worldPosition worldPosition.
+ * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
+ * @return {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
+ */
 ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
 {
-	// this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
-
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		// * if this in webWorldWind:
-		var xAxis = new WorldWind.Vec3(0, 0, 0),
-			yAxis = new WorldWind.Vec3(0, 0, 0),
-			zAxis = new WorldWind.Vec3(0, 0, 0);
-		var tMatrix = WorldWind.Matrix.fromIdentity();
-		
-		WorldWind.WWMath.localCoordinateAxesAtPoint([worldPosition.x, worldPosition.y, worldPosition.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
-				
-		tMatrix.set(
-			xAxis[0], yAxis[0], zAxis[0], worldPosition.x,
-			xAxis[1], yAxis[1], zAxis[1], worldPosition.y,
-			xAxis[2], yAxis[2], zAxis[2], worldPosition.z,
-			0, 0, 0, 1);
-		
-		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
-		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
-		resultGeoLocMatrix.setByFloat32Array(tMatrixColMajorArray);
-		return resultGeoLocMatrix;
-	}
 
 	if (magoManager.globe === undefined)
 	{ magoManager.globe = new Globe(); }
@@ -103,24 +89,37 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
 	return resultGeoLocMatrix;
 };
 
+/**
+ * this function calculates the transformation matrix for (longitude, latitude, altitude) coordinate, that has NO heading, pitch or roll rotations.
+ * @param {number} longitude longitude.
+ * @param {number} latitude latitude.
+ * @param {number} altitude altitude.
+ * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
+ * @return {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
+ */
 ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix, magoManager) 
 {
-	// this function calculates the transformation matrix for (longitude, latitude, altitude) coordinate, that has NO heading, pitch or roll rotations.
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
 	
-	var worldPosition;
-	worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
+	var worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
 	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
 	
 	return resultGeoLocMatrix;
 };
 
+/**
+ * This function calculates the "resultGeoLocMatrix" & "resultTransformMatrix".
+ * @param {Point3D} worldPosition worldPosition.
+ * @param {number} heading heading.
+ * @param {number} pitch pitch.
+ * @param {number} roll roll.
+ * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance. this transformMatrix without the heading, pitch, roll rotations.
+ * @param {Matrix4|undefined} resultTransformMatrix. Optional. result transform matrix. if undefined, create Matrix4 instance. this matrix including the heading, pitch, roll rotations.
+ * @return {Matrix4} resultTransformMatrix.
+ */
 ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading, pitch, roll, resultGeoLocMatrix, resultTransformMatrix, magoManager) 
 {
-	// This function calculates the "resultGeoLocMatrix" & "resultTransformMatrix".
-	// note: "resultGeoLocMatrix" is the transformMatrix without the heading, pitch, roll rotations.
-	// note: "resultTransformMatrix" is the transformMatrix including the heading, pitch, roll rotations.
 	var xRotMatrix = new Matrix4();  // created as identity matrix.
 	var yRotMatrix = new Matrix4();  // created as identity matrix.
 	var zRotMatrix = new Matrix4();  // created as identity matrix.
@@ -133,17 +132,6 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 
 	if (roll !== undefined && roll !== 0)
 	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0); }
-
-	/*
-	if (heading !== undefined && heading !== 0)
-	{ zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, -1.0); }
-
-	if (pitch !== undefined && pitch !== 0)
-	{ xRotMatrix.rotationAxisAngDeg(pitch, -1.0, 0.0, 0.0); }
-
-	if (roll !== undefined && roll !== 0)
-	{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, -1.0, 0.0); }
-	*/
 
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }  // created as identity matrix.
@@ -167,10 +155,20 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 	return resultTransformMatrix;
 };
 
+/**
+ * This function calculates all data and matrices for the location(longitude, latitude, altitude) and rotation(heading, pitch, roll).
+ * @param {number} longitude Required. longitude.
+ * @param {number} latitude Required. latitude.
+ * @param {number} altitude altitude.
+ * @param {number} heading heading. Unit is degree.
+ * @param {number} pitch pitch. Unit is degree.
+ * @param {number} roll roll. Unit is degree.
+ * @param {GeoLocationData|undefined} resultGeoLocationData Optional. result geolocation matrix. if undefined, create GeoLocationData instance.
+ * @param {MagoManager} magoManager for magoManager.globe
+ * @return {GeoLocationData} resultGeoLocationData.
+ */
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
 {
-	// This function calculates all data and matrices for the location(longitude, latitude, altitude) and rotation(heading, pitch, roll).
-	// Note: Heading, pitch & roll are angles in degree.***
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
@@ -259,9 +257,18 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	return resultGeoLocationData;
 };
 
+/**
+ * This function calculates geolocation data use pixel point(calculated world point). 
+ * When use Object Marker, this function called.
+ * @param {number} absoluteX absoluteX.
+ * @param {number} absoluteY absoluteY.
+ * @param {number} absoluteZ absoluteZ.
+ * @param {GeoLocationData|undefined} resultGeoLocationData Optional. result geolocation matrix. if undefined, create GeoLocationData instance.
+ * @param {MagoManager} magoManager
+ * @return {GeoLocationData} resultGeoLocationData.
+ */
 ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absoluteY, absoluteZ, resultGeoLocationData, magoManager) 
 {
-
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
@@ -278,17 +285,9 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	resultGeoLocationData.position.x = absoluteX;
 	resultGeoLocationData.position.y = absoluteY;
 	resultGeoLocationData.position.z = absoluteZ;
-		
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		var globe = magoManager.wwd.globe;
-		var resultCartographic = new WorldWind.Vec3(0, 0, 0);
-		resultCartographic = globe.computePositionFromPoint(absoluteX, absoluteY, absoluteZ, resultCartographic);
-		resultGeoLocationData.geographicCoord.longitude = resultCartographic.longitude;
-		resultGeoLocationData.geographicCoord.latitude = resultCartographic.latitude;
-		resultGeoLocationData.geographicCoord.altitude = resultCartographic.altitude;
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	
+	//추후에 세슘의존성 버리는 코드로 대체 가능해 보임. 손수석님과 검토 필요.
+	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
 		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
@@ -366,67 +365,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, -1.0, 0.0);
 	}
 	
-	if (magoManager.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		// * if this in webWorldWind:
-		var xAxis = new WorldWind.Vec3(0, 0, 0),
-			yAxis = new WorldWind.Vec3(0, 0, 0),
-			zAxis = new WorldWind.Vec3(0, 0, 0);
-		var rotMatrix = WorldWind.Matrix.fromIdentity();
-		var tMatrix = WorldWind.Matrix.fromIdentity();
-		
-		WorldWind.WWMath.localCoordinateAxesAtPoint([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], magoManager.wwd.globe, xAxis, yAxis, zAxis);
-
-		rotMatrix.set(
-			xAxis[0], yAxis[0], zAxis[0], 0,
-			xAxis[1], yAxis[1], zAxis[1], 0,
-			xAxis[2], yAxis[2], zAxis[2], 0,
-			0, 0, 0, 1); 
-				
-		tMatrix.set(
-			xAxis[0], yAxis[0], zAxis[0], resultGeoLocationData.position.x,
-			xAxis[1], yAxis[1], zAxis[1], resultGeoLocationData.position.y,
-			xAxis[2], yAxis[2], zAxis[2], resultGeoLocationData.position.z,
-			0, 0, 0, 1);
-				
-		var columnMajorArray = WorldWind.Matrix.fromIdentity(); 
-		columnMajorArray = rotMatrix.columnMajorComponents(columnMajorArray); // no used.***
-			
-		var matrixInv = WorldWind.Matrix.fromIdentity();
-		matrixInv.invertMatrix(rotMatrix);
-		var columnMajorArrayAux_inv = WorldWind.Matrix.fromIdentity();
-		var columnMajorArray_inv = matrixInv.columnMajorComponents(columnMajorArrayAux_inv); 
-		
-		var tMatrixColMajorArray = WorldWind.Matrix.fromIdentity();
-		tMatrixColMajorArray = tMatrix.columnMajorComponents(tMatrixColMajorArray);
-		resultGeoLocationData.tMatrix.setByFloat32Array(tMatrixColMajorArray);
-		
-		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix); // "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
-
-		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
-		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
-		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
-		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
-
-		resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
-		resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
-		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
-		
-		// now calculate the inverses of the matrices.***
-		var tMatrixInv = WorldWind.Matrix.fromIdentity();
-		tMatrixInv.invertMatrix(resultGeoLocationData.tMatrix._floatArrays);
-		resultGeoLocationData.tMatrixInv.setByFloat32Array(tMatrixInv);
-		
-		var rotMatrixInv = WorldWind.Matrix.fromIdentity();
-		rotMatrixInv.invertMatrix(resultGeoLocationData.rotMatrix._floatArrays);
-		resultGeoLocationData.rotMatrixInv.setByFloat32Array(rotMatrixInv);
-		
-		var geoLocMatrixInv = WorldWind.Matrix.fromIdentity();
-		geoLocMatrixInv.invertMatrix(resultGeoLocationData.geoLocMatrix._floatArrays);
-		resultGeoLocationData.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
-	}
-	else if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
 		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
@@ -464,6 +403,16 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	return resultGeoLocationData;
 };
 
+/**
+ * 자릿수가 긴 숫자를 나머지와 몫으로 분리. gl에서는 float형밖에 처리 불가.
+ * @example <caption>Example usage of calculateSplitedValues</caption>
+ * ManagerUtils.calculateSplitedValues(4049653.5985745606, new SplitValue());
+ * resultSplitValue.high = 3997696; // Math.floor(4049653.5985745606 / 65536.0) * 65536.0;
+ * resultSplitValue.low = 51957.5985745606 // 4049653.5985745606 - 3997696;
+ * @param {number} value Required. coordinate x or y or z.
+ * @param {SplitValue} resultSplitValue Optional. result split value. if undefined, create SplitValue instance.
+ * @return {SplitValue} resultSplitValue.
+ */
 ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
 {
 	if (resultSplitValue === undefined)
@@ -472,7 +421,7 @@ ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
 	var doubleHigh;
 	if (value >= 0.0) 
 	{
-		doubleHigh = Math.floor(value / 65536.0) * 65536.0;
+		doubleHigh = Math.floor(value / 65536.0) * 65536.0; //unsigned short max
 		resultSplitValue.high = doubleHigh;
 		resultSplitValue.low = value - doubleHigh;
 	}
@@ -486,16 +435,24 @@ ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
 	return resultSplitValue;
 };
 
+/**
+ * 자릿수가 긴 숫자를 나머지(low)와 몫(high)으로 분리한 결과를 각각 배열로 생성. gl에서는 float형밖에 처리 불가.
+ * @param {Point3D} point3fv Required.
+ * @param {Float32Array} resultSplitPoint3fvHigh Optional. result split high value array. if undefined, set new Float32Array(3).
+ * @param {Float32Array} resultSplitPoint3fvLow Optional. result split low value array. if undefined, set new Float32Array(3).
+ * 
+ * @see ManagerUtils#calculateSplitedValues
+ */
 ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, resultSplitPoint3fvLow)
 {
 	if (point3fv === undefined)
 	{ return undefined; }
 
-	if (resultSplitPoint3fvHigh === undefined) // delete unnecesary.
-	{ resultSplitPoint3fvHigh = new Float32Array(3); }// delete unnecesary.
+	if (resultSplitPoint3fvHigh === undefined) // delete unnecesary. agree
+	{ resultSplitPoint3fvHigh = new Float32Array(3); }// delete unnecesary. agree
 
-	if (resultSplitPoint3fvLow === undefined)// delete unnecesary.
-	{ resultSplitPoint3fvLow = new Float32Array(3); }// delete unnecesary.
+	if (resultSplitPoint3fvLow === undefined)// delete unnecesary. agree
+	{ resultSplitPoint3fvLow = new Float32Array(3); }// delete unnecesary. agree
 
 	var posSplitX = new SplitValue();
 	posSplitX = this.calculateSplitedValues(point3fv[0], posSplitX);
@@ -513,36 +470,7 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
 };
 
-/**
- * Calculates the pixel linear depth value.
- * @param {WebGLRenderingContext} gl WebGL Rendering Context.
- * @param {Number} pixelX Screen x position of the pixel.
- * @param {Number} pixelY Screen y position of the pixel.
- * @param {FBO} depthFbo Depth frameBuffer object.
- * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
- */
-ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, magoManager) 
-{
-	//gl.depthRange(0, 1);
-	//gl.frontFace(gl.CCW);
 
-	if (depthFbo === undefined)
-	{ depthFbo = magoManager.depthFboNeo; }
-	
-	if (depthFbo) 
-	{
-		depthFbo.bind(); // bind the existent last depthFramebuffer.
-	}
-
-	// Now, read the pixel and find the pixel position.
-	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
-	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	
-	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
-	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.***
-	return linearDepth;
-};
 
 
 

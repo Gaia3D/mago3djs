@@ -63,6 +63,7 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
 
 /**
  * 속성값에 의한 가시화 유무설정
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} isShow true = 표시, false = 비표시
  */
@@ -114,6 +115,13 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
 }
 
 /**
+ * Object literal with change Location And Rotation animation option.
+ * @typedef {Object} animationOption
+ * @property {string} dutaion optional. 
+ * @property {boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
+ */
+
+/**
  * location and rotation 변경
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId
@@ -124,8 +132,9 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * @param {string} heading 좌, 우
  * @param {string} pitch 위, 아래
  * @param {string} roll 좌, 우 기울기
+ * @param {animationOption} animationOption animation option
  */
-function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll) 
+function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll, animationOption) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -138,6 +147,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey
 	api.setHeading(heading);
 	api.setPitch(pitch);
 	api.setRoll(roll);
+	api.setAnimationOption(animationOption);
 	managerFactoryInstance.callAPI(api);
 }
 
@@ -269,6 +279,7 @@ function changeMagoModeAPI(managerFactoryInstance, flag)
 
 /**
  * 현재 위치 근처 issue list. false인 경우 clear
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {boolean} flag true = 활성화, false = 비활성화
  */
@@ -284,6 +295,7 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
 /**
  * TODO 이건 위에 이슈 등록 활성화, 비활성화 api로 통합이 가능할거 같음
  * issue 등록 geo 정보 관련 상태 변경
+ * 확인 필요
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} insertIssueState 이슈 등록 좌표 상태
  */
@@ -357,7 +369,7 @@ function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
 }
 
 /**
- * 화면에 있는 모든 데이터를 삭제, 비표시
+ * 모든 f4d 데이터를 삭제, 비표시
  * @param {ManagerFactory} managerFactoryInstance
  */
 function clearAllDataAPI(managerFactoryInstance)
@@ -468,6 +480,7 @@ function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duratio
 
 /**
  * 마우스를 사용할 수 없는 환경에서 버튼 이벤트로 대체
+ * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} eventType 어떤 마우스 동작을 원하는지를 구분
  */
@@ -600,5 +613,158 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
 	api.setInputPoint(inputPoint);
 	api.setResultPoint(resultPoint);
 
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * get current camera position
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {number} unit position unit. if not define, default value is CODE.units.DEGREE. 0 : CODE.units.METRE, 1 : CODE.units.DEGREE, 2 : CODE.units.RADIAN
+ * @return {Object|Cartesian3|Cartographic}
+ */
+function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
+{
+	var api = new API("getCameraCurrentPosition");
+	
+	api.setReturnable(true);
+	api.setUnit(unit);
+	
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * get current camera orientaion
+ * @param {ManagerFactory} managerFactoryInstance
+ * @return {Object}
+ */
+function getCameraCurrentOrientaionAPI(managerFactoryInstance)
+{
+	var api = new API("getCameraCurrentOrientaion");
+	
+	api.setReturnable(true);
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * change camera orientation
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string|undefined|null} heading 좌, 우. needs degree. default value is current camera's heading value.
+ * @param {string|undefined|null} pitch 위, 아래. needs degree. default value is current camera's pitch value.
+ * @param {string|undefined|null} roll 좌, 우 기울기. needs degree. default value is current camera's roll value.
+ * @param {string|undefined|null} duration 이동하는 시간. default value is 0.
+ */
+function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll, duration)
+{
+	var api = new API("changeCameraOrientation");
+
+	api.setHeading(heading);
+	api.setPitch(pitch);
+	api.setRoll(roll);
+	api.setDuration(duration);
+
+	managerFactoryInstance.callAPI(api);
+}
+
+
+/**
+ * Object literal with config options for instantiate static model.
+ * @typedef {Object} instantiateOption
+ * @property {string} projectId Required. projectId. static model key.
+ * @property {string} instanceId Required. instance Id.
+ * @property {number} longitude Required. initial longitude.
+ * @property {number} latitude Required. initial latitude.
+ * @property {number} height Optional. Default value is 0.
+ * @property {number} heading Optional. Default value is 0.
+ * @property {number} pitch Optional. Default value is 0.
+ * @property {number} roll Optional. Default value is 0.
+ */
+
+/**
+ * instantiate static model
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {instantiateOption} attributes
+ */
+function instantiateStaticModelAPI(managerFactoryInstance, attributes)
+{
+	var api = new API("instantiateStaticModel");
+	
+	api.setInstantiateObj(attributes);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * Object literal with config options for add static model.
+ * @typedef {Object} staticModelOption
+ * @property {string} projectId Required. projectId. Static model key.
+ * @property {string} projectFolderName Required. Static Model Folder Name.
+ * @property {string} buildingFolderName Required. Static Model data Folder Name.
+ */
+
+/**
+ * add static model
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {staticModelOption} attributes
+ */
+function addStaticModelAPI(managerFactoryInstance, attributes)
+{
+	var api = new API("addStaticModel");
+	
+	api.setStaticModelAttributeObj(attributes);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * set track target node.
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ */
+function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new API("setTrackNode");
+	
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * set track target node.
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function stopTrackAPI(managerFactoryInstance)
+{
+	var api = new API("stopTrack");
+	
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check static model is exist
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId
+ * @return {Boolean} isExist
+ */
+function isExistStaticModelAPI(managerFactoryInstance, projectId)
+{
+	var api = new API("isExistStaticModel");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check data is exist
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @return {Boolean} isExist
+ */
+function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new API("isExistData");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
 	return managerFactoryInstance.callAPI(api);
 }

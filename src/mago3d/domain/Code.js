@@ -55,5 +55,11 @@ CODE.modelerDrawingElement = {
 	"GEOGRAPHICPOINTS" : 4,
 };
 
+CODE.units = {
+	"METRE"  : 0,
+	"DEGREE" : 1,
+	"RADIAN" : 2
+};
+
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";
