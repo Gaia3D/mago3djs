@@ -511,7 +511,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 	if (this.configInformation === undefined) 
 	{
-		// MagoWorld. No need update matrices.***
+		// We are on MagoWorld. No need update matrices.***
 		return;
 	}
 
@@ -655,6 +655,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var nearOffset = scene.opaqueFrustumNearOffset;
 		var numFrustums = frustumCommandsList.length;
 		var distancesArray = [];
+		var tanHalfFovy = undefined;
 		for (var i=0; i<numFrustums; i++)
 		{
 			distancesArray[i*2] = frustumCommandsList[i].near;
@@ -670,7 +671,9 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 			frustum.fovRad[0] = scene.camera.frustum._fov;
 			frustum.fovyRad[0]= scene.camera.frustum._fovy;
 			frustum.aspectRatio[0] = scene.camera.frustum._aspectRatio;
-			frustum.tangentOfHalfFovy[0] = Math.tan(frustum.fovyRad/2);
+			if (tanHalfFovy === undefined)
+			{ tanHalfFovy = Math.tan(frustum.fovyRad/2); }
+			frustum.tangentOfHalfFovy[0] = tanHalfFovy;
 		}
 		
 		// Set cam dir & up by modelViewMatrix.***
@@ -1276,8 +1279,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
-
-	
 };
 
 
@@ -2034,8 +2035,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -4848,7 +4849,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				var data = node.data;
 				data.currentLod;
 				data.distToCam = distToCamera;
-
+				
 				//neoBuilding.distToCam = distToCamera;
 				
 				if (data.distToCam < lod0Dist)
@@ -5374,6 +5375,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node.data.attributes = attributes;
 			node.data.mapping_type = mapping_type;
 			var tMatrix;
+			
+			
 			
 			if (attributes.isPhysical)
 			{

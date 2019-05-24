@@ -589,6 +589,23 @@
 				"flipYTexCoords": true
 			},
 			"children": [],
+			"data_key": "R1",
+			"data_name": "R1",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
 			"data_key": "00 BunYangBeSuJang",
 			"data_name": "00 문양배수장_FG",
 			"mapping_type":"origin",
