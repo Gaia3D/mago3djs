@@ -345,43 +345,6 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	}
 };
 
-MagoManager.prototype.render = function(dc)
-{
-	// Function for WebWorldWind.*********************************************************************************************************
-	// Function for WebWorldWind.*********************************************************************************************************
-
-	// Now, we add to orderedRenderable the buildings that wants to render. PENDENT.***
-	dc.addOrderedRenderable(this, 1000.0); // 1000 = distance to eye.*** Provisionally, we render all.***
-	
-};
-
-/**
- * object 를 그리는 두가지 종류의 function을 호출
- * @param scene 변수
- * @param pass 변수
- * @param frustumIdx 변수
- * @param numFrustums 변수
- */
-MagoManager.prototype.renderOrdered = function(dc)
-{
-	// Function for WebWorldWind.*********************************************************************************************************
-	// Function for WebWorldWind.*********************************************************************************************************
-	if (this.configInformation === undefined)
-	{
-		this.configInformation = MagoConfig.getPolicy();
-	}
-		
-	var isLastFrustum = true;
-	var frustumIdx = 0;
-	var numFrustums = 1;
-	this.sceneState.dc = dc;
-	this.sceneState.gl = dc.currentGlContext;
-	var scene;
-	
-	this.startRender(isLastFrustum, frustumIdx, numFrustums);
-};
-
-
 /**
  * Swaps the current rendering Phase.
  */
@@ -552,119 +515,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		return;
 	}
 
-	// here updates the modelView and modelViewProjection matrices of the scene.***
-	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		// * else if this is in WebWorldWind:
-		// www dependency.****
-		var dc = sceneState.dc;
-		
-		var columnMajorArray = WorldWind.Matrix.fromIdentity();
-		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
-		
-		var modelViewRelToEye = WorldWind.Matrix.fromIdentity();
-		modelViewRelToEye.copy(dc.navigatorState.modelview);
-		modelViewRelToEye[3] = 0.0;
-		modelViewRelToEye[7] = 0.0;
-		modelViewRelToEye[11] = 0.0;
-		
-		// ModelViewMatrix.***
-		var modelView = WorldWind.Matrix.fromIdentity();
-		modelView.copy(dc.navigatorState.modelview);
-		columnMajorArray = modelView.columnMajorComponents(columnMajorArrayAux);
-		sceneState.modelViewMatrix.copyFromFloatArray(columnMajorArray);
-		
-		// ModelViewMatrix Inverse.***
-		var matrixInv = WorldWind.Matrix.fromIdentity();
-		//matrixInv.invertMatrix(modelView);
-		matrixInv.invertOrthonormalMatrix(modelView);
-		columnMajorArray = matrixInv.columnMajorComponents(columnMajorArrayAux);
-		sceneState.modelViewMatrixInv.copyFromFloatArray(columnMajorArray);
-		
-		// NormalMatrix.***
-		sceneState.normalMatrix4.copyFromFloatArray(matrixInv);
-	  
-		// Projection Matrix.***
-		var projection = WorldWind.Matrix.fromIdentity();
-		projection.copy(dc.navigatorState.projection);
-		columnMajorArray = projection.columnMajorComponents(columnMajorArrayAux);
-		sceneState.projectionMatrix.copyFromFloatArray(columnMajorArray);
-		
-		// ModelViewRelToEyeMatrix.***
-		modelView = WorldWind.Matrix.fromIdentity();
-		modelView.copy(dc.navigatorState.modelview);
-		columnMajorArray = modelViewRelToEye.columnMajorComponents(columnMajorArray);
-		sceneState.modelViewRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
-		
-		// ModelViewRelToEyeMatrixInv.***
-		var mvRelToEyeInv = WorldWind.Matrix.fromIdentity();
-		mvRelToEyeInv.invertOrthonormalMatrix(modelViewRelToEye);
-		columnMajorArray = mvRelToEyeInv.columnMajorComponents(columnMajorArrayAux);
-		sceneState.modelViewRelToEyeMatrixInv.copyFromFloatArray(columnMajorArray);
-		
-		// ModelViewProjectionRelToEyeMatrix.***
-		var modelViewProjectionRelToEye_aux = WorldWind.Matrix.fromIdentity();
-		modelViewProjectionRelToEye_aux.copy(projection);
-		modelViewProjectionRelToEye_aux.multiplyMatrix(modelViewRelToEye);
-		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
-		var columnMajorArray = modelViewProjectionRelToEye_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
-		sceneState.modelViewProjRelToEyeMatrix.copyFromFloatArray(columnMajorArray);
-		
-		// ModelViewProjectionMatrix.***
-		var modelViewProjection_aux = WorldWind.Matrix.fromIdentity();
-		modelViewProjection_aux.copy(projection);
-		modelViewProjection_aux.multiplyMatrix(modelView);
-		var columnMajorArrayAux = WorldWind.Matrix.fromIdentity();
-		var columnMajorArray = modelViewProjection_aux.columnMajorComponents(columnMajorArrayAux); // Original.***
-		sceneState.modelViewProjMatrix.copyFromFloatArray(columnMajorArray);
-		
-
-		var cameraHeading = dc.navigatorState.heading;
-		var cameraTilt = dc.navigatorState.tilt;
-		
-		// now, calculate camera direction and up from cameraHeading and cameraTilt.
-		var cameraDirection = new Point3D();
-		cameraDirection.set(0, 0, -1);
-		var rotatedCameraDirection = new Point3D();
-		rotatedCameraDirection.set(0, 0, 0);
-		
-		var cameraUp = new Point3D();
-		cameraUp.set(0, 1, 0);
-		var rotatedCameraUp = new Point3D();
-		rotatedCameraUp.set(0, 0, 0);
-		
-		rotatedCameraDirection = sceneState.modelViewMatrixInv.rotatePoint3D(cameraDirection, rotatedCameraDirection);
-		rotatedCameraDirection.unitary();
-		rotatedCameraUp = sceneState.modelViewMatrixInv.rotatePoint3D(cameraUp, rotatedCameraUp);
-		rotatedCameraUp.unitary();
-			
-		var cameraPosition = dc.navigatorState.eyePoint;
-		sceneState.camera.position.set(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
-		sceneState.camera.direction.set(rotatedCameraDirection.x, rotatedCameraDirection.y, rotatedCameraDirection.z);
-		sceneState.camera.up.set(rotatedCameraUp.x, rotatedCameraUp.y, rotatedCameraUp.z);
-		ManagerUtils.calculateSplited3fv([cameraPosition[0], cameraPosition[1], cameraPosition[2]], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
-		
-		var viewport = this.wwd.viewport;
-		sceneState.camera.frustum.aspectRatio[0] = viewport.width/viewport.height;
-		sceneState.camera.frustum.near[0] = 0.1;
-		sceneState.camera.frustum.far[0] = 1000.0;
-		
-		// Calculate FOV & FOVY.***
-		if (sceneState.camera.frustum.dirty)
-		{
-			var projectionMatrix = dc.navigatorState.projection;
-			var aspectRat = sceneState.camera.frustum.aspectRatio;
-			var angleAlfa = 2*Math.atan(1/(aspectRat*projectionMatrix[0]));
-			var frustum0 = sceneState.camera.getFrustum(0);
-			frustum0.dirty = false;
-			sceneState.camera.setAspectRatioAndFovyRad(viewport.width/viewport.height, angleAlfa);
-		}
-
-		// screen size.***
-		sceneState.drawingBufferWidth[0] = viewport.width;
-		sceneState.drawingBufferHeight[0] = viewport.height;
-	}
-	else if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// * if this is in Cesium:
 		var scene = this.scene;
@@ -829,21 +680,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
  */
 MagoManager.prototype.upDateCamera = function(resultCamera) 
 {
-	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		var frustumIdx = this.currentFrustumIdx;
-		var frustum = resultCamera.getFrustum(frustumIdx);
-		var fovy = frustum.fovyRad;
-		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
-		
-		var wwwFrustumVolume = this.sceneState.dc.navigatorState.frustumInModelCoordinates;
-		for (var i=0; i<6; i++)
-		{
-			var plane = wwwFrustumVolume._planes[i];
-			resultCamera.frustum.planesArray[i].setNormalAndDistance(plane.normal[0], plane.normal[1], plane.normal[2], plane.distance);
-		}
-	}
-	else if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var camera = this.scene.frameState.camera;
 		
@@ -1288,11 +1125,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 2) color render.************************************************************************************************************
-	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		;//
-	}
-	else if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
@@ -1477,11 +1310,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
 
-	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		gl.activeTexture(gl.TEXTURE0);
-		this.wwd.drawContext.redrawRequested = true;
-	}
 	
 };
 
@@ -2044,12 +1872,7 @@ MagoManager.prototype.isDragging = function()
  */
 MagoManager.prototype.setCameraMotion = function(state)
 {
-	if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		this.wwd.navigator.panRecognizer.enabled = state;
-		this.wwd.navigator.primaryDragRecognizer.enabled = state;
-	}
-	else if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		this.scene.screenSpaceCameraController.enableRotate = state;
 		this.scene.screenSpaceCameraController.enableZoom = state;
@@ -5341,11 +5164,6 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 			duration: parseInt(duration)
 		});
 	}
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND)
-	{
-		this.wwd.goToAnimator.travelTime = duration * 1000;
-		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude)));
-	}
 	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
 	{
 		this.magoWorld.goto(parseFloat(longitude),
@@ -5401,12 +5219,6 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
 		var seconds = 3;
 		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, seconds);
-	}
-	else if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-	{
-		var geographicCoord = buildingSeed.geographicCoordOfBBox;
-		this.wwd.goToAnimator.travelTime = 3000;
-		this.wwd.goTo(new WorldWind.Position(geographicCoord.latitude, geographicCoord.longitude, geographicCoord.altitude + 1000));
 	}
 };
 
@@ -6286,11 +6098,7 @@ MagoManager.prototype.callAPI = function(api)
 
 			this.cameraFPV.init();
 
-			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-			{
-				;
-			}
-			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			 if (this.configInformation.geo_view_library === Constant.CESIUM)
 			{
 				var scratchLookAtMatrix4 = new Cesium.Matrix4();
 				var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
@@ -6324,11 +6132,7 @@ MagoManager.prototype.callAPI = function(api)
 		else 
 		{
 			if (this.cameraFPV._cameraBAK === undefined)	{ return; }
-			if (this.configInformation.geo_view_library === Constant.WORLDWIND)
-			{
-				;
-			}
-			else if (this.configInformation.geo_view_library === Constant.CESIUM)
+			if (this.configInformation.geo_view_library === Constant.CESIUM)
 			{
 				this.scene.camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene.camera);
 			}
