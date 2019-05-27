@@ -308,7 +308,7 @@ Point3DList.prototype.makeVbo = function(magoManager)
  * @param shader 
  * @param renderType
  * @param bLoop 
- * @param bEnableDepth 
+ * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
  */
 Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
