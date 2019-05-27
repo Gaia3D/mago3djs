@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 선
+ * This represents a line which can be shown as linear equation
  * @class Line
  */
 var Line = function(point, direction) 
@@ -24,13 +24,13 @@ var Line = function(point, direction)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
- * @param dx 변수
- * @param dy 변수
- * @param dz 변수
+ * Set a point and a direction of a linear equation
+ * @param px 변수 the value of x coordi of the point
+ * @param py 변수 the value of y coordi of the point
+ * @param pz 변수 the value of z coordi of the point
+ * @param dx 변수 the value of x coordi of the point which represents direction
+ * @param dy 변수 the value of y coordi of the point which represents direction
+ * @param dz 변수 the value of z coordi of the point which represents direction
  */
 Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz) 
 {
@@ -40,8 +40,10 @@ Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * get the point which is projected as 2d plane(the plane which is represented by using x,y axis)
+ * @param point the target point 
+ * @param projectedPoint the projected point of the target point
+ * @return projetedPoint
  */
 Line.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
@@ -56,8 +58,10 @@ Line.prototype.getProjectedPoint = function(point, projectedPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Check whether the given point is on this line or not
+ * @param {Point3D} point the given point
+ * @param {Number} error the error rate which can be handdled
+ * @return {Boolean} 
  */
 Line.prototype.isCoincidentPoint = function(point, error) 
 {

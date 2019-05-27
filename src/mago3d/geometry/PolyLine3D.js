@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This is similar with Point23List, but this one represents real polyline geometry feature.
  * @class PolyLine3D
  */
 var PolyLine3D = function() 
@@ -18,7 +18,10 @@ var PolyLine3D = function()
 
 /**
  * Creates a new Point3D.
- * @class PolyLine3D
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ * @return point3d
  */
 PolyLine3D.prototype.newPoint3d = function(x, y, z)
 {
@@ -31,7 +34,8 @@ PolyLine3D.prototype.newPoint3d = function(x, y, z)
 };
 
 /**
- * @class PolyLine3D
+ * Add a list of Point3D at the last of this.pointsArray
+ * @param point3dArray the point that will be pushed at this.pointsArray
  */
 PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 {
@@ -45,7 +49,8 @@ PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 };
 
 /**
- * @class PolyLine3D
+ * Return the coordinate contained at geoLocDataManager
+ * @return geoLoc
  */
 PolyLine3D.prototype.getGeographicLocation = function()
 {
@@ -62,7 +67,8 @@ PolyLine3D.prototype.getGeographicLocation = function()
 };
 
 /**
- * @class PolyLine3D
+ * Make the vbo of this point3DList
+ * @param magoManager
  */
 PolyLine3D.prototype.makeVbo = function(magoManager)
 {
@@ -86,7 +92,12 @@ PolyLine3D.prototype.makeVbo = function(magoManager)
 };
 
 /**
- * @class PolyLine3D
+ * Render this point3dlist using vbo of this list. 
+ * @param magoManager
+ * @param shader 
+ * @param renderType
+ * @param bLoop 
+ * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
  */
 PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
