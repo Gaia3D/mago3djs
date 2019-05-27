@@ -38,7 +38,7 @@ Point2D.prototype.setAssociated = function(associated)
 {
 	// aux test.***
 	this.associated.x = associated.x;
-	this.associated.y = associated.y;''
+	this.associated.y = associated.y;
 };
 
 /**
