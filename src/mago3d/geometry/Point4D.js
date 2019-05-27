@@ -3,6 +3,10 @@
 /**
  * 4차원 정보
  * @class Point4D
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ * @param {Number} w
  */
 var Point4D = function(x, y, z, w) 
 {
