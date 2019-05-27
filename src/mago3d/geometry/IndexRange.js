@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * index range. consist of two index. start and end.
+ * index range. consist of two vertex index. start and end.
+ * 특정 geometry의 시작vertex와 끝vertex의 index를 저장
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class IndexRange
