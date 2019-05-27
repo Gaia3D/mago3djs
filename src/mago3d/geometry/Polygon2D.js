@@ -11,7 +11,7 @@ var Polygon2D = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// This is a 2D polygon.***
-	this.point2dList;
+	this.point2dList; // the border of this feature
 	this.normal; // Polygon2D sense. (normal = 1) -> CCW. (normal = -1) -> CW.***
 	this.convexPolygonsArray; // tessellation result.***
 	this.bRect; // boundary rectangle.***
@@ -36,7 +36,11 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 	resultBRect = this.point2dList.getBoundingRectangle(resultBRect);
 	return resultBRect;
 };
-
+/**
+ * get the direction of the specific line segment of the edge
+ * @param {Number} idx the index of the specific line segment
+ * @return direction	
+ */
 Polygon2D.prototype.getEdgeDirection = function(idx)
 {
 	// the direction is unitary vector.***
@@ -45,6 +49,11 @@ Polygon2D.prototype.getEdgeDirection = function(idx)
 	return direction;
 };
 
+/**
+ * get the vector of the specigic line segement of the edge
+ * @param {Number} index the index of the specific line segment
+ * @return vector
+ */
 Polygon2D.prototype.getEdgeVector = function(idx)
 {
 	var segment = this.point2dList.getSegment(idx);
@@ -52,12 +61,20 @@ Polygon2D.prototype.getEdgeVector = function(idx)
 	return vector;
 };
 
+/**
+ * reverse the direction sense of this polygon
+ */
 Polygon2D.prototype.reverseSense = function()
 {
 	if (this.point2dList !== undefined)
 	{ this.point2dList.reverse(); }
 };
 
+/**
+ * copy the information of the other polygon to this polygon
+ * @param {Polygon2D} resultCopyPolygon
+ * @return {Polygon2D} resultCopyPolygon
+ */
 Polygon2D.prototype.getCopy = function(resultCopyPolygon)
 {
 	if (this.point2dList === undefined)
@@ -78,6 +95,11 @@ Polygon2D.prototype.getCopy = function(resultCopyPolygon)
 	return resultCopyPolygon;
 };
 
+/**
+ * Calculate the normal vector of this polygon
+ * @param resultConcavePointsIdxArray save the index of the points which make concave at the border
+ * @return resultFConcavePointsIdxArray the list of the index which make concave at the border
+ */
 Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
 	// must check if the verticesCount is 3. Then is a convex polygon.***
@@ -135,13 +157,16 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 	return resultConcavePointsIdxArray;
 };
 
-
+/**
+ * Make the tessellate of the triangles which originally make up single Polygon2D feature (like a patchwork with triangle)
+ * To call this function, before must call "calculateNormal" that returns "concaveVerticesIndices"
+ * In 2D, "normal" is -1=(cw) or 1=(ccw).
+ * @param concaveVerticesIndices the index of the points which make concave
+ * @param convexPolygonsArray the index of the points which make convex
+ */
 Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
 {
-	// Note: to call this function, before must call "calculateNormal" that returns "concaveVerticesIndices".***
-	// Note: in 2D, "normal" is -1=(cw) or 1=(ccw).***
-	//----------------------------------------------------------------------------------------------------------
-	
+
 	var concaveVerticesCount = concaveVerticesIndices.length;
 	
 	if (concaveVerticesCount === 0)
@@ -238,11 +263,12 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 	
 	return convexPolygonsArray;
 };
-
+/**
+ * Check whether the given segment cut a polygon edges or is coincident with a polygon's vertex 
+ * @param segment the target segement
+ * */
 Polygon2D.prototype.intersectionWithSegment = function(segment)
 {
-	// "segment" cut a polygons edge.***
-	// "segment" coincident with a polygons vertex.***
 	if (this.bRect !== undefined)
 	{
 		// if exist boundary rectangle, check bRect intersection.***
@@ -275,6 +301,12 @@ Polygon2D.prototype.intersectionWithSegment = function(segment)
 	return false;
 };
 
+/**
+ * Split single polygon as 2 polygons regarding of points of idx1, idx2
+ * @param idx1 the index of the first point
+ * @param idx2 the index of the second point
+ * @param resultSplittedPolygonsArray the list of the created polygons by splitting
+ */
 Polygon2D.prototype.splitPolygon = function(idx1, idx2, resultSplittedPolygonsArray)
 {
 	if (resultSplittedPolygonsArray === undefined)
@@ -355,6 +387,11 @@ Polygon2D.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultS
 	return resultSortedPointsIdxArray;
 };
 
+/**
+ * Make the list of triangles at the convex polygon
+ * @param resultTrianglesArray the list of triangles made from the polygon
+ * @return resultTrianglesArray
+ */
 Polygon2D.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 {
 	// PROVISIONAL.***
@@ -384,7 +421,10 @@ Polygon2D.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 	
 	return resultTrianglesArray;
 };
-
+/**
+ * @TODO : need to refactoring both of this function. 
+ * 
+ */
 Polygon2D.prototype.getVbo = function(resultVbo)
 {
 	// PROVISIONAL.***
@@ -433,7 +473,10 @@ Polygon2D.prototype.getVbo = function(resultVbo)
 
 	return resultVbo;
 };
-
+/**
+ * @TODO : need to refactoring both of this function. 
+ * 
+ */
 Polygon2D.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
 {
 	// PROVISIONAL.***
