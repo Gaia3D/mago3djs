@@ -42421,7 +42421,7 @@ Profile.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesData)
 			}
 			else 
 			{
-				ringIdxInList = this.innerRingsList.getRingIdx(currRing);
+				ringIdxInList = this.innerRingsList.getRingIndex(currRing);
 			}
 			indexData.ownerIdx = ringIdxInList;
 			convexDatas.push(indexData);
@@ -43463,7 +43463,7 @@ RingsList.prototype.getRingsCount = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-RingsList.prototype.getRingIdx = function(ring) 
+RingsList.prototype.getRingIndex = function(ring) 
 {
 	if (ring === undefined)
 	{ return undefined; }
