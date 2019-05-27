@@ -1,6 +1,6 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
+* Contain the list of the features of Point3D
 * @class Point3DList
 */
 var Point3DList = function(points3dArray) 
@@ -14,12 +14,14 @@ var Point3DList = function(points3dArray)
 	if (points3dArray !== undefined)
 	{ this.pointsArray = points3dArray; }
 	
-	this.bLoop;
+	this.bLoop; //check whether this Point3DList represents just LineString or Ring
 	
-	this.geoLocDataManager;
-	this.vboKeysContainer;
+	this.geoLocDataManager;//This contains the information to change this point to Absolute CRS
+	this.vboKeysContainer;//This saves the key which GPU returns to VBO
 };
-
+/**
+ * Clear the properties of this feature
+ */
 Point3DList.prototype.deleteObjects = function(magoManager)
 {
 	this.deletePoints3d();
@@ -32,6 +34,9 @@ Point3DList.prototype.deleteObjects = function(magoManager)
 	}
 };
 
+/**
+ * Clear vboKeysContainer
+*/
 Point3DList.prototype.deleteVboKeysContainer = function(magoManager)
 {
 	if (this.vboKeysContainer !== undefined)
@@ -41,7 +46,9 @@ Point3DList.prototype.deleteVboKeysContainer = function(magoManager)
 		this.vboKeysContainer = undefined;
 	}
 };
-
+/**
+ * Clear this.pointsArray of this feature
+ */
 Point3DList.prototype.deletePoints3d = function()
 {
 	if (this.pointsArray === undefined)
@@ -55,7 +62,10 @@ Point3DList.prototype.deletePoints3d = function()
 	}
 	this.pointsArray = undefined;
 };
-
+/**
+ * Add a feature of Point3D at the last of this.pointsArray
+ * @param {Point3D} point3d the point that will be pushed at this.pointsArray
+ */
 Point3DList.prototype.addPoint = function(point3d)
 {
 	if (point3d === undefined)
@@ -66,7 +76,10 @@ Point3DList.prototype.addPoint = function(point3d)
 
 	this.pointsArray.push(point3d);
 };
-
+/**
+ * Return the coordinate contained at geoLocDataManager
+ * @return geoLoc
+ */
 Point3DList.prototype.getGeographicLocation = function()
 {
 	if (this.geoLocDataManager === undefined)
@@ -80,7 +93,10 @@ Point3DList.prototype.getGeographicLocation = function()
 	
 	return geoLoc;
 };
-
+/**
+ * Add a list of Point3D at the last of this.pointsArray
+ * @param point3dArray the point that will be pushed at this.pointsArray
+ */
 Point3DList.prototype.addPoint3dArray = function(points3dArray)
 {
 	if (this.pointsArray === undefined)
@@ -88,7 +104,13 @@ Point3DList.prototype.addPoint3dArray = function(points3dArray)
 
 	this.pointsArray.push.apply(this.pointsArray, points3dArray);
 };
-
+/**
+ * Create a new feature of Point3D
+ * @param {Number} x the x coordi of the point
+ * @param {Number} y the y coordi of the point
+ * @param {Number} z the z coordi of the point
+ * @return {Point3D} return the created point
+ */
 Point3DList.prototype.newPoint = function(x, y, z)
 {
 	if (this.pointsArray === undefined)
@@ -98,12 +120,19 @@ Point3DList.prototype.newPoint = function(x, y, z)
 	this.pointsArray.push(point);
 	return point;
 };
-
+/**
+ * Search and return the specific feature of Point2D with the index that has at this.pointArray
+ * @param {Number} idx the index of the target point at this.pointArray
+ * 
+ */
 Point3DList.prototype.getPoint = function(idx)
 {
 	return this.pointsArray[idx];
 };
-
+/**
+ * Return the length of this.pointArray
+ * @return {Number}
+ */
 Point3DList.prototype.getPointsCount = function()
 {
 	if (this.pointsArray === undefined)
@@ -112,6 +141,12 @@ Point3DList.prototype.getPointsCount = function()
 	return this.pointsArray.length;
 };
 
+/**
+ * This function is used when this feature is a point3DRing.
+ * Return the previous index of the given index.
+ * @param {Number} idx the target index
+ * @return {Number} prevIdx
+ */
 Point3DList.prototype.getPrevIdx = function(idx)
 {
 	// Note: This function is used when this is a point3dLoop.***
@@ -125,10 +160,14 @@ Point3DList.prototype.getPrevIdx = function(idx)
 
 	return prevIdx;
 };
-
+/**
+ * This function is used when this is a point3dLoop.
+ * @param {Number} idx the index of the target point at this.pointArray
+  * @return {Number} prevIdx
+ */
 Point3DList.prototype.getNextIdx = function(idx)
 {
-	// Note: This function is used when this is a point3dLoop.***
+	
 	var pointsCount = this.pointsArray.length;
 	var nextIdx;
 	
@@ -140,6 +179,13 @@ Point3DList.prototype.getNextIdx = function(idx)
 	return nextIdx;
 };
 
+/**
+ * get the segement with the index of the segment
+ * @param {Number} idx the index of start point of segment
+ * @param {Segment3D} resultSegment the segement which will store the result segment
+ * @return {Segment3D} resultSegment 
+ * 
+ */
 Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)
 {
 	// If "bLoop" = true, then this points3dList is a loop.***
@@ -165,12 +211,17 @@ Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)
 	
 	return resultSegment3d;
 };
-
+/**
+ * This function returns a plane that has the same angle with the 2 segments of a point(idx).
+ * If "bLoop" = true, then this points3dList is a loop.
+ * If "bLoop" = false, then this points3dList is a string.
+ * @param idx index of the point3D which will define bisection plane
+ * @param resultBisectionPlane
+ * @param bLoop save the information whether this point3DList is ring or not
+ * @result resultBisectionPlane a plane that has the same angle with the 2 segments of a point
+ */
 Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bLoop)
 {
-	// This function returns a plane that has the same angle with the 2 segments of a point(idx).***
-	// If "bLoop" = true, then this points3dList is a loop.***
-	// If "bLoop" = false, then this points3dList is a string.***
 	if (bLoop === undefined)
 	{ bLoop = false; }
 	
@@ -225,6 +276,11 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	return resultBisectionPlane;
 };
 
+
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
 Point3DList.prototype.makeVbo = function(magoManager)
 {
 	if (this.vboKeysContainer === undefined)
@@ -246,6 +302,14 @@ Point3DList.prototype.makeVbo = function(magoManager)
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
 };
 
+/**
+ * Render this point3dlist using vbo of this list. 
+ * @param magoManager
+ * @param shader 
+ * @param renderType
+ * @param bLoop 
+ * @param bEnableDepth 
+ */
 Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
 	if (this.pointsArray === undefined)
