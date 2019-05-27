@@ -417,8 +417,6 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		}
 		
 	}
-	//else
-	//	var hola = 0;
 };
 
 /**
@@ -510,7 +508,6 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
 		node = nodeSeedsArray[i];
-		
 		if (this.intersectsNode(node))
 		{
 			nodeSeedsArray.splice(i, 1);

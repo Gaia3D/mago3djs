@@ -15,15 +15,14 @@ var Point2D = function(x, y)
 	if (y) { this.y = y; }
 	else { this.y = 0.0; }
 	
-	this.ownerVertex3d; // Aux var.***
+	this.ownerVertex3d; // Aux var.*** This will be used for this : this Point2D is the projected ownerVertex3d into 2D
 	
-	// aux test.***
+	/**associated this property will be used to save topologic information */
 	this.associated;
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * delete the value of x and y coordi
  */
 Point2D.prototype.deleteObjects = function() 
 {
@@ -32,28 +31,29 @@ Point2D.prototype.deleteObjects = function()
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * set the value of the property 'associated'
+ * @param {Point2D} associated
  */
 Point2D.prototype.setAssociated = function(associated) 
 {
 	// aux test.***
-	this.associated = associated;
+	this.associated.x = associated.x;
+	this.associated.y = associated.y;
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * get the value of the property 'associated'
+ * @return {Point2D} this.associated
  */
 Point2D.prototype.getAssociated = function() 
 {
 	// aux test.***
-	return this.associated;
+	return this.associated;	
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * copy the value of other point
+ * @param {Point2D} point2d
  */
 Point2D.prototype.copyFrom = function(point2d) 
 {
@@ -62,8 +62,7 @@ Point2D.prototype.copyFrom = function(point2d)
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * change the sign of the values of point inversely
  */
 Point2D.prototype.inverse = function() 
 {
@@ -72,8 +71,9 @@ Point2D.prototype.inverse = function()
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * set the value of x,y coordi of the point
+ * @param {Number} x
+ * @param {Number} y
  */
 Point2D.prototype.set = function(x, y) 
 {
@@ -82,8 +82,8 @@ Point2D.prototype.set = function(x, y)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns this.x*this.x + this.y*this.y + this.z*this.z;
+ * return the result of calculating (this.x*this.x + this.y*this.y) 
+ * @returns this.x*this.x + this.y*this.y;
  */
 Point2D.prototype.getSquaredModul = function() 
 {
@@ -91,8 +91,8 @@ Point2D.prototype.getSquaredModul = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
+ * return the result of calculating Math.sqrt(this.x*this.x + this.y*this.y);
+ * @returns Math.sqrt(this.x*this.x + this.y*this.y);
  */
 Point2D.prototype.getModul = function() 
 {
@@ -101,7 +101,7 @@ Point2D.prototype.getModul = function()
 
 /**
  * 
- * 어떤 일을 하고 있습니까?
+ * make unitary of the point
  */
 Point2D.prototype.unitary = function() 
 {
@@ -111,9 +111,9 @@ Point2D.prototype.unitary = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @returns dx*dx + dy*dy + dz*dz
+ * prepare to calculate the Euclidean distance between this point and the other point.
+ * @param {Number} point
+ * @returns dx*dx + dy*dy
  */
 Point2D.prototype.squareDistToPoint = function(point) 
 {
@@ -124,11 +124,9 @@ Point2D.prototype.squareDistToPoint = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
- * @returns dx*dx + dy*dy + dz*dz
+ * calculate the Euclidean distance between this point and the other point.
+ * @param {Point2D} point the target
+ * @returns the calculated Euclidan distance
  */
 Point2D.prototype.distToPoint = function(point) 
 {
@@ -136,11 +134,10 @@ Point2D.prototype.distToPoint = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
- * @returns dx*dx + dy*dy + dz*dz
+ * Check whether this point and the other point are overlapped(coincident) or not 
+ * @param {Point2D} point the point which will be checked whether the two points are coincident or not
+ * @param {Number} errorDist allowed error range value of calculating distance
+ * @returns {boolean} the flag which let us know whether they are coincident or not 
  */
 Point2D.prototype.isCoincidentToPoint = function(point, errorDist) 
 {
@@ -155,14 +152,12 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
+ * @param {Point2D} targetPoint this returns a vector that points to "targetPoint" from "this" 
+ * @param resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
+ * @returns resultVector
  */
 Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
 {
-	// this returns a vector that points to "targetPoint" from "this".***
-	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.***
 	if (targetPoint === undefined)
 	{ return undefined; }
 	
@@ -175,10 +170,9 @@ Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate vector product
+ * @param {Point2D} point the point which will be used at this calculate.
+ * @returns {Number} calculated result
  */
 Point2D.prototype.crossProduct = function(point) 
 {
@@ -186,10 +180,9 @@ Point2D.prototype.crossProduct = function(point)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate scalar production of vector
+ * @param {Point2D} point the point which will be used at this calculate.
+ * @returns {Number} calculated result
  */
 Point2D.prototype.scalarProduct = function(point) 
 {
@@ -198,8 +191,9 @@ Point2D.prototype.scalarProduct = function(point)
 };
 
 /**
- * nomal 계산
- * @param vector 변수
+ * Calculate the radian value of the angle of the two vectors
+ * @param vector the target vector
+ * @return the angle of two vector
  */
 Point2D.prototype.angleRadToVector = function(vector) 
 {
@@ -224,7 +218,7 @@ Point2D.prototype.angleRadToVector = function(vector)
 };
 
 /**
- * nomal 계산
+ * Calculate the degree value of the angle of the two vectors
  * @param point 변수
  * @param resultPoint 변수
  * @returns resultPoint

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * F4D MetaData 클래스
+ * F4D MetaData class.
  * 
  * @alias MetaData
  * @class MetaData
