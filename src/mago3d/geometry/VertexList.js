@@ -2,7 +2,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Vertex List (Array of Vetex)
+ * @see Vertex
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class VertexList
  */
 var VertexList = function() 
@@ -12,9 +16,20 @@ var VertexList = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * vertex list.
+	 * @type {Array.<Vertex>}
+	 */
 	this.vertexArray = [];
 };
 
+/**
+ * get previus index of vertexArray
+ * @static
+ * @param {Number} idx index must bigger than 0, less than vertexArray length.
+ * @param {Array.<Vertex>} vertexArray
+ * @return {Number} prevIdx. if idx is 0, return vertexArray.length - 1.
+ */
 VertexList.getPrevIdx = function(idx, vertexArray)
 {
 	var verticesCount = vertexArray.length;
@@ -32,6 +47,13 @@ VertexList.getPrevIdx = function(idx, vertexArray)
 	return prevIdx;
 };
 
+/**
+ * get next index of vertexArray
+ * @static
+ * @param {Number} idx index must bigger than 0, less than vertexArray length.
+ * @param {Array.<Vertex>} vertexArray
+ * @return {Number} nextIdx. if idx is equal vertexArray.length - 1, return 0.
+ */
 VertexList.getNextIdx = function(idx, vertexArray)
 {
 	var verticesCount = vertexArray.length;
@@ -49,6 +71,14 @@ VertexList.getNextIdx = function(idx, vertexArray)
 	return nextIdx;
 };
 
+/**
+ * get vertex segment. This segment is consist of indexed vertex and next vertex
+ * @static
+ * @param {Number} idx index
+ * @param {Array.<Vertex>} vertexArray
+ * @param {VtxSegment} resultVtxSegment if resultVtxSegment is undefined, resultVtxSegment set new VtxSegemnt instance.
+ * @return {VtxSegment} resultVtxSegment
+ */
 VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
 {
 	var currVertex = vertexArray[idx];
@@ -65,6 +95,14 @@ VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
 	return resultVtxSegment;
 };
 
+/**
+ * get vertex vector. This vector is consist of indexed vertex and next vertex
+ * @static
+ * @param {Number} idx index
+ * @param {Array.<Vertex>} vertexArray
+ * @param {Point3D} resultVector if resultVector is undefined, resultVector set new Point3D instance.
+ * @return {Point3D} resultVector
+ */
 VertexList.getVector = function(idx, vertexArray, resultVector)
 {
 	var currVertex = vertexArray[idx];
@@ -84,6 +122,14 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
 	return resultVector;
 };
 
+/**
+ * get vertex direction. vertex vector's unitary.
+ * @static
+ * @param {Number} idx index
+ * @param {Array.<Vertex>} vertexArray
+ * @param {Point3D} resultDir point3d unitary.
+ * @return {Point3D} 
+ */
 VertexList.getDirection = function(idx, vertexArray, resultDir)
 {
 	resultDir = VertexList.getVector(idx, vertexArray, resultDir);
@@ -91,6 +137,15 @@ VertexList.getDirection = function(idx, vertexArray, resultDir)
 	return resultDir;
 };
 
+/**
+ * get crossproduct. This crossproduct is consist of indexed vertex and prev vertex
+ * @deprecated
+ * @static
+ * @param {Number} idx index
+ * @param {Array.<Vertex>} vertexArray
+ * @param {Point3D} resultCrossProduct
+ * @return {Point3D} 
+ */
 VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 {
 	var currVector = VertexList.getVector(idx, vertexArray, undefined);
@@ -101,6 +156,17 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 	return resultCrossProduct;
 };
 
+/**
+ * get vertex list. this vertex is projected onto plane. 
+ * @static
+ * @param {Array.<Vertex>} vertexArray if vertexArray is undefined, return resultVertexList
+ * @param {Plane} plane. 
+ * @param {Point3D} projectionDirection projectionDirection must be unitary.
+ * @param {VertexList} resultVertexList if resultVertexList is undefined, resultVector set new VertexList instance.
+ * @return {VertexList} 
+ * 
+ * @see Vertex#getProjectedOntoPlane
+ */
 VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirection, resultVertexList)
 {
 	if (vertexList === undefined)
@@ -121,6 +187,14 @@ VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirecti
 	return resultVertexList;
 };
 
+/**
+ * get projected point(2d) list.
+ * @static
+ * @param {Array.<Vertex>} vertexArray if vertexArray is undefined, return resultPoints2dArray
+ * @param {Point3D} normal. 
+ * @param {Array.<Point2D>} resultPoints2dArray array.
+ * @return {Array.<Point2D>} resultPoints2dArray
+ */
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
 	// This function projects the vertices on to planes xy, yz or xz.***
@@ -188,8 +262,7 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * delete all vertex.
  */
 VertexList.prototype.deleteObjects = function() 
 {
@@ -202,8 +275,8 @@ VertexList.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * Copy vertex list from another vertexList.
+ * @param {VertexList} vertexList
  */
 VertexList.prototype.copyFrom = function(vertexList) 
 {
@@ -223,8 +296,8 @@ VertexList.prototype.copyFrom = function(vertexList)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * Copy vertex list from point3d array
+ * @param {Array.<Point3D>} point3dArray Required.
  */
 VertexList.prototype.copyFromPoint3DArray = function(point3dArray) 
 {
@@ -251,8 +324,9 @@ VertexList.prototype.copyFromPoint3DArray = function(point3dArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * Copy vertex list from point2d array and z coordinate.
+ * @param {Point2DList} point2dArray.
+ * @param {Number} z default is 0.
  */
 VertexList.prototype.copyFromPoint2DList = function(point2dList, z) 
 {
@@ -278,8 +352,10 @@ VertexList.prototype.copyFromPoint2DList = function(point2dList, z)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * set normal
+ * @param {Number} nx
+ * @param {Number} ny
+ * @param {Number} nz
  */
 VertexList.prototype.setNormal = function(nx, ny, nz) 
 {
@@ -293,8 +369,8 @@ VertexList.prototype.setNormal = function(nx, ny, nz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertex
+ * add vertex and return.
+ * @return {Vertex}
  */
 VertexList.prototype.newVertex = function() 
 {
@@ -304,9 +380,9 @@ VertexList.prototype.newVertex = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * get vertex
+ * @param {Number} idx
+ * @returns {Vertex}
  */
 VertexList.prototype.getVertex = function(idx) 
 {
@@ -314,24 +390,40 @@ VertexList.prototype.getVertex = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexArray.length
+ * get vertex list lench
+ * @returns {Number}
  */
 VertexList.prototype.getVertexCount = function() 
 {
 	return this.vertexArray.length;
 };
 
+/**
+ * get previus index
+ * @param {Number} idx
+ * @returns {Number} prev index
+ */
 VertexList.prototype.getPrevIdx = function(idx)
 {
 	return VertexList.getPrevIdx(idx, this.vertexArray);
 };
 
+/**
+ * get next index
+ * @param {Number} idx
+ * @returns {Number} next index
+ */
 VertexList.prototype.getNextIdx = function(idx)
 {
 	return VertexList.getNextIdx(idx, this.vertexArray);
 };
 
+/**
+ * get index of vertex in list
+ * @deprecated not use.
+ * @param {Vertex}
+ * @returns {Number} index
+ */
 VertexList.prototype.getIdxOfVertex = function(vertex)
 {
 	var verticesCount = this.vertexArray.length;
@@ -351,17 +443,23 @@ VertexList.prototype.getIdxOfVertex = function(vertex)
 	return idx;
 };
 
+/**
+ * get vertex segment
+ * @deprecated not use.
+ * @param {Number} idx
+ * @param {VtxSegment}
+ * @returns {VtxSegment}
+ */
 VertexList.prototype.getVtxSegment = function(idx, resultVtxSegment)
 {
 	return VertexList.getVtxSegment(idx, this.vertexArray, resultVtxSegment);
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param dirX 변수
- * @param dirY 변수
- * @param dirZ 변수
- * @param distance 변수
+ * translate vertex
+ * @param {Number} dx
+ * @param {Number} dy
+ * @param {Number} dz
  */
 VertexList.prototype.translateVertices = function(dx, dy, dz) 
 {
@@ -372,9 +470,9 @@ VertexList.prototype.translateVertices = function(dx, dy, dz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultBox 변수
- * @returns resultBox
+ * get bounding box of vertex list.
+ * @param {BoundingBox} resultBox if this is undefined, set new BoundingBox instance.
+ * @returns {BoundingBox} resultBox
  */
 VertexList.prototype.getBoundingBox = function(resultBox) 
 {
@@ -389,8 +487,9 @@ VertexList.prototype.getBoundingBox = function(resultBox)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param transformMatrix 변수
+ * vertex point transform by matrix4
+ * @param {Matrix4} transformMatrix
+ * @see Matrix4#transformPoint3D
  */
 VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix) 
 {
@@ -401,6 +500,9 @@ VertexList.prototype.transformPointsByMatrix4 = function(transformMatrix)
 	}
 };
 
+/**
+ * set vertex idxInList
+ */
 VertexList.prototype.setIdxInList = function()
 {
 	VertexList.setIdxInList(this.vertexArray);
@@ -412,6 +514,11 @@ VertexList.prototype.setIdxInList = function()
 	*/
 };
 
+/**
+ * set vertex idxInList
+ * @static
+ * @param {VertexList} Required.
+ */
 VertexList.setIdxInList = function(vertexArray)
 {
 	if (vertexArray === undefined)
@@ -424,8 +531,13 @@ VertexList.setIdxInList = function(vertexArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param transformMatrix 변수
+ * get vbo vertex index cache key. not use.
+ * @deprecated only used static method.
+ * @param {VBOVertexIdxCacheKey} resultVbo.
+ * @param {VBOMemoryManager} vboMemManager.
+ * @return {VBOVertexIdxCacheKey}
+ * 
+ * @see VertexList#getVboDataArrays
  */
 VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager) 
 {
@@ -434,8 +546,14 @@ VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param transformMatrix 변수
+ * get vbo vertex index cache key. for set VboBuffer data
+ * @static
+ * @param {VertexList} vertexArray if this length 0, return argument resultVbo.
+ * @param {VBOVertexIdxCacheKey} resultVbo. if this is undefined, set new VBOVertexIdxCacheKey Instance.
+ * @param {VBOMemoryManager} vboMemManager.
+ * @return {VBOVertexIdxCacheKey}
+ * 
+ * @see VBOManager
  */
 VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager) 
 {
@@ -549,41 +667,3 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 
 	return resultVbo;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

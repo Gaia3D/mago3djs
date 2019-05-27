@@ -1,8 +1,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * vertex ring.
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class VtxRing
+ * 
  */
 var VtxRing = function() 
 {
@@ -11,10 +14,22 @@ var VtxRing = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * vertex list
+	 * @type {VertexList}
+	 */
 	this.vertexList;
-	this.elemsIndexRangesArray; // [] array.***
+
+	/**
+	 * indexRange array
+	 * @type {Array.<IndexRange>}
+	 */
+	this.elemsIndexRangesArray;
 };
 
+/**
+ * delete all vertex and element index ranges.
+ */
 VtxRing.prototype.deleteObjects = function()
 {
 	if (this.vertexList !== undefined)
@@ -29,6 +44,9 @@ VtxRing.prototype.deleteObjects = function()
 	}
 };
 
+/**
+ * delete all element index ranges.
+ */
 VtxRing.prototype.deleteElementIndexRanges = function()
 {
 	if (this.elemsIndexRangesArray === undefined)
@@ -44,6 +62,10 @@ VtxRing.prototype.deleteElementIndexRanges = function()
 	this.elemsIndexRangesArray = undefined;
 };
 
+/**
+ * add new index range and return.
+ * @return {IndexRange}
+ */
 VtxRing.prototype.newElementIndexRange = function()
 {
 	if (this.elemsIndexRangesArray === undefined)
@@ -54,6 +76,11 @@ VtxRing.prototype.newElementIndexRange = function()
 	return indexRange;
 };
 
+/**
+ * get IndexRange
+ * @param {number}
+ * @return {IndexRange|undefined}
+ */
 VtxRing.prototype.getElementIndexRange = function(idx)
 {
 	if (this.elemsIndexRangesArray === undefined)
@@ -62,6 +89,11 @@ VtxRing.prototype.getElementIndexRange = function(idx)
 	return this.elemsIndexRangesArray[idx];
 };
 
+/**
+ * get all vertex. 
+ * @param {Array} resultVerticesArray
+ * @return {Array.<Vertex>|undefined} if this.vertexList is undefined or this.vertexList.vertexArray is undefined, return resultVerticesArray.
+ */
 VtxRing.prototype.getAllVertices = function(resultVerticesArray)
 {
 	if (this.vertexList === undefined || this.vertexList.vertexArray === undefined)
@@ -75,6 +107,10 @@ VtxRing.prototype.getAllVertices = function(resultVerticesArray)
 	return resultVerticesArray;
 };
 
+/**
+ * vertex ring copy from another vertex ring.
+ * @param {VtxRing} vtxRing
+ */
 VtxRing.prototype.copyFrom = function(vtxRing)
 {
 	if (vtxRing.vertexList !== undefined)
@@ -101,6 +137,13 @@ VtxRing.prototype.copyFrom = function(vtxRing)
 	}
 };
 
+/**
+ * vertex point translate.
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ * @see Point3D#add
+ */
 VtxRing.prototype.translate = function(x, y, z)
 {
 	if (this.vertexList !== undefined)
@@ -109,6 +152,11 @@ VtxRing.prototype.translate = function(x, y, z)
 	}
 };
 
+/**
+ * vertex point transform by matrix4
+ * @param {Matrix4} tMat4
+ * @see Matrix4#transformPoint3D
+ */
 VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
 {
 	if (this.vertexList !== undefined)
@@ -117,6 +165,14 @@ VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
 	}
 };
 
+/**
+ * get projected poly line. this line based ring2d.
+ * @param {Ring2D|undefined} resultRing2d if undefined, set new Ring2D instance.
+ * @param {Point3D} normal
+ * @return {Ring2D}
+ * 
+ * @see VertexList#getProjectedPoints2DArray
+ */
 VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, normal)
 {
 	// This function returns a ring2d made by polylines2d.***
@@ -135,6 +191,12 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
 	return resultRing2d;
 };
 
+/**
+ * use point3d array, set VtxRing's vertex list and indexrange.
+ * @param {Array.<Point3D>} point3dArray Required.
+ * 
+ * @see VertexList#copyFromPoint3DArray
+ */
 VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 {
 	if (point3dArray === undefined)
@@ -147,6 +209,12 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 	this.calculateElementsIndicesRange();
 };
 
+/**
+ * use point3d array, update VtxRing's vertex list.
+ * @param {Array.<Point3D>} point3dArray Required.
+ * 
+ * @see VertexList#copyFromPoint3DArray
+ */
 VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 {
 	// Note: point3dCount must be equal to this.verticesCount.***
@@ -179,6 +247,12 @@ VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 	//this.calculateElementsIndicesRange();
 };
 
+/**
+ * use point2d array, update VtxRing's vertex list and indexrange.
+ * @param {Point2DList} point2dArray Required.
+ * @param {number} z altitude. default is zero.
+ * @see VertexList#copyFromPoint3DArray
+ */
 VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 {
 	if (point2dList === undefined)
@@ -194,13 +268,22 @@ VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 	this.calculateElementsIndicesRange();
 };
 
+/**
+ * calculate plane normal.
+ * Note: this ring must be planar (or almost planar).***
+ * @param {Point3D} resultPlaneNormal not use.
+ * @return {Point3D} planeNormal
+ * @see Face#calculatePlaneNormal
+ */
 VtxRing.prototype.calculatePlaneNormal = function(resultPlaneNormal)
 {
-	// Note: this ring must be planar (or almost planar).***
 	var planeNormal = Face.calculatePlaneNormal(this.vertexList.vertexArray, undefined);
 	return planeNormal;
 };
 
+/**
+ * calculate elements indices range.
+ */
 VtxRing.prototype.calculateElementsIndicesRange = function()
 {
 	if (this.vertexList === undefined)
@@ -244,6 +327,15 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 	{ idxRange.endIdx = 0; }
 };
 
+/**
+ * get vertex intersected with plane. 
+ * @static
+ * @param {VtxRing} vtxRing if vtxRing's vertexList undefined, return resultVtxRing.
+ * @param {Plane} plane. 
+ * @param {Point3D} projectionDirection projectionDirection must be unitary.
+ * @param {VtxRing} resultVtxRing Optional. if undefined, set new VtxRing instance.
+ * @return {VtxRing} resultVertex
+ */
 VtxRing.getProjectedOntoPlane = function(vtxRing, plane, projectionDirection, resultVtxRing)
 {
 	if (vtxRing.vertexList === undefined)

@@ -1,7 +1,14 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
+* Vertex Profile List
+* @exception {Error} Messages.CONSTRUCT_ERROR
+
 * @class VtxProfilesList
+
+* @param {number} x not used
+* @param {number} y not used
+*
+* @see VtxProfile
 */
 var VtxProfilesList = function(x, y) 
 {
@@ -10,10 +17,24 @@ var VtxProfilesList = function(x, y)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * VtxProfile Array
+	 * @type {Array.<VtxProfile>}
+	 */
 	this.vtxProfilesArray;
+
+	
+	/**
+	 * convex index data array
+	 * @type {Array.<Array.<IndexData>>}
+	 */
 	this.convexFacesIndicesData;
 };
 
+
+/**
+ * delete vertex profile and convex array.
+ */
 VtxProfilesList.prototype.deleteObjects = function()
 {
 	if (this.vtxProfilesArray !== undefined)

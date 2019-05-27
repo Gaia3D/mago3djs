@@ -1,7 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * index range. consist of two index. start and end.
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class IndexRange
  */
 var IndexRange = function() 
@@ -10,10 +12,24 @@ var IndexRange = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	/**
+	 * start index
+	 * @type {Number}
+	 */
 	this.strIdx;
+
+	/**
+	 * last index
+	 * @type {Number}
+	 */
 	this.endIdx;
 };
 
+/**
+ * make indexRange copy from another indexRange.
+ * @param {IndexRange} indexRange 
+ */
 IndexRange.prototype.copyFrom = function(indexRange)
 {
 	if (indexRange === undefined)
@@ -23,6 +39,10 @@ IndexRange.prototype.copyFrom = function(indexRange)
 	this.endIdx = indexRange.endIdx;
 };
 
+/**
+ * indexRange init.
+ * all member set undifined;
+ */
 IndexRange.prototype.deleteObjects = function()
 {
 	this.strIdx = undefined;
