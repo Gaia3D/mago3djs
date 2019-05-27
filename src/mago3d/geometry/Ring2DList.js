@@ -1,28 +1,34 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
-* @class Rings2DList
-*/
-var Rings2DList = function() 
+ * Ring2D 의 리스트 {@link Ring2D}
+ */
+var Ring2DList = function() 
 {
-	if (!(this instanceof Rings2DList)) 
+	if (!(this instanceof Ring2DList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.ringsArray;
+	/**
+	 * 폴리곤 배열
+	 * @type {}
+	 */
+	this.ringsArray = [];
+
+	/**
+	 * 인덱스 리스트
+	 * @type {}
+	 */
 	this.idxInList;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * Ring2D 를 생성하고 배열에 추가한다.
+ * 
+ * @return {Ring2D} 생성된 Ring2D 의 객체
  */
-Rings2DList.prototype.newRing = function() 
+Ring2DList.prototype.newRing = function() 
 {
-	if (this.ringsArray === undefined)
-	{ this.ringsArray = []; }
-	
 	var ring = new Ring2D();
 	this.ringsArray.push(ring);
 	
@@ -30,53 +36,48 @@ Rings2DList.prototype.newRing = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * 주어진 Ring2D 를 배열에 추가한다.
+ * 
+ * @param {Ring2D} ring 추가할 Ring2D 객체
  */
-Rings2DList.prototype.addRing = function(ring) 
+Ring2DList.prototype.addRing = function(ring) 
 {
-	if (this.ringsArray === undefined)
-	{ this.ringsArray = []; }
-	
 	this.ringsArray.push(ring);
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * 생성된 객체가 있다면 삭제하고 초기화 한다.
  */
-Rings2DList.prototype.deleteObjects = function() 
+Ring2DList.prototype.deleteObjects = function() 
 {
-	if (this.ringsArray)
+	for (var i=0, len = this.ringsArray.length; i<len; i++)
 	{
-		var ringsCount = this.ringsArray.length;
-		for (var i=0; i<ringsCount; i++)
-		{
-			this.ringsArray[i].deleteObjects();
-			this.ringsArray[i] = undefined;
-		}
-		this.ringsArray = undefined;
+		this.ringsArray[i].deleteObjects();
+		this.ringsArray[i] = undefined;
 	}
+	this.ringsArray = [];
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * Ring2D 배열의 개수를 구한다.
+ * 
+ * @return {Number} 배열의 개수
  */
-Rings2DList.prototype.getRingsCount = function() 
+Ring2DList.prototype.getRingsCount = function() 
 {
-	if (this.ringsArray === undefined)
-	{ return 0; }
-
 	return this.ringsArray.length;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * 주어진 객체의 인덱스값을 찾는다.
+ * 
+ * @param {Ring2D} ring Ring2D 객체
+ * @return {Number} 인덱스값
  */
-Rings2DList.prototype.getRingIdx = function(ring) 
+Ring2DList.prototype.getRingIndex = function(ring) 
 {
+	return this.ringsArray.indexOf(ring);
+/*
 	if (ring === undefined)
 	{ return undefined; }
 
@@ -95,25 +96,26 @@ Rings2DList.prototype.getRingIdx = function(ring)
 	}
 	
 	return ringIdx;
+*/
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * 주어진 인덱스에 있는 Ring2D 객체를 가져온다.
+ * 
+ * @param {Number} index 가져올 Ring2D 객체의 인덱스값.
+ * @return {Ring2D} <code>index</code> 위치의 Ring2D 객체
+ * 
+ * @see Ring2DList#getRingsCount
  */
-Rings2DList.prototype.getRing = function(idx) 
+Ring2DList.prototype.getRing = function(index) 
 {
-	if (this.ringsArray === undefined)
-	{ return undefined; }
-
-	return this.ringsArray[idx];
+	return this.ringsArray[index];
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * 
  */
-Rings2DList.getBoundingRectangle = function(ringsArray, resultBRect) 
+Ring2DList.getBoundingRectangle = function(ringsArray, resultBRect) 
 {
 	if (this.resultBRect === undefined)
 	{ resultBRect = new BoundingRectangle(); }
@@ -143,7 +145,7 @@ Rings2DList.getBoundingRectangle = function(ringsArray, resultBRect)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Rings2DList.prototype.setIdxInList = function() 
+Ring2DList.prototype.setIdxInList = function() 
 {
 	var ringsCount = this.ringsArray.length;
 	for (var i=0; i<ringsCount; i++)
@@ -156,7 +158,7 @@ Rings2DList.prototype.setIdxInList = function()
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Rings2DList.prototype.intersectionWithSegment = function(segment) 
+Ring2DList.prototype.intersectionWithSegment = function(segment) 
 {
 	// returns true if any ring's polygon intersects with "segment".***
 	if (segment === undefined)
@@ -181,7 +183,7 @@ Rings2DList.prototype.intersectionWithSegment = function(segment)
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
-Rings2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
+Ring2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
 {
 	if (point === undefined)
 	{ return resultSortedObjectsArray; }
@@ -214,7 +216,7 @@ Rings2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSort
 		startIdx = 0;
 		endIdx = objectsAuxArray.length - 1;
 		
-		insertIdx = Rings2DList.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
+		insertIdx = Ring2DList.getIndexToInsertBySquaredDist(objectsAuxArray, objectAux, startIdx, endIdx);
 		objectsAuxArray.splice(insertIdx, 0, objectAux);
 	}
 	
@@ -236,7 +238,7 @@ Rings2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSort
  * 어떤 일을 하고 있습니까?
  * @returns result_idx
  */
-Rings2DList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
+Ring2DList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.

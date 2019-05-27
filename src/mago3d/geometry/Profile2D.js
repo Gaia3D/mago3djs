@@ -13,7 +13,7 @@ var Profile2D = function()
 	}
 
 	this.outerRing; // one Ring2D. 
-	this.innerRingsList; // class: Rings2DList. 
+	this.innerRingsList; // class: Ring2DList. 
 };
 
 /**
@@ -39,7 +39,7 @@ Profile2D.prototype.newOuterRing = function()
 Profile2D.prototype.newInnerRing = function() 
 {
 	if (this.innerRingsList === undefined)
-	{ this.innerRingsList = new Rings2DList(); }
+	{ this.innerRingsList = new Ring2DList(); }
 	
 	var innerRing = this.innerRingsList.newRing();
 	
@@ -53,7 +53,7 @@ Profile2D.prototype.newInnerRing = function()
 Profile2D.prototype.getInnerRingsList = function() 
 {
 	if (this.innerRingsList === undefined)
-	{ this.innerRingsList = new Rings2DList(); }
+	{ this.innerRingsList = new Ring2DList(); }
 
 	return this.innerRingsList;
 };
@@ -156,7 +156,7 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
 			}
 			else 
 			{
-				ringIdxInList = this.innerRingsList.getRingIdx(currRing);
+				ringIdxInList = this.innerRingsList.getRingIndex(currRing);
 			}
 			indexData.ownerIdx = ringIdxInList;
 			convexDatas.push(indexData);
@@ -377,11 +377,11 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	while (!finished && i<innerRingsCount)
 	{
 		// calculate the most left-down innerRing.***
-		innersBRect = Rings2DList.getBoundingRectangle(innerRingsArray, innersBRect);
+		innersBRect = Ring2DList.getBoundingRectangle(innerRingsArray, innersBRect);
 		innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
 		
 		objectsArray.length = 0; // init.***
-		objectsArray = Rings2DList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
+		objectsArray = Ring2DList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
 	
 		objectAux = objectsArray[0];
 		hole = objectAux.ring;
