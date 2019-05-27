@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * PolyLine represented in 2D
+ * This is similar with Point2DList, but this one represents real polyline geometry feature.
  * @class PolyLine2D
  */
 var PolyLine2D = function() 
@@ -16,7 +17,9 @@ var PolyLine2D = function()
 
 /**
  * Creates a new Point2D.
- * @class PolyLine2D
+ * @param {Number} x
+ * @param {Number} y
+ * @return point2d
  */
 PolyLine2D.prototype.newPoint2d = function(x, y)
 {
@@ -29,8 +32,7 @@ PolyLine2D.prototype.newPoint2d = function(x, y)
 };
 
 /**
- * Creates a new Point2D.
- * @class PolyLine2D
+ * Count the number of the point2D in this list
  */
 PolyLine2D.prototype.getPointsCount = function()
 {
@@ -41,8 +43,7 @@ PolyLine2D.prototype.getPointsCount = function()
 };
 
 /**
- * Creates a new Point2D.
- * @class PolyLine2D
+ * Clear all the features in this.point2dArray
  */
 PolyLine2D.prototype.deleteObjects = function()
 {
@@ -56,8 +57,9 @@ PolyLine2D.prototype.deleteObjects = function()
 };
 
 /**
- * Creates a new Point2D.
- * @class PolyLine2D
+ * Copy the point from this.point2dArray to resultPointsArray
+ * @param resultPointsArray
+ * @return resultPointsArray 
  */
 PolyLine2D.prototype.getPoints = function(resultPointsArray)
 {
