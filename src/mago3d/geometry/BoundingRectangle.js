@@ -10,10 +10,10 @@ var BoundingRectangle = function(x, y)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.minX = 100000;
-	this.maxX = -100000;
-	this.minY = 100000;
-	this.maxY = -100000;
+	this.minX = Number.MAX_VALUE;
+	this.maxX = Number.MIN_VALUE;
+	this.minY = Number.MAX_VALUE;
+	this.maxY = Number.MIN_VALUE;
 };
 
 BoundingRectangle.prototype.setInit = function(point)
