@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This represent the circle feature drawn in 2D.
  * @class Circle2D
  */
 var Circle2D = function() 
@@ -12,14 +12,15 @@ var Circle2D = function()
 	}
 	// sweeping in CounterClockWise is positive.***
 	// zero startAngle is in "X" axis positive.***
-	this.centerPoint; // Point3D.***
+	this.centerPoint; // Point2D.***
 	this.radius;
 	this.numPointsFor360Deg; // interpolation param.***
 };
 
 /**
  * Set the center position of Circle.
- * @class Circle2D
+ * @param {Number} cx the x coordi of the center
+ * @param {Number} cy the y coordi of the center
  */
 Circle2D.prototype.setCenterPosition = function(cx, cy)
 {
@@ -30,8 +31,8 @@ Circle2D.prototype.setCenterPosition = function(cx, cy)
 };
 
 /**
- * Set the center position of Circle.
- * @class Circle2D
+ * Set the radius value
+ * @param {Number} radius
  */
 Circle2D.prototype.setRadius = function(radius)
 {
@@ -39,8 +40,9 @@ Circle2D.prototype.setRadius = function(radius)
 };
 
 /**
- * Returns the points of the arc.
- * @class Circle2D
+ * Returns the points of the circle.
+ * @param reulstPointsArray the array which saves the result of the points
+ * @param pointsCountFor360Deg the value used for interpolation way
  */
 Circle2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {
