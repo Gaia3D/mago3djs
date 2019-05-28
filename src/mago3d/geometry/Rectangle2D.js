@@ -1,7 +1,4 @@
 'use strict';
-
-
-
 /**
  * 중심점과 가로, 세로 길이를 가진 클래스
  * @exception {Error} Messages.CONSTRUCT_ERROR

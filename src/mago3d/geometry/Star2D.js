@@ -1,7 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * '별(star)'모양 폴리곤 객체
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class Star2D
  */
 var Star2D = function() 
@@ -12,16 +14,34 @@ var Star2D = function()
 	}
 
 	// this is a closed element.***
+	/**
+	 * center of star
+	 * @type {Point2D}
+	 */
 	this.centerPoint; // Point3D.***
-	this.interiorRadius;
-	this.exteriorRadius;
-	this.radiusCount;
 
+	/**
+	 * interior radius
+	 * @type {Number}
+	 */
+	this.interiorRadius;
+	/**
+	 * exterior radius
+	 * @type {Number}
+	 */
+	this.exteriorRadius;
+
+	/**
+	 * 별꼭지점 갯수
+	 * @type {Number}
+	 */
+	this.radiusCount;
 };
 
 /**
- * Set the center position of Star.
- * @class Star2D
+ * star의 중심점 설정
+ * @param {number} cx
+ * @param {number} cy
  */
 Star2D.prototype.setCenterPosition = function(cx, cy)
 {
@@ -32,7 +52,8 @@ Star2D.prototype.setCenterPosition = function(cx, cy)
 };
 
 /**
- * @class Star2D
+ * star의 interior radius 설정
+ * @param {number} radius
  */
 Star2D.prototype.setInteriorRadius = function(radius)
 {
@@ -40,7 +61,8 @@ Star2D.prototype.setInteriorRadius = function(radius)
 };
 
 /**
- * @class Star
+ * star의 exterior radius 설정
+ * @param {number} radius
  */
 Star2D.prototype.setExteriorRadius = function(radius)
 {
@@ -48,16 +70,18 @@ Star2D.prototype.setExteriorRadius = function(radius)
 };
 
 /**
- * @class Star2D
+ * star의 꼭지점 갯수 설정
+ * @param {number} radiusCount
  */
-Star2D.prototype.setRadiusCount = function(rediusCount)
+Star2D.prototype.setRadiusCount = function(radiusCount)
 {
-	this.radiusCount = rediusCount;
+	this.radiusCount = radiusCount;
 };
 
 /**
- * Returns the points of the Star.
- * @class Star2D
+ * star의 꼭지점 배열 반환
+ * @param {Array.<Point2D>} resultPointsArray
+ * @return {Array.<Point2D>} 
  */
 Star2D.prototype.getPoints = function(resultPointsArray)
 {
