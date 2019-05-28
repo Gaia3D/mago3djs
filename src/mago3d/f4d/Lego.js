@@ -2,9 +2,13 @@
 
 /**
  * F4D Lego 클래스
+ * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @alias Lego
  * @class Lego
+ * 
+ * blick
+ * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var Lego = function() 
 {
@@ -13,32 +17,107 @@ var Lego = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * @type {VBOVertexIdxCacheKeysContainer}
+	 */
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
+
+	/**
+	 * lego file load state. Default is 0(READY)
+	 * "READY"            : 0,
+	 * "LOADING_STARTED"  : 1,
+	 * "LOADING_FINISHED" : 2,
+	 * "PARSE_STARTED"    : 3,
+	 * "PARSE_FINISHED"   : 4,
+	 * "IN_QUEUE"         : 5,
+	 * "LOAD_FAILED"      : 6
+	 * @type {Number}
+	 */
 	this.fileLoadState = CODE.fileLoadState.READY;
+
+	/**
+	 * lego bounding box
+	 * @type {BoundingBox}
+	 */
 	this.bbox;
+
+	/**
+	 * lego data array buffer. parse가 끝난 후 undefined.
+	 * @type {ArrayBuffer}
+	 */
 	this.dataArrayBuffer;
+
+	/**
+	 * lego data color. not used
+	 * @deprecated
+	 * @type {Color}
+	 */
 	this.selColor4;
+
+	/**
+	 * 텍스쳐 coord 유무
+	 * @type {Boolean}
+	 */
 	this.hasTexCoords;
+
+	/**
+	 * 텍스쳐
+	 * @type {Texture}
+	 */
 	this.texture;
+
+	/**
+	 * 텍스쳐 이름
+	 * @type {String}
+	 */
 	this.textureName;
+
+	/**
+	 * lego key
+	 * @type {String}
+	 */
 	this.legoKey;
 	this.xhr;
 	
-	// extra vars.***
+	/**
+	 * not use
+	 * @deprecated
+	 * @type {String}
+	 */
 	this.renderableType; // triangles, lines, points, etc.***
+
+	/**
+	 * 칼라값 유무
+	 * @type {Boolean}
+	 */
 	this.hasColors;
+
+	/**
+	 * blendAlpha
+	 * @type {Number}
+	 */
 	this.blendAlpha = 0.0;
+
+	/**
+	 * birthTime
+	 * @type {Date}
+	 */
 	this.birthTime;
+
+	/**
+	 * not use
+	 * @deprecated
+	 * @type {Boolean}
+	 */
 	this.isAdult = false;
 };
 
 /**
- * F4D Lego 자료를 읽는다
+ * F4D Lego 자료를 읽어서 가져온 ArrayBuffer를 파싱.
  * 
- * @param {any} gl 
- * @param {any} readWriter 
- * @param {any} dataArraybuffer 
- * @param {any} bytesReaded 
+ * @param {WebGLRendering​Context} gl 
+ * @param {ArrayBuffer} dataArraybuffer 
+ * @param {MagoManager} magoManager 
  */
 Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 {
@@ -46,6 +125,10 @@ Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 };
 
 /**
+ * BlendAlpha 반환
+ * 
+ * @param {Date} currTime not use
+ * @return {Number} always return 1.0
  */
 Lego.prototype.getBlendAlpha = function(currTime) 
 {
@@ -71,8 +154,8 @@ Lego.prototype.getBlendAlpha = function(currTime)
 };
 
 /**
- * F4D Lego 자료를 읽는다
- * 
+ * render할 준비가 됬는지 체크
+ * @return {Boolean} this.fileLoadState가 CODE.fileLoadState.PARSE_FINISHED(4)이거나 this.texture, this.texture.texId가 존재할때 true 반환
  */
 Lego.prototype.isReadyToRender = function()
 {
@@ -86,12 +169,10 @@ Lego.prototype.isReadyToRender = function()
 };
 
 /**
- * F4D Lego 자료를 읽는다
+ * lego 초기화. gl에서 해당 lego 삭제
  * 
- * @param {any} gl 
- * @param {any} readWriter 
- * @param {any} dataArraybuffer 
- * @param {any} bytesReaded 
+ * @param {WebGLRendering​Context} gl 
+ * @param {VboManager} vboMemManager 
  */
 Lego.prototype.deleteObjects = function(gl, vboMemManager)
 {
@@ -130,9 +211,14 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
 };
 
 /**
- * F4D Lego 자료를 읽는다
+ * F4D Lego 자료(point cloude data)를 읽어서 가져온 ArrayBuffer를 파싱.
+ * vertex index cache key를 생성하여 담는다.
+ * LOADING_FINISHED 상태일때 실행.
+ * normal, texCoord는 없음
  * 
- * @param {ArrayBuffer} buffer 
+ * @param {ArrayBuffer} dataArraybuffer 
+ * @param {WebGLRendering​Context} gl not use
+ * @param {MagoManager} magoManager 
  */
 Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 {
@@ -206,9 +292,13 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 };
 
 /**
- * F4D Lego 자료를 읽는다
+ * F4D Lego 자료를 읽어서 가져온 ArrayBuffer를 파싱.
+ * vertex index cache key를 생성하여 담는다.
+ * LOADING_FINISHED 상태일때 실행.
  * 
- * @param {ArrayBuffer} buffer 
+ * @param {ArrayBuffer} dataArraybuffer 
+ * @param {WebGLRendering​Context} gl not use
+ * @param {MagoManager} magoManager 
  */
 Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 {
@@ -271,7 +361,12 @@ Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
 };
 
 /**
- * F4D Lego 자료를 읽는다
+ * F4D Lego 자료를 gl에 렌더
+ * 
+ * @param {MagoManager} magoManager
+ * @param {Number} renderType
+ * @param {Boolean} renderTexture
+ * @param {PostFxShader} shader 
  */
 Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 {
