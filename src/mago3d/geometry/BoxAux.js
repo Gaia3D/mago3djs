@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 영역 박스
+ * This is similar with the 3D version of the Bounding Rectangle but this is slighthly different.
  * @class BoxAux
  */
 var BoxAux = function() 
@@ -24,10 +24,7 @@ var BoxAux = function()
 };
 
 /**
- * axis aligned bounding BoxAux
- * @param xLength
- * @param yLength
- * @param zLength
+ * get the Vbo keys container of this feature
  */
 BoxAux.prototype.getVboKeysContainer = function()
 {
@@ -35,8 +32,8 @@ BoxAux.prototype.getVboKeysContainer = function()
 };
 
 /**
- * axis aligned bounding BoxAux
- * @param xLength
+ * make Axis Aligned Bounding Box(Aux)
+ * @param xLength 
  * @param yLength
  * @param zLength
  */
