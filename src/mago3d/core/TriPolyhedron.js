@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Triangular mesh
+ * 영역 박스
  * @class TriPolyhedron
  */
 var TriPolyhedron = function() 
@@ -11,8 +11,8 @@ var TriPolyhedron = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.vertexMatrix = new VertexMatrix();
-	this.vertexList = this.vertexMatrix.newVertexList(); //the list of the vertexs which consist of this feature
-	this.triSurfacesArray = []; //triSurfaceArray is a list of TriSurfaces which consist of this feature
+	this.vertexList = this.vertexMatrix.newVertexList();
+	this.triSurfacesArray = [];
 };
 
 TriPolyhedron.prototype.newTriSurface = function() 
@@ -22,9 +22,6 @@ TriPolyhedron.prototype.newTriSurface = function()
 	return triSurface;
 };
 
-/**
- * Inverse the direction sense of the triangle meshes
- */
 TriPolyhedron.prototype.invertTrianglesSenses = function() 
 {
 	var triSurfacesCount = this.triSurfacesArray.length;
@@ -34,11 +31,6 @@ TriPolyhedron.prototype.invertTrianglesSenses = function()
 	}
 };
 
-/**
- * Get the information of the VBO key of the triangles which consist of the TriPolyhedron
- * @param resultVBOVertexIdxCacheKey the array which will hold the VBO key of the triangular meshes
- * @param vboMemManager 
- */
 TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey, vboMemManager) 
 {
 	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
