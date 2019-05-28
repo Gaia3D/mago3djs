@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 영역 박스
+ * This class is needed to be implemented more, but it will be used at the future.
  * @class Box
  */
 var Box = function(width, length, height) 
