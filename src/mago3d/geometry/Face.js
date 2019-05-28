@@ -323,6 +323,12 @@ Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygo
 	return resultProjectedPolygon2d;
 };
 
+/**
+ * 오목 폴리곤들을 볼록 폴리곤들로 분리 후 반환.
+ * concave to convex list.
+ * @param {Array.<Triangle>} resultTrianglesArray
+ * @return {Array.<Triangle>}
+ */
 Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 {
 	if (resultTrianglesArray === undefined)
@@ -335,7 +341,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 		resultTrianglesArray = this.getTrianglesConvex(resultTrianglesArray);
 		return resultTrianglesArray;
 	}
-	
 
 	// 1rst, must project the face to a plane and process to tessellate in 2d.***
 	var normal = this.getPlaneNormal();

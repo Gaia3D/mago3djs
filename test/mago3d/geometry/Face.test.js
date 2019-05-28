@@ -4,12 +4,15 @@ describe("Face 테스트", function(){
     describe('임시 테스트', function(){
         var vertexArray;
         var normal;
+        var p1;
+        var p2;
+        var p3;
         beforeEach(function(){
-            var p1 = new Point3D(1,1,3);
+            p1 = new Point3D(1,1,3);
             p1.pointType = 1;
-            var p2 = new Point3D(1,4,3);
+            p2 = new Point3D(1,4,3);
             p2.pointType = 1;
-            var p3 = new Point3D(4,1,3);
+            p3 = new Point3D(4,1,3);
             p3.pointType = 1;
 
             vertexArray = [new Vertex(p1),new Vertex(p2),new Vertex(p3)];
@@ -39,6 +42,15 @@ describe("Face 테스트", function(){
                 expect(point.ownerVertex3d.point3d.y).toEqual(vertexArray[key].point3d.y);
                 expect(point.ownerVertex3d.point3d.z).toEqual(vertexArray[key].point3d.z);
             }
+        })
+
+        it('getTrianglesConvex test', function(){
+            var face = new Face();
+            face.addVertex(new Vertex(p1));
+            face.addVertex(new Vertex(p2));
+
+            var triangle = face.getTrianglesConvex();
+            expect(triangle.length).toEqual(0);
         })
     })
 });
