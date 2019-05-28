@@ -1,6 +1,6 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
+* This class represent the bounding box of the other feature in 2D
 * @class BoundingRectangle
 */
 var BoundingRectangle = function(x, y) 
@@ -10,10 +10,10 @@ var BoundingRectangle = function(x, y)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.minX = 100000;
-	this.maxX = -100000;
-	this.minY = 100000;
-	this.maxY = -100000;
+	this.minX = Number.MAX_VALUE;
+	this.maxX = Number.MIN_VALUE;
+	this.minY = Number.MAX_VALUE;
+	this.maxY = Number.MIN_VALUE;
 };
 
 BoundingRectangle.prototype.setInit = function(point)
@@ -26,7 +26,10 @@ BoundingRectangle.prototype.setInit = function(point)
 	this.maxX = point.x;
 	this.maxY = point.y;
 };
-
+/**
+ * Initiation bounding rectangle by the other bounding rectangle
+ * @param {BoundingRectangle} bRect The other bounding rectangle	
+ */
 BoundingRectangle.prototype.setInitByRectangle = function(bRect)
 {
 	if (bRect === undefined)
@@ -38,6 +41,10 @@ BoundingRectangle.prototype.setInitByRectangle = function(bRect)
 	this.maxY = bRect.maxY;
 };
 
+/**
+ * Change the range of this bounding rectangle if a point is added
+ * @param {Point2D} point 
+ */
 BoundingRectangle.prototype.addPoint = function(point)
 {
 	if (point === undefined)
@@ -53,7 +60,10 @@ BoundingRectangle.prototype.addPoint = function(point)
 	else if (point.y > this.maxY)
 	{ this.maxY = point.y; }
 };
-
+/**
+ * Change the range of this bounding rectangle if a rectangle is added
+ * @param {BoundingRectangle} bRect
+ */
 BoundingRectangle.prototype.addRectangle = function(bRect)
 {
 	if (bRect === undefined)
@@ -69,7 +79,11 @@ BoundingRectangle.prototype.addRectangle = function(bRect)
 	if (bRect.maxY > this.maxY)
 	{ this.maxY = bRect.maxY; }
 };
-
+/**
+ * Check whether this rectangle is intersected with the given bounding rectangle
+ * @param {BoundingRectangle} bRect
+ * @return {Boolean}
+ */
 BoundingRectangle.prototype.intersectsWithRectangle = function(bRect)
 {
 	if (bRect === undefined)

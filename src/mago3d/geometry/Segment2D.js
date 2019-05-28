@@ -1,8 +1,10 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
-* @class Segment2D
-*/
+ * 선분 생성을 위한 클래스
+ *
+ * @param {Point2D} strPoint2D 시작 포인트
+ * @param {Point2D} endPoint2D 종료 포인트
+ */
 var Segment2D = function(strPoint2D, endPoint2D) 
 {
 	if (!(this instanceof Segment2D)) 
@@ -14,96 +16,174 @@ var Segment2D = function(strPoint2D, endPoint2D)
 	this.endPoint2d;
 	
 	if (strPoint2D)
-	{ this.startPoint2d = strPoint2D; }
+	{
+		this.startPoint2d = strPoint2D;
+	}
 	
 	if (endPoint2D)
-	{ this.endPoint2d = endPoint2D; }
+	{
+		this.endPoint2d = endPoint2D;
+	}
 };
 
+
+/**
+ * 선분에 포인트를 설정한다.
+ *
+ * @param {Point2D} strPoint2D 시작 포인트
+ * @param {Point2D} endPoint2D 종료 포인트
+ */
 Segment2D.prototype.setPoints = function(strPoint2D, endPoint2D)
 {
-	if (strPoint2D)
-	{ this.startPoint2d = strPoint2D; }
-	
-	if (endPoint2D)
-	{ this.endPoint2d = endPoint2D; }
+	if (strPoint2D !== undefined)
+	{
+		this.startPoint2d = strPoint2D; 
+	}
+	if (endPoint2D !== undefined)
+	{ 
+		this.endPoint2d = endPoint2D;
+	}
 };
 
-Segment2D.prototype.getVector = function(resultVector)
+/**
+ * 시작 포인트에서 종료 포인트까지의 벡터를 구한다.
+ *
+ * @param {Point2D} result 벡터 결과값
+ * @return {Point2D} 벡터 결과값
+ */
+Segment2D.prototype.getVector = function(result)
 {
 	if (this.startPoint2d === undefined || this.endPoint2d === undefined)
-	{ return undefined; }
+	{
+		return undefined;
+	}
 	
-	if (resultVector === undefined)
-	{ resultVector = new Point2D(); }
+	if (result === undefined)
+	{
+		result = new Point2D();
+	}
 	
-	resultVector = this.startPoint2d.getVectorToPoint(this.endPoint2d, resultVector);
-	return resultVector;
+	result = this.startPoint2d.getVectorToPoint(this.endPoint2d, result);
+	return result;
 };
 
-Segment2D.prototype.getDirection = function(resultDir)
+
+/**
+ * 선분의 방향값을 계산한다.
+ *
+ * @param {Point2D} result 선분이 나타내는 방향값
+ * @return {Point2D} 선분이 나타내는 방향값
+ */
+Segment2D.prototype.getDirection = function(result)
 {
-	if (resultDir === undefined)
-	{ resultDir = new Point2D(); }
+	if (result === undefined)
+	{
+		result = new Point2D();
+	}
 	
-	resultDir = this.getVector(resultDir);
-	resultDir.unitary();
+	result = this.getVector(result);
+	result.unitary();
 	
-	return resultDir;
+	return result;
 };
 
-Segment2D.prototype.getBoundaryRectangle = function(resultBRect)
+
+/**
+ * 선분의 경계 사각형을 구한다.
+ *
+ * @param {BoundaryRectangle} result 선분을 포함하는 경계 사각형
+ * @return {BoundaryRectangle} 선분을 포함하는 경계 사각형
+ */
+Segment2D.prototype.getBoundaryRectangle = function(result)
 {
-	if (resultBRect === undefined)
-	{ resultBRect = new BoundaryRectangle(); }
+	if (result === undefined)
+	{
+		result = new BoundaryRectangle();
+	}
 	
-	resultBRect.setInit(this.startPoint2d);
-	resultBRect.addPoint(this.endPoint2d);
+	result.setInit(this.startPoint2d);
+	result.addPoint(this.endPoint2d);
 	
-	return resultBRect;
+	return result;
 };
 
-Segment2D.prototype.getLine = function(resultLine)
+
+/**
+ * 선분을 지나는 직선을 구한다.
+ *
+ * @param {Line2D} result 주어진 선분을 지나는 직선
+ * @return {Line2D} 주어진 선분을 지나는 직선
+ */
+Segment2D.prototype.getLine = function(result)
 {
-	if (resultLine === undefined)
-	{ resultLine = new Line2D(); }
-	
-	var dir = this.getDirection(); // unitary direction.***
+	if (result === undefined)
+	{
+		result = new Line2D();
+	}
+	// unitary direction.
+	var dir = this.getDirection();
 	var strPoint = this.startPoint2d;
-	resultLine.setPointAndDir(strPoint.x, strPoint.y, dir.x, dir.y);
-	return resultLine;
+	result.setPointAndDir(strPoint.x, strPoint.y, dir.x, dir.y);
+	return result;
 };
 
+
+/**
+ * 선분의 제곱된 길이를 구한다.
+ *
+ * @return {Number} 선분의 제곱된 길이
+ */
 Segment2D.prototype.getSquaredLength = function()
 {
 	return this.startPoint2d.squareDistToPoint(this.endPoint2d);
 };
 
+
+/**
+ * 선분의 길이를 구한다.
+ *
+ * @return {Number} 선분의 길이
+ */
 Segment2D.prototype.getLength = function()
 {
 	return Math.sqrt(this.getSquaredLength());
 };
 
+
+/**
+ * 오차율에 따라 주어진 포인트와 선분의 교차를 판단한다.
+ *
+ * @param {Point2D} point 포인트
+ * @param {Number} error 오차율
+ * @return 교차 판단 결과값
+ */
 Segment2D.prototype.intersectionWithPointByDistances = function(point, error)
 {
 	if (point === undefined)
-	{ return undefined; }
+	{
+		return undefined;
+	}
 	
 	if (error === undefined)
-	{ error = 10E-8; }
+	{
+		error = 10E-8;
+	}
 	
-	// here no check line-point coincidance.***
-	
-	// now, check if is inside of the segment or if is coincident with any vertex of segment.***
+	// here no check line-point coincidance.
+	// now, check if is inside of the segment or if is coincident with any vertex of segment.
 	var distA = this.startPoint2d.distToPoint(point);
 	var distB = this.endPoint2d.distToPoint(point);
 	var distTotal = this.getLength();
 	
 	if (distA < error)
-	{ return Constant.INTERSECTION_POINT_A; }
+	{
+		return Constant.INTERSECTION_POINT_A;
+	}
 	
 	if (distB < error)
-	{ return Constant.INTERSECTION_POINT_B; }
+	{
+		return Constant.INTERSECTION_POINT_B;
+	}
 	
 	if (distA> distTotal || distB> distTotal)
 	{
@@ -111,120 +191,126 @@ Segment2D.prototype.intersectionWithPointByDistances = function(point, error)
 	}
 	
 	if (Math.abs(distA + distB - distTotal) < error)
-	{ return Constant.INTERSECTION_INSIDE; }
+	{
+		return Constant.INTERSECTION_INSIDE;
+	}
 };
 
+
+/**
+ * 오차율에 따라 주어진 포인트와 선분의 교차를 판단한다.
+ *
+ * @param {Point2D} point 포인트
+ * @param {Number} error 오차율
+ * @return 교차 판단 결과값
+ */
 Segment2D.prototype.intersectionWithPoint = function(point, error)
 {
 	if (point === undefined)
-	{ return undefined; }
+	{
+		return undefined;
+	}
 	
 	if (error === undefined)
-	{ error = 10E-8; }
+	{
+		error = 10E-8;
+	}
 	
 	var line = this.getLine();
 	if (!line.isCoincidentPoint(point, error))
-	{ return Constant.INTERSECTION_OUTSIDE; } // no intersection.***
+	{
+		// no intersection
+		return Constant.INTERSECTION_OUTSIDE;
+	}
 	
 	return this.intersectionWithPointByDistances(point, error);
 };
 
-Segment2D.prototype.intersectionWithSegment = function(segment_B, error)
+/**
+ * 오차율에 따라 주어진 선분과 선분의 교차를 판단한다.
+ *
+ * @param {Segment2D} segment 선분
+ * @param {Number} error 오차율
+ * @return 교차 판단 결과값
+ */
+Segment2D.prototype.intersectionWithSegment = function(segment, error)
 {
-	if (segment_B === undefined)
-	{ return undefined; }
+	if (segment === undefined)
+	{
+		return undefined;
+	}
 	
 	if (error === undefined)
-	{ error = 10E-8; }
+	{
+		error = 10E-8;
+	}
 	
-	var myLine = this.getLine();
-	var line = segment_B.getLine();
-	var intersectionPoint = myLine.intersectionWithLine(line);
+	var lineA = this.getLine();
+	var lineB = segment.getLine();
+	var intersectionPoint = lineA.intersectionWithLine(lineB);
 	
+	// 두 선분이 평행한 경우
 	if (intersectionPoint === undefined)
-	{ return undefined; } // are parallels.***
+	{
+		return undefined;
+	}
 	
-	// now use "intersectionWithPointByDistances" instead "intersectionWithPoint" bcos line-point intersection check is no necesary.***
-	var intersectionType_A = this.intersectionWithPointByDistances(intersectionPoint);
+	var intersectionTypeA = this.intersectionWithPointByDistances(intersectionPoint);
+	var intersectionTypeB = segment.intersectionWithPointByDistances(intersectionPoint);
 	
-	if (intersectionType_A === Constant.INTERSECTION_OUTSIDE)
-	{ return Constant.INTERSECTION_OUTSIDE; }
-	
-	var intersectionType_B = segment_B.intersectionWithPointByDistances(intersectionPoint);
-	
-	if (intersectionType_B === Constant.INTERSECTION_OUTSIDE)
-	{ return Constant.INTERSECTION_OUTSIDE; }
+	if (intersectionTypeA === Constant.INTERSECTION_OUTSIDE)
+	{
+		return Constant.INTERSECTION_OUTSIDE;
+	}
+	if (intersectionTypeB === Constant.INTERSECTION_OUTSIDE)
+	{
+		return Constant.INTERSECTION_OUTSIDE;
+	}
 	
 	return Constant.INTERSECTION_INTERSECT;
 };
 
+
+/**
+ * 주어진 포인트가 시작 포인트 또는 종료 포인트를 갖는지 판단한다.
+ * returns if this segment has "point" as startPoint or endPoint.
+ *
+ * @param {Point2D} point 포인트
+ * @return {Boolean} 시작/종료 포인트 존재 여부
+ */
 Segment2D.prototype.hasPoint = function(point)
 {
-	// returns if this segment has "point" as startPoint or endPoint.***
 	if (point === undefined)
-	{ return false; }
+	{
+		return false;
+	}
 	
 	if (point === this.startPoint2d || point === this.endPoint2d)
-	{ return true; }
+	{
+		return true;
+	}
 	
 	return false;
 };
 
+
+/**
+ * 주어진 선분이 해당 선분과 공유 포인트를 갖는지 판단한다.
+ *
+ * @param {Segment2D} segment 선분
+ * @return {Boolean} 공유 포인트 존재 여부
+ */
 Segment2D.prototype.sharesPointsWithSegment = function(segment)
 {
 	if (segment === undefined)
-	{ return false; }
+	{
+		return false;
+	}
 	
 	if (this.hasPoint(segment.startPoint2d) || this.hasPoint(segment.endPoint2d))
-	{ return true; }
+	{
+		return true;
+	}
 	
 	return false;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
