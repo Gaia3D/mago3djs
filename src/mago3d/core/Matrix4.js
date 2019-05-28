@@ -1,8 +1,9 @@
 'use strict';
 
+
 /**
- * 어떤 일을 하고 있습니까?
- * @class Matrix4
+ * 열우선 배열 방식의 4차원 행렬
+ *
  */
 var Matrix4 = function() 
 {
@@ -11,51 +12,57 @@ var Matrix4 = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this._floatArrays = new Float32Array([ 	1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	]);
+	/**
+	 * @type {Float32Array}
+	 */
+	this._floatArrays = new Float32Array([ 1, 0, 0, 0,
+										   0, 1, 0, 0,
+										   0, 0, 1, 0,
+										   0, 0, 0, 1]);
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 단위행렬로 설정한다.
  */
 Matrix4.prototype.Identity = function() 
 {
-	this._floatArrays[0] = 1.0;
-	this._floatArrays[1] = 0.0;
-	this._floatArrays[2] = 0.0;
-	this._floatArrays[3] = 0.0;
+	this._floatArrays[0] = 1.0;		// I(1,1)
+	this._floatArrays[1] = 0.0;		// I(2,1)
+	this._floatArrays[2] = 0.0;		// I(3,1)
+	this._floatArrays[3] = 0.0;		// I(4,1)
 	
-	this._floatArrays[4] = 0.0;
-	this._floatArrays[5] = 1.0;
-	this._floatArrays[6] = 0.0;
-	this._floatArrays[7] = 0.0;
+	this._floatArrays[4] = 0.0;		// I(1,2)
+	this._floatArrays[5] = 1.0;		// I(2,2)
+	this._floatArrays[6] = 0.0;		// I(3,2)
+	this._floatArrays[7] = 0.0;		// I(4,2)
 	
-	this._floatArrays[8] = 0.0;
-	this._floatArrays[9] = 0.0;
-	this._floatArrays[10] = 1.0;
-	this._floatArrays[11] = 0.0;
+	this._floatArrays[8] = 0.0;		// I(1,3)
+	this._floatArrays[9] = 0.0;		// I(2,3)
+	this._floatArrays[10] = 1.0;	// I(3,3)
+	this._floatArrays[11] = 0.0;	// I(4,3)
 	
-	this._floatArrays[12] = 0.0;
-	this._floatArrays[13] = 0.0;
-	this._floatArrays[14] = 0.0;
-	this._floatArrays[15] = 1.0;
+	this._floatArrays[12] = 0.0;	// I(1,4)
+	this._floatArrays[13] = 0.0;	// I(2,4)
+	this._floatArrays[14] = 0.0;	// I(3,4)
+	this._floatArrays[15] = 1.0;	// I(4,4)
 };
 
+
 /**
- * 어떤 일을 하고 있습니까?
- * @returns rowMajor_matrix
+ * 행렬 정보 삭제
  */
 Matrix4.prototype.deleteObjects = function() 
 {
 	this._floatArrays = undefined;
 };
 
+
 /**
- * 어떤 일을 하고 있습니까?
- * @returns rowMajor_matrix
+ * 행우선 배열 방식의 4차원 행렬을 제공한다.
+ *
+ * @return {Float32Array} 행우선 4차원 행렬
+ * 
+ * @see Matrix4#get
  */
 Matrix4.prototype.getRowMajorMatrix = function() 
 {
@@ -85,32 +92,38 @@ Matrix4.prototype.getRowMajorMatrix = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param angRad 변수
- * @param axis_x 변수
- * @param axis_y 변수
- * @param axis_z 변수
+ * XYZ축에 대한 회전양에 따라 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Number} zRotDeg z축에 대한 회전양(Degree)
+ * @param {Number} xRotDeg x축에 대한 회전양(Degree)
+ * @param {Number} yRotDeg y축에 대한 회전양(Degree)
+ * @param {Matrix4} result 회전된 4차원 행렬
+ * @return {Matrix4} 회전된 4차원 행렬
+ * 
+ * @see Matrix4#rotationAxisAngDeg
+ * @see Matrix4#getMultipliedByMatrix
  */
-Matrix4.getRotationDegZXYMatrix = function(zRotDeg, xRotDeg, yRotDeg, resultMatrix4) 
+Matrix4.getRotationDegZXYMatrix = function(zRotDeg, xRotDeg, yRotDeg, result) 
 {
-	// static function.***
+	// created as identity matrix.
+	if (result === undefined)
+	{
+		result = new Matrix4();
+	}
+
 	var xRotMatrix = new Matrix4();  // created as identity matrix.
 	var yRotMatrix = new Matrix4();  // created as identity matrix.
 	var zRotMatrix = new Matrix4();  // created as identity matrix.
 	
-	if (zRotDeg !== undefined && zRotDeg !== 0)
-	{ zRotMatrix.rotationAxisAngDeg(zRotDeg, 0.0, 0.0, 1.0); }
-
+	
 	if (xRotDeg !== undefined && xRotDeg !== 0)
 	{ xRotMatrix.rotationAxisAngDeg(xRotDeg, 1.0, 0.0, 0.0); }
-
+	
 	if (yRotDeg !== undefined && yRotDeg !== 0)
 	{ yRotMatrix.rotationAxisAngDeg(yRotDeg, 0.0, 1.0, 0.0); }
-
-
-	if (resultMatrix4 === undefined)
-	{ resultMatrix4 = new Matrix4(); }  // created as identity matrix.
-
+	
+	if (zRotDeg !== undefined && zRotDeg !== 0)
+	{ zRotMatrix.rotationAxisAngDeg(zRotDeg, 0.0, 0.0, 1.0); }
 
 	var zRotatedTMatrix;
 	var zxRotatedTMatrix;
@@ -120,16 +133,22 @@ Matrix4.getRotationDegZXYMatrix = function(zRotDeg, xRotDeg, yRotDeg, resultMatr
 	zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
 	zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
 	
-	resultMatrix4 = zxyRotatedTMatrix;
-	return resultMatrix4;
+	result = zxyRotatedTMatrix;
+
+	return result;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param angDeg 변수
- * @param axis_x 변수
- * @param axis_y 변수
- * @param axis_z 변수
+ * 좌표값과 회전양을 통해 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Number} angDeg 회전양(Degree)
+ * @param {Number} axis_x X축 좌표
+ * @param {Number} axis_y Y축 좌표
+ * @param {Number} axis_z Z축 좌표
+ * 
+ * @see Quaternion
+ * @see Quaternion#rotationAngDeg
+ * @see Matrix4#rotationByQuaternion
  */
 Matrix4.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z) 
 {
@@ -140,11 +159,16 @@ Matrix4.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param angRad 변수
- * @param axis_x 변수
- * @param axis_y 변수
- * @param axis_z 변수
+ * 좌표값과 회전양을 통해 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Number} angRad 회전양(Radian)
+ * @param {Number} axis_x X축 좌표
+ * @param {Number} axis_y Y축 좌표
+ * @param {Number} axis_z Z축 좌표
+ * 
+ * @see Quaternion
+ * @see Quaternion#rotationAngRad
+ * @see Matrix4#rotationByQuaternion
  */
 Matrix4.prototype.rotationAxisAngRad = function(angRad, axis_x, axis_y, axis_z) 
 {
@@ -155,15 +179,16 @@ Matrix4.prototype.rotationAxisAngRad = function(angRad, axis_x, axis_y, axis_z)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param quaternion 변수
+ * 쿼터니언(사원수)을 통한 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Quaternion} quaternion 사원수
  */
 Matrix4.prototype.rotationByQuaternion = function(quaternion) 
 {
-	var w = quaternion.w;
 	var x = quaternion.x;
 	var y = quaternion.y;
 	var z = quaternion.z;
+	var w = quaternion.w;
 
 	this._floatArrays[this.getIndexOfArray(0, 0)] = 1 - 2*y*y - 2*z*z;
 	this._floatArrays[this.getIndexOfArray(0, 1)] = 2*x*y + 2*z*w;
@@ -187,8 +212,9 @@ Matrix4.prototype.rotationByQuaternion = function(quaternion)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param float32array 변수
+ * Float32 형식의 4차원 행렬로 행렬값을 설정한다.
+ *
+ * @param {Float32Array} float32array
  */
 Matrix4.prototype.setByFloat32Array = function(float32array) 
 {
@@ -199,9 +225,11 @@ Matrix4.prototype.setByFloat32Array = function(float32array)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param col 변수
- * @param row 변수
+ * 열우선 방식으로 행렬의 인덱스값을 계산한다.
+ * 
+ * @param {Number} col 열의 위치
+ * @param {Number} row 행의 위치
+ * @return {Number} 행렬의 인덱스
  */
 Matrix4.prototype.getIndexOfArray = function(col, row) 
 {
@@ -212,22 +240,23 @@ Matrix4.prototype.getIndexOfArray = function(col, row)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param col 변수
- * @param row 변수
+ * 지정된 행/열의 위치에 있는 값을 구한다.
+ *
+ * @param {Number} col 열의 위치
+ * @param {Number} row 행의 위치
+ * @return {Number} 행렬값
  */
 Matrix4.prototype.get = function(col, row) 
 {
-	if (this._floatArrays === null)
-	{ return null; }
-	
 	return this._floatArrays[this.getIndexOfArray(col, row)];
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param col 변수
- * @param row 변수
+ * XYZ축으로 이동한다.
+ *
+ * @param {Number} x X축 이동량
+ * @param {Number} y Y축 이동량
+ * @param {Number} z Z축 이동량
  */
 Matrix4.prototype.setTranslation = function(x, y, z) 
 {
@@ -236,11 +265,7 @@ Matrix4.prototype.setTranslation = function(x, y, z)
 	this.set(3, 2, z);
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param col 변수
- * @param row 변수
- */
+
 Matrix4.prototype.set = function(col, row, value) 
 {
 	this._floatArrays[this.getIndexOfArray(col, row)] = value;
