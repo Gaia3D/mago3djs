@@ -1,4 +1,5 @@
 /* eslint-disable strict */
+
 describe("Matrix4 테스트", function () 
 {
 	var matrix;

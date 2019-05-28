@@ -1,4 +1,5 @@
 /* eslint-disable strict */
+
 describe('APIGateway', function () 
 {
 	/*

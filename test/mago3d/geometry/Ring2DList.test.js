@@ -4,7 +4,7 @@ describe('Ring3DList', function()
 {
 	var test;
 
-	beforeEach(function()
+	beforeEach(function() 
 	{
 		test = [1, 3, 5, 7, 8, 9];
 	});
