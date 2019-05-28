@@ -67,6 +67,22 @@ VtxProfilesList.prototype.deleteObjects = function()
 	}
 };
 
+/**
+ * 페이스 목록 생성 및 반환. 메쉬의 hedgelist 업데이트
+ * 
+ * @static
+ * @param {VtxRing} bottomVtxRing
+ * @param {VtxRing} topVtxRing
+ * @param {Array.<Face>} resultFacesArray
+ * @param {Mesh} resultMesh
+ * @param {IndexRange} elemIndexRange
+ * 
+ * @see VtxProfilesList#getMesh
+ * @see Mesh#getHalfEdgesList
+ * @see Face#createHalfEdges
+ * @see Face#setTwinFace
+ * @see HalfEdgesList#addHalfEdgesArray
+ */
 VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFacesArray, resultMesh, elemIndexRange)
 {
 	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".***
@@ -112,6 +128,10 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	return resultFacesArray;
 };
 
+/**
+ * VtxProfile 추가
+ * @param {VtxProfile} vtxProfile
+ */
 VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
 {
 	if (this.vtxProfilesArray === undefined)
@@ -120,6 +140,10 @@ VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
 	this.vtxProfilesArray.push(vtxProfile);
 };
 
+/**
+ * VtxProfile 생성하여 vtxProfileArray에 추가 후 반환.
+ * @return {VtxProfile} vtxProfile
+ */
 VtxProfilesList.prototype.newVtxProfile = function()
 {
 	if (this.vtxProfilesArray === undefined)
@@ -130,6 +154,10 @@ VtxProfilesList.prototype.newVtxProfile = function()
 	return vtxProfile;
 };
 
+/**
+ * vtxProfileArray length 반환.
+ * @return {Number}
+ */
 VtxProfilesList.prototype.getVtxProfilesCount = function()
 {
 	if (this.vtxProfilesArray === undefined)
@@ -138,6 +166,10 @@ VtxProfilesList.prototype.getVtxProfilesCount = function()
 	return this.vtxProfilesArray.length;
 };
 
+/**
+ * 인덱스에 해당하는 vtxProfile 반환
+ * @return {VtxProfile}
+ */
 VtxProfilesList.prototype.getVtxProfile = function(idx)
 {
 	if (this.vtxProfilesArray === undefined)
@@ -146,6 +178,11 @@ VtxProfilesList.prototype.getVtxProfile = function(idx)
 	return this.vtxProfilesArray[idx];
 };
 
+/**
+ * vtxProfileArray에 있는 모든 vertex를 배열에 담아 반환
+ * @param {Array.<Vertex>|undefined} resultVerticesArray 비어있을 시 배열 초기화.
+ * @return {Array.<Vertex>}
+ */
 VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 {
 	// collect all vertices of all vtxProfiles.***
@@ -163,6 +200,16 @@ VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 	return resultVerticesArray;
 };
 
+/**
+ * vtxProfileList로 부터 Mesh 생성 후 반환
+ * @param {Mesh} resultMesh 비어있을 시 new Mesh 인스턴스 선언.
+ * @param {Boolean} bIncludeBottomCap Mesh의 바닥 surface 추가 유무, true 일시 getTransversalSurface
+ * @param {Boolean} bIncludeTopCap Mesh의 위쪽(뚜껑) surface 추가 유무, true 일시 getTransversalSurface
+ * @param {Boolean} bLoop 기본값은 false. true로 선언 시, bIncludeBottomCap, bIncludeTopCap 는 false로 변경
+ * @return {Mesh}
+ * 
+ * @see VtxProfilesList#getTransversalSurface
+ */
 VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap, bLoop)
 {
 	// face's vertex order.***
@@ -352,6 +399,14 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	return resultMesh;
 };
 
+/**
+ * 위쪽이나 아랫쪽 surface 생성.
+ * @static
+ * @param {VtxProfile} vtxProfile
+ * @param {Array.<IndexData>} convexFacesIndicesData
+ * @param {Surface} resultSurface 비어있을 시 Surface 인스턴스 선언.
+ * @return {Surface}
+ */
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
 	if (resultSurface === undefined)
@@ -398,16 +453,14 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 };
 
 /**
+ * profile2d와 경로 point3d 리스트를 이용하여 vtxProfile 생성 후 vtxProfilesArray에 추가
  * @method VtxProfilesList.makeLoft
  * @param {Profile2D} profile2d
  * @param {Points3DList} pathPoints3dList
- * @param {boolean} bLoop
- * @returns none
- * @description 설명
- * @example
- * ` ``js
+ * @param {boolean} bLoop 기본값은 false.
  * 
- * ` ``
+ * @see Point3DList#getBisectionPlane
+ * @see Point3DList#getSegment3D
  */
 VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList, bLoop)
 {
