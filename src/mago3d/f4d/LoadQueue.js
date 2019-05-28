@@ -2,7 +2,7 @@
 
 /**
  * LoadData
- * 
+ * @deprecated 삭제예정
  * @alias LoadData
  * @class LoadData
  */
@@ -44,6 +44,7 @@ LoadData.prototype.deleteObjects = function()
 
 /**
  * LoadQueue
+ * @deprecated 삭제예정
  * 
  * @alias LoadQueue
  * @class LoadQueue
