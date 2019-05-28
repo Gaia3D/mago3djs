@@ -17,7 +17,10 @@ var CuttingPlane = function()
 	// geometric representation.***
 	this.mesh; // use to draw a rectangle.***
 };
-
+/**
+ * Calculate plane.
+ * In the transformationMatrix there are the normal of the plane.
+ */
 CuttingPlane.prototype.getPlane = function()
 {
 	// Calculate plane.***
@@ -32,7 +35,11 @@ CuttingPlane.prototype.getPlane = function()
 	
 	return this.plane;
 };
-
+/**
+ * create mesh to draw cutting plane's rectangle
+ * @param {Number} width the width of the cutting plane's rectangle
+ * @param {Number} height the height of the cutting plane's rectangle
+ */
 CuttingPlane.prototype.makeRectangle = function(width, height)
 {
 	// Provisional function.***
@@ -69,6 +76,12 @@ CuttingPlane.prototype.makeRectangle = function(width, height)
 	
 };
 
+/**
+ * Render cutting plane
+ * @param magoManager
+ * @param shader
+ * @param renderType
+ */
 CuttingPlane.prototype.render = function(magoManager, shader, renderType)
 {
 	var gl = magoManager.sceneState.gl;
