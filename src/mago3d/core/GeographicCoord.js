@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class represents the coordinate as geographic coordinate system
  * @class GeographicCoord
  */
 var GeographicCoord = function(lon, lat, alt) 
@@ -31,10 +31,8 @@ var GeographicCoord = function(lon, lat, alt)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param longitude 경도
- * @param latitude 위도
- * @param altitude 고도
+ * Clear the value of this instance from the vbo key container and geoLocDataManager 
+ * @param {VBOMemoryManager}vboMemManager
  */
 GeographicCoord.prototype.deleteObjects = function(vboMemManager) 
 {
@@ -62,7 +60,8 @@ GeographicCoord.prototype.deleteObjects = function(vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Change this GeographicCoord point to Point3D point
+ * @param {Point3D} resultPoint3D
  */
 GeographicCoord.prototype.getWgs84Point3D = function(resultPoint3d) 
 {
@@ -76,7 +75,8 @@ GeographicCoord.prototype.getWgs84Point3D = function(resultPoint3d)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Change this GeographicCoord point to Point2D point using Mercator projection
+ * @param {Point2D} resultPoint2d
  */
 GeographicCoord.prototype.getMercatorProjection = function(resultPoint2d) 
 {
@@ -84,7 +84,7 @@ GeographicCoord.prototype.getMercatorProjection = function(resultPoint2d)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get the GeoLocationDataManager of this feature
  */
 GeographicCoord.prototype.getGeoLocationDataManager = function() 
 {
@@ -95,7 +95,8 @@ GeographicCoord.prototype.getGeoLocationDataManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Copy the value of the other GeographicCoord feature
+ * @param {GeographicCoord} geographicCoord
  */
 GeographicCoord.prototype.copyFrom = function(geographicCoord) 
 {
@@ -105,7 +106,7 @@ GeographicCoord.prototype.copyFrom = function(geographicCoord)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Set lon,lat,alt at this feature
  * @param longitude 경도
  * @param latitude 위도
  * @param altitude 고도
@@ -121,7 +122,11 @@ GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get the middle point between two GeopraphicCoord features
+ * @param {GeographicCoord} geographicCoordA
+ * @param {GeographicCoord} geographicCoordB
+ * @param {GeographicCoord} resultGeographicCoord
+ * @return {GeographicCoord}
  */
 GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resultGeographicCoord) 
 {
@@ -140,7 +145,8 @@ GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resul
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * make the vbo data of this feature
+ * @param {VBOMemoryManager} vboMemManager
  */
  
 GeographicCoord.prototype.prepareData = function(vboMemManager) 
@@ -161,7 +167,7 @@ GeographicCoord.prototype.prepareData = function(vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Render this feature
  */
 GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, renderType) 
 {
@@ -216,7 +222,8 @@ var GeographicCoordsList = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * push single point
+ * @param {GeographicCoord}
  */
 GeographicCoordsList.prototype.addGeoCoord = function(geographicPoint) 
 {
@@ -225,7 +232,8 @@ GeographicCoordsList.prototype.addGeoCoord = function(geographicPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get single point
+ * @param {Number} idx the index of target
  */
 GeographicCoordsList.prototype.getGeoCoord = function(idx) 
 {
@@ -236,7 +244,8 @@ GeographicCoordsList.prototype.getGeoCoord = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Get the number of the point in this list
+ * @return {Number} the number of the points
  */
 GeographicCoordsList.prototype.getGeoCoordsCount = function() 
 {
@@ -247,11 +256,14 @@ GeographicCoordsList.prototype.getGeoCoordsCount = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This function returns points3dArray relative to the geoLocIn.
+ * @param {GeoLocationData} geoLocIn the information about the axis of this GeographicCoord
+ * @param resultPoint3dArray
+ * 
  */
 GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocIn, resultPoints3dArray) 
 {
-	// This function returns points3dArray relative to the geoLocIn.***
+
 	if (resultPoints3dArray === undefined)
 	{ resultPoints3dArray = []; }
 	
@@ -270,7 +282,7 @@ GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocI
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Clear the data in this instance and delete the vbo info of this instance
  */
 GeographicCoordsList.prototype.deleteObjects = function(vboMemManager) 
 {
@@ -296,7 +308,7 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Make Lines making the first point as the origin for the other points. Change the points to the GeographicCoords.
  */
 GeographicCoordsList.prototype.makeLines = function(magoManager) 
 {
@@ -323,7 +335,7 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Render lines
  */
 GeographicCoordsList.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth) 
 {
@@ -346,7 +358,12 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Rendering this feature
+ * @param magoManager
+ * @param shader
+ * @param renderType
+ * @param bEnableDepth
+ * 
  */
 GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, renderType, bEnableDepth) 
 {
@@ -435,7 +452,8 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Change Point3D features from WGS84 Points
+ * @param resultPoint3DArray the target
  */
 GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray) 
 {
@@ -453,6 +471,10 @@ GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray)
 	
 	return resultPoint3DArray;
 };
+
+
+
+
 
 
 
