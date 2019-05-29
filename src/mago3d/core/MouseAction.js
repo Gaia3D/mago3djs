@@ -163,7 +163,7 @@ MouseAction.prototype.claculateStartPositionsAux = function(magoManager)
 };
 
 /**
- * Save the current-state on start-state vars.
+ * Save the current-state on start-state vars. of worldPoint and CamCoordPoint
  */
 MouseAction.prototype.saveCurrentToStart = function()
 {
