@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * the list of the features of Profile2D
  * @class Profiles2DList
  */
 var Profiles2DList = function() 
@@ -18,8 +18,8 @@ var Profiles2DList = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * create new feature of Profile2D and push it at the list
+ * @returns {Profile2D} profile
  */
 Profiles2DList.prototype.newProfile = function() 
 {
@@ -32,8 +32,7 @@ Profiles2DList.prototype.newProfile = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * Clear all the features of this list
  */
 Profiles2DList.prototype.deleteObjects = function() 
 {

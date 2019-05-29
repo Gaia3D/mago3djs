@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class represents ellipsoid, but this is needed to be implemented more.
  * @class Ellipsoid
  */
 var Ellipsoid = function(radiusX, radiusY, radiusZ) 

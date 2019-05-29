@@ -1,6 +1,7 @@
 'use strict';
 
 /**
+ * The plane which can be represented as linear equation
  * Plane on 3D space. Plane equation ax+by+cz+d = 0.
  * @class Plane
  */
@@ -19,13 +20,13 @@ var Plane = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
- * @param nx 변수
- * @param ny 변수
- * @param nz 변수p
+ * set the point and the vector which determine this plane
+ * @param px the x coordi of the point that determine this plane
+ * @param py the y coordi of the point that determine this plane
+ * @param pz the z coordi of the point that determine this plane
+ * @param nx the x coordi of the normal vector
+ * @param ny the y coordi of the normal vector
+ * @param nz the z coordi of the normal vector
  */
 Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) 
 {
@@ -36,10 +37,10 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
+ * set the point which determine this plane
+ * @param px the x coordi of the point that determine this plane
+ * @param py the y coordi of the point that determine this plane
+ * @param pz the z coordi of the point that determine this plane
  */
 Plane.prototype.setPoint = function(px, py, pz) 
 {
@@ -47,11 +48,11 @@ Plane.prototype.setPoint = function(px, py, pz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * determine this plane as normal vector and the distance from the point which determine normal vector
  * @param dist
- * @param nx 변수
- * @param ny 변수
- * @param nz 변수p
+ * @param nx the x coordi of the normal vector
+ * @param ny the y coordi of the normal vector
+ * @param nz the z coordi of the normal vector
  */
 Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) 
 {
@@ -62,7 +63,7 @@ Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get the point of normal vector
  */
 Plane.prototype.getNormal = function(resultNormal) 
 {
@@ -75,7 +76,8 @@ Plane.prototype.getNormal = function(resultNormal)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Calculate the matrix which can rotate this plane
+ * @param resultMatrix the matrix which will hold the result
  */
 Plane.prototype.getRotationMatrix = function(resultTMatrix) 
 {
@@ -128,7 +130,7 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Get the point of the intersecting point of line and this plane
  * @param line 변수
  * @param intersectionPoint 변수
  */
@@ -157,9 +159,8 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param line 변수
- * @param intersectionPoint 변수
+ * Check whether the given sphere is intersected with this plane or not
+ * @param sphere sphere
  */
 Plane.prototype.intersectionSphere = function(sphere) 
 {

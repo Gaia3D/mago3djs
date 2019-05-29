@@ -4,7 +4,7 @@
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Save and calculate the color value as RGB
  * @class Color
  */
 var Color = function() 
@@ -13,10 +13,6 @@ var Color = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	//this[0] = 0.0;
-	//this[1] = 0.0;
-	//this[2] = 0.0;
-	//this[3] = 1.0;
 
 	this.r = 0;
 	this.g = 0;
@@ -26,8 +22,10 @@ var Color = function()
 
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param gray 변수
+ * Match gray scale to RGB scale
+ * @param gray the percentage of the gray color. normalize the value from 0.0 to 1.0
+ * @param {Color} resultColor
+ * @return {Color} 
  */
 Color.grayToRGB_MagoStyle = function(gray, resultColor) 
 {
@@ -58,8 +56,8 @@ Color.grayToRGB_MagoStyle = function(gray, resultColor)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param red 변수
+ * copy of the value of RGB instance
+ * @param {Color} color
  */
 Color.prototype.copyFrom = function(color) 
 {
@@ -70,7 +68,7 @@ Color.prototype.copyFrom = function(color)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Clear the RGBA value of this instance
  */
 Color.prototype.deleteObjects = function() 
 {
@@ -81,41 +79,41 @@ Color.prototype.deleteObjects = function()
 };
   
 /**
- * 어떤 일을 하고 있습니까?
- * @param red 변수
- * @param green 변수
- * @param blue 변수
- * @param alpha 변수
+ * Set the value of RGBA (A means transparancy) as default. 
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
+ * @param alpha the value of transparancy
  */
 Color.prototype.set = function(red, green, blue, alpha) 
 {
-	//this[0] = red;
-	//this[1] = green;
-	//this[2] = blue;
-	//this[3] = alpha;
-	this.r = red; this.g = green; this.b = blue; this.a = alpha;
+
+	this.r = red; 
+	this.g = green; 
+	this.b = blue; 
+	this.a = alpha;
 };
   
 /**
- * 어떤 일을 하고 있습니까?
- * @param red 변수
- * @param green 변수
- * @param blue 변수
+ * Set the value of RGB
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
  */
 Color.prototype.setRGB = function(red, green, blue) 
 {
-	//this[0] = red;
-	//this[1] = green;
-	//this[2] = blue;
-	this.r = red; this.g = green; this.b = blue;
+
+	this.r = red; 
+	this.g = green; 
+	this.b = blue;
 };
   
 /**
- * 어떤 일을 하고 있습니까?
- * @param red 변수
- * @param green 변수
- * @param blue 변수
- * @param alpha 변수
+ * Set the value of RGBA (A means transparancy)
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
+ * @param alpha the value of transparancy
  */
 Color.prototype.setRGBA = function(red, green, blue, alpha) 
 {
@@ -127,7 +125,7 @@ Color.prototype.setRGBA = function(red, green, blue, alpha)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class is used for color code of GL
  * @class SelectionColor
  */
 var SelectionColor = function() 
@@ -141,7 +139,7 @@ var SelectionColor = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Initiate the color value of this feature
  */
 SelectionColor.prototype.init = function() 
 {
@@ -152,7 +150,8 @@ SelectionColor.prototype.init = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get the color code of given RGB color
+ * @param {Color} resultColor target color instance
  */
 SelectionColor.prototype.getAvailableColor = function(resultColor) 
 {
@@ -182,7 +181,12 @@ SelectionColor.prototype.getAvailableColor = function(resultColor)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Change the RGB code to color code.
+ * (255,255,255) is used to white color so 254 number is used
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b
+ * @return Color code
  */
 SelectionColor.prototype.decodeColor3 = function(r, g, b) 
 {

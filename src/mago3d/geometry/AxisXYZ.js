@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 선
+ * This show x, y ,z axises of the given feature to visualize them
  * @class AxisXYZ
  */
 var AxisXYZ = function(length) 
@@ -19,11 +19,19 @@ var AxisXYZ = function(length)
 	//this.vboKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 };
 
+/**
+ * Set the length of the axises
+ * @param {Number} length the length of the axis
+ */
 AxisXYZ.prototype.setDimension = function(length)
 {
 	this.length = length;
 };
 
+/**
+ * Visualize the axises at the feature
+ * @param {Number} length the length of the axis to set the length of the axises
+ */
 AxisXYZ.prototype.makeMesh = function(length)
 {
 	if (length !== undefined)

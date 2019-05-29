@@ -7,7 +7,7 @@ describe('Point3D', function()
 	var testY = 2.0;
 	var testZ = 3.0;
 
-	beforeEach(function()
+	beforeEach(function() 
 	{
 		testPoint = new Point3D();
 	});

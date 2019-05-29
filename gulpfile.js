@@ -30,7 +30,7 @@ var paths = {
 	dest_js   : './build/mago3d',
 	//	dest_images : './images',
 	//	dest_css : './build/css',
-	test      : './test/*.js',
+	test      : ['./test/*.js', './test/mago3d/*.js', './test/mago3d/**/*.js'],
 	build     : './build'
 };
 
@@ -160,6 +160,7 @@ gulp.task('lint', function()
 {
 	var list = paths.source_js;
 	list.push('!./src/mago3d/extern/*.js');
+	list = list.concat(paths.test);
 	return gulp.src(list)
 		.pipe(eslint({fix: true}))
 		.pipe(eslint.format())

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This represent Arc feature in 2D
  * @class Arc2D
  */
 var Arc2D = function() 
@@ -10,13 +10,13 @@ var Arc2D = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// sweeping in CounterClockWise is positive.***
-	// zero startAngle is in "X" axis positive.***
+	
+	
 	this.centerPoint; // Point2D.***
 	this.radius;
-	this.startAngleDeg;
-	this.sweepAngleDeg;
-	this.numPointsFor360Deg; // interpolation param.***
+	this.startAngleDeg; // zero startAngle is in "X" axis positive.
+	this.sweepAngleDeg; // sweeping in CounterClockWise is positive.
+	this.numPointsFor360Deg; // interpolation param.
 	
 	// Alternative vars.***
 	this.startPoint; // if no exist radius, then startPoint define the radius.***
@@ -51,8 +51,9 @@ Arc2D.prototype.deleteObjects = function()
 };
 
 /**
- * Set the center position of arc.
- * @class Arc2D
+ * Set the center position of Arc
+ * @param {Number} cx the x coordi of the center
+ * @param {Number} cy the y coordi of the center
  */
 Arc2D.prototype.setCenterPosition = function(cx, cy)
 {
@@ -63,8 +64,8 @@ Arc2D.prototype.setCenterPosition = function(cx, cy)
 };
 
 /**
- * Set the center position of arc.
- * @class Arc2D
+ * Set the radius value
+ * @param {Number} radius
  */
 Arc2D.prototype.setRadius = function(radius)
 {
@@ -73,7 +74,7 @@ Arc2D.prototype.setRadius = function(radius)
 
 /**
  * Set the start angle of the arc.
- * @class Arc2D
+ * @param startAngleDegree 
  */
 Arc2D.prototype.setStartAngleDegree = function(startAngleDegree)
 {
@@ -81,8 +82,9 @@ Arc2D.prototype.setStartAngleDegree = function(startAngleDegree)
 };
 
 /**
- * Set the start angle of the arc.
- * @class Arc2D
+ * Set the start point of the arc.
+ * @param {Number} x
+ * @param {NUmber} y
  */
 Arc2D.prototype.setStartPoint = function(x, y)
 {
@@ -107,8 +109,8 @@ Arc2D.prototype.setEndPoint = function(x, y)
 };
 
 /**
- * Set the start angle of the arc.
- * @class Arc2D
+ * Set the sweep direction sense of the arc.
+ * @param sense
  */
 Arc2D.prototype.setSense = function(sense)
 {
@@ -117,7 +119,7 @@ Arc2D.prototype.setSense = function(sense)
 
 /**
  * Set the sweep angle of the arc.
- * @class Arc2D
+ * @param sweepAngleDegree 
  */
 Arc2D.prototype.setSweepAngleDegree = function(sweepAngleDegree)
 {
@@ -126,7 +128,8 @@ Arc2D.prototype.setSweepAngleDegree = function(sweepAngleDegree)
 
 /**
  * Returns the points of the arc.
- * @class Arc2D
+ * @param resultPointsArray the array which saves the result of the points
+ * @param pointsCountFor360Deg the value used for interpolation way
  */
 Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 {

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 영역 박스
+ * This class is needed to be implemented at the future. not yet implemented fully.
  * @class BoundingSphere
  */
 var BoundingSphere = function() 

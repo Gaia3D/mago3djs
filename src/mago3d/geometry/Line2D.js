@@ -17,11 +17,11 @@ var Line2D = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param dx 변수
- * @param dy 변수
+ * set the needed value of this line with a point and a direction value
+ * @param px the value of x coordi of this line
+ * @param py the value of y coordi of this line
+ * @param dx the value of x direction of this line
+ * @param dy the value of y direction of this line
  */
 Line2D.prototype.setPointAndDir = function(px, py, dx, dy) 
 {
@@ -31,8 +31,7 @@ Line2D.prototype.setPointAndDir = function(px, py, dx, dy)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * 
  */
 Line2D.prototype.getPerpendicularRight = function(point) 
 {
@@ -48,8 +47,9 @@ Line2D.prototype.getPerpendicularRight = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Get the perpendicular direction of the line in left-handed coordinate system
+ * @param point target point
+ * @return perpendicular the perpendicular direction 
  */
 Line2D.prototype.getPerpendicularLeft = function(point) 
 {
@@ -65,8 +65,11 @@ Line2D.prototype.getPerpendicularLeft = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Return the point which is projected as perpendicular way to the line
+ * @param {Point2D} point the given point
+ * @param {Point2D} projectedPoint the result of the projection to the line
+ * @return {Point2D} projectedPoint
+ * 
  */
 Line2D.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
@@ -83,8 +86,10 @@ Line2D.prototype.getProjectedPoint = function(point, projectedPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Check whether the given point is on this line or not
+ * @param {Point2D} point the given point
+ * @param {Number} error the error rate which can be handdled
+ * @return {Boolean} 
  */
 Line2D.prototype.isCoincidentPoint = function(point, error) 
 {
@@ -104,8 +109,9 @@ Line2D.prototype.isCoincidentPoint = function(point, error)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Check whether the given line is parallel to this line or not
+ * @param {Line2D} line
+ * @return {Boolean}
  */
 Line2D.prototype.isParallelToLine = function(line) 
 {
@@ -123,8 +129,10 @@ Line2D.prototype.isParallelToLine = function(line)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Get the intersection point with given line
+ * @param {Line2D} line
+ * @param {Point2D} resultIntersectPoint
+ * @return {Point2D} resultIntersectPoint
  */
 Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint) 
 {
