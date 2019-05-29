@@ -1,3 +1,4 @@
+'use strict';
 /**
  * This class is used for color code of GL
  * @class SelectionColor

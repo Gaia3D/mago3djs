@@ -2,23 +2,23 @@
 
 describe('ManagerUtils test : ', function() 
 {
-    var testPoint;
-    var testGeographicCoord;
+	var testPoint;
+	var testGeographicCoord;
 
-    var testResultPointUndefined;
-    var testResultGeographicCoordUndefined;
+	var testResultPointUndefined;
+	var testResultGeographicCoordUndefined;
 
-    var testResultPointInstance;
-    var testResultGeographicCoordInstance;
+	var testResultPointInstance;
+	var testResultGeographicCoordInstance;
 
-    var testLat = 37.581899408197266;
-    var testLon = 126.90127536589439;
-    var testAlt = -1.4179975027284853e-9;
-    var testX = -3038736.4234381397;
-    var testY = 4047029.3054877245;
-    var testZ = 3868771.59308859;
+	var testLat = 37.581899408197266;
+	var testLon = 126.90127536589439;
+	var testAlt = -1.4179975027284853e-9;
+	var testX = -3038736.4234381397;
+	var testY = 4047029.3054877245;
+	var testZ = 3868771.59308859;
 
-    /*var customMatchers = {
+	/*var customMatchers = {
         checkType: function(util, customEqualityTesters) {
             return {
                 compare: function(actual, expected) {
@@ -42,34 +42,36 @@ describe('ManagerUtils test : ', function()
         }
     };*/
 
-    beforeEach(function()
-    {
-        //jasmine.addMatchers(customMatchers);
-        testPoint = new Point3D(testX, testY, testZ);
-        testGeographicCoord = new GeographicCoord(testLon, testLat, testAlt);
-        testResultPointInstance = new Point3D();
-        testResultGeographicCoordInstance = new GeographicCoord();
-    });
+	beforeEach(function()
+	{
+		//jasmine.addMatchers(customMatchers);
+		testPoint = new Point3D(testX, testY, testZ);
+		testGeographicCoord = new GeographicCoord(testLon, testLat, testAlt);
+		testResultPointInstance = new Point3D();
+		testResultGeographicCoordInstance = new GeographicCoord();
+	});
 
-    describe('pointToGeographicCoord : world coordinate to geographic coordinate', function() 
-    {
-        var result;
-        beforeEach(function()
-        {
-            result = ManagerUtils.pointToGeographicCoord(testPoint);
-        });
+	describe('pointToGeographicCoord : world coordinate to geographic coordinate', function() 
+	{
+		var result;
+		beforeEach(function()
+		{
+			result = ManagerUtils.pointToGeographicCoord(testPoint);
+		});
 
-        it('case1 : is result GeographicCoord?', function(){
-            expect(result instanceof GeographicCoord).toEqual(true);
-        });
+		it('case1 : is result GeographicCoord?', function()
+		{
+			expect(result instanceof GeographicCoord).toEqual(true);
+		});
 
-        it('case2 : result value check', function(){
-            expect(result.longitude).toEqual(testLon);
-            expect(result.latitude).toEqual(testLat);
-            expect(result.altitude).toEqual(testAlt);
-        });
+		it('case2 : result value check', function()
+		{
+			expect(result.longitude).toEqual(testLon);
+			expect(result.latitude).toEqual(testLat);
+			expect(result.altitude).toEqual(testAlt);
+		});
 
-        /*it('case3 : When world coordinate is undefined', function(){
+		/*it('case3 : When world coordinate is undefined', function(){
             var captured = null;
             try {
                 ManagerUtils.pointToGeographicCoord();
@@ -79,5 +81,5 @@ describe('ManagerUtils test : ', function()
             }
             expect(captured).toBe(null);
         });*/
-    });
+	});
 });
