@@ -886,10 +886,6 @@ MagoManager.prototype.loadAndPrepareData = function()
 	//if(this.isFarestFrustum())
 	this.manageQueue();
 	
-	if (this.currentFrustumIdx === 0)
-	{
-		this.loadQueue.manageQueue();
-	}
 };
 
 /**
@@ -1092,7 +1088,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderGeometry(gl, cameraPosition, currentShader, renderTexture, ssao_idx, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
@@ -1161,11 +1157,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderMagoGeometries(ssao_idx); //TEST
+	this.renderMagoGeometries(ssao_idx); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
 };
+
 
 /**
  * Main loop function. This function contains all Mago3D Pipe-Line.
@@ -1208,6 +1205,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.sceneState.camera.doTrack(this);
 	}
 	
+	
 	var cameraPosition = this.sceneState.camera.position;
 	
 	// Take the current frustumVolumenObject.***
@@ -1224,10 +1222,14 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		var frustumVolume = this.myCameraSCX.bigFrustum;
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
+
 		doFrustumCullingToBuildings = true;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
+		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
+
 	}
+	
 
 	var currentShader = undefined;
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
@@ -1238,6 +1240,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.loadAndPrepareData();
 		this.managePickingProcess();
 	}
+	
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
@@ -1269,10 +1272,12 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		}
 	}
 	
+	
 	// lightDepthRender: TODO.***
 
 	// Render process.***
 	this.doRender(frustumVolumenObject);
+	
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1333,8 +1338,8 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		pMesh.profile = new Profile2D(); // provisional.***
 		var profileAux = pMesh.profile; // provisional.***
 		
-		profileAux.TEST__setFigureHole_2();
-		//profileAux.TEST__setFigure_1();
+		//profileAux.TEST__setFigureHole_2();
+		profileAux.TEST__setFigure_1();
 		
 		if (pMesh.vboKeyContainer === undefined)
 		{ pMesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer(); }
@@ -2034,8 +2039,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//};
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
@@ -4778,6 +4783,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var distToCamera;
 	var magoPolicy = this.magoPolicy;
 	
+	
+	
 	var lod0_minDist = magoPolicy.getLod1DistInMeters();
 	var lod1_minDist = 1;
 	var lod2_minDist = magoPolicy.getLod2DistInMeters();
@@ -4813,6 +4820,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 	
+	
+	
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > Number(lod5_minDist))
 		{ continue; }
@@ -4834,6 +4843,9 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				neoBuilding = node.data.neoBuilding;
+				
+				
+				
 				if (neoBuilding === undefined)
 				{
 					// This node is a reference node.***
@@ -4849,6 +4861,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				var data = node.data;
 				data.currentLod;
 				data.distToCam = distToCamera;
+				
+				
 				
 				//neoBuilding.distToCam = distToCamera;
 				
@@ -4873,6 +4887,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue; 
 				}
 				
+				
+				
 				// If necessary do frustum culling.*************************************************************************
 				if (doFrustumCullingToBuildings)
 				{
@@ -4886,6 +4902,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						continue;
 					}
 				}
+				
+				
 				//-------------------------------------------------------------------------------------------
 				
 				
@@ -4996,6 +5014,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		
 		
 	}
+	
 };
 
 
@@ -5032,8 +5051,9 @@ MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowe
 		
 		neoBuilding.nodeOwner = node;
 		node.data.neoBuilding = neoBuilding;
-		nodeBbox = new BoundingBox();
-		node.data.bbox = nodeBbox;
+		if (node.data.bbox === undefined)
+		{ node.data.bbox = new BoundingBox(); }
+		nodeBbox = node.data.bbox;
 		buildingSeed = node.data.buildingSeed;
 		
 		lowestTile.nodesArray.push(node);

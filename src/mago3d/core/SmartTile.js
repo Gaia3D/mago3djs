@@ -469,6 +469,7 @@ SmartTile.prototype.intersectsNode = function(node)
 	
 	// Find geographicCoords as is possible.***
 	var longitude, latitude;
+	
 	if (rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
 	{
 		longitude = rootNode.data.bbox.geographicCoord.longitude;
