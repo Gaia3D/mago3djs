@@ -47,6 +47,8 @@ var CCTV = function(name)
 };
 
 /**
+ * Update time as current time
+ * @param currTime current time
  */
 CCTV.prototype.updateTime = function(currTime)
 {
@@ -54,6 +56,12 @@ CCTV.prototype.updateTime = function(currTime)
 };
 
 /**
+ * Calculate the angularSpped to rotate the CCTV with the three direction : heading, pitch, roll
+ * @param headingDeg
+ * @param pitchDeg
+ * @param rollDeg
+ * @param transitionTimeSec
+ * 
  */
 CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transitionTimeSec)
 {
@@ -103,6 +111,8 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 };
 
 /**
+ * Rotate the CCTV with current time and pre-calculated angular speed
+ * @param currTime current time 
  */
 CCTV.prototype.updateOrientation = function(currTime)
 {
@@ -213,6 +223,8 @@ CCTV.prototype.updateOrientation = function(currTime)
 };
 
 /**
+ * only rotating with the heading direction
+ * @param currTime current time
  */
 CCTV.prototype.updateHeading = function(currTime)
 {
@@ -238,6 +250,8 @@ CCTV.prototype.updateHeading = function(currTime)
 };
 
 /**
+ * Update the color of the screen shown at the CCTV
+ * @param currTime
  */
 CCTV.prototype.updateColor = function(currTime)
 {
@@ -300,6 +314,7 @@ CCTV.prototype.updateColor = function(currTime)
 };
 
 /**
+ * Calculate the matrix when update the orientation of the matrix
  */
 CCTV.prototype.calculateRotationMatrix = function()
 {
@@ -309,6 +324,10 @@ CCTV.prototype.calculateRotationMatrix = function()
 };
 
 /**
+ * get the Vbo of the mesh which consist of the frustum of this CCTV
+ * @param resultVboContainer
+ * @param resultVboContainerEdges
+ * @param vboMemManager
  */
 CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vboMemManager)
 {
@@ -342,6 +361,7 @@ CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vb
 };
 
 /**
+ * 
  */
 CCTV.prototype.render = function(gl, magoManager, shader)
 {
@@ -389,6 +409,8 @@ CCTV.prototype.render = function(gl, magoManager, shader)
 };
 
 /**
+ * Make Frustum Geometry for this CCTV
+ * @param resultMesh the frustum
  */
 CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 {
@@ -445,6 +467,8 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 };
 
 /**
+ * Make Frustum Geometry for this CCTV
+ * @param resultMesh the frustum
  */
 CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 {
@@ -681,6 +705,8 @@ var CCTVList = function()
 };
 
 /**
+ * Create CCTV with name
+ * @param {String} name
  */
 CCTVList.prototype.new_CCTV = function(name)
 {
@@ -693,6 +719,9 @@ CCTVList.prototype.new_CCTV = function(name)
 };
 
 /**
+ * Get single CCTV instance as the index of the instance in this CCTV list
+ * @param {Number} idx
+ * @return {CCTV}
  */
 CCTVList.prototype.getCCTV = function(idx)
 {
@@ -700,6 +729,8 @@ CCTVList.prototype.getCCTV = function(idx)
 };
 
 /**
+ * Get single CCTV instance as the name of the instance
+ * @param {String} cameraName the name of that CCTV
  */
 CCTVList.prototype.getCCTVByName = function(cameraName)
 {
@@ -722,6 +753,8 @@ CCTVList.prototype.getCCTVByName = function(cameraName)
 };
 
 /**
+ * Get the number of the CCTV in this list 
+ * @return {Number} count
  */
 CCTVList.prototype.getCCTVCount = function()
 {
@@ -729,6 +762,9 @@ CCTVList.prototype.getCCTVCount = function()
 };
 
 /**
+ * Update the properties of the list of CCTV with current time and render the view that each CCTV show
+ * @param {MagoManager} magoManager
+ * @param shader
  */
 CCTVList.prototype.render = function(magoManager, shader)
 {
