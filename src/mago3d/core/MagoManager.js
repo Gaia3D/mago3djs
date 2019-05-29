@@ -1325,7 +1325,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 MagoManager.prototype.renderMagoGeometries = function(ssao_idx) 
 {
 	// 1rst, make the test object if no exist.***
-	//return;
+	return;
 	
 	if (this.nativeProjectsArray === undefined)
 	{
