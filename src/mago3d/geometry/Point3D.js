@@ -156,7 +156,7 @@ Point3D.prototype.getRelativeOrientationToVector = function(vector, radError)
 {
 	var angRad = this.angleRadToVector(vector);
 	if (angRad < radError)
-	{ return 0; } // there are parallel & the same sense.***
+	{ return 0; } // there are parallel & the same direction sense.***
 	else if (Math.abs(Math.PI - angRad) < radError)
 	{ return 1; } // there are parallel & opposite sense.***
 	else
