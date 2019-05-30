@@ -192,6 +192,9 @@ var PostFxShader = function(gl)
 	this.uniformsArrayLocal = []; // this array has the same uniforms that "uniformsCacheObj".***
 	this.uniformsMapLocal = {}; // this object has the same uniforms that "uniformsArray".***
 	
+	// No general objects.***
+	this.camera;
+	
 	// shader program.***
 	this.program;
 	this.shader_vertex;
@@ -336,6 +339,10 @@ PostFxShader.prototype.bindUniformGenerals = function()
 	{
 		this.uniformsArrayGeneral[i].bindUniform();
 	}
+	
+	// Bind camera uniforms.***
+	if (this.camera)
+	{ this.camera.bindCameraUniforms(this.gl, this); }
 };
 
 /**
@@ -516,24 +523,6 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.encodedCamPosLow;
 	}
 	
-	// 8. frustumNear.***
-	uniformLocation = gl.getUniformLocation(shader.program, "near");
-	if (uniformLocation !== null && uniformLocation !== undefined)
-	{
-		uniformDataPair = shader.newUniformDataPair("1f", "frustumNear");
-		uniformDataPair.uniformLocation = uniformLocation;
-		uniformDataPair.floatValue = sceneState.camera.frustum.near;
-	}
-	
-	// 9. frustumFar.***
-	uniformLocation = gl.getUniformLocation(shader.program, "far");
-	if (uniformLocation !== null && uniformLocation !== undefined)
-	{
-		uniformDataPair = shader.newUniformDataPair("1f", "frustumFar");
-		uniformDataPair.uniformLocation = uniformLocation;
-		uniformDataPair.floatValue = sceneState.camera.frustum.far; // original.***
-	}
-	
 	// 10. fovy.***
 	uniformLocation = gl.getUniformLocation(shader.program, "fov");
 	if (uniformLocation !== null && uniformLocation !== undefined)
@@ -669,7 +658,8 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.ssaoKernel16;
 	}
 	
-	
+	// Set the camera.***
+	this.camera = sceneState.camera;
 };
 
 /**
@@ -721,6 +711,14 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	//uniform bool bUseFixPointSize;
 	shader.fixPointSize_loc = gl.getUniformLocation(shader.program, "fixPointSize");
 	shader.bUseFixPointSize_loc = gl.getUniformLocation(shader.program, "bUseFixPointSize");
+	
+	// Camera frustum near & far.***
+	// frustumNear.***
+	shader.frustumNear_loc = gl.getUniformLocation(shader.program, "near");
+
+	// frustumFar.***
+	shader.frustumFar_loc = gl.getUniformLocation(shader.program, "far");
+
 	
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 카메라
+ * Furstum used by camera
  * @class Frustum
  */
 var Frustum = function() 
@@ -13,9 +13,9 @@ var Frustum = function()
 	
 	this.near = new Float32Array([0.1]);
 	this.far = new Float32Array([1000.0]);
-	this.fovyRad = new Float32Array([0.8037]);
-	this.tangentOfHalfFovy = new Float32Array([0.0]);
-	this.fovRad = new Float32Array([1.047]);
+	this.fovyRad = new Float32Array([0.8037]); //vertical viewing angle
+	this.tangentOfHalfFovy = new Float32Array([0.0]); // to get the length of the horizontal angle of fov
+	this.fovRad = new Float32Array([1.047]);//horizontal viewing angle
 	this.aspectRatio = new Float32Array([1.3584]);
 	this.planesArray = [];
 	this.dirty = true;
@@ -29,8 +29,8 @@ var Frustum = function()
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * copy the other frustum
+ * @param {Frustum} frustum
  */
 Frustum.prototype.copyParametersFrom = function(frustum) 
 {
@@ -43,8 +43,8 @@ Frustum.prototype.copyParametersFrom = function(frustum)
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * Set the near of frustum by distance
+ * @param near
  */
 Frustum.prototype.setNear = function(near) 
 {
@@ -52,8 +52,8 @@ Frustum.prototype.setNear = function(near)
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * Set the fart of frustum by distance
+ * @param far
  */
 Frustum.prototype.setFar = function(far) 
 {
@@ -61,8 +61,9 @@ Frustum.prototype.setFar = function(far)
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * Check whether the bounding sphere of the feature is intersected with the near and far of the frustum for frustum culling
+ * @param {Sphere} sphere
+ * @returns {Boolean}
  */
 Frustum.prototype.intersectionNearFarSphere = function(sphere) 
 {
@@ -83,8 +84,9 @@ Frustum.prototype.intersectionNearFarSphere = function(sphere)
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * Check whether the bounding sphere of the feature is intersected with this frustum for frustum culling
+ * @param {Sphere} sphere
+ * @returns {Boolean}
  */
 Frustum.prototype.intersectionSphere = function(sphere) 
 {

@@ -708,6 +708,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.setFrustumsDistances(numFrustums, distancesArray);
 		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
 		resultCamera.calculateFrustumsPlanes();
+		
+		//resultCamera.currentFrustumFar
 	}
 	else if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
 	{
@@ -1175,6 +1177,15 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
+	
+	if (frustumIdx === 0)
+	{ var hola = 0; }
+	else if (frustumIdx === 1)
+	{ var hola = 0; }
+	else if (frustumIdx === 2)
+	{ var hola = 0; }
+	else if (frustumIdx === 3)
+	{ var hola = 0; }
 
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -1234,6 +1245,15 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 	var currentShader = undefined;
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
+	
+	if (frustumIdx === 0)
+	{ var hola = 0; }
+	else if (frustumIdx === 1)
+	{ var hola = 0; }
+	else if (frustumIdx === 2)
+	{ var hola = 0; }
+	else if (frustumIdx === 3)
+	{ var hola = 0; }
 
 	// prepare data if camera is no moving.***
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -2040,6 +2060,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//};
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
@@ -2471,11 +2492,10 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 
 /**
  * Moves an object.
- * @param {GL} gl 변수
+ * @param {WebGLRenderingContext} gl WebGLRenderingContext.
  */
 MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
 {
-	//var cameraPosition = this.sceneState.camera.position;
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
 		if (this.selectionManager.currentNodeSelected === undefined)
@@ -2483,6 +2503,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		
 		var geoLocDataManager = this.selectionManager.currentNodeSelected.getNodeGeoLocDataManager();
 		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+		
+		var mouseAction = this.sceneState.mouseAction;
 	
 		// create a XY_plane in the selected_pixel_position.***
 		if (this.selObjMovePlane === undefined) 
@@ -2490,11 +2512,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.selObjMovePlane = new Plane();
 			// create a local XY plane.
 			// find the pixel position relative to building.
-			var pixelPosWorldCoord = new Point3D();
-			pixelPosWorldCoord = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPosWorldCoord, undefined, undefined, this);
-			var tMatrixInv = geoLocationData.getTMatrixInv();
-			var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(pixelPosWorldCoord, pixelPosBuildingCoord);
-			
+			var tMatrixInv = geoLocationData.getGeoLocationMatrixInv();
+			var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(mouseAction.strWorldPoint, pixelPosBuildingCoord);
 			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
 		}
 
@@ -2522,30 +2541,26 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
 		intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
 		
-		if (this.pointSC === undefined)
-		{ this.pointSC = new Point3D(); }
-		this.pointSC = geoLocationData.geoLocMatrix.transformPoint3D(intersectionPoint, this.pointSC);
-		intersectionPoint.set(this.pointSC.x, this.pointSC.y, this.pointSC.z);
+		// Now, calculate the intersectionPoint in world coordinates.***
+		var intersectionPointWC = new Point3D();
+		intersectionPointWC = geoLocationData.geoLocMatrix.transformPoint3D(intersectionPoint, intersectionPointWC);
 
 		// register the movement.***
 		if (!this.thereAreStartMovePoint) 
 		{
-			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPoint, cartographic, this);
+			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
 			this.startMovPoint.x = cartographic.longitude;
 			this.startMovPoint.y = cartographic.latitude;
 			this.thereAreStartMovePoint = true;
 		}
 		else 
 		{
-			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPoint, cartographic, this);
-			this.pointSC.x = cartographic.longitude;
-			this.pointSC.y = cartographic.latitude;
-			var difX = this.pointSC.x - this.startMovPoint.x;
-			var difY = this.pointSC.y - this.startMovPoint.y;
+			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
+			var difX = cartographic.longitude - this.startMovPoint.x;
+			var difY = cartographic.latitude - this.startMovPoint.y;
 
 			var newLongitude = geoLocationData.geographicCoord.longitude - difX;
 			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
-			//var newHeight = cartographic.altitude;
 
 			this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
 			this.displayLocationAndRotation(this.buildingSelected);
@@ -2553,8 +2568,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.startMovPoint.x -= difX;
 			this.startMovPoint.y -= difY;
 		}
-		
-		//this.buildingSelected.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 	}
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
@@ -3628,6 +3641,15 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
+			if (this.currentFrustumIdx === 0)
+			{ var hola = 0; }
+			else if (this.currentFrustumIdx === 1)
+			{ var hola = 0; }
+			else if (this.currentFrustumIdx === 2)
+			{ var hola = 0; }
+			else if (this.currentFrustumIdx === 3)
+			{ var hola = 0; }
+			
 			currentShader.bindUniformGenerals();
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
@@ -3739,21 +3761,16 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			if (this.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && this.buildingSelected)
 			{
 				node = this.nodeSelected;
-				var geoLocDataManager = node.getNodeGeoLocDataManager();
-				neoBuilding = this.buildingSelected;
-				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-				//var neoReferencesMotherAndIndices = this.octreeSelected.neoReferencesMotherAndIndices;
-				var glPrimitive = gl.POINTS;
-				glPrimitive = gl.TRIANGLES;
-				var maxSizeToRender = 0.0;
-				var refMatrixIdxKey = 0;
-				var skinLego = neoBuilding.getCurrentSkin();
-				if (skinLego !== undefined)
+				
+				if (node !== undefined) // test code.***
 				{
-					// do as the "getSelectedObjectPicking".**********************************************************
+					var geoLocDataManager = node.getNodeGeoLocDataManager();
+					neoBuilding = this.buildingSelected;
+					var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+				
 					currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
 					currentShader.useProgram();
-					
+
 					gl.enableVertexAttribArray(currentShader.position3_loc);
 					
 					buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
@@ -3778,16 +3795,81 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 					gl.depthRange(0, 0);
 					
 					gl.stencilFunc(gl.EQUAL, 0, 1);
-					//gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-					gl.stencilOp(gl.KEEP, gl.REPLACE, gl.REPLACE);
+					gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+					//gl.stencilOp(gl.KEEP, gl.REPLACE, gl.REPLACE);
 						
 					//glPrimitive = gl.POINTS;
 					glPrimitive = gl.TRIANGLES;
-					gl.uniform1i(currentShader.refMatrixType_loc, 0); // 0 = identity matrix.***
+					gl.uniform1i(currentShader.refMatrixType_loc, 0); // 0 = identity matrix, there are not referencesMatrix.***
+					//gl.polygonMode( gl.FRONT_AND_BACK, gl.LINE );
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					
+					
+					var refTMatrixIdxKey = 0;
+					var minSizeToRender = 0.0;
+					var renderType = 0;
+					var refMatrixIdxKey =0; // provisionally set this var here.***
+					var offsetSize = 4/1000;
+
+					gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, offsetSize]);
+					this.renderer.renderNodes(gl, [node], this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+					gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [-offsetSize, offsetSize]);
+					this.renderer.renderNodes(gl, [node], this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+					gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, -offsetSize]);
+					this.renderer.renderNodes(gl, [node], this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+					gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [-offsetSize, -offsetSize]);
+					this.renderer.renderNodes(gl, [node], this, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+					
+					currentShader.disableVertexAttribArrayAll();
+				}
+				/*
+				var geoLocDataManager = node.getNodeGeoLocDataManager();
+				neoBuilding = this.buildingSelected;
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+				//var neoReferencesMotherAndIndices = this.octreeSelected.neoReferencesMotherAndIndices;
+				var glPrimitive = gl.POINTS;
+				glPrimitive = gl.TRIANGLES;
+				var maxSizeToRender = 0.0;
+				var refMatrixIdxKey = 0;
+				var skinLego = neoBuilding.getCurrentSkin();
+				if (skinLego !== undefined)
+				{
+					// do as the "getSelectedObjectPicking".**********************************************************
+					currentShader = this.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
+					currentShader.useProgram();
+
+					gl.enableVertexAttribArray(currentShader.position3_loc);
+					
+					buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
+
+					gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, this.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
+					gl.uniformMatrix4fv(currentShader.ModelViewMatrixRelToEye_loc, false, this.sceneState.modelViewRelToEyeMatrix._floatArrays);
+					gl.uniform3fv(currentShader.cameraPosHIGH_loc, this.sceneState.encodedCamPosHigh);
+					gl.uniform3fv(currentShader.cameraPosLOW_loc, this.sceneState.encodedCamPosLow);
+					
+					// do the colorCoding render.***
+					
+					gl.uniform4fv(currentShader.color4Aux_loc, [0.0, 1.0, 0.0, 1.0]);
+					gl.uniform2fv(currentShader.screenSize_loc, [this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight]);
+					gl.uniformMatrix4fv(currentShader.ProjectionMatrix_loc, false, this.sceneState.projectionMatrix._floatArrays);
+					
+					gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+					
+					gl.enable(gl.STENCIL_TEST);
+					gl.disable(gl.POLYGON_OFFSET_FILL);
+					gl.disable(gl.CULL_FACE);
+					gl.disable(gl.DEPTH_TEST);
+					gl.depthRange(0, 0);
+					
+					gl.stencilFunc(gl.EQUAL, 0, 1);
+					gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+					//gl.stencilOp(gl.KEEP, gl.REPLACE, gl.REPLACE);
+						
+					//glPrimitive = gl.POINTS;
+					glPrimitive = gl.TRIANGLES;
+					gl.uniform1i(currentShader.refMatrixType_loc, 0); // 0 = identity matrix, there are not referencesMatrix.***
 					//gl.polygonMode( gl.FRONT_AND_BACK, gl.LINE );
 
-					
-					gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
 					var offsetSize = 4/1000;
 					var localRenderType = 0; // only need positions.***
 					gl.uniform2fv(currentShader.camSpacePixelTranslation_loc, [offsetSize, offsetSize]);
@@ -3805,7 +3887,7 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 					
 					currentShader.disableVertexAttribArrayAll();
 				}
-				
+				*/
 			}
 			
 			// draw the axis.***
@@ -4348,8 +4430,7 @@ MagoManager.prototype.renderGeometryDepth = function(gl, renderType, visibleObjC
 		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
 		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
 		currentShader.disableVertexAttribArray(currentShader.color4_loc);
-		currentShader.bindUniformGenerals();
-		
+
 		currentShader.bindUniformGenerals();
 
 		var refTMatrixIdxKey = 0;
