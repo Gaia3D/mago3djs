@@ -583,7 +583,7 @@ VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function()
 	if (this.vboCacheKeysArray === undefined)
 	{ this.vboCacheKeysArray = []; }
 	
-	var vboVertexIdxCacheKey = new VboVertexIdxCacheKey();
+	var vboVertexIdxCacheKey = new VBOVertexIdxCacheKey();
 	this.vboCacheKeysArray.push(vboVertexIdxCacheKey);
 	return vboVertexIdxCacheKey;
 };
