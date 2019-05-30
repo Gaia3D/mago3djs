@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Frame Buffer Object
  * @class FBO
  * @param {WebGLRenderingContext} gl WebGL rendering context.
  * @param {Number} width Framebuffer width.
@@ -110,6 +110,7 @@ FBO.prototype.unbind = function()
 
 /**
  * Deletes all objects.
+ * @param gl
  */
 FBO.prototype.deleteObjects = function(gl) 
 {
@@ -143,7 +144,7 @@ FBO.createBuffer = function(gl, data)
 };
 
 /**
- * Binds a framebuffer.
+ * Binds a framebuffer and texture to this instance
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {WebGLFramebuffer} framebuffer WebGL Framebuffer.
  * @param {WebGLTexture} texture WebGL Texture.
@@ -156,7 +157,9 @@ FBO.bindFramebuffer = function(gl, framebuffer, texture)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
 	}
 };
-
+/**
+ * Binds the attribute of each 
+ */
 FBO.bindAttribute = function(gl, buffer, attribute, numComponents) 
 {
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
