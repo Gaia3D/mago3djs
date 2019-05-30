@@ -8,7 +8,7 @@
  * @alias LodBuildingData
  * @class LodBuildingData
  * 
- * header
+ * 아래 문서의 Table 1-3 (lodInfo) 참조
  * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var LodBuildingData = function() 

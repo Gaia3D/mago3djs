@@ -2,9 +2,13 @@
 
 /**
  * F4D MetaData class.
+ * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @alias MetaData
  * @class MetaData
+ * 
+ * 아래 문서의 Table 1 참조
+ * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var MetaData = function() 
 {
@@ -13,46 +17,161 @@ var MetaData = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.guid; // must be undefined initially.***
-	this.version = "";
-	this.geographicCoord; // longitude, latitude, altitude.***
+	/**
+	 * guid. must be undefined initially.
+	 * @type {String} 
+	 */
+	this.guid;
 
+	/**
+	 * f4d version
+	 * @type {String} 
+	 */
+	this.version = "";
+
+	/**
+	 * f4d origin geographic coord. longitude, latitude, altitude.
+	 * @type {GeographicCoord} 
+	 */
+	this.geographicCoord;
+
+	/**
+	 * heading. unit is degree.
+	 * @type {Number} 
+	 */
 	this.heading;
+
+	/**
+	 * pitch. unit is degree.
+	 * @type {Number} 
+	 */
 	this.pitch;
+
+	/**
+	 * roll. unit is degree.
+	 * @type {Number} 
+	 */
 	this.roll;
 
-	this.bbox; // BoundingBox.***
+	/**
+	 * BoundingBox
+	 * @type {BoundingBox} 
+	 */
+	this.bbox;
+
+	/**
+	 * not used
+	 * @deprecated
+	 */
 	this.imageLodCount;
-	
-	// Project_data_type (new in version 002).***************************************
-	// 1 = 3d model data type (normal 3d with interior & exterior data).***
-	// 2 = single building skin data type (as vWorld or googleEarth data).***
-	// 3 = multi building skin data type (as Shibuya & Odaiba data).***
-	// 4 = pointsCloud data type.***
-	// 5 = pointsCloud data type pyramidOctree test.***	
+
+	/**
+	 * Project_data_type (new in version 002).
+	 * 1 = 3d model data type (normal 3d with interior & exterior data).
+	 * 2 = single building skin data type (as vWorld or googleEarth data).
+	 * 3 = multi building skin data type (as Shibuya & Odaiba data).
+	 * 4 = pointsCloud data type.
+	 * 5 = pointsCloud data type pyramidOctree test.
+	 * @type {Number} 
+	 */
 	this.projectDataType;
 	//-------------------------------------------------------------------------------
 	
+	/**
+	 * offset x. Added since version 0.02
+	 * @type {Number} 
+	 */
 	this.offSetX;
+
+	/**
+	 * offset y. Added since version 0.02
+	 * @type {Number} 
+	 */
 	this.offSetY;
+
+	/**
+	 * offset z. Added since version 0.02
+	 * @type {Number} 
+	 */
 	this.offSetZ;
 
-	// Buildings octree mother size.***
+	/**
+	 * Buildings octree mother size.
+	 * 
+	 * @see Octree#setBoxSize
+	 * @see ReaderWriter#getNeoHeaderAsimetricVersion
+	 */ 
+
+	 /**
+	 * octree min x. octree.centerPos.x - octree.half_dx
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_min_x = 0.0;
+
+	 /**
+	 * octree max x. octree.centerPos.x + octree.half_dx
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_max_x = 0.0;
+
+	/**
+	 * octree min y. octree.centerPos.y - octree.half_dy
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_min_y = 0.0;
+
+	/**
+	 * octree min y. octree.centerPos.y + octree.half_dy
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_max_y = 0.0;
+
+	/**
+	 * octree min z. octree.centerPos.z - octree.half_dz
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_min_z = 0.0;
+
+	/**
+	 * octree max z. octree.centerPos.z + octree.half_dz
+	 * @type {Number} 
+	 * @default 0.0
+	 */
 	this.oct_max_z = 0.0;
 
+	/**
+	 * small flag. 
+	 * 
+	 * when under condition, set true.
+	 * bbox.maxX - bbox.minX < 40.0 && bbox.maxY - bbox.minY < 40.0 && bbox.maxZ - bbox.minZ < 30.0
+	 * @deprecated
+	 * 
+	 * @type {Boolean} 
+	 * @default false
+	 */
 	this.isSmall = false;
+
+	/**
+	 * lego file load state. Default is 0(READY)
+	 * "READY"            : 0,
+	 * "LOADING_STARTED"  : 1,
+	 * "LOADING_FINISHED" : 2,
+	 * "PARSE_STARTED"    : 3,
+	 * "PARSE_FINISHED"   : 4,
+	 * "IN_QUEUE"         : 5,
+	 * "LOAD_FAILED"      : 6
+	 * @type {Number}
+	 */
 	this.fileLoadState = CODE.fileLoadState.READY;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param arrayBuffer 변수
- * @param readWriter 변수
+ * MetaData 초기화
  */
 MetaData.prototype.deleteObjects = function() 
 {
@@ -84,9 +203,9 @@ MetaData.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param arrayBuffer 변수
- * @param readWriter 변수
+ * HeaderAsimetric.hed 파일을 불러와서 metadata 부분을 파싱.
+ * @param {ArrayBuffer} arrayBuffer
+ * @param {ReaderWriter} readWriter 
  */
 MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter) 
 {

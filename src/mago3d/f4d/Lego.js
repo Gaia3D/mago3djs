@@ -7,7 +7,7 @@
  * @alias Lego
  * @class Lego
  * 
- * blick
+ * 아래 문서의 Table 2 (Overall Structure of LOD2 file) 참조
  * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var Lego = function() 
