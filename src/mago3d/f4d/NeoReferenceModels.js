@@ -249,6 +249,14 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 {
 	var gl = magoManager.sceneState.gl;
 	
+	// Check if we are under a selected data structure.***
+	var selectionManager = magoManager.selectionManager;
+	var referenceObjectIsSelected = false;
+	if (selectionManager.parentSelected && magoManager.objectSelected === this)
+	{
+		referenceObjectIsSelected = true;
+	}
+	
 	// Check the color or texture of reference object.
 	if (neoBuilding.isHighLighted)
 	{
@@ -258,7 +266,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	else if (neoBuilding.isColorChanged)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		if (magoManager.objectSelected === this) 
+		if (referenceObjectIsSelected) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 		}
@@ -270,7 +278,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	else if (this.aditionalColor)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		if (magoManager.objectSelected === this) 
+		if (referenceObjectIsSelected) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 		}
@@ -282,7 +290,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	else
 	{
 		// Normal rendering.
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === this) 
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && referenceObjectIsSelected) 
 		{
 			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);

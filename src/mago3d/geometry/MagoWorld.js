@@ -223,7 +223,7 @@ MagoWorld.prototype.mousemove = function(event)
 		var nowPoint;
 		var camRay, camRayCamCoord;
 		
-		camRayCamCoord = this.magoManager.getRayCamSpace(nowX, nowY, camRayCamCoord);
+		camRayCamCoord = ManagerUtils.getRayCamSpace(nowX, nowY, camRayCamCoord, this.magoManager);
 		
 		// Now calculate rayWorldCoord.***
 		if (this.pointSC === undefined)

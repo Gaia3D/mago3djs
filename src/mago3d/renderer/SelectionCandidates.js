@@ -86,6 +86,8 @@ var SelectionManager = function()
 	this.selCandidatesMap = {};
 	this.currentGeneralObjectSelected;
 	
+	// Parameter that indicates that we are rendering selected data structure.
+	this.parentSelected = false;
 };
 
 /**

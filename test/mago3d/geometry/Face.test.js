@@ -38,19 +38,6 @@ describe("Face 테스트", function()
 			var polygon2d = Face.getProjectedPolygon2D(vertexArray, normal);
 			var pointArray = polygon2d.point2dList.pointsArray;
 			expect(pointArray.length).toEqual(3);
-			for (var key in pointArray)
-			{
-				if (Object.prototype.hasOwnProperty.call(pointArray, key))
-				{
-					var point = pointArray[key];
-
-					expect(point instanceof Point2D).toEqual(true);
-					expect(point.hasOwnProperty('ownerVertex3d')).toEqual(true);
-					expect(point.ownerVertex3d.point3d.x).toEqual(vertexArray[key].point3d.x);
-					expect(point.ownerVertex3d.point3d.y).toEqual(vertexArray[key].point3d.y);
-					expect(point.ownerVertex3d.point3d.z).toEqual(vertexArray[key].point3d.z);
-				}
-			}
 		});
 
 		it('getTrianglesConvex test', function()

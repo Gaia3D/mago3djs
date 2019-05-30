@@ -295,7 +295,17 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
 };
 
 /**
- * Calculate frustums' planes of near, far
+ */
+Camera.prototype.bindCameraUniforms = function(gl, shader) 
+{
+	// Bind frustum near & far.***
+	var frustum = this.frustum;
+	gl.uniform1f(shader.frustumNear_loc, frustum.near[0]);
+	gl.uniform1f(shader.frustumFar_loc, frustum.far[0]);
+};
+
+/**
+ * 카메라
  * @class Camera
  */
 Camera.prototype.calculateFrustumsPlanes = function()
