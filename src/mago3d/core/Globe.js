@@ -247,8 +247,6 @@ Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 	return resultNormal;
 };
 
-
-
 Globe.atan2Test = function(y, x) 
 {
 	var M_PI = Math.PI;

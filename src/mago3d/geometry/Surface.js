@@ -207,7 +207,7 @@ Surface.prototype.getCopyIndependentSurface = function(result)
 		// TODO : 생성과 관련된 코드는 클래스 외부에서 하지 않도록 변경해야함
 		faceCopy.vertexArray = [];
 
-		for (var j=0, len=face.getVerticesCount(); j<len; j++)
+		for (var j=0, len2=face.getVerticesCount(); j<len2; j++)
 		{
 			vertex = face.getVertex(j);
 			vertexIdxInList = vertex.getIdxInList();

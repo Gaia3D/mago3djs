@@ -2,11 +2,11 @@
 
 describe('Point2D', function() 
 {
-    var testPoint;
-    var vPoint;
+	var testPoint;
+	var vPoint;
 	var testX = 1.0;
-    var testY = 2.0;
-    var vX = 3.0;
+	var testY = 2.0;
+	var vX = 3.0;
 	var vY = 4.0;
 
 	beforeEach(function() 
@@ -94,19 +94,20 @@ describe('Point2D', function()
 		});
 		*/
         
-        beforeEach(function() 
-        {
-            vPoint = new Point2D(3.0,4.0);
-            testPoint.set(testX, testY);
+		beforeEach(function() 
+		{
+			vPoint = new Point2D(3.0, 4.0);
+			testPoint.set(testX, testY);
 
-        });
+		});
         
-        it('getVectorToPoint(targetPoint,resultVector)',function(){
-            var resultVector = new Point2D();
-            resultVector.set(vPoint.x-testPoint.x,vPoint.y-testPoint.y);
-            var result;
-            expect(resultVector).toEqual(testPoint.getVectorToPoint(vPoint,result));
-        });
+		it('getVectorToPoint(targetPoint,resultVector)', function()
+		{
+			var resultVector = new Point2D();
+			resultVector.set(vPoint.x-testPoint.x, vPoint.y-testPoint.y);
+			var result;
+			expect(resultVector).toEqual(testPoint.getVectorToPoint(vPoint, result));
+		});
 
 		it('벡터곱을 구한다.', function() 
 		{
@@ -114,33 +115,36 @@ describe('Point2D', function()
 			result = testPoint.crossProduct(vPoint);
 
 			expect(result).toEqual(testX*vY - testY*vX);
-        });
+		});
         
-        it('내적을 구한다',function(){
+		it('내적을 구한다', function()
+		{
 
-            result = testPoint.scalarProduct(vPoint);
+			result = testPoint.scalarProduct(vPoint);
 			expect(result).toEqual(testX*vX + testY*vY);
 
-        });
+		});
 
-        it('angleRadToVector(vector)', function(){
+		it('angleRadToVector(vector)', function()
+		{
     		var result;
-            result = testPoint.angleRadToVector(vPoint);
+			result = testPoint.angleRadToVector(vPoint);
 
-            expect(result).toEqual(Math.acos(testPoint.scalarProduct(vPoint)/(testPoint.getModul()*vPoint.getModul())));
+			expect(result).toEqual(Math.acos(testPoint.scalarProduct(vPoint)/(testPoint.getModul()*vPoint.getModul())));
 
-        });
+		});
 
-        it('angleDegToVector(vector)', function(){
-            var result;
-            var angRad = testPoint.angleRadToVector(vPoint);
+		it('angleDegToVector(vector)', function()
+		{
+			var result;
+			var angRad = testPoint.angleRadToVector(vPoint);
 
-            result = testPoint.angleDegToVector(vPoint);
+			result = testPoint.angleDegToVector(vPoint);
 
-            expect(result).toEqual(angRad * 180.0/Math.PI);
+			expect(result).toEqual(angRad * 180.0/Math.PI);
 
 
-        });
+		});
 
 
 	});
@@ -157,15 +161,17 @@ describe('Point2D', function()
 		{
 			var result = testX * testX + testY * testY;
 			testPoint.set(testX, testY);
-			expect(testPoint.squareDistToPoint(new Point2D(0,0))).toEqual(result);
+			expect(testPoint.squareDistToPoint(new Point2D(0, 0))).toEqual(result);
 		});
-    });
-    describe('isCoincidentToPoint(point, errorDist)',function(){
+	});
+	describe('isCoincidentToPoint(point, errorDist)', function()
+	{
 
-        it('주어진 점과 해당 점이 겹치는지 확인한다.',function(){
-            var overlappedPoint = new Point2D(testX,testY);
-            testPoint.set(testX,testY);
-            expect(testPoint.isCoincidentToPoint(overlappedPoint,0.0001)).toEqual(true);
-        });
-    });
+		it('주어진 점과 해당 점이 겹치는지 확인한다.', function()
+		{
+			var overlappedPoint = new Point2D(testX, testY);
+			testPoint.set(testX, testY);
+			expect(testPoint.isCoincidentToPoint(overlappedPoint, 0.0001)).toEqual(true);
+		});
+	});
 });
