@@ -2,7 +2,12 @@
 
 /**
  * 블럭 모델
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class Block
+ * 
+ * 아래 문서의 1.3 Models Folder의 항목 참조
+ * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var Block = function() 
 {
@@ -10,24 +15,62 @@ var Block = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	/**
+	 * This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.
+	 * Change this for "vbo_VertexIdx_CacheKeys_Container__idx"
+	 * @type {VBOVertexIdxCacheKeysContainer}
+	 */
+	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
 
-	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.***
-	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".***
+	/**
+	 * @deprecated
+	 * @type {number}
+	 * @default -1
+	 */
 	this.mIFCEntityType = -1;
-	this.isSmallObj = false;
-	this.radius = 10;
-	this.vertexCount = 0; // only for test.*** delete this.***
 
+	/**
+	 * small object flag. 
+	 * if bbox.getMaxLength() < 0.5, isSmallObj = true
+	 * 
+	 * @type {Boolean} 
+	 * @default false
+	 */
+	this.isSmallObj = false;
+
+	/**
+	 * block radius
+	 * 일반적으로 bbox.getMaxLength() / 2.0 로 선언됨.
+	 * 
+	 * @type {Boolean} 
+	 * @default 10
+	 */
+	this.radius = 10;
+
+
+	/**
+	 * only for test.delete this.
+	 * @deprecated
+	 */
+	this.vertexCount = 0;
+
+	/**
+	 * 각각의 사물중 복잡한 모델이 있을 경우 Lego로 처리
+	 * 현재는 사용하지 않으나 추후에 필요할 수 있어서 그대로 둠.
+	 * @type {Lego}
+	 */
 	this.lego; // legoBlock.***
 };
 
 /**
- * 블럭이 가지는 데이터 삭제
- * @returns block
+ * block 초기화. gl에서 해당 block 및 lego 삭제
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {VboManager} vboMemManager 
  */
 Block.prototype.deleteObjects = function(gl, vboMemManager) 
 {
-
 	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
 	this.vBOVertexIdxCacheKeysContainer = undefined;
 	this.mIFCEntityType = undefined;
@@ -41,10 +84,12 @@ Block.prototype.deleteObjects = function(gl, vboMemManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param 
-  * @returns {boolean} returns if the Block is ready to render.
- */
+ * render할 준비가 됬는지 체크
+ * @param {NeoReference} neoReference magoManager의 objectSelected와 비교 하기 위한 neoReference 객체
+ * @param {MagoManager} magoManager 
+ * @param {Number} maxSizeToRender block의 radius와 비교하기 위한 ref number.
+ * @return {Boolean} block의 radius가 maxSizeToRender보다 크고, block의 radius가 magoManager의 보다 크고, 카메라가 움직이고 있지 않고, magoManager의 objectSelected와 neoReference가 같을 경우 true 반환
+ */ 
 Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
 {
 	if (maxSizeToRender && (this.radius < maxSizeToRender))
@@ -60,8 +105,11 @@ Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToR
 //****************************************************************************************************
 
 /**
- * 블록 목록
- * @class BlocksList
+ * 블록의 내용이 엄청 많아서 나눠서 받아야 할 경우 사용하기 위한 객체. 현재는 미구현 상태. 추후 f4d v0.0.2 이상부터 적용 될 예정
+ * @deprecated
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
+ * @class BlocksArrayPartition
  */
 var BlocksArrayPartition = function(version) 
 {
@@ -73,15 +121,18 @@ var BlocksArrayPartition = function(version)
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
-
 };
 
 //****************************************************************************************************
 //****************************************************************************************************
 
 /**
- * 블록 목록
+ * 블록 리스트 객체
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class BlocksList
+ * 
+ * @param {String} version
  */
 var BlocksList = function(version) 
 {
@@ -91,26 +142,66 @@ var BlocksList = function(version)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * 블록 리스트 명
+	 * @type {string}
+	 * @default ''
+	 */
 	this.name = "";
+
+	/**
+	 * f4d 버전
+	 * @type {string}
+	 * @default ''
+	 */
 	this.version;
+
+	/**
+	 * 블락 리스트
+	 * @type {Array.<Block>}
+	 * @default ''
+	 */
 	this.blocksArray;
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+
+	/**
+	 *  block file load state. Default is 0(READY)
+	 * "READY"            : 0,
+	 * "LOADING_STARTED"  : 1,
+	 * "LOADING_FINISHED" : 2,
+	 * "PARSE_STARTED"    : 3,
+	 * "PARSE_FINISHED"   : 4,
+	 * "IN_QUEUE"         : 5,
+	 * "LOAD_FAILED"      : 6
+	 * @type {Number}
+	 */
 	this.fileLoadState = CODE.fileLoadState.READY;
+
+	/**
+	 * block data array buffer.
+	 * @type {ArrayBuffer}
+	 */
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.***
+
 	this.xhr; // file request.***
 	
 	if (version !== undefined)
 	{ this.version = version; }
 	
-	// v002.***
+
+	/**
+	 * BlocksArrayPartition 리스트 관련 변수들.
+	 * f4d 버전 0.0.2 이후 부터 사용 계획있음 현재는 개발중
+	 */
 	this.blocksArrayPartitionsCount;
 	this.blocksArrayPartitionsArray;
 	this.blocksArrayPartitionsMasterPathName;
 };
 
 /**
- * 새 블록 생성
- * @returns block
+ * 새 블록 생성 후 blocksArray에 푸쉬 및 반환
+ * 
+ * @returns {Block}
  */
 BlocksList.prototype.newBlock = function() 
 {
@@ -122,9 +213,9 @@ BlocksList.prototype.newBlock = function()
 };
 
 /**
- * 블록 획득
- * @param idx 변수
- * @returns block
+ * 인덱스에 해당하는 블록 획득
+ * @param {Number} idx
+ * @returns {Block|null}
  */
 BlocksList.prototype.getBlock = function(idx) 
 {
@@ -138,9 +229,10 @@ BlocksList.prototype.getBlock = function(idx)
 };
 
 /**
- * 블록을 삭제
- * @param idx 변수
- * @returns block
+ * 블록 리스트 초기화. gl에서 해당 블록 리스트의 블록 및 lego 삭제
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {VboManager} vboMemManager 
  */
 BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
@@ -177,11 +269,12 @@ BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager)
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
+ * F4D 버전이 0.0.1일 경우 사용
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {Number} bytesReaded readed bytes.
  * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
  */
 BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
 {
@@ -190,7 +283,7 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var normalByteValuesCount;
 	var shortIndicesValuesCount;
 	var sizeLevels;
-	var startBuff, endBuff;
+	//var startBuff, endBuff;
 	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
@@ -229,19 +322,16 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
  */
 BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
 {
-	var posByteSize;
+	/*var posByteSize;
 	var norByteSize;
 	var idxByteSize;
 	var classifiedPosByteSize;
 	var classifiedNorByteSize;
 	var classifiedIdxByteSize;
-	var startBuff, endBuff;
+	var startBuff, endBuff;*/
 	var vboMemManager = magoManager.vboMemoryManager;
 	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	// test.***
-	if (vboDatasCount > 12)
-	{ var hola = 0; }
 	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
@@ -256,26 +346,28 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
+ * F4D 버전이 0.0.1일 경우 사용
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
  * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
+ * @param {MagoManager} magoManager
  */
 BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
+	/*var vboMemManager = magoManager.vboMemoryManager;
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
-	var vboMemManager = magoManager.vboMemoryManager;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
+	var gl = magoManager.sceneState.gl;*/
 	var succesfullyGpuDataBinded = true;
 	
 	// read the version.
 	var versionLength = 5;
-	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
+	//var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
 	bytesReaded += versionLength;
 	
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
@@ -364,11 +456,11 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
 	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
+	/*var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
+	var gl = magoManager.sceneState.gl;*/
 	var succesfullyGpuDataBinded = true;
 	
 	// read the version.
@@ -472,11 +564,11 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
+	/*var startBuff, endBuff;
+	var posByteSize, norByteSize, idxByteSize;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
+	var gl = magoManager.sceneState.gl;*/
 	var succesfullyGpuDataBinded = true;
 
 	for ( var i = 0; i< blocksCount; i++ ) 
@@ -567,7 +659,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
  */
 BlocksList.prototype.prepareData = function(magoManager, octreeOwner) 
 {
-	
 	if (this.version === "0.0.1")
 	{
 		// Provisionally this function is into octree.prepareModelReferencesListData(...).***
