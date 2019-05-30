@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * AnimationData
+ * manage AnimationData
  * @class AnimationData
  */
 var AnimationData = function() 
@@ -55,7 +55,7 @@ var AnimationManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * put the node which will move
  */
 AnimationManager.prototype.putNode = function(node) 
 {
@@ -67,7 +67,8 @@ AnimationManager.prototype.putNode = function(node)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Check whether this node already moved or not
+ * @param {MagoManager} magoManager
  */
 AnimationManager.prototype.checkAnimation = function(magoManager) 
 {
@@ -89,7 +90,7 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 };
 
 /**
- * tracked clear.
+ * If given node has Animation Data, then clear the state of tracked as 'undefined'
  */
 AnimationManager.prototype.clearTracked = function() 
 {
@@ -111,7 +112,7 @@ AnimationManager.prototype.clearTracked = function()
 };
 
 /**
- * start track.
+ * If given node has Animation Data, then change the state of tracked to true
  */
 AnimationManager.prototype.startTracked = function(node) 
 {
@@ -120,7 +121,7 @@ AnimationManager.prototype.startTracked = function(node)
 		throw new Error('animation already end.');
 	}
 	
-	if (node.data.animationData)
+	if (node.data.animationData) 
 	{
 		this.clearTracked();
 		node.data.animationData.tracked = true;
