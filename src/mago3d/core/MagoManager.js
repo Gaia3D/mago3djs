@@ -1184,7 +1184,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		this.load_testTextures();
+		//테스트코드 주석처리.
+		//this.load_testTextures(); 
 
 		if (this.myCameraSCX === undefined) 
 		{ this.myCameraSCX = new Camera(); }
