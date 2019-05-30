@@ -20,7 +20,7 @@ var ParametricMesh = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Delete the data of this.profile
  */
 ParametricMesh.prototype.deleteObjects = function() 
 {
@@ -30,11 +30,22 @@ ParametricMesh.prototype.deleteObjects = function()
 	this.profile = undefined;
 };
 
+/**
+ * Get the vbo key container of this feature
+ * @returns {VBOVertexIdxCacheKeysContaier}	
+ */
 ParametricMesh.prototype.getVboKeysContainer = function()
 {
 	return this.vboKeyContainer;
 };
 
+/**
+ * Get mesh of this instance
+ * @param {Mesh} resultMesh
+ * @param {Boolean} bIncludeBottomCap Chech whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeTopCap Chech whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @returns {Mesh}
+ */
 ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {
 	if (resultMesh === undefined)
@@ -47,6 +58,13 @@ ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncl
 	return resultMesh;
 };
 
+/**
+ * Change the unified mesh to the group of surfaces for drawing the mesh with WebGL
+ * @param {Mesh} resultMesh
+ * @param {Boolean} bIncludeBottomCap Chech whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeTopCap Chech whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * 
+ */
 ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
 {
 	if (resultMesh === undefined)
@@ -61,7 +79,12 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Extrude the profile with curved direction
+ * @param profile2d the profile which will be extruede
+ * @param revolveAngDeg the angle of the vector used for extruding
+ * @param revolveSegmentsCount the number of the segements which constitue of the extruded feature
+ * @param revolveSegment2d rotating shaft
+ * 
  */
 ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
@@ -110,7 +133,11 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Make new instance which consist of the part of the extruded segment(The number of the segments is extrudeSegmentsCount) by extruding profile2D
+ * @param {profile2D} profile2d the feature which will be extruded
+ * @param {Number} extrusionDist the height of extruded feature
+ * @param {Number} extrudeSegmentsCount the number of the segement which consist of extruded feature
+ * @param {Point3D} extrusionVector the direction of extrusion
  */
 ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {

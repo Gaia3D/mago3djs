@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class is used to assume the real globe of earth as ellipsoid
  * @class Globe
  */
 var Globe = function() 
@@ -48,10 +48,14 @@ Globe.polarRadiusSquared = function()
 {
 	return 40408299984087.05552164;
 };
-
+/**
+ * This function returns the radius of earth at the latitude "latDeg".
+ * @param latDeg the latitude
+ * 
+ */
 Globe.radiusAtLatitudeDeg = function(latDeg)
 {
-	// This function returns the radius of earth at the latitude "latDeg".***
+
 	// a = equatorialRadius, b = polarRadius.***************
 	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).*********
 	//------------------------------------------------------
@@ -70,7 +74,10 @@ Globe.radiusAtLatitudeDeg = function(latDeg)
 	var radius = (a*b)/(Math.sqrt(a2*sin2 + b2*cos2));
 	return radius;
 };
-
+/**
+ * Normalize the elements of the 3D feature
+ * @param cartesian this can be any feature such as a point or a axis to make unitary
+ */
 Globe.prototype.normalizeCartesian = function(cartesian)
 {
 	if (cartesian === undefined)
@@ -84,6 +91,15 @@ Globe.prototype.normalizeCartesian = function(cartesian)
 	return cartesian;
 };
 
+/**
+ * Return the transformation matrix which transform the cartesian point to wgs84
+ * @param x
+ * @param y
+ * @param z 
+ * @param {Float32Array} float32Array
+ * @return {Float32Array} float32Array
+ * 
+ */
 Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32Array)
 {
 	var xAxis, yAxis, zAxis;
@@ -132,10 +148,15 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
 	
 	return float32Array;
 };
-
+/**
+ * function used by "MagoWorld" to paning & rotate the globe by dragging mouse.
+ * @param line
+ * @param resultCartesian
+ * @param radius
+ */
 Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 {
-	// function used by "MagoWorld" to paning & rotate the globe by dragging mouse.***
+	// ***
 	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
 	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
 	
@@ -228,6 +249,10 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	return resultCartesian;
 	
 };
+
+/**
+ * Return the normal vector from changing cartesian point on this globe to WGS84 Point
+ */
 
 Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 {
@@ -427,6 +452,13 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 	return result;
 };
 
+/**
+ * This change the GeographicCoord feature to Point2D feature
+ * @param longitude
+ * @param latitude
+ * @param {Point2D} resultPoint2d
+ * @return {Point2D}
+ */
 Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint2d) 
 {
 	// longitude = [-180, 180].***
@@ -438,6 +470,13 @@ Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint
 	return Globe.geographicRadianToMercatorProjection(lonRad, latRad, resultPoint2d);
 };
 
+/**
+ * This change the GeographicCoord feature to Point2D feature using Mercator projection
+ * @param longitude
+ * @param latitude
+ * @param {Point2D} resultPoint2d
+ * @return {Point2D}
+ */
 Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoint2d) 
 {
 	// longitude = [-pi, pi].***
@@ -451,10 +490,18 @@ Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoin
 	return resultPoint2d;
 };
 
+/**
+ * This change the GeographicCoord feature to the cartesian WGS84 point using the blow method.
+ * defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
+ * https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
+ * @param longitude
+ * @param latitude
+ * @param altitude
+ * @param resultCartesian
+ * @return resultCartesian
+ */
 Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resultCartesian)
 {
-	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
-	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
 	// a = semi-major axis.
 	// e2 = firstEccentricitySquared.
 	// v = a / sqrt(1 - e2 * sin2(lat)).

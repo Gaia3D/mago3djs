@@ -558,8 +558,10 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl, vboMemManager)
 // VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
 // VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
 // VBOVertexIdxCacheKeysContainer.*****************************************************************************************************
+
+
 /**
- * 어떤 일을 하고 있습니까?
+ * This class is the container which holds the VBO Cache Keys
  * @class VBOVertexIdxCacheKeysContainer
  */
 var VBOVertexIdxCacheKeysContainer = function() 
@@ -569,26 +571,27 @@ var VBOVertexIdxCacheKeysContainer = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.vboCacheKeysArray = [];
+	this.vboCacheKeysArray = []; //the container of vbo keys
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vboViCacheKey
+ * Create the default VBO instance
+ * @returns {VBOVertexIdxCacheKey} vboVertexIdxCacheKey
  */
 VBOVertexIdxCacheKeysContainer.prototype.newVBOVertexIdxCacheKey = function() 
 {
 	if (this.vboCacheKeysArray === undefined)
 	{ this.vboCacheKeysArray = []; }
 	
-	var vboViCacheKey = new VBOVertexIdxCacheKey();
-	this.vboCacheKeysArray.push(vboViCacheKey);
-	return vboViCacheKey;
+	var vboVertexIdxCacheKey = new VboVertexIdxCacheKey();
+	this.vboCacheKeysArray.push(vboVertexIdxCacheKey);
+	return vboVertexIdxCacheKey;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vboViCacheKey
+ * Clear the data of this instance
+ * @param gl
+ * @param {VBOMemoryManager} vboMemManager
  */
 VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
@@ -606,8 +609,8 @@ VBOVertexIdxCacheKeysContainer.prototype.deleteGlObjects = function(gl, vboMemMa
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vboViCacheKey
+ * 
+ * @returns {Number} the number of the key that this instance holds
  */
 VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function() 
 {
@@ -617,9 +620,10 @@ VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vboViCacheKey
- */
+ * Get the VBO key by the index
+ * @param {Number} idx
+ * @return {VBOVertexIdxCacheKey}
+ *  */
 VBOVertexIdxCacheKeysContainer.prototype.getVboKey = function(idx) 
 {
 	if (this.vboCacheKeysArray === undefined)
