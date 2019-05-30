@@ -8,7 +8,8 @@ var Point3D = function(x, y, z)
 {
 	if (!(this instanceof Point3D)) 
 	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
+		// throw new Error(Messages.CONSTRUCT_ERROR);
+		throw new Error(i18next.t('error.construct.create'));
 	}
 
 	if (x !== undefined)
