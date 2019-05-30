@@ -188,7 +188,8 @@ Surface.prototype.getCopyIndependentSurface = function(result)
 	var vertex;
 	var vertexCopy;
 	var verticesArray = this.getNoRepeatedVerticesArray();
-	for (var i=0, len=verticesArray.length; i<len; i++)
+	var vertexCount = verticesArray.length;
+	for (var i=0; i<vertexCount; i++)
 	{
 		vertex = verticesArray[i];
 		vertex.setIdxInList(i);
@@ -200,14 +201,17 @@ Surface.prototype.getCopyIndependentSurface = function(result)
 	var face;
 	var faceCopy;
 	var vertexIdxInList;
-	for (var i=0, len=this.getFacesCount(); i<len; i++)
+
+	var faceCount = this.getFacesCount();
+	for (var i=0; i<faceCount; i++)
 	{
 		face = this.getFace(i);
 		faceCopy = result.newFace();
 		// TODO : 생성과 관련된 코드는 클래스 외부에서 하지 않도록 변경해야함
 		faceCopy.vertexArray = [];
 
-		for (var j=0, len=face.getVerticesCount(); j<len; j++)
+		vertexCount = face.getVerticesCount();
+		for (var j=0; j<vertexCount; j++)
 		{
 			vertex = face.getVertex(j);
 			vertexIdxInList = vertex.getIdxInList();

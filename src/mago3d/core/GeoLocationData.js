@@ -515,7 +515,7 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 };
 
 /**
- * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ * 
  */
 GeoLocationData.prototype.getTransformedRelativePositionNoApplyHeadingPitchRoll = function(absolutePosition, resultRelativePosition) 
 {
@@ -534,7 +534,9 @@ GeoLocationData.prototype.getTransformedRelativePositionNoApplyHeadingPitchRoll 
 };
 
 /**
- * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ * Change the absolute coordinate feature to relative coordinate feature
+ * @param absolutePosition
+ * @param {Point3D} resultRelativePosition
  */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
@@ -604,7 +606,7 @@ var GeoLocationDataManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Clear all object of GeoLocationDataManager
  */
 GeoLocationDataManager.prototype.deleteObjects = function() 
 {
@@ -620,7 +622,7 @@ GeoLocationDataManager.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Remove the latest GeoLocationData instance
  */
 GeoLocationDataManager.prototype.popGeoLocationData = function() 
 {
@@ -628,7 +630,7 @@ GeoLocationDataManager.prototype.popGeoLocationData = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * put the geoLocationData from this.geoLocationDataArray
  * @param geoLocationName 변수
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
@@ -648,8 +650,8 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns this.geoLoactionDataArray[idx]
+ * return the length of this geoLocationDataArray
+ * @returns {Number} the length of this geoLocationDataArray
  */
 GeoLocationDataManager.prototype.getGeoLocationDatasCount = function() 
 {
@@ -659,7 +661,7 @@ GeoLocationDataManager.prototype.getGeoLocationDatasCount = function()
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
- * @param idx
+ * @param {Number} idx
  * @returns this.geoLoactionDataArray[idx]
  */
 GeoLocationDataManager.prototype.getGeoLocationData = function(idx) 
@@ -670,10 +672,10 @@ GeoLocationDataManager.prototype.getGeoLocationData = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * provisionally return the first data of GeoLocationDataArray
  * @class GeoLocationData
- * @param idx
- * @returns this.geoLoactionDataArray[idx]
+ * @param {Number}idx
+ * @returns {GeoLocationData}this.geoLoactionDataArray[idx]
  */
 GeoLocationDataManager.prototype.getCurrentGeoLocationData = function() 
 {
