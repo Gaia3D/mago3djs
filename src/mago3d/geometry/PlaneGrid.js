@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * PlaneGrid on 3D space. 
+ * PlaneGrid on 3D space. (Draw on the ground or plane in 3D space)
+ * Now under implementation 
  * @class PlaneGrid
  */
 var PlaneGrid = function(width, height, numCols, numRows) 

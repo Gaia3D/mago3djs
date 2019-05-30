@@ -189,6 +189,14 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
+	// Check if we are under selected data structure.***
+	var selectionManager = magoManager.selectionManager;
+	if (selectionManager.currentNodeSelected === this)
+	{ selectionManager.parentSelected = true; }
+	else 
+	{ selectionManager.parentSelected = false; }
+	
+
 	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.***
 	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).***
 	neoBuilding.currentVisibleOctreesControler = data.currentVisibleOctreesControler;

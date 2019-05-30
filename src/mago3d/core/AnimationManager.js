@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * AnimationData
+ * manage AnimationData
  * @class AnimationData
  */
 var AnimationData = function() 
@@ -55,7 +55,7 @@ var AnimationManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * put the node which will move
  */
 AnimationManager.prototype.putNode = function(node) 
 {
@@ -67,7 +67,8 @@ AnimationManager.prototype.putNode = function(node)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Check whether this node already moved or not
+ * @param {MagoManager} magoManager
  */
 AnimationManager.prototype.checkAnimation = function(magoManager) 
 {
@@ -85,44 +86,5 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 				delete this.nodesMap[key];
 			}
 		}
-	}
-};
-
-/**
- * tracked clear.
- */
-AnimationManager.prototype.clearTracked = function() 
-{
-	if (this.nodesMap === undefined)
-	{ return; }
-	
-	var node;
-	for (var key in this.nodesMap)
-	{
-		if (Object.prototype.hasOwnProperty.call(this.nodesMap, key))
-		{
-			node = this.nodesMap[key];
-			if (node.data.animationData)
-			{
-				node.data.animationData.tracked = undefined;
-			}
-		}
-	}
-};
-
-/**
- * start track.
- */
-AnimationManager.prototype.startTracked = function(node) 
-{
-	if (this.nodesMap === undefined || !Object.prototype.hasOwnProperty.call(this.nodesMap, node.data.nodeId))
-	{ 
-		throw new Error('animation already end.');
-	}
-	
-	if (node.data.animationData)
-	{
-		this.clearTracked();
-		node.data.animationData.tracked = true;
 	}
 };

@@ -115,9 +115,9 @@ var Lego = function()
 /**
  * F4D Lego 자료를 읽어서 가져온 ArrayBuffer를 파싱.
  * 
- * @param {WebGLRenderingContext} gl
- * @param {ArrayBuffer} dataArraybuffer
- * @param {MagoManager} magoManager
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {ArrayBuffer} dataArraybuffer 
+ * @param {MagoManager} magoManager 
  */
 Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
 {
@@ -171,7 +171,11 @@ Lego.prototype.isReadyToRender = function()
 /**
  * lego 초기화. gl에서 해당 lego 삭제
  * 
+<<<<<<< HEAD
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+=======
  * @param {WebGLRenderingContext} gl 
+>>>>>>> develop
  * @param {VboManager} vboMemManager 
  */
 Lego.prototype.deleteObjects = function(gl, vboMemManager)
@@ -217,7 +221,11 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
  * normal, texCoord는 없음
  * 
  * @param {ArrayBuffer} dataArraybuffer 
+<<<<<<< HEAD
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+=======
  * @param {WebGLRenderingContext} gl not use
+>>>>>>> develop
  * @param {MagoManager} magoManager 
  */
 Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
@@ -297,7 +305,11 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  * LOADING_FINISHED 상태일때 실행.
  * 
  * @param {ArrayBuffer} dataArraybuffer 
+<<<<<<< HEAD
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+=======
  * @param {WebGLRenderingContext} gl not use
+>>>>>>> develop
  * @param {MagoManager} magoManager 
  */
 Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
