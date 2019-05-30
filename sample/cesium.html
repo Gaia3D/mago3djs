@@ -13,6 +13,7 @@
 	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
 	<script type="text/javascript" src="../externlib/jquery-ui/jquery-ui.js"></script>
 	<script type="text/javascript" src="../externlib/jquery-toast/jquery.toast.js"></script>
+	<script type="text/javascript" src="../externlib/jquery-i18next/jquery-i18next.min.js"></script>
 	<script type="text/javascript" src="../externlib/treegrid/jquery.treegrid.js"></script>
 	<script type="text/javascript" src="../externlib/treegrid/jquery.treegrid.bootstrap3.js"></script>
 	<script type="text/javascript" src="../externlib/jqplot/jquery.jqplot.min.js"></script>
@@ -26,20 +27,22 @@
 <body>
 	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
 	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
-<ul class="nav">
+<ul class="nav i18n">
 	<li id="homeMenu" class="home">
 		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
 	</li>
-	<li id="myIssueMenu" class="issue" data-tooltip-text="Shows the latest 10 issues sorted chronologically from the entire Issue List.">Issue
-		<br/><span id="issueListCount">4</span></li>
-	<li id="searchMenu" class="search" data-tooltip-text="searching such as issue, object, and spatial information.">Search</li>
-	<li id="apiMenu" class="api" data-tooltip-text="APIs to control various functions of mago3D.">API</li>	
-	<li id="insertIssueMenu" class="regist" data-tooltip-text="Issue registration for Object.">Regist</li>
-	<li id="treeMenu" class="tree" data-tooltip-text="Display data hierarchy and Attributes by project.">Tree</li>
-	<li id="chartMenu" class="chart" data-tooltip-text="Display statistical data by project.">Chart</li>
-	<li id="logMenu" class="log" data-tooltip-text="Displays the data change log.">Log</li>
-	<li id="attributeMenu" class="attribute" data-tooltip-text="Supports data attribute retrieval.">Attribute</li>
-	<li id="configMenu" class="config" data-tooltip-text="Settings related to rendering.">Settings</li>
+	<li id="myIssueMenu" class="issue" data-i18n="[data-tooltip-text]menu.issue.tooltip;menu.issue.title">Issue
+		<br /><span id="issueListCount">4</span></li>
+	<li id="searchMenu" class="search" data-i18n="[data-tooltip-text]menu.search.tooltip;menu.search.title">Search</li>
+	<li id="apiMenu" class="api" data-i18n="[data-tooltip-text]menu.api.tooltip;menu.api.title">API</li>
+	<li id="insertIssueMenu" class="regist" data-i18n="[data-tooltip-text]menu.regist.tooltip;menu.regist.title">Regist
+	</li>
+	<li id="treeMenu" class="tree" data-i18n="[data-tooltip-text]menu.tree.tooltip;menu.tree.title">Tree</li>
+	<li id="chartMenu" class="chart" data-i18n="[data-tooltip-text]menu.chart.tooltip;menu.chart.title">Chart</li>
+	<li id="logMenu" class="log" data-i18n="[data-tooltip-text]menu.log.tooltip;menu.log.title">Log</li>
+	<li id="attributeMenu" class="attribute" data-i18n="[data-tooltip-text]menu.attribute.tooltip;menu.attribute.title">
+		Attribute</li>
+	<li id="configMenu" class="config" data-i18n="[data-tooltip-text]menu.settings.tooltip;menu.settings.title">Settings</li>
 </ul>
 
 <div id="menuContent" class="navContents">
@@ -683,7 +686,12 @@
 	</div>
 	</form>
 
-	<div id="configMenuContent" class="configWrap">
+	<div id="configMenuContent" class="configWrap i18n">
+		<div>
+			<h3 data-i18n="language.title"></h3>
+			<button class="btn" onclick="changeLang('en')" data-i18n="language.english"></button>
+			<button class="btn" onclick="changeLang('ko')" data-i18n="language.korean"></button>
+		</div>
 		<div>
 			<h3>Label</h3>
 			<input type="radio" id="showLabel" name="labelInfo" value="true" onclick="changeLabel(true);" />
@@ -950,10 +958,13 @@
 </div>
 
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/i18next.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/i18nextXHRBackend.js"></script>
+<script type="text/javascript" src="../src/mago3d/extern/i18nextBrowserLanguageDetector.js"></script>
+<script type="text/javascript" src="../src/mago3d/message/MessageSource.js"></script>
 <script type="text/javascript" src="../src/mago3d/message/Message.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/AnimationManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Atmosphere.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/AuxiliarSegment.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/BoundingBox.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/BoundingSphere.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Box.js"></script>
@@ -974,7 +985,6 @@
 <script type="text/javascript" src="../src/mago3d/core/GeoLocationData.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/GeometryModifier.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Globe.js"></script>
-<script type="text/javascript" src="../src/mago3d/core/GlobeTile.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/MagoManager.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/ManagerFactory.js"></script>
 <script type="text/javascript" src="../src/mago3d/core/Matrix4.js"></script>
@@ -1104,6 +1114,41 @@
 <script type="text/javascript" src="../src/mago3d/topology/NetworkNode.js"></script>
 <script type="text/javascript" src="../src/mago3d/topology/NetworkSpace.js"></script>
 <script>
+	var message = new Message(i18next, MessageSource);
+
+	function changeLang(lang) 
+	{
+		if(i18next === undefined)
+		{
+			return;
+		}
+		
+		var language = lang || i18next.language;
+		var namespace = i18next.options.ns[0];
+
+		$.ajax({
+			url: "/locales/"+namespace+"/"+language+".json",
+			type: "GET",
+			dataType: "json",
+			success: function(data){
+				i18next.addResourceBundle(language, namespace, data, true, true);
+				i18next.changeLanguage(language);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	
+	message.init(function (){
+		i18next = message.getHandle();
+		i18next.on('languageChanged', function (lang) {
+			$('.i18n').localize();
+		});
+		jqueryI18next.init(i18next, $);
+		changeLang();
+	});
+
 	var agent = navigator.userAgent.toLowerCase();
 	//if(agent.indexOf('chrome') < 0) { 
 		//alert("This page is optimized for the Chrome browser for massive data processing.\n Please use the Chrome browser for seamless service.");

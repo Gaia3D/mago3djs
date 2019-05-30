@@ -1,9 +1,10 @@
 'use strict';
 
 /**
-* 어떤 일을 하고 있습니까?
-* @class Quaternion
-*/
+ * 쿼터니언
+ * 
+ * @class
+ */
 var Quaternion = function() 
 {
 	if (!(this instanceof Quaternion)) 
@@ -11,9 +12,28 @@ var Quaternion = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * x 속성값
+	 * @type {Number}
+	 */
 	this.x = 0.0;
+
+	/**
+	 * y 속성값
+	 * @type {Number}
+	 */
 	this.y = 0.0;
+
+	/**
+	 * z 속성값
+	 * @type {Number}
+	 */
 	this.z = 0.0;
+
+	/**
+	 * w 속성값
+	 * @type {Number}
+	 */
 	this.w = 1.0;
 };
 
