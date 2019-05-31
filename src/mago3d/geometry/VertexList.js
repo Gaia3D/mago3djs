@@ -3,11 +3,11 @@
 
 /**
  * Vertex List (Array of Vetex)
- * @see Vertex
- * 
- * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VertexList
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * @see Vertex
  */
 var VertexList = function() 
 {
@@ -235,7 +235,8 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(point3d.y, point3d.z); }
 			else
 			{ point2d = new Point2D(-point3d.y, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			// with this we can reconvert polygon2D to face3D.
+			point2d.ownerVertex3d = vertex; 
 			resultPoints2dArray.push(point2d);
 		}
 	}

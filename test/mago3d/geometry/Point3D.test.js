@@ -12,20 +12,22 @@ describe('Point3D', function()
 		testPoint = new Point3D();
 	});
 
-	it('객체 생성시 new 키워드 없이 생성할 경우 예외를 던져야 한다.', function() 
-	{
-		expect(function () 
+	describe('객체 생성시', function() {
+		it('new 키워드 없이 생성할 경우 예외를 던져야 한다.', function() 
 		{
-			return Point3D();
-		}).toThrowError('이 객체는 new를 사용하여 생성해야 합니다.');
-	});
-	
-	it('객체 생성시 기본값은 0 값을 갖는다.', function() 
-	{
-		expect(testPoint.x).toEqual(0.0);
-		expect(testPoint.y).toEqual(0.0);
-		expect(testPoint.z).toEqual(0.0);
-	});
+			expect(function () 
+			{
+				return Point3D();
+			}).toThrowError();
+		});
+		
+		it('기본값은 0 값을 갖는다.', function() 
+		{
+			expect(testPoint.x).toEqual(0.0);
+			expect(testPoint.y).toEqual(0.0);
+			expect(testPoint.z).toEqual(0.0);
+		});
+	})
 	/*
 	describe('destroy()', function() 
 	{

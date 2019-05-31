@@ -1,23 +1,42 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
-* @class Point2D
-*/
+ * 2차원 포인트 관리 클래스
+ * 
+ * @class
+ * @param {Number} x x좌표값
+ * @param {Number} y y좌표값
+ */
 var Point2D = function(x, y) 
 {
 	if (!(this instanceof Point2D)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	/**
+	 * x좌표값. 0.0 초기화
+	 * @type {Number} [this.x=0.0]
+	 * @default 0.0
+	 */
+	this.x = x || 0.0;
 
-	if (x) { this.x = x; }
-	else { this.x = 0.0; }
-	if (y) { this.y = y; }
-	else { this.y = 0.0; }
+	/**
+	 * y좌표값.
+	 * @type {Number}
+	 */
+	this.y = y || 0.0;
+
+	/**
+	 * Aux var. This will be used for this : this Point2D is the projected ownerVertex3d into 2D
+	 * 
+	 * @type {Vertex}
+	 */
+	this.ownerVertex3d; 
 	
-	this.ownerVertex3d; // Aux var.*** This will be used for this : this Point2D is the projected ownerVertex3d into 2D
-	
-	/**associated this property will be used to save topologic information */
+	/**
+	 * 
+	 */
+	// associated this property will be used to save topologic information
 	this.associated;
 };
 
@@ -32,27 +51,28 @@ Point2D.prototype.deleteObjects = function()
 
 /**
  * set the value of the property 'associated'
+ * 
  * @param {Point2D} associated
  */
 Point2D.prototype.setAssociated = function(associated) 
 {
-	// aux test.***
 	this.associated.x = associated.x;
 	this.associated.y = associated.y;
 };
 
 /**
  * get the value of the property 'associated'
+ * 
  * @return {Point2D} this.associated
  */
 Point2D.prototype.getAssociated = function() 
 {
-	// aux test.***
 	return this.associated;	
 };
 
 /**
  * copy the value of other point
+ * 
  * @param {Point2D} point2d
  */
 Point2D.prototype.copyFrom = function(point2d) 
@@ -72,6 +92,7 @@ Point2D.prototype.inverse = function()
 
 /**
  * set the value of x,y coordi of the point
+ * 
  * @param {Number} x
  * @param {Number} y
  */
@@ -83,6 +104,7 @@ Point2D.prototype.set = function(x, y)
 
 /**
  * return the result of calculating (this.x*this.x + this.y*this.y) 
+ * 
  * @returns this.x*this.x + this.y*this.y;
  */
 Point2D.prototype.getSquaredModul = function() 
@@ -92,6 +114,7 @@ Point2D.prototype.getSquaredModul = function()
 
 /**
  * return the result of calculating Math.sqrt(this.x*this.x + this.y*this.y);
+ * 
  * @returns Math.sqrt(this.x*this.x + this.y*this.y);
  */
 Point2D.prototype.getModul = function() 
@@ -113,7 +136,7 @@ Point2D.prototype.unitary = function()
 /**
  * prepare to calculate the Euclidean distance between this point and the other point.
  * @param {Number} point
- * @returns dx*dx + dy*dy
+ * @returns {Number} {dx*dx + dy*dy}
  */
 Point2D.prototype.squareDistToPoint = function(point) 
 {
@@ -192,24 +215,17 @@ Point2D.prototype.scalarProduct = function(point)
 
 /**
  * Calculate the radian value of the angle of the two vectors
- * @param vector the target vector
- * @return the angle of two vector
+ * @param {} vector the target vector
+ * @return {} the angle of two vector
  */
 Point2D.prototype.angleRadToVector = function(vector) 
 {
 	if (vector === undefined)
 	{ return undefined; }
 	
-	//******************************************************
-	//var scalarProd = this.scalarProduct(vector);
 	var myModul = this.getModul();
 	var vecModul = vector.getModul();
 	
-	// calcule by cos.***
-	//var cosAlfa = scalarProd / (myModul * vecModul); 
-	//var angRad = Math.acos(cosAlfa);
-	//var angDeg = alfa * 180.0/Math.PI;
-	//------------------------------------------------------
 	var error = 10E-10;
 	if (myModul < error || vecModul < error)
 	{ return undefined; }
@@ -219,8 +235,8 @@ Point2D.prototype.angleRadToVector = function(vector)
 
 /**
  * Calculate the degree value of the angle of the two vectors
- * @param point 변수
- * @param resultPoint 변수
+ * @param {} point 변수
+ * @param {} resultPoint 변수
  * @returns resultPoint
  */
 Point2D.prototype.angleDegToVector = function(vector) 
