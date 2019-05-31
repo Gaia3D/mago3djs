@@ -171,6 +171,136 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 	return geoLoc;
 };
 
+Node.prototype.checkChangesHistoryMovements = function() 
+{
+	var moveHistoryMap = this.data.moveHistoryMap;
+	if (moveHistoryMap === undefined)
+	{ return; }
+	
+	var neoBuilding = this.data.neoBuilding;
+	///for (var changeHistory of moveHistoryMap.values()) 
+	
+	for (var key in moveHistoryMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key)) 
+		{
+			var changeHistory = moveHistoryMap[key];
+			var objectIndexOrder = changeHistory.getObjectIndexOrder();
+			var refObject = neoBuilding.getReferenceObject(objectIndexOrder);
+			if (refObject === undefined)
+			{ continue; }
+			
+			if (refObject.moveVector === undefined)
+			{ refObject.moveVector = new Point3D(); }
+			
+			if (refObject.moveVectorRelToBuilding === undefined)
+			{ refObject.moveVectorRelToBuilding = new Point3D(); }
+			
+			var moveVector = changeHistory.getReferenceObjectAditionalMovement();
+			var moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
+			refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
+			refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
+			
+			// now check if the building was rotated.
+			var rootNode = this.getRoot();
+			if (rootNode === undefined)
+			{ continue; }
+			
+			var geoLocdataManager = rootNode.getNodeGeoLocDataManager();
+			var geoLoc = geoLocdataManager.getCurrentGeoLocationData();
+			// if was rotated then recalculate the move vector.
+			refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
+			
+			// if was no rotated, then set the moveVector of the changeHistory.
+			//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);	
+		}
+	}
+};
+
+/**
+ * Checks if there are some objects that was changed the color.***
+ */
+Node.prototype.checkChangesHistoryColors = function() 
+{
+	var data = this.data;
+	
+	if (data === undefined)
+	{ return; }
+	
+	var colorChangedHistoryMap = data.colorChangedHistoryMap;
+	
+	if (colorChangedHistoryMap === undefined)
+	{ return; }
+	
+	var node = this;
+	
+	for (var key in colorChangedHistoryMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
+		{
+			var changeHistory = colorChangedHistoryMap[key];
+			if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
+			{
+				if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+				{
+					// change color for all node.
+					data.isColorChanged = true;
+					if (data.aditionalColor === undefined)
+					{ data.aditionalColor = new Color(); }
+					
+					data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+				}
+				else 
+				{
+					// there are properties.
+					var nodesArray = [];
+					node.extractNodes(nodesArray);
+					var nodesCount = nodesArray.length;
+					var aNode;
+					for (var i=0; i<nodesCount; i++)
+					{
+						aNode = nodesArray[i];
+						var propertyKey = changeHistory.propertyKey;
+						var propertyValue = changeHistory.propertyValue;
+						// 1rst, check if this has the same "key" and same "value".
+						if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
+						{
+							data.isColorChanged = true;
+							if (data.aditionalColor === undefined)
+							{ data.aditionalColor = new Color(); }
+							
+							data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+						}
+					}
+				}
+			}
+			else 
+			{
+				// change color for an object.
+				var neoBuilding = node.data.neoBuilding;
+				
+				if (neoBuilding === undefined)
+				{ return; }
+				
+				var objectId = changeHistory.objectId;
+				var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
+				if (objectsArray)
+				{
+					var objectsCount = objectsArray.length;
+					for (var j=0; j<objectsCount; j++)
+					{
+						var object = objectsArray[j];
+						if (object.aditionalColor === undefined)
+						{ object.aditionalColor = new Color(); }
+						
+						object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+					}
+				}
+			}	
+		}
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -189,6 +319,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
+	if (this.data.nodeId === "GyeomjaeJeongSeon_del")
+	{ var hola = 0; }
+
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
 	if (selectionManager.currentNodeSelected === this)
@@ -203,6 +336,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	neoBuilding.myCameraRelative = data.myCameraRelative;
 	neoBuilding.isColorChanged = data.isColorChanged;
 	neoBuilding.aditionalColor = data.aditionalColor;
+	
+	this.checkChangesHistoryColors();
+	this.checkChangesHistoryMovements();
 
 	// Check projectType.*************************
 	var metaData = neoBuilding.metaData;
@@ -738,6 +874,7 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	var nodeRoot;
 	//nodeRoot = this.getRoot(); // original.***
 	nodeRoot = this.getClosestParentWithData("geoLocDataManager");
+	// 126.60625627706231
 	
 	if (nodeRoot === undefined)
 	{ return; }
@@ -766,9 +903,15 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		{
 			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
 		}
+		if (geoLocationData === undefined)
+		{ continue; }
+	
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		if (geoLocationData === undefined)
 		{ continue; }
+	
+		if (geoLocationData.geographicCoord === undefined)
+		{ continue; } 
 	
 		// Change the geoCoords of the buildingSeed.***
 		var buildingSeed = aNode.data.buildingSeed;
@@ -788,6 +931,12 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.***
 		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
+		
+		// Now, calculate the geoCoords of the bbox.***
+		if (nodeRoot.data.bbox.geographicCoord === undefined)
+		{ nodeRoot.data.bbox.geographicCoord = new GeographicCoord(); }
+		
+		nodeRoot.data.bbox.geographicCoord.setLonLatAlt(longitude, latitude, elevation); // provisional. Must calculate the ... TODO:
 		
 		// aNode was moved, so, check if is out of the smartTileOwner.***
 		// If aNode is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.***
